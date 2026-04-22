@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-hub">
+    <header class="np-sh-hero np-sh-hero--lux glass-panel np-glass mp-animate-in" id="np-sh-hero">
+        <div class="np-sh-hero-noise" aria-hidden="true"></div>
+        <div class="np-sh-hero-glow" aria-hidden="true"></div>
+        <div class="np-sh-hero-inner">
+            <div class="np-sh-hero-head">
+                <div class="np-sh-hero-copy">
+                    <p class="np-sh-eyebrow">SAT Math workspace</p>
+                    <h1 class="np-sh-title">Pick your lane</h1>
+                    <p class="np-sh-subzh">Drills, analytics, and future exam modes—same polished flow as the home dashboard.</p>
+                </div>
+                <button type="button" id="np-sh-theme-toggle" class="sat-theme-toggle np-sh-theme-toggle" title="Appearance" aria-label="Toggle workspace theme" aria-pressed="false">
+                    <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
+                    <span class="sat-theme-toggle-label">Light</span>
+                </button>
+            </div>
+            <p class="np-sh-lead">Units 1–3 are live in the full bank. Finish any set for an instant score sheet and mistake recap—tag patterns later in analytics.</p>
+        </div>
+    </header>
+
+    <div class="np-sh-grid">
+        <a href="{{ url_for('practice_specialized') }}" class="np-sh-card np-sh-card--live np-sh-card--tilt">
+            <span class="np-sh-card-pill np-sh-card-pill--live">Live</span>
+            <h2 class="np-sh-card-title">Specialized training</h2>
+            <p class="np-sh-card-desc">Chapters, full banks, topic lists—one tap in.</p>
+        </a>
+
+        <a href="{{ url_for('practice_challenge') }}" class="np-sh-card np-sh-card--soon np-sh-card--tilt">
+            <span class="np-sh-card-pill">Soon</span>
+            <h2 class="np-sh-card-title">Hard problem drill</h2>
+            <p class="np-sh-card-desc">Hard sets + hints—shipping soon.</p>
+        </a>
+
+        <a href="{{ url_for('practice_exams') }}" class="np-sh-card np-sh-card--soon np-sh-card--tilt">
+            <span class="np-sh-card-pill">Soon</span>
+            <h2 class="np-sh-card-title">Real exam practice</h2>
+            <p class="np-sh-card-desc">Timed mocks—on the roadmap.</p>
+        </a>
+
+        <a href="{{ url_for('practice_analytics') }}" class="np-sh-card np-sh-card--focus np-sh-card--tilt">
+            <span class="np-sh-card-pill np-sh-card-pill--focus">Core</span>
+            <h2 class="np-sh-card-title">Mistake analytics</h2>
+            <p class="np-sh-card-desc">Tags, notes, redo—pattern intelligence.</p>
+        </a>
+    </div>
+</div>
+</div>
+
+<script>
+(() => {
+    const hero = document.getElementById("np-sh-hero");
+    if (!hero) return;
+    const move = (clientX, clientY) => {
+        const rect = hero.getBoundingClientRect();
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        const y = ((clientY - rect.top) / rect.height) * 100;
+        hero.style.setProperty("--np-sh-glow-x", x + "%");
+        hero.style.setProperty("--np-sh-glow-y", y + "%");
+    };
+    hero.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
+    hero.addEventListener("mouseleave", () => {
+        hero.style.setProperty("--np-sh-glow-x", "70%");
+        hero.style.setProperty("--np-sh-glow-y", "22%");
+    });
+    document.querySelectorAll(".np-sh-card--tilt").forEach((el) => {
+        el.addEventListener("mousemove", (e) => {
+            const r = el.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5;
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            el.style.transform = `perspective(880px) rotateX(${py * -3}deg) rotateY(${px * 4}deg) translateZ(0)`;
+        });
+        el.addEventListener("mouseleave", () => {
+            el.style.transform = "";
+        });
+    });
+})();
+</script>
+{% endblock %}

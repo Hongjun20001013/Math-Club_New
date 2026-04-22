@@ -1,5 +1,55 @@
-<h2>Result</h2>
-<p>Correct {{ correct }} / {{ total }} ({{ score_pct }}%)</p>
-{% for qid, stu, key, ok in detailed %}
-  <p>Q{{ qid }}: Your answer: {{ stu }} | Correct: {{ key }} | {{ "✔" if ok else "✘" }}</p>
-{% endfor %}
+{% extends "base.html" %}
+{% block content %}
+
+<div class="np-page-shell">
+<div class="exam-container">
+  <h2>Result</h2>
+  <p>Correct {{ correct }} / {{ total }} ({{ score_pct }}%)</p>
+
+  {% if answer_known is defined and not answer_known %}
+    <p>Answer key not found for this question yet. Your response was saved.</p>
+  {% endif %}
+
+  {% for qid, stu, key, ok in detailed %}
+    <p>
+      Q{{ qid }}: Your answer: {{ stu }} | Correct: {{ key }} |
+      {% if ok is none %}
+        Unknown (no key)
+      {% else %}
+        {{ "Correct" if ok else "Incorrect" }}
+      {% endif %}
+    </p>
+  {% endfor %}
+
+  {% if question_stem %}
+    <div class="question-panel" style="margin-top: 16px;">
+      {{ question_stem|safe }}
+    </div>
+  {% endif %}
+
+  {% if result_choices %}
+    <div class="choices-panel" style="margin-top: 12px;">
+      {% for item in result_choices %}
+        <div class="choice-card{% if item.is_selected %} selected{% endif %}">
+          <span class="choice-letter">{{ item.letter }}.</span>
+          <div class="choice-content">
+            {{ item.html|safe }}
+            {% if item.is_selected %}
+              <div><strong>Your selection</strong></div>
+            {% endif %}
+            {% if answer_known and item.is_correct %}
+              <div><strong>Correct answer</strong></div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="nav-bar" style="margin-top: 14px;">
+    <a href="/practice" class="nav-btn">Back to Practice</a>
+  </div>
+</div>
+</div>
+
+{% endblock %}

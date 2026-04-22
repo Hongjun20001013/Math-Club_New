@@ -1,0 +1,584 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="sat-practice-page-wrap{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}">
+<div class="exam-container practice-run sat-practice{% if placement_mode %} sat-practice--placement{% endif %}">
+
+    <div class="sat-exam-chrome" aria-label="Session controls">
+    {% if placement_mode %}
+    <div class="sat-placement-ribbon" role="status">
+      <span class="sat-placement-ribbon-dot" aria-hidden="true"></span>
+      <span class="sat-placement-ribbon-title">Course placement</span>
+      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+      <span class="sat-placement-ribbon-meta">Question {{ qnum + 1 }} of {{ total }}</span>
+    </div>
+    {% endif %}
+    <!-- Header -->
+    <div class="exam-header sat-exam-top">
+        <div class="left-header exam-timer">
+            <span class="exam-timer-icon" aria-hidden="true">⏳</span>
+            <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}95:00{% else %}05:00{% endif %}</span>
+        </div>
+
+        <div class="exam-header-center">
+            <div class="progress-label">{% if placement_mode %}Diagnostic{% else %}Question{% endif %}</div>
+            <div class="progress-text">
+                <span class="progress-current">{{ qnum + 1 }}</span>
+                <span class="progress-sep">/</span>
+                <span class="progress-total">{{ total }}</span>
+            </div>
+        </div>
+
+        <div class="exam-header-actions">
+        <button type="button" id="sat-theme-toggle" class="sat-theme-toggle" title="Toggle exam appearance" aria-label="Toggle dark exam mode" aria-pressed="false">
+            <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
+            <span class="sat-theme-toggle-label">Light</span>
+        </button>
+        {% if placement_mode %}
+        <a href="{{ url_for('placement_landing') }}" class="sat-header-placement-home">Placement home</a>
+        {% else %}
+        <button type="button" id="q-picker-trigger" class="q-picker-trigger" onclick="toggleQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog" title="Open question list">
+            <span class="q-picker-trigger-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            </span>
+            <span class="q-picker-trigger-text">Jump</span>
+            <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
+        </button>
+        {% endif %}
+
+        {% if calculator_allowed %}
+        <button type="button" onclick="toggleCalc()" class="calc-btn calc-open-btn" aria-label="Open calculator">
+            <span class="calc-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <rect x="4" y="2.5" width="16" height="19" rx="2.5" fill="currentColor" opacity="0.15"></rect>
+                    <rect x="6.5" y="5" width="11" height="3.5" rx="1" fill="currentColor"></rect>
+                    <circle cx="8.5" cy="11.5" r="1.2" fill="currentColor"></circle>
+                    <circle cx="12" cy="11.5" r="1.2" fill="currentColor"></circle>
+                    <circle cx="15.5" cy="11.5" r="1.2" fill="currentColor"></circle>
+                    <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"></circle>
+                    <circle cx="12" cy="15.5" r="1.2" fill="currentColor"></circle>
+                    <rect x="14.3" y="14.3" width="2.4" height="2.4" rx="0.8" fill="currentColor"></rect>
+                </svg>
+            </span>
+            <span>Calculator</span>
+        </button>
+        {% else %}
+        <span class="sat-calc-locked" title="Calculator not allowed on this item">No calculator</span>
+        {% endif %}
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-wrap sat-progress-inner">
+        <div class="progress-bar">
+            <div class="progress-fill"
+                 style="width: {{ ((qnum+1)/total)*100 }}%;">
+            </div>
+        </div>
+    </div>
+    {% if placement_mode %}
+    <p class="sat-practice-progress-foot" aria-live="polite">
+      <span class="sat-practice-progress-foot__answered">{{ answered_count }} answered</span>
+      <span class="sat-practice-progress-foot__sep" aria-hidden="true">·</span>
+      <span class="sat-practice-progress-foot__remain">{{ remaining_count }} not yet answered</span>
+    </p>
+    {% endif %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar practice-nav-row sat-subnav">
+        {% if qnum > 0 %}
+        <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum - 1) }}" class="nav-btn nav-btn-secondary">
+            ← Previous
+        </a>
+        {% endif %}
+
+        {% if qnum < total - 1 %}
+        <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum + 1) }}" class="nav-btn nav-btn-secondary">
+            Next →
+        </a>
+        {% endif %}
+        {% if placement_mode %}
+        <button type="button" id="q-picker-trigger" class="q-picker-trigger q-picker-trigger--in-nav" onclick="toggleQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog" title="Open question list">
+            <span class="q-picker-trigger-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            </span>
+            <span class="q-picker-trigger-text">Jump</span>
+            <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
+        </button>
+        {% else %}
+        <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
+        <a href="{{ url_for('practice_analytics') }}" class="nav-btn nav-btn-secondary">Mistake log</a>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{{ url_for('submit_practice_answer') }}" class="practice-form sat-practice-form">
+        <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
+        <input type="hidden" name="domain" value="{{ domain }}">
+        <input type="hidden" name="topic" value="{{ topic }}">
+        <input type="hidden" name="qnum" value="{{ qnum }}">
+        {% if q.question_kind|default('mcq') != 'free_response' %}
+        <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
+        {% endif %}
+
+    <!-- SAT-style split: stem left, choices right -->
+    <div class="sat-split-card{% if placement_mode %} sat-split-card--placement{% endif %}" aria-label="Question and answer area">
+        <div class="sat-split">
+            <section class="sat-pane sat-pane-stem" aria-label="Question">
+                <header class="sat-pane-head">
+                    <span class="sat-pane-kicker">Question</span>
+                    <span class="sat-pane-badge">{{ qnum + 1 }} / {{ total }}</span>
+                </header>
+                <div class="sat-stem-scroll">
+                    <div class="question-panel sat-stem-body">
+                        {{ q.stem|safe }}
+                    </div>
+                </div>
+            </section>
+
+            <div class="sat-split-gutter" aria-hidden="true"></div>
+
+            <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+                <header class="sat-pane-head sat-pane-head-choices">
+                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'free_response' %}Enter a number or fraction{% else %}Select one{% endif %}</span>
+                </header>
+                {% if q.question_kind|default('mcq') == 'free_response' %}
+                <div class="sat-spr-panel">
+                    <label class="sat-spr-label" for="spr-answer-input">Answer</label>
+                    <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. -22, 3/2, 0.75" aria-describedby="spr-hint">
+                    <p id="spr-hint" class="sat-spr-hint">Decimals or fractions are accepted when they match the answer key.</p>
+                </div>
+                {% else %}
+                <div class="choices-panel choices-stack sat-choices-list">
+            {% for choice in q.choices %}
+            <div class="choice-card" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+                <span class="choice-bubble" aria-hidden="true"></span>
+                <span class="choice-letter">{{ choice_letters[loop.index0] }}</span>
+                <div class="choice-content">
+                    {{ choice|safe }}
+                </div>
+            </div>
+            {% endfor %}
+                </div>
+                {% endif %}
+                <div class="sat-submit-wrap">
+                    {% if is_last %}
+                    <p class="sat-submit-hint">Finish this question to see your score for all {{ total }} questions.</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
+                    {% else %}
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    </form>
+
+</div>
+</div>
+
+<!-- Question picker (modal) — numbers only when opened -->
+<div id="q-picker-backdrop" class="q-picker-backdrop" onclick="closeQuestionPicker()" aria-hidden="true" role="presentation"></div>
+<div id="q-picker-panel" class="q-picker-panel" role="dialog" aria-modal="true" aria-labelledby="q-picker-title" aria-hidden="true">
+    <div class="q-picker-panel-inner glass-panel">
+        <div class="q-picker-head">
+            <div>
+                <h2 id="q-picker-title" class="q-picker-title">Jump to question</h2>
+                <p class="q-picker-sub">
+                    <span class="q-picker-sub-line">Tap a number to move in this set.</span>
+                    <span class="q-picker-progress" aria-live="polite">
+                        <strong>{{ answered_count }}</strong> of <strong>{{ total }}</strong> answered
+                        {% if answered_count < total %}· <span class="q-picker-remain">{{ total - answered_count }} left</span>{% endif %}
+                    </span>
+                </p>
+                <div class="q-picker-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ answered_count }}" aria-label="Answered in this session">
+                    <span class="q-picker-bar-fill" style="width: {{ answered_pct }}%;"></span>
+                </div>
+                <div class="q-picker-legend" aria-hidden="true">
+                    <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--done"></span> Answered</span>
+                    <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--here"></span> Here</span>
+                    <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--todo"></span> Not yet</span>
+                </div>
+            </div>
+            <button type="button" class="q-picker-close" onclick="closeQuestionPicker()" aria-label="Close">×</button>
+        </div>
+        <div class="q-picker-scroll">
+            <div class="question-nav q-picker-grid">
+                {% for i in range(total) %}
+                {% set done = i in answered_qset %}
+                <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=i) }}"
+                   class="q-nav-btn{% if i == qnum %} is-current{% endif %}{% if done %} is-done{% endif %}"
+                   aria-label="Question {{ i + 1 }}{% if i == qnum %}, current{% endif %}{% if done %}, answered{% else %}, not answered yet{% endif %}">
+                   {{ i + 1 }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================= -->
+<!-- DESMOS CALCULATOR PANEL -->
+<!-- ============================= -->
+{% if calculator_allowed %}
+<div id="calculator-panel">
+    <div class="calculator-panel-header">
+        <strong>Calculator</strong>
+        <button type="button" class="calculator-close-btn" onclick="closeCalc()" aria-label="Close calculator">×</button>
+    </div>
+    <div id="calculator-status" style="font-size: 14px; color: #555; margin-bottom: 10px;">
+        Click calculator button to load Desmos...
+    </div>
+    <div id="fallback-calculator" style="display:none;">
+        <div style="margin-bottom: 10px;">
+            <label for="fallback-calc-input" style="font-size: 13px; color: #666;">Offline calculator</label>
+            <input
+                id="fallback-calc-input"
+                type="text"
+                placeholder="Example: (12+5)*3/9"
+                style="width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"
+            >
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button type="button" id="fallback-calc-eval" class="calc-btn">Compute</button>
+            <button type="button" id="fallback-calc-clear" class="calc-btn">Clear</button>
+        </div>
+        <div id="fallback-calc-result" style="margin-top: 10px; min-height: 20px; font-weight: 600; color: #333;"></div>
+    </div>
+    <div id="calculator" style="width:100%; height:400px;"></div>
+</div>
+{% endif %}
+
+
+<!-- ============================= -->
+<!-- SCRIPTS -->
+<!-- ============================= -->
+<script>
+/* Theme toggles: global handler in base.html (all .sat-theme-toggle). */
+
+/* ================= TIMER ================= */
+const practiceTimerSeconds = {{ practice_timer_seconds|int }};
+const practiceTimerSummaryUrl = {{ practice_timer_summary_url | tojson }};
+const practiceAttemptId = {{ attempt_id|int }};
+const placementTimerMode = {{ placement_mode | tojson }};
+const PLACEMENT_DEADLINE_KEY = "sat-placement-deadline-ms-" + String(practiceAttemptId);
+
+function placementDeadlineMs() {
+    let raw = sessionStorage.getItem(PLACEMENT_DEADLINE_KEY);
+    if (!raw) {
+        const end = Date.now() + practiceTimerSeconds * 1000;
+        sessionStorage.setItem(PLACEMENT_DEADLINE_KEY, String(end));
+        return end;
+    }
+    const ms = parseInt(raw, 10);
+    return Number.isFinite(ms) ? ms : Date.now() + practiceTimerSeconds * 1000;
+}
+
+function initialTimerSeconds() {
+    if (placementTimerMode) {
+        const left = Math.floor((placementDeadlineMs() - Date.now()) / 1000);
+        return Math.max(0, left);
+    }
+    return practiceTimerSeconds;
+}
+
+let totalSeconds = initialTimerSeconds();
+let timerId = null;
+
+function renderTime() {
+    const el = document.getElementById("time");
+    if (!el) return;
+    const min = Math.floor(totalSeconds / 60);
+    const sec = totalSeconds % 60;
+    el.innerText =
+        String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
+}
+
+function onTimerExpired() {
+    if (placementTimerMode && practiceTimerSummaryUrl) {
+        sessionStorage.removeItem(PLACEMENT_DEADLINE_KEY);
+        window.location.replace(practiceTimerSummaryUrl);
+        return;
+    }
+    alert("Time is up!");
+}
+
+function startTimer() {
+    if (placementTimerMode && totalSeconds <= 0) {
+        renderTime();
+        onTimerExpired();
+        return;
+    }
+    renderTime();
+    timerId = setInterval(() => {
+        if (placementTimerMode) {
+            totalSeconds = Math.max(
+                0,
+                Math.floor((placementDeadlineMs() - Date.now()) / 1000)
+            );
+        } else {
+            totalSeconds--;
+        }
+
+        if (totalSeconds <= 0) {
+            totalSeconds = 0;
+            renderTime();
+            if (timerId) clearInterval(timerId);
+            timerId = null;
+            onTimerExpired();
+            return;
+        }
+
+        renderTime();
+    }, 1000);
+}
+
+startTimer();
+
+
+/* ================= QUESTION PICKER (MODAL) ================= */
+
+function openQuestionPicker() {
+    const back = document.getElementById("q-picker-backdrop");
+    const panel = document.getElementById("q-picker-panel");
+    const trig = document.getElementById("q-picker-trigger");
+    if (!back || !panel) return;
+    back.classList.add("is-open");
+    panel.classList.add("is-open");
+    back.setAttribute("aria-hidden", "false");
+    panel.setAttribute("aria-hidden", "false");
+    document.body.classList.add("q-picker-open");
+    if (trig) trig.setAttribute("aria-expanded", "true");
+}
+
+function closeQuestionPicker() {
+    const back = document.getElementById("q-picker-backdrop");
+    const panel = document.getElementById("q-picker-panel");
+    const trig = document.getElementById("q-picker-trigger");
+    if (!back || !panel) return;
+    back.classList.remove("is-open");
+    panel.classList.remove("is-open");
+    back.setAttribute("aria-hidden", "true");
+    panel.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("q-picker-open");
+    if (trig) trig.setAttribute("aria-expanded", "false");
+}
+
+function toggleQuestionPicker() {
+    const panel = document.getElementById("q-picker-panel");
+    if (panel && panel.classList.contains("is-open")) closeQuestionPicker();
+    else openQuestionPicker();
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeQuestionPicker();
+});
+
+
+/* ================= CHOICE SELECT ================= */
+
+const storageKey = "{{ domain }}_{{ topic }}_{{ qnum }}";
+const selectedInput = document.getElementById("selected-answer-input");
+const sprInput = document.getElementById("spr-answer-input");
+
+if (selectedInput) {
+document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
+    const activate = () => {
+        document.querySelectorAll(".sat-choices-list .choice-card")
+            .forEach(c => c.classList.remove("selected"));
+
+        card.classList.add("selected");
+        localStorage.setItem(storageKey, card.dataset.index);
+        selectedInput.value = card.dataset.letter;
+    };
+    card.addEventListener("click", activate);
+    card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activate();
+        }
+    });
+});
+}
+
+window.addEventListener("load", () => {
+    const saved = localStorage.getItem(storageKey);
+    if (sprInput && saved !== null) {
+        sprInput.value = saved;
+    } else if (selectedInput && saved !== null) {
+        const cards = document.querySelectorAll(".sat-choices-list .choice-card");
+        if (cards[saved]) {
+            cards[saved].classList.add("selected");
+            selectedInput.value = cards[saved].dataset.letter;
+        }
+    }
+
+    if (sprInput) {
+        sprInput.addEventListener("input", () => {
+            localStorage.setItem(storageKey, sprInput.value);
+        });
+    }
+
+    if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+    }
+});
+
+document.querySelector("form").addEventListener("submit", (event) => {
+    if (sprInput) {
+        if (!sprInput.value.trim()) {
+            event.preventDefault();
+            alert("Please enter an answer before submitting.");
+        }
+        return;
+    }
+    if (selectedInput && !selectedInput.value) {
+        event.preventDefault();
+        alert("Please select an answer before submitting.");
+    }
+});
+
+
+/* ================= DESMOS (RIGHT DRAWER) ================= */
+
+let calculator = null;
+let desmosLoadPromise = null;
+let fallbackInitialized = false;
+const desmosApiKey = "{{ desmos_api_key }}";
+const placementCalcAllowed = {{ calculator_allowed|tojson }};
+
+function setCalcStatus(message) {
+    const status = document.getElementById("calculator-status");
+    if (status) status.innerText = message;
+}
+
+function ensureDesmosLoaded() {
+    if (!desmosApiKey) return Promise.resolve(false);
+    if (window.Desmos) return Promise.resolve(true);
+    if (desmosLoadPromise) return desmosLoadPromise;
+
+    desmosLoadPromise = new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = `https://www.desmos.com/api/v1.6/calculator.js?apiKey=${encodeURIComponent(desmosApiKey)}`;
+        script.async = true;
+
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.head.appendChild(script);
+
+        // Fallback timeout for blocked network/CDN.
+        setTimeout(() => resolve(!!window.Desmos), 5000);
+    });
+
+    return desmosLoadPromise;
+}
+
+function evaluateFallbackExpression(expr) {
+    // Allow only basic calculator characters for safety.
+    if (!/^[0-9+\-*/().\s]+$/.test(expr)) {
+        throw new Error("Only numbers and + - * / ( ) are allowed.");
+    }
+    // eslint-disable-next-line no-new-func
+    const value = Function(`"use strict"; return (${expr});`)();
+    if (typeof value !== "number" || Number.isNaN(value) || !Number.isFinite(value)) {
+        throw new Error("Invalid expression.");
+    }
+    return value;
+}
+
+function showFallbackCalculator(message) {
+    setCalcStatus(message);
+    const fallback = document.getElementById("fallback-calculator");
+    const desmosEl = document.getElementById("calculator");
+    if (fallback) fallback.style.display = "block";
+    if (desmosEl) desmosEl.style.display = "none";
+
+    if (fallbackInitialized) return;
+    fallbackInitialized = true;
+
+    const input = document.getElementById("fallback-calc-input");
+    const resultEl = document.getElementById("fallback-calc-result");
+    const evalBtn = document.getElementById("fallback-calc-eval");
+    const clearBtn = document.getElementById("fallback-calc-clear");
+
+    const runEval = () => {
+        const expr = (input?.value || "").trim();
+        if (!expr) {
+            if (resultEl) resultEl.innerText = "Please enter an expression.";
+            return;
+        }
+        try {
+            const val = evaluateFallbackExpression(expr);
+            if (resultEl) resultEl.innerText = `Result: ${val}`;
+        } catch (err) {
+            if (resultEl) resultEl.innerText = err.message || "Calculation failed.";
+        }
+    };
+
+    if (evalBtn) evalBtn.addEventListener("click", runEval);
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            if (input) input.value = "";
+            if (resultEl) resultEl.innerText = "";
+        });
+    }
+    if (input) {
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") runEval();
+        });
+    }
+}
+
+async function toggleCalc() {
+    if (placementCalcAllowed === false) return;
+    const panel = document.getElementById("calculator-panel");
+    const calcEl = document.getElementById("calculator");
+    if (!panel) return;
+    // Clear any stale inline fallback style from previous close.
+    panel.style.transform = "";
+    panel.style.opacity = "";
+    panel.style.visibility = "";
+    panel.style.pointerEvents = "";
+    panel.classList.toggle("active");
+
+    if (!panel.classList.contains("active")) return;
+
+    if (!calculator) {
+        setCalcStatus("Loading Desmos...");
+        if (!desmosApiKey) {
+            showFallbackCalculator("DESMOS_API_KEY is not configured. Switched to offline calculator.");
+            return;
+        }
+        const ok = await ensureDesmosLoaded();
+        if (!ok || !window.Desmos) {
+            showFallbackCalculator("Desmos failed to load. Switched to offline calculator.");
+            return;
+        }
+
+        setCalcStatus("");
+        const fallback = document.getElementById("fallback-calculator");
+        if (fallback) fallback.style.display = "none";
+        if (calcEl) calcEl.style.display = "block";
+        calculator = Desmos.GraphingCalculator(calcEl, {
+            expressions: true,
+            settingsMenu: false
+        });
+    }
+
+    // Force reflow when drawer opens to avoid blank / wrong size
+    setTimeout(() => {
+        if (calculator && calculator.resize) calculator.resize();
+    }, 350);
+}
+
+function closeCalc() {
+    const panel = document.getElementById("calculator-panel");
+    if (!panel) return;
+    panel.classList.remove("active");
+}
+</script>
+
+{% endblock %}

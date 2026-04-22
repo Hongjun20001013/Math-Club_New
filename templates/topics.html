@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="np-page-shell">
+<div class="np-domain-page">
+  {% if domain == 'placement' %}
+  <p class="np-pw-breadcrumb"><a href="{{ url_for('placement_landing') }}">← Placement</a></p>
+  {% else %}
+  <p class="np-pw-breadcrumb">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    · <a href="{{ url_for('practice_specialized') }}">Specialized</a>
+  </p>
+  {% endif %}
+
+  <header class="np-domain-hero glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <p class="np-domain-kicker">Topic bank</p>
+    <h1 class="np-domain-title">{{ domain_title|default(domain|replace('_', ' ')|title) }}</h1>
+    <p class="np-domain-lead np-prose-wide">Choose a slice or run the full unit—every attempt feeds your session reports.</p>
+  </header>
+
+  {% if not topics %}
+  <div class="np-domain-empty glass-panel np-glass">
+    <p>No MCQ banks are wired for this domain yet. Add a <code>.tex</code> bank and register it in <code>app.py</code>.</p>
+  </div>
+  {% else %}
+  <div class="np-topic-grid">
+    {% for t in topics %}
+    <article class="np-topic-card glass-panel np-glass">
+      <div class="np-topic-card-top">
+        <h2 class="np-topic-card-title">{{ t.title }}</h2>
+        <span class="np-topic-card-count">{{ t.count }} items</span>
+      </div>
+      <a href="{% if domain == 'placement' %}{{ url_for('placement_start') }}{% else %}/practice/{{ domain }}/{{ t.key }}/0{% endif %}" class="big-btn mp-btn-pill np-topic-card-btn">Start</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+</div>
+
+{% endblock %}

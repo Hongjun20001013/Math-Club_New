@@ -1,6 +1,31 @@
-<form method="post">
-  <h2>Login (student / 1234)</h2>
-  <input name="username" placeholder="username">
-  <input name="password" placeholder="password" type="password">
-  <button type="submit">Login</button>
-</form>
+{% extends "base.html" %}
+{% block content %}
+<div class="np-page-shell">
+<div class="np-login-page">
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul class="np-flash-list np-login-flash" role="status">
+    {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
+
+  <article class="np-login-card glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise np-login-noise" aria-hidden="true"></div>
+    <header class="np-login-head">
+      <p class="np-login-kicker">Novel Prep</p>
+      <h1 class="np-login-title">Sign in</h1>
+      <p class="np-login-lead">Student workspace · progress syncs to this account</p>
+    </header>
+    <form method="post" class="np-login-form">
+      <label class="np-login-label" for="np-login-user">Username</label>
+      <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="e.g. student" required>
+      <label class="np-login-label" for="np-login-pass">Password</label>
+      <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="••••" required>
+      <button type="submit" class="np-login-submit big-btn mp-btn-pill">Continue</button>
+    </form>
+    <p class="np-login-hint">Demo: <code>student</code> / <code>1234</code> if seeded locally.</p>
+  </article>
+</div>
+</div>
+{% endblock %}

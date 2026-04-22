@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "source_note": "Parsed from Novel Prep Answer.tex Unit 2 tables; order matches banks/algebra 2_1–2_3.",
+  "section_titles_zh": {
+    "2.1": "2.1 等价表达式",
+    "2.2": "2.2 非线性方程与方程组",
+    "2.3": "2.3 非线性函数"
+  },
+  "section_titles_en": {
+    "2.1": "2.1 Equivalent expressions",
+    "2.2": "2.2 Nonlinear equations and systems",
+    "2.3": "2.3 Nonlinear functions"
+  },
+  "answers_by_topic": {
+    "2_1": [
+      "C",
+      "B",
+      "7/6",
+      "C",
+      {
+        "canonical": "4/225",
+        "alternates": [
+          ".0177",
+          ".0178"
+        ]
+      },
+      "-419",
+      "D",
+      "A",
+      {
+        "canonical": "9/100",
+        "alternates": [
+          ".09"
+        ]
+      },
+      "B",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "C",
+      "8",
+      "C",
+      "D",
+      "6632",
+      {
+        "canonical": "361/8",
+        "alternates": [
+          "45.12",
+          "45.13"
+        ]
+      },
+      "C",
+      "C"
+    ],
+    "2_2": [
+      "9",
+      "B",
+      "6",
+      "A",
+      "A",
+      "5",
+      "D",
+      {
+        "canonical": "81/4",
+        "alternates": [
+          "20",
+          "25"
+        ]
+      },
+      "-3",
+      "A",
+      "51",
+      "5",
+      "A",
+      "50",
+      "C",
+      "B",
+      {
+        "canonical": "2",
+        "alternates": [
+          "8"
+        ]
+      },
+      "289",
+      "-1",
+      "D",
+      "D",
+      "D",
+      "D",
+      "C",
+      "D",
+      "A",
+      {
+        "canonical": "29/3",
+        "alternates": [
+          "9.666",
+          "9.667"
+        ]
+      },
+      "A",
+      "A",
+      "C",
+      "C",
+      "5",
+      {
+        "canonical": "1/16",
+        "alternates": [
+          ".0625"
+        ]
+      },
+      "D",
+      "C",
+      "C",
+      "A",
+      {
+        "canonical": "29/2",
+        "alternates": [
+          "14.5"
+        ]
+      },
+      "C",
+      "-10"
+    ],
+    "2_3": [
+      "D",
+      "A",
+      "D",
+      "D",
+      "20",
+      "D",
+      "-324",
+      "C",
+      "D",
+      "D",
+      "A",
+      "76",
+      "B",
+      "7",
+      "5",
+      "D",
+      "B",
+      "A",
+      "B",
+      "C",
+      "A",
+      "D",
+      "D",
+      "D",
+      "B",
+      "B",
+      "13",
+      "C",
+      {
+        "canonical": "86/25",
+        "alternates": [
+          "3.44"
+        ]
+      },
+      "A",
+      "B",
+      "A",
+      "B",
+      "C",
+      "-2112",
+      "C",
+      "B",
+      "450",
+      {
+        "canonical": "25/4",
+        "alternates": [
+          "6.25"
+        ]
+      },
+      "210",
+      "B",
+      "-7",
+      "D",
+      "D",
+      "D",
+      "C",
+      "D",
+      "8",
+      "C",
+      "D",
+      "C",
+      "C",
+      "A",
+      "D"
+    ]
+  }
+}

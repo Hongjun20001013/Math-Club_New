@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="np-page-shell">
+<div class="exam-container np-summary-page{% if domain == 'placement' %} np-summary-page--placement{% endif %}">
+  {% if domain == 'placement' %}
+  <p class="np-pw-breadcrumb np-summary-bc"><a href="{{ url_for('placement_landing') }}">← Course placement</a></p>
+  {% endif %}
+  <canvas id="np-celebration-canvas" aria-hidden="true"></canvas>
+  <nav class="np-summary-jump np-glass" aria-label="Jump to report sections">
+    {% if placement_rec %}<a href="#np-placement-rec">Recommendation</a>{% endif %}
+    {% if section_stats %}<a href="#np-by-area">By area</a>{% endif %}
+    <a href="#np-summary-full-sheet">Item list</a>
+  </nav>
+  <header class="np-summary-hero{% if domain == 'placement' %} np-summary-hero--placement-finale{% endif %}">
+    <p class="np-summary-kicker">{% if domain == 'placement' %}Diagnostic complete{% else %}Session complete{% endif %}</p>
+    <h1 class="np-summary-title">{% if domain == 'placement' %}Your placement report{% else %}Your results{% endif %}</h1>
+    {% if domain == 'placement' and placement_student and placement_student.name %}
+    <p class="np-summary-for-student">For <strong>{{ placement_student.name }}</strong>{% if placement_student.grade %} · {{ placement_student.grade }}{% endif %}</p>
+    {% endif %}
+    <div class="np-score-ring-wrap">
+      <div class="np-score-ring" style="--pct: {{ score_pct }};">
+        <div class="np-score-ring-inner">
+          <span class="np-score-num">{{ correct_count }}</span>
+          <span class="np-score-den">/ {{ total_q }}</span>
+        </div>
+      </div>
+      <p class="np-score-pct"><span id="np-score-pct-num" data-target="{{ score_pct }}">0</span>% correct</p>
+      <p class="np-summary-score-foot">{{ correct_count }} correct of {{ total_q }} questions in this set</p>
+    </div>
+    <p class="np-summary-meta">
+      {{ topic_title }}
+      {% if domain and topic %}
+        <span class="np-meta-sep">·</span> {{ domain }} / {{ topic }}
+      {% endif %}
+    </p>
+    {% if domain != 'placement' and skipped_count %}
+    <p class="np-summary-skip-note">You did not submit an answer on <strong>{{ skipped_count }}</strong> item(s); they appear as skipped in the sheet below.</p>
+    {% endif %}
+  </header>
+
+  {% if domain == 'placement' %}
+  <section class="np-placement-student-card glass-panel np-glass" aria-label="Student information on file for this attempt">
+    <p class="np-placement-student-kicker">Student profile</p>
+    {% if placement_student and (placement_student.name or placement_student.grade or placement_student.math_course) %}
+    <div class="np-placement-student-grid">
+      {% if placement_student.name %}
+      <div class="np-placement-student-cell">
+        <span class="np-placement-student-label">Name</span>
+        <span class="np-placement-student-value">{{ placement_student.name }}</span>
+      </div>
+      {% endif %}
+      {% if placement_student.grade %}
+      <div class="np-placement-student-cell">
+        <span class="np-placement-student-label">Grade</span>
+        <span class="np-placement-student-value">{{ placement_student.grade }}</span>
+      </div>
+      {% endif %}
+      {% if placement_student.math_course %}
+      <div class="np-placement-student-cell np-placement-student-cell--wide">
+        <span class="np-placement-student-label">Current math class</span>
+        <span class="np-placement-student-value">{{ placement_student.math_course }}</span>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="np-placement-student-missing">No student profile is stored on this attempt (often an older session before the intake form, or a bookmark to an old summary). Use <strong>Retake placement</strong>, fill the short form, then finish the run—your name, grade, and class will appear here and on the PDF.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% if domain == 'placement' %}
+  <div class="np-summary-export-card glass-panel np-glass">
+    <p class="np-summary-export-kicker">Export</p>
+    <p class="np-summary-export-title">Parent-ready placement PDF</p>
+    <p class="np-summary-export-lead">One file with student context, band, narrative recommendation, knowledge snapshot, and every item in a clean table.</p>
+    <a class="np-summary-pdf-btn np-summary-pdf-btn--large" href="{{ url_for('practice_placement_report_pdf', attempt_id=attempt_id) }}">Download PDF report</a>
+  </div>
+  {% endif %}
+
+  {% if domain != 'placement' and mistake_focus %}
+  <section class="np-mistake-debrief glass-panel np-glass" aria-label="Mistakes from this session">
+    <div class="np-mistake-debrief-head">
+      <div>
+        <p class="np-mistake-debrief-kicker">After this set</p>
+        <h2 class="np-mistake-debrief-title">Mistakes to review</h2>
+        <p class="np-mistake-debrief-sub">{{ mistake_focus | length }} item(s) missed. Each card shows the stem, your answer, and the key—open the explanation or jump to the full sheet.</p>
+      </div>
+      <a href="{{ url_for('practice_analytics') }}" class="np-mistake-debrief-analytics">Mistake analytics</a>
+    </div>
+    <div class="np-mistake-debrief-cards">
+      {% for m in mistake_focus %}
+      <article class="np-mistake-card">
+        <header class="np-mistake-card-top">
+          <span class="np-mistake-card-q">Q {{ m.q_display }}</span>
+          <span class="np-mistake-card-topic"><span class="np-topic-tag">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}</span>
+        </header>
+        <div class="np-mistake-card-answers">
+          <span>Yours: <strong>{{ m.yours_display }}</strong></span>
+          <span class="np-mistake-card-sep">·</span>
+          <span>Correct: <strong>{{ m.key_display }}</strong></span>
+        </div>
+        <div class="np-mistake-card-stem question-panel">{{ m.stem_html | safe }}</div>
+        {% if m.explanation_en %}
+        <details class="np-explain-details np-mistake-card-explain">
+          <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>
+          <div class="np-explain-body np-explain-body--rich">{{ m.explanation_en | safe }}</div>
+        </details>
+        {% endif %}
+        <a class="np-mistake-card-jump" href="#{{ m.row_id }}">In full sheet ↓</a>
+      </article>
+      {% endfor %}
+    </div>
+    <p class="np-mistake-debrief-foot"><a href="#np-summary-full-sheet">Jump to full itemized results</a></p>
+  </section>
+  {% endif %}
+
+  {% if placement_rec %}
+  <section id="np-placement-rec" class="np-placement-rec np-placement-rec--t{{ placement_rec.tier | default(2) }} glass-panel np-glass" aria-label="Course placement recommendation">
+    <div class="np-placement-rec-top">
+      <div class="np-placement-rec-badge">
+        <span class="np-placement-rec-badge-label">Recommended track</span>
+        <span class="np-placement-rec-badge-range">{{ placement_rec.band_range | default('—') }} correct</span>
+      </div>
+      {% if placement_rec.tier | default(0) >= 5 %}
+      <span class="np-placement-rec-pill np-placement-rec-pill--elite">Top placement band</span>
+      {% elif placement_rec.tier | default(0) >= 4 %}
+      <span class="np-placement-rec-pill">Advanced readiness</span>
+      {% endif %}
+    </div>
+    <h2 class="np-placement-rec-headline">{{ placement_rec.headline | default(placement_rec.title) }}</h2>
+    {% if placement_rec.headline_zh %}
+    <p class="np-placement-rec-headline-zh">{{ placement_rec.headline_zh }}</p>
+    {% endif %}
+    <p class="np-placement-rec-course">{{ placement_rec.title }}</p>
+    <p class="np-placement-rec-body">{{ placement_rec.summary }}</p>
+    {% if placement_rec.summary_zh %}
+    <p class="np-placement-rec-body-zh">{{ placement_rec.summary_zh }}</p>
+    {% endif %}
+    {% if placement_rec.highlights %}
+    <ul class="np-placement-rec-highlights">
+      {% for line in placement_rec.highlights %}
+      <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if placement_brand and placement_brand.trust_line %}
+    <p class="np-placement-rec-trust">{{ placement_brand.trust_line }}</p>
+    {% if placement_brand.trust_line_zh %}
+    <p class="np-placement-rec-trust-zh">{{ placement_brand.trust_line_zh }}</p>
+    {% endif %}
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if section_stats %}
+  <section id="np-by-area" class="np-knowledge-grid glass-panel np-glass" aria-label="Results by topic">
+    <h2 class="np-knowledge-heading">By knowledge area</h2>
+    <p class="np-knowledge-sub">{% if domain == 'placement' %}Breakdown by tagged subsection from the diagnostic items.{% elif domain == 'algebra' %}Each card is a subsection of Unit&nbsp;1—see where to drill next.{% elif domain == 'advanced_math' %}Each card is a subsection of Unit&nbsp;2 (advanced math).{% elif domain == 'problem_solving' %}Each card is a subsection of Unit&nbsp;3 (problem solving &amp; data).{% else %}Results grouped by knowledge subsection for this set.{% endif %}</p>
+    <div class="np-knowledge-cards">
+      {% for s in section_stats %}
+      <div class="np-knowledge-card">
+        <div class="np-knowledge-card-top">
+          <span class="np-knowledge-sec">{{ s.section }}</span>
+          <span class="np-knowledge-pct">{{ s.pct }}%</span>
+        </div>
+        <p class="np-knowledge-title">{{ s.title_en }}</p>
+        <div class="np-knowledge-bar"><span class="np-knowledge-bar-fill" style="width: {{ s.pct }}%;"></span></div>
+        <p class="np-knowledge-count">{{ s.correct }} / {{ s.total }} correct</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section id="np-summary-full-sheet" class="np-summary-table-wrap glass-panel np-glass">
+    <header class="np-summary-sheet-cap">
+      <p class="np-summary-sheet-kicker">Full breakdown</p>
+      <h2 class="np-summary-sheet-title">Item-by-item results</h2>
+      <p class="np-summary-sheet-lead">Tap a row’s coach note to expand explanations where available.</p>
+    </header>
+    <div class="np-summary-table-head np-summary-head-extended">
+      <span class="col-q">#</span>
+      <span class="col-topic">Topic</span>
+      <span class="col-yours">Your answer</span>
+      <span class="col-key">Correct</span>
+      <span class="col-st">Status</span>
+    </div>
+    {% for row in rows %}
+    <div id="{{ row.row_id }}" class="np-summary-block np-row-{{ row.status }}">
+      <div class="np-summary-row np-summary-row-main">
+        <span class="col-q">
+          <span class="np-q-main">{{ row.q_display }}</span>
+          {% if row.session_q != row.q_display %}
+          <span class="np-q-sub">set {{ row.session_q }}</span>
+          {% endif %}
+        </span>
+        <span class="col-topic">
+          {% if row.knowledge_title_en %}
+            <span class="np-topic-tag">{{ row.knowledge_section }}</span>
+            <span class="np-topic-name">{{ row.knowledge_title_en }}</span>
+          {% else %}
+            <span class="np-topic-muted">—</span>
+          {% endif %}
+        </span>
+        <span class="col-yours">{{ row.yours_display }}</span>
+        <span class="col-key">{{ row.key_display }}</span>
+        <span class="col-st">
+          {% if row.status == 'correct' %}
+            <span class="np-badge np-badge-ok">Correct</span>
+          {% elif row.status == 'incorrect' %}
+            <span class="np-badge np-badge-bad">Incorrect</span>
+          {% elif row.status == 'nocheck' %}
+            <span class="np-badge np-badge-muted">Key N/A</span>
+          {% else %}
+            <span class="np-badge np-badge-muted">Skipped</span>
+          {% endif %}
+        </span>
+      </div>
+      {% if row.explanation_en %}
+      <details class="np-explain-details">
+        <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>
+        <div class="np-explain-body np-explain-body--rich">{{ row.explanation_en | safe }}</div>
+      </details>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <div class="np-summary-actions">
+    {% if domain == 'placement' %}
+    <a href="{{ url_for('practice_placement_report_pdf', attempt_id=attempt_id) }}" class="big-btn mp-btn-secondary mp-btn-pill np-summary-pdf-action">Download PDF</a>
+    <a href="{{ url_for('practice_new_session', domain=domain, topic=topic) }}" class="big-btn mp-btn-pill mp-btn-glow">Retake placement</a>
+    <a href="{{ url_for('placement_landing') }}" class="big-btn mp-btn-secondary mp-btn-pill">Placement home</a>
+    <a href="{{ url_for('index') }}" class="big-btn mp-btn-secondary mp-btn-pill">Dashboard</a>
+    {% else %}
+    <a href="{{ url_for('practice_new_session', domain=domain, topic=topic) }}" class="nav-btn nav-btn-submit np-btn-primary">Practice this topic again</a>
+    <a href="{{ url_for('practice_topics', domain=domain) }}" class="nav-btn nav-btn-secondary">Back to topics</a>
+    <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
+    <a href="{{ url_for('practice_analytics') }}" class="nav-btn nav-btn-secondary">Mistake analytics</a>
+    {% endif %}
+  </div>
+</div>
+</div>
+
+<script>
+(() => {
+  const n = document.getElementById('np-score-pct-num');
+  if (n) {
+    const target = Number(n.dataset.target || '0');
+    const start = performance.now();
+    const duration = 900;
+    const tick = (t) => {
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      n.textContent = String(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  const canvas = document.getElementById('np-celebration-canvas');
+  if (!canvas) return;
+  const celebrateConfetti = {{ celebrate_confetti | tojson }};
+  const placementFinale = {{ (domain == 'placement') | tojson }};
+  if (!celebrateConfetti) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const dpr = window.devicePixelRatio || 1;
+  const bandH = placementFinale ? 280 : 220;
+  const resize = () => {
+    const w = window.innerWidth;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${bandH}px`;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(bandH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  const colors = placementFinale
+    ? ['#14b8a6', '#2dd4bf', '#6c4eff', '#a78bfa', '#fde68a', '#fb7185', '#38bdf8', '#c4b5fd']
+    : ['#6c4eff', '#9b8cff', '#5ad1ff', '#ff7ecf', '#ffd166'];
+  const confettiCount = placementFinale ? 140 : 90;
+  const confetti = Array.from({ length: confettiCount }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: -20 - Math.random() * 160,
+    w: 4 + Math.random() * 9,
+    h: 8 + Math.random() * 14,
+    vy: (placementFinale ? 1.4 : 1.2) + Math.random() * 2.8,
+    vx: -1.4 + Math.random() * 2.8,
+    rot: Math.random() * Math.PI,
+    vr: -0.14 + Math.random() * 0.28,
+    c: colors[Math.floor(Math.random() * colors.length)],
+  }));
+
+  const t0 = performance.now();
+  const dur = placementFinale ? 3400 : 2600;
+  const run = (t) => {
+    const elapsed = t - t0;
+    ctx.clearRect(0, 0, window.innerWidth, bandH);
+    confetti.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (elapsed < dur) requestAnimationFrame(run);
+    else canvas.classList.add('is-done');
+  };
+  requestAnimationFrame(run);
+})();
+</script>
+{% if domain == 'placement' %}
+<script>
+sessionStorage.removeItem("sat-placement-deadline-ms-" + String({{ attempt_id|int }}));
+</script>
+{% endif %}
+
+{% endblock %}

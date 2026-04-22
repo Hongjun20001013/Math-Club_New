@@ -1,23 +1,165 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Novel Prep SAT Platform</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+    (function () {
+        try {
+            var k = "np-exam-theme";
+            var s = localStorage.getItem(k);
+            var mode = (s === "dark" || s === "light") ? s : "light";
+            document.documentElement.setAttribute("data-exam-theme", mode);
+        } catch (e) {
+            document.documentElement.setAttribute("data-exam-theme", "light");
+        }
+    })();
+    </script>
+    <title>Novel Prep Math Studio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20260417-report-exam-polish') }}">
+
+    <!-- MathJax Config -->
+    <script>
+      window.MathJax = {
+        tex: {
+          // Only \\(...\\) for inline math. Do NOT use $...$ here: currency
+          // (&#36; in HTML) becomes $ in the DOM and pairs incorrectly with
+          // later dollar signs, swallowing whole sentences as math.
+          inlineMath: [['\\(', '\\)']],
+          displayMath: [['\\[', '\\]']],
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-<body>
 
-<div class="navbar">
-    <div class="logo">Novel Prep SAT Platform</div>
-    <div class="nav-links">
-        <a href="/">Dashboard</a>
-        <a href="/practice">Practice</a>
-        <a href="/mock">Mock Test</a>
+<body class="np-app-body">
+
+<!-- Top Navigation -->
+<header class="navbar">
+    <div class="nav-title-wrap">
+        <div class="nav-title">Novel Prep Math Studio</div>
+        <p class="nav-subtitle">Current track: <strong>{{ active_track_label }}</strong></p>
     </div>
-</div>
+    <div class="track-switcher track-switcher--split" role="navigation" aria-label="Track switcher">
+        <div class="track-switcher-scroll">
+            <span class="track-switcher-label">Exams</span>
+            {% for t in learning_tracks %}
+            {% if t.catalog == 'standardized' %}
+            <a href="{{ t.cta_href }}" class="track-chip track-chip--std{% if active_track_label == t.title %} is-active{% endif %}">{{ t.title }}</a>
+            {% endif %}
+            {% endfor %}
+            <span class="track-switcher-divider" aria-hidden="true"></span>
+            <span class="track-switcher-label">School</span>
+            {% for t in learning_tracks %}
+            {% if t.catalog == 'school' %}
+            {% if t.key != 'placement' or nav_path == '/' or nav_path.startswith('/placement') or nav_path.startswith('/practice/placement') %}
+            <a href="{{ t.cta_href }}" class="track-chip track-chip--school{% if active_track_label == t.title %} is-active{% endif %}">{{ t.title }}</a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <nav class="nav-links" aria-label="Primary">
+        <a href="/" class="{% if nav_path == '/' %}is-active{% endif %}">Dashboard</a>
+        <a href="/practice" class="{% if nav_path.startswith('/practice') %}is-active{% endif %}">Workspace</a>
+        {% if nav_path == '/' or nav_path.startswith('/placement') or nav_path.startswith('/practice/placement') %}
+        <a href="/placement" class="{% if nav_path.startswith('/placement') %}is-active{% endif %}">Placement</a>
+        {% endif %}
+        <a href="/#track-catalog" class="{% if nav_path == '/' %}is-active{% endif %}">Catalog</a>
+        <button type="button" class="sat-theme-toggle np-nav-theme-toggle" title="Site appearance" aria-label="Toggle light or dark theme" aria-pressed="false">
+            <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
+            <span class="sat-theme-toggle-label">Light</span>
+        </button>
+    </nav>
+</header>
 
-<div class="container">
+<!-- Page Content -->
+<div class="container np-app-container">
     {% block content %}{% endblock %}
 </div>
+
+<footer class="np-site-footer" role="contentinfo">
+    <div class="np-site-footer-inner">
+        <span class="np-site-footer-brand">Novel Prep Math Studio</span>
+        <span class="np-site-footer-sep" aria-hidden="true">·</span>
+        <span class="np-site-footer-meta">Practice · placement · analytics</span>
+        <a class="np-site-footer-link" href="/">Home</a>
+        <a class="np-site-footer-link" href="/practice">Workspace</a>
+        {% if session.get('user_id') %}
+        <a class="np-site-footer-link" href="{{ url_for('logout') }}">Sign out</a>
+        {% else %}
+        <a class="np-site-footer-link" href="{{ url_for('login') }}">Sign in</a>
+        {% endif %}
+    </div>
+</footer>
+
+<script>
+(function () {
+    var KEY = "np-exam-theme";
+    var root = document.documentElement;
+
+    function currentMode() {
+        return root.getAttribute("data-exam-theme") === "dark" ? "dark" : "light";
+    }
+
+    function syncAllThemeToggles() {
+        var mode = currentMode();
+        var dark = mode === "dark";
+        document.querySelectorAll(".sat-theme-toggle").forEach(function (btn) {
+            btn.setAttribute("aria-pressed", dark);
+            var lab = btn.querySelector(".sat-theme-toggle-label");
+            if (lab) {
+                lab.textContent = dark ? "Dark" : "Light";
+            }
+        });
+    }
+
+    function applyMode(mode) {
+        root.setAttribute("data-exam-theme", mode);
+        try {
+            localStorage.setItem(KEY, mode);
+        } catch (e) { /* ignore */ }
+        syncAllThemeToggles();
+    }
+
+    function ensureDocumentMode() {
+        var m = root.getAttribute("data-exam-theme");
+        if (m !== "dark" && m !== "light") {
+            try {
+                var s = localStorage.getItem(KEY);
+                m = s === "dark" || s === "light" ? s : "light";
+            } catch (e2) {
+                m = "light";
+            }
+            root.setAttribute("data-exam-theme", m);
+        }
+        syncAllThemeToggles();
+    }
+
+    document.addEventListener("DOMContentLoaded", ensureDocumentMode);
+
+    document.addEventListener(
+        "click",
+        function (ev) {
+            var btn = ev.target.closest(".sat-theme-toggle");
+            if (!btn) {
+                return;
+            }
+            ev.preventDefault();
+            var next = currentMode() === "dark" ? "light" : "dark";
+            applyMode(next);
+        },
+        true
+    );
+})();
+</script>
 
 </body>
 </html>

@@ -1,2 +1,5 @@
 flask
 gunicorn
+python-dotenv
+fpdf2>=2.7.0
+pypdf>=4.0.0

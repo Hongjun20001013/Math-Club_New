@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-pl-start">
+    <p class="np-pw-breadcrumb np-pl-start-bc"><a href="{{ url_for('placement_landing') }}">← Placement overview</a></p>
+    <div class="np-pl-start-bg" aria-hidden="true">
+        <span class="np-pl-start-orb np-pl-start-orb--a"></span>
+        <span class="np-pl-start-orb np-pl-start-orb--b"></span>
+    </div>
+    <div class="np-pl-start-layout">
+        <article class="np-pl-start-card glass-panel np-glass mp-animate-in">
+            <div class="np-sh-hero-noise np-pl-start-noise" aria-hidden="true"></div>
+            <header class="np-pl-start-head">
+                <p class="np-pl-start-kicker">You’re one step from the diagnostic</p>
+                <h1 class="np-pl-start-title">Personalize this placement run</h1>
+                <p class="np-pl-start-lead">A <strong>name on the report</strong> signals care. Grade and current class help everyone read the band in context—parents see it on screen and in the <strong>exportable PDF</strong> beside the recommendation.</p>
+                <p class="np-pl-start-hint">Takes about <strong>30 seconds</strong>. Then the full 70-item diagnostic opens—same structure as the printable placement.</p>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="np-pl-start-flash" role="status">
+                {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+
+            <form method="post" action="{{ url_for('placement_begin') }}" class="np-pl-start-form">
+                <div class="np-pl-field">
+                    <label class="np-pl-label" for="pl-name">Student name <span class="np-pl-req">*</span></label>
+                    <input id="pl-name" name="student_name" type="text" autocomplete="name" required maxlength="160" placeholder="e.g. Alex Chen" class="np-pl-input">
+                </div>
+                <div class="np-pl-field">
+                    <label class="np-pl-label" for="pl-grade">Grade</label>
+                    <select id="pl-grade" name="student_grade" class="np-pl-input np-pl-select">
+                        <option value="">Select (optional)</option>
+                        <option>6th</option>
+                        <option>7th</option>
+                        <option>8th</option>
+                        <option>9th</option>
+                        <option>10th</option>
+                        <option>11th</option>
+                        <option>12th</option>
+                        <option>College</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="np-pl-field np-pl-field--full">
+                    <label class="np-pl-label" for="pl-course">Current school math class</label>
+                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input">
+                </div>
+                <p class="np-pl-start-privacy">Name is required. Grade and class are optional but recommended—they print only on <strong>this attempt’s</strong> report and PDF, not on other SAT practice in the studio.</p>
+                <div class="np-pl-start-trust" role="note">
+                    <span class="np-pl-start-trust-icon" aria-hidden="true">✓</span>
+                    <span>Designed for advising: clear headers, band language, and a file you can forward as-is.</span>
+                </div>
+                <div class="np-pl-start-actions">
+                    <button type="submit" class="big-btn mp-btn-pill mp-btn-glow">Begin 70-item diagnostic</button>
+                    <a href="{{ url_for('placement_landing') }}" class="big-btn mp-btn-secondary mp-btn-pill">Back</a>
+                </div>
+            </form>
+        </article>
+    </div>
+</div>
+</div>
+{% endblock %}

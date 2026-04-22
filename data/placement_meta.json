@@ -1,0 +1,185 @@
+{
+  "description": "Novel Prep Math Placement Test (70 items). calculator_by_index: calculator on Q30 and Q61–70. score_band_rubric: raw correct out of 70, aligned with the printed Answer Key and placement interpretation.",
+  "brand": {
+    "report_title": "Official course placement report",
+    "trust_line": "Score bands follow the printed Novel Prep Math Placement Test guide (same 70-item key as the paper diagnostic).",
+    "trust_line_zh": "分数区间与纸质《数学分班测试》官方说明一致（70 题标准答案）。"
+  },
+  "calculator_by_index": {
+    "1": false,
+    "2": false,
+    "3": false,
+    "4": false,
+    "5": false,
+    "6": false,
+    "7": false,
+    "8": false,
+    "9": false,
+    "10": false,
+    "11": false,
+    "12": false,
+    "13": false,
+    "14": false,
+    "15": false,
+    "16": false,
+    "17": false,
+    "18": false,
+    "19": false,
+    "20": false,
+    "21": false,
+    "22": false,
+    "23": false,
+    "24": false,
+    "25": false,
+    "26": false,
+    "27": false,
+    "28": false,
+    "29": false,
+    "30": true,
+    "31": false,
+    "32": false,
+    "33": false,
+    "34": false,
+    "35": false,
+    "36": false,
+    "37": false,
+    "38": false,
+    "39": false,
+    "40": false,
+    "41": false,
+    "42": false,
+    "43": false,
+    "44": false,
+    "45": false,
+    "46": false,
+    "47": false,
+    "48": false,
+    "49": false,
+    "50": false,
+    "51": false,
+    "52": false,
+    "53": false,
+    "54": false,
+    "55": false,
+    "56": false,
+    "57": false,
+    "58": false,
+    "59": false,
+    "60": false,
+    "61": true,
+    "62": true,
+    "63": true,
+    "64": true,
+    "65": true,
+    "66": true,
+    "67": true,
+    "68": true,
+    "69": true,
+    "70": true
+  },
+  "score_band_rubric": [
+    {
+      "course_key": "algebra_i",
+      "tier": 1,
+      "title": "Algebra I",
+      "min_score": 0,
+      "max_score": 18,
+      "headline": "A confident start: strengthen the core before accelerating.",
+      "headline_zh": "建议从代数基础扎实起步，再加速进阶。",
+      "summary": "This band matches the printed guide for students who will benefit most from rebuilding fluency with expressions, linear models, and proportional reasoning. Algebra I is the right next step so later geometry and advanced algebra feel manageable—not rushed.",
+      "summary_zh": "该区间与官方说明一致：适合系统巩固代数表达、一次模型与比例推理，再以代数 I 为正式起点。",
+      "highlights": [
+        "Prioritize number sense, signed arithmetic, and solving linear equations without a calculator where policy allows.",
+        "Algebra I builds the habits (showing work, checking reasonableness) that every higher course depends on.",
+        "Re-take the placement after a focused unit of study to confirm growth—scores are a snapshot, not a label."
+      ]
+    },
+    {
+      "course_key": "geometry",
+      "tier": 2,
+      "title": "Geometry",
+      "min_score": 19,
+      "max_score": 31,
+      "headline": "Ready to formalize spatial reasoning and proof.",
+      "headline_zh": "适合进入系统的几何与说理训练。",
+      "summary": "This range aligns with the official Geometry band: the student can handle a meaningful portion of foundational algebra while benefiting from structured work on figures, measurement, and logical structure. It is an excellent bridge toward Algebra II when taught with depth.",
+      "summary_zh": "与官方“几何”区间一致：在巩固代数的同时，加强图形、度量与逻辑结构，为代数 II 铺路。",
+      "highlights": [
+        "Emphasize diagrams, definitions, and short proofs—not only numeric answers.",
+        "Keep algebra skills warm with mixed review so skills do not fade during the geometry year.",
+        "Discuss honors vs. standard pacing with your teacher; placement is one signal among several."
+      ]
+    },
+    {
+      "course_key": "algebra_ii",
+      "tier": 3,
+      "title": "Algebra II",
+      "min_score": 32,
+      "max_score": 46,
+      "headline": "Solid algebraic engine—time to deepen functions.",
+      "headline_zh": "代数基础较好，适合在代数 II 深化函数与建模。",
+      "summary": "This band mirrors the printed Algebra II recommendation: good command of core manipulations with room to grow in functions, exponentials, and more abstract forms. The next phase is depth and flexibility, not skipping ahead without mastery.",
+      "summary_zh": "与官方“代数 II”区间一致：核心运算过关，需在函数、指数与更抽象形式上加深。",
+      "highlights": [
+        "Target transformations, systems, and nonlinear models—these unlock precalculus comfort.",
+        "Use missed items on this diagnostic as a personalized review list, not just a score.",
+        "Consider tutoring or small-group support if pacing in school feels faster than practice depth."
+      ]
+    },
+    {
+      "course_key": "precalculus",
+      "tier": 4,
+      "title": "Precalculus",
+      "min_score": 47,
+      "max_score": 60,
+      "headline": "Strong across topics—precalculus will stretch you the right amount.",
+      "headline_zh": "整体表现扎实，预备微积分是匹配的下一步。",
+      "summary": "This matches the official Precalculus band: the student is succeeding on a wide range of algebra and function items and is beginning to show readiness for trigonometry and richer graph analysis. Precalculus is the sweet spot when calculus is the goal but every advanced topic is not yet automatic.",
+      "summary_zh": "与官方“预备微积分”区间一致：代数与函数面广，三角与图像分析仍有上升空间。",
+      "highlights": [
+        "Lock in identities, unit-circle thinking, and modeling with periodic functions early.",
+        "Keep written explanations crisp—college-level courses reward communication, not only answers.",
+        "Preview limits and rate-of-change ideas toward the end of the year to smooth the jump to calculus."
+      ]
+    },
+    {
+      "course_key": "calculus_readiness",
+      "tier": 5,
+      "title": "Calculus readiness",
+      "min_score": 61,
+      "max_score": 70,
+      "headline": "Top band: you are operating at calculus-track level on this diagnostic.",
+      "headline_zh": "最高档：在本套诊断上已达到微积分路径水平。",
+      "summary": "This is the highest placement band on the printed key—strong performance across algebra, advanced functions, graphs, and the geometry-heavy items that typically separate good students from calculus-ready ones. With consistent homework quality and prerequisite grades, a calculus-track course is a natural fit; honors or AP pathways may be appropriate where offered.",
+      "summary_zh": "与官方“微积分准备度”最高档一致：代数、函数、图像与几何综合表现突出；在作业质量与学校先修条件满足时，可规划微积分路径（含荣誉/AP 等）。",
+      "highlights": [
+        "Maintain challenge through harder problem sets so fluency does not plateau after placement.",
+        "Discuss AP Calculus AB/BC sequencing with your school counselor using this report plus transcripts.",
+        "Use any missed items as precision targets—at this level, small gaps become the only barriers."
+      ]
+    }
+  ],
+  "rubric": [
+    {
+      "course_key": "algebra_i_ii",
+      "title": "Algebra I / II",
+      "min_percent": 0,
+      "max_percent": 45,
+      "summary": "Percent-based fallback when score bands are missing: strengthen foundations before advanced coursework."
+    },
+    {
+      "course_key": "precalculus",
+      "title": "Precalculus",
+      "min_percent": 46,
+      "max_percent": 74,
+      "summary": "Percent-based fallback: close to calculus readiness; prioritize advanced functions and identities."
+    },
+    {
+      "course_key": "calculus_ab",
+      "title": "Calculus AB",
+      "min_percent": 75,
+      "max_percent": 100,
+      "summary": "Percent-based fallback: strong overall performance on the items attempted."
+    }
+  ]
+}

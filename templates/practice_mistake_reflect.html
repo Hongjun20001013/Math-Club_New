@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-reflect-wrap">
+    <p class="np-pw-breadcrumb">
+        <a href="{{ url_for('practice') }}">SAT modules</a>
+        · <a href="{{ url_for('practice_analytics') }}">Mistake analytics</a>
+        · <span class="np-bc-current">Reflection</span>
+    </p>
+
+    <header class="np-reflect-head glass-panel np-glass">
+        <p class="np-reflect-kicker">Quick reflection</p>
+        <h1 class="np-reflect-title">What went wrong?</h1>
+        <p class="np-reflect-meta">{{ topic_title }} · Question {{ q_index + 1 }} / {{ total }}</p>
+        <div class="np-reflect-answers">
+            <p><strong>Your answer:</strong> {{ yours or "—" }}</p>
+            <p><strong>Correct:</strong> {{ key_disp or "—" }}</p>
+        </div>
+    </header>
+
+    <section class="np-reflect-stem glass-panel np-glass" aria-label="Question stem">
+        <h2 class="np-reflect-stem-h">Stem</h2>
+        <div class="question-panel np-reflect-stem-body">{{ q.stem|safe }}</div>
+    </section>
+
+    <form method="post" class="np-reflect-form glass-panel np-glass">
+        <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
+        <input type="hidden" name="continue_to" value="{{ continue_to }}">
+
+        <fieldset class="np-reflect-tags">
+            <legend class="np-reflect-legend">Mistake tags (choose any that apply)</legend>
+            <div class="np-reflect-tag-grid">
+                {% for o in mistake_tag_options %}
+                <label class="np-reflect-tag">
+                    <input type="checkbox" name="mistake_tag" value="{{ o.id }}"{% if o.id in prev_tags %} checked{% endif %}>
+                    <span class="np-reflect-tag-label">{{ o.label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <label class="np-reflect-note-label" for="mistake_note">Notes (optional)</label>
+        <textarea id="mistake_note" name="mistake_note" class="np-reflect-note" rows="4" maxlength="2000" placeholder="e.g. Forgot to flip the inequality when multiplying by a negative…">{{ prev_note }}</textarea>
+
+        <div class="np-reflect-actions">
+            <button type="submit" class="np-pw-btn np-pw-btn--primary">Save and continue</button>
+            <a href="{% if continue_to == 'next' %}{{ url_for('practice_question', domain=domain, topic=topic, qnum=q_index + 1) }}{% else %}{{ url_for('practice_session_summary', attempt_id=attempt_id) }}{% endif %}" class="np-reflect-skip">Skip without saving tags</a>
+        </div>
+        <p class="np-reflect-hint">Saving helps your <a href="{{ url_for('practice_analytics') }}">mistake analytics</a> surface patterns.</p>
+    </form>
+</div>
+</div>
+{% endblock %}

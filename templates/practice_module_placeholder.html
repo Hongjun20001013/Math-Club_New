@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-mod-placeholder">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
+    <header class="np-mod-ph-hero glass-panel np-glass mp-animate-in">
+        <p class="np-mod-ph-pill">{{ pill|default("Coming soon") }}</p>
+        <h1 class="np-mod-ph-title">{{ title }}</h1>
+        <p class="np-mod-ph-lead-en">{{ lead }}</p>
+    </header>
+</div>
+</div>
+{% endblock %}

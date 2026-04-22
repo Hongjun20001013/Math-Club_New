@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "source_note": "Parsed from SAT_CB_Bank_Question answer PDF; order matches banks/problem_solving 3_1–3_7.",
+  "section_titles_zh": {
+    "3.1": "3.1 比率、速率与单位",
+    "3.2": "3.2 百分数",
+    "3.3": "3.3 一元数据：分布与集中/离散程度",
+    "3.4": "3.4 二元数据：模型与散点图",
+    "3.5": "3.5 概率与条件概率",
+    "3.6": "3.6 由样本统计量推断与误差范围",
+    "3.7": "3.7 对统计论断的评估：观察性研究与实验"
+  },
+  "section_titles_en": {
+    "3.1": "3.1 Ratios, rates, proportional relationships, and units",
+    "3.2": "3.2 Percentages",
+    "3.3": "3.3 One-variable data: distributions and center/spread",
+    "3.4": "3.4 Two-variable data: models and scatterplots",
+    "3.5": "3.5 Probability and conditional probability",
+    "3.6": "3.6 Inference from sample statistics and margin of error",
+    "3.7": "3.7 Evaluating statistical claims: studies and experiments"
+  },
+  "answers_by_topic": {
+    "3_1": [
+      "C",
+      "A",
+      "30",
+      "D",
+      {
+        "canonical": ".0625",
+        "alternates": [
+          "1/16"
+        ]
+      },
+      "B",
+      "D",
+      "D",
+      "B"
+    ],
+    "3_2": [
+      "B",
+      "8",
+      "B",
+      "75",
+      {
+        "canonical": "0.54",
+        "alternates": [
+          "27/50"
+        ]
+      },
+      "600",
+      "A",
+      {
+        "canonical": "0.48",
+        "alternates": [
+          "12/25"
+        ]
+      },
+      {
+        "canonical": "9.78",
+        "alternates": [
+          "987/100"
+        ]
+      },
+      {
+        "canonical": "189/4",
+        "alternates": [
+          "47.25"
+        ]
+      },
+      {
+        "canonical": "203/50",
+        "alternates": [
+          "4.06"
+        ]
+      },
+      {
+        "canonical": "1.8",
+        "alternates": [
+          "9/5"
+        ]
+      },
+      "0.0014",
+      "C",
+      {
+        "canonical": "0.88",
+        "alternates": [
+          "22/25"
+        ]
+      },
+      "A"
+    ],
+    "3_3": [
+      "C",
+      "52",
+      "A",
+      "D",
+      "A",
+      "B",
+      "A",
+      "A",
+      "C",
+      "A",
+      "D",
+      "C",
+      "41",
+      "D",
+      "44",
+      "B",
+      "2.6",
+      "1"
+    ],
+    "3_4": [
+      "A",
+      "D",
+      {
+        "canonical": "4.5",
+        "alternates": [
+          "9/2"
+        ]
+      },
+      "285",
+      "D",
+      "B",
+      "D",
+      "A",
+      "C"
+    ],
+    "3_5": [
+      "5/7",
+      "8",
+      "1/3",
+      "42",
+      {
+        "canonical": "0.3833",
+        "alternates": [
+          "23/60"
+        ]
+      },
+      "C",
+      "B"
+    ],
+    "3_6": [
+      "D",
+      "94",
+      "D",
+      "C",
+      "BNovel Prep SAT Preparation Answer Key Jack Zeng"
+    ],
+    "3_7": [
+      "B",
+      "D",
+      "B",
+      "B",
+      "C"
+    ]
+  }
+}

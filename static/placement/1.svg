@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260" role="img" aria-labelledby="q64-title">
+  <title id="q64-title">Circle with diameter AC, chords BE perpendicular to AC at D, and triangle ABC with a right angle at B</title>
+  <defs>
+    <style><![CDATA[
+      .fig { fill: none; stroke: #1a1a2e; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+      .thin { stroke-width: 1.85; }
+      .lbl { font: 700 17px ui-sans-serif, system-ui, "Segoe UI", sans-serif; fill: #0f172a; }
+      .rt { fill: none; stroke: #1a1a2e; stroke-width: 1.35; }
+    ]]></style>
+  </defs>
+  <!-- Math: center (0,0), R=100, y up. SVG: sx=150+x, sy=130-y -->
+  <!-- A(-100,0), C(100,0); B(-60,80), E(-60,-80); AC diameter; BE perp AC at D(-60,0); angle ABC = 90 (Thales) -->
+  <circle class="fig" cx="150" cy="130" r="100"/>
+  <line class="fig" x1="50" y1="130" x2="250" y2="130"/>
+  <line class="fig" x1="90" y1="50" x2="90" y2="210"/>
+  <line class="fig thin" x1="50" y1="130" x2="90" y2="50"/>
+  <line class="fig thin" x1="90" y1="50" x2="250" y2="130"/>
+  <!-- Right angle at D (small square toward C and B from intersection) -->
+  <path class="rt" d="M 104 130 L 104 116 L 90 116"/>
+  <!-- Right angle at B -->
+  <path class="rt" d="M 85.08 59.84 L 94.92 64.76 L 99.84 54.92"/>
+  <circle cx="50" cy="130" r="3.2" fill="#1a1a2e"/>
+  <circle cx="90" cy="50" r="3.2" fill="#1a1a2e"/>
+  <circle cx="250" cy="130" r="3.2" fill="#1a1a2e"/>
+  <circle cx="90" cy="210" r="3.2" fill="#1a1a2e"/>
+  <circle cx="90" cy="130" r="3.2" fill="#1a1a2e"/>
+  <text class="lbl" x="22" y="136" text-anchor="end">A</text>
+  <text class="lbl" x="278" y="136" text-anchor="start">C</text>
+  <text class="lbl" x="90" y="30" text-anchor="middle">B</text>
+  <text class="lbl" x="90" y="236" text-anchor="middle">E</text>
+  <text class="lbl" x="108" y="146" text-anchor="start">D</text>
+</svg>

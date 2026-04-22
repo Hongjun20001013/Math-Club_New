@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mp-page-shell np-page-shell">
+<section class="mp-hero mp-hero--pro glass-panel np-glass mp-animate-in">
+  <div class="mp-hero-shine" aria-hidden="true"></div>
+  <div class="np-sh-hero-noise" aria-hidden="true"></div>
+  <p class="mp-eyebrow">Roadmap</p>
+  <h1 class="mp-title">{{ track.title }}</h1>
+  <p class="mp-subtitle">{{ track.description }}</p>
+  <div class="mp-hero-glow" aria-hidden="true"></div>
+</section>
+
+<section class="card-grid mp-animate-up">
+  <article class="card">
+    <h3>Current Status</h3>
+    <p>{{ track.level }}. This track is being designed with curriculum, bank format, and analytics templates.</p>
+  </article>
+  <article class="card">
+    <h3>What is planned</h3>
+    <p>Topic maps, unit-level progress, and explanation pipelines matching the SAT workflow.</p>
+  </article>
+  <article class="card">
+    <h3>Return to active learning</h3>
+    <p>SAT remains fully available right now.</p>
+    <a href="/practice" class="big-btn">Go to SAT Practice</a>
+  </article>
+</section>
+</div>
+{% endblock %}

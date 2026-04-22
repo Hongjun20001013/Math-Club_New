@@ -1,10 +1,30 @@
-<form method="post" action="/submit">
-  {% for q in questions %}
-    <p><b>{{ loop.index }}. {{ q.stem }}</b></p>
-    <label><input type="radio" name="{{ q.id }}" value="A"> {{ q.choice_a }}</label><br>
-    <label><input type="radio" name="{{ q.id }}" value="B"> {{ q.choice_b }}</label><br>
-    <label><input type="radio" name="{{ q.id }}" value="C"> {{ q.choice_c }}</label><br>
-    <label><input type="radio" name="{{ q.id }}" value="D"> {{ q.choice_d }}</label><br><br>
-  {% endfor %}
-  <button type="submit">Submit</button>
-</form>
+{% extends "base.html" %}
+{% block content %}
+
+<div class="np-page-shell">
+<div class="practice-container">
+
+    <div class="nav-bar">
+        <a href="/practice/{{ unit }}/{{ qnum - 1 }}" class="nav-btn">← Previous</a>
+        <a href="/practice/{{ unit }}/{{ qnum + 1 }}" class="nav-btn">Next →</a>
+    </div>
+
+    <div class="question-layout">
+        <div class="stem">
+            {{ q.stem|safe }}
+        </div>
+
+        <div class="choices">
+            {% for c in q.choices %}
+            <label class="choice-card">
+                <input type="radio" name="choice">
+                <span class="choice-text">{{ c|safe }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</div>
+
+{% endblock %}

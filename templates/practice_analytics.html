@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-analytics-wrap">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="np-flash-list" role="status">
+        {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <header class="np-analytics-hero np-analytics-hero--lux glass-panel np-glass mp-animate-in">
+        <div class="np-sh-hero-noise" aria-hidden="true"></div>
+        <p class="np-analytics-kicker">Mistake log</p>
+        <h1 class="np-analytics-title">Patterns, not noise</h1>
+        <p class="np-analytics-lead">Tag misses after a set; edits save to your account (or this device when logged out).</p>
+        <p class="np-analytics-stat"><strong>{{ wrong_total }}</strong> incorrect attempts in log</p>
+        {% if top_mistake_tags %}
+        <div class="np-analytics-tagsummary">
+            <span class="np-analytics-tagsummary-label">Top tags:</span>
+            {% for label, c in top_mistake_tags %}
+            <span class="np-analytics-tagchip">{{ label }} ({{ c }})</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </header>
+
+    {% if not wrong_rows %}
+    <p class="np-analytics-empty glass-panel np-glass">No wrong answers in your log yet. Complete a practice set; misses are saved automatically and show on the session results page.</p>
+    {% else %}
+    <div class="np-analytics-list">
+        {% for row in wrong_rows %}
+        <article class="np-analytics-row glass-panel np-glass">
+            <div class="np-analytics-row-top">
+                <div>
+                    <p class="np-analytics-row-topic">{{ row.topic_title }}</p>
+                    <p class="np-analytics-row-meta">{{ row.when }} · Q {{ row.q_index + 1 }} · {{ row.domain }}</p>
+                </div>
+                <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Redo</a>
+            </div>
+            <p class="np-analytics-row-ans"><span>Yours: <strong>{{ row.yours }}</strong></span> · <span>Key: <strong>{{ row.key }}</strong></span></p>
+            {% if row.tag_labels %}
+            <p class="np-analytics-row-tags">{{ row.tag_labels | join(' · ') }}</p>
+            {% endif %}
+            {% if row.note %}
+            <p class="np-analytics-row-note">“{{ row.note }}”</p>
+            {% endif %}
+
+            <details class="np-analytics-edit">
+                <summary>Edit tags and note</summary>
+                <form method="post" action="{{ url_for('practice_analytics_update', pr_id=row.pr_id) }}" class="np-analytics-edit-form">
+                    <div class="np-reflect-tag-grid np-analytics-edit-tags">
+                        {% for o in mistake_tag_options %}
+                        <label class="np-reflect-tag">
+                            <input type="checkbox" name="mistake_tag" value="{{ o.id }}"{% if o.id in row.tag_ids %} checked{% endif %}>
+                            <span class="np-reflect-tag-label">{{ o.label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <label class="np-reflect-note-label" for="note-{{ row.pr_id }}">Note</label>
+                    <textarea id="note-{{ row.pr_id }}" name="mistake_note" class="np-reflect-note" rows="3" maxlength="2000">{{ row.note }}</textarea>
+                    <button type="submit" class="np-pw-btn np-pw-btn--primary">Save</button>
+                </form>
+            </details>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

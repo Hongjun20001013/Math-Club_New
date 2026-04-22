@@ -1,0 +1,1893 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{unicode-math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+\usepackage{eso-pic} % for page background
+
+% --------- 主题颜色设置 ---------
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{headerbg}{RGB}{240,240,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
+
+% --------- 页眉背景色条 ---------
+\newcommand{\headbackground}{
+  \AddToShipoutPictureBG*{
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+% --------- 页眉设置 ---------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
+\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+
+\newtcolorbox{SATCard}[1][]{%
+  enhanced,
+  colback=white,
+  colframe=novelblue,
+  coltitle=white,
+  boxrule=0.6pt,
+  arc=4pt,
+  boxsep=5pt,
+  left=8pt, right=8pt, top=10pt, bottom=10pt,
+  sharp corners=south,
+  drop shadow south east,
+  #1
+}
+
+% --------- 顶部 Mark for Review 栏 ---------
+\newcommand{\markforreview}{
+  \stepcounter{questionnum} % 自动递增题号
+  \begin{tikzpicture}[scale=1.1]
+    % 黑色题号
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+
+    % 灰底主栏
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+
+    % Mark for Review
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+
+    % ABC 按钮区域
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+
+
+  \newcommand{\choiceboxcircled}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    rounded corners=6pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+    \textbf{\large\textcircled{\textbf{#1}}} \ #2
+  \end{tcolorbox}
+}
+}
+
+% --------- 选项框样式 ---------
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white, 
+    colframe=novelblue,
+    boxrule=0.5pt, 
+    rounded corners=4pt, 
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+
+\begin{document}
+
+\section*{Unit 3 Problem - Solving and Data Analysis}
+
+
+\subsection*{3.1 Ratios, Rates, Proportional Relationships, and Units}
+\noindent\markforreview
+\vspace{1em}
+
+\textbf{Species of tree and Growth factor}
+\begin{center}
+    
+
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Species of tree} & \textbf{Growth factor} \\
+\hline
+Red maple & 4.5 \\
+River birch & 3.5 \\
+Cottonwood & 2.0 \\
+Black walnut & 4.5 \\
+White birch & 5.0 \\
+American elm & 4.0 \\
+Pin oak & 3.0 \\
+Shagbark hickory & 7.5 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+One method of calculating the approximate age, in years, of a tree of a particular species is to multiply the diameter of the tree, in inches, by a constant called the growth factor for that species.  
+The table above gives the growth factors for eight species of trees.  
+If a white birch tree and a pin oak tree each now have a diameter of 1 foot, which of the following will be closest to the difference, in inches, of their diameters 10 years from now?  
+(1 foot = 12 inches)
+
+\vspace{0.75em}
+
+\choicebox{A}{1.0}  
+\choicebox{B}{1.2}  
+\choicebox{C}{1.3}  
+\choicebox{D}{1.4}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A sample of oak has a density of 807 kilograms per cubic meter.  
+The sample is in the shape of a cube, where each edge has a length of 0.90 meters.  
+To the nearest whole number, what is the mass, in kilograms, of this sample?
+
+\vspace{0.75em}
+
+\choicebox{A}{588}  
+\choicebox{B}{726}  
+\choicebox{C}{897}  
+\choicebox{D}{1,107}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+Jeremy deposited $x$ dollars in his investment account on January 1, 2001.  
+The amount of money in the account doubled each year until Jeremy had 480 dollars in his investment account on January 1, 2005.  
+What is the value of $x$?
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+\textbf{Power capacity distribution by state}
+\begin{center}
+    
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+State & Low & Medium & High & Total \\
+\hline
+Texas & 4 & 2 & 3 & 9 \\
+California & 1 & 0 & 1 & 2 \\
+Oregon & 1 & 0 & 1 & 2 \\
+Indiana & 0 & 2 & 0 & 2 \\
+Colorado & 1 & 1 & 0 & 2 \\
+Iowa & 2 & 0 & 0 & 2 \\
+Oklahoma & 1 & 0 & 0 & 1 \\
+\hline
+Total & 10 & 5 & 5 & 20 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+The table shows the distribution, by location and power capacity (maximum rate of power generation) of the twenty largest wind projects in the United States in 2013.  
+The total power capacity of the nine wind projects located in Texas was 4,952 megawatts (MW), and the total power capacity of the twenty wind projects was 11,037 MW in 2013.  
+The amount of energy produced in one hour at a rate of one megawatt is one megawatt-hour.  
+If each of the nine Texas wind projects in 2013 had operated continuously for 24 hours at the maximum rate of power generation, approximately how many megawatt-hours of energy would the nine projects have produced?
+
+\vspace{0.75em}
+
+\choicebox{A}{200}  
+\choicebox{B}{5,000}  
+\choicebox{C}{11,000}  
+\choicebox{D}{120,000}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+If $\frac{4a}{b} = 6.7$ and $\frac{a}{bn} = 26.8$, what is the value of $n$?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The density of a certain type of wood is 353 kilograms per cubic meter.  
+A sample of this type of wood is in the shape of a cube and has a mass of 345 kilograms.  
+To the nearest hundredth of a meter, what is the length of one edge of this sample?
+
+\vspace{0.75em}
+
+\choicebox{A}{0.98}  
+\choicebox{B}{0.99}  
+\choicebox{C}{1.01}  
+\choicebox{D}{1.02}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A certain town has an area of 4.36 square miles.  
+What is the area, in \textbf{square yards}, of this town?  
+(1 mile = 1,760 yards)
+
+\vspace{0.75em}
+
+\choicebox{A}{404}  
+\choicebox{B}{7,674}  
+\choicebox{C}{710,459}  
+\choicebox{D}{13,505,536}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+Anita created a batch of green paint by mixing 2 ounces of blue paint with 3 ounces of yellow paint.  
+She must mix a second batch using the same ratio of blue and yellow paint as the first batch.  
+If she uses 5 ounces of blue paint for the second batch, how much yellow paint should Anita use?
+
+\vspace{0.75em}
+
+\choicebox{A}{Exactly 5 ounces}  
+\choicebox{B}{3 ounces more than the amount of yellow paint used in the first batch}  
+\choicebox{C}{1.5 times the amount of yellow paint used in the first batch}  
+\choicebox{D}{1.5 times the amount of blue paint used in the second batch}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A certain park has an area of 11,863,808 square yards.  
+What is the area, in \textbf{square miles}, of this park?  
+(1 mile = 1,760 yards)
+
+\vspace{0.75em}
+
+\choicebox{A}{1.96}  
+\choicebox{B}{3.83}  
+\choicebox{C}{3,444.39}  
+\choicebox{D}{6,740.8}
+
+\newpage
+\subsection*{3.2 Percentages}
+
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+Jennifer bought a box of Crunchy Grain cereal.  
+The nutrition facts on the box state that a serving size of the cereal is $\frac{3}{4}$ cup and provides 210 calories, 50 of which are calories from fat.  
+In addition, each serving of the cereal provides 180 milligrams of potassium, which is 5\% of the daily allowance for adults.  
+If $p$ percent of an adult’s daily allowance of potassium is provided by $x$ servings of Crunchy Grain cereal per day, which of the following expresses $p$ in terms of $x$?
+
+\vspace{0.75em}
+
+\choicebox{A}{$p = 0.5x$}  
+\choicebox{B}{$p = 5x$}  
+\choicebox{C}{$p = (0.05)^x$}  
+\choicebox{D}{$p = (1.05)^x$}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A school district is forming a committee to discuss plans for the construction of a new high school.  
+Of those invited to join the committee, 15\% are parents of students, 45\% are teachers from the current high school, 25\% are school and district administrators, and the remaining 6 individuals are students.  
+How many more teachers were invited to join the committee than school and district administrators?
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{tabular}{|c|c|}
+\hline
+Year & Subscriptions sold \\
+\hline
+2012 & 5,600 \\
+2013 & 5,880 \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+The manager of an online news service received the report above on the number of subscriptions sold by the service.  
+The manager estimated that the percent increase from 2012 to 2013 would be double the percent increase from 2013 to 2014.  
+How many subscriptions did the manager expect would be sold in 2014?
+
+\vspace{0.75em}
+
+\choicebox{A}{6,020}  
+\choicebox{B}{6,027}  
+\choicebox{C}{6,440}  
+\choicebox{D}{6,468}
+
+\vspace{2em}
+
+\noindent\markforreview
+
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{5.jpg}
+\end{center}
+
+The line graph shows the total amount of snow, in inches, recorded each year in Washington, DC, from 2003 to 2015.  
+If $p$\% is the percent decrease in the annual snowfall from 2003 to 2007, what is the value of $p$?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+The number $a$ is 70\% less than the positive number $b$.  
+The number $c$ is 80\% greater than $a$.  
+The number $c$ is how many times $b$?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+210 is $p$\% greater than 30.  
+What is the value of $p$?
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+\textbf{Climate Preferences}
+
+\vspace{1em}
+\begin{center}
+    
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+ & Warm & Cool & No preference & Total \\
+\hline
+18--35 years old & 295 & 168 & 45 & 508 \\
+36--50 years old & 246 & 123 & 41 & 410 \\
+51--65 years old & 238 & 117 & 48 & 403 \\
+Greater than 65 & 137 & 78 & 64 & 279 \\
+\hline
+Total & 916 & 486 & 198 & 1600 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+Which of the following is closest to the difference between the percentage of adults aged 18--50 years who responded “warm” and the percentage of adults aged 51 years or greater who responded “warm”?
+
+\vspace{0.75em}
+
+\choicebox{A}{4\%}  
+\choicebox{B}{5\%}  
+\choicebox{C}{10\%}  
+\choicebox{D}{18\%}
+
+\vspace{2em}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The number $a$ is 70\% less than the positive number $b$.  
+The number $c$ is 60\% greater than $a$.  
+The number $c$ is how many times $b$?
+
+\vspace{0.75em}
+
+
+
+\vspace{5em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The number $a$ is 110\% greater than the number $b$.  
+The number $b$ is 90\% less than 47.  
+What is the value of $a$?
+
+\vspace{0.75em}
+
+
+\vspace{5em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The number $w$ is 110\% greater than the number $z$.  
+The number $z$ is 55\% less than 50.  
+What is the value of $w$?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+A gift shop buys souvenirs at a wholesale price of \$7.00 each and resells them at a retail price that is 290\% of the wholesale price.  
+At the end of the season, any remaining souvenirs are marked at a discounted price that is 80\% off the retail price.  
+What is the discounted price of each remaining souvenir, in dollars?
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The regular price of a shirt at a store is \$11.70.  
+The sale price of the shirt is 80\% less than the regular price, and the sale price is 30\% greater than the store’s cost for the shirt.  
+What was the store’s cost, in dollars, for the shirt?  
+(Disregard the \$ sign when entering your answer. For example, if your answer is \$4.97, enter 4.97)
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+According to a set of standards, a certain type of substance can contain a maximum of 0.001\% phosphorus by mass.  
+If a sample of this substance has a mass of 140 grams, what is the maximum mass, in grams, of phosphorus the sample can contain to meet these standards?
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+37\% of the items in a box are green.  
+Of those, 37\% are also rectangular.  
+Of the green rectangular items, 42\% are also metal.  
+Which of the following is closest to the percentage of the items in the box that are \textbf{not} rectangular green metal items?
+
+\vspace{0.75em}
+
+\choicebox{A}{1.16\%}  
+\choicebox{B}{57.50\%}  
+\choicebox{C}{94.25\%}  
+\choicebox{D}{98.84\%}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The number $a$ is 60\% greater than the positive number $b$.  
+The number $c$ is 45\% less than $a$.  
+The number $c$ is how many times $b$?
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The value of a collectible comic book increased by 167\% from the end of 2011 to the end of 2012  
+and then decreased by 16\% from the end of 2012 to the end of 2013.  
+What was the net percentage increase in the value of the collectible comic book from the end of 2011 to the end of 2013?
+
+\vspace{0.75em}
+
+\choicebox{A}{124.28\%}  
+\choicebox{B}{140.28\%}  
+\choicebox{C}{151.00\%}  
+\choicebox{D}{209.72\%}
+
+
+
+\newpage
+\subsection*{3.3 One Variable Data: Distributions and Measures of Center and Spread}
+
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+
+\noindent\markforreview
+
+\begin{center}
+    \includegraphics[width =0.5\linewidth]{1.png}
+\end{center}
+
+
+The box plots summarize the masses, in kilograms, of two groups of gazelles.  
+Based on the box plots, which of the following statements must be true?
+
+\vspace{0.75em}
+
+\choicebox{A}{The mean mass of group 1 is greater than the mean mass of group 2.}  
+\choicebox{B}{The mean mass of group 1 is less than the mean mass of group 2.}  
+\choicebox{C}{The median mass of group 1 is greater than the median mass of group 2.}  
+\choicebox{D}{The median mass of group 1 is less than the median mass of group 2.}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Data set A consists of 10 positive integers less than 60. The list shown gives 9 of the integers from data set A.  
+\[43, 45, 44, 43, 38, 39, 40, 46, 40  \]
+
+
+The mean of these 9 integers is 42. If the mean of data set A is an integer that is greater than 42, what is the value of the largest integer from data set A?
+
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+Data set A and data set B each consist of 27 values. The table shows the frequencies of the values for each data set.  
+Which of the following statements best compares the means of the two data sets?
+
+\vspace{1em}
+
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Value} & \textbf{Data set A frequency} & \textbf{Data set B frequency} \\
+\hline
+30 & 2 & 9 \\
+34 & 4 & 7 \\
+38 & 5 & 5 \\
+42 & 7 & 4 \\
+46 & 9 & 2 \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+\choicebox{A}{The mean of data set A is greater than the mean of data set B.}  
+\choicebox{B}{The mean of data set A is less than the mean of data set B.}  
+\choicebox{C}{The mean of data set A is equal to the mean of data set B.}  
+\choicebox{D}{There is not enough information to compare the means of the data sets.}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A data set of 27 different numbers has a mean of 33 and a median of 33. A new data set is created by adding 7 to each number in the original data set that is greater than the median and subtracting 7 from each number in the original data set that is less than the median.  
+Which of the following measures does NOT have the same value in both the original and new data sets?
+
+\vspace{0.75em}
+
+\choicebox{A}{Median}  
+\choicebox{B}{Mean}  
+\choicebox{C}{Sum of the numbers}  
+\choicebox{D}{Standard deviation}
+
+\vspace{2em}
+
+\noindent\markforreview
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{2.png}
+\end{center}
+
+The dot plots represent the distributions of values in data sets A and B.  
+Which of the following statements must be true?
+
+\vspace{0.75em}
+
+\choicebox{A}{I only}  
+\choicebox{B}{II only}  
+\choicebox{C}{I and II}  
+\choicebox{D}{Neither I nor II}
+\newpage
+
+\noindent\markforreview
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{3.png}
+\end{center}
+Two data sets of 23 integers each are summarized in the histograms shown.  
+For each of the histograms, the first interval represents the frequency of integers greater than or equal to 10, but less than 20. The second interval represents the frequency of integers greater than or equal to 20, but less than 30, and so on.  
+What is the smallest possible difference between the mean of data set A and the mean of data set B?
+
+\vspace{0.75em}
+
+\choicebox{A}{0}  
+\choicebox{B}{1}  
+\choicebox{C}{10}  
+\choicebox{D}{23}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The frequency distribution above summarizes a set of data, where $a$ is a positive integer.  
+How much greater is the mean of the set of data than the median?
+
+\vspace{1em}
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Value} & \textbf{Frequency} \\
+\hline
+1 & $a$ \\
+2 & $2a$ \\
+3 & $3a$ \\
+4 & $2a$ \\
+5 & $a$ \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+\choicebox{A}{0}  
+\choicebox{B}{1}  
+\choicebox{C}{2}  
+\choicebox{D}{3}
+
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+Two different teams consisting of 10 members each ran in a race. Each member’s completion time of the race was recorded.  
+The mean of the completion times for each team was calculated and is shown below.
+
+\vspace{0.5em}
+
+Team A: 3.41 minutes 
+
+Team B: 3.79 minutes
+
+
+
+Which of the following MUST be true?
+
+\begin{itemize}
+\item[I.] Every member of team A completed the race in less time than any member of team B.
+\item[II.] The median time it took the members of team B to complete the race is greater than the median time it took the members of team A to complete the race.
+\item[III.] There is at least one member of team B who took more time to complete the race than some member of team A.
+\end{itemize}
+
+\vspace{0.5em}
+
+\choicebox{A}{III only}  
+\choicebox{B}{I and III only}  
+\choicebox{C}{II and III only}  
+\choicebox{D}{I, II, and III}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+The mean score of 8 players in a basketball game was 14.5 points. If the highest individual score is removed, the mean score of the remaining 7 players becomes 12 points.  
+What was the highest score?
+
+\vspace{0.75em}
+
+\choicebox{A}{20}  
+\choicebox{B}{24}  
+\choicebox{C}{32}  
+\choicebox{D}{36}
+
+\vspace{2em}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+Each of the following frequency tables represents a data set. Which data set has the greatest mean?
+
+\vspace{0.75em}
+
+\choicebox{A}{
+\begin{tabular}{|c|c|}
+\hline
+Value & Frequency \\
+\hline
+70 & 4 \\
+80 & 5 \\
+90 & 6 \\
+100 & 7 \\
+\hline
+\end{tabular}
+}
+
+\choicebox{B}{
+\begin{tabular}{|c|c|}
+\hline
+Value & Frequency \\
+\hline
+70 & 6 \\
+80 & 6 \\
+90 & 6 \\
+100 & 6 \\
+\hline
+\end{tabular}
+}
+
+\choicebox{C}{
+\begin{tabular}{|c|c|}
+\hline
+Value & Frequency \\
+\hline
+70 & 7 \\
+80 & 6 \\
+90 & 6 \\
+100 & 7 \\
+\hline
+\end{tabular}
+}
+
+\choicebox{D}{
+\begin{tabular}{|c|c|}
+\hline
+Value & Frequency \\
+\hline
+70 & 8 \\
+80 & 5 \\
+90 & 5 \\
+100 & 8 \\
+\hline
+\end{tabular}
+}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+The mean amount of time that the 20 employees of a construction company have worked for the company is 6.7 years.  
+After one of the employees leaves the company, the mean amount of time that the remaining employees have worked for the company is reduced to 6.25 years.  
+How many years did the employee who left the company work for the company?
+
+\vspace{0.75em}
+
+\choicebox{A}{0.45}  
+\choicebox{B}{2.30}  
+\choicebox{C}{9.00}  
+\choicebox{D}{15.25}
+
+\vspace{2em}
+
+\noindent\markforreview
+\begin{center}
+    \includegraphics[width=0.22\linewidth]{4.jpg}
+\end{center}
+
+
+The dot plot represents the 15 values in data set A.  
+Data set B is created by adding 56 to each of the values in data set A.  
+Which of the following correctly compares the medians and the ranges of data sets A and B?
+
+\vspace{1em}
+
+\choicebox{A}{The median of data set B is equal to the median of data set A, and the range of data set B is equal to the range of data set A.}  
+\choicebox{B}{The median of data set B is equal to the median of data set A, and the range of data set B is greater than the range of data set A.}  
+\choicebox{C}{The median of data set B is greater than the median of data set A, and the range of data set B is equal to the range of data set A.}  
+\choicebox{D}{The median of data set B is greater than the median of data set A, and the range of data set B is greater than the range of data set A.}
+
+\vspace{2em}
+
+\noindent\markforreview
+
+\begin{itemize}
+
+
+    \item Data set A consists of the heights of 75 objects and has a mean of 25 meters. 
+
+    \item Data set B consists of the heights of 50 objects and has a mean of 65 meters.  
+
+    \item Data set C consists of the heights of the 125 objects from data sets A and B.  
+\end{itemize}
+What is the mean, in meters, of data set C?
+
+\vspace{2em}
+
+
+
+\noindent\markforreview
+\vspace{1em}
+
+Data set F consists of 55 integers between 170 and 290. Data set G consists of all the integers in data set F as well as the integer 10.  
+Which of the following must be less for data set F than for data set G?
+
+
+\begin{itemize}
+    \item[I.] The Mean
+    \item[II.] The Median
+\end{itemize}
+
+\vspace{0.75em}
+
+\choicebox{A}{I only}  
+\choicebox{B}{II only}  
+\choicebox{C}{I and II}  
+\choicebox{D}{Neither I nor II}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+\begin{itemize}
+
+
+    \item Data set A consists of the heights of 75 buildings and has a mean of 32 meters. 
+
+    \item Data set B consists of the heights of 50 buildings and has a mean of 62 meters. 
+
+    \item Data set C consists of the heights of the 125 buildings from data sets A and B.  
+\end{itemize}
+What is the mean, in meters, of data set C?
+
+
+
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+\textbf{Percent of Residents Who Earned a Bachelor's Degree or Higher}
+\begin{center}
+    
+
+\begin{tabular}{|c|c|}
+\hline
+State & Percent of residents \\
+\hline
+State A & 21.9\% \\
+State B & 27.9\% \\
+State C & 25.9\% \\
+State D & 19.5\% \\
+State E & 30.1\% \\
+State F & 36.4\% \\
+State G & 35.5\% \\
+\hline
+\end{tabular}
+\end{center}
+
+
+
+A survey was given to residents of all 50 states asking if they had earned a bachelor’s degree or higher.  
+The results from 7 of the states are given in the table above.  
+The median percent of residents who earned a bachelor’s degree or higher for all 50 states was 26.95\%.  
+What is the difference between the median percent of residents who earned a bachelor’s degree or higher for these 7 states and the median for all 50 states?
+
+\vspace{0.75em}
+
+\choicebox{A}{0.05\%}  
+\choicebox{B}{0.95\%}  
+\choicebox{C}{1.22\%}  
+\choicebox{D}{7.45\%}
+
+\vspace{2em}
+
+
+
+\noindent\markforreview
+
+\begin{center}
+    
+
+\textbf{Masses (kilograms)}
+
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{6}{c|}{Masses (kilograms)} \\
+\hline
+Andrew & 2.4 & 2.5 & 3.6 & 3.1 & 2.5 & 2.7 \\
+\hline
+Maria & $x$ & 3.1 & 2.7 & 2.9 & 3.3 & 2.8 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+Andrew and Maria each collected six rocks, and the masses of the rocks are shown in the table above.  
+The mean of the masses of the rocks Maria collected is 0.1 kilogram greater than the mean of the masses of the rocks Andrew collected.  
+What is the value of $x$?
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+For a certain computer game, individuals receive an integer score that ranges from 2 through 10.  
+The table below shows the frequency distribution of the scores of the 9 players in group A and the 11 players in group B.
+
+\vspace{1em}
+\begin{center}
+    
+
+\begin{tabular}{|c|c|c|}
+\hline
+Score & Group A & Group B \\
+\hline
+2 & 1 & 0 \\
+3 & 1 & 0 \\
+4 & 2 & 0 \\
+5 & 1 & 4 \\
+6 & 2 & 2 \\
+7 & 0 & 0 \\
+8 & 2 & 2 \\
+9 & 1 & 1 \\
+10 & 0 & 2 \\
+\hline
+Total & 9 & 11 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+The median of the scores for group B is how much greater than the median of the scores for group A?
+
+\vspace{0.75em}
+
+
+
+
+
+\newpage
+
+\subsection*{3.4 Two Variable Data: Models and Scatterplots}
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Years since 1940},
+    ylabel={Minimum Wage (dollars)},
+    ytick={0,1,...,8},
+    xmin=0, xmax=80,
+    ymin=0, ymax=8,
+    grid=major,
+    width=10cm, height=6cm,
+    title={Minimum Wage}
+]
+\addplot[
+    only marks,
+    mark=*,
+    samples at={0,10,20,30,40,50,60,70},
+]
+coordinates {
+    (0, 0.3)
+    (10, 0.7)
+    (20, 1)
+    (30, 1.8)
+    (40, 3.01)
+    (50, 3.9)
+    (60, 5.1)
+    (70, 7.2)
+};
+\addplot[domain=0:80, thick] {0.096*x - 0.488};
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot above shows the federal-mandated minimum wage every 10 years between 1940 and 2010.  
+A line of best fit is shown, and its equation is $y = 0.096x - 0.488$.  
+What does the line of best fit predict about the increase in the minimum wage over the 70-year period?
+
+\vspace{0.75em}
+
+\choicebox{A}{Each year between 1940 and 2010, the average increase in minimum wage was 0.096 dollars.}  
+\choicebox{B}{Each year between 1940 and 2010, the average increase in minimum wage was 0.49 dollars.}  
+\choicebox{C}{Every 10 years between 1940 and 2010, the average increase in minimum wage was 0.096 dollars.}  
+\choicebox{D}{Every 10 years between 1940 and 2010, the average increase in minimum wage was 0.488 dollars.}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Temperature (°C)},
+    ylabel={Sales (dollars)},
+    ytick={300,400,...,1000},
+    xmin=10, xmax=26,
+    ymin=300, ymax=1000,
+    grid=major,
+    width=10cm, height=6cm,
+    title={Ice Cream Sales}
+]
+\addplot[
+    only marks,
+    mark=*,
+]
+coordinates {
+    (12, 490)
+    (14, 510)
+    (16, 600)
+    (17, 650)
+    (18, 700)
+    (19, 730)
+    (20, 770)
+    (21, 810)
+    (22, 750)
+    (23, 800)
+    (24, 850)
+    (25, 880)
+};
+\addplot[domain=10:26, thick] {33*x + 84};
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot above shows a company’s ice cream sales $d$, in dollars, and the high temperature $t$, in degrees Celsius (°C), on 12 different days.  
+A line of best fit for the data is also shown.  
+Which of the following could be an equation of the line of best fit?
+
+\vspace{0.75em}
+
+\choicebox{A}{$d = 0.03t + 402$}  
+\choicebox{B}{$d = 10t + 402$}  
+\choicebox{C}{$d = 33t + 300$}  
+\choicebox{D}{$d = 33t + 84$}
+
+\newpage
+
+
+\noindent\markforreview
+\vspace{1em}
+\begin{center}
+    
+
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Days after January 11},
+    ylabel={Length of time (hours)},
+    xmin=0, xmax=10,
+    ymin=0, ymax=18,
+    grid=major,
+    width=10cm, height=6cm,
+    ytick={0,2,...,18},
+    xtick={0,1,...,10}
+]
+\addplot[
+    only marks,
+    mark=*,
+    black
+] coordinates {
+    (1,14) (2,6) (3,10) (4,15) (5,14)
+    (6,7) (7,11) (8,14) (9,13.5) (10,12)
+};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+The scatterplot shows the relationship between the length of time $y$, in hours, a certain bird spent in flight and the number of days after January 11, $x$.
+
+What is the average rate of change, in hours per day, of the length of time the bird spent in flight on January 13 to the length of time the bird spent in flight on January 15?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Average temperature ($^\circ$C)},
+    ylabel={Number of people},
+    xtick={25,26,...,35},
+    ytick={80,160,...,640},
+    xmin=25, xmax=35,
+    ymin=0, ymax=650,
+    grid=major,
+    width=10cm, height=6cm
+]
+\addplot[only marks, mark=*] coordinates {
+    (26,220) (27,250) (28,280) (29,320) (30,350)
+    (31,400) (32,450) (33,510) (34,550)
+};
+\addplot[red, thick, domain=25:35, samples=2] {57*x - 1345};
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+
+
+Each dot in the scatterplot above represents the temperature and the number of people who visited a beach in Lagos, Nigeria, on one of eleven different days.  
+The line of best fit for the data is also shown.  
+The line of best fit has a slope of approximately $57$.  
+According to this estimate, how many additional people per day are predicted to visit the beach for each $5^\circ$C increase in average temperature?
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Time (years)},
+    ylabel={Energy (millions of MWh)},
+    xtick={0,2,...,12},
+    ytick={700,720,...,820},
+    xmin=0, xmax=12,
+    ymin=700, ymax=820,
+    grid=major,
+    width=10cm, height=6cm
+]
+\addplot[only marks, mark=*] coordinates {
+     (1,765) (2,789) (3,781) (4,785)
+    (5,808) (6,809) (7,792) (8,809) (9,790) (10,770)
+};
+\addplot[blue, thick, domain=0:10] {1.674*x^2 + 19.76*x - 745.73};
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot below shows the amount of electric energy generated, in millions of megawatt-hours, by nuclear sources over a 10-year period.
+
+Of the following equations, which best models the data in the scatterplot?
+
+\vspace{0.75em}
+
+\choicebox{A}{$y = 1.674x^2 + 19.76x - 745.73$}
+\choicebox{B}{$y = -1.674x^2 - 19.76x - 745.73$}
+\choicebox{C}{$y = 1.674x^2 + 19.76x + 745.73$}
+\choicebox{D}{$y = -1.674x^2 + 19.76x + 745.73$}
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Size (thousands of sq ft)},
+    ylabel={Sale Price (thousands of dollars)},
+        xtick={0,0.5,...,3},
+    ytick={0,50,...,400},
+    xmin=0, xmax=3.0,
+    ymin=0, ymax=400,
+    grid=major,
+    width=10cm, height=6cm
+]
+\addplot[only marks, mark=*] coordinates {
+    (0.8,170) (0.9,200) (1.1,200) (1.2,240) (1.3,230)(1.4,190)(1.45,280)(1.48,320)(1.51,340)(1.51,230)(1.6,250)(1.7,240)(1.8,248)(1.8,275)(1.9,330)(2,225)(2.0,275)(2.1,248)(2.1,355)(2.2,280)(2.2,348)(2.4,355)
+    (2.51,350) (2.6,325) (2.7,350) 
+};
+
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot above shows the size $x$ and the sale price $y$ of 25 houses for sale in Town H.  
+Which of the following could be an equation for a line of best fit for the data?
+
+\vspace{0.75em}
+
+\choicebox{A}{$y = 200x + 100$}
+\choicebox{B}{$y = 100x + 100$}
+\choicebox{C}{$y = 50x + 100$}
+\choicebox{D}{$y = 100x$}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+For $x > 0$, the function $f$ is defined as follows:  
+\begin{center}
+
+$f(x)$ equals $201\%$ of $x$.
+\end{center}
+
+Which of the following could describe this function?
+
+\vspace{0.75em}
+
+\choicebox{A}{Decreasing exponential}
+\choicebox{B}{Decreasing linear}
+\choicebox{C}{Increasing exponential}
+\choicebox{D}{Increasing linear}
+
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+& \textbf{Amount invested} & \textbf{Balance increase} \\
+\hline
+\textbf{Account A} & \$500 & 6\% annual interest \\
+\textbf{Account B} & \$1,000 & \$25 per year \\
+\hline
+\end{tabular}
+\end{center}
+
+Two investments were made as shown in the table above.  
+The interest in Account A is compounded once per year.  
+Which of the following is true about the investments?
+
+\vspace{0.75em}
+
+\choicebox{A}{Account A always earns more money per year than Account B.}
+\choicebox{B}{Account A always earns less money per year than Account B.}
+\choicebox{C}{Account A earns more money per year than Account B at first but eventually earns less money per year.}
+\choicebox{D}{Account A earns less money per year than Account B at first but eventually earns more money per year.}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Total protein (grams)},
+    ylabel={Total fat (grams)},
+    title={Total Protein and Total Fat\\for Eight Sandwiches},
+    xmin=0, xmax=50,
+    ymin=0, ymax=80,
+    xtick={0,10,20,30,40,50},
+    ytick={0,10,20,30,40,50,60,70,80},
+    grid=major,
+    width=12cm, height=6cm,
+    legend style={at={(0.98,0.05)}, anchor=south east}
+]
+
+% Scatterplot points (estimated visually)
+\addplot[only marks, mark=*] coordinates {
+    (9, 15) (13, 21.5) (20, 35) (25, 40)
+    (30, 50) (35, 53) (40, 60) (48,75 )
+};
+
+% Best fit line (from previous slope estimation: y = 1.29x + 2.39)
+\addplot[red, thick, domain=0:50] {1.54*x + 2.5};
+
+
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot above shows the numbers of grams of both total protein and total fat for eight sandwiches on a restaurant menu.  
+The line of best fit for the data is also shown.  
+According to the line of best fit, which of the following is closest to the predicted increase in total fat, in grams,  
+for every increase of 1 gram in total protein?
+
+\vspace{0.75em}
+
+\choicebox{A}{$2.5$}
+\choicebox{B}{$2.0$}
+\choicebox{C}{$1.5$}
+\choicebox{D}{$1.0$}
+
+
+\newpage
+\subsection*{3.5 Probability and Conditional Probability}
+
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+
+\noindent\markforreview
+
+\begin{center}
+\textbf{Number of Contestants by Score and Day}
+\end{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+ & 5 out of 5 & 4 out of 5 & 3 out of 5 & 2 out of 5 & 1 out of 5 & 0 out of 5 & Total \\
+\hline
+Day 1 & 2 & 3 & 4 & 6 & 3 & 2 & 20 \\
+Day 2 & 2 & 5 & 5 & 4 & 2 & 2 & 20 \\
+Day 3 & 3 & 1 & 4 & 6 & 4 & 2 & 20 \\
+\hline
+Total & 7 & 9 & 13 & 16 & 9 & 6 & 60 \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+The same 20 contestants, on each of 3 days, answered 5 questions in order to win a prize.  
+Each contestant received 1 point for each correct answer. The number of contestants receiving a given score on each day is shown in the table above.  
+
+No contestant received the same score on two different days.  
+If a contestant is selected at random, what is the probability that the selected contestant received a score of 5 on Day 2 or Day 3, given that the contestant received a score of 5 on one of the three days?
+
+\vspace{0.75em}
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+
+
+\begin{center}
+\textbf{Blood type}
+\end{center}
+\begin{center}
+    
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Rhesus factor & A & B & AB & O \\
+\hline
++ & 33 & 9 & 3 & 37 \\
+-- & 7 & 2 & 1 & $x$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+Human blood can be classified into four common blood types—A, B, AB, and O.  
+It is also characterized by the presence ($+$) or absence ($-$) of the rhesus factor.  
+The table above shows the distribution of blood type and rhesus factor for a group of people.  
+If one of these people who is rhesus negative ($-$) is chosen at random, the probability that the person has blood type B is $\frac{1}{9}$.  
+What is the value of $x$?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+\newpage
+\noindent\markforreview
+
+\begin{center}
+    
+
+\textbf{Preferred Activity by Response Type (Percent)}
+
+\vspace{0.5em}
+\begin{tabular}{|l|c|c|}
+\hline
+Activity & Phone & Email \\
+\hline
+Dinner dance & 55\% & 80\% \\
+Football game & 20\% & 10\% \\
+Picnic & 20\% & 5\% \\
+Pool party & 5\% & 5\% \\
+\hline
+Total & 100\% & 100\% \\
+\hline
+\end{tabular}
+\end{center}
+
+
+An alumni association survey asked each high school graduate to select the one activity he or she preferred for the association’s next event.  
+Some of the people responded by phone, and the others responded by email.  
+For the survey, the number of email responses was twice the number of phone responses.  
+If a person who preferred a picnic is selected at random, what is the probability that the person responded by email?
+
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+On May 10, 2015, there were 83 million Internet subscribers in Nigeria.  
+The major Internet providers were MTN, Globacom, Airtel, Etisalat, and Visafone.  
+By September 30, 2015, the number of Internet subscribers in Nigeria had increased to 97 million.  
+If an Internet subscriber in Nigeria on September 30, 2015, is selected at random, the probability that the person selected was an MTN subscriber is 0.43.  
+There were $p$ million MTN subscribers in Nigeria on September 30, 2015.  
+To the nearest integer, what is the value of $p$?
+
+\vspace{0.75em}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+
+\begin{center}
+    
+
+\textbf{Distribution of Age and Assigned Group}
+
+\vspace{0.5em}
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+ & 0--9 years & 10--19 years & 20+ years & Total \\
+\hline
+Group A & 7 & 14 & 9 & 30 \\
+Group B & 6 & 4 & 20 & 30 \\
+Group C & 17 & 12 & 1 & 30 \\
+\hline
+Total & 30 & 30 & 30 & 90 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+One of these participants will be selected at random.  
+What is the probability of selecting a participant from group A, given that the participant is at least 10 years of age?  
+(Express your answer as a decimal or fraction, not as a percent.)
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+
+
+\begin{center}
+    
+
+\textbf{2013 State-Level Taxes}
+
+\vspace{0.5em}
+
+\begin{tabular}{|l|c|c|}
+\hline
+ & State sales tax & No state sales tax \\
+\hline
+State income tax & 39 & 4 \\
+No state income tax & 6 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+To the nearest tenth of a percent, what percent of states with a state-level sales tax do \textbf{not} have a state-level income tax?
+
+\vspace{0.75em}
+
+\choicebox{A}{6.0\%}  
+\choicebox{B}{12.0\%}  
+\choicebox{C}{13.3\%}  
+\choicebox{D}{14.0\%}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Employees working for a customer service line at an electric company recorded all the calls last Monday and noted whether the caller asked for repairs and whether the caller asked about a bill.  
+The results are summarized in the table below.
+
+\vspace{0.75em}
+
+\begin{tabular}{|l|c|c|c|}
+\hline
+ & Asked for repairs & Did not ask for repairs & Total \\
+\hline
+Asked about a bill & 48 & 623 & 671 \\
+Did not ask about a bill & 130 & 90 & 220 \\
+\hline
+Total & 178 & 713 & 891 \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+If a caller last Monday who asked about his or her bill is selected at random, which of the following is closest to the probability that the customer also asked for repairs?
+
+\vspace{0.75em}
+
+\choicebox{A}{0.05}  
+\choicebox{B}{0.07}  
+\choicebox{C}{0.20}  
+\choicebox{D}{0.27}
+
+\newpage
+\subsection*{3.6 Inference from Sample Statistics and Margin of Error }
+
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+
+\noindent\markforreview
+
+\begin{center}
+    
+
+\textbf{Texting Behavior and Cell Phone Use}
+
+\vspace{0.4em}
+
+\begin{tabular}{|l|c|c|c|}
+\hline
+Texting behavior & Talks on cell phone daily & Does not talk on cell phone daily & Total \\
+\hline
+Light & 110 & 146 & 256 \\
+Medium & 139 & 164 & 303 \\
+Heavy & 166 & 74 & 240 \\
+\hline
+Total & 415 & 384 & 799 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+In a study of cell phone use, 799 randomly selected US teens were asked how often they talked on a cell phone and about their texting behavior.  
+The data are summarized in the table above.  
+Based on the data from the study, an estimate of the percent of US teens who are heavy texters is 30\% and the associated margin of error is 3\%.  
+Which of the following is a correct statement based on the given margin of error?
+
+\vspace{0.75em}
+
+\choicebox{A}{Approximately 3\% of the teens in the study who are classified as heavy texters are not really heavy texters.}  
+\choicebox{B}{It is not possible that the percent of all US teens who are heavy texters is less than 27\%.}  
+\choicebox{C}{The percent of all US teens who are heavy texters is 33\%.}  
+\choicebox{D}{It is doubtful that the percent of all US teens who are heavy texters is 35\%.}
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+
+\begin{center}
+    
+
+\textbf{Views on Nuclear Energy Use}
+
+\vspace{0.4em}
+
+\begin{tabular}{|l|c|}
+\hline
+Response & Frequency \\
+\hline
+Strongly favor & 56 \\
+Somewhat favor & 214 \\
+Somewhat oppose & 104 \\
+Strongly oppose & 37 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+A researcher interviewed 411 randomly selected US residents and asked about their views on the use of nuclear energy.  
+The table above summarizes the responses of the interviewees.  
+If the population of the United States was 300 million when the survey was given, based on the sample data for the 411 US residents,  
+what is the best estimate, in \textbf{millions}, of the difference between the number of US residents who somewhat favor or strongly favor  
+the use of nuclear energy and the number of those who somewhat oppose or strongly oppose it?  
+(Round your answer to the nearest whole number.)
+
+\vspace{0.75em}
+
+\vspace{2em}
+
+
+
+
+\noindent\markforreview
+
+
+\begin{center}
+    
+
+\textbf{Sample A vs. Sample B}
+
+\vspace{0.4em}
+\begin{tabular}{|l|c|c|}
+\hline
+Sample & Percent in favor & Margin of error \\
+\hline
+A & 52\% & 4.2\% \\
+B & 48\% & 1.6\% \\
+\hline
+\end{tabular}
+
+\end{center}
+
+\vspace{1em}
+
+The results of two random samples of votes for a proposition are shown above.  
+The samples were selected from the same population, and the margins of error were calculated using the same method.  
+Which of the following is the most appropriate reason that the margin of error for sample A is greater than the margin of error for sample B?
+
+\vspace{0.75em}
+
+\choicebox{A}{Sample A had a smaller number of votes that could not be recorded.}  
+\choicebox{B}{Sample A had a higher percent of favorable responses.}  
+\choicebox{C}{Sample A had a larger sample size.}  
+\choicebox{D}{Sample A had a smaller sample size.}
+
+\vspace{2em}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+In State X, Mr. Camp’s eighth-grade class consisting of 26 students was surveyed and 34.6 percent of the students reported that they had at least two siblings.  
+The average eighth-grade class size in the state is 26.  
+If the students in Mr. Camp’s class are representative of students in the state’s eighth-grade classes and there are 1,800 eighth-grade classes in the state,  
+which of the following best estimates the number of eighth-grade students in the state who have fewer than two siblings?
+
+\vspace{0.75em}
+
+\choicebox{A}{16,200}  
+\choicebox{B}{23,400}  
+\choicebox{C}{30,600}  
+\choicebox{D}{46,800}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\begin{center}
+    
+
+\textbf{Poll Results}
+
+\vspace{0.4em}
+\begin{tabular}{|l|c|}
+\hline
+Candidate & Votes \\
+\hline
+Angel Cruz & 483 \\
+Terry Smith & 320 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+The table shows the results of a poll. A total of 803 voters selected at random were asked which candidate they would vote for in the upcoming election.  
+According to the poll, if 6,424 people vote in the election, by how many votes would Angel Cruz be expected to win?
+
+\vspace{0.75em}
+
+\choicebox{A}{163}  
+\choicebox{B}{1,304}  
+\choicebox{C}{3,864}  
+\choicebox{D}{5,621}
+
+\vspace{2em}
+
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection*{3.7 Evaluating Statistical Claims: Observational Studies and Experiments }
+
+\vspace{0.5em}
+
+\setcounter{questionnum}{0}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+A sample of 40 fourth-grade students was selected at random from a certain school.  
+The 40 students completed a survey about the morning announcements, and 32 thought the announcements were helpful.  
+Which of the following is the largest population to which the results of the survey can be applied?
+
+\vspace{0.75em}
+
+\choicebox{A}{The 40 students who were surveyed}  
+\choicebox{B}{All fourth-grade students at the school}  
+\choicebox{C}{All students at the school}  
+\choicebox{D}{All fourth-grade students in the county in which the school is located}
+
+\vspace{2em}
+
+
+\newpage
+\noindent\markforreview
+\vspace{0.5em}
+
+A trivia tournament organizer wanted to study the relationship between the number of points a team scores in a trivia round  
+and the number of hours that a team practices each week. For the study, the organizer selected 55 teams at random  
+from all trivia teams in a certain tournament. The table displays the information for the 40 teams in the sample that practiced  
+for at least 3 hours per week.
+
+
+\begin{center}
+    
+
+\begin{tabular}{|l|c|c|c|}
+\hline
+Hours practiced & 6 to 13 points & 14 or more points & Total \\
+\hline
+3 to 5 hours & 6 & 4 & 10 \\
+More than 5 hours & 4 & 26 & 30 \\
+\hline
+Total & 10 & 30 & 40 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+
+\noindent Which option is the largest population to which the results of the study can be generalized?
+
+
+
+\choicebox{A}{All trivia teams in the tournament that scored 14 or more points in the round}  
+\choicebox{B}{The 55 trivia teams in the sample}  
+\choicebox{C}{The 40 trivia teams in the sample that practiced for at least 3 hours per week}  
+\choicebox{D}{All trivia teams in the tournament}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A psychologist designed and conducted a study to determine whether playing a certain educational game  
+increases middle school students’ accuracy in adding fractions.  
+For the study, the psychologist chose a random sample of 35 students from all of the students  
+at one of the middle schools in a large city. The psychologist found that students who played the game  
+showed significant improvement in accuracy when adding fractions.  
+What is the largest group to which the results of the study can be generalized?
+
+\vspace{0.75em}
+
+\choicebox{A}{The 35 students in the sample}  
+\choicebox{B}{All students at the school}  
+\choicebox{C}{All middle school students in the city}  
+\choicebox{D}{All students in the city}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Near the end of a US cable news show, the host invited viewers to respond to a poll on the show’s website that asked,  
+“Do you support the new federal policy discussed during the show?” At the end of the show, the host reported that  
+28\% responded “Yes,” and 70\% responded “No.”  
+Which of the following best explains why the results are unlikely to represent the sentiments of the population of the United States?
+
+\vspace{0.75em}
+
+\choicebox{A}{The percentages do not add up to 100\%, so any possible conclusions from the poll are invalid.}  
+\choicebox{B}{Those who responded to the poll were not a random sample of the population of the United States.}  
+\choicebox{C}{There were not 50\% “Yes” responses and 50\% “No” responses.}  
+\choicebox{D}{The show did not allow viewers enough time to respond to the poll.}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+To determine the mean number of children per household in a community,  
+Tabitha surveyed 20 families at a playground.  
+For the 20 families surveyed, the mean number of children per household was 2.4.  
+Which of the following statements must be true?
+
+\vspace{0.75em}
+
+\choicebox{A}{The mean number of children per household in the community is 2.4.}  
+\choicebox{B}{A determination about the mean number of children per household in the community should not be made because the sample size is too small.}  
+\choicebox{C}{The sampling method is flawed and may produce a biased estimate of the mean number of children per household in the community.}  
+\choicebox{D}{The sampling method is not flawed and is likely to produce an unbiased estimate of the mean number of children per household in the community.}
+
+
+
+
+
+
+\end{document}
