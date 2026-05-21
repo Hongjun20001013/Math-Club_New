@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Student Detail · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-admin-page">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('admin') }}">← Admin Panel</a></p>
+
+    <section class="np-admin-hero glass-panel np-glass mp-animate-in">
+      <div>
+        <p class="np-admin-kicker">Student Record</p>
+        <h1>{{ student.username }}</h1>
+        <p>Created: {{ student.created_at or "Unknown" }} · {{ "Active" if student.is_active else "Inactive" }}</p>
+      </div>
+      <div class="np-admin-stats" aria-label="Student summary">
+        <div><strong>{{ totals.sessions }}</strong><span>Sessions</span></div>
+        <div><strong>{{ totals.responses }}</strong><span>Responses</span></div>
+        <div><strong>{% if totals.accuracy_pct is not none %}{{ totals.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
+      </div>
+    </section>
+
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-student-sessions">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Practice History</p>
+          <h2 id="np-admin-student-sessions">All Sessions</h2>
+          <p>Open a session to see the submitted questions, answers, and correctness.</p>
+        </div>
+      </header>
+      <div class="np-admin-record-table" role="table" aria-label="Student practice sessions">
+        <div class="np-admin-record-row np-admin-record-row--head" role="row">
+          <span>Domain</span>
+          <span>Topic</span>
+          <span>Responses</span>
+          <span>Correct</span>
+          <span>Started</span>
+          <span>Last activity</span>
+          <span>Detail</span>
+        </div>
+        {% for attempt in attempts %}
+        <div class="np-admin-record-row" role="row">
+          <span>{{ attempt.domain }}</span>
+          <span>{{ attempt.topic }}</span>
+          <span>{{ attempt.responses_total or 0 }}</span>
+          <span>{{ attempt.correct_total or 0 }}</span>
+          <span>{{ attempt.created_at }}</span>
+          <span>{{ attempt.last_submitted_at or attempt.created_at }}</span>
+          <span><a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-admin-detail-link">Report</a></span>
+        </div>
+        {% else %}
+        <p class="np-admin-empty">This student has no practice sessions yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-analytics-wrap">
+<div class="np-analytics-wrap" data-mastery-api="{{ url_for('practice_analytics_api_mastery') }}" data-mastery-cancel-api="{{ url_for('practice_analytics_api_mastery_cancel') }}">
     <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
 
     {% with messages = get_flashed_messages() %}
@@ -13,12 +13,64 @@
     {% endif %}
     {% endwith %}
 
-    <header class="np-analytics-hero np-analytics-hero--lux glass-panel np-glass mp-animate-in">
+    <header class="np-analytics-hero np-analytics-hero--lux{% if not selected_partition %} np-analytics-hero--source-home{% endif %} glass-panel np-glass mp-animate-in">
         <div class="np-sh-hero-noise" aria-hidden="true"></div>
-        <p class="np-analytics-kicker">Mistake log</p>
-        <h1 class="np-analytics-title">Patterns, not noise</h1>
-        <p class="np-analytics-lead">Tag misses after a set; edits save to your account (or this device when logged out).</p>
-        <p class="np-analytics-stat"><strong>{{ wrong_total }}</strong> incorrect attempts in log</p>
+        <p class="np-analytics-kicker">Mistake Analytics</p>
+        <h1 class="np-analytics-title">{% if selected_partition %}{{ selected_partition.label }} mistakes{% else %}Choose a mistake source.{% endif %}</h1>
+        <p class="np-analytics-lead">{% if selected_partition %}Now drill into units, error causes, and the exact questions to redo.{% else %}Start by choosing where the missed questions came from. This keeps SAT practice, placement diagnostics, and future exam modes separated for students.{% endif %}</p>
+        <p class="np-analytics-quality-note">SAT previews are filtered out automatically: only sessions with 3+ submitted questions count here. Placement diagnostics always count.</p>
+        {% if selected_partition %}
+        <div class="np-analytics-hero-insights" aria-label="Quick mistake insights">
+            {% if classifier.primary %}
+            <span><b>Main pattern</b>{{ classifier.primary.label }}</span>
+            {% endif %}
+            {% for part in analytics_partitions[:2] %}
+            <a href="{{ url_for('practice_analytics', part=part.id) }}"><b>{{ part.label }}</b>{{ part.count }} misses</a>
+            {% endfor %}
+        </div>
+        <div class="np-analytics-hero-stats" aria-label="Mistake analytics summary">
+            <p class="np-analytics-stat"><strong>{{ wrong_total }}</strong><span>incorrect attempts</span></p>
+            <p class="np-analytics-stat"><strong>{{ classifier.health_score }}</strong><span>stability score</span></p>
+            {% if classifier.primary %}
+            <p class="np-analytics-stat"><strong>{{ classifier.primary.level }}</strong><span>primary risk</span></p>
+            {% endif %}
+        </div>
+        {% if analytics_partitions %}
+        <div class="np-analytics-hero-visual" aria-label="Mistake distribution preview">
+            <div class="np-analytics-orbit-col">
+                <div class="np-analytics-orbit{% if viz_hero_conic %} np-analytics-orbit--data{% endif %}" aria-hidden="true"{% if viz_hero_conic %} style="background: {{ viz_hero_conic }};"{% endif %}>
+                    <span class="np-analytics-orbit-core">{{ wrong_total }}</span>
+                </div>
+                <ul class="np-analytics-hero-legend" aria-label="Share by track">
+                    {% for part in analytics_partitions %}
+                    <li>
+                        <i class="np-analytics-hero-legend-swatch" style="background: {{ part.viz_color }};"></i>
+                        <a href="{{ url_for('practice_analytics', part=part.id) }}">{{ part.label }}</a>
+                        <em>{{ part.pct }}%</em>
+                        <span class="np-analytics-hero-legend-n">{{ part.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="np-analytics-hero-bars-wrap">
+                <p class="np-analytics-hero-bars-kicker">Track split</p>
+                <div class="np-analytics-hero-split-strip" aria-hidden="true" title="Proportional mix of misses by dashboard">
+                    {% for part in analytics_partitions %}
+                    <a class="np-analytics-hero-split-seg np-analytics-hero-split-seg--{{ part.id }}" href="{{ url_for('practice_analytics', part=part.id) }}" style="flex: {{ part.pct }} 1 0; min-width: 2px; background: {{ part.viz_color }};"></a>
+                    {% endfor %}
+                </div>
+                <div class="np-analytics-hero-bars">
+                    {% for part in analytics_partitions %}
+                    <a href="{{ url_for('practice_analytics', part=part.id) }}" class="np-analytics-hero-bar np-analytics-hero-bar--{{ part.id }}">
+                        <span>{{ part.label }}</span>
+                        <strong>{{ part.count }}</strong>
+                        <b aria-hidden="true"><i style="width: {{ part.pct }}%; background: {{ part.viz_color }};"></i></b>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% if top_mistake_tags %}
         <div class="np-analytics-tagsummary">
             <span class="np-analytics-tagsummary-label">Top tags:</span>
@@ -27,49 +79,609 @@
             {% endfor %}
         </div>
         {% endif %}
+        {% endif %}
     </header>
 
     {% if not wrong_rows %}
     <p class="np-analytics-empty glass-panel np-glass">No wrong answers in your log yet. Complete a practice set; misses are saved automatically and show on the session results page.</p>
     {% else %}
-    <div class="np-analytics-list">
-        {% for row in wrong_rows %}
-        <article class="np-analytics-row glass-panel np-glass">
-            <div class="np-analytics-row-top">
-                <div>
-                    <p class="np-analytics-row-topic">{{ row.topic_title }}</p>
-                    <p class="np-analytics-row-meta">{{ row.when }} · Q {{ row.q_index + 1 }} · {{ row.domain }}</p>
-                </div>
-                <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Redo</a>
+    {% if not selected_partition %}
+    <section class="np-mistake-source-home" aria-label="Choose mistake source">
+        <div class="np-source-home-head">
+            <div>
+                <p class="np-analytics-card-kicker">Mistake sources</p>
+                <h2>Where do you want to review?</h2>
+                <p>Pick one folder first. Inside each folder, the page will show units, patterns, missed questions, redo links, and quizzes.</p>
             </div>
-            <p class="np-analytics-row-ans"><span>Yours: <strong>{{ row.yours }}</strong></span> · <span>Key: <strong>{{ row.key }}</strong></span></p>
-            {% if row.tag_labels %}
-            <p class="np-analytics-row-tags">{{ row.tag_labels | join(' · ') }}</p>
+            <span>{{ wrong_total }} total misses</span>
+        </div>
+        <div class="np-source-card-grid">
+            {% for part in analytics_partitions %}
+            <a href="{{ url_for('practice_analytics', part=part.id) }}{% if part.id == 'sat' %}#np-analytics-data{% endif %}" class="np-source-card np-source-card--{{ part.id }} glass-panel np-glass">
+                <span class="np-source-card-count">{{ part.count }}</span>
+                <p class="np-source-card-kicker">{% if part.id == 'sat' %}Practice banks · Units 1–4{% elif part.id == 'placement' %}Timed diagnostic only{% else %}Other saved practice{% endif %}</p>
+                <h3>{{ part.label }}</h3>
+                <p>{% if part.id == 'sat' %}Review mistakes from Algebra, Advanced Math, Data, and Geometry full-bank practice.{% elif part.id == 'placement' %}Review misses from course placement attempts without mixing them into SAT practice.{% else %}Review mistakes that do not belong to SAT Units 1–4 or Placement.{% endif %}</p>
+                {% if part.classifier.primary %}
+                <em>Main pattern: {{ part.classifier.primary.label }}</em>
+                {% endif %}
+                {% if part.sat_children|default([]) %}
+                <span class="np-source-card-mini">
+                    {% for ch in part.sat_children %}
+                    <b>{{ ch.label }} <small>{{ ch.count }}</small></b>
+                    {% endfor %}
+                </span>
+                {% elif part.units %}
+                <span class="np-source-card-mini">
+                    {% for unit in part.units[:4] %}
+                    <b>{{ unit.label }} <small>{{ unit.count }}</small></b>
+                    {% endfor %}
+                </span>
+                {% endif %}
+                <strong class="np-source-card-cta">Open {{ part.label }} →</strong>
+            </a>
+            {% endfor %}
+            <article class="np-source-card np-source-card--roadmap glass-panel np-glass" aria-disabled="true">
+                <span class="np-source-card-count">Soon</span>
+                <p class="np-source-card-kicker">Hard question drill</p>
+                <h3>Challenge Mistakes</h3>
+                <p>Future misses from hard-question drills will live here, separate from regular SAT unit practice.</p>
+                <strong class="np-source-card-cta np-source-card-cta--muted">Coming after challenge mode</strong>
+            </article>
+            <article class="np-source-card np-source-card--roadmap glass-panel np-glass" aria-disabled="true">
+                <span class="np-source-card-count">Soon</span>
+                <p class="np-source-card-kicker">Real exam mode</p>
+                <h3>Mock Exam Mistakes</h3>
+                <p>Future full-test or timed-section misses will live here, so official-style exams stay separate.</p>
+                <strong class="np-source-card-cta np-source-card-cta--muted">Coming after exam mode</strong>
+            </article>
+        </div>
+        <div class="np-source-routing-note glass-panel np-glass">
+            <strong>Recommended structure:</strong>
+            <span>SAT Math = normal Unit 1–4 practice</span>
+            <span>Placement Test = course placement diagnostic</span>
+            <span>Challenge Mistakes = future hard problems</span>
+            <span>Mock Exam Mistakes = future real exam mode</span>
+        </div>
+    </section>
+    {% else %}
+    <section class="np-analytics-subject-picker" aria-label="Choose mistake category">
+        <div class="np-analytics-section-head">
+            <div>
+                <p class="np-analytics-card-kicker">Mistake folders</p>
+                <h2>Pick one dashboard</h2>
+            </div>
+            {% if selected_partition %}
+            <a href="{% if selected_partition.id in ['unit1', 'unit2', 'unit3', 'unit4'] %}{{ url_for('practice_analytics', part='sat') }}{% else %}{{ url_for('practice_analytics') }}{% endif %}" class="np-analytics-back">{% if selected_partition.id in ['unit1', 'unit2', 'unit3', 'unit4'] %}← SAT Math{% else %}All mistake boxes{% endif %}</a>
             {% endif %}
-            {% if row.note %}
-            <p class="np-analytics-row-note">“{{ row.note }}”</p>
-            {% endif %}
+        </div>
+        <div class="np-analytics-subject-grid">
+            {% for part in analytics_partitions %}
+            <a href="{{ url_for('practice_analytics', part=part.id) }}" class="np-analytics-subject-card np-analytics-subject-card--{{ part.id }}{% if selected_partition and (selected_partition.id == part.id or (part.id == 'sat' and selected_partition.id in ['unit1', 'unit2', 'unit3', 'unit4'])) %} is-active{% endif %} glass-panel np-glass">
+                <span class="np-analytics-subject-count">{{ part.count }}</span>
+                <span class="np-analytics-subject-kicker">{{ part.subtitle }}</span>
+                <strong>{{ part.label }}</strong>
+                <span>{{ part.count }} wrong answer{% if part.count != 1 %}s{% endif %}{% if part.classifier.primary %} · main pattern: {{ part.classifier.primary.label }}{% endif %}</span>
+                {% if part.classifier.diagnoses %}
+                <span class="np-analytics-subject-stack" aria-label="{{ part.label }} error mix">
+                    {% for d in part.classifier.diagnoses[:4] %}
+                    <i class="np-analytics-stack-seg np-analytics-stack-seg--{{ d.id }}" style="width: {{ d.pct }}%;" title="{{ d.label }} {{ d.pct }}%"></i>
+                    {% endfor %}
+                </span>
+                {% endif %}
+                {% if part.sat_children|default([]) %}
+                <span class="np-analytics-subject-units">
+                    {% for ch in part.sat_children %}
+                    <b>{{ ch.label }} <small>{{ ch.count }}</small></b>
+                    {% endfor %}
+                </span>
+                {% elif part.units %}
+                <span class="np-analytics-subject-units">
+                    {% for unit in part.units[:5] %}
+                    <b>{{ unit.label }} <small>{{ unit.count }}</small></b>
+                    {% endfor %}
+                </span>
+                {% endif %}
+                <em>Open dashboard</em>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
 
-            <details class="np-analytics-edit">
-                <summary>Edit tags and note</summary>
-                <form method="post" action="{{ url_for('practice_analytics_update', pr_id=row.pr_id) }}" class="np-analytics-edit-form">
-                    <div class="np-reflect-tag-grid np-analytics-edit-tags">
-                        {% for o in mistake_tag_options %}
-                        <label class="np-reflect-tag">
-                            <input type="checkbox" name="mistake_tag" value="{{ o.id }}"{% if o.id in row.tag_ids %} checked{% endif %}>
-                            <span class="np-reflect-tag-label">{{ o.label }}</span>
-                        </label>
+    <section id="np-analytics-data" class="np-analytics-viz-grid" aria-label="Mistake data visualization">
+        <article class="np-analytics-viz-card glass-panel np-glass">
+            <div class="np-analytics-viz-head">
+                <p class="np-analytics-card-kicker">Track split</p>
+                <strong>{{ wrong_total }}</strong>
+            </div>
+            <div class="np-analytics-viz-strip" aria-hidden="true">
+                {% for part in analytics_partitions %}
+                <span class="np-analytics-viz-strip-seg" style="width: {{ part.pct }}%; background: {{ part.viz_color }};"></span>
+                {% endfor %}
+            </div>
+            <div class="np-analytics-viz-bars">
+                {% for part in analytics_partitions %}
+                <a href="{{ url_for('practice_analytics', part=part.id) }}" class="np-analytics-viz-row{% if selected_partition and (selected_partition.id == part.id or (part.id == 'sat' and selected_partition.id in ['unit1', 'unit2', 'unit3', 'unit4'])) %} is-active{% endif %}">
+                    <span class="np-analytics-viz-row-label"><i class="np-analytics-viz-dot" style="background: {{ part.viz_color }};"></i>{{ part.label }}</span>
+                    <em>{{ part.count }} · {{ part.pct }}%</em>
+                    <b aria-hidden="true"><i style="width: {{ part.pct }}%; background: {{ part.viz_color }};"></i></b>
+                </a>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="np-analytics-viz-card glass-panel np-glass">
+            <div class="np-analytics-viz-head">
+                <p class="np-analytics-card-kicker">Error signature</p>
+                {% if classifier.primary %}<strong>{{ classifier.primary.label }}</strong>{% endif %}
+            </div>
+            <div class="np-analytics-viz-bars">
+                {% for d in classifier.diagnoses[:5] %}
+                <div class="np-analytics-viz-row np-analytics-viz-row--diag-{{ d.id }}">
+                    <span>{{ d.label }}</span>
+                    <em>{{ d.pct }}%</em>
+                    <b aria-hidden="true"><i style="width: {{ d.pct }}%;"></i></b>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+
+        {% if top_tags_viz %}
+        <article class="np-analytics-viz-card np-analytics-viz-card--tags glass-panel np-glass">
+            <div class="np-analytics-viz-head">
+                <p class="np-analytics-card-kicker">Tag mix</p>
+                <strong>top {{ top_tags_viz|length }}</strong>
+            </div>
+            <div class="np-analytics-tag-viz">
+                {% for t in top_tags_viz %}
+                <div class="np-analytics-tag-viz-row">
+                    <span title="{{ t.label }}">{{ t.label }}</span>
+                    <div class="np-analytics-tag-viz-track"><i style="width: {{ t.rel_pct }}%;"></i></div>
+                    <em>{{ t.count }}</em>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+        {% endif %}
+
+        {% if selected_partition %}
+        <article class="np-analytics-viz-card np-analytics-viz-card--wide glass-panel np-glass">
+            <div class="np-analytics-viz-head">
+                <p class="np-analytics-card-kicker">{{ selected_partition.label }} · distribution</p>
+                <strong>{{ selected_partition.count }}</strong>
+            </div>
+            <div class="np-analytics-hbar-chart" role="list">
+                {% if selected_partition.sat_children|default([]) %}
+                {% for ch in selected_partition.sat_children %}
+                <a class="np-analytics-hbar-row np-analytics-hbar-row--link" role="listitem" href="{{ url_for('practice_analytics', part=ch.id) }}">
+                    <span class="np-analytics-hbar-label">{{ ch.label }}</span>
+                    <div class="np-analytics-hbar-track" aria-hidden="true"><i style="width: {{ ch.viz_pct }}%; background: {{ ch.viz_color }};"></i></div>
+                    <span class="np-analytics-hbar-meta"><strong>{{ ch.count }}</strong><em>{{ ch.viz_pct }}%</em></span>
+                </a>
+                {% endfor %}
+                {% else %}
+                {% for unit in selected_partition.units %}
+                <div class="np-analytics-hbar-row" role="listitem">
+                    <span class="np-analytics-hbar-label">{{ unit.label }}</span>
+                    <div class="np-analytics-hbar-track" aria-hidden="true"><i style="width: {{ unit.pct }}%; background: {{ unit.viz_color }};"></i></div>
+                    <span class="np-analytics-hbar-meta"><strong>{{ unit.count }}</strong><em>{{ unit.pct }}%</em></span>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </article>
+        {% endif %}
+    </section>
+
+    {% if selected_partition %}
+    <section class="np-analytics-risk-map glass-panel np-glass" aria-label="{{ selected_partition.label }} unit risk map">
+        <div class="np-analytics-section-head">
+            <div>
+                <p class="np-analytics-card-kicker">Risk map</p>
+                <h2>{% if selected_partition.sat_children|default([]) %}SAT Math · pick a unit{% else %}{{ selected_partition.label }} unit snapshot{% endif %}</h2>
+            </div>
+            <span>{% if selected_partition.sat_children|default([]) %}Use the <strong>purple bar</strong> on each card for that unit’s <strong>mistake list</strong>; the <strong>outline button</strong> starts the full bank at question 1.{% else %}unit size = missed count, color mix = error cause{% endif %}</span>
+        </div>
+        <div class="np-analytics-risk-grid">
+            {% if selected_partition.sat_children|default([]) %}
+            {% for ch in selected_partition.sat_children %}
+            <div class="np-analytics-risk-tile np-analytics-risk-tile--sat-child np-analytics-risk-tile--with-practice">
+                <span id="np-risk-main-help-{{ ch.id }}" class="np-visually-hidden">Opens this unit’s mistake list and missed questions. Does not start the timed full-bank practice set.</span>
+                <a class="np-analytics-risk-tile-main" href="{{ url_for('practice_analytics', part=ch.id) }}" aria-describedby="np-risk-main-help-{{ ch.id }}">
+                    <span class="np-analytics-risk-count">{{ ch.count }}</span>
+                    <span class="np-analytics-risk-title">{{ ch.label }}</span>
+                    <span class="np-analytics-risk-sub">{{ ch.subtitle }}</span>
+                    {% if ch.classifier.primary %}
+                    <strong>{{ ch.classifier.primary.label }}</strong>
+                    {% endif %}
+                    <span class="np-analytics-risk-stack" aria-hidden="true">
+                        {% for d in ch.classifier.diagnoses[:4] %}
+                        <i class="np-analytics-stack-seg np-analytics-stack-seg--{{ d.id }}" style="width: {{ d.pct }}%;"></i>
+                        {% endfor %}
+                    </span>
+                    <div class="np-analytics-risk-meter" aria-hidden="true"><span style="width: {{ ((100 * ch.count / risk_viz_max) if risk_viz_max else 0)|int }}%; background: {{ ch.viz_color|default('#5b4dff') }};"></span></div>
+                    <span class="np-analytics-risk-tile-primary-cta">Mistake list · {{ ch.count }} →</span>
+                </a>
+                <a class="np-pw-btn np-pw-btn--ghost np-analytics-risk-tile-practice" href="{{ url_for('practice_question', domain=ch.practice_domain, topic=ch.practice_topic, qnum=0) }}" title="Timed full-bank run from question 1">Full bank · start at Q1</a>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% for unit in selected_partition.units %}
+            <a class="np-analytics-risk-tile" href="#analytics-unit-{{ unit.id }}">
+                <span class="np-analytics-risk-count">{{ unit.count }}</span>
+                <span class="np-analytics-risk-title">{{ unit.label }}</span>
+                <span class="np-analytics-risk-sub">{{ unit.subtitle }}</span>
+                {% if unit.classifier.primary %}
+                <strong>{{ unit.classifier.primary.label }}</strong>
+                {% endif %}
+                <span class="np-analytics-risk-stack" aria-hidden="true">
+                    {% for d in unit.classifier.diagnoses[:4] %}
+                    <i class="np-analytics-stack-seg np-analytics-stack-seg--{{ d.id }}" style="width: {{ d.pct }}%;"></i>
+                    {% endfor %}
+                </span>
+                <div class="np-analytics-risk-meter" aria-hidden="true"><span style="width: {{ ((100 * unit.count / risk_viz_max) if risk_viz_max else 0)|int }}%; background: {{ unit.viz_color|default('#6c4eff') }};"></span></div>
+            </a>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="np-analytics-intel-grid" aria-label="Classifier overview">
+        {% if classifier.primary %}
+        <article class="np-analytics-primary glass-panel np-glass">
+            <p class="np-analytics-card-kicker">Classifier output</p>
+            <h2>{{ classifier.primary.label }}</h2>
+            <p class="np-analytics-primary-sub">{{ classifier.primary.short }} · {{ classifier.primary.pct }}% of recent misses · {{ classifier.primary.confidence }}% confidence</p>
+            <div class="np-analytics-confidence" aria-label="Classifier confidence {{ classifier.primary.confidence }} percent">
+                <span style="width: {{ classifier.primary.confidence }}%;"></span>
+            </div>
+            <p class="np-analytics-action">{{ classifier.primary.action }}</p>
+        </article>
+        {% endif %}
+
+        <article class="np-analytics-plan glass-panel np-glass">
+            <p class="np-analytics-card-kicker">Next study loop</p>
+            <ol class="np-analytics-plan-list">
+                {% for step in classifier.review_plan %}
+                <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+        </article>
+    </section>
+
+    <section class="np-analytics-diagnosis" aria-label="Mistake type classification">
+        {% for d in classifier.diagnoses %}
+        <article class="np-analytics-diag-card np-analytics-diag-card--{{ d.id }} glass-panel np-glass">
+            <div class="np-analytics-diag-top">
+                <div>
+                    <p class="np-analytics-card-kicker">{{ d.level }} signal</p>
+                    <h3>{{ d.label }}</h3>
+                </div>
+                <strong>{{ d.pct }}%</strong>
+            </div>
+            <p>{{ d.count }} miss(es) classified here. {{ d.short }}.</p>
+            {% if d.evidence %}
+            <div class="np-analytics-evidence">
+                {% for e in d.evidence %}
+                <span>{{ e }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </section>
+
+    {% if classifier.skills %}
+    <section class="np-analytics-skills glass-panel np-glass" aria-label="Priority skill clusters">
+        <div class="np-analytics-section-head">
+            <div>
+                <p class="np-analytics-card-kicker">Priority queue</p>
+                <h2>Skills to attack first</h2>
+            </div>
+            <span>ranked by repeated misses</span>
+        </div>
+        <div class="np-analytics-skill-list">
+            {% for skill in classifier.skills %}
+            <a class="np-analytics-skill" href="{{ skill.href }}">
+                <span class="np-analytics-skill-rank">{{ loop.index }}</span>
+                <span class="np-analytics-skill-main">
+                    <strong>{{ skill.title }}</strong>
+                    <em>{{ skill.count }} miss(es) · {{ skill.risk }} risk</em>
+                </span>
+                <span class="np-analytics-skill-bar"><span style="width: {{ skill.pct }}%;"></span></span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if selected_partition.units|length %}
+    <div class="np-analytics-section-head np-analytics-log-head">
+        <div>
+            <p class="np-analytics-card-kicker">Mistake learning system</p>
+            <h2>{{ selected_partition.label }} mistakes by unit</h2>
+            <p class="np-analytics-ladder-lead">Each miss has a <strong>status</strong> (unreviewed → reviewed → redo correct → mastered). <strong>Open item</strong> brings back that bank question only—after you submit once you’ll see the full walkthrough and return here. Expand <strong>Pattern &amp; pitfalls</strong> for similar links; use the unit <strong>miss quiz</strong> when you want a longer shuffled set.</p>
+        </div>
+        <span>read top to bottom: unit → cause → skill → question</span>
+    </div>
+
+    <div class="np-analytics-part-list">
+        {% for part in [selected_partition] %}
+        <section class="np-analytics-part np-analytics-part--{{ part.id }}" aria-label="{{ part.label }} mistake map">
+            <header class="np-analytics-part-head glass-panel np-glass">
+                <div>
+                    <p class="np-analytics-card-kicker">{{ part.subtitle }}</p>
+                    <h3>{{ part.label }}</h3>
+                    <p>{{ part.count }} wrong answer{% if part.count != 1 %}s{% endif %} in this part{% if part.classifier.primary %} · main pattern: {{ part.classifier.primary.label }}{% endif %}</p>
+                    {% if part.id in ['unit1', 'unit2', 'unit3', 'unit4'] %}
+                    <p class="np-analytics-unit-quiz-cta">
+                        <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_miss_quiz_sat_module', part_id=part.id) }}">Take unit miss quiz</a>
+                        <span class="np-analytics-unit-quiz-hint">Shuffled redo for every tracked miss in this unit (1.1–1.5 style scope).</span>
+                    </p>
+                    {% endif %}
+                </div>
+                <strong>{{ part.count }}</strong>
+            </header>
+
+            <div class="np-analytics-unit-list">
+                {% for unit in part.units %}
+                <section id="analytics-unit-{{ unit.id }}" class="np-analytics-unit glass-panel np-glass">
+                    <header class="np-analytics-unit-head">
+                        <div>
+                            <p class="np-analytics-card-kicker">{{ unit.subtitle }}</p>
+                            <h4>{{ unit.label }}</h4>
+                            <p>{{ unit.count }} wrong answer{% if unit.count != 1 %}s{% endif %}{% if unit.classifier.primary %} · main pattern: {{ unit.classifier.primary.label }}{% endif %}</p>
+                        </div>
+                        <strong>{{ unit.count }}</strong>
+                    </header>
+
+                    <div class="np-analytics-group-list">
+                        {% for group in unit.classifier.diagnosis_groups %}
+                        <section class="np-analytics-group glass-panel np-glass np-analytics-group--{{ group.id }}">
+                            <header class="np-analytics-group-head">
+                                <div>
+                                    <p class="np-analytics-card-kicker">{{ group.level }} priority · {{ group.count }} question{% if group.count != 1 %}s{% endif %}</p>
+                                    <h3>{{ group.label }}</h3>
+                                    <p>{{ group.short }}. {{ group.action }}</p>
+                                </div>
+                                <strong>{{ group.pct }}%</strong>
+                            </header>
+
+                            {% if group.skill_summary %}
+                            <div class="np-analytics-group-skills" aria-label="Skills in this mistake group">
+                                {% for skill in group.skill_summary %}
+                                <span>{{ skill.title }} <b>{{ skill.count }}</b></span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="np-analytics-group-rows">
+                                {% for row in group.rows %}
+                                <article class="np-analytics-mini-row" id="np-miss-pr-{{ row.pr_id }}">
+                                    <div class="np-analytics-mini-main">
+                                        <span class="np-analytics-mini-q">Q {{ row.q_index + 1 }}</span>
+                                        <div>
+                                            <p class="np-analytics-mini-title">{{ row.knowledge_title or row.topic_title }}</p>
+                                            <p class="np-analytics-mini-meta">{{ row.when }} · {{ row.analytics_unit_label }}{% if row.question_kind == 'free_response' %} · free response{% else %} · multiple choice{% endif %}</p>
+                                        </div>
+                                        <span class="np-analytics-mastery-badge np-analytics-mastery-badge--{{ row.mastery_effective }}" data-mastery-badge title="Review status">{{ row.mastery_label }}</span>
+                                    </div>
+                                    <p class="np-analytics-mini-ans">
+                                        <span>Yours <strong>{{ row.yours }}</strong></span>
+                                        <span>Key <strong>{{ row.key }}</strong></span>
+                                    </p>
+                                    {% if row.tag_labels or row.note %}
+                                    <div class="np-analytics-mini-context">
+                                        {% if row.tag_labels %}
+                                        <p>{{ row.tag_labels | join(' · ') }}</p>
+                                        {% endif %}
+                                        {% if row.note %}
+                                        <p>“{{ row.note }}”</p>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if row.pattern_pack %}
+                                    <details class="np-analytics-pattern-pack">
+                                        <summary>Pattern &amp; pitfalls (student view)</summary>
+                                        <div class="np-analytics-pattern-body">
+                                            <p class="np-analytics-pattern-line"><strong>{{ row.pattern_pack.title }}.</strong> {{ row.pattern_pack.student_line }}</p>
+                                            <p class="np-analytics-pattern-coach"><em>Next move:</em> {{ row.pattern_pack.coach_move }}</p>
+                                            {% if row.pattern_pack.keywords %}
+                                            <p class="np-analytics-pattern-kw"><em>Keywords to watch:</em> {{ row.pattern_pack.keywords | join(', ') }}</p>
+                                            {% endif %}
+                                            {% if row.pattern_pack.playbook %}
+                                            <p class="np-analytics-pattern-playbook"><em>Standard pattern:</em> {{ row.pattern_pack.playbook }}</p>
+                                            {% endif %}
+                                            {% if row.pattern_pack.pitfall %}
+                                            <p class="np-analytics-pattern-pitfall"><em>Common pitfall:</em> {{ row.pattern_pack.pitfall }}</p>
+                                            {% endif %}
+                                            {% if row.similar_questions|length > 1 %}
+                                            <p class="np-analytics-pattern-more"><em>More in this file:</em>
+                                                {% for s in row.similar_questions[1:] %}
+                                                <a href="{{ s.href }}">{{ s.label }}</a>{% if not loop.last %} · {% endif %}
+                                                {% endfor %}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </details>
+                                    {% endif %}
+                                    <div class="np-analytics-mini-actions">
+                                        <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Open item</a>
+                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective == 'mastered' %} hidden{% endif %}>Mark mastered</button>
+                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-cancel-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective != 'mastered' %} hidden{% endif %}>Cancel mark mastered</button>
+                                        <details class="np-analytics-edit np-analytics-mini-edit">
+                                            <summary>Edit tags</summary>
+                                            <form method="post" action="{{ url_for('practice_analytics_update', pr_id=row.pr_id) }}" class="np-analytics-edit-form">
+                                                <input type="hidden" name="part" value="{{ request.args.get('part','') }}">
+                                                <input type="hidden" name="anchor" value="np-miss-pr-{{ row.pr_id }}">
+                                                <div class="np-reflect-tag-grid np-analytics-edit-tags">
+                                                    {% for o in mistake_tag_options %}
+                                                    <label class="np-reflect-tag">
+                                                        <input type="checkbox" name="mistake_tag" value="{{ o.id }}"{% if o.id in row.tag_ids %} checked{% endif %}>
+                                                        <span class="np-reflect-tag-label">{{ o.label }}</span>
+                                                    </label>
+                                                    {% endfor %}
+                                                </div>
+                                                <label class="np-reflect-note-label" for="note-{{ row.pr_id }}">Note</label>
+                                                <textarea id="note-{{ row.pr_id }}" name="mistake_note" class="np-reflect-note" rows="3" maxlength="2000">{{ row.note }}</textarea>
+                                                <button type="submit" class="np-pw-btn np-pw-btn--primary">Save</button>
+                                            </form>
+                                        </details>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                            </div>
+                        </section>
                         {% endfor %}
                     </div>
-                    <label class="np-reflect-note-label" for="note-{{ row.pr_id }}">Note</label>
-                    <textarea id="note-{{ row.pr_id }}" name="mistake_note" class="np-reflect-note" rows="3" maxlength="2000">{{ row.note }}</textarea>
-                    <button type="submit" class="np-pw-btn np-pw-btn--primary">Save</button>
-                </form>
-            </details>
+                </section>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+    {% elif selected_partition.id == 'sat' and selected_partition.sat_children|default([]) %}
+    <div class="np-analytics-section-head np-analytics-log-head">
+        <div>
+            <p class="np-analytics-card-kicker">Mistake learning system</p>
+            <h2>SAT Math · choose a unit</h2>
+            <p class="np-analytics-ladder-lead">Open <strong>Unit 1–4</strong> for section breakdown, every miss, <strong>Open item</strong> redo, and that unit’s <strong>miss quiz</strong>. You are still inside SAT Math overall.</p>
+        </div>
+        <span>then: section → cause → skill → question</span>
+    </div>
+    <div class="np-analytics-sat-children-grid">
+        {% for ch in selected_partition.sat_children %}
+        <article class="np-analytics-sat-child-card np-analytics-sat-child-card--split glass-panel np-glass">
+            <span id="np-sat-child-help-{{ ch.id }}" class="np-visually-hidden">Opens this unit’s mistake list with every tracked miss. Does not start the timed full-bank practice set.</span>
+            <a class="np-analytics-sat-child-card-hit" href="{{ url_for('practice_analytics', part=ch.id) }}" aria-describedby="np-sat-child-help-{{ ch.id }}">
+                <span class="np-analytics-sat-child-count">{{ ch.count }}</span>
+                <div class="np-analytics-sat-child-main">
+                    <strong>{{ ch.label }}</strong>
+                    <span class="np-analytics-sat-child-sub">{{ ch.subtitle }}</span>
+                    {% if ch.classifier.primary %}
+                    <em class="np-analytics-sat-child-pattern">{{ ch.classifier.primary.label }}</em>
+                    {% endif %}
+                </div>
+                <span class="np-analytics-sat-child-cta np-analytics-sat-child-cta--primary">Mistake list →</span>
+            </a>
+            <a class="np-pw-btn np-pw-btn--ghost np-analytics-sat-child-practice" href="{{ url_for('practice_question', domain=ch.practice_domain, topic=ch.practice_topic, qnum=0) }}" title="Timed full-bank run from question 1">Full bank · start at Q1</a>
         </article>
         {% endfor %}
     </div>
     {% endif %}
+    {% endif %}
+    {% endif %}
+    {% endif %}
 </div>
 </div>
+<script>
+(function () {
+  var root = document.querySelector('.np-analytics-wrap[data-mastery-api]');
+  if (!root) return;
+  var api = root.getAttribute('data-mastery-api');
+  var cancelApi = root.getAttribute('data-mastery-cancel-api');
+  function clearMasteryToast() {
+    var t = document.querySelector('.np-analytics-mastery-toast');
+    if (t) t.remove();
+  }
+  function showMasteryUndoToast(row, domain, topic, qIndex) {
+    clearMasteryToast();
+    var wrap = document.createElement('div');
+    wrap.className = 'np-analytics-mastery-toast glass-panel np-glass';
+    wrap.setAttribute('role', 'status');
+    var p = document.createElement('p');
+    p.textContent = 'Marked as mastered.';
+    var u = document.createElement('button');
+    u.type = 'button';
+    u.className = 'np-pw-btn np-pw-btn--ghost';
+    u.textContent = 'Undo';
+    u.addEventListener('click', function () {
+      u.disabled = true;
+      fetch(cancelApi, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ domain: domain, topic: topic, question_index: qIndex }),
+        credentials: 'same-origin'
+      })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (x) {
+          if (!x.ok || !x.j || !x.j.ok) {
+            u.disabled = false;
+            return;
+          }
+          if (row) applyBadge(row, x.j);
+          clearMasteryToast();
+        })
+        .catch(function () {
+          u.disabled = false;
+        });
+    });
+    wrap.appendChild(p);
+    wrap.appendChild(u);
+    document.body.appendChild(wrap);
+    window.setTimeout(function () {
+      if (wrap.parentNode) wrap.remove();
+    }, 12000);
+  }
+  function syncMasteryButtons(row, effective) {
+    var mark = row.querySelector('.np-analytics-mastery-btn');
+    var cancel = row.querySelector('.np-analytics-mastery-cancel-btn');
+    if (!mark || !cancel) return;
+    if (effective === 'mastered') {
+      mark.hidden = true;
+      mark.disabled = false;
+      cancel.hidden = false;
+      cancel.disabled = false;
+    } else {
+      mark.hidden = false;
+      mark.disabled = false;
+      cancel.hidden = true;
+      cancel.disabled = false;
+    }
+  }
+  function applyBadge(row, j) {
+    var badge = row.querySelector('[data-mastery-badge]');
+    if (badge) {
+      badge.textContent = j.mastery_label || '—';
+      badge.className = 'np-analytics-mastery-badge np-analytics-mastery-badge--' + (j.mastery_effective || 'unreviewed');
+      badge.setAttribute('title', 'Review status');
+    }
+    syncMasteryButtons(row, j.mastery_effective);
+  }
+  root.addEventListener('click', function (e) {
+    var markBtn = e.target && e.target.closest && e.target.closest('.np-analytics-mastery-btn');
+    var cancelBtn = e.target && e.target.closest && e.target.closest('.np-analytics-mastery-cancel-btn');
+    var btn = markBtn || cancelBtn;
+    if (!btn || btn.hidden) return;
+    var domain = btn.getAttribute('data-domain');
+    var topic = btn.getAttribute('data-topic');
+    var qRaw = btn.getAttribute('data-q-index');
+    var qIndex = parseInt(qRaw, 10);
+    if (!domain || !topic || Number.isNaN(qIndex)) return;
+    var url = markBtn ? api : cancelApi;
+    if (!url) return;
+    btn.disabled = true;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ domain: domain, topic: topic, question_index: qIndex }),
+      credentials: 'same-origin'
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok || !x.j || !x.j.ok) {
+          btn.disabled = false;
+          return;
+        }
+        var row = btn.closest('.np-analytics-mini-row');
+        if (row) applyBadge(row, x.j);
+        if (markBtn && row) showMasteryUndoToast(row, domain, topic, qIndex);
+        if (cancelBtn) clearMasteryToast();
+      })
+      .catch(function () {
+        btn.disabled = false;
+      });
+  });
+})();
+</script>
 {% endblock %}

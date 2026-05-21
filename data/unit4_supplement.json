@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "source_note": "Parsed from SAT_CB_Bank_Question answer PDF; order matches banks/geometry 4_1–4_4.",
+  "section_titles_zh": {
+    "4.1": "4.1 体积与面积",
+    "4.2": "4.2 直线、角与三角形",
+    "4.3": "4.3 直角三角形与三角学",
+    "4.4": "4.4 圆"
+  },
+  "section_titles_en": {
+    "4.1": "4.1 Volume and area",
+    "4.2": "4.2 Lines, angles, and triangles",
+    "4.3": "4.3 Right triangles and trigonometry",
+    "4.4": "4.4 Circles"
+  },
+  "answers_by_topic": {
+    "4_1": [
+      "27556",
+      "A",
+      "C",
+      "36504",
+      "66",
+      "D",
+      {
+        "canonical": "25295",
+        "alternates": [
+          "518.4"
+        ]
+      },
+      "2216",
+      "A",
+      "B",
+      "C",
+      {
+        "canonical": "24.5",
+        "alternates": [
+          "49/2"
+        ]
+      },
+      "D",
+      "D",
+      "B",
+      {
+        "canonical": "135/8",
+        "alternates": [
+          "16.87",
+          "16.88"
+        ]
+      },
+      "B"
+    ],
+    "4_2": [
+      "83",
+      "123",
+      "97",
+      "30",
+      "D",
+      "C",
+      "D",
+      "C",
+      "C",
+      "C",
+      {
+        "canonical": "10/3",
+        "alternates": [
+          "15/4",
+          "25/6"
+        ]
+      },
+      {
+        "canonical": "14.66",
+        "alternates": [
+          "14.67",
+          "44/3"
+        ]
+      },
+      {
+        "canonical": "101/2",
+        "alternates": [
+          "50.5"
+        ]
+      },
+      "4.5"
+    ],
+    "4_3": [
+      "24",
+      {
+        "canonical": "6956",
+        "alternates": [
+          "6957",
+          "16/23"
+        ]
+      },
+      "C",
+      "104",
+      "6",
+      "C",
+      "B",
+      "D",
+      "113",
+      "B",
+      "0",
+      "D",
+      "12",
+      "A",
+      {
+        "canonical": "0.7241",
+        "alternates": [
+          "21/29"
+        ]
+      },
+      "D",
+      "7/50",
+      "30",
+      "15/17",
+      "12"
+    ],
+    "4_4": [
+      "15",
+      "10",
+      "B",
+      "3",
+      "5",
+      "78",
+      "B",
+      "6",
+      "101",
+      "A",
+      "46",
+      "A",
+      "A",
+      "15",
+      "C",
+      "A",
+      "52",
+      "B",
+      "1/6",
+      "D"
+    ]
+  }
+}

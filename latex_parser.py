@@ -448,6 +448,7 @@ def _format_stem_html(text: str) -> str:
 def _replace_includegraphics_static_prefix(text: str, prefix: str) -> str:
     """Turn \\includegraphics{file} into <img> under a static URL prefix (e.g. Unit 3 figures)."""
     base = prefix.rstrip("/")
+    img_class = "stem-figure-img stem-figure-img--hard" if "/hard" in base else "stem-figure-img"
 
     def repl(m: Any) -> str:
         fname = m.group(1).strip()
@@ -455,7 +456,7 @@ def _replace_includegraphics_static_prefix(text: str, prefix: str) -> str:
         if not safe:
             return ""
         return (
-            f'<img class="stem-figure-img" src="{base}/{safe}" '
+            f'<img class="{img_class}" src="{base}/{safe}" '
             'alt="" loading="lazy" />'
         )
 
@@ -469,6 +470,8 @@ def parse_tex_file(path: str):
     norm = path.replace("\\", "/")
     if "Unit_3_PS" in norm or "/problem_solving/" in norm:
         content = _replace_includegraphics_static_prefix(content, "/static/unit3/")
+    if "/hard/" in norm:
+        content = _replace_includegraphics_static_prefix(content, "/static/hard/")
 
     questions = []
 

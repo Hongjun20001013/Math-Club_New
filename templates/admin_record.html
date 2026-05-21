@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Practice Record · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-admin-page">
+    <p class="np-pw-breadcrumb">
+      <a href="{{ url_for('admin') }}">← Admin Panel</a>
+      {% if attempt.user_id %} · <a href="{{ url_for('admin_student_detail', user_id=attempt.user_id) }}">{{ attempt.username }}</a>{% endif %}
+    </p>
+
+    <section class="np-admin-hero glass-panel np-glass mp-animate-in">
+      <div>
+        <p class="np-admin-kicker">Practice Record</p>
+        <h1>{{ attempt.username or "Guest / legacy" }}</h1>
+        <p>{{ topic_title }} · {{ attempt.domain }} / {{ attempt.topic }} · Started {{ attempt.created_at }}</p>
+      </div>
+      <div class="np-admin-stats" aria-label="Record summary">
+        <div><strong>{{ response_total }}</strong><span>Answered</span></div>
+        <div><strong>{{ correct_total }}</strong><span>Correct</span></div>
+        <div><strong>{% if score_pct is not none %}{{ score_pct }}%{% else %}—{% endif %}</strong><span>Score</span></div>
+      </div>
+    </section>
+
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-record-questions">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Question Detail</p>
+          <h2 id="np-admin-record-questions">Submitted Questions</h2>
+          <p>Each card shows the question stem, choices when available, the student answer, and the correct answer.</p>
+        </div>
+      </header>
+
+      <div class="np-admin-question-list">
+        {% for row in rows %}
+        <article class="np-admin-question-card">
+          <header class="np-admin-question-head">
+            <div>
+              <span>Question {{ row.display_number }}</span>
+              <strong class="{% if row.status == 'Correct' %}is-correct{% elif row.status == 'Incorrect' %}is-incorrect{% endif %}">{{ row.status }}</strong>
+            </div>
+            <em>{{ row.submitted_at or "No timestamp" }}</em>
+          </header>
+          <div class="np-admin-question-stem">
+            {{ row.stem_html|safe }}
+          </div>
+          {% if row.choices %}
+          <div class="np-admin-question-choices">
+            {% for choice in row.choices %}
+            <div><b>{{ "ABCD"[loop.index0] }}</b><span>{{ choice|safe }}</span></div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <dl class="np-admin-answer-grid">
+            <div>
+              <dt>Student answer</dt>
+              <dd>{{ row.selected_answer }}</dd>
+            </div>
+            <div>
+              <dt>Correct answer</dt>
+              <dd>{{ row.correct_answer }}</dd>
+            </div>
+          </dl>
+        </article>
+        {% else %}
+        <p class="np-admin-empty">This session has no submitted responses yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

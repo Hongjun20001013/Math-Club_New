@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Create Admin · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-admin-page">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="np-flash-list np-login-flash" role="status">
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <article class="np-login-card np-admin-setup-card glass-panel np-glass mp-animate-in">
+      <header class="np-login-head">
+        <p class="np-login-kicker">{{ site_admin_kicker }}</p>
+        <h1 class="np-login-title">Create the first admin account</h1>
+        <p class="np-login-lead">This page is only available while no active admin account exists.</p>
+      </header>
+      <form method="post" class="np-login-form">
+        <label class="np-login-label" for="np-admin-user">Admin email or username</label>
+        <input id="np-admin-user" class="np-login-input" name="username" type="text" autocomplete="username" required>
+
+        <label class="np-login-label" for="np-admin-pass">Password</label>
+        <input id="np-admin-pass" class="np-login-input" name="password" type="password" autocomplete="new-password" required>
+
+        <label class="np-login-label" for="np-admin-confirm">Confirm password</label>
+        <input id="np-admin-confirm" class="np-login-input" name="confirm_password" type="password" autocomplete="new-password" required>
+
+        <button type="submit" class="np-login-submit big-btn mp-btn-pill">Create admin</button>
+      </form>
+      <p class="np-login-hint">After this, sign in and open the Admin panel to create student accounts.</p>
+    </article>
+  </div>
+</div>
+{% endblock %}

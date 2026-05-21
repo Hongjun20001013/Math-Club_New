@@ -14,7 +14,7 @@
                     <h1 class="np-pw-title">Choose your domain</h1>
                 </div>
             </div>
-            <p class="np-pw-lead">Algebra, Advanced Math, and Problem Solving &amp; Data—full-bank runs, chapter slices, session summaries with coach breakdowns, and per-question progress you can see at a glance.</p>
+            <p class="np-pw-lead">Algebra, Advanced Math, Problem Solving &amp; Data, and Geometry—full-bank runs, chapter slices, session summaries with coach breakdowns, and per-question progress you can see at a glance.</p>
             <div class="np-pw-hero-stats" role="list">
                 <div class="np-pw-stat" role="listitem">
                     <span class="np-pw-stat-val">{{ pw_domains_live }}</span>
@@ -44,7 +44,7 @@
                 {% if not pw_logged_in %}
                 <p class="np-pw-engagement-hint">You’re browsing as a guest—progress is stored on this browser session. <a href="{{ url_for('login') }}">Sign in</a> to keep it with your account.</p>
                 {% else %}
-                <p class="np-pw-engagement-hint">Each bar counts <strong>distinct</strong> questions you’ve submitted at least once in <strong>full-bank</strong> mode (Unit 1–3).</p>
+                <p class="np-pw-engagement-hint">Each bar counts <strong>distinct</strong> questions you’ve submitted at least once in <strong>full-bank</strong> mode (Units 1–4).</p>
                 {% endif %}
             </section>
             <div class="np-pw-roadmap">
@@ -57,10 +57,26 @@
                 </div>
             </div>
             <p class="np-pw-hero-foot">
-                <a href="{{ url_for('practice_analytics') }}" class="np-pw-hero-foot-link">Mistake analytics</a>
+                <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-pw-hero-foot-link">Mistake analytics</a>
                 <span class="np-pw-hero-foot-sep">·</span>
                 <a href="{{ url_for('practice_topics', domain='algebra') }}" class="np-pw-hero-foot-link">Jump to Unit 1 topics</a>
+                <span class="np-pw-hero-foot-sep">·</span>
+                <a href="#np-unit-pdfs" class="np-pw-hero-foot-link">Printable PDFs</a>
             </p>
+            <div class="np-study-mode-row" aria-label="Recommended training modes">
+                <a href="/practice/algebra/unit_1_all/0" class="np-study-mode np-study-mode--primary">
+                    <span>Fast Start</span>
+                    <strong>Begin Unit 1 full bank</strong>
+                </a>
+                <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-study-mode">
+                    <span>Fix Mistakes</span>
+                    <strong>Open analytics</strong>
+                </a>
+                <a href="{{ url_for('practice_topics', domain='geometry') }}" class="np-study-mode">
+                    <span>Targeted Drill</span>
+                    <strong>Browse Geometry</strong>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -97,6 +113,12 @@
                 <a href="/practice/algebra/unit_1_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_algebra_touched %}Continue full set{% else %}Start full set{% endif %}</a>
                 <a href="/practice/algebra" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
             </div>
+            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'algebra')|first %}
+            {% if pdf and pdf.available %}
+            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 1 PDF</a>
+            {% else %}
+            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
+            {% endif %}
         </article>
 
         <article class="np-pw-card np-pw-card--live np-tilt">
@@ -131,6 +153,12 @@
                 <a href="/practice/advanced_math/unit_2_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_advanced_math_touched %}Continue full set{% else %}Start full set{% endif %}</a>
                 <a href="/practice/advanced_math" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
             </div>
+            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'advanced_math')|first %}
+            {% if pdf and pdf.available %}
+            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 2 PDF</a>
+            {% else %}
+            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
+            {% endif %}
         </article>
 
         <article class="np-pw-card np-pw-card--live np-tilt">
@@ -165,29 +193,87 @@
                 <a href="/practice/problem_solving/unit_3_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_problem_solving_touched %}Continue full set{% else %}Start full set{% endif %}</a>
                 <a href="/practice/problem_solving" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
             </div>
+            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'problem_solving')|first %}
+            {% if pdf and pdf.available %}
+            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 3 PDF</a>
+            {% else %}
+            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
+            {% endif %}
         </article>
 
-        <article class="np-pw-card np-pw-card--soon np-tilt">
+        <article class="np-pw-card np-pw-card--live np-tilt">
             <div class="np-pw-card-top">
-                <div class="np-pw-icon np-pw-icon--soon" aria-hidden="true">
+                <div class="np-pw-icon np-pw-icon--geometry" aria-hidden="true">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 4l8 14H4l8-14z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                        <path d="M12 10v5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                        <path d="M12 3L4 20h16L12 3z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+                        <path d="M12 9v5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <div class="np-pw-card-meta">
                     <span class="np-pw-unit">Unit 4</span>
-                    <span class="np-pw-pill np-pw-pill--soon">Roadmap</span>
+                    <span class="np-pw-pill np-pw-pill--live">Live</span>
                 </div>
             </div>
             <h2 class="np-pw-card-title">Geometry</h2>
-            <p class="np-pw-card-desc">Lines, angles, triangles, circles, and volume—same split-domain experience as Units 1–3 when content ships.</p>
-            <p class="np-pw-soon-hint">Follows Unit 3 so each SAT domain stays cleanly separated.</p>
-            <div class="np-pw-soon-foot">
-                <span class="np-pw-soon-note">In development</span>
+            <p class="np-pw-card-desc">Volume and area, lines and triangles, right-triangle trigonometry, and circles—four chapter slices plus one merged full bank, matching the Units 1–4 practice flow.</p>
+            <div class="np-pw-card-progress" aria-label="Geometry full bank progress">
+                <div class="np-pw-card-progress-row">
+                    <span class="np-pw-card-progress-label">Full bank</span>
+                    <span class="np-pw-card-progress-val">{{ pw_geometry_touched }} / {{ pw_geometry_count }}</span>
+                </div>
+                <div class="np-pw-card-progress-track">
+                    <span class="np-pw-card-progress-fill np-pw-card-progress-fill--u4" style="width: {{ pw_geometry_progress_pct }}%;"></span>
+                </div>
             </div>
+            <ul class="np-pw-mini">
+                <li>{{ pw_geometry_count }} questions in catalog</li>
+                <li>Four slices + full bank</li>
+            </ul>
+            <div class="np-pw-actions">
+                <a href="/practice/geometry/unit_4_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_geometry_touched %}Continue full set{% else %}Start full set{% endif %}</a>
+                <a href="/practice/geometry" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
+            </div>
+            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'geometry')|first %}
+            {% if pdf and pdf.available %}
+            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 4 PDF</a>
+            {% else %}
+            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
+            {% endif %}
         </article>
     </div>
+
+    <section id="np-unit-pdfs" class="np-unit-pdf-suite glass-panel np-glass mp-animate-in" aria-label="Printable SAT unit PDFs">
+        <header class="np-unit-pdf-head">
+            <div>
+                <p class="np-pw-eyebrow">Printable library</p>
+                <h2>Unit PDF packets</h2>
+                <p>Students can download paper versions for homework, annotation, or offline practice. PDFs appear automatically once uploaded with the expected filename.</p>
+            </div>
+        </header>
+        <div class="np-unit-pdf-grid">
+            {% for pdf in unit_pdf_cards %}
+            {% if pdf.available %}
+            <a href="{{ pdf.href }}" class="np-unit-pdf-card">
+            {% else %}
+            <div class="np-unit-pdf-card is-pending">
+            {% endif %}
+                <span>{{ pdf.unit }}</span>
+                <strong>{{ pdf.title }}</strong>
+                {% if pdf.available %}
+                <em>Ready to download</em>
+                <b>Download PDF →</b>
+                {% else %}
+                <em>Waiting for file</em>
+                <small>Save as <code>{{ pdf.filename_hint }}</code></small>
+                {% endif %}
+            {% if pdf.available %}
+            </a>
+            {% else %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </section>
 </div>
 </div>
 

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="np-page-shell">
+<div class="mq-feedback-wrap glass-panel np-glass">
+    <p class="np-pw-breadcrumb"><a href="{{ back_href }}">← Back to mistake list</a></p>
+
+    <header class="mq-feedback-hero">
+        <p class="mq-feedback-kicker">{{ topic_title }} · bank question {{ q_index + 1 }}</p>
+        {% if is_correct %}
+        <h1 class="mq-feedback-title mq-feedback-title--ok">Correct</h1>
+        <p class="mq-feedback-sub">Nice—your answer matches the verified key. Skim the walkthrough if you want a second angle on the reasoning.</p>
+        {% else %}
+        <h1 class="mq-feedback-title mq-feedback-title--bad">Incorrect</h1>
+        <p class="mq-feedback-sub">Compare your work with the key below, then read the coach walkthrough before you return to your list.</p>
+        {% endif %}
+    </header>
+
+    <div class="mq-feedback-grid">
+        <div class="mq-feedback-card">
+            <span class="mq-feedback-label">Your answer</span>
+            <strong class="mq-feedback-value">{{ selected_answer or "—" }}</strong>
+        </div>
+        <div class="mq-feedback-card">
+            <span class="mq-feedback-label">Answer key</span>
+            <strong class="mq-feedback-value">{{ correct_key_display }}</strong>
+        </div>
+    </div>
+
+    {% if explanation_en %}
+    <article class="mq-feedback-explain glass-panel np-glass mq-feedback-explain--open" aria-label="Verified solution">
+        <h2 class="mq-feedback-explain-title">Walkthrough &amp; analysis</h2>
+        <div class="mq-feedback-explain-body question-panel">{{ explanation_en | safe }}</div>
+    </article>
+    {% endif %}
+
+    <div class="mq-feedback-actions">
+        <a class="np-pw-btn np-pw-btn--primary" href="{{ back_href }}">Back to mistake list</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=q_index, mistake_redo=1, analytics_part=mistake_analytics_part or None, miss_anchor=mistake_miss_anchor or None) }}">Try this question again</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice') }}">SAT modules</a>
+    </div>
+</div>
+</div>
+{% endblock %}

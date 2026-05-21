@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-List SAT extended-walkthrough *authoring* slots for Unit 1–3 slices in data/question_bank.json.
+List SAT extended-walkthrough *authoring* slots for Unit 1–4 slices in data/question_bank.json.
 
 After each build, every question already receives an auto-generated Full walkthrough in
 question_bank.json. This script lists keys for data/sat_extended_walkthroughs.json so you
@@ -23,7 +23,7 @@ APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 WT_PATH = os.path.join(APP_DIR, "data", "sat_extended_walkthroughs.json")
 
-DOMAINS = ("algebra", "advanced_math", "problem_solving")
+DOMAINS = ("algebra", "advanced_math", "problem_solving", "geometry")
 
 
 def _strip(s: str) -> str:

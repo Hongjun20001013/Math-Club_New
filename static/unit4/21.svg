@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 360" width="100%" role="img" aria-hidden="true">
+<rect width="500" height="360" rx="10" fill="#ffffff"/>
+<polygon points="250.0,90.0 120.0,280.0 380.0,280.0 250.0,90.0" fill="rgba(79, 47, 212, 0.10)" stroke="#352875" stroke-width="2.8" stroke-linejoin="round"/>
+<circle cx="250.0" cy="90.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="250.0" y="68.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">R</text>
+<circle cx="120.0" cy="280.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="120.0" y="306.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">S</text>
+<circle cx="380.0" cy="280.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="380.0" y="306.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">T</text>
+<text x="250.0" y="200.0" font-size="11" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="400">W on RT (not shown)</text>
+</svg>

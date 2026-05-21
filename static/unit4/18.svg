@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 340" width="100%" role="img" aria-hidden="true">
+<rect width="460" height="340" rx="10" fill="#ffffff"/>
+<polygon points="80.0,260.0 360.0,260.0 220.0,80.0 80.0,260.0" fill="none" stroke="#352875" stroke-width="2.8" stroke-linejoin="round"/>
+<circle cx="80.0" cy="260.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="80.0" y="286.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">A</text>
+<circle cx="360.0" cy="260.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="360.0" y="286.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">B</text>
+<circle cx="220.0" cy="80.0" r="5.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="220.0" y="106.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">C</text>
+<text x="230.0" y="220.0" font-size="16" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">x°</text>
+</svg>

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Verify compiled question_bank.json matches Unit 1–3 masters + slices:
+Verify compiled question_bank.json matches Unit 1–4 masters + slices:
   - unit_1_all count == sum(1_1..1_5); stems align
   - unit_2_all count == sum(2_1..2_3); stems align
   - unit_3_all count == sum(3_1..3_7); stems align
+  - unit_4_all count == sum(4_1..4_4); stems align
 
 Run: python3 scripts/verify_bank_alignment.py
 """
@@ -12,13 +13,16 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
+from pathlib import Path
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 MANIFEST_PATH = os.path.join(APP_DIR, "data", "unit1_question_manifest.json")
 MANIFEST2_PATH = os.path.join(APP_DIR, "data", "unit2_question_manifest.json")
 MANIFEST3_PATH = os.path.join(APP_DIR, "data", "unit3_question_manifest.json")
+MANIFEST4_PATH = os.path.join(APP_DIR, "data", "unit4_question_manifest.json")
 
 SLICES = ["1_1", "1_2", "1_3", "1_4", "1_5"]
 SECTION_LABEL = {
@@ -45,6 +49,14 @@ SECTION3_LABEL = {
     "3_5": "3.5",
     "3_6": "3.6",
     "3_7": "3.7",
+}
+
+SLICES4 = ["4_1", "4_2", "4_3", "4_4"]
+SECTION4_LABEL = {
+    "4_1": "4.1",
+    "4_2": "4.2",
+    "4_3": "4.3",
+    "4_4": "4.4",
 }
 
 
@@ -106,6 +118,35 @@ def _verify_unit(
     return 0
 
 
+def _verify_unit4_static_figures() -> int:
+    """Every \\includegraphics basename under banks/geometry must exist under static/unit4/."""
+    root = Path(APP_DIR)
+    refs: set[str] = set()
+    geo_dir = root / "banks" / "geometry"
+    if not geo_dir.is_dir():
+        print("Missing banks/geometry/", file=sys.stderr)
+        return 1
+    for tex in sorted(geo_dir.glob("*.tex")):
+        text = tex.read_text(encoding="utf-8")
+        for m in re.finditer(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", text):
+            refs.add(m.group(1).strip())
+    static = root / "static" / "unit4"
+    for name in sorted(refs):
+        p = static / name
+        if not p.is_file():
+            print(f"Unit 4 figure missing on disk: {p}", file=sys.stderr)
+            return 1
+        head = p.read_bytes()[:256].lstrip()
+        ok_jpeg = head[:2] == b"\xff\xd8"
+        ok_png = head[:8] == b"\x89PNG\r\n\x1a\n"
+        ok_svg = head[:4] == b"<svg" or head[:5] == b"<?xml"
+        if not (ok_jpeg or ok_png or ok_svg):
+            print(f"Unit 4 figure is not a JPEG/PNG/SVG payload: {p}", file=sys.stderr)
+            return 1
+    print(f"OK: Unit 4 figures ({len(refs)} files) present under static/unit4/")
+    return 0
+
+
 def main() -> int:
     with open(BANK_PATH, encoding="utf-8") as f:
         bank = json.load(f)
@@ -125,7 +166,15 @@ def main() -> int:
     r3 = _verify_unit(
         ps, "unit_3_all", SLICES3, SECTION3_LABEL, "Unit 3", MANIFEST3_PATH
     )
-    return r3
+    if r3 != 0:
+        return r3
+    geo = bank.get("geometry", {})
+    r4 = _verify_unit(
+        geo, "unit_4_all", SLICES4, SECTION4_LABEL, "Unit 4", MANIFEST4_PATH
+    )
+    if r4 != 0:
+        return r4
+    return _verify_unit4_static_figures()
 
 
 if __name__ == "__main__":

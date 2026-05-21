@@ -9,44 +9,95 @@
         <div class="np-sh-hero-inner">
             <div class="np-sh-hero-head">
                 <div class="np-sh-hero-copy">
-                    <p class="np-sh-eyebrow">SAT Math workspace</p>
-                    <h1 class="np-sh-title">Pick your lane</h1>
-                    <p class="np-sh-subzh">Drills, analytics, and future exam modes—same polished flow as the home dashboard.</p>
+                    <p class="np-sh-eyebrow">SAT Math Workspace</p>
+                    <h1 class="np-sh-title">Your SAT command center</h1>
+                    <p class="np-sh-subzh">Choose a focused drill, review mistakes, or jump straight into a full Unit 1–4 bank.</p>
                 </div>
                 <button type="button" id="np-sh-theme-toggle" class="sat-theme-toggle np-sh-theme-toggle" title="Appearance" aria-label="Toggle workspace theme" aria-pressed="false">
                     <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
                     <span class="sat-theme-toggle-label">Light</span>
                 </button>
             </div>
-            <p class="np-sh-lead">Units 1–3 are live in the full bank. Finish any set for an instant score sheet and mistake recap—tag patterns later in analytics.</p>
+            <p class="np-sh-lead">Units 1–4 are live with instant scoring, per-session summaries, mistake tagging, and topic-level navigation. Start with the training room, or open a unit directly below.</p>
+            <div class="np-upgrade-path" aria-label="Recommended practice flow">
+                <span class="np-upgrade-path-item">
+                    <strong>1</strong>
+                    Pick a unit
+                </span>
+                <span class="np-upgrade-path-line" aria-hidden="true"></span>
+                <span class="np-upgrade-path-item">
+                    <strong>2</strong>
+                    Answer with timer + tools
+                </span>
+                <span class="np-upgrade-path-line" aria-hidden="true"></span>
+                <span class="np-upgrade-path-item">
+                    <strong>3</strong>
+                    Review misses
+                </span>
+            </div>
+            <div class="np-sh-quick-row" aria-label="Quick SAT unit starts">
+                <a href="/practice/algebra/unit_1_all/0">Unit 1 · Algebra</a>
+                <a href="/practice/advanced_math/unit_2_all/0">Unit 2 · Advanced Math</a>
+                <a href="/practice/problem_solving/unit_3_all/0">Unit 3 · Data</a>
+                <a href="/practice/geometry/unit_4_all/0">Unit 4 · Geometry</a>
+            </div>
         </div>
     </header>
 
     <div class="np-sh-grid">
         <a href="{{ url_for('practice_specialized') }}" class="np-sh-card np-sh-card--live np-sh-card--tilt">
+            <span class="np-sh-card-icon" aria-hidden="true">01</span>
             <span class="np-sh-card-pill np-sh-card-pill--live">Live</span>
             <h2 class="np-sh-card-title">Specialized training</h2>
-            <p class="np-sh-card-desc">Chapters, full banks, topic lists—one tap in.</p>
+            <p class="np-sh-card-desc">Chapter slices, full banks, and topic lists with one-tap starts.</p>
+            <span class="np-sh-card-cta">Open training room →</span>
         </a>
 
-        <a href="{{ url_for('practice_challenge') }}" class="np-sh-card np-sh-card--soon np-sh-card--tilt">
-            <span class="np-sh-card-pill">Soon</span>
+        <a href="{{ url_for('practice_challenge') }}" class="np-sh-card np-sh-card--live np-sh-card--tilt">
+            <span class="np-sh-card-icon" aria-hidden="true">02</span>
+            <span class="np-sh-card-pill np-sh-card-pill--live">Live</span>
             <h2 class="np-sh-card-title">Hard problem drill</h2>
-            <p class="np-sh-card-desc">Hard sets + hints—shipping soon.</p>
+            <p class="np-sh-card-desc">Hard Question Set 1 is live with advanced algebra and function challenges.</p>
+            <span class="np-sh-card-cta">Open hard drill →</span>
         </a>
 
         <a href="{{ url_for('practice_exams') }}" class="np-sh-card np-sh-card--soon np-sh-card--tilt">
+            <span class="np-sh-card-icon" aria-hidden="true">03</span>
             <span class="np-sh-card-pill">Soon</span>
             <h2 class="np-sh-card-title">Real exam practice</h2>
-            <p class="np-sh-card-desc">Timed mocks—on the roadmap.</p>
+            <p class="np-sh-card-desc">Timed mocks, section pacing, score snapshots, and exam-style review.</p>
+            <span class="np-sh-card-cta np-sh-card-cta--muted">Roadmap</span>
         </a>
 
-        <a href="{{ url_for('practice_analytics') }}" class="np-sh-card np-sh-card--focus np-sh-card--tilt">
+        <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-sh-card np-sh-card--focus np-sh-card--tilt">
+            <span class="np-sh-card-icon" aria-hidden="true">04</span>
             <span class="np-sh-card-pill np-sh-card-pill--focus">Core</span>
             <h2 class="np-sh-card-title">Mistake analytics</h2>
-            <p class="np-sh-card-desc">Tags, notes, redo—pattern intelligence.</p>
+            <p class="np-sh-card-desc">Tags, notes, redo links, and weak-topic patterns after each session.</p>
+            <span class="np-sh-card-cta">Review mistakes →</span>
         </a>
     </div>
+
+    <section class="np-upgrade-studio glass-panel np-glass mp-animate-in" aria-label="Study experience highlights">
+        <div>
+            <p class="np-upgrade-eyebrow">Upgraded study flow</p>
+            <h2 class="np-upgrade-title">Practice now feels like a real study room.</h2>
+        </div>
+        <div class="np-upgrade-studio-grid">
+            <div class="np-upgrade-feature">
+                <span>Keyboard answers</span>
+                <strong>A–E</strong>
+            </div>
+            <div class="np-upgrade-feature">
+                <span>Scratch notes</span>
+                <strong>Saved</strong>
+            </div>
+            <div class="np-upgrade-feature">
+                <span>Review flag</span>
+                <strong>Local</strong>
+            </div>
+        </div>
+    </section>
 </div>
 </div>
 

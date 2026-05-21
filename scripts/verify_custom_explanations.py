@@ -115,6 +115,13 @@ def main() -> int:
             os.path.join(data_dir, "unit3_explanations_en.json"),
             os.path.join(data_dir, "unit3_question_manifest.json"),
         ),
+        (
+            "Unit 4",
+            "geometry",
+            "unit_4_all",
+            os.path.join(data_dir, "unit4_explanations_en.json"),
+            os.path.join(data_dir, "unit4_question_manifest.json"),
+        ),
     ]
     all_errs: list[str] = []
     for label, dom, topic, ep, mp in checks:

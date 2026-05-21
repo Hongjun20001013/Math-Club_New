@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% block title %}Hard Problem Drill · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-hard-page">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
+
+    <section class="np-hard-hero np-hard-hero--catalog glass-panel np-glass mp-animate-in">
+      <div class="np-sh-hero-noise" aria-hidden="true"></div>
+      <div class="np-hard-hero-copy">
+        <p class="np-hard-kicker">SAT Math · Hard Problem Drill</p>
+        <h1>Hard question studio.</h1>
+        <p>Select a set, review materials, and begin when you are ready. Your progress syncs across every session.</p>
+        <div class="np-hard-hero-stats">
+          <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
+          <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
+          <span class="np-hard-hero-stat np-hard-hero-stat--new"><i aria-hidden="true"></i>{{ hard_stats.new }} new</span>
+        </div>
+        {% if continue_set %}
+        <a class="np-hard-hero-continue" href="{{ continue_set.href }}">
+          {% if continue_set.progress_state == 'done' %}
+          Review Hard Practice {{ continue_set.index }}
+          {% elif continue_set.progress_state == 'progress' %}
+          Continue Hard Practice {{ continue_set.index }} · {{ continue_set.answered }}/{{ continue_set.total }}
+          {% else %}
+          Start Hard Practice {{ continue_set.index }}
+          {% endif %}
+          <span aria-hidden="true">→</span>
+        </a>
+        {% endif %}
+      </div>
+      <aside class="np-hard-progress" aria-label="Hard drill progress">
+        <span>Overall progress</span>
+        <strong>{{ total_answered }}<small>/{{ total_questions }}</small></strong>
+        <div class="np-hard-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total_questions }}" aria-valuenow="{{ total_answered }}">
+          <i style="width: {{ overall_pct }}%;"></i>
+        </div>
+        <em>{{ overall_pct }}% complete across all sets</em>
+        {% if next_set and next_set.progress_state != 'done' %}
+        <p class="np-hard-progress-next">Up next: Hard Practice {{ next_set.index }}</p>
+        {% endif %}
+      </aside>
+    </section>
+
+    {% if hard_sets %}
+    <section
+      class="np-hard-studio glass-panel np-glass mp-animate-up"
+      aria-label="Hard practice studio"
+      data-hard-library
+      data-default-index="{{ default_index }}"
+    >
+      <header class="np-hard-studio-head">
+        <div>
+          <p class="np-hard-kicker">Practice library</p>
+          <h2>Hard question library</h2>
+          <p class="np-hard-studio-lead">Click a number to preview. Use the begin button when you are ready to enter questions.</p>
+        </div>
+        <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
+          <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>
+          <button type="button" data-hard-filter="new">New <em>{{ hard_stats.new }}</em></button>
+          <button type="button" data-hard-filter="progress">Active <em>{{ hard_stats.progress }}</em></button>
+          <button type="button" data-hard-filter="done">Done <em>{{ hard_stats.done }}</em></button>
+        </div>
+      </header>
+
+      <div class="np-hard-studio-meta">
+        {% if hard_sets|length > 10 %}
+        <div class="np-hard-studio-ranges" role="group" aria-label="Practice range">
+          <button type="button" class="is-active" data-hard-range="all">All sets</button>
+          <button type="button" data-hard-range="1">1–10</button>
+          <button type="button" data-hard-range="2">11–20</button>
+          {% if hard_sets|length > 20 %}
+          <button type="button" data-hard-range="3">21+</button>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="np-hard-studio-legend" aria-hidden="true">
+          <span><i class="is-new"></i>New</span>
+          <span><i class="is-progress"></i>Active</span>
+          <span><i class="is-done"></i>Done</span>
+        </div>
+      </div>
+
+      <div class="np-hard-studio-layout">
+        <div class="np-hard-studio-picker">
+          <div class="np-hard-picker-grid" data-hard-picker role="listbox" aria-label="Choose a practice set">
+            {% for set in hard_sets %}
+            <button
+              type="button"
+              class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}"
+              data-hard-tile
+              data-index="{{ set.index }}"
+              data-state="{{ set.progress_state }}"
+              data-range="{{ set.range_bucket }}"
+              data-href="{{ set.href }}"
+              data-restart="{{ set.restart_href }}"
+              data-status="{{ set.status if set.progress_state != 'done' else 'Review' }}"
+              data-subtitle="{{ set.subtitle }}"
+              data-answered="{{ set.answered }}"
+              data-total="{{ set.total }}"
+              data-progress="{{ set.progress_pct }}"
+              {% if set.materials %}data-materials='{{ set.materials|tojson }}'{% endif %}
+              role="option"
+              aria-selected="false"
+              aria-label="Hard Practice {{ set.index }}, {{ set.answered }} of {{ set.total }} answered"
+              style="--tile-progress: {{ set.progress_pct }}%;"
+            >
+              <span class="np-hard-picker-num">{{ set.index }}</span>
+              <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
+              <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
+            </button>
+            {% endfor %}
+          </div>
+          <p class="np-hard-picker-empty" data-hard-empty hidden>No sets in this filter.</p>
+          <p class="np-hard-picker-tip">Tip: use arrow keys to move between sets, Enter to begin.</p>
+        </div>
+
+        <aside class="np-hard-detail" data-hard-detail aria-live="polite">
+          <div class="np-hard-detail-top">
+            <div class="np-hard-detail-badge" data-hard-detail-badge>01</div>
+            <div class="np-hard-detail-ring" aria-hidden="true">
+              <svg viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" class="np-hard-detail-ring-track"></circle>
+                <circle cx="22" cy="22" r="18" class="np-hard-detail-ring-fill" data-hard-detail-ring></circle>
+              </svg>
+              <span data-hard-detail-ring-label>0%</span>
+            </div>
+          </div>
+
+          <div class="np-hard-detail-body" data-hard-detail-body>
+            <div class="np-hard-detail-head">
+              <p class="np-hard-kicker" data-hard-detail-kicker>Practice 1</p>
+              <h3 data-hard-detail-title>Practice 1</h3>
+              <p data-hard-detail-subtitle>SAT Hard Question Set 1</p>
+            </div>
+
+            <div class="np-hard-detail-stats">
+              <div class="np-hard-detail-stat">
+                <span>Questions</span>
+                <strong data-hard-detail-count>0 / 11</strong>
+              </div>
+              <div class="np-hard-detail-stat">
+                <span>Status</span>
+                <strong data-hard-detail-status>Not started</strong>
+              </div>
+            </div>
+
+            <div class="np-hard-detail-meter" aria-hidden="true">
+              <span data-hard-detail-bar style="width: 0%;"></span>
+            </div>
+
+            <div class="np-hard-detail-materials-wrap" data-hard-detail-materials-wrap hidden>
+              <p class="np-hard-detail-materials-label">Downloads</p>
+              <div class="np-hard-detail-materials" data-hard-detail-materials></div>
+            </div>
+
+            <div class="np-hard-detail-actions">
+              <a href="#" class="np-hard-detail-start" data-hard-detail-start>Begin practice</a>
+              <button type="button" class="np-hard-detail-restart" data-hard-detail-restart>Restart set</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    {% else %}
+    <section class="np-hard-studio glass-panel np-glass mp-animate-up">
+      <p class="np-admin-empty">No hard practice sets are live yet.</p>
+    </section>
+    {% endif %}
+  </div>
+</div>
+
+{% if hard_sets %}
+<script>
+(function () {
+  var library = document.querySelector("[data-hard-library]");
+  if (!library) return;
+
+  var emptyEl = library.querySelector("[data-hard-empty]");
+  var tiles = Array.prototype.slice.call(library.querySelectorAll("[data-hard-tile]"));
+  var filterButtons = Array.prototype.slice.call(library.querySelectorAll("[data-hard-filter]"));
+  var rangeButtons = Array.prototype.slice.call(library.querySelectorAll("[data-hard-range]"));
+  var badge = library.querySelector("[data-hard-detail-badge]");
+  var ring = library.querySelector("[data-hard-detail-ring]");
+  var ringLabel = library.querySelector("[data-hard-detail-ring-label]");
+  var detailBody = library.querySelector("[data-hard-detail-body]");
+  var kicker = library.querySelector("[data-hard-detail-kicker]");
+  var title = library.querySelector("[data-hard-detail-title]");
+  var subtitle = library.querySelector("[data-hard-detail-subtitle]");
+  var count = library.querySelector("[data-hard-detail-count]");
+  var status = library.querySelector("[data-hard-detail-status]");
+  var bar = library.querySelector("[data-hard-detail-bar]");
+  var materialsWrap = library.querySelector("[data-hard-detail-materials-wrap]");
+  var materials = library.querySelector("[data-hard-detail-materials]");
+  var startBtn = library.querySelector("[data-hard-detail-start]");
+  var restartBtn = library.querySelector("[data-hard-detail-restart]");
+  var detail = library.querySelector("[data-hard-detail]");
+  var activeFilter = "all";
+  var activeRange = "all";
+  var activeTile = null;
+  var ringCirc = 2 * Math.PI * 18;
+
+  if (detail) {
+    var nav = document.querySelector(".navbar");
+    var stickyTop = nav ? nav.getBoundingClientRect().height + 8 : 12;
+    detail.style.setProperty("--hard-sticky-top", stickyTop + "px");
+  }
+
+  var statusLabels = {
+    new: "Not started",
+    progress: "In progress",
+    done: "Completed"
+  };
+
+  var startLabels = {
+    new: "Begin practice",
+    progress: "Continue practice",
+    done: "Review practice"
+  };
+
+  function visibleTiles() {
+    return tiles.filter(function (tile) { return !tile.hidden; });
+  }
+
+  function tileMatches(tile) {
+    var state = tile.getAttribute("data-state") || "";
+    var range = String(tile.getAttribute("data-range") || "");
+    if (activeFilter !== "all" && state !== activeFilter) return false;
+    if (activeRange !== "all" && range !== activeRange) return false;
+    return true;
+  }
+
+  function padIndex(value) {
+    var n = parseInt(value, 10) || 0;
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function setRing(progress) {
+    var pct = Math.max(0, Math.min(100, parseInt(progress, 10) || 0));
+    if (ring) {
+      ring.style.strokeDasharray = ringCirc + " " + ringCirc;
+      ring.style.strokeDashoffset = String(ringCirc * (1 - pct / 100));
+    }
+    if (ringLabel) {
+      ringLabel.textContent = pct + "%";
+    }
+  }
+
+  function renderMaterials(tile) {
+    if (!materials || !materialsWrap) return;
+    materials.innerHTML = "";
+    var raw = tile.getAttribute("data-materials");
+    var items = [];
+    if (raw) {
+      try {
+        items = JSON.parse(raw);
+      } catch (e) {
+        items = [];
+      }
+    }
+    if (!items.length) {
+      materialsWrap.hidden = true;
+      return;
+    }
+    items.forEach(function (item) {
+      var link = document.createElement("a");
+      link.href = item.href;
+      link.className = "np-hard-detail-material" + (item.is_slides ? " np-hard-detail-material--slides" : "");
+      if (item.is_slides) {
+        link.target = "_blank";
+        link.rel = "noopener";
+      }
+      link.innerHTML =
+        "<span>" + (item.is_slides ? "Slides" : "PDF") + "</span>" +
+        "<strong>" + item.label + "</strong>" +
+        "<em>" + (item.description || "") + "</em>";
+      materials.appendChild(link);
+    });
+    materialsWrap.hidden = false;
+  }
+
+  function selectTile(tile, scrollIntoView) {
+    if (!tile) return;
+    activeTile = tile;
+    var index = tile.getAttribute("data-index");
+    var state = tile.getAttribute("data-state") || "new";
+    var progress = tile.getAttribute("data-progress") || "0";
+    tiles.forEach(function (item) {
+      var selected = item === tile;
+      item.classList.toggle("is-active", selected);
+      item.setAttribute("aria-selected", selected ? "true" : "false");
+    });
+    if (detail) {
+      detail.className = "np-hard-detail np-hard-detail--" + state + " is-updating";
+      window.setTimeout(function () {
+        detail.classList.remove("is-updating");
+      }, 220);
+    }
+    badge.textContent = padIndex(index);
+    kicker.textContent = "Practice " + index;
+    title.textContent = "Practice " + index;
+    subtitle.textContent = tile.getAttribute("data-subtitle") || "";
+    count.textContent = (tile.getAttribute("data-answered") || "0") + " / " + (tile.getAttribute("data-total") || "0");
+    status.textContent = statusLabels[state] || "Not started";
+    bar.style.width = progress + "%";
+    setRing(progress);
+    startBtn.textContent = startLabels[state] || "Begin practice";
+    startBtn.href = tile.getAttribute("data-href") || "#";
+    restartBtn.dataset.restartHref = tile.getAttribute("data-restart") || "#";
+    renderMaterials(tile);
+    if (scrollIntoView && window.matchMedia("(max-width: 900px)").matches) {
+      detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  function applyFilters() {
+    var visible = [];
+    tiles.forEach(function (tile) {
+      var show = tileMatches(tile);
+      tile.hidden = !show;
+      if (show) visible.push(tile);
+    });
+    if (emptyEl) emptyEl.hidden = visible.length !== 0;
+    if (!activeTile || activeTile.hidden) {
+      selectTile(visible[0] || null, false);
+    }
+  }
+
+  function setActiveGroup(buttons, activeButton, kind) {
+    buttons.forEach(function (btn) {
+      btn.classList.toggle("is-active", btn === activeButton);
+    });
+    if (kind === "filter") {
+      activeFilter = activeButton.getAttribute("data-hard-filter") || "all";
+    } else {
+      activeRange = activeButton.getAttribute("data-hard-range") || "all";
+    }
+    applyFilters();
+  }
+
+  function moveSelection(step) {
+    var visible = visibleTiles();
+    if (!visible.length) return;
+    var currentIndex = activeTile ? visible.indexOf(activeTile) : -1;
+    var nextIndex = currentIndex + step;
+    if (nextIndex < 0) nextIndex = visible.length - 1;
+    if (nextIndex >= visible.length) nextIndex = 0;
+    selectTile(visible[nextIndex], true);
+    visible[nextIndex].focus();
+  }
+
+  filterButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setActiveGroup(filterButtons, btn, "filter");
+    });
+  });
+
+  rangeButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setActiveGroup(rangeButtons, btn, "range");
+    });
+  });
+
+  tiles.forEach(function (tile) {
+    tile.addEventListener("click", function () {
+      selectTile(tile, true);
+    });
+  });
+
+  if (restartBtn) {
+    restartBtn.addEventListener("click", function () {
+      var href = restartBtn.dataset.restartHref;
+      if (!href) return;
+      var label = activeTile ? ("Hard Practice " + activeTile.getAttribute("data-index")) : "this set";
+      if (window.confirm("Restart " + label + "? Your current progress for this set will reset.")) {
+        window.location.href = href;
+      }
+    });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (!library.contains(document.activeElement) && document.activeElement !== document.body) {
+      return;
+    }
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      moveSelection(1);
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      moveSelection(-1);
+    } else if (event.key === "Enter" && activeTile && (document.activeElement === activeTile || !event.target.closest("a, button"))) {
+      if (startBtn && startBtn.href) {
+        window.location.href = startBtn.href;
+      }
+    }
+  });
+
+  var defaultIndex = library.getAttribute("data-default-index");
+  var initial = tiles.find(function (tile) {
+    return String(tile.getAttribute("data-index")) === String(defaultIndex);
+  }) || tiles.find(function (tile) { return tile.getAttribute("data-state") === "progress"; }) || tiles[0];
+  if (initial) {
+    selectTile(initial, false);
+  }
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -797,6 +797,206 @@ def _simple_tikz_grid_to_svg(tikz_block: str) -> Optional[str]:
     return "".join(parts)
 
 
+def _node_anchor_offsets(anchor: str) -> Tuple[float, float]:
+    """TikZ node anchor → rough label offset in SVG px (y-down)."""
+    a = anchor.replace(" ", "").lower()
+    dx, dy = 0.0, 0.0
+    if "left" in a:
+        dx -= 10.0
+    if "right" in a:
+        dx += 10.0
+    if "above" in a:
+        dy -= 10.0
+    if "below" in a:
+        dy += 10.0
+    if a in ("left",):
+        dx -= 8.0
+    if a in ("right",):
+        dx += 8.0
+    if a in ("above",):
+        dy -= 10.0
+    if a in ("below",):
+        dy += 10.0
+    return dx, dy
+
+
+def _strip_math_label(raw: str) -> str:
+    s = raw.strip()
+    if s.startswith("$") and s.endswith("$"):
+        s = s[1:-1]
+    return html.escape(s.strip(), quote=False)
+
+
+def _coord_plane_grid_filldraw_svg(tikz_block: str) -> Optional[str]:
+    """
+    PGF/TikZ coordinate planes like:
+      \\draw[very thin,...] (x0,y0) grid (x1,y1);
+      \\draw[->,thick] (xa,0)--(xb,0) node[...]{$x$};
+      \\draw[->,thick] (0,ya)--(0,yb) node[...]{$y$};
+      \\filldraw[black] (px,py) circle (3pt) node[above left]{$A(-3,4)$};
+    Default grid step is 1 unit (no ``step=`` in \\draw).
+    """
+    gm = re.search(
+        r"\\draw\[[^\]]*\]\s*\(([-\d.]+),([-\d.]+)\)\s+grid\s+\(([-\d.]+),([-\d.]+)\)",
+        tikz_block,
+    )
+    if not gm:
+        return None
+    gx0, gy0, gx1, gy1 = map(float, gm.groups())
+    xmin, xmax = (gx0, gx1) if gx0 <= gx1 else (gx1, gx0)
+    ymin, ymax = (gy0, gy1) if gy0 <= gy1 else (gy1, gy0)
+
+    axis_iter = list(
+        re.finditer(
+            r"\\draw\[->,thick\]\s*\(([-\d.]+),([-\d.]+)\)\s*--\s*\(([-\d.]+),([-\d.]+)\)"
+            r"(?:\s*node\[[^\]]*\]\s*\{[^}]*\})?\s*;?",
+            tikz_block,
+        )
+    )
+    if len(axis_iter) < 2:
+        return None
+
+    pt_iter = list(
+        re.finditer(
+            r"\\filldraw\[[^\]]*\]\s*\(([-\d.]+),([-\d.]+)\)\s+circle\s*\(([\d.]+)pt\)"
+            r"\s*node\[([^\]]+)\]\s*\{([^}]*)\}",
+            tikz_block,
+        )
+    )
+    if len(pt_iter) < 2:
+        return None
+
+    pts: List[Tuple[float, float, str, str]] = []
+    for m in pt_iter:
+        px, py, _rpt, anchor, label_raw = (
+            float(m.group(1)),
+            float(m.group(2)),
+            m.group(3),
+            m.group(4),
+            m.group(5),
+        )
+        pts.append((px, py, anchor, label_raw))
+
+    w, h = 440, 360
+    pad = 28.0
+
+    def tx(x: float) -> float:
+        return pad + (x - xmin) / (xmax - xmin) * (w - 2 * pad)
+
+    def ty(y: float) -> float:
+        return pad + (ymax - y) / (ymax - ymin) * (h - 2 * pad)
+
+    unit_x = (w - 2 * pad) / (xmax - xmin)
+    unit_y = (h - 2 * pad) / (ymax - ymin)
+    pr = max(4.0, min(unit_x, unit_y) * 0.22)
+
+    global _svg_marker_seq
+    _svg_marker_seq += 1
+    mid = f"npAxis{_svg_marker_seq}"
+
+    parts: List[str] = []
+    parts.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
+        'class="stem-tikz-svg stem-tikz-svg--coord" role="img" aria-label="Coordinate plane">'
+    )
+    parts.append("<defs>")
+    parts.append(
+        f'<marker id="{mid}" viewBox="0 0 10 10" refX="9" refY="5" '
+        'markerWidth="7" markerHeight="7" orient="auto">'
+        '<path d="M 0 0 L 10 5 L 0 10 z" fill="#2d2657"/></marker>'
+    )
+    parts.append("</defs>")
+    parts.append(f'<rect x="0" y="0" width="{w}" height="{h}" rx="10" fill="{_PLOT_BG}"/>')
+
+    # Integer grid (implicit step 1)
+    lo_x, hi_x = int(math.floor(xmin)), int(math.ceil(xmax))
+    lo_y, hi_y = int(math.floor(ymin)), int(math.ceil(ymax))
+    for xi in range(lo_x, hi_x + 1):
+        x_ = tx(float(xi))
+        parts.append(
+            f'<line x1="{x_:.2f}" y1="{ty(ymax):.2f}" x2="{x_:.2f}" y2="{ty(ymin):.2f}" '
+            f'stroke="{_GRID}" stroke-width="1"/>'
+        )
+    for yi in range(lo_y, hi_y + 1):
+        y_ = ty(float(yi))
+        parts.append(
+            f'<line x1="{tx(xmin):.2f}" y1="{y_:.2f}" x2="{tx(xmax):.2f}" y2="{y_:.2f}" '
+            f'stroke="{_GRID}" stroke-width="1"/>'
+        )
+
+    # Axes on top of grid
+    for am in axis_iter:
+        ax0, ay0, ax1, ay1 = map(float, am.groups())
+        parts.append(
+            f'<line x1="{tx(ax0):.2f}" y1="{ty(ay0):.2f}" x2="{tx(ax1):.2f}" y2="{ty(ay1):.2f}" '
+            f'stroke="{_AXIS}" stroke-width="2.2" marker-end="url(#{mid})"/>'
+        )
+
+    # Axis labels x / y (from optional node on the matching segment)
+    for am in axis_iter:
+        seg = am.group(0)
+        if "node" not in seg:
+            continue
+        nm = re.search(r"node\[([^\]]*)\]\s*\{\$([^$]*)\$\}", seg)
+        if not nm:
+            continue
+        lab = nm.group(2).strip()
+        ax0, ay0, ax1, ay1 = map(float, am.groups()[:4])
+        if abs(ay1 - ay0) < 1e-9 and abs(ay0) < 1e-9:
+            parts.append(
+                f'<text x="{tx(ax1) + 6:.2f}" y="{ty(0) + 4:.2f}" font-size="13" '
+                f'font-style="italic" fill="{_AXIS}">{html.escape(lab, quote=False)}</text>'
+            )
+        elif abs(ax1 - ax0) < 1e-9 and abs(ax0) < 1e-9:
+            parts.append(
+                f'<text x="{tx(0) + 4:.2f}" y="{ty(ay1) - 6:.2f}" font-size="13" '
+                f'font-style="italic" fill="{_AXIS}">{html.escape(lab, quote=False)}</text>'
+            )
+
+    # Triangle fill when exactly three vertices (SAT “area of triangle” stems)
+    if len(pts) == 3:
+        poly = " ".join(f"{tx(px):.2f},{ty(py):.2f}" for px, py, _, _ in pts)
+        parts.append(
+            f'<polygon points="{poly}" fill="rgba(79, 47, 212, 0.12)" '
+            f'stroke="{_STROKE}" stroke-width="2" stroke-linejoin="round"/>'
+        )
+
+    for px, py, anchor, label_raw in pts:
+        cx, cy = tx(px), ty(py)
+        parts.append(
+            f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{pr:.2f}" fill="#111827" '
+            'stroke="#ffffff" stroke-width="1.2"/>'
+        )
+        dx, dy = _node_anchor_offsets(anchor)
+        lx = cx + dx
+        ly = cy + dy
+        parts.append(
+            f'<text x="{lx:.2f}" y="{ly:.2f}" font-size="12" font-weight="600" '
+            f'fill="#1e1b4b" dominant-baseline="middle">{_strip_math_label(label_raw)}</text>'
+        )
+
+    # Tick numbers (integers in view)
+    for gi in range(lo_x, hi_x + 1):
+        if gi == 0:
+            continue
+        gx_ = tx(float(gi))
+        parts.append(
+            f'<text x="{gx_:.2f}" y="{h - pad + 16:.2f}" text-anchor="middle" '
+            f'font-size="10" fill="{_TICK}">{gi}</text>'
+        )
+    for gj in range(lo_y, hi_y + 1):
+        if gj == 0:
+            continue
+        gy_ = ty(float(gj))
+        parts.append(
+            f'<text x="{pad - 8:.2f}" y="{gy_ + 4:.2f}" text-anchor="end" '
+            f'font-size="10" fill="{_TICK}">{gj}</text>'
+        )
+
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 def _tikz_block_to_figure_html(block: str) -> Optional[str]:
     block = block.strip()
     if r"\begin{axis}" in block:
@@ -809,6 +1009,9 @@ def _tikz_block_to_figure_html(block: str) -> Optional[str]:
     np_svg = _novel_prep_placement_graph_svg(block)
     if np_svg:
         return f'<div class="stem-figure-wrap stem-figure-wrap--choice">{np_svg}</div>'
+    coord_svg = _coord_plane_grid_filldraw_svg(block)
+    if coord_svg:
+        return f'<div class="stem-figure-wrap stem-figure-wrap--coord">{coord_svg}</div>'
     sg = _simple_tikz_grid_to_svg(block)
     if sg:
         return f'<div class="stem-figure-wrap stem-figure-wrap--choice">{sg}</div>'

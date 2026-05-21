@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" width="100%" role="img" aria-hidden="true">
+<rect width="420" height="420" rx="10" fill="#ffffff"/>
+<circle cx="210.0" cy="210.0" r="150.0" fill="none" stroke="#352875" stroke-width="2.8"/>
+<circle cx="210.0" cy="210.0" r="5.0" fill="#4f2fd4" stroke="#fff" stroke-width="1"/>
+<text x="210.0" y="198.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">O</text>
+<circle cx="210.0" cy="78.0" r="4.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="210.0" y="66.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">A</text>
+<circle cx="86.0" cy="255.1" r="4.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="74.7" y="259.3" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">D</text>
+<circle cx="342.0" cy="210.0" r="4.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="354.0" y="210.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">C</text>
+<circle cx="210.0" cy="342.0" r="4.0" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="210.0" y="354.0" font-size="13" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="600">B</text>
+<text x="210.0" y="400.0" font-size="11" font-family="system-ui,Segoe UI,sans-serif" fill="#1e1b4b" text-anchor="middle" font-weight="400">arc ADC = 5π, x = 100° (schematic)</text>
+</svg>

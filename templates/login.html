@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% block title %}Sign In · {{ site_brand_name }}{% endblock %}
+
 {% block content %}
 <div class="np-page-shell">
 <div class="np-login-page">
@@ -10,22 +12,57 @@
   {% endif %}
   {% endwith %}
 
-  <article class="np-login-card glass-panel np-glass mp-animate-in">
+  <section class="np-login-shell glass-panel np-glass mp-animate-in" aria-label="{{ site_brand_short }} sign in">
     <div class="np-sh-hero-noise np-login-noise" aria-hidden="true"></div>
-    <header class="np-login-head">
-      <p class="np-login-kicker">Novel Prep</p>
-      <h1 class="np-login-title">Sign in</h1>
-      <p class="np-login-lead">Student workspace · progress syncs to this account</p>
-    </header>
-    <form method="post" class="np-login-form">
-      <label class="np-login-label" for="np-login-user">Username</label>
-      <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="e.g. student" required>
-      <label class="np-login-label" for="np-login-pass">Password</label>
-      <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="••••" required>
-      <button type="submit" class="np-login-submit big-btn mp-btn-pill">Continue</button>
-    </form>
-    <p class="np-login-hint">Demo: <code>student</code> / <code>1234</code> if seeded locally.</p>
-  </article>
+
+    <div class="np-login-brand">
+      <p class="np-login-kicker">{{ site_login_kicker }}</p>
+      <h1 class="np-login-title">Practice with a clear path.</h1>
+      <p class="np-login-lead">Sign in to keep your SAT progress, missed-question log, redo history, and unit analytics connected to your account.</p>
+
+      <div class="np-login-benefits" aria-label="Student workspace benefits">
+        <span>Unit progress</span>
+        <span>Mistake analytics</span>
+        <span>Redo loop</span>
+        <span>Teacher visibility</span>
+      </div>
+
+      <div class="np-login-preview" aria-hidden="true">
+        <div class="np-login-preview-top">
+          <span>SAT Math</span>
+          <strong>Today’s focus</strong>
+        </div>
+        <div class="np-login-preview-meter">
+          <span style="width: 68%;"></span>
+        </div>
+        <div class="np-login-preview-grid">
+          <div><strong>68%</strong><span>Unit progress</span></div>
+          <div><strong>14</strong><span>Misses to redo</span></div>
+          <div><strong>4</strong><span>Active units</span></div>
+        </div>
+      </div>
+    </div>
+
+    <article class="np-login-card">
+      <header class="np-login-form-head">
+        <p class="np-login-form-kicker">Student Login</p>
+        <h2 class="np-login-form-title">Welcome back</h2>
+        <p class="np-login-form-lead">Use the account provided by {{ site_teacher_label }}.</p>
+      </header>
+      <form method="post" class="np-login-form">
+        <label class="np-login-label" for="np-login-user">Username</label>
+        <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="student@example.com" required>
+        <label class="np-login-label" for="np-login-pass">Password</label>
+        <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        <button type="submit" class="np-login-submit big-btn mp-btn-pill">Continue to workspace</button>
+      </form>
+      {% if needs_admin_setup %}
+      <p class="np-login-hint">First time setting up the site? <a href="{{ url_for('admin_setup') }}">Create the admin account</a>.</p>
+      {% else %}
+      <p class="np-login-hint">Need access? Ask {{ site_teacher_label }} to create an account for you.</p>
+      {% endif %}
+    </article>
+  </section>
 </div>
 </div>
 {% endblock %}

@@ -14,9 +14,20 @@
 
   <header class="np-domain-hero glass-panel np-glass mp-animate-in">
     <div class="np-sh-hero-noise" aria-hidden="true"></div>
-    <p class="np-domain-kicker">Topic bank</p>
-    <h1 class="np-domain-title">{{ domain_title|default(domain|replace('_', ' ')|title) }}</h1>
-    <p class="np-domain-lead np-prose-wide">Choose a slice or run the full unit—every attempt feeds your session reports.</p>
+    <div class="np-domain-hero-grid">
+      <div>
+        <p class="np-domain-kicker">Topic bank</p>
+        <h1 class="np-domain-title">{{ domain_title|default(domain|replace('_', ' ')|title) }}</h1>
+        <p class="np-domain-lead np-prose-wide">Choose the full bank for mixed review, or start a focused slice. Every attempt feeds your score sheet and mistake log.</p>
+      </div>
+      {% if topics %}
+      <div class="np-domain-summary" aria-label="Topic bank summary">
+        <span class="np-domain-summary-label">Available</span>
+        <strong>{{ topics|length }}</strong>
+        <span>{{ topics|sum(attribute='count') }} questions</span>
+      </div>
+      {% endif %}
+    </div>
   </header>
 
   {% if not topics %}
@@ -26,12 +37,26 @@
   {% else %}
   <div class="np-topic-grid">
     {% for t in topics %}
-    <article class="np-topic-card glass-panel np-glass">
+    <article class="np-topic-card glass-panel np-glass{% if loop.first %} np-topic-card--featured{% endif %}">
+      <span class="np-topic-card-index" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span>
       <div class="np-topic-card-top">
-        <h2 class="np-topic-card-title">{{ t.title }}</h2>
+        <div>
+          <p class="np-topic-card-kicker">{% if loop.first %}Recommended start{% else %}Focused slice{% endif %}</p>
+          <h2 class="np-topic-card-title">{{ t.title }}</h2>
+        </div>
         <span class="np-topic-card-count">{{ t.count }} items</span>
       </div>
-      <a href="{% if domain == 'placement' %}{{ url_for('placement_start') }}{% else %}/practice/{{ domain }}/{{ t.key }}/0{% endif %}" class="big-btn mp-btn-pill np-topic-card-btn">Start</a>
+      <p class="np-topic-card-desc">
+        {% if loop.first %}
+        Mixed run across the complete bank for this unit. Best for diagnostics and review.
+        {% else %}
+        Focus only this chapter, then review missed items from the session summary.
+        {% endif %}
+      </p>
+      <div class="np-topic-card-bottom">
+        <a href="{% if domain == 'placement' %}{{ url_for('placement_start') }}{% else %}/practice/{{ domain }}/{{ t.key }}/0{% endif %}" class="big-btn mp-btn-pill np-topic-card-btn">Start</a>
+        <span class="np-topic-card-arrow" aria-hidden="true">→</span>
+      </div>
     </article>
     {% endfor %}
   </div>

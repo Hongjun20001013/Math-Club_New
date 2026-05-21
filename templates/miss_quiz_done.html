@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="np-page-shell">
+<div class="mq-done-wrap glass-panel np-glass">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a></p>
+
+    <header class="mq-done-hero">
+        <p class="mq-done-kicker">Miss quiz complete</p>
+        <h1 class="mq-done-title">{{ label }}</h1>
+        <p class="mq-done-meta">{{ topic_title }}</p>
+    </header>
+
+    {% if total > 0 %}
+    {% if quiz_passed %}
+    <p class="mq-done-verdict mq-done-verdict--pass">Passed · you scored at or above <strong>{{ pass_percent }}%</strong> on this shuffled miss set.</p>
+    {% else %}
+    <p class="mq-done-verdict mq-done-verdict--fail">Not passed · need <strong>{{ pass_percent }}%+</strong> correct on this run. Ladder status for <strong>{{ mastery_reset_count }}</strong> tracked slot(s) in this set was reset to <em>Unreviewed</em>—redo the miss quiz until you clear the bar.</p>
+    {% endif %}
+    {% endif %}
+
+    <div class="mq-done-score">
+        <div class="mq-done-ring" style="--mq-ring: {{ pct }}%;">
+            <div class="mq-done-ring-inner">
+                <span class="mq-done-num">{{ correct_n }}</span>
+                <span class="mq-done-den">/ {{ total }}</span>
+            </div>
+        </div>
+        <p class="mq-done-pct"><strong>{{ pct }}%</strong> correct this run</p>
+        <p class="mq-done-lead">Misses you cleared stay in your analytics until you consistently get them right across sessions.</p>
+    </div>
+
+    <div class="mq-done-actions">
+        <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_miss_quiz_start', domain=domain, topic=topic) }}">Run again (all misses)</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=0) }}">Open full bank</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice_analytics') }}">Back to mistake analytics</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice') }}">SAT modules</a>
+    </div>
+</div>
+</div>
+{% endblock %}

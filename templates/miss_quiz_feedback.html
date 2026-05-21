@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="np-page-shell">
+<div class="mq-feedback-wrap glass-panel np-glass">
+    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a></p>
+
+    <header class="mq-feedback-hero">
+        <p class="mq-feedback-kicker">Miss quiz · Item {{ step + 1 }} of {{ feedback.quiz_total }}</p>
+        {% if feedback.is_correct %}
+        <h1 class="mq-feedback-title mq-feedback-title--ok">Correct</h1>
+        <p class="mq-feedback-sub">Nice—your reasoning matched the key for bank question {{ feedback.bank_q + 1 }}.</p>
+        {% else %}
+        <h1 class="mq-feedback-title mq-feedback-title--bad">Incorrect</h1>
+        <p class="mq-feedback-sub">Compare your pick with the key, skim the coach note, then continue.</p>
+        {% endif %}
+    </header>
+
+    <div class="mq-feedback-grid">
+        <div class="mq-feedback-card">
+            <span class="mq-feedback-label">Your answer</span>
+            <strong class="mq-feedback-value">{{ feedback.yours }}</strong>
+        </div>
+        <div class="mq-feedback-card">
+            <span class="mq-feedback-label">Correct key</span>
+            <strong class="mq-feedback-value">{{ feedback.key }}</strong>
+        </div>
+    </div>
+
+    {% if feedback.explanation %}
+    <details class="mq-feedback-explain glass-panel np-glass">
+        <summary>Coach breakdown (tap to expand)</summary>
+        <div class="mq-feedback-explain-body question-panel">{{ feedback.explanation | safe }}</div>
+    </details>
+    {% endif %}
+
+    <div class="mq-feedback-actions">
+        {% if feedback.has_next %}
+        <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_miss_quiz_question', domain=domain, topic=topic, step=step + 1) }}">Next question</a>
+        {% else %}
+        <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_miss_quiz_done', domain=domain, topic=topic) }}">View quiz summary</a>
+        {% endif %}
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice_analytics') }}">Mistake analytics</a>
+        <a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice') }}">SAT modules</a>
+    </div>
+</div>
+</div>
+{% endblock %}

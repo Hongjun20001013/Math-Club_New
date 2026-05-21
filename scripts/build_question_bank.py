@@ -28,6 +28,9 @@ UNIT2_EXPL_EN = os.path.join(OUTPUT_DIR, "unit2_explanations_en.json")
 UNIT3_MANIFEST = os.path.join(OUTPUT_DIR, "unit3_question_manifest.json")
 UNIT3_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit3_supplement.json")
 UNIT3_EXPL_EN = os.path.join(OUTPUT_DIR, "unit3_explanations_en.json")
+UNIT4_MANIFEST = os.path.join(OUTPUT_DIR, "unit4_question_manifest.json")
+UNIT4_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit4_supplement.json")
+UNIT4_EXPL_EN = os.path.join(OUTPUT_DIR, "unit4_explanations_en.json")
 SAT_EXTENDED_WALKTHROUGHS = os.path.join(OUTPUT_DIR, "sat_extended_walkthroughs.json")
 
 SECTION_HINT_EN = {
@@ -46,6 +49,10 @@ SECTION_HINT_EN = {
     "3.5": "Multiply probabilities along branches; for conditional probability, shrink the sample space.",
     "3.6": "Connect sample proportion to population; interpret margin of error as plausible swing, not certainty.",
     "3.7": "Separate correlation from causation; check random assignment, controls, and confounding.",
+    "4.1": "Relate length, area, and volume under scaling; sum faces for surface area; pick the right solid formula before crunching numbers.",
+    "4.2": "Use parallel lines and transversals; triangle angle sums and exteriors; similar triangles give proportional sides.",
+    "4.3": "Apply the Pythagorean theorem and trig ratios; label opposite/adjacent to the referenced angle carefully.",
+    "4.4": "Link radius, diameter, circumference, and area; read circle equations for center and radius; arc length is a fraction of the full circumference.",
 }
 
 _SLICE_ORDER = ("1_1", "1_2", "1_3", "1_4", "1_5")
@@ -73,6 +80,14 @@ _SLICE_SECTION_U3 = {
     "3_5": "3.5",
     "3_6": "3.6",
     "3_7": "3.7",
+}
+
+_SLICE_ORDER_U4 = ("4_1", "4_2", "4_3", "4_4")
+_SLICE_SECTION_U4 = {
+    "4_1": "4.1",
+    "4_2": "4.2",
+    "4_3": "4.3",
+    "4_4": "4.4",
 }
 
 
@@ -140,6 +155,32 @@ def _manifest_from_unit3_payload(ps: dict) -> List[dict]:
         if not qs:
             return []
         sec = _SLICE_SECTION_U3[tk]
+        for li in range(len(qs)):
+            rows.append(
+                {
+                    "display_number": g + 1,
+                    "section": sec,
+                    "topic_key": tk,
+                    "topic_local_index": li,
+                }
+            )
+            g += 1
+    if g != len(full):
+        return []
+    return rows
+
+
+def _manifest_from_unit4_payload(geo: dict) -> List[dict]:
+    full = geo.get("unit_4_all")
+    if not full:
+        return []
+    rows: List[dict] = []
+    g = 0
+    for tk in _SLICE_ORDER_U4:
+        qs = geo.get(tk)
+        if not qs:
+            return []
+        sec = _SLICE_SECTION_U4[tk]
         for li in range(len(qs)):
             rows.append(
                 {
@@ -687,6 +728,80 @@ def _enrich_unit3_questions(
             )
 
 
+def _enrich_unit4_questions(
+    topic_key: str,
+    questions: List[Any],
+    manifest: Optional[List[Any]],
+    walkthroughs: Optional[dict[str, Any]] = None,
+) -> None:
+    if not manifest:
+        return
+    supp = _load_json(UNIT4_SUPPLEMENT)
+    if not supp:
+        return
+    expl_en_ov = _load_json(UNIT4_EXPL_EN) or {}
+    titles_zh = supp.get("section_titles_zh", {})
+    titles_en = supp.get("section_titles_en", {})
+    by_topic = supp.get("answers_by_topic", {})
+
+    def _cells_for_topic(tk: str) -> Optional[List[Any]]:
+        row = by_topic.get(tk)
+        return list(row) if isinstance(row, list) else None
+
+    if topic_key == "unit_4_all":
+        flat: List[Any] = []
+        for tk in _SLICE_ORDER_U4:
+            cells = _cells_for_topic(tk)
+            if not cells:
+                print("Warning: missing Unit 4 answers for", tk)
+                return
+            flat.extend(cells)
+        if len(flat) != len(questions) or len(manifest) != len(questions):
+            print(
+                "Warning: unit_4_all length mismatch; skip answer enrichment.",
+                len(flat),
+                len(questions),
+                len(manifest),
+            )
+            return
+        for i, q in enumerate(questions):
+            _attach_unit1_answer_row(
+                q, flat[i], manifest[i], titles_zh, titles_en, expl_en_ov
+            )
+            m = manifest[i]
+            _apply_slot_walkthrough(
+                q,
+                "geometry",
+                str(m.get("topic_key", "")),
+                int(m.get("topic_local_index", 0)),
+                walkthroughs or {},
+            )
+    elif topic_key in by_topic:
+        cells = _cells_for_topic(topic_key)
+        sub = [row for row in manifest if row.get("topic_key") == topic_key]
+        if not cells or len(cells) != len(questions) or len(sub) != len(questions):
+            print(
+                "Warning: Unit 4 slice",
+                topic_key,
+                "answer length mismatch; skip enrichment.",
+                len(cells or []),
+                len(questions),
+            )
+            return
+        for j, q in enumerate(questions):
+            _attach_unit1_answer_row(
+                q, cells[j], sub[j], titles_zh, titles_en, expl_en_ov
+            )
+            sj = sub[j]
+            _apply_slot_walkthrough(
+                q,
+                "geometry",
+                str(sj.get("topic_key", topic_key)),
+                int(sj.get("topic_local_index", j)),
+                walkthroughs or {},
+            )
+
+
 def build_bank():
     bank = {}
     report = {
@@ -773,6 +888,13 @@ def build_bank():
                     for k in order3:
                         merged3.extend(domain_payload[k])
                     domain_payload["unit_3_all"] = merged3
+            elif domain == "geometry":
+                order4 = ("4_1", "4_2", "4_3", "4_4")
+                if all(domain_payload.get(k) for k in order4):
+                    merged4: List[Any] = []
+                    for k in order4:
+                        merged4.extend(domain_payload[k])
+                    domain_payload["unit_4_all"] = merged4
             bank[domain] = domain_payload
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -825,6 +947,22 @@ def build_bank():
             for tk in _SLICE_ORDER_U3:
                 if tk in ps:
                     _enrich_unit3_questions(tk, ps[tk], mrows3, sat_wt)
+
+    geo = bank.get("geometry", {})
+    if geo.get("unit_4_all"):
+        mrows4 = _manifest_from_unit4_payload(geo)
+        if mrows4:
+            with open(UNIT4_MANIFEST, "w", encoding="utf-8") as f:
+                json.dump(mrows4, f, ensure_ascii=False, indent=2)
+        else:
+            mrows4 = _load_json(UNIT4_MANIFEST)
+        if mrows4:
+            _enrich_unit4_questions(
+                "unit_4_all", geo["unit_4_all"], mrows4, sat_wt
+            )
+            for tk in _SLICE_ORDER_U4:
+                if tk in geo:
+                    _enrich_unit4_questions(tk, geo[tk], mrows4, sat_wt)
 
     with open(OUTPUT_BANK, "w", encoding="utf-8") as f:
         json.dump(bank, f, ensure_ascii=False, indent=2)

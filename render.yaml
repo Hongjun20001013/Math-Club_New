@@ -1,6 +1,7 @@
 # Render Blueprint: https://render.com/docs/blueprint-spec
 #
 # SECRET_KEY is auto-generated on first deploy (see envVars below).
+# Set SITE_BRAND_NAME (and related SITE_* vars) in the dashboard before sharing with students.
 # Optional: DESMOS_API_KEY in the dashboard for the graphing calculator.
 #
 # SQLite is ephemeral on the free tier (data can reset on redeploy / spin-down).

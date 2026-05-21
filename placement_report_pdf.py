@@ -50,6 +50,10 @@ _C_BAD = (220, 38, 38)
 _C_SKIP = (120, 113, 108)
 
 
+def _pdf_brand_name() -> str:
+    return (os.environ.get("SITE_BRAND_NAME") or "Novel Prep").strip() or "Novel Prep"
+
+
 def _strip_html(s: str) -> str:
     t = _HTML_TAG.sub("", s or "")
     t = re.sub(r"\s+", " ", t).strip()
@@ -174,7 +178,7 @@ class _PlacementReportPDF(FPDF):
         self.set_font(self._ff, "", 7)
         self.set_text_color(*_C_MUTED)
         uw = self.w - self.l_margin - self.r_margin
-        left = _pdf_core_font_safe("Novel Prep  ·  Course placement")
+        left = _pdf_core_font_safe(f"{_pdf_brand_name()}  ·  Course placement")
         self.set_x(self.l_margin)
         self.cell(uw * 0.58, 4, left, align="L")
         self.cell(uw * 0.42, 4, f"Page {self.page_no()}/{{nb}}", align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
@@ -405,7 +409,7 @@ def _draw_sections_continuation_band(pdf: FPDF, font: str, topic_title: str) -> 
     pdf.set_xy(0, 3)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font(font, "B", 10)
-    pdf.cell(0, 5, _pdf_core_font_safe("Novel Prep"), align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.cell(0, 5, _pdf_core_font_safe(_pdf_brand_name()), align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_font(font, "", 7.5)
     pdf.set_text_color(238, 236, 255)
     pdf.cell(0, 4, _pdf_core_font_safe(topic_title or "Placement diagnostic"), align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
@@ -746,7 +750,7 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
     font = _setup_font(pdf)
     pdf._ff = font  # type: ignore[attr-defined]
 
-    pdf.set_title(_pdf_core_font_safe("Novel Prep - Placement report"))
+    pdf.set_title(_pdf_core_font_safe(f"{_pdf_brand_name()} - Placement report"))
     pdf.alias_nb_pages()
 
     topic_title = _pdf_core_font_safe(str(ctx.get("topic_title") or "Placement diagnostic"))

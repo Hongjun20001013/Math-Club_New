@@ -1,31 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
+{% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
 
-<div class="sat-practice-page-wrap{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}">
-<div class="exam-container practice-run sat-practice{% if placement_mode %} sat-practice--placement{% endif %}">
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}">
+<div class="exam-container practice-run sat-practice sat-practice--split-lock{% if placement_mode %} sat-practice--placement{% endif %}{% if chrome_focus %} sat-practice--miss-quiz{% endif %}">
 
-    <div class="sat-exam-chrome" aria-label="Session controls">
+    <div class="sat-exam-chrome{% if placement_mode %} sat-exam-chrome--placement{% endif %}" aria-label="Session controls">
     {% if placement_mode %}
     <div class="sat-placement-ribbon" role="status">
       <span class="sat-placement-ribbon-dot" aria-hidden="true"></span>
       <span class="sat-placement-ribbon-title">Course placement</span>
       <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-meta">Question {{ qnum + 1 }} of {{ total }}</span>
+      <span class="sat-placement-ribbon-meta">Item {{ qnum + 1 }} / {{ total }}</span>
     </div>
     {% endif %}
     <!-- Header -->
     <div class="exam-header sat-exam-top">
-        <div class="left-header exam-timer">
+        {% if not chrome_focus %}
+        <div class="left-header exam-timer{% if not placement_mode %} exam-timer--unlimited{% endif %}">
             <span class="exam-timer-icon" aria-hidden="true">⏳</span>
-            <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}95:00{% else %}05:00{% endif %}</span>
+            <span class="exam-timer-copy">
+                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}95:00{% else %}00:00{% endif %}</span>
+                {% if not placement_mode %}<span class="exam-timer-mode">Unlimited</span>{% endif %}
+            </span>
         </div>
+        {% elif miss_quiz_mode %}
+        <div class="left-header sat-miss-quiz-brand" aria-hidden="true">
+            <span class="sat-miss-quiz-dot"></span>
+            <span class="sat-miss-quiz-label">Miss quiz</span>
+        </div>
+        {% else %}
+        <div class="left-header sat-miss-quiz-brand" aria-hidden="true">
+            <span class="sat-miss-quiz-dot"></span>
+            <span class="sat-miss-quiz-label">Single redo</span>
+        </div>
+        {% endif %}
 
         <div class="exam-header-center">
-            <div class="progress-label">{% if placement_mode %}Diagnostic{% else %}Question{% endif %}</div>
+            <div class="progress-label">{% if miss_quiz_mode %}Quiz item{% elif mistake_redo_mode|default(false) %}Redo{% elif placement_mode %}Diagnostic{% else %}Question{% endif %}</div>
             <div class="progress-text">
+                {% if miss_quiz_mode %}
+                <span class="progress-current">{{ miss_quiz_step + 1 }}</span>
+                <span class="progress-sep">/</span>
+                <span class="progress-total">{{ miss_quiz_total }}</span>
+                {% elif mistake_redo_mode|default(false) %}
+                <span class="progress-current">1</span>
+                <span class="progress-sep">/</span>
+                <span class="progress-total">1</span>
+                {% else %}
                 <span class="progress-current">{{ qnum + 1 }}</span>
                 <span class="progress-sep">/</span>
                 <span class="progress-total">{{ total }}</span>
+                {% endif %}
             </div>
         </div>
 
@@ -36,33 +62,9 @@
         </button>
         {% if placement_mode %}
         <a href="{{ url_for('placement_landing') }}" class="sat-header-placement-home">Placement home</a>
-        {% else %}
-        <button type="button" id="q-picker-trigger" class="q-picker-trigger" onclick="toggleQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog" title="Open question list">
-            <span class="q-picker-trigger-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-            </span>
-            <span class="q-picker-trigger-text">Jump</span>
-            <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
-        </button>
         {% endif %}
 
-        {% if calculator_allowed %}
-        <button type="button" onclick="toggleCalc()" class="calc-btn calc-open-btn" aria-label="Open calculator">
-            <span class="calc-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <rect x="4" y="2.5" width="16" height="19" rx="2.5" fill="currentColor" opacity="0.15"></rect>
-                    <rect x="6.5" y="5" width="11" height="3.5" rx="1" fill="currentColor"></rect>
-                    <circle cx="8.5" cy="11.5" r="1.2" fill="currentColor"></circle>
-                    <circle cx="12" cy="11.5" r="1.2" fill="currentColor"></circle>
-                    <circle cx="15.5" cy="11.5" r="1.2" fill="currentColor"></circle>
-                    <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"></circle>
-                    <circle cx="12" cy="15.5" r="1.2" fill="currentColor"></circle>
-                    <rect x="14.3" y="14.3" width="2.4" height="2.4" rx="0.8" fill="currentColor"></rect>
-                </svg>
-            </span>
-            <span>Calculator</span>
-        </button>
-        {% else %}
+        {% if not calculator_allowed and not placement_mode %}
         <span class="sat-calc-locked" title="Calculator not allowed on this item">No calculator</span>
         {% endif %}
         </div>
@@ -72,62 +74,131 @@
     <div class="progress-bar-wrap sat-progress-inner">
         <div class="progress-bar">
             <div class="progress-fill"
-                 style="width: {{ ((qnum+1)/total)*100 }}%;">
+                 style="width: {% if miss_quiz_mode %}{{ ((miss_quiz_step + 1) / miss_quiz_total) * 100 }}{% elif mistake_redo_mode|default(false) %}100{% else %}{{ ((qnum+1)/total)*100 }}{% endif %}%;">
             </div>
         </div>
     </div>
-    {% if placement_mode %}
-    <p class="sat-practice-progress-foot" aria-live="polite">
-      <span class="sat-practice-progress-foot__answered">{{ answered_count }} answered</span>
-      <span class="sat-practice-progress-foot__sep" aria-hidden="true">·</span>
-      <span class="sat-practice-progress-foot__remain">{{ remaining_count }} not yet answered</span>
-    </p>
+    <div class="sat-session-strip" aria-label="Practice session details">
+        {% if miss_quiz_mode %}
+        <span class="sat-session-chip sat-session-chip--topic sat-session-chip--miss-quiz">{{ miss_quiz_label }}</span>
+        <span class="sat-session-chip">Bank Q {{ miss_quiz_bank_qnum + 1 }} of {{ bank_total|default(total) }}</span>
+        <span class="sat-session-chip">{{ answered_count }} / {{ miss_quiz_total }} in this quiz</span>
+        {% elif mistake_redo_mode|default(false) %}
+        <span class="sat-session-chip sat-session-chip--topic sat-session-chip--miss-quiz">Mistake redo</span>
+        <span class="sat-session-chip">{{ domain|replace('_', ' ')|title }} · {{ topic|replace('_', ' ')|title }}</span>
+        <span class="sat-session-chip">Bank Q {{ qnum + 1 }} of {{ bank_total|default(total) }}</span>
+        {% else %}
+        {% if placement_mode %}
+        <span class="sat-session-chip sat-session-chip--topic">Placement · {{ total }} items</span>
+        <span class="sat-session-chip">{{ answered_count }} answered</span>
+        <span class="sat-session-chip">{{ remaining_count }} remaining</span>
+        {% else %}
+        <span class="sat-session-chip sat-session-chip--topic">{{ domain|replace('_', ' ')|title }} · {{ topic|replace('_', ' ')|title }}</span>
+        <span class="sat-session-chip">{{ answered_count }} answered</span>
+        <span class="sat-session-chip">{{ remaining_count }} remaining</span>
+        {% endif %}
+        {% endif %}
+        {% if calculator_allowed %}
+        <span class="sat-session-chip sat-session-chip--calc">Calculator allowed</span>
+        {% else %}
+        <span class="sat-session-chip sat-session-chip--locked">No calculator</span>
+        {% endif %}
+    </div>
+    {% if not placement_mode and not chrome_focus %}
+    <p class="sat-data-quality-note">Analytics starts after 3 submitted questions in this session, so quick previews do not pollute progress or mistake reports.</p>
+    {% endif %}
+    {% if miss_quiz_mode %}
+    <p class="sat-miss-quiz-hint">Submit to see <strong>correct / incorrect</strong> right away, then continue through your miss list.</p>
+    {% elif mistake_redo_mode|default(false) %}
+    <p class="sat-miss-quiz-hint">Submit once to see the <strong>answer key</strong> and full <strong>walkthrough</strong>, then return to your mistake list.</p>
     {% endif %}
     </div>
 
     <!-- Navigation -->
     <div class="nav-bar practice-nav-row sat-subnav">
+        {% if miss_quiz_mode %}
+        <div class="sat-subnav-group sat-subnav-group--primary">
+        <a href="{{ url_for('practice_analytics') }}" class="nav-btn nav-btn-secondary">← Mistake analytics</a>
+        <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT modules</a>
+        </div>
+        {% elif mistake_redo_mode|default(false) %}
+        <div class="sat-subnav-group sat-subnav-group--primary">
+        <a href="{{ mistake_return_href }}" class="nav-btn nav-btn-secondary">← Back to mistake list</a>
+        <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT modules</a>
+        </div>
+        {% else %}
+        <div class="sat-subnav-group sat-subnav-group--primary">
         {% if qnum > 0 %}
         <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum - 1) }}" class="nav-btn nav-btn-secondary">
             ← Previous
         </a>
         {% endif %}
-
         {% if qnum < total - 1 %}
         <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum + 1) }}" class="nav-btn nav-btn-secondary">
             Next →
         </a>
         {% endif %}
-        {% if placement_mode %}
-        <button type="button" id="q-picker-trigger" class="q-picker-trigger q-picker-trigger--in-nav" onclick="toggleQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog" title="Open question list">
+        {% if not placement_mode and not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
+        <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
+        <a href="{{ url_for('practice_analytics', part='sat') }}" class="nav-btn nav-btn-secondary">Mistake log</a>
+        {% endif %}
+        </div>
+        {% if placement_mode and not miss_quiz_mode %}
+        <div class="sat-subnav-group sat-subnav-group--tools" aria-label="Question tools">
+        <button type="button" id="q-picker-trigger" class="q-picker-trigger q-picker-trigger--in-nav sat-nav-tool-btn" onclick="toggleQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog" title="Open question list">
             <span class="q-picker-trigger-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
             </span>
             <span class="q-picker-trigger-text">Jump</span>
             <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
         </button>
+        {% if calculator_allowed %}
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" onclick="toggleCalc()">Calculator</button>
         {% else %}
-        <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
-        <a href="{{ url_for('practice_analytics') }}" class="nav-btn nav-btn-secondary">Mistake log</a>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc-off" disabled title="Calculator is not available on this item (paper Section 1 rules)">Calculator</button>
+        {% endif %}
+        </div>
+        {% elif not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
+        <div class="sat-subnav-group sat-subnav-group--tools" aria-label="Question tools">
+        <button type="button" id="sat-review-flag" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--review" aria-pressed="false">
+            <span aria-hidden="true">☆</span> Mark
+        </button>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" onclick="openQuestionPicker()">Jump</button>
+        {% if calculator_allowed %}
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" onclick="toggleCalc()">Calculator</button>
+        {% endif %}
+        <span id="sat-review-status" class="sat-review-status" aria-live="polite"></span>
+        </div>
+        {% endif %}
         {% endif %}
     </div>
 
-    <form method="post" action="{{ url_for('submit_practice_answer') }}" class="practice-form sat-practice-form">
+    <form method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
         <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
         <input type="hidden" name="domain" value="{{ domain }}">
         <input type="hidden" name="topic" value="{{ topic }}">
+        {% if miss_quiz_mode %}
+        <input type="hidden" name="mq_step" value="{{ miss_quiz_step }}">
+        <input type="hidden" name="mq_bank_q" value="{{ miss_quiz_bank_qnum }}">
+        {% else %}
         <input type="hidden" name="qnum" value="{{ qnum }}">
+        {% endif %}
+        {% if mistake_redo_mode|default(false) %}
+        <input type="hidden" name="mistake_redo" value="1">
+        <input type="hidden" name="analytics_part" value="{{ mistake_analytics_part|default('') }}">
+        <input type="hidden" name="miss_anchor" value="{{ mistake_miss_anchor|default('') }}">
+        {% endif %}
         {% if q.question_kind|default('mcq') != 'free_response' %}
         <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
         {% endif %}
 
     <!-- SAT-style split: stem left, choices right -->
-    <div class="sat-split-card{% if placement_mode %} sat-split-card--placement{% endif %}" aria-label="Question and answer area">
+    <div id="question-area" class="sat-split-card" aria-label="Question and answer area">
         <div class="sat-split">
             <section class="sat-pane sat-pane-stem" aria-label="Question">
                 <header class="sat-pane-head">
                     <span class="sat-pane-kicker">Question</span>
-                    <span class="sat-pane-badge">{{ qnum + 1 }} / {{ total }}</span>
+                    <span class="sat-pane-badge">{% if miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
                 </header>
                 <div class="sat-stem-scroll">
                     <div class="question-panel sat-stem-body">
@@ -148,6 +219,14 @@
                     <label class="sat-spr-label" for="spr-answer-input">Answer</label>
                     <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. -22, 3/2, 0.75" aria-describedby="spr-hint">
                     <p id="spr-hint" class="sat-spr-hint">Decimals or fractions are accepted when they match the answer key.</p>
+                    <div class="sat-spr-assist" aria-label="Accepted response formats">
+                        <span class="sat-spr-assist-kicker">Accepted formats</span>
+                        <div class="sat-spr-assist-grid">
+                            <span>Integer</span>
+                            <span>Fraction</span>
+                            <span>Decimal</span>
+                        </div>
+                    </div>
                 </div>
                 {% else %}
                 <div class="choices-panel choices-stack sat-choices-list">
@@ -162,13 +241,24 @@
             {% endfor %}
                 </div>
                 {% endif %}
+                <details class="sat-scratchpad">
+                    <summary>Scratch notes for this question</summary>
+                    <textarea id="sat-scratch-note" class="sat-scratch-note" rows="4" placeholder="Write quick steps, formulas, or why you chose this answer. Notes stay in this browser only."></textarea>
+                </details>
                 <div class="sat-submit-wrap">
-                    {% if is_last %}
+                    {% if miss_quiz_mode %}
+                    <p class="sat-submit-hint">You will see <strong>instant feedback</strong> before moving on.</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Check answer</button>
+                    {% elif mistake_redo_mode|default(false) %}
+                    <p class="sat-submit-hint">One submission opens the <strong>verified walkthrough</strong> and sends you back to your list.</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit &amp; see review</button>
+                    {% elif is_last %}
                     <p class="sat-submit-hint">Finish this question to see your score for all {{ total }} questions.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
                     {% endif %}
+                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
                 </div>
             </aside>
         </div>
@@ -180,6 +270,7 @@
 </div>
 
 <!-- Question picker (modal) — numbers only when opened -->
+{% if not chrome_focus %}
 <div id="q-picker-backdrop" class="q-picker-backdrop" onclick="closeQuestionPicker()" aria-hidden="true" role="presentation"></div>
 <div id="q-picker-panel" class="q-picker-panel" role="dialog" aria-modal="true" aria-labelledby="q-picker-title" aria-hidden="true">
     <div class="q-picker-panel-inner glass-panel">
@@ -199,6 +290,7 @@
                 <div class="q-picker-legend" aria-hidden="true">
                     <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--done"></span> Answered</span>
                     <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--here"></span> Here</span>
+                    <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--marked"></span> Marked</span>
                     <span class="q-picker-legend-item"><span class="q-picker-dot q-picker-dot--todo"></span> Not yet</span>
                 </div>
             </div>
@@ -210,6 +302,7 @@
                 {% set done = i in answered_qset %}
                 <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=i) }}"
                    class="q-nav-btn{% if i == qnum %} is-current{% endif %}{% if done %} is-done{% endif %}"
+                   data-q-index="{{ i }}"
                    aria-label="Question {{ i + 1 }}{% if i == qnum %}, current{% endif %}{% if done %}, answered{% else %}, not answered yet{% endif %}">
                    {{ i + 1 }}
                 </a>
@@ -218,6 +311,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 
 <!-- ============================= -->
@@ -225,8 +319,12 @@
 <!-- ============================= -->
 {% if calculator_allowed %}
 <div id="calculator-panel">
-    <div class="calculator-panel-header">
-        <strong>Calculator</strong>
+    <div class="calculator-panel-header" id="calculator-drag-handle">
+        <div class="calculator-panel-title">
+            <strong>Calculator</strong>
+            <span>Drag header · resize from corner</span>
+        </div>
+        <button type="button" class="calculator-reset-btn" onclick="resetCalcPanel()" aria-label="Reset calculator position and size">Reset</button>
         <button type="button" class="calculator-close-btn" onclick="closeCalc()" aria-label="Close calculator">×</button>
     </div>
     <div id="calculator-status" style="font-size: 14px; color: #555; margin-bottom: 10px;">
@@ -258,12 +356,24 @@
 <!-- ============================= -->
 <script>
 /* Theme toggles: global handler in base.html (all .sat-theme-toggle). */
+if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+}
+
+/* Keep this page on the intended two-column exam layout and remove stale duplicated tools from older cached markup. */
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".exam-header-actions .q-picker-trigger, .exam-header-actions .calc-open-btn, .sat-focus-tools").forEach((el) => {
+        el.remove();
+    });
+});
 
 /* ================= TIMER ================= */
 const practiceTimerSeconds = {{ practice_timer_seconds|int }};
 const practiceTimerSummaryUrl = {{ practice_timer_summary_url | tojson }};
 const practiceAttemptId = {{ attempt_id|int }};
 const placementTimerMode = {{ placement_mode | tojson }};
+const practiceTimerMode = {{ practice_timer_mode|default('elapsed')|tojson }};
+const attemptStartedUnix = {{ attempt_started_unix|default(0)|int }};
 const PLACEMENT_DEADLINE_KEY = "sat-placement-deadline-ms-" + String(practiceAttemptId);
 
 function placementDeadlineMs() {
@@ -282,7 +392,10 @@ function initialTimerSeconds() {
         const left = Math.floor((placementDeadlineMs() - Date.now()) / 1000);
         return Math.max(0, left);
     }
-    return practiceTimerSeconds;
+    if (practiceTimerMode === "elapsed" && attemptStartedUnix > 0) {
+        return Math.max(0, Math.floor(Date.now() / 1000) - attemptStartedUnix);
+    }
+    return 0;
 }
 
 let totalSeconds = initialTimerSeconds();
@@ -320,10 +433,10 @@ function startTimer() {
                 Math.floor((placementDeadlineMs() - Date.now()) / 1000)
             );
         } else {
-            totalSeconds--;
+            totalSeconds++;
         }
 
-        if (totalSeconds <= 0) {
+        if (placementTimerMode && totalSeconds <= 0) {
             totalSeconds = 0;
             renderTime();
             if (timerId) clearInterval(timerId);
@@ -336,7 +449,11 @@ function startTimer() {
     }, 1000);
 }
 
-startTimer();
+const missQuizMode = {{ (miss_quiz_mode|default(false)) | tojson }};
+const mistakeRedoMode = {{ (mistake_redo_mode|default(false)) | tojson }};
+if (!missQuizMode && !mistakeRedoMode) {
+    startTimer();
+}
 
 
 /* ================= QUESTION PICKER (MODAL) ================= */
@@ -346,6 +463,7 @@ function openQuestionPicker() {
     const panel = document.getElementById("q-picker-panel");
     const trig = document.getElementById("q-picker-trigger");
     if (!back || !panel) return;
+    syncQuestionPickerMarks();
     back.classList.add("is-open");
     panel.classList.add("is-open");
     back.setAttribute("aria-hidden", "false");
@@ -373,6 +491,20 @@ function toggleQuestionPicker() {
     else openQuestionPicker();
 }
 
+function syncQuestionPickerMarks() {
+    const prefix = "{{ domain }}_{{ topic }}_";
+    document.querySelectorAll(".q-picker-grid .q-nav-btn[data-q-index]").forEach((btn) => {
+        const idx = btn.getAttribute("data-q-index");
+        const flagged = localStorage.getItem(prefix + idx + "_review_flag") === "1";
+        btn.classList.toggle("is-marked", flagged);
+        const base = "Question " + (Number(idx) + 1);
+        const current = btn.classList.contains("is-current") ? ", current" : "";
+        const answered = btn.classList.contains("is-done") ? ", answered" : ", not answered yet";
+        const marked = flagged ? ", marked for review" : "";
+        btn.setAttribute("aria-label", base + current + answered + marked);
+    });
+}
+
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeQuestionPicker();
 });
@@ -381,19 +513,49 @@ document.addEventListener("keydown", (e) => {
 /* ================= CHOICE SELECT ================= */
 
 const storageKey = "{{ domain }}_{{ topic }}_{{ qnum }}";
+const scratchKey = storageKey + "_scratch";
+const reviewFlagKey = storageKey + "_review_flag";
 const selectedInput = document.getElementById("selected-answer-input");
 const sprInput = document.getElementById("spr-answer-input");
+const practiceForm = document.querySelector(".sat-practice-form");
+const answerStatus = document.getElementById("sat-answer-status");
+const submitButtons = document.querySelectorAll(".sat-submit-btn");
+
+function setAnswerState(hasAnswer, label) {
+    practiceForm?.classList.toggle("is-answered", hasAnswer);
+    answerStatus?.classList.toggle("is-visible", hasAnswer);
+    submitButtons.forEach((btn) => {
+        btn.toggleAttribute("disabled", !hasAnswer);
+        btn.classList.toggle("is-disabled", !hasAnswer);
+    });
+    if (answerStatus) {
+        answerStatus.textContent = hasAnswer
+            ? (label || "Answer selected. You can submit when ready.")
+            : "{% if q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
+    }
+}
+
+setAnswerState(false);
 
 if (selectedInput) {
 document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
     const activate = () => {
         document.querySelectorAll(".sat-choices-list .choice-card")
-            .forEach(c => c.classList.remove("selected"));
+            .forEach(c => {
+                c.classList.remove("selected");
+                c.classList.remove("is-selected");
+                c.setAttribute("aria-pressed", "false");
+            });
 
         card.classList.add("selected");
+        card.classList.add("is-selected");
+        card.setAttribute("aria-pressed", "true");
         localStorage.setItem(storageKey, card.dataset.index);
         selectedInput.value = card.dataset.letter;
+        setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
     };
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-pressed", "false");
     card.addEventListener("click", activate);
     card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -404,26 +566,125 @@ document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
 });
 }
 
+function revealQuestionContent() {
+    const questionArea = document.getElementById("question-area");
+    const stemScroll = document.querySelector(".sat-stem-scroll");
+    const target = document.querySelector(".sat-subnav") || questionArea;
+    if (stemScroll) stemScroll.scrollTop = 0;
+    if (!target) return;
+
+    const top = window.scrollY + target.getBoundingClientRect().top - 16;
+    window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "auto"
+    });
+}
+
+function scheduleRevealQuestionContent() {
+    requestAnimationFrame(revealQuestionContent);
+    setTimeout(revealQuestionContent, 120);
+    setTimeout(revealQuestionContent, 420);
+}
+
+window.addEventListener("pageshow", scheduleRevealQuestionContent);
+
 window.addEventListener("load", () => {
+    scheduleRevealQuestionContent();
+
+    document.querySelectorAll("#question-area img").forEach((img) => {
+        if (!img.complete) {
+            img.addEventListener("load", revealQuestionContent, { once: true });
+        }
+    });
+
+    if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().then(revealQuestionContent).catch(() => {});
+    }
+
+    const scratch = document.getElementById("sat-scratch-note");
+    if (scratch) {
+        scratch.value = localStorage.getItem(scratchKey) || "";
+        scratch.addEventListener("input", () => {
+            localStorage.setItem(scratchKey, scratch.value);
+        });
+    }
+
+    const reviewBtn = document.getElementById("sat-review-flag");
+    const reviewStatus = document.getElementById("sat-review-status");
+    const questionArea = document.getElementById("question-area");
+    if (reviewBtn) {
+        const syncReviewFlag = () => {
+            const flagged = localStorage.getItem(reviewFlagKey) === "1";
+            reviewBtn.classList.toggle("is-flagged", flagged);
+            reviewBtn.setAttribute("aria-pressed", String(flagged));
+            questionArea?.classList.toggle("is-marked-for-review", flagged);
+            reviewBtn.innerHTML = flagged
+                ? '<span aria-hidden="true">★</span> Marked'
+                : '<span aria-hidden="true">☆</span> Mark';
+            if (reviewStatus) {
+                reviewStatus.textContent = flagged ? "This question is marked" : "";
+            }
+            syncQuestionPickerMarks();
+        };
+        syncReviewFlag();
+        reviewBtn.addEventListener("click", () => {
+            const next = localStorage.getItem(reviewFlagKey) === "1" ? "0" : "1";
+            if (next === "1") {
+                localStorage.setItem(reviewFlagKey, "1");
+            } else {
+                localStorage.removeItem(reviewFlagKey);
+            }
+            syncReviewFlag();
+        });
+    }
+
     const saved = localStorage.getItem(storageKey);
     if (sprInput && saved !== null) {
         sprInput.value = saved;
+        setAnswerState(!!sprInput.value.trim(), "Answer entered. Ready to submit.");
     } else if (selectedInput && saved !== null) {
         const cards = document.querySelectorAll(".sat-choices-list .choice-card");
         if (cards[saved]) {
             cards[saved].classList.add("selected");
+            cards[saved].classList.add("is-selected");
+            cards[saved].setAttribute("aria-pressed", "true");
             selectedInput.value = cards[saved].dataset.letter;
+            setAnswerState(true, `Selected ${cards[saved].dataset.letter}. Ready to submit.`);
         }
     }
 
     if (sprInput) {
+        const syncSprStatus = () => {
+            const hasValue = sprInput.value.trim().length > 0;
+            setAnswerState(hasValue, "Answer entered. Ready to submit.");
+        };
+        syncSprStatus();
         sprInput.addEventListener("input", () => {
             localStorage.setItem(storageKey, sprInput.value);
+            syncSprStatus();
         });
     }
 
-    if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise();
+});
+
+document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    const typing = target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+    if (typing || event.metaKey || event.ctrlKey || event.altKey) return;
+    const key = event.key.toLowerCase();
+    if (selectedInput && /^[a-e]$/.test(key)) {
+        const cards = Array.from(document.querySelectorAll(".sat-choices-list .choice-card"));
+        const index = key.charCodeAt(0) - "a".charCodeAt(0);
+        if (cards[index]) {
+            event.preventDefault();
+            cards[index].click();
+        }
+    } else if (event.key === "Enter") {
+        const canSubmit = sprInput ? sprInput.value.trim() : selectedInput?.value;
+        if (canSubmit) {
+            event.preventDefault();
+            practiceForm?.requestSubmit();
+        }
     }
 });
 
@@ -431,13 +692,15 @@ document.querySelector("form").addEventListener("submit", (event) => {
     if (sprInput) {
         if (!sprInput.value.trim()) {
             event.preventDefault();
-            alert("Please enter an answer before submitting.");
+            setAnswerState(false);
+            sprInput.focus();
         }
         return;
     }
     if (selectedInput && !selectedInput.value) {
         event.preventDefault();
-        alert("Please select an answer before submitting.");
+        setAnswerState(false);
+        document.querySelector(".choice-card")?.focus();
     }
 });
 
@@ -449,10 +712,143 @@ let desmosLoadPromise = null;
 let fallbackInitialized = false;
 const desmosApiKey = "{{ desmos_api_key }}";
 const placementCalcAllowed = {{ calculator_allowed|tojson }};
+const CALC_PANEL_KEY = "sat-calc-panel-layout-v1";
 
 function setCalcStatus(message) {
     const status = document.getElementById("calculator-status");
     if (status) status.innerText = message;
+}
+
+function defaultCalcPanelLayout() {
+    const width = Math.min(640, Math.max(420, window.innerWidth - 40));
+    const height = Math.min(720, Math.max(420, window.innerHeight - 120));
+    return {
+        left: Math.max(16, window.innerWidth - width - 24),
+        top: Math.max(16, Math.min(88, window.innerHeight - height - 16)),
+        width,
+        height
+    };
+}
+
+function clampCalcPanelLayout(layout) {
+    const minW = 360;
+    const minH = 360;
+    const width = Math.min(Math.max(layout.width || minW, minW), Math.max(minW, window.innerWidth - 24));
+    const height = Math.min(Math.max(layout.height || minH, minH), Math.max(minH, window.innerHeight - 24));
+    const left = Math.min(Math.max(layout.left || 12, 12), Math.max(12, window.innerWidth - width - 12));
+    const top = Math.min(Math.max(layout.top || 12, 12), Math.max(12, window.innerHeight - height - 12));
+    return { left, top, width, height };
+}
+
+function saveCalcPanelLayout(panel) {
+    if (!panel) return;
+    const layout = {
+        left: panel.offsetLeft,
+        top: panel.offsetTop,
+        width: panel.offsetWidth,
+        height: panel.offsetHeight
+    };
+    try {
+        localStorage.setItem(CALC_PANEL_KEY, JSON.stringify(layout));
+    } catch (e) { /* ignore */ }
+}
+
+function applyCalcPanelLayout(panel, layout) {
+    if (!panel) return;
+    const next = clampCalcPanelLayout(layout || defaultCalcPanelLayout());
+    panel.style.left = `${next.left}px`;
+    panel.style.top = `${next.top}px`;
+    panel.style.width = `${next.width}px`;
+    panel.style.height = `${next.height}px`;
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+    panel.style.transform = "none";
+}
+
+function restoreCalcPanelLayout(panel) {
+    let layout = null;
+    try {
+        layout = JSON.parse(localStorage.getItem(CALC_PANEL_KEY) || "null");
+    } catch (e) {
+        layout = null;
+    }
+    applyCalcPanelLayout(panel, layout || defaultCalcPanelLayout());
+}
+
+function resetCalcPanel() {
+    const panel = document.getElementById("calculator-panel");
+    try {
+        localStorage.removeItem(CALC_PANEL_KEY);
+    } catch (e) { /* ignore */ }
+    applyCalcPanelLayout(panel, defaultCalcPanelLayout());
+    setTimeout(() => {
+        if (calculator && calculator.resize) calculator.resize();
+    }, 80);
+}
+
+function initCalculatorPanelControls() {
+    const panel = document.getElementById("calculator-panel");
+    const handle = document.getElementById("calculator-drag-handle");
+    if (!panel || !handle || panel.dataset.controlsReady === "1") return;
+    panel.dataset.controlsReady = "1";
+    restoreCalcPanelLayout(panel);
+
+    let dragging = null;
+    handle.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        event.preventDefault();
+        const rect = panel.getBoundingClientRect();
+        dragging = {
+            pointerId: event.pointerId,
+            dx: event.clientX - rect.left,
+            dy: event.clientY - rect.top
+        };
+        panel.classList.add("is-dragging");
+        handle.setPointerCapture(event.pointerId);
+    });
+
+    handle.addEventListener("pointermove", (event) => {
+        if (!dragging || dragging.pointerId !== event.pointerId) return;
+        const layout = clampCalcPanelLayout({
+            left: event.clientX - dragging.dx,
+            top: event.clientY - dragging.dy,
+            width: panel.offsetWidth,
+            height: panel.offsetHeight
+        });
+        panel.style.left = `${layout.left}px`;
+        panel.style.top = `${layout.top}px`;
+        panel.style.right = "auto";
+        panel.style.bottom = "auto";
+    });
+
+    function stopDrag(event) {
+        if (!dragging || dragging.pointerId !== event.pointerId) return;
+        dragging = null;
+        panel.classList.remove("is-dragging");
+        saveCalcPanelLayout(panel);
+        if (calculator && calculator.resize) calculator.resize();
+    }
+    handle.addEventListener("pointerup", stopDrag);
+    handle.addEventListener("pointercancel", stopDrag);
+
+    if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => {
+            if (!panel.classList.contains("active")) return;
+            saveCalcPanelLayout(panel);
+            if (calculator && calculator.resize) calculator.resize();
+        });
+        ro.observe(panel);
+    }
+
+    window.addEventListener("resize", () => {
+        applyCalcPanelLayout(panel, {
+            left: panel.offsetLeft,
+            top: panel.offsetTop,
+            width: panel.offsetWidth,
+            height: panel.offsetHeight
+        });
+        if (calculator && calculator.resize) calculator.resize();
+    });
 }
 
 function ensureDesmosLoaded() {
@@ -537,8 +933,8 @@ async function toggleCalc() {
     const panel = document.getElementById("calculator-panel");
     const calcEl = document.getElementById("calculator");
     if (!panel) return;
+    initCalculatorPanelControls();
     // Clear any stale inline fallback style from previous close.
-    panel.style.transform = "";
     panel.style.opacity = "";
     panel.style.visibility = "";
     panel.style.pointerEvents = "";
@@ -577,8 +973,11 @@ async function toggleCalc() {
 function closeCalc() {
     const panel = document.getElementById("calculator-panel");
     if (!panel) return;
+    saveCalcPanelLayout(panel);
     panel.classList.remove("active");
 }
+
+initCalculatorPanelControls();
 </script>
 
 {% endblock %}
