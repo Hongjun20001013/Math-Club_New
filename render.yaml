@@ -1,18 +1,22 @@
 # Render Blueprint: https://render.com/docs/blueprint-spec
 #
-# Deploy: Render Dashboard → New → Blueprint → connect Math-Club_New repo.
-# After deploy: visit https://YOUR-SERVICE.onrender.com/admin/setup once to create admin.
+# IMPORTANT — student accounts & progress:
+# Free tier wipes SQLite on redeploy / long idle. Use Starter + disk below so data persists.
 #
-# SQLite on free tier is ephemeral (data may reset on redeploy). For production with
-# students, upgrade to a paid instance and uncomment the disk + DB_PATH block below.
+# Deploy: Render Dashboard → New → Blueprint → connect Math-Club_New repo.
+# After deploy: visit /admin/setup once to create admin.
 services:
   - type: web
     name: novel-prep-sat
     runtime: python
-    plan: free
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     healthCheckPath: /health
+    disk:
+      name: sat-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.11
@@ -20,15 +24,9 @@ services:
         value: "true"
       - key: SECRET_KEY
         generateValue: true
+      - key: DB_PATH
+        value: /var/data/sat.db
       - key: SITE_BRAND_NAME
         value: Novel Prep Math Studio
       - key: SITE_BRAND_SHORT
         value: Novel Prep
-    # Paid plan only — keeps student accounts & progress across redeploys:
-    # disk:
-    #   name: sat-data
-    #   mountPath: /var/data
-    #   sizeGB: 1
-    # envVars (add after disk):
-    #   - key: DB_PATH
-    #     value: /var/data/sat.db

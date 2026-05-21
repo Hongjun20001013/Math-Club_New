@@ -34,7 +34,8 @@ def _try_numeric_value(s: str) -> Optional[float]:
 
 
 def _norm_text(s: str) -> str:
-    return re.sub(r"\s+", "", _strip_input(s).lower())
+    t = re.sub(r"\s+", "", _strip_input(s).lower())
+    return t.replace("(", "").replace(")", "")
 
 
 def numeric_match(a: float, b: float, tol: float = 0.002) -> bool:

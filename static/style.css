@@ -7451,7 +7451,8 @@ html[data-exam-theme="dark"] .sat-stem-body .stem-table th {
 }
 
 .sat-stem-body .stem-table-wrap {
-    margin: 1.1em 0 1.25em;
+    margin: 1.1em auto 1.25em;
+    max-width: min(100%, 480px);
     border-radius: 0;
     box-shadow:
         0 10px 24px rgba(49, 38, 130, 0.055),
@@ -7977,6 +7978,11 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
 .sat-stem-body .stem-figure-img--hard[src$="hard_2_f2.jpg"] {
     width: min(100%, 420px);
     max-height: 360px;
+}
+
+.sat-stem-body .stem-figure-img--hard[src$="hard_4_q6.svg"] {
+    width: min(100%, 340px);
+    max-height: 260px;
 }
 
 .stem-figure-wrap--choice {
@@ -21074,12 +21080,75 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
 }
 
 .np-hard-studio-meta {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.np-hard-quick-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 10px;
+}
+
+.np-hard-quick-nav-btn {
+    display: grid;
+    gap: 2px;
+    min-height: 74px;
+    padding: 12px 14px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-hard-quick-nav-btn:hover,
+.np-hard-quick-nav-btn.is-active {
+    transform: translateY(-1px);
+    border-color: rgba(91, 77, 255, 0.28);
+    box-shadow: 0 12px 28px rgba(49, 38, 130, 0.1);
+}
+
+.np-hard-quick-nav-btn strong {
+    color: #171326;
+    font: 950 1.45rem / 1 "Inter Tight", "Outfit", system-ui, sans-serif;
+    letter-spacing: -0.04em;
+}
+
+.np-hard-quick-nav-btn span {
+    color: #6f6784;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.np-hard-quick-nav-btn em {
+    color: #8b83a8;
+    font-style: normal;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.np-hard-quick-nav-btn--progress {
+    border-color: rgba(20, 184, 166, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 250, 0.84));
+}
+
+.np-hard-quick-nav-btn--done {
+    border-color: rgba(34, 197, 94, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(240, 253, 244, 0.84));
+}
+
+.np-hard-studio-meta-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
 }
 
 .np-hard-studio-legend {
@@ -21180,7 +21249,7 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
 
 .np-hard-picker-grid {
     display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
     gap: 10px;
 }
 
@@ -21239,10 +21308,23 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     font-weight: 700;
 }
 
-.np-hard-picker-num {
-    font: 950 clamp(1.15rem, 2vw, 1.35rem) / 1 "Inter Tight", "Outfit", system-ui, sans-serif;
+.np-hard-picker-tile:focus-visible .np-hard-picker-roman,
+.np-hard-picker-tile.is-active .np-hard-picker-roman {
+    color: #4f32f0;
+}
+
+.np-hard-picker-roman {
+    font: 950 clamp(1.35rem, 2.4vw, 1.65rem) / 1 "Inter Tight", "Outfit", system-ui, sans-serif;
     letter-spacing: -0.05em;
     color: #171326;
+}
+
+.np-hard-picker-num {
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8b83a8;
 }
 
 .np-hard-picker-bar {
@@ -21275,7 +21357,7 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
         linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(236, 253, 250, 0.82) 100%);
 }
 
-.np-hard-picker-tile--progress .np-hard-picker-num {
+.np-hard-picker-tile--progress .np-hard-picker-roman {
     color: #0f766e;
 }
 
@@ -21285,7 +21367,7 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
         linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(240, 253, 244, 0.82) 100%);
 }
 
-.np-hard-picker-tile--done .np-hard-picker-num {
+.np-hard-picker-tile--done .np-hard-picker-roman {
     color: #15803d;
 }
 

@@ -1,0 +1,260 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{unicode-math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+\usepackage{eso-pic} % for page background
+
+% --------- 主题颜色设置 ---------
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{headerbg}{RGB}{240,240,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
+
+% --------- 页眉背景色条 ---------
+\newcommand{\headbackground}{
+  \AddToShipoutPictureBG*{
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+% --------- 页眉设置 ---------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
+\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+
+\newtcolorbox{SATCard}[1][]{%
+  enhanced,
+  colback=white,
+  colframe=novelblue,
+  coltitle=white,
+  boxrule=0.6pt,
+  arc=4pt,
+  boxsep=5pt,
+  left=8pt, right=8pt, top=10pt, bottom=10pt,
+  sharp corners=south,
+  drop shadow south east,
+  #1
+}
+
+% --------- 顶部 Mark for Review 栏 ---------
+\newcommand{\markforreview}{
+  \stepcounter{questionnum} % 自动递增题号
+  \begin{tikzpicture}[scale=1.1]
+    % 黑色题号
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+
+    % 灰底主栏
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+
+    % Mark for Review
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+
+    % ABC 按钮区域
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+
+
+  \newcommand{\choiceboxcircled}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    rounded corners=6pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+    \textbf{\large\textcircled{\textbf{#1}}} \ #2
+  \end{tcolorbox}
+}
+}
+
+% --------- 选项框样式 ---------
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white, 
+    colframe=novelblue,
+    boxrule=0.5pt, 
+    rounded corners=4pt, 
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+
+\begin{document}
+
+\section*{SAT Hard Question 4}
+\noindent\markforreview
+\vspace{1em}
+
+The incomplete table below summarizes the number of left-handed and right-handed students by gender for eighth-grade students at Keisel Middle School.
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Gender} & \textbf{Left} & \textbf{Right} \\
+\hline
+Female &  &  \\
+\hline
+Male &  &  \\
+\hline
+Total & 18 & 122 \\
+\hline
+\end{tabular}
+\end{center}
+
+There are \textbf{5 times} as many right-handed female students as left-handed female students, and \textbf{9 times} as many right-handed male students as left-handed male students.
+
+If there are a total of 18 left-handed and 122 right-handed students, which of the following is closest to the probability that a randomly selected right-handed student is female?
+
+\vspace{0.75em}
+\choicebox{A}{0.410}
+\choicebox{B}{0.357}
+\choicebox{C}{0.333}
+\choicebox{D}{0.250}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+If shoppers enter a store at an average rate of \(r\) shoppers per minute and each stays in the store for an average time of \(T\) minutes, then the average number of shoppers in the store, \(N\), is given by the formula:
+
+\[
+N = rT
+\]
+
+The owner of the Good Deals Store estimates that 3 shoppers per minute enter the store, and each stays for 15 minutes. The store owner estimates 45 shoppers in the store at a time.
+
+Now, for a new store, the estimate is 90 shoppers per hour, each staying 12 minutes. What percent less is this new store’s average than the original?
+
+(Note: Ignore the percent symbol in your answer.)
+
+\vspace{0.75em}
+\choicebox{A}{57}
+\choicebox{B}{58}
+\choicebox{C}{59}
+\choicebox{D}{60}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+A trivia tournament organizer wanted to study the relationship between the number of points a team scores in a trivia round and the number of hours that a team practices each week.
+
+For the study, the organizer selected \textbf{55} teams at random from all trivia teams in a certain tournament. The table displays the information for the \textbf{40} teams in the sample that practiced for at least \textbf{3 hours per week.}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Hours practiced} & \textbf{6 to 13 points} & \textbf{14 or more points} & \textbf{Total} \\
+\hline
+\textbf{3 to 5 hours} & 6 & 4 & 10 \\
+\textbf{More than 5 hours} & 4 & 26 & 30 \\
+\hline
+\textbf{Total} & 10 & 30 & 40 \\
+\hline
+\end{tabular}
+\end{center}
+
+Which of the following is the \textbf{largest population} to which the results of the study can be generalized?
+
+\vspace{0.75em}
+\choicebox{A}{All trivia teams in the tournament that scored 14 or more points.}
+\choicebox{B}{The 55 trivia teams in the sample.}
+\choicebox{C}{The 40 trivia teams in the sample that practiced 3+ hours/week.}
+\choicebox{D}{All trivia teams in the tournament.}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A circle is centered at \((-1,1)\). Line \(t\) is tangent to the circle at point \((4,-3)\).
+
+Which of the following points lies on line \(t\)?
+
+\vspace{0.75em}
+\choicebox{A}{\((0,\frac{5}{4})\)}
+\choicebox{B}{(3,6)}
+\choicebox{C}{(8,2)}
+\choicebox{D}{(9,1)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Two identical rectangular prisms have a height of \(90\ \text{cm}\), square bases, and surface area \(K\ \text{cm}^2\). Glued along a square base, the resulting surface area is \(\frac{92}{47}K\ \text{cm}^2\).
+
+What is the side length \(s\) of the square base?
+
+\vspace{0.75em}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In triangle \(RST\), angle \(T\) is a right angle. \(L\) lies on \(\overline{RS}\), \(K\) lies on \(\overline{ST}\), and \(LK \parallel RT\).
+
+\textbf{Given:}
+\begin{itemize}
+\item \(RT = 72\ \text{units}\)
+\item \(LK = 24\ \text{units}\)
+\item \(\text{Area of } \triangle RST = 792\ \text{square units}\)
+\end{itemize}
+
+Find the length of \(KT\) in units.
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The equation of a circle is:
+\[
+(x - 6)^2 + (y + 5)^2 = 16
+\]
+and point \(P(10, -5)\) lies on the circle. If \(PQ\) is the diameter, what are the coordinates of point \(Q\)?
+
+\newpage
+
+
+
+
+
+
+
+\end{document}

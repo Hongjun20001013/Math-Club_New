@@ -611,6 +611,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_1": "banks/hard/hard_1.tex",
         "hard_2": "banks/hard/hard_2.tex",
         "hard_3": "banks/hard/hard_3.tex",
+        "hard_4": "banks/hard/hard_4.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -666,7 +667,23 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "download_name": "NovelPrep-SAT-Hard-Practice-3-Slides.pdf",
             "mimetype": "application/pdf",
         },
-    }
+    },
+    "hard_4": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_4.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable version for paper practice or homework packets.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-4-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_4_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Classroom presentation version for walkthrough lessons.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-4-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
 }
 
 UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
@@ -1107,9 +1124,10 @@ TOPIC_TITLES = {
     "4_2": "Unit 4.2 – Lines, angles, and triangles",
     "4_3": "Unit 4.3 – Right triangles and trigonometry",
     "4_4": "Unit 4.4 – Circles",
-    "hard_1": "SAT Hard Question Set 1",
-    "hard_2": "SAT Hard Question Set 2",
-    "hard_3": "SAT Hard Question Set 3",
+    "hard_1": "SAT Hard Question Set 1 (Practice I)",
+    "hard_2": "SAT Hard Question Set 2 (Practice II)",
+    "hard_3": "SAT Hard Question Set 3 (Practice III)",
+    "hard_4": "SAT Hard Question Set 4 (Practice IV)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
@@ -1145,6 +1163,15 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "3.88", "answer_alternates": ["3.883", "3.8834"]},
         {"correct_answer": "C"},
+    ],
+    "hard_4": [
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "8"},
+        {"correct_answer": "22/3", "answer_alternates": ["7.333", "7.3333", "7.33"]},
+        {"correct_answer": "2,-5", "answer_alternates": ["(2,-5)", "(2, -5)", "2, -5"]},
     ],
 }
 
@@ -2873,6 +2900,31 @@ def practice_challenge():
     session["active_track_label"] = "SAT Math"
     db = get_db()
     uid = session.get("user_id")
+
+    def _int_to_roman(value: int) -> str:
+        pairs = (
+            (1000, "M"),
+            (900, "CM"),
+            (500, "D"),
+            (400, "CD"),
+            (100, "C"),
+            (90, "XC"),
+            (50, "L"),
+            (40, "XL"),
+            (10, "X"),
+            (9, "IX"),
+            (5, "V"),
+            (4, "IV"),
+            (1, "I"),
+        )
+        out = ""
+        n = max(1, int(value))
+        for amount, numeral in pairs:
+            while n >= amount:
+                out += numeral
+                n -= amount
+        return out
+
     hard_sets = []
     for idx, (topic, tex_path) in enumerate(BANKS.get("hard_problem", {}).items(), start=1):
         questions = get_questions_for_topic("hard_problem", topic, tex_path)
@@ -2912,8 +2964,9 @@ def practice_challenge():
         hard_sets.append(
             {
                 "index": idx,
+                "roman": _int_to_roman(idx),
                 "topic": topic,
-                "title": f"Hard Practice {idx}",
+                "title": f"Hard Practice {_int_to_roman(idx)}",
                 "subtitle": TOPIC_TITLES.get(topic, f"SAT Hard Question Set {idx}"),
                 "total": total,
                 "answered": answered,
