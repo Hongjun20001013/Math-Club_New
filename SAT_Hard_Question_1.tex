@@ -1,0 +1,254 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{unicode-math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+\usepackage{eso-pic} % for page background
+
+% --------- 主题颜色设置 ---------
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{headerbg}{RGB}{240,240,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
+
+% --------- 页眉背景色条 ---------
+\newcommand{\headbackground}{
+  \AddToShipoutPictureBG*{
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+% --------- 页眉设置 ---------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
+\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+
+\newtcolorbox{SATCard}[1][]{%
+  enhanced,
+  colback=white,
+  colframe=novelblue,
+  coltitle=white,
+  boxrule=0.6pt,
+  arc=4pt,
+  boxsep=5pt,
+  left=8pt, right=8pt, top=10pt, bottom=10pt,
+  sharp corners=south,
+  drop shadow south east,
+  #1
+}
+
+% --------- 顶部 Mark for Review 栏 ---------
+\newcommand{\markforreview}{
+  \stepcounter{questionnum} % 自动递增题号
+  \begin{tikzpicture}[scale=1.1]
+    % 黑色题号
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+
+    % 灰底主栏
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+
+    % Mark for Review
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+
+    % ABC 按钮区域
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+
+
+  \newcommand{\choiceboxcircled}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    rounded corners=6pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+    \textbf{\large\textcircled{\textbf{#1}}} \ #2
+  \end{tcolorbox}
+}
+}
+
+% --------- 选项框样式 ---------
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white, 
+    colframe=novelblue,
+    boxrule=0.5pt, 
+    rounded corners=4pt, 
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+
+\begin{document}
+\section*{Math Hard Question 1}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given expression, \(a\) and \(c\) are positive constants. If \(px + q\) is a factor of the expression,
+\[
+ax^2 + 176x + c = (px + q)(rx + s),
+\]
+where \(p\) and \(q\) are positive constants, what is the greatest possible value of \(ac\)?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given expression,
+\[
+34z^{18} + b z^9 + 30,
+\]
+\(b\) is a positive integer. If \(qz^9 + r\) is a factor of the expression, where \(q\) and \(r\) are positive integers, what is the greatest possible value of \(b\)?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The expression
+\[
+6x^4 + 17x^2 + 7
+\]
+can be rewritten as \((3x^2 + a)(2x^2 + b)\), where \(a\) and \(b\) are positive integers, or as \((3x^2 + c)(2x^2 + d)\), where \(c\) and \(d\) are positive non-integers.
+
+What is the value of \(a + c\)?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The given quadratic function
+\[
+54x^4 + 219x^2 + 105
+\]
+has factors in the form \((k)(ax^2 + b)(cx^2 + d)\). If \(a, b, c, d, k\) are integers, what is the smallest possible value of \(ab\)?
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The equation of a parabola is written in the form
+\[
+y = ax^2 + bx + c,
+\]
+where \(a, b, c\) are constants. When graphed in the \(xy\)-plane, the parabola has vertex \((-1, 4)\) and does not intersect the \(x\)-axis. Which of the following could be the value of \(a - b - c\)?
+
+\choicebox{A}{2}
+\choicebox{B}{4}
+\choicebox{C}{-1}
+\choicebox{D}{-6}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A quadratic function with vertex \((1, 32)\) can be written as
+\[
+ -ax^2 + bx + c \quad (a, b, c \text{ are all positive integers}).
+\]
+What is the maximum value of \(b\)?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+An object’s speed is increasing at a rate of \(7.7\ \text{meters per second squared}\). What is this rate in \textbf{miles per minute squared}, rounded to the nearest tenth? (Use \(1\ \text{mile} = 1609\ \text{meters}\).)
+
+\vspace{0.75em}
+
+\choicebox{A}{0.3}
+\choicebox{B}{17.2}
+\choicebox{C}{206.5}
+\choicebox{D}{209}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The function \(f\) is defined by
+\[
+f(x) = ab^{\frac{x}{n}},
+\]
+where \(a, b, n\) are constants, and \(b, n\) are integers. If \(f(2) = 6\) and \(f(4) = 150\), what is the value of \(f(5)\)?
+
+\vspace{3em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The graph of \(y = f(x)\) in the \(xy\)-plane has a vertex at \((4, -7)\), contains the point \((3, -9)\), and has a \(y\)-intercept at \((0, a)\). The graph of \(y = 6 \cdot f(x)\) has a \(y\)-intercept at \((0, b)\). What is the positive difference between \(a\) and \(b\)?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The function \(f\) is defined by
+\[
+f(x) = ax^2 + bx + c,
+\]
+where \(a, b, c\) are constants. The graph of \(y = f(x)\) passes through the points \((9, 0)\) and \((-2, 0)\). If \(a\) is an integer greater than 1, which of the following could be the value of \(a + b\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{8}
+\choicebox{B}{7}
+\choicebox{C}{-6}
+\choicebox{D}{-12}
+
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+Which of the following expressions has a factor of \(x + 2b\), where \(b\) is a positive integer constant?
+
+
+
+\choicebox{A} {3x^2 + 7x + 14b}
+\choicebox{B}{3x^2 + 22x + 14b}
+\choicebox{C}{3x^2 + 30x + 14b} 
+\choicebox{D}{3x^2 + 37x + 14b} 
+
+
+
+\end{document}

@@ -163,6 +163,24 @@ def strip_document_noise(text: str) -> str:
     return "\n".join(lines_out)
 
 
+def _clean_table_cell(cell: str) -> str:
+    """Strip LaTeX text wrappers from array/tabular cells before HTML output."""
+    cell = cell.strip()
+    for _ in range(8):
+        updated = re.sub(
+            r"\\(?:text|textbf|mathrm|textit|emph)\{([^{}]*)\}",
+            r"\1",
+            cell,
+        )
+        if updated == cell:
+            break
+        cell = updated
+    cell = cell.replace("--", "–")
+    cell = cell.replace(r"\%", "%")
+    cell = cell.replace("{,}", ",")
+    return cell.strip()
+
+
 def _array_body_to_html_table(body: str) -> str:
     """Turn LaTeX array/tabular body (rows split by \\\\, cols by &) into an HTML table."""
     body = body.strip()
@@ -178,7 +196,7 @@ def _array_body_to_html_table(body: str) -> str:
         r = re.sub(r"\s*\\hline\s*$", "", r).strip()
         if not r:
             continue
-        rows.append([c.strip() for c in r.split("&")])
+        rows.append([_clean_table_cell(c) for c in r.split("&")])
     if not rows:
         return ""
     parts = [
@@ -286,6 +304,7 @@ def clean_latex_junk(text: str) -> str:
     text = re.sub(r"\\end\{center\}", "", text)
     text = re.sub(r"\\hline", "", text)
     text = re.sub(r"\\textbf\{([^{}]*)\}", r"\1", text)
+    text = re.sub(r"\\text\{([^{}]*)\}", r"\1", text)
     # Turn LaTeX table line breaks into readable line breaks (not inside amsmath).
     text = re.sub(r"\\\\", "\n", text)
     text = _unshield_amsmath(text, _amsmath_vault)

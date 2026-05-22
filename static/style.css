@@ -7980,9 +7980,28 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
     max-height: 360px;
 }
 
-.sat-stem-body .stem-figure-img--hard[src$="hard_4_q6.svg"] {
-    width: min(100%, 340px);
-    max-height: 260px;
+.sat-stem-body .stem-figure-img--hard[src$="hard_7_f4.png"] {
+    width: min(100%, 380px);
+    max-height: 300px;
+}
+
+.sat-stem-body .stem-figure-img--hard[src$="hard_8_f5.png"] {
+    width: min(100%, 420px);
+    max-height: 280px;
+}
+
+.sat-stem-body .stem-table-wrap + .stem-table-wrap {
+    margin-top: 0.65em;
+}
+
+@media (min-width: 640px) {
+    .sat-stem-body p + .stem-table-wrap,
+    .sat-stem-body .stem-table-wrap:not(:only-of-type) {
+        display: inline-block;
+        vertical-align: top;
+        max-width: min(100%, 240px);
+        margin-right: 0.85em;
+    }
 }
 
 .stem-figure-wrap--choice {
@@ -21086,9 +21105,26 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
 }
 
 .np-hard-quick-nav {
+    position: sticky;
+    top: calc(var(--hard-sticky-top, 72px) + 6px);
+    z-index: 3;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding-bottom: 4px;
+    background: linear-gradient(180deg, rgba(248, 246, 255, 0.98) 70%, rgba(248, 246, 255, 0));
+}
+
+@media (max-width: 720px) {
+    .np-hard-quick-nav {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .np-hard-quick-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .np-hard-quick-nav-btn {
@@ -21249,8 +21285,20 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
 
 .np-hard-picker-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .np-hard-picker-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .np-hard-picker-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .np-hard-picker-tile {

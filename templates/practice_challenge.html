@@ -10,8 +10,8 @@
       <div class="np-sh-hero-noise" aria-hidden="true"></div>
       <div class="np-hard-hero-copy">
         <p class="np-hard-kicker">SAT Math · Hard Problem Drill</p>
-        <h1>Hard question studio.</h1>
-        <p>Select a set, review materials, and begin when you are ready. Your progress syncs across every session.</p>
+        <h1>Hard question library.</h1>
+        <p>Jump to any practice set with the Roman numerals below, preview materials, then begin when you are ready.</p>
         <div class="np-hard-hero-stats">
           <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
           <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
@@ -53,8 +53,8 @@
       <header class="np-hard-studio-head">
         <div>
           <p class="np-hard-kicker">Practice library</p>
-          <h2>Hard question library</h2>
-          <p class="np-hard-studio-lead">Click a number to preview. Use the begin button when you are ready to enter questions.</p>
+          <h2>All practice sets</h2>
+          <p class="np-hard-studio-lead">Roman numerals jump instantly. Tiles below show progress. PDFs and slides live in the detail panel.</p>
         </div>
         <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
           <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>
@@ -75,7 +75,7 @@
           >
             <strong>{{ set.roman }}</strong>
             <span>Set {{ set.index }}</span>
-            <em>{{ set.answered }}/{{ set.total }}</em>
+            <em>{{ set.answered }}/{{ set.total }} · {{ set.total }} Q</em>
           </button>
           {% endfor %}
         </nav>
@@ -124,7 +124,7 @@
               style="--tile-progress: {{ set.progress_pct }}%;"
             >
               <span class="np-hard-picker-roman">{{ set.roman }}</span>
-              <span class="np-hard-picker-num">Set {{ set.index }}</span>
+              <span class="np-hard-picker-num">Set {{ set.index }} · {{ set.total }} Q</span>
               <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
               <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
             </button>
@@ -224,6 +224,7 @@
     var nav = document.querySelector(".navbar");
     var stickyTop = nav ? nav.getBoundingClientRect().height + 8 : 12;
     detail.style.setProperty("--hard-sticky-top", stickyTop + "px");
+    library.style.setProperty("--hard-sticky-top", stickyTop + "px");
   }
 
   var statusLabels = {
