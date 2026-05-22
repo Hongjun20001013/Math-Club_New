@@ -10,8 +10,11 @@
       <div class="np-sh-hero-noise" aria-hidden="true"></div>
       <div class="np-hard-hero-copy">
         <p class="np-hard-kicker">SAT Math · Hard Problem Drill</p>
-        <h1>Hard question library.</h1>
-        <p>Jump to any practice set with the Roman numerals below, preview materials, then begin when you are ready.</p>
+        <div class="np-hard-hero-title-row">
+          <h1>Hard question library.</h1>
+          <span class="np-hard-hero-pill">{{ hard_sets|length }} sets</span>
+        </div>
+        <p>Jump to any practice with Roman numerals I–IX. Preview PDFs, then begin when ready.</p>
         <div class="np-hard-hero-stats">
           <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
           <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
@@ -53,8 +56,8 @@
       <header class="np-hard-studio-head">
         <div>
           <p class="np-hard-kicker">Practice library</p>
-          <h2>All practice sets</h2>
-          <p class="np-hard-studio-lead">Roman numerals jump instantly. Tiles below show progress. PDFs and slides live in the detail panel.</p>
+          <h2>Practice sets</h2>
+          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump. Each tile tracks your progress. Materials download from the panel on the right.</p>
         </div>
         <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
           <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>

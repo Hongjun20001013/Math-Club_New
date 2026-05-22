@@ -304,7 +304,8 @@ def clean_latex_junk(text: str) -> str:
     text = re.sub(r"\\end\{center\}", "", text)
     text = re.sub(r"\\hline", "", text)
     text = re.sub(r"\\textbf\{([^{}]*)\}", r"\1", text)
-    text = re.sub(r"\\text\{([^{}]*)\}", r"\1", text)
+    # Do not strip \\text{} here — it breaks MathJax inside \\(...\\) (e.g. ^\\circ\\text{C}, \\text{cm}).
+    # Table cells are normalized earlier in _clean_table_cell().
     # Turn LaTeX table line breaks into readable line breaks (not inside amsmath).
     text = re.sub(r"\\\\", "\n", text)
     text = _unshield_amsmath(text, _amsmath_vault)

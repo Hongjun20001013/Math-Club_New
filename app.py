@@ -616,6 +616,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_6": "banks/hard/hard_6.tex",
         "hard_7": "banks/hard/hard_7.tex",
         "hard_8": "banks/hard/hard_8.tex",
+        "hard_9": "banks/hard/hard_9.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -749,6 +750,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-8-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_9": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_9.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable version for paper practice or homework packets.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-9-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_9_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Classroom presentation version for walkthrough lessons.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-9-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -1200,6 +1217,7 @@ TOPIC_TITLES = {
     "hard_6": "SAT Hard Question Set 6 (Practice VI)",
     "hard_7": "SAT Hard Question Set 7 (Practice VII)",
     "hard_8": "SAT Hard Question Set 8 (Practice VIII)",
+    "hard_9": "SAT Hard Question Set 9 (Practice IX)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
@@ -1306,6 +1324,17 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "1560"},
         {"correct_answer": "D"},
         {"correct_answer": "D"},
+    ],
+    "hard_9": [
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
     ],
 }
 
