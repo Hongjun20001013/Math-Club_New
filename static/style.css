@@ -23816,11 +23816,36 @@ html[data-exam-theme="dark"] .np-atelier-aside {
     gap: 6px;
 }
 
-.np-login-label-row {
+.np-login-options {
+    position: relative;
+    z-index: 1;
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 14px;
+}
+
+.np-login-check {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
+    color: #5a5370;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+}
+
+.np-login-check input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #5f3df5;
+    cursor: pointer;
+}
+
+html[data-exam-theme="dark"] .np-login-check {
+    color: #c9bfd9;
 }
 
 .np-login-atelier .np-login-label {
@@ -23830,24 +23855,6 @@ html[data-exam-theme="dark"] .np-atelier-aside {
     font-weight: 950;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-}
-
-.np-login-toggle-pass {
-    margin-top: 10px;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: #5f3df5;
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-}
-
-.np-login-toggle-pass:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
 }
 
 .np-login-atelier .np-login-input {

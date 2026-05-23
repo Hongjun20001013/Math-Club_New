@@ -24,7 +24,7 @@
     <section class="np-login-intro" aria-label="Workspace overview">
       <header class="np-login-intro-head">
         <p class="np-atelier-kicker">{{ site_login_kicker }}</p>
-        <h1>Your SAT workspace, one sign-in away.</h1>
+        <h1>Your Math workspace, one sign-in away.</h1>
         <p class="np-atelier-hero-lead">Units 1–4, Hard Drill I–XIV, session reports, mistake analytics, and redo loops — all tied to your account so progress follows you every session.</p>
         <div class="np-atelier-hero-stats" role="list">
           <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
@@ -95,13 +95,21 @@
         </div>
 
         <div class="np-login-field">
-          <div class="np-login-label-row">
-            <label class="np-login-label" for="np-login-pass">Password</label>
-            <button type="button" class="np-login-toggle-pass" id="np-login-toggle-pass" aria-label="Show password" aria-pressed="false">Show</button>
-          </div>
+          <label class="np-login-label" for="np-login-pass">Password</label>
           <div class="np-login-pass-wrap">
             <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
           </div>
+        </div>
+
+        <div class="np-login-options" role="group" aria-label="Sign-in options">
+          <label class="np-login-check">
+            <input type="checkbox" id="np-login-remember" name="remember" value="1">
+            <span>Remember password</span>
+          </label>
+          <label class="np-login-check">
+            <input type="checkbox" id="np-login-show-pass" aria-controls="np-login-pass">
+            <span>Show password</span>
+          </label>
         </div>
 
         <button type="submit" class="np-login-submit big-btn mp-btn-pill" id="np-login-submit">
@@ -129,22 +137,54 @@
 <script>
 (function () {
   var form = document.getElementById("np-login-form");
+  var user = document.getElementById("np-login-user");
   var pass = document.getElementById("np-login-pass");
-  var toggle = document.getElementById("np-login-toggle-pass");
+  var remember = document.getElementById("np-login-remember");
+  var showPass = document.getElementById("np-login-show-pass");
   var submit = document.getElementById("np-login-submit");
+  var STORAGE_KEY = "np-login-saved";
 
-  if (toggle && pass) {
-    toggle.addEventListener("click", function () {
-      var show = pass.type === "password";
-      pass.type = show ? "text" : "password";
-      toggle.textContent = show ? "Hide" : "Show";
-      toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
-      toggle.setAttribute("aria-pressed", show ? "true" : "false");
+  function setPasswordVisible(visible) {
+    if (!pass) return;
+    pass.type = visible ? "text" : "password";
+    if (showPass) showPass.checked = visible;
+  }
+
+  function loadSavedCredentials() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (user && saved.username) user.value = saved.username;
+      if (pass && saved.password) pass.value = saved.password;
+      if (remember) remember.checked = true;
+    } catch (e) { /* ignore */ }
+  }
+
+  function persistCredentials() {
+    try {
+      if (remember && remember.checked) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          username: user ? user.value : "",
+          password: pass ? pass.value : ""
+        }));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  loadSavedCredentials();
+
+  if (showPass && pass) {
+    showPass.addEventListener("change", function () {
+      setPasswordVisible(showPass.checked);
     });
   }
 
   if (form && submit) {
     form.addEventListener("submit", function () {
+      persistCredentials();
       submit.classList.add("is-busy");
       submit.disabled = true;
     });
