@@ -59,7 +59,7 @@
       {% if needs_admin_setup %}
       <p class="np-login-hint">First time setting up the site? <a href="{{ url_for('admin_setup') }}">Create the admin account</a>.</p>
       {% else %}
-      <p class="np-login-hint">Need access? Ask {{ site_teacher_label }} to create an account for you.</p>
+      <p class="np-login-hint">Need access? Ask {{ site_teacher_label }} to create a <strong>student</strong> account. Colleagues need a separate staff account from the site supervisor.</p>
       {% endif %}
     </article>
   </section>

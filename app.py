@@ -304,7 +304,10 @@ def inject_template_config():
         "nav_path": p,
         "learning_tracks": LEARNING_TRACKS,
         "user_logged_in": "user_id" in session,
-        "user_is_admin": current_user_is_admin(),
+        "user_is_admin": current_user_can_access_admin(),
+        "user_is_supervisor": current_user_is_supervisor(),
+        "user_can_access_admin": current_user_can_access_admin(),
+        "current_user_role": current_user_role(),
         "load_mathjax": load_mathjax,
         "style_css_revision": STYLE_CSS_REVISION,
         **_site_branding_context(),
@@ -315,8 +318,29 @@ def require_login() -> bool:
     return "user_id" in session
 
 
+ROLE_ADMIN = "admin"
+ROLE_STAFF = "staff"
+ROLE_STUDENT = "student"
+STAFF_ROLES = frozenset({ROLE_ADMIN, ROLE_STAFF})
+
+
+def current_user_role() -> str:
+    return str(session.get("user_role") or ROLE_STUDENT)
+
+
+def current_user_is_supervisor() -> bool:
+    """Site owner / lead teacher — full admin powers including staff accounts."""
+    return current_user_role() == ROLE_ADMIN
+
+
+def current_user_can_access_admin() -> bool:
+    """Supervisor or colleague — student data & account management."""
+    return current_user_role() in STAFF_ROLES
+
+
 def current_user_is_admin() -> bool:
-    return session.get("user_role") == "admin"
+    """Backward-compatible alias used in templates for admin nav visibility."""
+    return current_user_can_access_admin()
 
 
 def _admin_exists(db: sqlite3.Connection) -> bool:
@@ -369,12 +393,25 @@ def _set_login_session(user: sqlite3.Row) -> None:
     session["user_role"] = str(user["role"] or "student")
 
 
-def _require_admin_response():
+def _require_staff_response():
     if not require_login():
         return redirect(url_for("login", next=request.full_path or request.path))
-    if not current_user_is_admin():
+    if not current_user_can_access_admin():
         abort(403)
     return None
+
+
+def _require_supervisor_response():
+    if not require_login():
+        return redirect(url_for("login", next=request.full_path or request.path))
+    if not current_user_is_supervisor():
+        abort(403)
+    return None
+
+
+def _require_admin_response():
+    """Legacy name — most admin routes allow staff; use _require_supervisor_response for owner-only."""
+    return _require_staff_response()
 
 
 @app.before_request
@@ -5579,7 +5616,7 @@ def login():
             next_url = (request.args.get("next") or "").strip()
             if not next_url.startswith("/"):
                 next_url = ""
-            if current_user_is_admin():
+            if current_user_can_access_admin():
                 return redirect(next_url or url_for("admin"))
             return redirect(next_url or url_for("index"))
         else:
@@ -5648,6 +5685,19 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
             }
         )
     return out
+
+
+def _staff_rows(db: sqlite3.Connection) -> List[dict]:
+    rows = db.execute(
+        """
+        SELECT id, username, role, is_active, created_at, last_login_at
+        FROM users
+        WHERE role = ?
+        ORDER BY is_active DESC, created_at DESC
+        """,
+        (ROLE_STAFF,),
+    ).fetchall()
+    return [dict(row) for row in rows]
 
 
 def _recent_record_rows(db: sqlite3.Connection) -> List[dict]:
@@ -5853,10 +5903,12 @@ def admin():
     return render_template(
         "admin.html",
         students=students,
+        staff_members=_staff_rows(db) if current_user_is_supervisor() else [],
         recent_records=recent_records,
         data_snapshot=data_snapshot,
         totals=totals,
         q=q,
+        user_is_supervisor=current_user_is_supervisor(),
     )
 
 
@@ -5929,6 +5981,85 @@ def admin_create_student():
     return redirect(url_for("admin"))
 
 
+@app.route("/admin/staff", methods=["POST"])
+def admin_create_staff():
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "").strip()
+
+    if not username or len(username) > 160:
+        flash("Enter a colleague email or username.")
+    elif not password:
+        flash("Enter a password for this colleague account.")
+    else:
+        db = get_db()
+        try:
+            db.execute(
+                """
+                INSERT INTO users (username, password, password_hash, role, is_active, created_at)
+                VALUES (?, '', ?, ?, 1, CURRENT_TIMESTAMP)
+                """,
+                (username, generate_password_hash(password), ROLE_STAFF),
+            )
+            db.commit()
+            flash(f"Colleague account created for {username}. They can view student data in Admin.")
+        except sqlite3.IntegrityError:
+            flash("That username already exists.")
+
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/staff/<int:user_id>/reset-password", methods=["POST"])
+def admin_reset_staff_password(user_id: int):
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    password = request.form.get("password", "").strip()
+    if not password:
+        flash("Enter a new password.")
+        return redirect(url_for("admin"))
+
+    db = get_db()
+    db.execute(
+        """
+        UPDATE users
+        SET password_hash = ?,
+            password = '',
+            password_changed_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND role = ?
+        """,
+        (generate_password_hash(password), user_id, ROLE_STAFF),
+    )
+    db.commit()
+    flash("Colleague password updated.")
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/staff/<int:user_id>/toggle-active", methods=["POST"])
+def admin_toggle_staff_active(user_id: int):
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    row = db.execute(
+        "SELECT is_active FROM users WHERE id = ? AND role = ?",
+        (user_id, ROLE_STAFF),
+    ).fetchone()
+    if row is None:
+        flash("Colleague account not found.")
+    else:
+        next_active = 0 if int(row["is_active"] or 0) == 1 else 1
+        db.execute("UPDATE users SET is_active = ? WHERE id = ?", (next_active, user_id))
+        db.commit()
+        flash("Colleague account status updated.")
+    return redirect(url_for("admin"))
+
+
 @app.route("/admin/students/<int:user_id>/reset-password", methods=["POST"])
 def admin_reset_student_password(user_id: int):
     gate = _require_admin_response()
@@ -5979,7 +6110,7 @@ def admin_toggle_student_active(user_id: int):
 
 @app.route("/admin/students/<int:user_id>/delete", methods=["POST"])
 def admin_delete_student(user_id: int):
-    gate = _require_admin_response()
+    gate = _require_supervisor_response()
     if gate is not None:
         return gate
 
@@ -6006,7 +6137,7 @@ def admin_delete_student(user_id: int):
 
 @app.route("/admin/data/clear-legacy", methods=["POST"])
 def admin_clear_legacy_data():
-    gate = _require_admin_response()
+    gate = _require_supervisor_response()
     if gate is not None:
         return gate
 
@@ -6025,7 +6156,7 @@ def admin_clear_legacy_data():
 
 @app.route("/admin/data/reset-practice", methods=["POST"])
 def admin_reset_practice_data():
-    gate = _require_admin_response()
+    gate = _require_supervisor_response()
     if gate is not None:
         return gate
 
@@ -6043,7 +6174,7 @@ def admin_reset_practice_data():
 
 @app.route("/admin/records/clear", methods=["POST"])
 def admin_clear_all_records():
-    gate = _require_admin_response()
+    gate = _require_supervisor_response()
     if gate is not None:
         return gate
 

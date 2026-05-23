@@ -15,8 +15,8 @@
     <section class="np-admin-hero glass-panel np-glass mp-animate-in">
       <div>
         <p class="np-admin-kicker">Administration</p>
-        <h1>Admin Panel</h1>
-        <p>Launch-ready controls for student accounts, practice records, and clean data rollout.</p>
+        <h1>{% if user_is_supervisor %}Admin Panel{% else %}Staff Panel{% endif %}</h1>
+        <p>{% if user_is_supervisor %}Manage colleague accounts, student logins, practice records, and launch data.{% else %}View student progress, open session reports, and register new student accounts.{% endif %}</p>
       </div>
       <div class="np-admin-stats" aria-label="Admin summary">
         <div><strong>{{ totals.active_students }}</strong><span>Active students</span></div>
@@ -25,6 +25,7 @@
       </div>
     </section>
 
+    {% if user_is_supervisor %}
     <section class="np-admin-card np-admin-launch-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-launch">
       <header class="np-admin-section-head">
         <div>
@@ -58,6 +59,55 @@
         </article>
       </div>
     </section>
+    {% endif %}
+
+    {% if user_is_supervisor %}
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Team access</p>
+          <h2 id="np-admin-add-staff">Add Colleague (Staff)</h2>
+          <p>Colleagues can open Admin, view student data, and register students — but cannot wipe data or manage other staff.</p>
+        </div>
+      </header>
+      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-add-form">
+        <label>
+          <span>Colleague email or username</span>
+          <input name="username" type="text" autocomplete="username" placeholder="teacher@example.com" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input name="password" type="text" autocomplete="new-password" placeholder="Temporary password" required>
+        </label>
+        <button type="submit" class="big-btn mp-btn-pill">Create colleague account</button>
+      </form>
+      {% if staff_members %}
+      <div class="np-admin-student-list np-admin-staff-list">
+        {% for member in staff_members %}
+        <article class="np-admin-student-row">
+          <div class="np-admin-student-main">
+            <strong>{{ member.username }}</strong>
+            <span>Staff · Created: {{ member.created_at or "Unknown" }}</span>
+            <span class="np-admin-status{% if not member.is_active %} is-inactive{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
+          </div>
+          <div class="np-admin-student-metrics">
+            <span>Login: {{ member.last_login_at or "Never" }}</span>
+          </div>
+          <div class="np-admin-student-actions">
+            <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}">
+              <input name="password" type="text" placeholder="New password" aria-label="New password for {{ member.username }}" required>
+              <button type="submit">Reset</button>
+            </form>
+            <form method="post" action="{{ url_for('admin_toggle_staff_active', user_id=member.id) }}">
+              <button type="submit">{{ "Deactivate" if member.is_active else "Reactivate" }}</button>
+            </form>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-user">
       <header class="np-admin-section-head">
@@ -117,10 +167,12 @@
               </form>
               <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-view-btn">View record</a>
             </div>
+            {% if user_is_supervisor %}
             <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-delete-form">
               <input name="confirm" type="text" placeholder="Type DELETE to remove" aria-label="Confirm deleting {{ student.username }}">
               <button type="submit">Delete</button>
             </form>
+            {% endif %}
           </div>
         </article>
         {% else %}
@@ -161,6 +213,7 @@
         <p class="np-admin-empty">No practice records yet.</p>
         {% endfor %}
       </div>
+      {% if user_is_supervisor %}
       <aside class="np-admin-record-danger" aria-label="Clear all practice records">
         <div>
           <p class="np-admin-danger-kicker">Danger zone</p>
@@ -175,6 +228,7 @@
           <button type="submit">Clear all records</button>
         </form>
       </aside>
+      {% endif %}
     </section>
   </div>
 </div>
