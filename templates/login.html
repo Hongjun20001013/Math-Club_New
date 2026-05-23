@@ -3,66 +3,152 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-login-page">
+<div class="np-sat-atelier np-login-atelier">
+
+  <nav class="np-atelier-rail" aria-label="Sign in navigation">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Sign in</span>
+  </nav>
+
   {% with messages = get_flashed_messages() %}
   {% if messages %}
-  <ul class="np-flash-list np-login-flash" role="status">
+  <ul class="np-login-atelier-flash np-flash-list" role="alert" aria-live="assertive">
     {% for m in messages %}<li>{{ m }}</li>{% endfor %}
   </ul>
   {% endif %}
   {% endwith %}
 
-  <section class="np-login-shell glass-panel np-glass mp-animate-in" aria-label="{{ site_brand_short }} sign in">
-    <div class="np-sh-hero-noise np-login-noise" aria-hidden="true"></div>
+  <div class="np-login-stage mp-animate-in">
 
-    <div class="np-login-brand">
-      <p class="np-login-kicker">{{ site_login_kicker }}</p>
-      <h1 class="np-login-title">Practice with a clear path.</h1>
-      <p class="np-login-lead">Sign in to keep your SAT progress, missed-question log, redo history, and unit analytics connected to your account.</p>
+    <section class="np-login-intro" aria-label="Workspace overview">
+      <header class="np-login-intro-head">
+        <p class="np-atelier-kicker">{{ site_login_kicker }}</p>
+        <h1>Your SAT workspace, one sign-in away.</h1>
+        <p class="np-atelier-hero-lead">Units 1–4, Hard Drill I–XIV, session reports, mistake analytics, and redo loops — all tied to your account so progress follows you every session.</p>
+        <div class="np-atelier-hero-stats" role="list">
+          <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
+          <div class="np-atelier-stat" role="listitem"><strong>14</strong><span>hard sets</span></div>
+          <div class="np-atelier-stat" role="listitem"><strong>∞</strong><span>retries</span></div>
+        </div>
+      </header>
 
-      <div class="np-login-benefits" aria-label="Student workspace benefits">
-        <span>Unit progress</span>
-        <span>Mistake analytics</span>
-        <span>Redo loop</span>
-        <span>Teacher visibility</span>
+      <div class="np-login-role-grid" aria-label="Account types">
+        <article class="np-login-role-card">
+          <span class="np-login-role-icon" aria-hidden="true">S</span>
+          <div>
+            <h2>Student</h2>
+            <p>Practice units, hard drill, mistake analytics, and session reports. Ask {{ site_teacher_label }} for a student account.</p>
+          </div>
+        </article>
+        <article class="np-login-role-card np-login-role-card--staff">
+          <span class="np-login-role-icon" aria-hidden="true">T</span>
+          <div>
+            <h2>Colleague (staff)</h2>
+            <p>Admin panel, student roster, and progress visibility. Requires a separate staff account from the site supervisor.</p>
+          </div>
+        </article>
+        <article class="np-login-role-card np-login-role-card--admin">
+          <span class="np-login-role-icon" aria-hidden="true">★</span>
+          <div>
+            <h2>Supervisor</h2>
+            <p>Full admin access — create staff and student accounts, reset passwords, and manage the workspace.</p>
+          </div>
+        </article>
       </div>
 
-      <div class="np-login-preview" aria-hidden="true">
+      <aside class="np-login-preview glass-panel np-glass" aria-label="Sample workspace snapshot">
         <div class="np-login-preview-top">
           <span>SAT Math</span>
           <strong>Today’s focus</strong>
         </div>
-        <div class="np-login-preview-meter">
-          <span style="width: 68%;"></span>
+        <div class="np-atelier-progress">
+          <div class="np-atelier-progress-row">
+            <span>Unit progress</span>
+            <span class="np-atelier-progress-val">68%</span>
+          </div>
+          <div class="np-atelier-progress-track" aria-hidden="true">
+            <i class="np-atelier-progress-fill" style="width: 68%;"></i>
+          </div>
         </div>
         <div class="np-login-preview-grid">
-          <div><strong>68%</strong><span>Unit progress</span></div>
           <div><strong>14</strong><span>Misses to redo</span></div>
           <div><strong>4</strong><span>Active units</span></div>
+          <div><strong>3</strong><span>Hard sets done</span></div>
         </div>
-      </div>
-    </div>
+      </aside>
+    </section>
 
-    <article class="np-login-card">
-      <header class="np-login-form-head">
-        <p class="np-login-form-kicker">Student Login</p>
-        <h2 class="np-login-form-title">Welcome back</h2>
-        <p class="np-login-form-lead">Use the account provided by {{ site_teacher_label }}.</p>
+    <article class="np-login-panel glass-panel np-glass" aria-label="Sign in form">
+      <span class="np-login-panel-watermark" aria-hidden="true">→</span>
+
+      <header class="np-login-panel-head">
+        <p class="np-login-panel-kicker">Secure sign in</p>
+        <h2>Welcome back</h2>
+        <p class="np-login-panel-lead">Use the username and password from {{ site_teacher_label }}. Students, colleagues, and supervisors all sign in here — you’ll land in the right workspace automatically.</p>
       </header>
-      <form method="post" class="np-login-form">
-        <label class="np-login-label" for="np-login-user">Username</label>
-        <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="student@example.com" required>
-        <label class="np-login-label" for="np-login-pass">Password</label>
-        <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
-        <button type="submit" class="np-login-submit big-btn mp-btn-pill">Continue to workspace</button>
+
+      <form method="post" class="np-login-form" id="np-login-form" novalidate>
+        <div class="np-login-field">
+          <label class="np-login-label" for="np-login-user">Username</label>
+          <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="student@example.com" required autofocus>
+        </div>
+
+        <div class="np-login-field">
+          <div class="np-login-label-row">
+            <label class="np-login-label" for="np-login-pass">Password</label>
+            <button type="button" class="np-login-toggle-pass" id="np-login-toggle-pass" aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
+          <div class="np-login-pass-wrap">
+            <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="np-login-submit big-btn mp-btn-pill" id="np-login-submit">
+          <span class="np-login-submit-text">Continue to workspace</span>
+          <span class="np-login-submit-busy" aria-hidden="true">Signing in…</span>
+        </button>
       </form>
+
+      <div class="np-login-trust" aria-label="Security note">
+        <span class="np-login-trust-icon" aria-hidden="true">🔒</span>
+        <p>Sessions are encrypted. After too many failed attempts, sign-in is briefly paused to protect your account.</p>
+      </div>
+
       {% if needs_admin_setup %}
-      <p class="np-login-hint">First time setting up the site? <a href="{{ url_for('admin_setup') }}">Create the admin account</a>.</p>
+      <p class="np-login-footnote">First time on this site? <a href="{{ url_for('admin_setup') }}">Create the supervisor account</a> to get started.</p>
       {% else %}
-      <p class="np-login-hint">Need access? Ask {{ site_teacher_label }} to create a <strong>student</strong> account. Colleagues need a separate staff account from the site supervisor.</p>
+      <p class="np-login-footnote">Need access? Ask {{ site_teacher_label }} for a <strong>student</strong> account, or contact the site supervisor for a <strong>staff</strong> account.</p>
       {% endif %}
     </article>
-  </section>
+
+  </div>
 </div>
 </div>
+
+<script>
+(function () {
+  var form = document.getElementById("np-login-form");
+  var pass = document.getElementById("np-login-pass");
+  var toggle = document.getElementById("np-login-toggle-pass");
+  var submit = document.getElementById("np-login-submit");
+
+  if (toggle && pass) {
+    toggle.addEventListener("click", function () {
+      var show = pass.type === "password";
+      pass.type = show ? "text" : "password";
+      toggle.textContent = show ? "Hide" : "Show";
+      toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      toggle.setAttribute("aria-pressed", show ? "true" : "false");
+    });
+  }
+
+  if (form && submit) {
+    form.addEventListener("submit", function () {
+      submit.classList.add("is-busy");
+      submit.disabled = true;
+    });
+  }
+})();
+</script>
 {% endblock %}
