@@ -12,6 +12,14 @@
     {% endif %}
     {% endwith %}
 
+    {% if user_is_supervisor and db_persistence and not db_persistence.persistence_ok %}
+    <div class="np-admin-persist-warn" role="alert">
+      <strong>Account data may reset after each deploy.</strong>
+      Render needs a persistent disk mounted at <code>/var/data</code> with <code>DB_PATH=/var/data/sat.db</code>.
+      Check <a href="/health/db" target="_blank" rel="noopener">/health/db</a> — <code>persistence_ok</code> must be <code>true</code>.
+    </div>
+    {% endif %}
+
     <section class="np-admin-hero glass-panel np-glass mp-animate-in">
       <div>
         <p class="np-admin-kicker">Administration</p>

@@ -1,10 +1,17 @@
 # Render Blueprint: https://render.com/docs/blueprint-spec
 #
 # IMPORTANT — student accounts & progress:
-# Free tier wipes SQLite on redeploy / long idle. Use Starter + disk below so data persists.
+# Free/ephemeral filesystem wipes SQLite on every redeploy.
+# You MUST attach a persistent disk (Starter plan) so accounts survive updates.
+#
+# Render Dashboard checklist (one-time):
+#   1. Service → Disks → Add disk: mount path /var/data, size 1 GB
+#   2. Environment → DB_PATH = /var/data/sat.db
+#   3. Environment → SECRET_KEY = (fixed random string; do NOT delete/recreate)
+#   4. After deploy, open /health/db — persistence_ok must be true
 #
 # Deploy: Render Dashboard → New → Blueprint → connect Math-Club_New repo.
-# After deploy: visit /admin/setup once to create admin.
+# After first deploy: visit /admin/setup once to create supervisor admin.
 services:
   - type: web
     name: novel-prep-sat

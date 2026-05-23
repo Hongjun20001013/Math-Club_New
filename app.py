@@ -42,11 +42,24 @@ load_dotenv(os.path.join(APP_DIR, ".env"))
 # persistent disk and set DB_PATH to an absolute path on that volume, e.g.
 #   /var/data/sat.db
 # Otherwise redeploys / restarts may reset the container filesystem.
-_db_env = os.environ.get("DB_PATH", "").strip()
-if _db_env:
-    DB_PATH = _db_env if os.path.isabs(_db_env) else os.path.normpath(os.path.join(APP_DIR, _db_env))
-else:
-    DB_PATH = os.path.join(APP_DIR, "sat.db")
+RENDER_PERSISTENT_DB_DIR = "/var/data"
+LEGACY_EPHEMERAL_DB_PATH = os.path.join(APP_DIR, "sat.db")
+
+
+def _is_render_runtime() -> bool:
+    return os.environ.get("RENDER", "").lower() in ("true", "1", "yes")
+
+
+def _resolve_db_path() -> str:
+    db_env = os.environ.get("DB_PATH", "").strip()
+    if db_env:
+        return db_env if os.path.isabs(db_env) else os.path.normpath(os.path.join(APP_DIR, db_env))
+    if _is_render_runtime():
+        return os.path.join(RENDER_PERSISTENT_DB_DIR, "sat.db")
+    return LEGACY_EPHEMERAL_DB_PATH
+
+
+DB_PATH = _resolve_db_path()
 
 COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
@@ -72,7 +85,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260522-login-remember")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260522-db-persist")
 
 
 def _site_brand_name() -> str:
@@ -127,7 +140,7 @@ _verify_style_bundle_best_effort()
 
 def _production_config_guard() -> None:
     """Warn when obvious secrets misconfiguration on Render."""
-    if os.environ.get("RENDER", "").lower() not in ("true", "1", "yes"):
+    if not _is_render_runtime():
         return
     sk = os.environ.get("SECRET_KEY", "").strip()
     if not sk or sk == "dev-secret-change-me":
@@ -137,7 +150,106 @@ def _production_config_guard() -> None:
         )
 
 
+def _path_on_render_disk(path: str) -> bool:
+    """True when path lives on a mounted volume (Render persistent disk), not ephemeral FS."""
+    if not _is_render_runtime():
+        return True
+    abs_path = os.path.abspath(path)
+    persistent_root = os.path.abspath(RENDER_PERSISTENT_DB_DIR)
+    if not (abs_path == persistent_root or abs_path.startswith(persistent_root + os.sep)):
+        return False
+    try:
+        with open("/proc/mounts", "r", encoding="utf-8") as mounts:
+            for line in mounts:
+                parts = line.split()
+                if len(parts) < 2:
+                    continue
+                mount_point = parts[1]
+                if mount_point in ("/", ""):
+                    continue
+                if abs_path == mount_point or abs_path.startswith(mount_point.rstrip("/") + os.sep):
+                    return True
+    except OSError:
+        pass
+    return False
+
+
+def _db_persistence_status() -> dict[str, Any]:
+    """Report whether SQLite lives on a volume that survives redeploys."""
+    db_path = os.path.abspath(DB_PATH)
+    dir_path = os.path.dirname(db_path)
+    on_render = _is_render_runtime()
+    on_persistent_volume = _path_on_render_disk(db_path)
+    dir_exists = os.path.isdir(dir_path)
+    db_exists = os.path.isfile(db_path)
+    writable = False
+    if dir_exists:
+        probe = os.path.join(dir_path, ".np_db_write_probe")
+        try:
+            with open(probe, "w", encoding="utf-8") as fh:
+                fh.write("ok")
+            os.remove(probe)
+            writable = True
+        except OSError:
+            writable = False
+
+    user_count = 0
+    if db_exists:
+        try:
+            conn = sqlite3.connect(db_path)
+            row = conn.execute("SELECT COUNT(*) FROM users").fetchone()
+            user_count = int(row[0]) if row else 0
+            conn.close()
+        except sqlite3.Error:
+            user_count = -1
+
+    persistence_ok = (not on_render) or (on_persistent_volume and dir_exists and writable)
+    return {
+        "db_path": db_path,
+        "on_render": on_render,
+        "on_persistent_volume": on_persistent_volume,
+        "dir_exists": dir_exists,
+        "db_exists": db_exists,
+        "writable": writable,
+        "user_count": user_count,
+        "persistence_ok": persistence_ok,
+        "legacy_ephemeral_exists": (
+            os.path.isfile(LEGACY_EPHEMERAL_DB_PATH)
+            and os.path.abspath(LEGACY_EPHEMERAL_DB_PATH) != db_path
+        ),
+    }
+
+
+def _maybe_migrate_ephemeral_db() -> None:
+    """One-time copy if accounts were created before persistent disk was configured."""
+    legacy = os.path.abspath(LEGACY_EPHEMERAL_DB_PATH)
+    target = os.path.abspath(DB_PATH)
+    if legacy == target or os.path.isfile(target) or not os.path.isfile(legacy):
+        return
+    import shutil
+
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    shutil.copy2(legacy, target)
+    app.logger.warning("Copied legacy SQLite database from %s to %s", legacy, target)
+
+
+def _bootstrap_db_storage() -> None:
+    parent = os.path.dirname(os.path.abspath(DB_PATH))
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    _maybe_migrate_ephemeral_db()
+    status = _db_persistence_status()
+    if status["on_render"] and not status["persistence_ok"]:
+        app.logger.error(
+            "SQLite is not on a persistent Render disk (path=%s). "
+            "Add a disk mounted at /var/data and set DB_PATH=/var/data/sat.db "
+            "or accounts will disappear after each deploy.",
+            status["db_path"],
+        )
+
+
 _production_config_guard()
+_bootstrap_db_storage()
 
 # =====================================================
 # DATABASE
@@ -2185,6 +2297,14 @@ def _dashboard_context() -> dict:
 def health():
     """For load balancers and hosting probes (no DB hit)."""
     return "ok", 200
+
+
+@app.route("/health/db")
+def health_db():
+    """Verify SQLite path and persistence (for Render ops; no secrets)."""
+    status = _db_persistence_status()
+    ok = status["persistence_ok"] and (status["db_exists"] or status["writable"])
+    return jsonify(ok=ok, **status), (200 if ok else 503)
 
 
 @app.route("/health/style")
@@ -5586,7 +5706,11 @@ def login():
         db = get_db()
         if _login_is_throttled(username):
             flash("Too many failed attempts. Please wait a few minutes and try again.")
-            return render_template("login.html", needs_admin_setup=not _admin_exists(db))
+            return render_template(
+                "login.html",
+                needs_admin_setup=not _admin_exists(db),
+                db_persistence=_db_persistence_status(),
+            )
 
         user = db.execute(
             """
@@ -5626,7 +5750,11 @@ def login():
     db = get_db()
     needs_admin_setup = not _admin_exists(db)
 
-    return render_template("login.html", needs_admin_setup=needs_admin_setup)
+    return render_template(
+        "login.html",
+        needs_admin_setup=needs_admin_setup,
+        db_persistence=_db_persistence_status(),
+    )
 
 
 @app.route("/logout")
@@ -5909,6 +6037,7 @@ def admin():
         totals=totals,
         q=q,
         user_is_supervisor=current_user_is_supervisor(),
+        db_persistence=_db_persistence_status(),
     )
 
 

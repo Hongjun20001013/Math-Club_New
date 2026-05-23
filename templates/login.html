@@ -19,6 +19,14 @@
   {% endif %}
   {% endwith %}
 
+  {% if needs_admin_setup %}
+  <div class="np-login-atelier-flash np-login-setup-notice" role="status">
+    <strong>No supervisor account found.</strong>
+    If you had accounts before a site update, the database may have been reset — configure a persistent disk on Render so accounts survive deploys.
+    <a href="{{ url_for('admin_setup') }}">Create the supervisor account</a> to start again.
+  </div>
+  {% endif %}
+
   <div class="np-login-stage mp-animate-in">
 
     <section class="np-login-intro" aria-label="Workspace overview">

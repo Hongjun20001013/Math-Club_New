@@ -23565,9 +23565,43 @@ html[data-exam-theme="dark"] .np-atelier-aside {
     border-color: rgba(167, 139, 250, 0.12);
 }
 
-/* ========================================================= */
-/* Login Atelier — premium sign-in gateway                   */
-/* ========================================================= */
+.np-login-setup-notice {
+    border-color: rgba(245, 158, 11, 0.35);
+    background: rgba(255, 251, 235, 0.95);
+    color: #92400e;
+}
+
+.np-login-setup-notice a {
+    color: #7c3aed;
+    font-weight: 900;
+}
+
+html[data-exam-theme="dark"] .np-login-setup-notice {
+    border-color: rgba(251, 191, 36, 0.28);
+    background: rgba(69, 45, 10, 0.72);
+    color: #fde68a;
+}
+
+.np-admin-persist-warn {
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: rgba(255, 251, 235, 0.95);
+    color: #92400e;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.np-admin-persist-warn code {
+    font-size: 0.84em;
+}
+
+html[data-exam-theme="dark"] .np-admin-persist-warn {
+    border-color: rgba(251, 191, 36, 0.28);
+    background: rgba(69, 45, 10, 0.72);
+    color: #fde68a;
+}
+
 
 .np-login-atelier {
     --login-panel-radius: 28px;
