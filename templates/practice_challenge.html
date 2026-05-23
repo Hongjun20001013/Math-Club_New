@@ -19,7 +19,7 @@
           <h1>Hard question library.</h1>
           <span class="np-hard-hero-pill">{{ hard_sets|length }} sets</span>
         </div>
-        <p>Jump to any practice with Roman numerals I–XI. Preview PDFs, then begin when ready.</p>
+        <p>Jump to any practice with Roman numerals I–XII. Preview PDFs, then begin when ready.</p>
         <div class="np-hard-hero-stats">
           <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
           <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
@@ -62,7 +62,7 @@
         <div>
           <p class="np-hard-kicker">Practice library</p>
           <h2>Practice sets</h2>
-          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump — sets I through XI. Each tile tracks your progress; materials download from the panel on the right.</p>
+          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump — sets I through XII. Each tile tracks your progress; materials download from the panel on the right.</p>
         </div>
         <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
           <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>
@@ -73,12 +73,29 @@
       </header>
 
       <div class="np-hard-studio-meta">
+        {% if hard_sets|length > 10 %}
+        <div class="np-hard-studio-ranges" role="group" aria-label="Practice range">
+          <button type="button" class="is-active" data-hard-range="all">All sets</button>
+          <button type="button" data-hard-range="1">I–X</button>
+          <button type="button" data-hard-range="2">{% if hard_sets|length == 12 %}XI–XII{% elif hard_sets|length == 11 %}XI{% else %}XI+{% endif %}</button>
+          {% if hard_sets|length > 20 %}
+          <button type="button" data-hard-range="3">21+</button>
+          {% endif %}
+        </div>
+        {% endif %}
         <nav class="np-hard-quick-nav np-hard-quick-nav--sets" aria-label="Jump to a practice set">
+          {% if hard_sets|length > 10 %}
+          <div class="np-hard-quick-nav-divider"><span>I – X</span></div>
+          {% endif %}
           {% for set in hard_sets %}
+          {% if set.index == 11 and hard_sets|length > 10 %}
+          <div class="np-hard-quick-nav-divider"><span>XI – XII</span></div>
+          {% endif %}
           <button
             type="button"
             class="np-hard-quick-nav-btn np-hard-quick-nav-btn--{{ set.progress_state }}"
             data-quick-index="{{ set.index }}"
+            data-range="{{ set.range_bucket }}"
             aria-label="Jump to Hard Practice {{ set.roman }}, {{ set.answered }} of {{ set.total }} answered"
           >
             <strong>{{ set.roman }}</strong>
@@ -87,16 +104,6 @@
           </button>
           {% endfor %}
         </nav>
-        {% if hard_sets|length > 10 %}
-        <div class="np-hard-studio-ranges" role="group" aria-label="Practice range">
-          <button type="button" class="is-active" data-hard-range="all">All sets</button>
-          <button type="button" data-hard-range="1">I–X</button>
-          <button type="button" data-hard-range="2">{% if hard_sets|length == 11 %}XI{% else %}XI+{% endif %}</button>
-          {% if hard_sets|length > 20 %}
-          <button type="button" data-hard-range="3">21+</button>
-          {% endif %}
-        </div>
-        {% endif %}
         <div class="np-hard-studio-meta-row">
         <div class="np-hard-studio-legend" aria-hidden="true">
           <span><i class="is-new"></i>New</span>

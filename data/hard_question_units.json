@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against all items in hard_1–hard_11 (May 2026). PPT slide topics cross-checked.",
+  "_notes": "Audited against all items in hard_1–hard_12 (May 2026). PPT slide topics cross-checked.",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -137,5 +137,16 @@
     {"unit": "U2", "skill": "Exponential x-intercepts"},
     {"unit": "U4", "skill": "Intersecting lines / angle sums"},
     {"unit": "U2", "skill": "Exponential y-intercept form"}
+  ],
+  "hard_12": [
+    {"unit": "U2", "skill": "Quadratic equation / roots"},
+    {"unit": "U1", "skill": "Linear equation (infinitely many solutions)"},
+    {"unit": "U2", "skill": "Quadratic intercepts / coefficients"},
+    {"unit": "U4", "skill": "Right triangle / altitude"},
+    {"unit": "U2", "skill": "Exponential growth model"},
+    {"unit": "U4", "skill": "Unit conversion (area rate)"},
+    {"unit": "U2", "skill": "Exponential decay / growth factor"},
+    {"unit": "U2", "skill": "Exponential equivalent form"},
+    {"unit": "U4", "skill": "Square pyramid surface area"}
   ]
 }

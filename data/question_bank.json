@@ -10705,10 +10705,10 @@
       {
         "stem": "<p>Which of the following expressions has a factor of \\(x + 2b\\), where \\(b\\) is a positive integer constant?</p>",
         "choices": [
-          "3x^2 + 7x + 14b",
-          "3x^2 + 22x + 14b",
-          "3x^2 + 30x + 14b",
-          "3x^2 + 37x + 14b"
+          "\\(3x^2 + 7x + 14b\\)",
+          "\\(3x^2 + 22x + 14b\\)",
+          "\\(3x^2 + 30x + 14b\\)",
+          "\\(3x^2 + 37x + 14b\\)"
         ],
         "question_kind": "mcq"
       }
@@ -11694,6 +11694,98 @@
           "II only",
           "I and II only",
           "Neither I nor II"
+        ],
+        "question_kind": "mcq"
+      }
+    ],
+    "hard_12": [
+      {
+        "stem": "<p>In the given equation, \\(a\\) and \\(b\\) are non-zero constants.</p>\n<p>Which of the following expressions gives a solution to the equation?</p>\n<div class=\"stem-math-block\">\\[\n7ax^2 + (7b - 12a)x - 12b = 0\n\\]</div>",
+        "choices": [
+          "\\(-\\frac{a}{b}\\)",
+          "\\(-\\frac{b}{a}\\)",
+          "\\(\\frac{a}{b}\\)",
+          "\\(\\frac{b}{a}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In the given equation, \\(a\\) and \\(b\\) are constants.</p>\n<p>The equation has infinitely many solutions.</p>\n<p>What is the value of \\(b\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\frac{ax + b}{3} = \\frac{6}{17}x - \\frac{13}{12}\n\\]</div>",
+        "choices": [
+          "\\(-\\frac{18}{17}\\)",
+          "\\(\\frac{18}{17}\\)",
+          "\\(-\\frac{13}{4}\\)",
+          "\\(\\frac{13}{4}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In the \\(xy\\)-plane, a parabola has \\(x\\)-intercepts at \\((-17, 0)\\) and \\((37, 0)\\).</p>\n<p>If the equation of the parabola is written as:</p>\n<div class=\"stem-math-block\">\\[\ny = ax^2 + bx + c,\n\\]</div>\n<p>where \\(a\\), \\(b\\), and \\(c\\) are constants,</p>\n<p>which of the following expressions gives \\(c\\) in terms of \\(a\\)?</p>",
+        "choices": [
+          "\\(c = -1080a\\)",
+          "\\(c = -629a\\)",
+          "\\(c = \\frac{a}{34}\\)",
+          "\\(c = 51a\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In triangle \\(ABC\\), the measure of angle \\(B\\) is \\(90^\\circ\\) and \\(BD\\) is an altitude of the triangle.</p>\n<p>The length of \\(AB\\) is 15, and the length of \\(AC\\) is 23 greater than the length of \\(AB\\).</p>\n<p>What is the value of \\(\\frac{BC}{BD}\\)?</p>",
+        "choices": [
+          "\\(\\frac{15}{38}\\)",
+          "\\(\\frac{15}{23}\\)",
+          "\\(\\frac{23}{15}\\)",
+          "\\(\\frac{38}{15}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A certain investment account offers a special interest rate for the first 4 months the account is open followed by a lower interest rate for the remainder of the time the account is open.</p>\n<p>Akeyla opened one of these accounts with an original account balance of &#36;700.00 and did not make any other deposits or withdrawals.</p>\n<ul class=\"stem-itemize\"><li>4 months after Akeyla opened the account, the balance had increased by 0.6% of the original balance.</li><li>6 months after opening, the balance had increased by an additional 0.1% of the balance at the end of the first 4 months.</li><li>Every 2 months after the first 6 months, the balance increased by an additional 0.1% of the balance 2 months before.</li></ul>\n<p>Which of the following equations could represent the account balance \\(B(x)\\), in dollars, \\(x\\) months after the account was opened, where \\(x \\geq 4\\)?</p>",
+        "choices": [
+          "\\(B(x) = 704.20(1.001)^{\\frac{x - 4}{2}}\\)",
+          "\\(B(x) = 700.00(1.001)^{\\frac{x - 4}{2}}\\)",
+          "\\(B(x) = 704.20(1.001)^{2(x - 4)}\\)",
+          "\\(B(x) = 700.00(1.001)^{2(x - 4)}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The area of a rectangular region is increasing at a rate of 180 square centimeters per hour.</p>\n<p>What is this rate, in square meters per minute?</p>",
+        "choices": [
+          "3",
+          "0.3",
+          "0.03",
+          "0.0003"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The exponential function \\(f(x)\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nf(x) = ab^x\n\\]</div>\n<p>where \\(a\\) and \\(b\\) are positive constants.</p>\n<p>If</p>\n<div class=\"stem-math-block\">\\[\nf(n - 1) = f(n) + \\frac{82}{100} f(n - 1)\n\\]</div>\n<p>where \\(n\\) is a constant, what is the value of \\(b\\)?</p>",
+        "choices": [
+          "1",
+          "0.82",
+          "0.18",
+          "10"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The function \\(f\\) is defined by the given equation, where \\(k\\) is a constant.</p>\n<p>The value of \\(f(x)\\) increases by 83% for every increase of \\(x\\) by 1.</p>\n<div class=\"stem-math-block\">\\[\nf(x) = k(1.83)^x\n\\]</div>\n<p>For which of the following functions, where \\(k\\) is a constant, does the value of \\(g(z)\\) increase by 83% for every increase of \\(z\\) by \\(\\frac{1}{4}\\)?</p>",
+        "choices": [
+          "\\(g(z) = k(1.83^z)^{\\frac{1}{4}}\\)",
+          "\\(g(z) = k(1.83)^{z + \\frac{1}{4}}\\)",
+          "\\(g(z) = k(1.83^z)^4\\)",
+          "\\(g(z) = k(1.83)^{z - 4}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A right square pyramid has a height of 11 centimeters (cm).</p>\n<p>A second right square pyramid has a height of 22 centimeters.</p>\n<p>The area of the bases of each of the two pyramids is \\(100\\text{ cm}^2\\).</p>\n<p>Which of the following is closest to the difference in the surface area of the second pyramid and the surface area of the first pyramid, in \\(\\text{cm}^2\\)?</p>",
+        "choices": [
+          "209",
+          "220",
+          "367",
+          "551"
         ],
         "question_kind": "mcq"
       }
