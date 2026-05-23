@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against all 103 items in hard_1–hard_10 (May 2026). PPT slide topics cross-checked.",
+  "_notes": "Audited against all items in hard_1–hard_11 (May 2026). PPT slide topics cross-checked.",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -123,5 +123,19 @@
     {"unit": "U2", "skill": "Quadratic equation"},
     {"unit": "U4", "skill": "Parallel lines / angle sums"},
     {"unit": "U4", "skill": "Triangle inequality"}
+  ],
+  "hard_11": [
+    {"unit": "U2", "skill": "Quadratic sum of roots"},
+    {"unit": "U3", "skill": "Percent relationships"},
+    {"unit": "U2", "skill": "Quadratic vertex / intercepts"},
+    {"unit": "U2", "skill": "Quadratic equivalent form"},
+    {"unit": "U2", "skill": "Quadratic revenue model"},
+    {"unit": "U2", "skill": "Polynomial factorization"},
+    {"unit": "U4", "skill": "Unit circle / trigonometry"},
+    {"unit": "U3", "skill": "Ratio / proportional reasoning"},
+    {"unit": "U4", "skill": "Circle geometry (coordinate)"},
+    {"unit": "U2", "skill": "Exponential x-intercepts"},
+    {"unit": "U4", "skill": "Intersecting lines / angle sums"},
+    {"unit": "U2", "skill": "Exponential y-intercept form"}
   ]
 }

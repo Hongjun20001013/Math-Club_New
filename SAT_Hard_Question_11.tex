@@ -1,0 +1,317 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{unicode-math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+\usepackage{eso-pic} % for page background
+
+% --------- 主题颜色设置 ---------
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{headerbg}{RGB}{240,240,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
+
+% --------- 页眉背景色条 ---------
+\newcommand{\headbackground}{
+  \AddToShipoutPictureBG*{
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+% --------- 页眉设置 ---------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
+\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+
+\newtcolorbox{SATCard}[1][]{%
+  enhanced,
+  colback=white,
+  colframe=novelblue,
+  coltitle=white,
+  boxrule=0.6pt,
+  arc=4pt,
+  boxsep=5pt,
+  left=8pt, right=8pt, top=10pt, bottom=10pt,
+  sharp corners=south,
+  drop shadow south east,
+  #1
+}
+
+% --------- 顶部 Mark for Review 栏 ---------
+\newcommand{\markforreview}{
+  \stepcounter{questionnum} % 自动递增题号
+  \begin{tikzpicture}[scale=1.1]
+    % 黑色题号
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+
+    % 灰底主栏
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+
+    % Mark for Review
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+
+    % ABC 按钮区域
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+
+
+  \newcommand{\choiceboxcircled}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    rounded corners=6pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+    \textbf{\large\textcircled{\textbf{#1}}} \ #2
+  \end{tcolorbox}
+}
+}
+
+% --------- 选项框样式 ---------
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white, 
+    colframe=novelblue,
+    boxrule=0.5pt, 
+    rounded corners=4pt, 
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+
+\begin{document}
+\section*{Math Hard Question 11}
+\noindent\markforreview
+\vspace{1em}
+
+In the given equation, \(a\) and \(b\) are positive constants.  
+The sum of the solutions to the given equation is \(k(6a + b)\), where \(k\) is constant.  
+What is the value of \(k\)?  
+\[
+24x^2 - (12a + 2b)x + ab = 0
+\]
+
+\choicebox{A}{\(\frac{1}{12}\)}  
+\choicebox{B}{\(-\frac{1}{12}\)}  
+\choicebox{C}{12}  
+\choicebox{D}{-12}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+The positive number \(a\) is 2136\% of the sum of the positive numbers \(b\) and \(c\),  
+and \(b\) is 89\% of \(c\). What percent of \(b\) is \(a\)?
+
+\choicebox{A}{4536\%}  
+\choicebox{B}{2400\%}  
+\choicebox{C}{4037\%}  
+\choicebox{D}{2225\%}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+The graphs in the \(xy\)-plane of the following quadratic equations each have  
+\(x\)-intercepts of \(-2\) and 4. The graph of which equation has its vertex  
+**farthest from the x-axis**?
+
+\choicebox{A}{\(y = -7(x + 2)(x - 4)\)}  
+\choicebox{B}{\(y = \frac{1}{10}(x + 2)(x - 4)\)}  
+\choicebox{C}{\(y = -\frac{1}{2}(x + 2)(x - 4)\)}  
+\choicebox{D}{\(y = 5(x + 2)(x - 4)\)}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+In one hour, the distance, \(d(s)\), in kilometers that a ferry can travel up and down a river  
+flowing with a constant speed \(s\), in meters per second, is:  
+\[
+d(s) = 10.7 - 1.2s^2
+\]  
+where \(s\) and \(d(s)\) are positive.  
+
+Which of the following equivalent expressions for \(d(s)\) contains the speed  
+of the river in meters per second, as a constant or coefficient, for which  
+the ferry can travel a distance of 8 kilometers in one hour?
+
+\choicebox{A}{\(8 - 1.2(s - 1.5)(s + 1.5)\)}  
+\choicebox{B}{\(8 + 1.2(2.25 - s^2)\)}  
+\choicebox{C}{\(8(1 - 0.15s^2) + 2.7\)}  
+\choicebox{D}{\(11.9 - 1.2(s - 1)^2 - 2.4s\)}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+A minor league hockey team has been collecting ticket sales data over the past year.  
+At a current price of \$25 per ticket, an average of 4000 seats are purchased.  
+They predict that for each \$1 increase in ticket price, 100 fewer tickets will be sold.  
+
+Which of the following functions best models the amount of money, \(y\),  
+that the hockey team expects to collect from ticket sales based on an \(x\)-dollar increase in ticket price?
+
+\choicebox{A}{\(y = (25 + x)(4000 - 100x)\)}  
+\choicebox{B}{\(y = (25 - x)(4000 + 100x)\)}  
+\choicebox{C}{\(y = x(4000 - 100x)\)}  
+\choicebox{D}{\(y = 4000(25 + x)\)}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+In the given expression:  
+\[
+34z^{14} + bz^7 + 70,
+\]  
+\(b\) is a positive integer. If \(qz^7 + r\) is a factor of the expression, where \(q\) and \(r\) are positive integers,  
+what is the greatest possible value of \(b\)?
+
+
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+Point \(N\) lies on a unit circle in the \(xy\)-plane and has coordinates \((1, 0)\).  
+Point \(O\) is the center of the circle and has coordinates \((0, 0)\).  
+Point \(M\) also lies on the unit circle, and the measure of angle \(\angle NOM\) is \(\frac{266\pi}{3}\) radians.  
+If the coordinates of point \(M\) are \((a, b)\), where \(a\) and \(b\) are constants, what is the value of \(a\)?
+
+\choicebox{A}{\(\frac{1}{2}\)}  
+\choicebox{B}{\(\frac{\sqrt{3}}{2}\)}  
+\choicebox{C}{\(-\frac{1}{2}\)}  
+\choicebox{D}{\(-\frac{\sqrt{3}}{2}\)}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+For each of two rectangles, the ratio of the rectangle’s length to its width is \(10 : 5\).  
+The width of rectangle \(X\) is 16.5 times the width of rectangle \(Y\).  
+How does the length of rectangle \(X\) compare to the length of rectangle \(Y\)?
+
+\choicebox{A}{The length of rectangle \(X\) is 0.5 times the length of rectangle \(Y\)}  
+\choicebox{B}{The length of rectangle \(X\) is 2 times the length of rectangle \(Y\)}  
+\choicebox{C}{The length of rectangle \(X\) is 16.5 times the length of rectangle \(Y\)}  
+\choicebox{D}{The length of rectangle \(X\) is 33 times the length of rectangle \(Y\)}
+
+\vspace{2em}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+In the \(xy\)-plane, a circle has center \(C\) with coordinates \((h, k)\).  
+Points \(A\) and \(B\) lie on the circle. Point \(A\) has coordinates \((h + 1, k + \sqrt{102})\),  
+and \(\angle ACB\) is a right angle. What is the length of \(\overline{AB}\)?
+
+\choicebox{A}{\(\sqrt{206}\)}  
+\choicebox{B}{\(2\sqrt{102}\)}  
+\choicebox{C}{\(103\sqrt{2}\)}  
+\choicebox{D}{\(103\sqrt{3}\)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+\[
+y = a * (\frac{6}{b})^{x}-c
+
+\]
+
+How many times does the graph of the given equation in the \(xy\)-plane cross the \(x\)-axis,  
+where \(a\), \(b\), and \(c\) are positive constants such that \(a > 6\) and \(b > c\)?
+
+\choicebox{A}{Zero}  
+\choicebox{B}{One}  
+\choicebox{C}{Two}  
+\choicebox{D}{Three}
+
+\vspace{2em}
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+Two lines intersect at exactly one point, forming two acute angles and two obtuse angles.  
+The measure of one of these angles is \(9x - 110^\circ\).  
+Which of the following could **NOT** be the sum of the measures of any two of these angles?
+
+\choicebox{A}{\(-18x + 220^\circ\)}  
+\choicebox{B}{\(-18x + 580^\circ\)}  
+\choicebox{C}{\(18x - 220^\circ\)}  
+\choicebox{D}{\(180^\circ\)}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+The function \(f\) is defined by:  
+\[
+f(x) = a(3.1^x + 3.1^b),
+\]  
+where \(a\) and \(b\) are integer constants and \(0 < a < b\).  
+The functions \(g\) and \(h\) are equivalent to function \(f\), where \(k\) and \(m\) are constants.  
+
+Which of the following equations displays the **\(y\)-coordinate of the \(y\)-intercept** of the graph  
+of \(y = f(x)\) in the \(xy\)-plane as a constant or coefficient?
+
+\begin{itemize}
+  \item[I.] \(g(x) = a(3.1^x + k)\)
+  \item[II.] \(h(x) = a(3.1^x) + m\)
+\end{itemize}
+
+\choicebox{A}{I only}  
+\choicebox{B}{II only}  
+\choicebox{C}{I and II only}  
+\choicebox{D}{Neither I nor II}
+
+\vspace{2em}
+
+
+
+
+
+
+
+
+
+\end{document}

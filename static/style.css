@@ -21546,9 +21546,9 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     top: calc(var(--hard-sticky-top, 72px) + 6px);
     z-index: 3;
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
-    padding: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px;
     border-radius: 24px;
     border: 1px solid rgba(91, 77, 255, 0.08);
     background: rgba(255, 255, 255, 0.62);
@@ -21556,9 +21556,14 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     box-shadow: 0 16px 40px rgba(49, 38, 130, 0.06);
 }
 
+.np-hard-quick-nav--sets {
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+}
+
 @media (max-width: 900px) {
-    .np-hard-quick-nav {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+    .np-hard-quick-nav,
+    .np-hard-quick-nav--sets {
+        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
     }
 }
 
@@ -21740,8 +21745,14 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
 
 .np-hard-picker-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+}
+
+@media (max-width: 1100px) {
+    .np-hard-picker-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 900px) {
@@ -21767,8 +21778,8 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     display: grid;
     gap: 8px;
     justify-items: center;
-    min-height: 88px;
-    padding: 12px 8px 10px;
+    min-height: 92px;
+    padding: 14px 10px 12px;
     border: 1px solid rgba(91, 77, 255, 0.08);
     border-radius: 20px;
     background:

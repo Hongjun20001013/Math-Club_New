@@ -19,7 +19,7 @@
           <h1>Hard question library.</h1>
           <span class="np-hard-hero-pill">{{ hard_sets|length }} sets</span>
         </div>
-        <p>Jump to any practice with Roman numerals I–X. Preview PDFs, then begin when ready.</p>
+        <p>Jump to any practice with Roman numerals I–XI. Preview PDFs, then begin when ready.</p>
         <div class="np-hard-hero-stats">
           <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
           <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
@@ -62,7 +62,7 @@
         <div>
           <p class="np-hard-kicker">Practice library</p>
           <h2>Practice sets</h2>
-          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump — two neat rows from I to X. Each tile tracks your progress; materials download from the panel on the right.</p>
+          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump — sets I through XI. Each tile tracks your progress; materials download from the panel on the right.</p>
         </div>
         <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
           <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>
@@ -73,7 +73,7 @@
       </header>
 
       <div class="np-hard-studio-meta">
-        <nav class="np-hard-quick-nav" aria-label="Jump to a practice set">
+        <nav class="np-hard-quick-nav np-hard-quick-nav--sets" aria-label="Jump to a practice set">
           {% for set in hard_sets %}
           <button
             type="button"
@@ -90,8 +90,8 @@
         {% if hard_sets|length > 10 %}
         <div class="np-hard-studio-ranges" role="group" aria-label="Practice range">
           <button type="button" class="is-active" data-hard-range="all">All sets</button>
-          <button type="button" data-hard-range="1">1–10</button>
-          <button type="button" data-hard-range="2">11–20</button>
+          <button type="button" data-hard-range="1">I–X</button>
+          <button type="button" data-hard-range="2">{% if hard_sets|length == 11 %}XI{% else %}XI+{% endif %}</button>
           {% if hard_sets|length > 20 %}
           <button type="button" data-hard-range="3">21+</button>
           {% endif %}
