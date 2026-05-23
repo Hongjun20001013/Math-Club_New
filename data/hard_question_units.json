@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against all items in hard_1–hard_12 (May 2026). PPT slide topics cross-checked.",
+  "_notes": "Audited against all items in hard_1–hard_13 (May 2026). PPT slide topics cross-checked.",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -148,5 +148,20 @@
     {"unit": "U2", "skill": "Exponential decay / growth factor"},
     {"unit": "U2", "skill": "Exponential equivalent form"},
     {"unit": "U4", "skill": "Square pyramid surface area"}
+  ],
+  "hard_13": [
+    {"unit": "U4", "skill": "Circle arc / circumference"},
+    {"unit": "U2", "skill": "Rational function / x-intercepts"},
+    {"unit": "U3", "skill": "Percent growth / word problem"},
+    {"unit": "U2", "skill": "Exponential growth factor"},
+    {"unit": "U1", "skill": "Linear function / word problem"},
+    {"unit": "U2", "skill": "Quadratic discriminant"},
+    {"unit": "U4", "skill": "Map scale / proportional reasoning"},
+    {"unit": "U4", "skill": "Similar triangles / geometry"},
+    {"unit": "U2", "skill": "Radical / exponent simplification"},
+    {"unit": "U1", "skill": "Linear equation from table"},
+    {"unit": "U1", "skill": "Linear function / piecewise cost"},
+    {"unit": "U4", "skill": "Unit conversion (acceleration)"},
+    {"unit": "U1", "skill": "Linear function from rational table"}
   ]
 }

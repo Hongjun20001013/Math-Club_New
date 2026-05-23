@@ -621,6 +621,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_10": "banks/hard/hard_10.tex",
         "hard_11": "banks/hard/hard_11.tex",
         "hard_12": "banks/hard/hard_12.tex",
+        "hard_13": "banks/hard/hard_13.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -818,6 +819,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-12-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_13": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_13.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable version for paper practice or homework packets.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-13-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_13_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Classroom presentation version for walkthrough lessons.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-13-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -1273,6 +1290,7 @@ TOPIC_TITLES = {
     "hard_10": "SAT Hard Question Set 10 (Practice X)",
     "hard_11": "SAT Hard Question Set 11 (Practice XI)",
     "hard_12": "SAT Hard Question Set 12 (Practice XII)",
+    "hard_13": "SAT Hard Question Set 13 (Practice XIII)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
@@ -1481,6 +1499,21 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "C"},
         {"correct_answer": "C"},
         {"correct_answer": "A"},
+    ],
+    "hard_13": [
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "C"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "-2"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
     ],
 }
 

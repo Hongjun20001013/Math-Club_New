@@ -11789,6 +11789,133 @@
         ],
         "question_kind": "mcq"
       }
+    ],
+    "hard_13": [
+      {
+        "stem": "<p>A circle has center \\(O\\), and points \\(A\\) and \\(B\\) lie on the circle.</p>\n<p>The measure of arc \\(AB\\) is \\(60^\\circ\\), and the length of this arc is 4 inches.</p>\n<p>What is the circumference, in inches, of the circle?</p>",
+        "choices": [
+          "4",
+          "8",
+          "16",
+          "24"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In the \\(xy\\)-plane, the graph of function \\(f\\), where \\(y = f(x)\\), has exactly 8 \\(x\\)-intercepts.</p>\n<p>One of these \\(x\\)-intercepts is \\((17, 0)\\).</p>\n<p>The rational function \\(g\\) is defined by:</p>\n<div class=\"stem-math-block\">\\[\ng(x) = \\frac{f(x)}{x - 17}\n\\]</div>\n<p>In the \\(xy\\)-plane, how many \\(x\\)-intercepts does the graph of \\(y = g(x)\\) have?</p>",
+        "choices": [
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A researcher investigated two species of mites: a predator and its prey.</p>\n<p>At the start of a week, there was an equal number of the two species.</p>\n<p>At the end of the week:</p>\n<ul class=\"stem-itemize\"><li>The number of prey had increased by 2700% of the number of prey at the start of the week.</li><li>The number of predators had increased by 180% of the number of predators at the start of the week.</li></ul>\n<p>The number of prey at the end of the week was \\(p%\\) greater than the number of predators at the end of the week.</p>\n<p>What is the value of \\(p\\)?</p>",
+        "choices": [
+          "9",
+          "90",
+          "900",
+          "9000"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The exponential function \\(f\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nf(x) = ab^x,\n\\]</div>\n<p>where \\(a\\) and \\(b\\) are positive constants.</p>\n<p>If \\(f(s) = t\\) and \\(f(s + 1) = t - 0.87t\\), where \\(s\\) and \\(t\\) are constants, what is the value of \\(b\\)?</p>",
+        "choices": [
+          "0.13",
+          "0.87",
+          "1.13",
+          "1.87"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A beekeeper's initial observation of the population of a certain bee colony was 1,100 bees.</p>\n<p>The beekeeper set a goal to increase the population to 2,600 bees.</p>\n<p>The beekeeper uses a model that predicts the population of this bee colony:</p>\n<ul class=\"stem-itemize\"><li>begins at 1,100</li><li>increases by 120 bees per week in the first two weeks</li><li>then increases by 180 bees per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 2\\),</p>\n<p>which of the following functions gives the predicted number of bees still needed to reach the beekeeper's goal?</p>",
+        "choices": [
+          "\\(p(w) = 2600 - 180w\\)",
+          "\\(p(w) = 2480 + 180w\\)",
+          "\\(p(w) = 1620 - 180w\\)",
+          "\\(p(w) = -120 + 180w\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>Given the quadratic equation:</p>\n<div class=\"stem-math-block\">\\[\n7rx^2 - 28sx + 7r = 0\n\\]</div>\n<p>In the equation:</p>\n<ul class=\"stem-itemize\"><li>\\(r\\) is a positive constant</li><li>\\(s\\) is a negative constant</li><li>The equation has two solutions</li></ul>\n<p>If \\(\\frac{r}{s} > k\\), what is the minimum value of \\(k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A square map has a side length of 55 inches, and 1 inch on the map represents an actual distance of 13 miles.</p>\n<p>A larger version of the same map is printed as a square with the side length 90% longer than the side length of the previous map.</p>\n<p>On the larger map, which of the following is closest to the actual distance, in miles, represented by 1 inch?</p>",
+        "choices": [
+          "1.30",
+          "6.84",
+          "24.70",
+          "49.50"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In isosceles triangle \\(ABC\\), sides \\(AB\\) and \\(AC\\) are congruent.</p>\n<p>Point \\(D\\) divides side \\(\\overline{BC}\\) such that the length of \\(\\overline{BD}\\) is \\(\\frac{4}{7}\\) of the length of \\(\\overline{BC}\\).</p>\n<p>Point \\(E\\) lies on side \\(AB\\) and point \\(F\\) lies on side \\(AC\\) such that when segments \\(\\overline{DE}\\) and \\(\\overline{DF}\\) are drawn, \\(\\angle BED\\) is congruent to \\(\\angle CFD\\).</p>\n<p>If the length of \\(\\overline{BE}\\) is 8, what is the length of \\(\\overline{CF}\\)?</p>",
+        "choices": [
+          "6",
+          "14",
+          "32",
+          "56"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{\\sqrt[3]{x^{17}y^5}}{5x^2\\left(\\sqrt[8]{y^8}\\right)}\n\\]</div>\n<p>For all positive values of \\(x\\) and \\(y\\), the given expression is equivalent to which of the following?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I</span> <span class=\"stem-li-body\">\\(\\dfrac{x^{\\frac{14}{3}}y^{\\frac{5}{3}}}{5xy}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II</span> <span class=\"stem-li-body\">\\(\\dfrac{\\sqrt[3]{x^{11}y^2}}{5}\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "II only",
+          "I and II",
+          "Neither I nor II"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The table shows three values of \\(x\\) and their corresponding values of \\(y\\), where \\(s\\) is a constant.</p>\n<p>There is a linear relationship between \\(x\\) and \\(y\\).</p>\n<p>Which of the following equations represents this relationship?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>-2s</td><td>24</td></tr><tr><td>-s</td><td>21</td></tr><tr><td>s</td><td>15</td></tr></tbody></table></div>",
+        "choices": [
+          "\\(sx + 3y = 18s\\)",
+          "\\(3x + sy = 18s\\)",
+          "\\(3x + sy = 18\\)",
+          "\\(sx + 3y = 18\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The cost of renting a carpet cleaner is &#36;52 for the first day and &#36;26 for each additional day.</p>\n<p>Which of the following functions gives the cost \\(C(d)\\), in dollars, of renting the carpet cleaner for \\(d\\) days, where \\(d\\) is a positive integer?</p>",
+        "choices": [
+          "\\(C(d) = 26d + 26\\)",
+          "\\(C(d) = 26d + 52\\)",
+          "\\(C(d) = 52d - 26\\)",
+          "\\(C(d) = 52d + 78\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The speed of a vehicle is increasing at a rate of 7.3 meters per second squared.</p>\n<p>What is this rate, in miles per minute squared, rounded to the nearest tenth?</p>\n<p>(Use 1 mile = 1,609 meters.)</p>",
+        "choices": [
+          "0.3",
+          "16.3",
+          "195.8",
+          "220.4"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The table shows three values of \\(x\\) and their corresponding values of \\(g(x)\\), where</p>\n<div class=\"stem-math-block\">\\[\ng(x) = \\frac{f(x)}{x + 5}\n\\]</div>\n<p>and \\(f\\) is a linear function.</p>\n<p>What is the \\(y\\)-intercept of the graph of \\(y = f(x)\\) in the \\(xy\\)-plane?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>g(x)</th></tr></thead><tbody><tr><td>-20</td><td>4</td></tr><tr><td>-8</td><td>0</td></tr><tr><td>10</td><td>6</td></tr></tbody></table></div>",
+        "choices": [
+          "\\((0, -8)\\)",
+          "\\((0, 5)\\)",
+          "\\((0, 8)\\)",
+          "\\((0, 40)\\)"
+        ],
+        "question_kind": "mcq"
+      }
     ]
   },
   "placement": {
