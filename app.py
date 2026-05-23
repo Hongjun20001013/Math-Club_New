@@ -85,7 +85,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260523-home-atelier")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260522-db-persist")
 
 
 def _site_brand_name() -> str:
@@ -368,7 +368,7 @@ def init_db():
 
 @app.before_request
 def ensure_db_initialized():
-    if request.endpoint in ("health", "health_db", "health_stylesheet_bundle"):
+    if request.endpoint in ("health", "health_stylesheet_bundle"):
         return
     init_db()
 
@@ -532,13 +532,10 @@ def require_authenticated_user():
     if endpoint in {
         "static",
         "health",
-        "health_db",
         "health_stylesheet_bundle",
         "login",
         "logout",
         "admin_setup",
-        "index",
-        "learning_track",
     }:
         return None
 
