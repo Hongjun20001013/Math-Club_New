@@ -8164,6 +8164,11 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
     max-height: 240px;
 }
 
+.sat-stem-body .stem-figure-img--hard[src$="hard_14_f12.png"] {
+    width: min(100%, 360px);
+    max-height: 260px;
+}
+
 .sat-stem-body .stem-table-wrap + .stem-table-wrap {
     margin-top: 0.65em;
 }

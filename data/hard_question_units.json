@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against all items in hard_1–hard_13 (May 2026). PPT slide topics cross-checked.",
+  "_notes": "Audited against all items in hard_1–hard_14 (May 2026). PPT slide topics cross-checked.",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -163,5 +163,24 @@
     {"unit": "U1", "skill": "Linear function / piecewise cost"},
     {"unit": "U4", "skill": "Unit conversion (acceleration)"},
     {"unit": "U1", "skill": "Linear function from rational table"}
+  ],
+  "hard_14": [
+    {"unit": "U4", "skill": "Trigonometric identity"},
+    {"unit": "U2", "skill": "Rational exponents / roots"},
+    {"unit": "U4", "skill": "Circle circumference / rate of change"},
+    {"unit": "U1", "skill": "Linear system / parametric point"},
+    {"unit": "U3", "skill": "Proportional reasoning"},
+    {"unit": "U2", "skill": "Rational equation (one solution)"},
+    {"unit": "U1", "skill": "Linear system consistency"},
+    {"unit": "U2", "skill": "Exponential function from points"},
+    {"unit": "U4", "skill": "Rectangular prism surface area"},
+    {"unit": "U3", "skill": "Percent chain / masses"},
+    {"unit": "U2", "skill": "Quadratic factoring"},
+    {"unit": "U1", "skill": "Linear function from graph"},
+    {"unit": "U3", "skill": "Percent decrease factor"},
+    {"unit": "U4", "skill": "Polygon interior angles"},
+    {"unit": "U2", "skill": "Exponential sequence / percent increase"},
+    {"unit": "U4", "skill": "Square pyramid height"},
+    {"unit": "U2", "skill": "Radical equation (one solution)"}
   ]
 }

@@ -11916,6 +11916,128 @@
         ],
         "question_kind": "mcq"
       }
+    ],
+    "hard_14": [
+      {
+        "stem": "<p>For two acute angles, \\(\\angle Q\\) and \\(\\angle R\\), \\(\\cos(Q) = \\sin(R)\\).</p>\n<p>The measures, in degrees, of \\(\\angle Q\\) and \\(\\angle R\\) are \\(x + 61\\) and \\(4x + 4\\) respectively.</p>\n<p>What is the value of \\(x\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>If \\(a\\) and \\(b\\) are numbers greater than 1 and \\(\\sqrt[7]{a^6}\\) is equivalent to \\(\\sqrt{b^3}\\), for what value of \\(n\\) is \\(a^{2n+1} = b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>The function \\(c\\) gives the partial length, in centimeters (cm), of the circumference of a circle with radius \\(r\\) cm:</p>\n<div class=\"stem-math-block\">\\[\nc(r) = \\frac{2}{5}(2\\pi r)\n\\]</div>\n<p>For each increase of 18 cm in \\(r\\), this partial length increases by \\(k\\pi\\) cm.</p>\n<p>What is the value of \\(k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>For each real number \\(r\\), which of the following points lies on the graph of both equations in the \\(xy\\)-plane for the given system?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n15x + 45y &= 33 \\\\\n5x + 15y &= 11\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(\\left(\\frac{11r}{5} - 3,\\, r\\right)\\)",
+          "\\(\\left(-3r + \\frac{11}{5},\\, r\\right)\\)",
+          "\\(\\left(r,\\, -\\frac{r}{3} - \\frac{11}{15}\\right)\\)",
+          "\\(\\left(r,\\, \\frac{r}{3} + \\frac{11}{15}\\right)\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>If \\(\\frac{a}{b} = \\frac{4}{5}\\) and \\(\\frac{5b}{ta} = 35\\), what is the value of \\(t\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>In the given equation, \\(c\\) is a constant.</p>\n<p>If the equation has exactly one solution, what is the value of \\(c\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\frac{1}{2cx} = \\frac{x}{16} + \\frac{1}{c}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>The given equation is one equation in a system of two linear equations.</p>\n<p>If the system has at least one solution, which of the following equations could be the other equation in the system?</p>\n<div class=\"stem-math-block\">\\[\n7x + 5y = 2\n\\]</div>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I</span> <span class=\"stem-li-body\">\\(10.5x + 7.5y = 3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II</span> <span class=\"stem-li-body\">\\(10.5x - 7.5y = 3\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "II only",
+          "I and II",
+          "Neither I nor II"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The function \\(f\\) is defined by \\(f(x) = ax - b\\), where \\(a\\) and \\(b\\) are constants.</p>\n<p>In the \\(xy\\)-plane, the graph of \\(y = f(x)\\) passes through the points \\((c, 7)\\) and \\((2c, 117)\\), where \\(c\\) is a constant.</p>\n<p>Which of the following could be the value of \\(b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A right rectangular prism has a base area of \\(16t\\) square centimeters (\\(\\text{cm}^2\\)).</p>\n<p>The length of the base of the rectangular prism is \\(\\frac{8}{3}\\) cm, and the height of the prism is 9 cm.</p>\n<p>Which expression represents the surface area, in \\(\\text{cm}^2\\), of the right rectangular prism?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>The mass of object A is 498% of the mass of object B, and the mass of object A is 0.830% of the mass of object C.</p>\n<p>If the mass of object C is \\(p%\\) of the mass of object B, what is the value of \\(p\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>Which of the following expressions has a factor of \\(x + 2b\\), where \\(b\\) is a positive integer constant?</p>",
+        "choices": [
+          "\\(3x^2 + 7x + 14b\\)",
+          "\\(3x^2 + 16x + 14b\\)",
+          "\\(3x^2 + 18x + 14b\\)",
+          "\\(3x^2 + 25x + 14b\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The graph of the linear function \\(y = f(x) - 19\\) is shown.</p>\n<p>If \\(c\\) and \\(d\\) are positive constants, which equation could define \\(f\\)?</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_14_f12.png\" alt=\"\" loading=\"lazy\" /></p>",
+        "choices": [
+          "\\(f(x) = d - cx\\)",
+          "\\(f(x) = -d + cx\\)",
+          "\\(f(x) = d + cx\\)",
+          "\\(f(x) = -d - cx\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The expression \\(kx\\) represents the result of decreasing a positive force, \\(x\\), acting on an object by 0.34%.</p>\n<p>What is the value of \\(k\\)?</p>",
+        "choices": [
+          "0.34%",
+          "1.34%",
+          "99.66%",
+          "100.34%"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A regular polygon has exactly 87 sides.</p>\n<p>If the measure of each of the 87 interior angles of this polygon is \\((180p)^\\circ\\), what is the value of \\(p\\)?</p>",
+        "choices": [
+          "\\(\\frac{85}{87}\\)",
+          "\\(\\frac{37}{87}\\)",
+          "\\(\\frac{87}{90}\\)",
+          "\\(\\frac{87}{180}\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The function \\(f(n) = 7(20.44)^{\\frac{n}{4}}\\) gives each term of a sequence as a function of the term's position \\(n\\) in the sequence, where \\(n\\) is a whole number.</p>\n<p>The value of the term in position 14 is \\(p%\\) more than the value of the term in position 10.</p>\n<p>What is the value of \\(p\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A right square pyramid has a total surface area of 28,160 square inches, and the combined surface area of the four lateral faces of this pyramid is 16,060 square inches.</p>\n<p>What is the height, in inches, of this pyramid?</p>",
+        "choices": [
+          "48",
+          "55",
+          "73",
+          "110"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In the given equation, \\(k\\) is a constant.</p>\n<p>The equation has exactly one real solution.</p>\n<p>What is the minimum possible value of \\(4k\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt{k - x} = 32 - x\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response"
+      }
     ]
   },
   "placement": {

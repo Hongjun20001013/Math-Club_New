@@ -622,6 +622,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_11": "banks/hard/hard_11.tex",
         "hard_12": "banks/hard/hard_12.tex",
         "hard_13": "banks/hard/hard_13.tex",
+        "hard_14": "banks/hard/hard_14.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -835,6 +836,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-13-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_14": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_14.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable version for paper practice or homework packets.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-14-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_14_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Classroom presentation version for walkthrough lessons.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-14-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -1291,6 +1308,7 @@ TOPIC_TITLES = {
     "hard_11": "SAT Hard Question Set 11 (Practice XI)",
     "hard_12": "SAT Hard Question Set 12 (Practice XII)",
     "hard_13": "SAT Hard Question Set 13 (Practice XIII)",
+    "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
@@ -1514,6 +1532,25 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "A"},
         {"correct_answer": "B"},
         {"correct_answer": "D"},
+    ],
+    "hard_14": [
+        {"correct_answer": "5"},
+        {"correct_answer": "-3/14", "answer_alternates": ["-0.214", "-0.2143"]},
+        {"correct_answer": "72/5", "answer_alternates": ["14.4"]},
+        {"correct_answer": "B"},
+        {"correct_answer": "5/28", "answer_alternates": ["0.1786", "0.179"]},
+        {"correct_answer": "-8"},
+        {"correct_answer": "C"},
+        {"correct_answer": "4"},
+        {"correct_answer": "140t+48", "answer_alternates": ["48+140t"]},
+        {"correct_answer": "60000"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "A"},
+        {"correct_answer": "1944"},
+        {"correct_answer": "A"},
+        {"correct_answer": "127"},
     ],
 }
 
