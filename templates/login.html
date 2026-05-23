@@ -134,7 +134,7 @@
       {% if needs_admin_setup %}
       <p class="np-login-footnote">First time on this site? <a href="{{ url_for('admin_setup') }}">Create the supervisor account</a> to get started.</p>
       {% else %}
-      <p class="np-login-footnote">Need access? Ask {{ site_teacher_label }} for a <strong>student</strong> account, or contact the site supervisor for a <strong>staff</strong> account.</p>
+      <p class="np-login-footnote">Need access? Ask {{ site_teacher_label }} for a <strong>student</strong> account, or contact the site supervisor for a <strong>staff</strong> account. <a href="{{ url_for('student_guide') }}">Student &amp; parent guide</a></p>
       {% endif %}
     </article>
 

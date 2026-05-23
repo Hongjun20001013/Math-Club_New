@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Student &amp; Parent Guide · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-guide-page">
+
+  <nav class="np-atelier-rail" aria-label="Guide navigation">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Student guide</span>
+  </nav>
+
+  <header class="np-guide-hero glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <p class="np-atelier-kicker">{{ site_brand_short }} · How to use</p>
+    <h1>Student &amp; parent guide<br><span lang="zh-Hans">学生与家长使用指南</span></h1>
+    <p class="np-atelier-hero-lead">Everything you need to sign in, practice SAT Math, review mistakes, and track progress — in one place.<br><span lang="zh-Hans">登录、练习 SAT 数学、复习错题、查看进度，一页说明。</span></p>
+    {% if not user_logged_in %}
+    <a href="{{ url_for('login') }}" class="np-atelier-btn np-atelier-btn--primary">Sign in · 登录</a>
+    {% else %}
+    <a href="{{ url_for('practice_specialized') }}" class="np-atelier-btn np-atelier-btn--primary">Open workspace · 进入练习</a>
+    {% endif %}
+  </header>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-guide-start">
+    <h2 id="np-guide-start">1 · Getting started <span lang="zh-Hans">开始使用</span></h2>
+    <ol class="np-guide-steps">
+      <li>
+        <strong>Get your account from {{ site_teacher_label }}</strong>
+        <span>Your teacher creates a personal username and password. You cannot self-register.</span>
+        <span lang="zh-Hans">向老师领取专属账号和密码，网站不支持自行注册。</span>
+      </li>
+      <li>
+        <strong>Open the site and sign in</strong>
+        <span>Go to <a href="{{ url_for('login') }}">Sign in</a> and enter your username and password.</span>
+        <span lang="zh-Hans">打开网站，点击 Sign in，输入账号密码登录。</span>
+      </li>
+      <li>
+        <strong>Start with Workspace</strong>
+        <span>After login, click <strong>Workspace</strong> in the top menu to open SAT Math practice.</span>
+        <span lang="zh-Hans">登录后点击顶部 <strong>Workspace</strong> 进入 SAT 数学练习区。</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-guide-practice">
+    <h2 id="np-guide-practice">2 · How to practice <span lang="zh-Hans">如何练习</span></h2>
+    <div class="np-guide-grid">
+      <article>
+        <p class="np-atelier-kicker">Units 1–4</p>
+        <h3>Specialized training</h3>
+        <p>Four full SAT Math units: Algebra, Advanced Math, Problem Solving &amp; Data, Geometry. Start with a full unit or a chapter slice (e.g. 1.1–1.5).</p>
+        <p lang="zh-Hans">四个完整单元：代数、高等数学、数据分析、几何。可按整单元或分章节练习。</p>
+      </article>
+      <article>
+        <p class="np-atelier-kicker">Hard drill</p>
+        <h3>Sets I–XIV</h3>
+        <p>Fourteen advanced problem sets for students aiming at top scores. Each set has a scored session and report.</p>
+        <p lang="zh-Hans">14 套进阶难题，适合冲刺高分。每套做完有分数和报告。</p>
+      </article>
+      <article>
+        <p class="np-atelier-kicker">After each set</p>
+        <h3>Session report</h3>
+        <p>When you finish (or pause), open the session summary to see score, accuracy, and each question reviewed.</p>
+        <p lang="zh-Hans">完成或暂停后，打开 Session Report 查看得分和逐题解析。</p>
+      </article>
+      <article>
+        <p class="np-atelier-kicker">Review loop</p>
+        <h3>Mistake analytics</h3>
+        <p>Every wrong answer is saved. Tag mistakes, add notes, and use redo links until you master the topic.</p>
+        <p lang="zh-Hans">错题自动保存，可打标签、写笔记、反复重做直到掌握。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-guide-parents">
+    <h2 id="np-guide-parents">3 · For parents <span lang="zh-Hans">给家长</span></h2>
+    <ul class="np-guide-bullets">
+      <li><strong>One account per student</strong> — progress, scores, and mistakes stay tied to that login.<br><span lang="zh-Hans">每位学生独立账号，进度与成绩单独保存。</span></li>
+      <li><strong>Check progress at home</strong> — sign in with your child’s account to see unit progress on the Dashboard and recent session scores.<br><span lang="zh-Hans">可用孩子账号登录，在 Dashboard 查看单元进度和最近练习分数。</span></li>
+      <li><strong>Mistake analytics</strong> — see which topics need work and whether your child has redone missed questions.<br><span lang="zh-Hans">在 Mistake analytics 查看薄弱知识点和错题重做情况。</span></li>
+      <li><strong>Need an account?</strong> — contact {{ site_teacher_label }} or {{ site_support_contact }}.<br><span lang="zh-Hans">需要账号请联系 {{ site_teacher_label }}。</span></li>
+    </ul>
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-guide-tips">
+    <h2 id="np-guide-tips">4 · Tips <span lang="zh-Hans">小提示</span></h2>
+    <ul class="np-guide-bullets np-guide-bullets--compact">
+      <li>Use a laptop or tablet for the best experience; the scratchpad works on touch screens.<br><span lang="zh-Hans">建议用电脑或平板；触摸屏可使用草稿板。</span></li>
+      <li>Complete at least a short set (3+ questions) so progress counts on your Dashboard.<br><span lang="zh-Hans">每次至少完成一小套（3 题以上），Dashboard 才会记录进度。</span></li>
+      <li>“Exam mode” and AP / ISEE tracks are coming soon — stick to Units 1–4 and Hard Drill for now.<br><span lang="zh-Hans">模考和 AP/ISEE 尚未上线，目前请使用 Units 1–4 和 Hard Drill。</span></li>
+      <li>Forgot your password? Ask {{ site_teacher_label }} to reset it from Admin.<br><span lang="zh-Hans">忘记密码请联系老师重置。</span></li>
+    </ul>
+  </section>
+
+  <footer class="np-guide-foot">
+    <a href="{{ url_for('login') }}">Sign in</a>
+    <a href="{{ url_for('practice_specialized') }}">Workspace</a>
+    <a href="{{ url_for('practice_analytics', part='sat') }}">Mistake analytics</a>
+    <a href="{{ url_for('index') }}">Dashboard</a>
+  </footer>
+
+</div>
+</div>
+{% endblock %}

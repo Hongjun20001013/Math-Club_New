@@ -147,6 +147,8 @@
           <input name="q" value="{{ q }}" type="search" placeholder="Search by email...">
           <button type="submit">Search</button>
         </form>
+        <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-export-btn">Export CSV</a>
+        <a href="{{ url_for('student_guide') }}" class="np-admin-export-btn np-admin-export-btn--ghost" target="_blank" rel="noopener">Student guide</a>
       </header>
 
       <div class="np-admin-student-list">

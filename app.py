@@ -85,7 +85,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260522-db-persist")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260523-student-guide")
 
 
 def _site_brand_name() -> str:
@@ -536,6 +536,7 @@ def require_authenticated_user():
         "login",
         "logout",
         "admin_setup",
+        "student_guide",
     }:
         return None
 
@@ -2323,6 +2324,89 @@ def index():
         "dashboard.html",
         tracks=LEARNING_TRACKS,
         **_dashboard_context(),
+    )
+
+
+@app.route("/guide")
+def student_guide():
+    """Public bilingual guide for students and parents."""
+    return render_template("student_guide.html")
+
+
+@app.route("/admin/export/students.csv")
+def admin_export_students_csv():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    students = _student_rows(db, "")
+    compiled = load_compiled_bank()
+    u_caps = {
+        "u1": len(compiled.get("algebra", {}).get("unit_1_all") or []),
+        "u2": len(compiled.get("advanced_math", {}).get("unit_2_all") or []),
+        "u3": len(compiled.get("problem_solving", {}).get("unit_3_all") or []),
+        "u4": len(compiled.get("geometry", {}).get("unit_4_all") or []),
+    }
+
+    import csv
+    import io
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "username",
+            "active",
+            "sessions",
+            "responses",
+            "accuracy_pct",
+            "unit1_answered",
+            "unit1_cap",
+            "unit2_answered",
+            "unit2_cap",
+            "unit3_answered",
+            "unit3_cap",
+            "unit4_answered",
+            "unit4_cap",
+            "last_login_at",
+            "last_activity",
+            "created_at",
+        ]
+    )
+    for s in students:
+        uid = int(s["id"])
+        u1 = _practice_distinct_answered(db, uid, "algebra", "unit_1_all")
+        u2 = _practice_distinct_answered(db, uid, "advanced_math", "unit_2_all")
+        u3 = _practice_distinct_answered(db, uid, "problem_solving", "unit_3_all")
+        u4 = _practice_distinct_answered(db, uid, "geometry", "unit_4_all")
+        writer.writerow(
+            [
+                s["username"],
+                "yes" if s["is_active"] else "no",
+                s["attempts_total"],
+                s["responses_total"],
+                s["accuracy_pct"] if s["accuracy_pct"] is not None else "",
+                u1,
+                u_caps["u1"],
+                u2,
+                u_caps["u2"],
+                u3,
+                u_caps["u3"],
+                u4,
+                u_caps["u4"],
+                s.get("last_login_at") or "",
+                s.get("last_activity") or "",
+                s.get("created_at") or "",
+            ]
+        )
+
+    payload = buf.getvalue()
+    filename = f"novel-prep-students-{date.today().isoformat()}.csv"
+    return Response(
+        payload,
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

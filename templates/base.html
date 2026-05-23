@@ -111,6 +111,7 @@
         <span class="np-site-footer-meta">{{ site_footer_tagline }}</span>
         <a class="np-site-footer-link" href="/">Home</a>
         <a class="np-site-footer-link" href="/practice">Workspace</a>
+        <a class="np-site-footer-link" href="{{ url_for('student_guide') }}">Guide</a>
         {% if user_is_admin %}
         <a class="np-site-footer-link" href="{{ url_for('admin') }}">Admin</a>
         {% endif %}
