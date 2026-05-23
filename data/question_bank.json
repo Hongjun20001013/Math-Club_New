@@ -11623,7 +11623,7 @@
         "question_kind": "mcq"
       },
       {
-        "stem": "<p>A minor league hockey team has been collecting ticket sales data over the past year.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\">\n<thead><tr>\n<th>At a current price of</th>\n<th>#36;25 per ticket, an average of 4000 seats are purchased.</th>\n</tr></thead>\n<tbody>\n<tr>\n<td>They predict that for each</td>\n<td>#36;1 increase in ticket price, 100 fewer tickets will be sold.</td>\n</tr>\n</tbody></table></div>\n<p>Which of the following functions best models the amount of money, \\(y\\),</p>\n<p>that the hockey team expects to collect from ticket sales based on an \\(x\\)-dollar increase in ticket price?</p>",
+        "stem": "<p>A minor league hockey team has been collecting ticket sales data over the past year.</p>\n<p>At a current price of &#36;25 per ticket, an average of 4,000 seats are purchased.</p>\n<p>For each &#36;1 increase in ticket price, 100 fewer tickets will be sold.</p>\n<p>Which of the following functions best models the total revenue \\(y\\), in dollars,</p>\n<p>from ticket sales when the ticket price increases by \\(x\\) dollars?</p>",
         "choices": [
           "\\(y = (25 + x)(4000 - 100x)\\)",
           "\\(y = (25 - x)(4000 + 100x)\\)",

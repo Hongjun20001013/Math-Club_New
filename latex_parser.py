@@ -65,6 +65,14 @@ def _extract_choiceboxes(block: str):
 
     return choices_map
 
+
+def _contains_table_ampersand(text: str) -> bool:
+    """Detect LaTeX/table column separators, ignoring &#...; currency entities."""
+    scratch = re.sub(r"&#\d+;", "", text)
+    scratch = re.sub(r"&(?:amp|lt|gt|quot|apos|nbsp);", "", scratch, flags=re.I)
+    return "&" in scratch
+
+
 def clean_math(text: str) -> str:
     """
     Normalize mixed LaTeX math delimiters for MathJax:
@@ -326,7 +334,7 @@ def _pipe_lines_to_table_html(text: str) -> Optional[str]:
     separator = None
     if sum(1 for line in lines if "|" in line) >= 2:
         separator = "|"
-    elif sum(1 for line in lines if "&" in line) >= 2:
+    elif sum(1 for line in lines if _contains_table_ampersand(line)) >= 2:
         separator = "&"
     if separator is None:
         return None
@@ -429,9 +437,9 @@ def _format_stem_html(text: str) -> str:
             html_parts.append(f"<p>{table_lines[0]}</p>")
             continue
 
-        if "&" in line:
+        if _contains_table_ampersand(line):
             table_lines = []
-            while i < len(lines) and "&" in lines[i]:
+            while i < len(lines) and _contains_table_ampersand(lines[i]):
                 current = lines[i].strip()
                 if current:
                     table_lines.append(current)
