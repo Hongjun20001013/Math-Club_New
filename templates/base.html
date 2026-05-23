@@ -91,7 +91,7 @@
         {% if user_is_admin %}
         <a href="{{ url_for('admin') }}" class="{% if nav_path.startswith('/admin') %}is-active{% endif %}">Admin</a>
         {% endif %}
-        <a href="/#track-catalog" class="{% if nav_path == '/' %}is-active{% endif %}">Catalog</a>
+        <a href="/#np-home-programs" class="{% if nav_path == '/' %}is-active{% endif %}">Programs</a>
         <button type="button" class="sat-theme-toggle np-nav-theme-toggle" title="Site appearance" aria-label="Toggle light or dark theme" aria-pressed="false">
             <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
             <span class="sat-theme-toggle-label">Light</span>

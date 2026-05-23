@@ -1,368 +1,277 @@
 {% extends "base.html" %}
-{% block title %}Dashboard · {{ site_brand_name }}{% endblock %}
-
-{% macro track_icon(key) -%}
-<span class="mp-track-glyph" aria-hidden="true">
-{% if key == 'sat' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 26V10l10-5 10 5v16l-10 5-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 5v22M6 10l10 5 10-5" stroke="currentColor" stroke-width="1.2" opacity=".45"/></svg>
-{% elif key == 'placement' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="1.5"/><path d="M16 5v22M5 16h22" stroke="currentColor" stroke-width="1.2" opacity=".4"/><circle cx="16" cy="16" r="2.5" fill="currentColor"/></svg>
-{% elif key == 'isee' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 24V14l4-2 4 2v10M20 24V10l4-2 4 2v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-{% elif key == 'ap_calc' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 20c3-8 9-8 12 0s9 8 12 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 8h6M11 5v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-{% elif key == 'ap_stats' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 24V18M13 24V10M19 24V14M25 24V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-{% elif key == 'ap_precalc' %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 24V9M7 24h18" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.4"/><path d="M8 20 Q16 5 24 20" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="currentColor" opacity="0.85"/></svg>
-{% else %}
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12l8-6 8 6v14H8V12z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 24v-8l4-3 4 3v8" stroke="currentColor" stroke-width="1.2" opacity=".5"/></svg>
-{% endif %}
-</span>
-{%- endmacro %}
+{% block title %}Home · {{ site_brand_name }}{% endblock %}
 
 {% block content %}
-<div class="mp-page-shell np-page-shell">
-<section class="mp-hero mp-hero--pro glass-panel np-glass mp-animate-in">
-  <div class="mp-hero-shine" aria-hidden="true"></div>
-  <div class="np-sh-hero-noise" aria-hidden="true"></div>
-  <div class="mp-hero-grid">
-    <div class="mp-hero-copy">
-      <p class="mp-eyebrow mp-eyebrow--lux">{{ site_brand_short }} · Student Dashboard</p>
+<div class="np-page-shell">
+<div class="np-sat-atelier np-home-atelier">
+
+  <header class="np-home-hero glass-panel np-glass mp-animate-in" aria-label="Welcome">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div class="np-home-hero-main">
+      <p class="np-atelier-kicker">{{ site_brand_short }} · Math Studio</p>
       {% if dashboard_username %}
-      <p class="mp-hero-welcome">Welcome back, <strong>{{ dashboard_username }}</strong></p>
+      <p class="np-home-welcome">Welcome back, <strong>{{ dashboard_username }}</strong></p>
       {% endif %}
-      <h1 class="mp-title">
-        <span>Your SAT plan,</span>
-        <span>ready to run.</span>
-      </h1>
-      <p class="mp-subtitle">Start with the next unit, review recent misses, and keep every answer connected to your {{ site_brand_short }} account.</p>
-      <div class="mp-hero-actions">
+      <h1>Structured math practice.<br>Progress you can see.</h1>
+      <p class="np-atelier-hero-lead">A premium workspace for SAT Math prep and course placement — built so <strong>students</strong> know what to practice next, and <strong>parents</strong> can follow unit progress, session scores, and mistake review in one place.</p>
+
+      <div class="np-home-hero-actions">
         {% if resume_practice %}
-        <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">{{ resume_practice.label }}</a>
+        <a href="{{ resume_practice.href }}" class="np-atelier-btn np-atelier-btn--primary np-home-cta">{{ resume_practice.label }}</a>
         {% elif next_unit %}
-        <a href="{{ next_unit.href }}" class="big-btn mp-btn-pill mp-btn-glow">Start {{ next_unit.label }}</a>
+        <a href="{{ next_unit.href }}" class="np-atelier-btn np-atelier-btn--primary np-home-cta">Start {{ next_unit.label }}</a>
         {% else %}
-        <a href="{{ url_for('practice_specialized') }}" class="big-btn mp-btn-pill mp-btn-glow">Open SAT workspace</a>
+        <a href="{{ url_for('practice_specialized') }}" class="np-atelier-btn np-atelier-btn--primary np-home-cta">Start SAT practice</a>
         {% endif %}
-        <a href="{{ url_for('practice_analytics', part='sat') }}" class="big-btn mp-btn-secondary mp-btn-pill">Fix mistakes</a>
-        <a href="{{ url_for('practice_specialized') }}" class="big-btn mp-btn-secondary mp-btn-pill mp-hero-actions--ghost">All units</a>
+        <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-btn np-atelier-btn--ghost">Review mistakes</a>
+        {% if not user_logged_in %}
+        <a href="{{ url_for('login') }}" class="np-atelier-btn np-atelier-btn--ghost">Sign in</a>
+        {% endif %}
       </div>
-      <div class="mp-hero-badges">
-        <span class="mp-hero-badge">{{ stats.sat_remaining }} questions left</span>
-        <span class="mp-hero-badge">{{ stats.wrong_total }} misses logged</span>
-        <span class="mp-hero-badge">{{ stats.accuracy_pct }}% current accuracy</span>
+
+      {% if user_logged_in and stats %}
+      <div class="np-atelier-hero-stats np-home-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>{{ stats.accuracy_pct }}%</strong><span>accuracy</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ stats.sat_engaged }}</strong><span>questions done</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ stats.wrong_total }}</strong><span>misses to fix</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ stats.attempts_total }}</strong><span>sessions</span></div>
       </div>
+      {% else %}
+      <div class="np-atelier-hero-stats np-home-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>SAT units</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>14</strong><span>hard sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>70</strong><span>placement items</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>∞</strong><span>retries</span></div>
+      </div>
+      {% endif %}
+    </div>
+
+    <aside class="np-home-parent-aside" aria-label="For students and parents">
+      <span class="np-atelier-aside-label">Who it's for</span>
+      <strong>Students &amp; parents</strong>
+      <ul class="np-home-parent-list">
+        <li><span>01</span> Practice by unit — Algebra through Geometry</li>
+        <li><span>02</span> Instant scoring + session reports after each set</li>
+        <li><span>03</span> Mistake log with tags, notes, and redo links</li>
+        <li><span>04</span> One account — progress saved every login</li>
+      </ul>
       {% if stats and stats.sat_bank_cap %}
-      <div class="mp-hero-footprint" aria-label="SAT Units 1 through 4 full bank engagement">
-        <div class="mp-hero-footprint-head">
-          <span class="mp-hero-footprint-title">SAT footprint · Units 1–4</span>
-          <span class="mp-hero-footprint-frac">{{ stats.sat_engaged }} / {{ stats.sat_bank_cap }}</span>
+      <div class="np-atelier-progress np-home-overall-progress">
+        <div class="np-atelier-progress-row">
+          <span>Overall SAT footprint</span>
+          <span class="np-atelier-progress-val">{{ stats.sat_engaged }} / {{ stats.sat_bank_cap }}</span>
         </div>
-        <div class="mp-hero-footprint-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ stats.sat_bank_cap }}" aria-valuenow="{{ stats.sat_engaged }}" aria-label="Distinct full-bank questions with at least one submitted answer">
-          <span class="mp-hero-footprint-fill" style="width: {{ stats.sat_engagement_pct }}%;"></span>
+        <div class="np-atelier-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ stats.sat_bank_cap }}" aria-valuenow="{{ stats.sat_engaged }}">
+          <i class="np-atelier-progress-fill" style="width: {{ stats.sat_engagement_pct }}%;"></i>
         </div>
-        <p class="mp-hero-footprint-hint">Only SAT sessions with at least 3 submitted questions count here, so quick previews do not pollute progress. Placement diagnostics always count.</p>
       </div>
       {% endif %}
+    </aside>
+  </header>
+
+  <section class="np-home-loop glass-panel np-glass mp-animate-in" aria-labelledby="np-home-loop-heading">
+    <div class="np-home-loop-head">
+      <p class="np-atelier-kicker">How it works</p>
+      <h2 id="np-home-loop-heading">Practice → score → fix → master.</h2>
+      <p class="np-home-loop-lead">Every session follows the same clear loop — no guesswork for students, easy to explain to parents.</p>
     </div>
-    {% if stats %}
-    <div class="mp-stat-stack">
-      <p class="mp-stat-stack-eyebrow">Live snapshot</p>
-      <aside class="mp-stat-strip" aria-label="Workspace snapshot">
-        <div class="mp-stat-item mp-stat-item--pop">
-          <span class="mp-stat-value" data-count="{{ stats.attempts_total }}">{{ stats.attempts_total }}</span>
-          <span class="mp-stat-label">Attempts</span>
-        </div>
-        <div class="mp-stat-item mp-stat-item--pop">
-          <span class="mp-stat-value">{{ stats.accuracy_pct }}%</span>
-          <span class="mp-stat-label">Accuracy</span>
-        </div>
-        <div class="mp-stat-item mp-stat-item--pop">
-          <span class="mp-stat-value">{{ stats.wrong_total }}</span>
-          <span class="mp-stat-label">Misses</span>
-        </div>
-        <div class="mp-stat-item mp-stat-item--pop mp-stat-item--accent">
-          <span class="mp-stat-value">{{ stats.sat_engaged }}</span>
-          <span class="mp-stat-label">Answered</span>
-        </div>
-      </aside>
-      {% if next_unit %}
-      <div class="mp-next-unit-card">
-        <span>Recommended next</span>
-        <strong>{{ next_unit.label }} · {{ next_unit.subtitle }}</strong>
-        <em>{{ next_unit.remaining }} questions remaining</em>
-        <a href="{{ next_unit.href }}">Open unit →</a>
+    <ol class="np-home-loop-steps">
+      <li>
+        <strong>Pick a unit</strong>
+        <span>Units 1–4 or Hard Sets I–XIV</span>
+      </li>
+      <li>
+        <strong>Answer &amp; submit</strong>
+        <span>Keyboard-friendly workspace with instant feedback</span>
+      </li>
+      <li>
+        <strong>Read the report</strong>
+        <span>Score, timing, and per-question breakdown</span>
+      </li>
+      <li>
+        <strong>Redo misses</strong>
+        <span>Tagged mistakes until they stick</span>
+      </li>
+    </ol>
+  </section>
+
+  <section id="np-home-programs" class="np-atelier-bento np-atelier-bento--equal" aria-label="Live programs">
+    <a href="{{ url_for('practice_specialized') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">01</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Core · SAT Math</span>
+        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
       </div>
-      {% endif %}
-    </div>
-    {% endif %}
-  </div>
-  <nav class="mp-dash-skip mp-dash-skip--in-hero mp-animate-up" aria-label="On this page" style="animation-delay: 0.04s;">
-    <span class="mp-dash-skip-label">On this page</span>
-    <div class="mp-dash-skip-links">
-      <a href="#catalog-standardized">Admissions · 标化</a>
-      <a href="#catalog-school">School · 校内</a>
-      <a href="#platform-insights">Activity</a>
-      <a href="#mp-sat-progress">SAT units</a>
-      <a href="#mp-quick-start">Quick start</a>
-    </div>
-  </nav>
-  <div class="mp-hero-glow" aria-hidden="true"></div>
-</section>
-
-<nav class="mp-home-jump mp-home-jump--dash glass-panel np-glass mp-animate-up" aria-label="Quick links" style="animation-delay: 0.02s;">
-  <div class="mp-home-jump-head">
-    <span class="mp-home-jump-label">Shortcuts</span>
-    <p class="mp-home-jump-sublabel">Everyday entry points</p>
-  </div>
-  <div class="mp-home-jump-links">
-    <a href="{{ url_for('practice_specialized') }}">SAT workspace</a>
-    <a href="{{ url_for('practice_analytics', part='sat') }}">Mistake analytics</a>
-    <a href="#mp-sat-progress">Unit progress</a>
-    <a href="#platform-insights">Recent activity</a>
-    {% if user_is_admin %}
-    <a href="{{ url_for('admin') }}">Admin panel</a>
-    {% endif %}
-    {% if not user_logged_in %}
-    <a href="{{ url_for('login') }}" class="mp-home-jump-links--subtle">Sign in</a>
-    {% endif %}
-  </div>
-</nav>
-
-<section class="np-command-center glass-panel np-glass mp-animate-up" style="animation-delay: 0.04s;" aria-labelledby="np-command-center-heading">
-  <div class="np-command-copy">
-    <p class="np-command-kicker">Today’s study plan</p>
-    <h2 id="np-command-center-heading">Start, score, fix, repeat.</h2>
-    <p>Use one clean loop every session: open a unit, answer a focused set, review the report, then rerun misses until they stick.</p>
-  </div>
-  <div class="np-command-steps" role="list">
-    <a href="{{ url_for('practice_specialized') }}" class="np-command-step" role="listitem">
-      <span>01</span>
-      <strong>Pick a unit</strong>
-      <em>Units 1–4 are live</em>
+      <h2 class="np-atelier-title">Unit training</h2>
+      <span class="np-atelier-count">4 units · chapter slices + full banks</span>
+      <p class="np-atelier-desc">Algebra, Advanced Math, Problem Solving &amp; Data, and Geometry — the full SAT Math curriculum with session reports.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Open workspace →</span>
+      </footer>
     </a>
-    <a href="/practice/algebra/unit_1_all/0" class="np-command-step np-command-step--hot" role="listitem">
-      <span>02</span>
-      <strong>Start practice</strong>
-      <em>Keyboard + scratchpad</em>
-    </a>
-    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-command-step" role="listitem">
-      <span>03</span>
-      <strong>Fix misses</strong>
-      <em>Tags, redo, mastery</em>
-    </a>
-  </div>
-</section>
 
-<section id="mp-sat-progress" class="mp-sat-progress mp-sat-progress--compact glass-panel np-glass mp-animate-up" style="animation-delay: 0.06s;" aria-labelledby="mp-sat-progress-heading">
-  <div class="mp-sat-progress-head">
-    <div>
-      <p class="mp-sat-progress-eyebrow">SAT Math</p>
-      <h2 id="mp-sat-progress-heading" class="mp-sat-progress-title">Unit progress</h2>
-    </div>
-    <div class="mp-sat-progress-head-actions">
+    <a href="{{ url_for('practice_challenge') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">02</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Advanced</span>
+        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+      </div>
+      <h2 class="np-atelier-title">Hard problem drill</h2>
+      <span class="np-atelier-count">14 sets · I–XIV</span>
+      <p class="np-atelier-desc">Challenge sets for students aiming at top scores — worksheets, slides, and scored sessions.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Open hard drill →</span>
+      </footer>
+    </a>
+
+    <a href="/placement" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">03</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">School · Placement</span>
+        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+      </div>
+      <h2 class="np-atelier-title">Course placement</h2>
+      <span class="np-atelier-count">70 items · printable report</span>
+      <p class="np-atelier-desc">Diagnostic to find the right honors or AP level — parents receive a polished PDF summary.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Start placement →</span>
+      </footer>
+    </a>
+
+    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">04</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Review</span>
+        <span class="np-atelier-pill np-atelier-pill--core">Core</span>
+      </div>
+      <h2 class="np-atelier-title">Mistake analytics</h2>
+      <span class="np-atelier-count">Tags · weak topics</span>
+      <p class="np-atelier-desc">See every miss, tag the error type, add notes, and jump back to redo — the parent-friendly progress view.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Open analytics →</span>
+      </footer>
+    </a>
+  </section>
+
+  {% if user_logged_in %}
+  <section id="np-home-progress" class="np-home-progress glass-panel np-glass mp-animate-in" aria-labelledby="np-home-progress-heading">
+    <div class="np-home-progress-head">
+      <div>
+        <p class="np-atelier-kicker">Your progress</p>
+        <h2 id="np-home-progress-heading">Unit snapshot</h2>
+      </div>
       {% if resume_practice %}
-      <a href="{{ resume_practice.href }}" class="mp-resume-pill mp-resume-pill--compact">
-        <span class="mp-resume-pill-kicker">Continue</span>
-        <span class="mp-resume-pill-line">{{ resume_practice.line }}</span>
-        {% if resume_practice.when_label %}<span class="mp-resume-pill-when">{{ resume_practice.when_label }}</span>{% endif %}
+      <a href="{{ resume_practice.href }}" class="np-home-resume-pill">
+        <span>Continue</span>
+        <strong>{{ resume_practice.line }}</strong>
       </a>
       {% endif %}
-      <a href="{{ url_for('practice_specialized') }}" class="mp-sat-progress-more">All units →</a>
     </div>
-  </div>
-  <div class="mp-unit-strip" role="list" aria-label="Progress by unit">
-    {% for u in sat_unit_progress %}
-    <a href="{{ u.href }}" class="mp-unit-strip-item mp-unit-strip-item--u{{ u.num }}" role="listitem" title="{{ u.subtitle }} — open unit">
-      <span class="mp-unit-strip-top">
-        <span class="mp-unit-strip-label">U{{ u.num }} · {{ u.subtitle }}</span>
-        <span class="mp-unit-strip-frac">{{ u.touched }} / {{ u.cap }}</span>
-      </span>
-      <span class="mp-unit-strip-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ u.cap }}" aria-valuenow="{{ u.touched }}" aria-label="{{ u.subtitle }}">
-        <i style="width: {{ u.pct }}%;"></i>
-      </span>
-    </a>
-    {% endfor %}
-  </div>
-</section>
-
-<div id="track-catalog" class="mp-catalog" aria-label="Learning tracks by program type">
-  <section id="catalog-standardized" class="mp-catalog-block mp-catalog-block--standardized glass-panel np-glass mp-animate-up">
-    <header class="mp-catalog-head mp-catalog-head--std">
-      <div>
-        <p class="mp-catalog-eyebrow mp-catalog-eyebrow--std">Standardized exams · 标化</p>
-        <h2 class="mp-catalog-title">Admissions tests</h2>
-        <p class="mp-catalog-lead">SAT and ISEE share the same workflow—timed sets, analytics, and concise takeaways you can export or review in-session.</p>
-      </div>
-    </header>
-    <div class="mp-track-grid mp-track-grid--std mp-track-reveal">
-      {% for track in tracks|selectattr('catalog', 'equalto', 'standardized') %}
-      <article class="mp-track-card mp-tilt mp-track-card--{{ track.key }} mp-stagger-item{% if track.key == 'sat' %} is-live{% endif %}{% if track.pill == 'Roadmap' %} mp-track-card--roadmap{% endif %}" style="--mp-stagger: {{ loop.index0 }}">
-        {{ track_icon(track.key) }}
-        <div class="mp-track-card-body">
-          <div class="mp-track-top">
-            <h3>{{ track.title }}</h3>
-            <span class="mp-track-pill{% if track.pill == 'Live' %} mp-track-pill--live{% elif track.pill == 'Roadmap' %} mp-track-pill--roadmap{% endif %}">{{ track.pill }}</span>
-          </div>
-          <p class="mp-track-desc">{{ track.description }}</p>
-          <a class="big-btn mp-btn-pill mp-track-cta{% if track.key == 'sat' %} mp-btn-glow{% else %} mp-track-cta--roadmap{% endif %}" href="{{ track.cta_href }}">{{ track.cta_label }}</a>
+    <div class="np-home-units" role="list">
+      {% for u in sat_unit_progress %}
+      <a href="{{ u.href }}" class="np-home-unit-card np-home-unit-card--u{{ u.num }}" role="listitem">
+        <div class="np-home-unit-top">
+          <span class="np-home-unit-label">Unit {{ u.num }} · {{ u.subtitle }}</span>
+          <span class="np-home-unit-frac">{{ u.engaged }} / {{ u.cap }}</span>
         </div>
-      </article>
+        <div class="np-atelier-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ u.cap }}" aria-valuenow="{{ u.engaged }}" aria-label="{{ u.subtitle }}">
+          <i class="np-atelier-progress-fill np-atelier-progress-fill--u{{ u.num }}" style="width: {{ u.pct }}%;"></i>
+        </div>
+        {% if u.miss_count %}
+        <span class="np-home-unit-miss">{{ u.miss_count }} miss{{ 'es' if u.miss_count != 1 else '' }} to redo</span>
+        {% endif %}
+      </a>
       {% endfor %}
     </div>
   </section>
 
-  <section id="catalog-school" class="mp-catalog-block mp-catalog-block--school glass-panel np-glass mp-animate-up" style="animation-delay: 0.08s;">
-    <header class="mp-catalog-head mp-catalog-head--school">
-      <div>
-        <p class="mp-catalog-eyebrow mp-catalog-eyebrow--school">School curriculum · 校内</p>
-        <h2 class="mp-catalog-title">Honors, AP &amp; college math</h2>
-        <p class="mp-catalog-lead">Start with <strong>Course placement</strong> to lock the right level, then open the track that matches your school path.</p>
+  {% if recent_sessions or focus_topics %}
+  <section class="np-home-insights" aria-label="Recent activity and focus areas">
+    {% if recent_sessions %}
+    <article class="np-home-insight-card glass-panel np-glass">
+      <div class="np-home-insight-head">
+        <h3>Recent sessions</h3>
+        <a href="{{ url_for('practice_specialized') }}">All practice →</a>
       </div>
-    </header>
-    <div class="mp-track-grid mp-track-grid--school mp-track-reveal">
-      {% for track in tracks|selectattr('catalog', 'equalto', 'school') %}
-      <article class="mp-track-card mp-tilt mp-school-card mp-track-card--{{ track.key }} mp-stagger-item{% if track.key == 'placement' %} is-live mp-track-card--placement-feature{% endif %}{% if track.pill == 'Roadmap' %} mp-track-card--roadmap{% endif %}" style="--mp-stagger: {{ loop.index0 }}">
-        {{ track_icon(track.key) }}
-        <div class="mp-track-card-body">
-          <div class="mp-track-top">
-            <h3>{{ track.title }}</h3>
-            <span class="mp-track-pill{% if track.pill == 'Live' %} mp-track-pill--live{% elif track.pill == 'Roadmap' %} mp-track-pill--roadmap{% endif %}">{{ track.pill }}</span>
+      <ul class="np-home-session-list" role="list">
+        {% for row in recent_sessions %}
+        <li>
+          <div class="np-home-session-main">
+            <strong>{{ row.track_short }} · {{ row.topic }}</strong>
+            <span>{{ row.when_label }}</span>
           </div>
-          <p class="mp-track-desc">{{ track.description }}</p>
-          <a class="big-btn mp-btn-pill mp-track-cta{% if track.key == 'placement' %} mp-btn-glow{% else %} mp-track-cta--roadmap{% endif %}" href="{{ track.cta_href }}">{{ track.cta_label }}</a>
-        </div>
-      </article>
+          <div class="np-home-session-side">
+            <span class="np-home-session-score">{{ row.score_label }} · {{ row.pct }}%</span>
+            {% if row.summary_href %}
+            <a href="{{ row.summary_href }}">Report</a>
+            {% elif row.resume_href %}
+            <a href="{{ row.resume_href }}">{{ row.resume_label }}</a>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endif %}
+
+    {% if focus_topics %}
+    <article class="np-home-insight-card glass-panel np-glass">
+      <div class="np-home-insight-head">
+        <h3>Focus areas</h3>
+        <a href="{{ url_for('practice_analytics', part='sat') }}">Analytics →</a>
+      </div>
+      <ul class="np-home-focus-list" role="list">
+        {% for row in focus_topics %}
+        <li>
+          <div class="np-home-focus-copy">
+            <strong>{{ row.topic_title }}</strong>
+            <span>{{ row.correct }} / {{ row.total }} correct</span>
+            <div class="np-atelier-progress-track np-home-focus-track" aria-hidden="true">
+              <i class="np-atelier-progress-fill" style="width: {{ row.pct }}%;"></i>
+            </div>
+          </div>
+          <div class="np-home-focus-side">
+            <em>{{ row.pct }}%</em>
+            {% if row.practice_href %}
+            <a href="{{ row.practice_href }}">Practice</a>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% else %}
+  <section class="np-home-guest glass-panel np-glass mp-animate-in" aria-label="Get started">
+    <div class="np-home-guest-copy">
+      <p class="np-atelier-kicker">Get started</p>
+      <h2>Sign in with your {{ site_teacher_label }} account.</h2>
+      <p>Students receive a personal login from their teacher. Every answer, session, and mistake is saved to that account — parents can review progress together at home.</p>
+    </div>
+    <a href="{{ url_for('login') }}" class="np-atelier-btn np-atelier-btn--primary">Sign in to your workspace</a>
+  </section>
+  {% endif %}
+
+  <section class="np-home-roadmap glass-panel np-glass" aria-labelledby="np-home-roadmap-heading">
+    <div class="np-home-roadmap-head">
+      <p class="np-atelier-kicker">Roadmap</p>
+      <h2 id="np-home-roadmap-heading">More tracks coming</h2>
+      <p class="np-home-roadmap-lead">ISEE, AP Calculus, AP Statistics, and more — same premium workflow when they launch.</p>
+    </div>
+    <div class="np-home-roadmap-pills">
+      {% for track in tracks if track.pill == 'Roadmap' %}
+      <span class="np-home-roadmap-pill">{{ track.title }}</span>
       {% endfor %}
     </div>
   </section>
+
 </div>
-
-<section id="platform-insights" class="mp-lower-grid mp-animate-up" style="animation-delay: 0.12s;">
-  <article class="mp-panel mp-activity-board glass-panel np-glass mp-tilt">
-    <div class="mp-panel-head">
-      <h3>Activity</h3>
-      <a href="/practice" class="mp-inline-link">Workspace →</a>
-    </div>
-    <div class="mp-activity-grid">
-      <div class="mp-activity-col">
-        <p class="mp-activity-kicker">Recent sessions</p>
-        {% if recent_sessions %}
-        <ul class="mp-activity-list" role="list">
-          {% for row in recent_sessions %}
-          <li class="mp-activity-session-row">
-            <div class="mp-activity-session-main">
-              <span class="mp-activity-session-line">{{ row.track_short }} · {{ row.topic }}</span>
-              <span class="mp-activity-session-when">{{ row.when_label }}</span>
-            </div>
-            <div class="mp-activity-session-score">
-              <span class="mp-activity-session-frac">{{ row.score_label }}</span>
-              <span class="mp-activity-session-pct">{{ row.pct }}%</span>
-              {% if row.summary_href %}
-              <a href="{{ row.summary_href }}" class="mp-inline-link mp-activity-link">Summary</a>
-              {% endif %}
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-        <p class="mp-activity-foot">Last three attempts. Full history stays in Workspace.</p>
-        {% else %}
-        <p class="mp-empty">No sessions yet—open the SAT workspace to start.</p>
-        {% endif %}
-      </div>
-      <div class="mp-activity-col mp-activity-col--focus">
-        <p class="mp-activity-kicker">Weakest topics</p>
-        {% if focus_topics %}
-        <ul class="mp-activity-list" role="list">
-          {% for row in focus_topics %}
-          <li class="mp-activity-focus-row">
-            <div class="mp-activity-focus-copy">
-              <span class="mp-activity-focus-track">{{ row.track_short }}</span>
-              <span class="mp-activity-focus-topic">{{ row.topic_title }}</span>
-              <span class="mp-activity-focus-meta">{{ row.correct }} / {{ row.total }} graded</span>
-              <span class="mp-activity-meter" aria-hidden="true"><span class="mp-activity-meter-fill" style="width: {{ row.pct }}%;"></span></span>
-            </div>
-            <div class="mp-activity-focus-side">
-              <strong class="mp-activity-focus-pct">{{ row.pct }}%</strong>
-              {% if row.practice_href %}
-              <a href="{{ row.practice_href }}" class="mp-inline-link mp-activity-link">Practice</a>
-              {% endif %}
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-        <p class="mp-activity-foot">Ranked by accuracy. Prefer topics with at least three graded questions; otherwise shows your lowest mix.</p>
-        {% else %}
-        <p class="mp-empty">Not enough graded data yet—complete a short set to see suggestions.</p>
-        {% endif %}
-      </div>
-    </div>
-  </article>
-</section>
-
-<section id="mp-quick-start" class="mp-sat-fastlane mp-animate-up" style="animation-delay: 0.2s;">
-  <article class="mp-fastlane-card glass-panel np-glass mp-tilt mp-fastlane-card--accent">
-    <div class="mp-fastlane-copy">
-      <p class="mp-fastlane-kicker">Quick start</p>
-      <h3>Under twenty minutes</h3>
-      <p>Jump straight into a full Unit 1–4 run—results and mistake recap when you finish.</p>
-    </div>
-    <div class="mp-fastlane-actions">
-      <a href="/practice/algebra/unit_1_all/0" class="big-btn mp-btn-pill">Unit 1 full set</a>
-      <a href="/practice/advanced_math/unit_2_all/0" class="big-btn mp-btn-secondary mp-btn-pill">Unit 2 full set</a>
-      <a href="/practice/problem_solving/unit_3_all/0" class="big-btn mp-btn-secondary mp-btn-pill">Unit 3 full set</a>
-      <a href="/practice/geometry/unit_4_all/0" class="big-btn mp-btn-secondary mp-btn-pill">Unit 4 full set</a>
-    </div>
-    <p class="mp-fastlane-meta"><a href="{{ url_for('practice_analytics', part='sat') }}" class="mp-inline-link">Mistake analytics →</a><span class="mp-fastlane-meta-sep">·</span><a href="{{ url_for('practice_specialized') }}" class="mp-inline-link">Workspace overview →</a></p>
-  </article>
-</section>
-
-<script>
-(() => {
-  const hero = document.querySelector('.mp-hero--pro');
-  if (hero) {
-    const move = (e) => {
-      const rect = hero.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      hero.style.setProperty('--mp-glow-x', `${x}%`);
-      hero.style.setProperty('--mp-glow-y', `${y}%`);
-    };
-    hero.addEventListener('pointermove', move);
-  }
-
-  document.querySelectorAll('.mp-tilt').forEach((card) => {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width;
-      const py = (e.clientY - r.top) / r.height;
-      const ry = (px - 0.5) * 5;
-      const rx = (0.5 - py) * 5;
-      card.style.transform = `perspective(920px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
-    });
-    card.addEventListener('pointerleave', () => {
-      card.style.transform = '';
-    });
-  });
-
-  const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduce) return;
-  document.querySelectorAll('.mp-stat-item--pop .mp-stat-value[data-count]').forEach((el) => {
-    const target = parseInt(el.getAttribute('data-count') || '0', 10);
-    if (Number.isNaN(target) || target <= 3) return;
-    const dur = 700;
-    const t0 = performance.now();
-    const tick = (t) => {
-      const p = Math.min(1, (t - t0) / dur);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = String(Math.round(target * eased));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    el.textContent = '0';
-    requestAnimationFrame(tick);
-  });
-})();
-</script>
 </div>
 {% endblock %}
