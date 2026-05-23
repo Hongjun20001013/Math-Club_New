@@ -1,0 +1,53 @@
+{# Unit card — chapter studio + PDF download #}
+<article class="np-atelier-card np-atelier-card--unit np-atelier-card--u{{ card.num }} is-interactive">
+  <span class="np-atelier-card-glow" aria-hidden="true"></span>
+  <span class="np-atelier-card-watermark">{{ card.num }}</span>
+  <div class="np-atelier-card-head">
+    <span class="np-atelier-kicker">{{ card.kicker }}</span>
+    <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+  </div>
+  <h2 class="np-atelier-title">{{ card.title }}</h2>
+  <div class="np-atelier-badges">
+    <span class="np-atelier-count">{{ card.count }} items</span>
+    {% if card.slice_count %}
+    <span class="np-atelier-count np-atelier-count--slice">{{ card.slice_range }} · {{ card.slice_count }} chapters + full bank</span>
+    {% endif %}
+  </div>
+  <p class="np-atelier-desc">{{ card.desc }}</p>
+  <div class="np-atelier-progress" aria-label="{{ card.name }} progress">
+    <div class="np-atelier-progress-row">
+      <span>Progress</span>
+      <span class="np-atelier-progress-val">{{ card.touched }} / {{ card.count }}</span>
+    </div>
+    <div class="np-atelier-progress-track">
+      <span class="np-atelier-progress-fill np-atelier-progress-fill--u{{ card.num }}" style="width: {{ card.pct }}%;"></span>
+    </div>
+  </div>
+  <footer class="np-atelier-foot np-atelier-foot--dual">
+    <a href="{{ card.studio_href }}" class="np-atelier-action np-atelier-action--full">
+      <span class="np-atelier-action-kicker">Chapter slices</span>
+      <span class="np-atelier-action-label">{{ card.slice_range or 'Open studio' }} · incl. full bank</span>
+    </a>
+    {% if card.pdf_href %}
+    <a href="{{ card.pdf_href }}" class="np-atelier-action np-atelier-action--pdf">
+      <span class="np-atelier-action-kicker">Download</span>
+      <span class="np-atelier-action-label">Unit PDF</span>
+    </a>
+    {% else %}
+    <span class="np-atelier-action np-atelier-action--pdf is-unavailable" aria-disabled="true">
+      <span class="np-atelier-action-kicker">Download</span>
+      <span class="np-atelier-action-label">PDF pending</span>
+    </span>
+    {% endif %}
+  </footer>
+  {% if card.report_href or card.miss_href %}
+  <div class="np-atelier-links">
+    {% if card.report_href %}
+    <a href="{{ card.report_href }}">{% if card.complete %}Session report{% else %}View report{% endif %}</a>
+    {% endif %}
+    {% if card.miss_href %}
+    <a href="{{ card.miss_href }}" class="is-miss">Review mistakes ({{ card.miss_count }})</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</article>

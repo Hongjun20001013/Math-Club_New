@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Review Q{{ q_index + 1 }} · {{ topic_title }} · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-session-item glass-panel np-glass">
+  <p class="np-pw-breadcrumb">
+    <a href="{{ summary_href }}">← Back to session results</a>
+  </p>
+
+  <header class="np-session-item-head">
+    <div class="np-session-item-head-main">
+      <p class="np-session-item-kicker">{{ topic_title }} · Question {{ q_index + 1 }} of {{ total_q }}</p>
+      {% if knowledge_title_en %}
+      <p class="np-session-item-unit">
+        <span class="np-topic-tag np-topic-tag--{{ knowledge_section|lower|replace(' ', '-') }}">{{ knowledge_section }}</span>
+        <span class="np-topic-name">{{ knowledge_title_en }}{% if hard_skill %} · {{ hard_skill }}{% endif %}</span>
+      </p>
+      {% endif %}
+      {% if status == 'correct' %}
+      <h1 class="np-session-item-title np-session-item-title--ok">Correct</h1>
+      {% elif status == 'incorrect' %}
+      <h1 class="np-session-item-title np-session-item-title--bad">Incorrect</h1>
+      {% elif status == 'skipped' %}
+      <h1 class="np-session-item-title np-session-item-title--skip">Skipped</h1>
+      {% else %}
+      <h1 class="np-session-item-title">Review</h1>
+      {% endif %}
+    </div>
+    <div class="np-session-item-answers">
+      <div class="np-session-item-answer-card">
+        <span>Your answer</span>
+        <strong>{{ yours_display }}</strong>
+      </div>
+      <div class="np-session-item-answer-card">
+        <span>Correct</span>
+        <strong>{{ key_display }}</strong>
+      </div>
+    </div>
+  </header>
+
+  <div class="np-session-item-body">
+    <section class="np-session-item-stem question-panel sat-stem-body" aria-label="Question">
+      {{ q.stem|safe }}
+    </section>
+
+    {% if result_choices %}
+    <section class="np-session-item-choices" aria-label="Answer choices">
+      <p class="np-session-item-choices-label">Answer choices</p>
+      <div class="choices-panel choices-stack sat-choices-list np-session-item-choice-list">
+        {% for item in result_choices %}
+        <div class="choice-card{% if item.is_selected %} selected{% endif %}{% if item.is_correct %} np-choice-correct{% endif %}{% if item.is_selected and not item.is_correct %} np-choice-wrong{% endif %}">
+          <span class="choice-letter">{{ item.letter }}</span>
+          <div class="choice-content">
+            {{ item.html|safe }}
+            {% if item.is_selected %}
+            <span class="np-choice-flag">Your pick</span>
+            {% endif %}
+            {% if item.is_correct %}
+            <span class="np-choice-flag np-choice-flag--key">Correct answer</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if explanation_en %}
+    <article class="np-session-item-explain" aria-label="Coach walkthrough">
+      <h2>Coach's breakdown</h2>
+      <div class="np-explain-body np-explain-body--rich question-panel">{{ explanation_en | safe }}</div>
+    </article>
+    {% endif %}
+  </div>
+
+  <nav class="np-session-item-nav" aria-label="Question navigation">
+    {% if prev_href %}
+    <a href="{{ prev_href }}" class="np-session-item-nav-btn">← Q{{ q_index }}</a>
+    {% else %}
+    <span class="np-session-item-nav-btn is-disabled" aria-hidden="true">← Prev</span>
+    {% endif %}
+    <a href="{{ summary_href }}" class="np-session-item-nav-btn np-session-item-nav-btn--center">All results</a>
+    {% if next_href %}
+    <a href="{{ next_href }}" class="np-session-item-nav-btn">Q{{ q_index + 2 }} →</a>
+    {% else %}
+    <span class="np-session-item-nav-btn is-disabled" aria-hidden="true">Next →</span>
+    {% endif %}
+  </nav>
+
+  <div class="np-session-item-actions">
+    <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_miss_quiz_one', domain=domain, topic=topic, q_index=q_index) }}">Redo this question</a>
+    <a class="np-pw-btn np-pw-btn--ghost" href="{{ summary_href }}">Back to results</a>
+  </div>
+</div>
+</div>
+{% endblock %}

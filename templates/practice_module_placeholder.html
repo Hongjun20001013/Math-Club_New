@@ -2,12 +2,19 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-mod-placeholder">
-    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
-    <header class="np-mod-ph-hero glass-panel np-glass mp-animate-in">
-        <p class="np-mod-ph-pill">{{ pill|default("Coming soon") }}</p>
-        <h1 class="np-mod-ph-title">{{ title }}</h1>
-        <p class="np-mod-ph-lead-en">{{ lead }}</p>
+<div class="np-sat-atelier np-mod-placeholder">
+    <nav class="np-atelier-rail" aria-label="SAT navigation">
+        <a href="{{ url_for('practice') }}">SAT modules</a>
+        <span class="np-atelier-rail-sep">·</span>
+        <span class="np-atelier-rail-current">{{ title }}</span>
+    </nav>
+    <header class="np-atelier-hero glass-panel np-glass mp-animate-in">
+        <div class="np-sh-hero-noise" aria-hidden="true"></div>
+        <div>
+            <span class="np-atelier-pill np-atelier-pill--soon">{{ pill|default("Coming soon") }}</span>
+            <h1>{{ title }}</h1>
+            <p class="np-atelier-hero-lead">{{ lead }}</p>
+        </div>
     </header>
 </div>
 </div>

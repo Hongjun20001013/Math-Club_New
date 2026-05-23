@@ -39,7 +39,7 @@
       <p class="mp-subtitle">Start with the next unit, review recent misses, and keep every answer connected to your {{ site_brand_short }} account.</p>
       <div class="mp-hero-actions">
         {% if resume_practice %}
-        <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">Continue last session</a>
+        <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">{{ resume_practice.label }}</a>
         {% elif next_unit %}
         <a href="{{ next_unit.href }}" class="big-btn mp-btn-pill mp-btn-glow">Start {{ next_unit.label }}</a>
         {% else %}
@@ -155,36 +155,33 @@
   </div>
 </section>
 
-<section id="mp-sat-progress" class="mp-sat-progress glass-panel np-glass mp-animate-up" style="animation-delay: 0.06s;" aria-labelledby="mp-sat-progress-heading">
+<section id="mp-sat-progress" class="mp-sat-progress mp-sat-progress--compact glass-panel np-glass mp-animate-up" style="animation-delay: 0.06s;" aria-labelledby="mp-sat-progress-heading">
   <div class="mp-sat-progress-head">
     <div>
-      <p class="mp-sat-progress-eyebrow">SAT Math · full bank</p>
-      <h2 id="mp-sat-progress-heading" class="mp-sat-progress-title">Progress by unit</h2>
-      <p class="mp-sat-progress-lead">Distinct questions you have submitted at least once, out of each unit’s full set. Open a unit to keep going from question 1 in the bank order.</p>
+      <p class="mp-sat-progress-eyebrow">SAT Math</p>
+      <h2 id="mp-sat-progress-heading" class="mp-sat-progress-title">Unit progress</h2>
     </div>
-    {% if resume_practice %}
-    <a href="{{ resume_practice.href }}" class="mp-resume-pill">
-      <span class="mp-resume-pill-kicker">Continue</span>
-      <span class="mp-resume-pill-line">{{ resume_practice.line }}</span>
-      {% if resume_practice.when_label %}<span class="mp-resume-pill-when">{{ resume_practice.when_label }}</span>{% endif %}
-    </a>
-    {% endif %}
+    <div class="mp-sat-progress-head-actions">
+      {% if resume_practice %}
+      <a href="{{ resume_practice.href }}" class="mp-resume-pill mp-resume-pill--compact">
+        <span class="mp-resume-pill-kicker">Continue</span>
+        <span class="mp-resume-pill-line">{{ resume_practice.line }}</span>
+        {% if resume_practice.when_label %}<span class="mp-resume-pill-when">{{ resume_practice.when_label }}</span>{% endif %}
+      </a>
+      {% endif %}
+      <a href="{{ url_for('practice_specialized') }}" class="mp-sat-progress-more">All units →</a>
+    </div>
   </div>
-  <div class="mp-unit-progress-grid" role="list">
+  <div class="mp-unit-strip" role="list" aria-label="Progress by unit">
     {% for u in sat_unit_progress %}
-    <a href="{{ u.href }}" class="mp-unit-progress-card mp-tilt" role="listitem">
-      <div class="mp-unit-progress-top">
-        <span class="mp-unit-progress-label">{{ u.label }}</span>
-        <span class="mp-unit-progress-sub">{{ u.subtitle }}</span>
-      </div>
-      <div class="mp-unit-progress-nums">
-        <span class="mp-unit-progress-frac">{{ u.engaged }} / {{ u.cap }}</span>
-        <span class="mp-unit-progress-pct">{{ u.pct }}%</span>
-      </div>
-      <div class="mp-unit-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ u.cap }}" aria-valuenow="{{ u.engaged }}" aria-label="{{ u.label }} completion">
-        <span class="mp-unit-progress-fill" style="width: {{ u.pct }}%;"></span>
-      </div>
-      <span class="mp-unit-progress-cta">Open unit →</span>
+    <a href="{{ u.href }}" class="mp-unit-strip-item mp-unit-strip-item--u{{ u.num }}" role="listitem" title="{{ u.subtitle }} — open unit">
+      <span class="mp-unit-strip-top">
+        <span class="mp-unit-strip-label">U{{ u.num }} · {{ u.subtitle }}</span>
+        <span class="mp-unit-strip-frac">{{ u.touched }} / {{ u.cap }}</span>
+      </span>
+      <span class="mp-unit-strip-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ u.cap }}" aria-valuenow="{{ u.touched }}" aria-label="{{ u.subtitle }}">
+        <i style="width: {{ u.pct }}%;"></i>
+      </span>
     </a>
     {% endfor %}
   </div>

@@ -3,8 +3,13 @@
 
 {% block content %}
 <div class="np-page-shell">
+  <div class="np-sat-atelier">
   <div class="np-hard-page">
-    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
+    <nav class="np-atelier-rail" aria-label="SAT navigation">
+      <a href="{{ url_for('practice') }}">SAT modules</a>
+      <span class="np-atelier-rail-sep">·</span>
+      <span class="np-atelier-rail-current">Hard problem drill</span>
+    </nav>
 
     <section class="np-hard-hero np-hard-hero--catalog glass-panel np-glass mp-animate-in">
       <div class="np-sh-hero-noise" aria-hidden="true"></div>
@@ -14,7 +19,7 @@
           <h1>Hard question library.</h1>
           <span class="np-hard-hero-pill">{{ hard_sets|length }} sets</span>
         </div>
-        <p>Jump to any practice with Roman numerals I–IX. Preview PDFs, then begin when ready.</p>
+        <p>Jump to any practice with Roman numerals I–X. Preview PDFs, then begin when ready.</p>
         <div class="np-hard-hero-stats">
           <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ hard_stats.done }} completed</span>
           <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ hard_stats.progress }} active</span>
@@ -23,7 +28,7 @@
         {% if continue_set %}
         <a class="np-hard-hero-continue" href="{{ continue_set.href }}">
           {% if continue_set.progress_state == 'done' %}
-          Review Hard Practice {{ continue_set.roman }}
+          View report · Hard Practice {{ continue_set.roman }}
           {% elif continue_set.progress_state == 'progress' %}
           Continue Hard Practice {{ continue_set.roman }} · {{ continue_set.answered }}/{{ continue_set.total }}
           {% else %}
@@ -57,7 +62,7 @@
         <div>
           <p class="np-hard-kicker">Practice library</p>
           <h2>Practice sets</h2>
-          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump. Each tile tracks your progress. Materials download from the panel on the right.</p>
+          <p class="np-hard-studio-lead">Tap a Roman numeral for instant jump — two neat rows from I to X. Each tile tracks your progress; materials download from the panel on the right.</p>
         </div>
         <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
           <button type="button" class="is-active" data-hard-filter="all">All <em>{{ hard_stats.done + hard_stats.progress + hard_stats.new }}</em></button>
@@ -191,6 +196,7 @@
     </section>
     {% endif %}
   </div>
+  </div>
 </div>
 
 {% if hard_sets %}
@@ -239,7 +245,7 @@
   var startLabels = {
     new: "Begin practice",
     progress: "Continue practice",
-    done: "Review practice"
+    done: "View report"
   };
 
   function visibleTiles() {

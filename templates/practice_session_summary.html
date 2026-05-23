@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="np-page-shell">
-<div class="exam-container np-summary-page np-summary-report-v3 np-summary-report-luxe{% if domain == 'placement' %} np-summary-page--placement{% endif %}">
+<div class="exam-container np-summary-page np-summary-report-v3 np-summary-report-luxe np-summary-atelier{% if domain == 'placement' %} np-summary-page--placement{% endif %}">
   {% if domain == 'placement' %}
   <p class="np-pw-breadcrumb np-summary-bc"><a href="{{ url_for('placement_landing') }}">← Course placement</a></p>
   {% endif %}
@@ -234,8 +234,12 @@
       {% for m in mistake_focus %}
       <article class="np-mistake-card np-mistake-card--v3">
         <header class="np-mistake-card-top">
+          {% if m.review_href %}
+          <a href="{{ m.review_href }}" class="np-mistake-card-q np-mistake-card-q--link">Q {{ m.q_display }}</a>
+          {% else %}
           <span class="np-mistake-card-q">Q {{ m.q_display }}</span>
-          <span class="np-mistake-card-topic"><span class="np-topic-tag">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}</span>
+          {% endif %}
+          <span class="np-mistake-card-topic"><span class="np-topic-tag np-topic-tag--{{ m.knowledge_section|lower|replace(' ', '-') }}">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}{% if m.hard_skill %} · {{ m.hard_skill }}{% endif %}</span>
         </header>
         <div class="np-mistake-card-answers">
           <span>Yours: <strong>{{ m.yours_display }}</strong></span>
@@ -301,7 +305,7 @@
   {% if section_stats %}
   <section id="np-by-area" class="np-knowledge-grid np-knowledge-grid-luxe glass-panel np-glass" aria-label="Results by topic">
     <h2 class="np-knowledge-heading">By knowledge area</h2>
-    <p class="np-knowledge-sub">{% if domain == 'placement' %}Breakdown by tagged subsection from the diagnostic items.{% elif domain == 'algebra' %}Each card is a subsection of Unit&nbsp;1—see where to drill next.{% elif domain == 'advanced_math' %}Each card is a subsection of Unit&nbsp;2 (advanced math).{% elif domain == 'problem_solving' %}Each card is a subsection of Unit&nbsp;3 (problem solving &amp; data).{% elif domain == 'geometry' %}Each card is a subsection of Unit&nbsp;4 (geometry).{% else %}Results grouped by knowledge subsection for this set.{% endif %}</p>
+    <p class="np-knowledge-sub">{% if domain == 'placement' %}Breakdown by tagged subsection from the diagnostic items.{% elif domain == 'hard_problem' %}Results grouped by SAT Math unit (Algebra, Advanced Math, Problem Solving &amp; Data, Geometry).{% elif domain == 'algebra' %}Each card is a subsection of Unit&nbsp;1—see where to drill next.{% elif domain == 'advanced_math' %}Each card is a subsection of Unit&nbsp;2 (advanced math).{% elif domain == 'problem_solving' %}Each card is a subsection of Unit&nbsp;3 (problem solving &amp; data).{% elif domain == 'geometry' %}Each card is a subsection of Unit&nbsp;4 (geometry).{% else %}Results grouped by knowledge subsection for this set.{% endif %}</p>
     <div class="np-knowledge-cards">
       {% for s in section_stats %}
       <div class="np-knowledge-card">
@@ -322,7 +326,7 @@
     <header class="np-summary-sheet-cap">
       <p class="np-summary-sheet-kicker">Full breakdown</p>
       <h2 class="np-summary-sheet-title">Item-by-item results</h2>
-      <p class="np-summary-sheet-lead">Tap a row’s coach note to expand explanations where available.</p>
+      <p class="np-summary-sheet-lead">Click a question number to open the full item review. Expand coach notes below when available.</p>
     </header>
     <div class="np-summary-table-head np-summary-head-extended">
       <span class="col-q">#</span>
@@ -335,15 +339,21 @@
     <div id="{{ row.row_id }}" class="np-summary-block np-row-{{ row.status }}">
       <div class="np-summary-row np-summary-row-main">
         <span class="col-q">
+          {% if row.review_href %}
+          <a href="{{ row.review_href }}" class="np-q-link" title="Review question {{ row.q_display }}">
+            <span class="np-q-main">{{ row.q_display }}</span>
+          </a>
+          {% else %}
           <span class="np-q-main">{{ row.q_display }}</span>
+          {% endif %}
           {% if row.session_q != row.q_display %}
           <span class="np-q-sub">set {{ row.session_q }}</span>
           {% endif %}
         </span>
         <span class="col-topic">
           {% if row.knowledge_title_en %}
-            <span class="np-topic-tag">{{ row.knowledge_section }}</span>
-            <span class="np-topic-name">{{ row.knowledge_title_en }}</span>
+            <span class="np-topic-tag np-topic-tag--{{ row.knowledge_section|lower|replace(' ', '-') }}">{{ row.knowledge_section }}</span>
+            <span class="np-topic-name">{{ row.knowledge_title_en }}{% if row.hard_skill %} · {{ row.hard_skill }}{% endif %}</span>
           {% else %}
             <span class="np-topic-muted">—</span>
           {% endif %}

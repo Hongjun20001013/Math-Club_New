@@ -2,8 +2,12 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-analytics-wrap" data-mastery-api="{{ url_for('practice_analytics_api_mastery') }}" data-mastery-cancel-api="{{ url_for('practice_analytics_api_mastery_cancel') }}">
-    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
+<div class="np-sat-atelier np-analytics-wrap" data-mastery-api="{{ url_for('practice_analytics_api_mastery') }}" data-mastery-cancel-api="{{ url_for('practice_analytics_api_mastery_cancel') }}">
+    <nav class="np-atelier-rail" aria-label="SAT navigation">
+        <a href="{{ url_for('practice') }}">SAT modules</a>
+        <span class="np-atelier-rail-sep">·</span>
+        <span class="np-atelier-rail-current">Mistake analytics</span>
+    </nav>
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}

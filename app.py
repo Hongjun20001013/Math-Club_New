@@ -562,6 +562,7 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         for i, meta in enumerate(keys):
             if i < len(out):
                 out[i].update(meta)
+        _apply_hard_question_units(topic, out)
         return out
     return qs
 
@@ -617,6 +618,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_7": "banks/hard/hard_7.tex",
         "hard_8": "banks/hard/hard_8.tex",
         "hard_9": "banks/hard/hard_9.tex",
+        "hard_10": "banks/hard/hard_10.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -766,6 +768,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-9-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_10": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_10.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable version for paper practice or homework packets.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-10-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_10_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Classroom presentation version for walkthrough lessons.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-10-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -1218,9 +1236,66 @@ TOPIC_TITLES = {
     "hard_7": "SAT Hard Question Set 7 (Practice VII)",
     "hard_8": "SAT Hard Question Set 8 (Practice VIII)",
     "hard_9": "SAT Hard Question Set 9 (Practice IX)",
+    "hard_10": "SAT Hard Question Set 10 (Practice X)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
+
+SAT_UNIT_LABELS: Dict[str, tuple[str, str]] = {
+    "U1": ("Unit 1", "Algebra"),
+    "U2": ("Unit 2", "Advanced Math"),
+    "U3": ("Unit 3", "Problem Solving & Data"),
+    "U4": ("Unit 4", "Geometry"),
+}
+
+# Per-question SAT unit tags for Hard Problem Drill — see data/hard_question_units.json
+_HARD_UNITS_CACHE: Dict[str, List[dict]] | None = None
+
+
+def _load_hard_question_units() -> Dict[str, List[dict]]:
+    global _HARD_UNITS_CACHE
+    if _HARD_UNITS_CACHE is not None:
+        return _HARD_UNITS_CACHE
+    path = os.path.join(APP_DIR, "data", "hard_question_units.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            raw = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        _HARD_UNITS_CACHE = {}
+        return _HARD_UNITS_CACHE
+    out: Dict[str, List[dict]] = {}
+    for topic, items in raw.items():
+        if topic.startswith("_") or not isinstance(items, list):
+            continue
+        out[topic] = [dict(x) for x in items if isinstance(x, dict) and x.get("unit")]
+    _HARD_UNITS_CACHE = out
+    return out
+
+
+def _hard_unit_meta(unit_key: str) -> tuple[str, str]:
+    sec, title = SAT_UNIT_LABELS.get(unit_key, ("—", ""))
+    return sec, title
+
+
+def _apply_hard_question_units(topic: str, questions: List[dict]) -> None:
+    units = _load_hard_question_units().get(topic) or []
+    keys = HARD_ANSWER_KEYS.get(topic, [])
+    for i, q in enumerate(questions):
+        meta: dict = {}
+        if i < len(units):
+            meta = units[i]
+        elif i < len(keys):
+            meta = keys[i]
+        unit_key = str(meta.get("unit") or "").strip()
+        if not unit_key:
+            continue
+        sec, title = _hard_unit_meta(unit_key)
+        q["knowledge_section"] = sec
+        q["knowledge_section_title_en"] = title
+        skill = str(meta.get("skill") or "").strip()
+        if skill:
+            q["hard_skill"] = skill
+
 
 HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
     "hard_1": [
@@ -1335,6 +1410,16 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "C"},
         {"correct_answer": "B"},
         {"correct_answer": "A"},
+    ],
+    "hard_10": [
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
     ],
 }
 
@@ -1497,6 +1582,56 @@ def _practice_distinct_answered(db: sqlite3.Connection, user_id: Any, domain: st
     return int(row["c"] or 0)
 
 
+def _practice_latest_complete_attempt_id(
+    db: sqlite3.Connection, user_id: Any, domain: str, topic: str, total_q: int
+) -> int | None:
+    """Most recent attempt where every question in the bank was answered."""
+    if total_q <= 0:
+        return None
+    if user_id is not None:
+        row = db.execute(
+            """
+            SELECT pa.id
+            FROM practice_attempts pa
+            JOIN practice_responses pr ON pr.attempt_id = pa.id
+            WHERE pa.user_id IS ? AND pa.domain = ? AND pa.topic = ?
+              AND pr.question_index IS NOT NULL
+            GROUP BY pa.id
+            HAVING COUNT(DISTINCT pr.question_index) >= ?
+            ORDER BY pa.id DESC
+            LIMIT 1
+            """,
+            (user_id, domain, topic, total_q),
+        ).fetchone()
+    else:
+        row = db.execute(
+            """
+            SELECT pa.id
+            FROM practice_attempts pa
+            JOIN practice_responses pr ON pr.attempt_id = pa.id
+            WHERE pa.user_id IS NULL AND pa.domain = ? AND pa.topic = ?
+              AND pr.question_index IS NOT NULL
+            GROUP BY pa.id
+            HAVING COUNT(DISTINCT pr.question_index) >= ?
+            ORDER BY pa.id DESC
+            LIMIT 1
+            """,
+            (domain, topic, total_q),
+        ).fetchone()
+    if not row:
+        return None
+    return int(row["id"])
+
+
+def _practice_report_href(
+    db: sqlite3.Connection, user_id: Any, domain: str, topic: str, total_q: int
+) -> str | None:
+    attempt_id = _practice_latest_complete_attempt_id(db, user_id, domain, topic, total_q)
+    if attempt_id is None:
+        return None
+    return url_for("practice_session_summary", attempt_id=attempt_id)
+
+
 def _dashboard_track_short(domain: str | None) -> str:
     d = (domain or "").strip()
     if not d:
@@ -1641,6 +1776,36 @@ def _dashboard_context() -> dict:
         dom = row["domain"]
         topic_slug = str(row["topic"] or "")
         topic_title = TOPIC_TITLES.get(topic_slug, topic_slug)
+        summary_href = (
+            url_for("practice_session_summary", attempt_id=int(row["id"]))
+            if gt
+            else None
+        )
+        bank_total = 0
+        if dom in BANKS and topic_slug in BANKS.get(dom, {}):
+            bank_total = len(
+                get_questions_for_topic(dom, topic_slug, BANKS[dom][topic_slug])
+            )
+        attempt_answered_row = db.execute(
+            """
+            SELECT COUNT(DISTINCT question_index) AS c
+            FROM practice_responses
+            WHERE attempt_id = ? AND question_index IS NOT NULL
+            """,
+            (int(row["id"]),),
+        ).fetchone()
+        attempt_answered = (
+            int(attempt_answered_row["c"] or 0) if attempt_answered_row else 0
+        )
+        session_complete = bank_total > 0 and attempt_answered >= bank_total
+        if session_complete and summary_href:
+            resume_href = summary_href
+        elif dom and topic_slug:
+            resume_href = url_for(
+                "practice_question", domain=dom, topic=topic_slug, qnum=0
+            )
+        else:
+            resume_href = None
         recent_sessions.append(
             {
                 "track_short": _dashboard_track_short(dom),
@@ -1649,17 +1814,10 @@ def _dashboard_context() -> dict:
                 "topic_key": topic_slug,
                 "score_label": f"{c}/{gt}" if gt else "Ungraded",
                 "pct": _pct(c, gt),
-                "summary_href": (
-                    url_for("practice_session_summary", attempt_id=int(row["id"]))
-                    if gt
-                    else None
-                ),
+                "summary_href": summary_href,
                 "when_label": _session_when_label(row["created_at"]),
-                "resume_href": (
-                    url_for("practice_question", domain=dom, topic=topic_slug, qnum=0)
-                    if dom and topic_slug
-                    else None
-                ),
+                "resume_href": resume_href,
+                "resume_label": "View report" if session_complete else "Continue",
             }
         )
 
@@ -1697,6 +1855,8 @@ def _dashboard_context() -> dict:
     sat_unit_progress = [
         {
             "key": "unit_1",
+            "domain": "algebra",
+            "num": "1",
             "label": "Unit 1",
             "subtitle": "Algebra",
             "engaged": _practice_distinct_answered(db, user_id, "algebra", "unit_1_all"),
@@ -1707,6 +1867,8 @@ def _dashboard_context() -> dict:
         },
         {
             "key": "unit_2",
+            "domain": "advanced_math",
+            "num": "2",
             "label": "Unit 2",
             "subtitle": "Advanced Math",
             "engaged": _practice_distinct_answered(
@@ -1722,6 +1884,8 @@ def _dashboard_context() -> dict:
         },
         {
             "key": "unit_3",
+            "domain": "problem_solving",
+            "num": "3",
             "label": "Unit 3",
             "subtitle": "Problem Solving & Data",
             "engaged": _practice_distinct_answered(
@@ -1737,6 +1901,8 @@ def _dashboard_context() -> dict:
         },
         {
             "key": "unit_4",
+            "domain": "geometry",
+            "num": "4",
             "label": "Unit 4",
             "subtitle": "Geometry",
             "engaged": _practice_distinct_answered(db, user_id, "geometry", "unit_4_all"),
@@ -1746,8 +1912,59 @@ def _dashboard_context() -> dict:
             ),
         },
     ]
+    dom_top_map = {
+        "unit_1": ("algebra", "unit_1_all"),
+        "unit_2": ("advanced_math", "unit_2_all"),
+        "unit_3": ("problem_solving", "unit_3_all"),
+        "unit_4": ("geometry", "unit_4_all"),
+    }
+    unit_desc = {
+        "unit_1": "Linear equations through inequalities—five chapter slices plus one merged full bank.",
+        "unit_2": "Equivalent expressions, nonlinear equations, and nonlinear functions.",
+        "unit_3": "Ratios, percentages, probability, charts, inference, and study design.",
+        "unit_4": "Volume and area, lines and triangles, trigonometry, and circles.",
+    }
     for u in sat_unit_progress:
         u["pct"] = _unit_pct(int(u["engaged"]), int(u["cap"] or 0))
+        cap = int(u.get("cap") or 0)
+        engaged = int(u.get("engaged") or 0)
+        dom = str(u.get("domain") or "")
+        u["studio_href"] = url_for("practice_topics", domain=dom) if dom else ""
+        part_id = MISS_PART_BY_DOMAIN.get(dom)
+        u["miss_count"] = (
+            len(_wrong_miss_items_for_module(db, user_id, part_id)) if part_id else 0
+        )
+        u["miss_href"] = (
+            url_for("practice_miss_quiz_sat_module", part_id=part_id)
+            if u["miss_count"] and part_id
+            else None
+        )
+        dom_top = dom_top_map.get(str(u.get("key") or ""))
+        u["report_href"] = (
+            _practice_report_href(db, user_id, dom_top[0], dom_top[1], cap)
+            if dom_top and cap
+            else None
+        )
+        u["featured"] = str(u.get("num") or "") == "1"
+        u["kicker"] = "Recommended start" if u["featured"] else "Focused slice"
+        u["name"] = str(u.get("subtitle") or "")
+        u["title"] = f"Unit {u['num']} – {u['subtitle']} (full bank)"
+        u["desc"] = unit_desc.get(str(u.get("key") or ""), "")
+        u["count"] = cap
+        u["touched"] = engaged
+        u["complete"] = cap > 0 and engaged >= cap
+        if u["complete"] and u["report_href"]:
+            u["cta_href"] = u["report_href"]
+            u["cta_label"] = "View report"
+        elif engaged:
+            u["cta_href"] = u["href"]
+            u["cta_label"] = "Continue full set"
+        else:
+            u["cta_href"] = u["href"]
+            u["cta_label"] = "Start full set"
+        if cap > 0 and engaged >= cap:
+            if dom_top and u["report_href"]:
+                u["href"] = u["report_href"]
 
     next_unit = next(
         (u for u in sat_unit_progress if int(u.get("cap") or 0) and int(u.get("pct") or 0) < 100),
@@ -1766,6 +1983,7 @@ def _dashboard_context() -> dict:
                 "href": top["resume_href"],
                 "line": f"{top['track_short']} · {top['topic']}",
                 "when_label": top.get("when_label") or "",
+                "label": top.get("resume_label") or "Continue last session",
             }
 
     return {
@@ -1909,6 +2127,17 @@ def _practice_workspace_merge_progress(
         ctx[f"{prefix}_touched"] = touched
         pct = min(100, int(round(100 * touched / total))) if total else 0
         ctx[f"{prefix}_progress_pct"] = pct
+        complete = total > 0 and touched >= total
+        ctx[f"{prefix}_complete"] = complete
+        report_href = _practice_report_href(db, user_id, domain, topic, total)
+        practice_href = url_for("practice_question", domain=domain, topic=topic, qnum=0)
+        ctx[f"{prefix}_cta_href"] = report_href if complete and report_href else practice_href
+        if complete:
+            ctx[f"{prefix}_cta_label"] = "View report"
+        elif touched:
+            ctx[f"{prefix}_cta_label"] = "Continue full set"
+        else:
+            ctx[f"{prefix}_cta_label"] = "Start full set"
         touched_sum += touched
     ctx["pw_total_touched"] = touched_sum
     tot = int(ctx.get("pw_total_questions") or 0)
@@ -1916,6 +2145,92 @@ def _practice_workspace_merge_progress(
         min(100, int(round(100 * touched_sum / tot))) if tot else 0
     )
     ctx["pw_logged_in"] = user_id is not None
+
+
+def _practice_unit_atelier_cards(
+    ctx: Dict[str, Any], db: sqlite3.Connection, user_id: Any
+) -> List[dict]:
+    """Premium bento card payloads for Units 1–4 (specialized + dashboard)."""
+    units = (
+        (
+            "algebra",
+            "unit_1_all",
+            "pw_algebra",
+            "1",
+            "Algebra",
+            "Linear equations through inequalities—five chapter slices.",
+        ),
+        (
+            "advanced_math",
+            "unit_2_all",
+            "pw_advanced_math",
+            "2",
+            "Advanced Math",
+            "Nonlinear equations, equivalent expressions, and advanced functions.",
+        ),
+        (
+            "problem_solving",
+            "unit_3_all",
+            "pw_problem_solving",
+            "3",
+            "Problem Solving & Data",
+            "Ratios, percentages, probability, charts, and study design.",
+        ),
+        (
+            "geometry",
+            "unit_4_all",
+            "pw_geometry",
+            "4",
+            "Geometry",
+            "Area, volume, triangles, trigonometry, and circles.",
+        ),
+    )
+    cards: List[dict] = []
+    for domain, topic, prefix, num, name, desc in units:
+        total = int(ctx.get(f"{prefix}_count") or 0)
+        touched = int(ctx.get(f"{prefix}_touched") or 0)
+        pct = int(ctx.get(f"{prefix}_progress_pct") or 0)
+        complete = bool(ctx.get(f"{prefix}_complete"))
+        part_id = MISS_PART_BY_DOMAIN.get(domain)
+        miss_count = (
+            len(_wrong_miss_items_for_module(db, user_id, part_id)) if part_id else 0
+        )
+        miss_href = (
+            url_for("practice_miss_quiz_sat_module", part_id=part_id)
+            if miss_count and part_id
+            else None
+        )
+        report_href = _practice_report_href(db, user_id, domain, topic, total)
+        studio_href = url_for("practice_topics", domain=domain)
+        slice_meta = _unit_chapter_slice_meta(domain)
+        pdf_meta = next(
+            (c for c in _unit_pdf_cards() if c.get("domain") == domain), None
+        )
+        pdf_href = (pdf_meta or {}).get("href") or None
+        pdf_available = bool(pdf_meta and pdf_meta.get("available") and pdf_href)
+        cards.append(
+            {
+                "domain": domain,
+                "topic": topic,
+                "num": num,
+                "name": name,
+                "title": f"Unit {num} – {name}",
+                "desc": desc,
+                "kicker": f"Unit {num}",
+                "count": total,
+                "touched": touched,
+                "pct": pct,
+                "complete": complete,
+                "studio_href": studio_href,
+                "report_href": report_href,
+                "miss_href": miss_href,
+                "miss_count": miss_count,
+                "pdf_href": pdf_href if pdf_available else None,
+                "pdf_available": pdf_available,
+                **slice_meta,
+            }
+        )
+    return cards
 
 
 def _mistake_tags_json_from_form(form) -> str:
@@ -2572,6 +2887,12 @@ def _knowledge_section_sort_key(sec: str) -> tuple:
     s = (sec or "").strip()
     if not s or s in ("—", "-", "Other"):
         return (99, 99, s)
+    if s.lower().startswith("unit "):
+        try:
+            n = int(s.split()[1])
+            return (n, 0, s)
+        except (ValueError, IndexError):
+            pass
     parts = s.split(".")
     try:
         major = int(parts[0])
@@ -3038,6 +3359,7 @@ def practice_specialized():
     ctx = _practice_workspace_counts()
     _practice_workspace_merge_progress(ctx, db, uid)
     ctx["unit_pdf_cards"] = _unit_pdf_cards()
+    ctx["pw_unit_cards"] = _practice_unit_atelier_cards(ctx, db, uid)
     return render_template("practice_specialized.html", **ctx)
 
 
@@ -3124,6 +3446,14 @@ def practice_challenge():
             progress_state = "progress"
         else:
             progress_state = "new"
+        practice_href = url_for(
+            "practice_question", domain="hard_problem", topic=topic, qnum=0
+        )
+        report_href = (
+            _practice_report_href(db, uid, "hard_problem", topic, total)
+            if progress_state == "done"
+            else None
+        )
         hard_sets.append(
             {
                 "index": idx,
@@ -3134,7 +3464,9 @@ def practice_challenge():
                 "total": total,
                 "answered": answered,
                 "progress_pct": min(100, round(100 * answered / total)) if total else 0,
-                "href": url_for("practice_question", domain="hard_problem", topic=topic, qnum=0),
+                "href": report_href or practice_href,
+                "practice_href": practice_href,
+                "report_href": report_href,
                 "restart_href": url_for("practice_new_session", domain="hard_problem", topic=topic),
                 "status": "Continue" if answered else "Start",
                 "progress_state": progress_state,
@@ -3518,6 +3850,167 @@ def practice_mistake_reflect(domain: str, topic: str, q_index: int):
     )
 
 
+def _topic_short_label(topic_key: str) -> str:
+    if topic_key.startswith("unit_"):
+        return "Full"
+    parts = topic_key.split("_")
+    if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+        return f"{parts[0]}.{parts[1]}"
+    return topic_key
+
+
+def _unit_chapter_slice_meta(domain: str) -> dict[str, Any]:
+    """Chapter slice count + range label (e.g. 1.1 – 1.5) for unit cards."""
+    topics = BANKS.get(domain) or {}
+    slice_keys = sorted(
+        (k for k in topics if not str(k).startswith("unit_")),
+        key=lambda k: (
+            int(str(k).split("_")[0]) if "_" in str(k) else 0,
+            int(str(k).split("_")[1])
+            if "_" in str(k) and str(k).split("_")[1].isdigit()
+            else 0,
+        ),
+    )
+    count = len(slice_keys)
+    if not slice_keys:
+        return {
+            "slice_count": 0,
+            "slice_range": "",
+            "studio_btn_label": "Topic studio",
+            "studio_btn_sub": "Browse banks",
+        }
+    labels = [_topic_short_label(k) for k in slice_keys]
+    slice_range = f"{labels[0]} – {labels[-1]}" if len(labels) > 1 else labels[0]
+    chapter_word = "chapters" if count != 1 else "chapter"
+    return {
+        "slice_count": count,
+        "slice_range": slice_range,
+        "studio_btn_label": "Chapter slices",
+        "studio_btn_sub": f"{slice_range} · {count} {chapter_word}",
+    }
+
+
+def _build_unit_topic_studio(
+    db: sqlite3.Connection, user_id: Any, domain: str
+) -> dict[str, Any] | None:
+    """Topic picker + detail panel data for Units 1–4 (Hard Drill–style studio)."""
+    domain_data = BANKS.get(domain)
+    if not domain_data or domain == "placement":
+        return None
+
+    topic_sets: List[dict] = []
+    total_questions = 0
+    total_answered_sum = 0
+    idx = 0
+
+    for topic_key, file_path in domain_data.items():
+        questions = get_questions_for_topic(domain, topic_key, file_path)
+        if not questions:
+            continue
+        idx += 1
+        total = len(questions)
+        answered = _practice_distinct_answered(db, user_id, domain, topic_key)
+        wrong_indices = _distinct_wrong_indices_for_topic(db, user_id, domain, topic_key)
+        wrong_count = len(wrong_indices)
+
+        if total and answered >= total:
+            progress_state = "done"
+        elif answered:
+            progress_state = "progress"
+        else:
+            progress_state = "new"
+
+        practice_href = url_for(
+            "practice_question", domain=domain, topic=topic_key, qnum=0
+        )
+        report_href = _practice_report_href(db, user_id, domain, topic_key, total)
+        href = report_href if progress_state == "done" and report_href else practice_href
+        miss_quiz_href = (
+            url_for("practice_miss_quiz_start", domain=domain, topic=topic_key)
+            if wrong_count
+            else None
+        )
+
+        topic_sets.append(
+            {
+                "index": idx,
+                "topic": topic_key,
+                "code": _topic_short_label(topic_key),
+                "title": TOPIC_TITLES.get(topic_key, topic_key),
+                "total": total,
+                "answered": answered,
+                "wrong_count": wrong_count,
+                "progress_pct": min(100, round(100 * answered / total)) if total else 0,
+                "progress_state": progress_state,
+                "href": href,
+                "practice_href": practice_href,
+                "report_href": report_href,
+                "restart_href": url_for(
+                    "practice_new_session", domain=domain, topic=topic_key
+                ),
+                "miss_quiz_href": miss_quiz_href,
+                "is_full_bank": topic_key.startswith("unit_"),
+            }
+        )
+        total_questions += total
+        total_answered_sum += answered
+
+    if not topic_sets:
+        return None
+
+    stats = {
+        "done": sum(1 for s in topic_sets if s["progress_state"] == "done"),
+        "progress": sum(1 for s in topic_sets if s["progress_state"] == "progress"),
+        "new": sum(1 for s in topic_sets if s["progress_state"] == "new"),
+    }
+
+    part_id = MISS_PART_BY_DOMAIN.get(domain)
+    unit_miss_count = (
+        len(_wrong_miss_items_for_module(db, user_id, part_id)) if part_id else 0
+    )
+    unit_miss_href = (
+        url_for("practice_miss_quiz_sat_module", part_id=part_id)
+        if unit_miss_count and part_id
+        else None
+    )
+
+    full_bank = next((s for s in topic_sets if s["is_full_bank"]), topic_sets[0])
+    continue_set = next(
+        (s for s in topic_sets if s["progress_state"] == "progress"), None
+    )
+    if continue_set is None:
+        continue_set = next((s for s in topic_sets if s["progress_state"] == "new"), None)
+    if continue_set is None:
+        continue_set = full_bank
+
+    next_set = next((s for s in topic_sets if s["progress_state"] != "done"), None)
+
+    unit_pdf = next(
+        (c for c in _unit_pdf_cards() if c.get("domain") == domain and c.get("available")),
+        None,
+    )
+
+    return {
+        "topic_sets": topic_sets,
+        "total_questions": total_questions,
+        "total_answered": total_answered_sum,
+        "overall_pct": (
+            min(100, round(100 * total_answered_sum / total_questions))
+            if total_questions
+            else 0
+        ),
+        "topic_stats": stats,
+        "continue_set": continue_set,
+        "next_set": next_set,
+        "default_index": continue_set["index"],
+        "full_bank": full_bank,
+        "unit_miss_count": unit_miss_count,
+        "unit_miss_href": unit_miss_href,
+        "analytics_href": url_for("practice_analytics", part="sat"),
+        "unit_pdf": unit_pdf,
+    }
+
+
 # -----------------------------------------------------
 # Topic List Page
 # -----------------------------------------------------
@@ -3528,8 +4021,31 @@ def practice_topics(domain):
     if not domain_data:
         return "Unknown domain", 404
 
-    topic_list = []
+    db = get_db()
+    uid = session.get("user_id")
+    studio = _build_unit_topic_studio(db, uid, domain)
 
+    if studio is not None:
+        unit_labels = {
+            "algebra": {"num": "1", "name": "Algebra"},
+            "advanced_math": {"num": "2", "name": "Advanced Math"},
+            "problem_solving": {"num": "3", "name": "Problem Solving & Data"},
+            "geometry": {"num": "4", "name": "Geometry"},
+        }
+        unit_info = unit_labels.get(domain, {"num": "", "name": domain.replace("_", " ").title()})
+        return render_template(
+            "topics.html",
+            domain=domain,
+            domain_title=PRACTICE_DOMAIN_TITLES.get(
+                domain, domain.replace("_", " ").title()
+            ),
+            studio_mode=True,
+            unit_num=unit_info["num"],
+            unit_name=unit_info["name"],
+            **studio,
+        )
+
+    topic_list = []
     for topic_key, file_path in domain_data.items():
         questions = get_questions_for_topic(domain, topic_key, file_path)
         if not questions:
@@ -3547,6 +4063,7 @@ def practice_topics(domain):
             domain, domain.replace("_", " ").title()
         ),
         topics=topic_list,
+        studio_mode=False,
     )
 
 
@@ -4194,6 +4711,12 @@ def practice_question(domain, topic, qnum):
     )
     answered_count = len(answered_qset)
     bank_total = len(questions)
+    if (
+        not mistake_redo_mode
+        and bank_total > 0
+        and len(answered_qset) >= bank_total
+    ):
+        return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
     if mistake_redo_mode:
         display_total = 1
         answered_pct = 100 if question_index in answered_qset else 0
@@ -4525,15 +5048,20 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
 
         rows_out.append(
             {
+                "q_index": i,
                 "q_display": str(disp),
                 "session_q": str(i + 1),
                 "row_id": f"summary-q-{i}",
                 "knowledge_section": sec,
                 "knowledge_title_en": title_en,
+                "hard_skill": qobj.get("hard_skill") or "",
                 "yours_display": yours,
                 "key_display": key_display,
                 "status": status,
                 "explanation_en": expl,
+                "review_href": url_for(
+                    "practice_session_item", attempt_id=attempt_id, q_index=i
+                ),
             }
         )
 
@@ -4548,6 +5076,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
                         **row,
                         "q_index": i,
                         "stem_html": questions[i].get("stem") or "",
+                        "hard_skill": questions[i].get("hard_skill") or "",
                     }
                 )
 
@@ -4569,6 +5098,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         part_order = ("3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7")
     elif domain == "geometry":
         part_order = ("4.1", "4.2", "4.3", "4.4")
+    elif domain == "hard_problem":
+        part_order = ("Unit 1", "Unit 2", "Unit 3", "Unit 4")
     else:
         part_order = tuple(sorted(acc.keys(), key=lambda x: str(x)))
     for sec in part_order:
@@ -4679,6 +5210,111 @@ def practice_session_summary(attempt_id: int):
     if isinstance(payload, tuple):
         return payload[0], payload[1]
     return render_template("practice_session_summary.html", **payload["render"])
+
+
+@app.route("/practice/session/<int:attempt_id>/item/<int:q_index>")
+def practice_session_item(attempt_id: int, q_index: int):
+    """Review a single item from a completed session (stem, choices, key, your answer)."""
+    db = get_db()
+    user_id = session.get("user_id")
+    if not _attempt_user_matches(db, attempt_id, user_id):
+        flash("Session not found.")
+        return redirect(url_for("practice"))
+    att = db.execute(
+        "SELECT domain, topic FROM practice_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        flash("Session not found.")
+        return redirect(url_for("practice"))
+    domain = str(att["domain"] or "")
+    topic = str(att["topic"] or "")
+    domain_data = BANKS.get(domain)
+    if not domain_data or topic not in domain_data:
+        return "Unknown topic", 404
+    tex_file = domain_data[topic]
+    questions = get_questions_for_topic(domain, topic, tex_file)
+    if not questions or q_index < 0 or q_index >= len(questions):
+        return "Invalid question", 404
+    qobj = questions[q_index]
+    resp = db.execute(
+        """
+        SELECT selected_answer, correct_answer, is_correct
+        FROM practice_responses
+        WHERE attempt_id = ? AND question_index = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (attempt_id, q_index),
+    ).fetchone()
+    yours_raw = (resp["selected_answer"] or "").strip() if resp else ""
+    correct_key = extract_correct_answer(qobj)
+    key_display = correct_key if correct_key else (
+        (resp["correct_answer"] or "").strip() if resp else "—"
+    )
+    if resp is None:
+        status = "skipped"
+    elif not yours_raw:
+        status = "skipped"
+    elif not correct_key:
+        status = "nocheck"
+    else:
+        graded = response_is_correct(qobj, yours_raw)
+        if graded is True:
+            status = "correct"
+        elif graded is False:
+            status = "incorrect"
+        else:
+            status = "nocheck"
+    choice_letters = ["A", "B", "C", "D"]
+    result_choices: List[dict] = []
+    if qobj.get("question_kind", "mcq") == "mcq" and qobj.get("choices"):
+        for j, html in enumerate(qobj["choices"]):
+            letter = choice_letters[j] if j < len(choice_letters) else "?"
+            is_selected = yours_raw.upper() == letter if yours_raw else False
+            is_correct_choice = (
+                correct_key.upper() == letter if correct_key and len(correct_key) == 1 else False
+            )
+            result_choices.append(
+                {
+                    "letter": letter,
+                    "html": html,
+                    "is_selected": is_selected,
+                    "is_correct": is_correct_choice,
+                }
+            )
+    summary_href = url_for("practice_session_summary", attempt_id=attempt_id)
+    prev_href = (
+        url_for("practice_session_item", attempt_id=attempt_id, q_index=q_index - 1)
+        if q_index > 0
+        else None
+    )
+    next_href = (
+        url_for("practice_session_item", attempt_id=attempt_id, q_index=q_index + 1)
+        if q_index + 1 < len(questions)
+        else None
+    )
+    return render_template(
+        "practice_session_item.html",
+        domain=domain,
+        topic=topic,
+        topic_title=TOPIC_TITLES.get(topic, topic),
+        attempt_id=attempt_id,
+        q_index=q_index,
+        q=qobj,
+        total_q=len(questions),
+        status=status,
+        yours_display=yours_raw if yours_raw else "—",
+        key_display=key_display,
+        result_choices=result_choices,
+        explanation_en=qobj.get("explanation_en") or "",
+        knowledge_section=qobj.get("knowledge_section") or "—",
+        knowledge_title_en=qobj.get("knowledge_section_title_en") or "",
+        hard_skill=qobj.get("hard_skill") or "",
+        summary_href=summary_href,
+        prev_href=prev_href,
+        next_href=next_href,
+    )
 
 
 @app.route("/practice/session/<int:attempt_id>/placement-report.pdf")

@@ -2,308 +2,82 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-practice-workspace">
-    <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
-    <header class="np-pw-hero np-pw-hero--lux glass-panel np-glass mp-animate-in" id="np-pw-hero">
-        <div class="np-sh-hero-noise" aria-hidden="true"></div>
-        <div class="np-pw-hero-glow" aria-hidden="true"></div>
-        <div class="np-pw-hero-inner">
-            <div class="np-pw-hero-head">
-                <div class="np-pw-hero-copy">
-                    <p class="np-pw-eyebrow">Specialized training</p>
-                    <h1 class="np-pw-title">Choose your domain</h1>
-                </div>
-            </div>
-            <p class="np-pw-lead">Algebra, Advanced Math, Problem Solving &amp; Data, and Geometry—full-bank runs, chapter slices, session summaries with coach breakdowns, and per-question progress you can see at a glance.</p>
-            <div class="np-pw-hero-stats" role="list">
-                <div class="np-pw-stat" role="listitem">
-                    <span class="np-pw-stat-val">{{ pw_domains_live }}</span>
-                    <span class="np-pw-stat-label">domains live</span>
-                </div>
-                <div class="np-pw-stat" role="listitem">
-                    <span class="np-pw-stat-val">{{ pw_total_questions }}</span>
-                    <span class="np-pw-stat-label">questions ready</span>
-                </div>
-                <div class="np-pw-stat np-pw-stat--accent" role="listitem">
-                    <span class="np-pw-stat-val">{{ pw_total_touched }}</span>
-                    <span class="np-pw-stat-label">questions engaged</span>
-                </div>
-                <div class="np-pw-stat np-pw-stat--muted" role="listitem">
-                    <span class="np-pw-stat-val">{{ pw_roadmap_units }}</span>
-                    <span class="np-pw-stat-label">more units soon</span>
-                </div>
-            </div>
-            <section class="np-pw-engagement" aria-label="Your progress across live full banks">
-                <div class="np-pw-engagement-head">
-                    <span class="np-pw-engagement-title">Your footprint · full banks</span>
-                    <span class="np-pw-engagement-fraction">{{ pw_total_touched }} / {{ pw_total_questions }}</span>
-                </div>
-                <div class="np-pw-engagement-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ pw_total_questions }}" aria-valuenow="{{ pw_total_touched }}" aria-label="Distinct questions with at least one submitted answer">
-                    <div class="np-pw-engagement-fill" style="width: {{ pw_aggregate_progress_pct }}%;"></div>
-                </div>
-                {% if not pw_logged_in %}
-                <p class="np-pw-engagement-hint">You’re browsing as a guest—progress is stored on this browser session. <a href="{{ url_for('login') }}">Sign in</a> to keep it with your account.</p>
-                {% else %}
-                <p class="np-pw-engagement-hint">Each bar counts <strong>distinct</strong> questions you’ve submitted at least once in <strong>full-bank</strong> mode (Units 1–4).</p>
-                {% endif %}
-            </section>
-            <div class="np-pw-roadmap">
-                <div class="np-pw-roadmap-label">
-                    <span class="np-pw-roadmap-title">SAT Math domains onboarded</span>
-                    <span class="np-pw-roadmap-count">{{ pw_domains_live }} / {{ pw_domain_target }}</span>
-                </div>
-                <div class="np-pw-roadmap-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ pw_domain_target }}" aria-valuenow="{{ pw_domains_live }}" aria-label="Share of planned domains that are live">
-                    <div class="np-pw-roadmap-fill" style="width: {{ pw_workspace_progress_pct }}%"></div>
-                </div>
-            </div>
-            <p class="np-pw-hero-foot">
-                <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-pw-hero-foot-link">Mistake analytics</a>
-                <span class="np-pw-hero-foot-sep">·</span>
-                <a href="{{ url_for('practice_topics', domain='algebra') }}" class="np-pw-hero-foot-link">Jump to Unit 1 topics</a>
-                <span class="np-pw-hero-foot-sep">·</span>
-                <a href="#np-unit-pdfs" class="np-pw-hero-foot-link">Printable PDFs</a>
-            </p>
-            <div class="np-study-mode-row" aria-label="Recommended training modes">
-                <a href="/practice/algebra/unit_1_all/0" class="np-study-mode np-study-mode--primary">
-                    <span>Fast Start</span>
-                    <strong>Begin Unit 1 full bank</strong>
-                </a>
-                <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-study-mode">
-                    <span>Fix Mistakes</span>
-                    <strong>Open analytics</strong>
-                </a>
-                <a href="{{ url_for('practice_topics', domain='geometry') }}" class="np-study-mode">
-                    <span>Targeted Drill</span>
-                    <strong>Browse Geometry</strong>
-                </a>
-            </div>
-        </div>
-    </header>
+<div class="np-sat-atelier np-practice-workspace">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Specialized training</span>
+  </nav>
 
-    <div class="np-pw-grid">
-        <article class="np-pw-card np-pw-card--live np-tilt">
-            <div class="np-pw-card-top">
-                <div class="np-pw-icon np-pw-icon--algebra" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 19L9 5l2.5 7L14 5l6 14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 14h5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="np-pw-card-meta">
-                    <span class="np-pw-unit">Unit 1</span>
-                    <span class="np-pw-pill np-pw-pill--live">Live</span>
-                </div>
-            </div>
-            <h2 class="np-pw-card-title">Algebra</h2>
-            <p class="np-pw-card-desc">Linear equations through inequalities—five chapter slices plus one merged full bank, with Jump progress and coach walkthroughs on every item.</p>
-            <div class="np-pw-card-progress" aria-label="Algebra full bank progress">
-                <div class="np-pw-card-progress-row">
-                    <span class="np-pw-card-progress-label">Full bank</span>
-                    <span class="np-pw-card-progress-val">{{ pw_algebra_touched }} / {{ pw_algebra_count }}</span>
-                </div>
-                <div class="np-pw-card-progress-track">
-                    <span class="np-pw-card-progress-fill" style="width: {{ pw_algebra_progress_pct }}%;"></span>
-                </div>
-            </div>
-            <ul class="np-pw-mini">
-                <li>{{ pw_algebra_count }} questions in catalog</li>
-                <li>Drills by chapter or full set</li>
-            </ul>
-            <div class="np-pw-actions">
-                <a href="/practice/algebra/unit_1_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_algebra_touched %}Continue full set{% else %}Start full set{% endif %}</a>
-                <a href="/practice/algebra" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
-            </div>
-            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'algebra')|first %}
-            {% if pdf and pdf.available %}
-            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 1 PDF</a>
-            {% else %}
-            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
-            {% endif %}
-        </article>
-
-        <article class="np-pw-card np-pw-card--live np-tilt">
-            <div class="np-pw-card-top">
-                <div class="np-pw-icon np-pw-icon--advanced" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 18c3-8 6-12 9-12s6 4 9 12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                        <path d="M7 14h10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="np-pw-card-meta">
-                    <span class="np-pw-unit">Unit 2</span>
-                    <span class="np-pw-pill np-pw-pill--live">Live</span>
-                </div>
-            </div>
-            <h2 class="np-pw-card-title">Advanced Math</h2>
-            <p class="np-pw-card-desc">Equivalent expressions, nonlinear equations and systems, and nonlinear functions—including exponentials and quadratics—tracked separately from Unit 1 analytics.</p>
-            <div class="np-pw-card-progress" aria-label="Advanced Math full bank progress">
-                <div class="np-pw-card-progress-row">
-                    <span class="np-pw-card-progress-label">Full bank</span>
-                    <span class="np-pw-card-progress-val">{{ pw_advanced_math_touched }} / {{ pw_advanced_math_count }}</span>
-                </div>
-                <div class="np-pw-card-progress-track">
-                    <span class="np-pw-card-progress-fill np-pw-card-progress-fill--u2" style="width: {{ pw_advanced_math_progress_pct }}%;"></span>
-                </div>
-            </div>
-            <ul class="np-pw-mini">
-                <li>{{ pw_advanced_math_count }} questions in catalog</li>
-                <li>Three slices + full bank</li>
-            </ul>
-            <div class="np-pw-actions">
-                <a href="/practice/advanced_math/unit_2_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_advanced_math_touched %}Continue full set{% else %}Start full set{% endif %}</a>
-                <a href="/practice/advanced_math" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
-            </div>
-            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'advanced_math')|first %}
-            {% if pdf and pdf.available %}
-            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 2 PDF</a>
-            {% else %}
-            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
-            {% endif %}
-        </article>
-
-        <article class="np-pw-card np-pw-card--live np-tilt">
-            <div class="np-pw-card-top">
-                <div class="np-pw-icon np-pw-icon--data" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 19V5M5 19h14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                        <path d="M9 15v-4M13 15V8M17 15v-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="np-pw-card-meta">
-                    <span class="np-pw-unit">Unit 3</span>
-                    <span class="np-pw-pill np-pw-pill--live">Live</span>
-                </div>
-            </div>
-            <h2 class="np-pw-card-title">Problem Solving &amp; Data</h2>
-            <p class="np-pw-card-desc">Ratios, percentages, probability, charts, inference, and study design—seven slices plus full bank, same session report and Jump UX as Units 1–2.</p>
-            <div class="np-pw-card-progress" aria-label="Problem solving full bank progress">
-                <div class="np-pw-card-progress-row">
-                    <span class="np-pw-card-progress-label">Full bank</span>
-                    <span class="np-pw-card-progress-val">{{ pw_problem_solving_touched }} / {{ pw_problem_solving_count }}</span>
-                </div>
-                <div class="np-pw-card-progress-track">
-                    <span class="np-pw-card-progress-fill np-pw-card-progress-fill--u3" style="width: {{ pw_problem_solving_progress_pct }}%;"></span>
-                </div>
-            </div>
-            <ul class="np-pw-mini">
-                <li>{{ pw_problem_solving_count }} questions in catalog</li>
-                <li>Seven slices + full bank</li>
-            </ul>
-            <div class="np-pw-actions">
-                <a href="/practice/problem_solving/unit_3_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_problem_solving_touched %}Continue full set{% else %}Start full set{% endif %}</a>
-                <a href="/practice/problem_solving" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
-            </div>
-            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'problem_solving')|first %}
-            {% if pdf and pdf.available %}
-            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 3 PDF</a>
-            {% else %}
-            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
-            {% endif %}
-        </article>
-
-        <article class="np-pw-card np-pw-card--live np-tilt">
-            <div class="np-pw-card-top">
-                <div class="np-pw-icon np-pw-icon--geometry" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 3L4 20h16L12 3z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
-                        <path d="M12 9v5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="np-pw-card-meta">
-                    <span class="np-pw-unit">Unit 4</span>
-                    <span class="np-pw-pill np-pw-pill--live">Live</span>
-                </div>
-            </div>
-            <h2 class="np-pw-card-title">Geometry</h2>
-            <p class="np-pw-card-desc">Volume and area, lines and triangles, right-triangle trigonometry, and circles—four chapter slices plus one merged full bank, matching the Units 1–4 practice flow.</p>
-            <div class="np-pw-card-progress" aria-label="Geometry full bank progress">
-                <div class="np-pw-card-progress-row">
-                    <span class="np-pw-card-progress-label">Full bank</span>
-                    <span class="np-pw-card-progress-val">{{ pw_geometry_touched }} / {{ pw_geometry_count }}</span>
-                </div>
-                <div class="np-pw-card-progress-track">
-                    <span class="np-pw-card-progress-fill np-pw-card-progress-fill--u4" style="width: {{ pw_geometry_progress_pct }}%;"></span>
-                </div>
-            </div>
-            <ul class="np-pw-mini">
-                <li>{{ pw_geometry_count }} questions in catalog</li>
-                <li>Four slices + full bank</li>
-            </ul>
-            <div class="np-pw-actions">
-                <a href="/practice/geometry/unit_4_all/0" class="np-pw-btn np-pw-btn--primary">{% if pw_geometry_touched %}Continue full set{% else %}Start full set{% endif %}</a>
-                <a href="/practice/geometry" class="np-pw-btn np-pw-btn--ghost">Browse topics</a>
-            </div>
-            {% set pdf = unit_pdf_cards|selectattr('domain', 'equalto', 'geometry')|first %}
-            {% if pdf and pdf.available %}
-            <a href="{{ pdf.href }}" class="np-unit-pdf-chip">Download Unit 4 PDF</a>
-            {% else %}
-            <span class="np-unit-pdf-chip np-unit-pdf-chip--pending">PDF pending</span>
-            {% endif %}
-        </article>
+  <header class="np-atelier-hero glass-panel np-glass mp-animate-in" id="np-atelier-hero">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div>
+      <p class="np-atelier-kicker">Specialized training</p>
+      <h1>Choose your domain.</h1>
+      <p class="np-atelier-hero-lead">Algebra, Advanced Math, Problem Solving &amp; Data, and Geometry—full-bank runs, chapter slices, session reports, and per-bank mistake redo in one studio per unit.</p>
+      <div class="np-atelier-hero-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>{{ pw_domains_live }}</strong><span>domains live</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ pw_total_questions }}</strong><span>questions ready</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ pw_total_touched }}</strong><span>engaged</span></div>
+      </div>
+      <div class="np-atelier-links" style="margin-top: 16px;">
+        <a href="{{ url_for('practice_analytics', part='sat') }}">Mistake analytics</a>
+        <a href="#np-unit-pdfs">Printable PDFs</a>
+      </div>
     </div>
+    <aside class="np-atelier-aside" aria-label="Aggregate progress">
+      <span class="np-atelier-aside-label">Your footprint · full banks</span>
+      <strong>{{ pw_total_touched }}<small>/{{ pw_total_questions }}</small></strong>
+      <div class="np-atelier-aside-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ pw_total_questions }}" aria-valuenow="{{ pw_total_touched }}">
+        <i style="width: {{ pw_aggregate_progress_pct }}%;"></i>
+      </div>
+      <em>{{ pw_aggregate_progress_pct }}% engaged across Units 1–4</em>
+      {% if not pw_logged_in %}
+      <p class="np-pw-engagement-hint" style="margin: 8px 0 0; font-size: 0.75rem;">Guest mode — <a href="{{ url_for('login') }}">Sign in</a> to keep progress.</p>
+      {% endif %}
+    </aside>
+  </header>
 
-    <section id="np-unit-pdfs" class="np-unit-pdf-suite glass-panel np-glass mp-animate-in" aria-label="Printable SAT unit PDFs">
-        <header class="np-unit-pdf-head">
-            <div>
-                <p class="np-pw-eyebrow">Printable library</p>
-                <h2>Unit PDF packets</h2>
-                <p>Students can download paper versions for homework, annotation, or offline practice. PDFs appear automatically once uploaded with the expected filename.</p>
-            </div>
-        </header>
-        <div class="np-unit-pdf-grid">
-            {% for pdf in unit_pdf_cards %}
-            {% if pdf.available %}
-            <a href="{{ pdf.href }}" class="np-unit-pdf-card">
-            {% else %}
-            <div class="np-unit-pdf-card is-pending">
-            {% endif %}
-                <span>{{ pdf.unit }}</span>
-                <strong>{{ pdf.title }}</strong>
-                {% if pdf.available %}
-                <em>Ready to download</em>
-                <b>Download PDF →</b>
-                {% else %}
-                <em>Waiting for file</em>
-                <small>Save as <code>{{ pdf.filename_hint }}</code></small>
-                {% endif %}
-            {% if pdf.available %}
-            </a>
-            {% else %}
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-    </section>
+  <section class="np-atelier-bento np-atelier-bento--equal np-atelier-bento--units" aria-label="SAT Math units">
+    {% for card in pw_unit_cards %}
+    {% with card=card %}
+    {% include "includes/atelier_unit_card.html" %}
+    {% endwith %}
+    {% endfor %}
+  </section>
+
+  <section id="np-unit-pdfs" class="np-unit-pdf-suite glass-panel np-glass mp-animate-in" aria-label="Printable SAT unit PDFs">
+    <header class="np-unit-pdf-head">
+      <div>
+        <p class="np-atelier-kicker">Printable library</p>
+        <h2>Unit PDF packets</h2>
+        <p>Download paper versions for homework, annotation, or offline practice.</p>
+      </div>
+    </header>
+    <div class="np-unit-pdf-grid">
+      {% for pdf in unit_pdf_cards %}
+      {% if pdf.available %}
+      <a href="{{ pdf.href }}" class="np-unit-pdf-card">
+      {% else %}
+      <div class="np-unit-pdf-card is-pending">
+      {% endif %}
+        <span>{{ pdf.unit }}</span>
+        <strong>{{ pdf.title }}</strong>
+        {% if pdf.available %}
+        <em>Ready to download</em>
+        <b>Download PDF →</b>
+        {% else %}
+        <em>Waiting for file</em>
+        <small>Save as <code>{{ pdf.filename_hint }}</code></small>
+        {% endif %}
+      {% if pdf.available %}
+      </a>
+      {% else %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </section>
 </div>
 </div>
-
-<script>
-(() => {
-    const hero = document.getElementById("np-pw-hero");
-    if (!hero) return;
-    const move = (clientX, clientY) => {
-        const rect = hero.getBoundingClientRect();
-        const x = ((clientX - rect.left) / rect.width) * 100;
-        const y = ((clientY - rect.top) / rect.height) * 100;
-        hero.style.setProperty("--np-pw-glow-x", x + "%");
-        hero.style.setProperty("--np-pw-glow-y", y + "%");
-    };
-    hero.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
-    hero.addEventListener("mouseleave", () => {
-        hero.style.setProperty("--np-pw-glow-x", "72%");
-        hero.style.setProperty("--np-pw-glow-y", "28%");
-    });
-    document.querySelectorAll(".np-practice-workspace .np-tilt").forEach((el) => {
-        el.addEventListener("mousemove", (e) => {
-            const r = el.getBoundingClientRect();
-            const px = (e.clientX - r.left) / r.width - 0.5;
-            const py = (e.clientY - r.top) / r.height - 0.5;
-            el.style.transform = `perspective(900px) rotateX(${py * -4}deg) rotateY(${px * 5}deg) translateZ(0)`;
-        });
-        el.addEventListener("mouseleave", () => {
-            el.style.transform = "";
-        });
-    });
-})();
-</script>
 {% endblock %}

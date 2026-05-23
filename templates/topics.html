@@ -1,15 +1,420 @@
 {% extends "base.html" %}
-{% block content %}
+{% block title %}{{ domain_title }} · {{ site_brand_name }}{% endblock %}
 
+{% block content %}
 <div class="np-page-shell">
+{% if studio_mode %}
+<div class="np-sat-atelier">
+<div class="np-hard-page np-unit-studio np-unit-studio--u{{ unit_num }}">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <a href="{{ url_for('practice_specialized') }}">Specialized training</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Unit {{ unit_num }}</span>
+  </nav>
+
+  <section class="np-hard-hero np-hard-hero--catalog np-hard-hero--unit glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div class="np-hard-hero-copy">
+      <p class="np-hard-kicker">SAT Math · Unit {{ unit_num }}</p>
+      <div class="np-hard-hero-title-row">
+        <h1>{{ unit_name }} studio.</h1>
+        <span class="np-hard-hero-pill">{{ topic_sets|length }} banks</span>
+      </div>
+      <p>Full bank plus focused chapter slices — start practice, open your session report, or redo mistakes in one place.</p>
+      <div class="np-hard-hero-stats">
+        <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ topic_stats.done }} completed</span>
+        <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ topic_stats.progress }} active</span>
+        <span class="np-hard-hero-stat np-hard-hero-stat--new"><i aria-hidden="true"></i>{{ topic_stats.new }} new</span>
+        {% if unit_miss_count %}
+        <span class="np-hard-hero-stat np-hard-hero-stat--miss"><i aria-hidden="true"></i>{{ unit_miss_count }} misses</span>
+        {% endif %}
+      </div>
+      {% if continue_set %}
+      <a class="np-hard-hero-continue" href="{{ continue_set.href }}">
+        {% if continue_set.progress_state == 'done' %}
+        View report · {{ continue_set.title }}
+        {% elif continue_set.progress_state == 'progress' %}
+        Continue · {{ continue_set.code }} · {{ continue_set.answered }}/{{ continue_set.total }}
+        {% else %}
+        Start · {{ continue_set.title }}
+        {% endif %}
+        <span aria-hidden="true">→</span>
+      </a>
+      {% endif %}
+      <div class="np-unit-hero-links">
+        {% if unit_miss_href %}
+        <a href="{{ unit_miss_href }}" class="np-unit-hero-link np-unit-hero-link--miss">Review unit mistakes ({{ unit_miss_count }})</a>
+        {% endif %}
+        <a href="{{ analytics_href }}" class="np-unit-hero-link">Mistake analytics</a>
+      </div>
+    </div>
+    <aside class="np-hard-progress" aria-label="Unit progress">
+      <span>Unit footprint</span>
+      <strong>{{ total_answered }}<small>/{{ total_questions }}</small></strong>
+      <div class="np-hard-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total_questions }}" aria-valuenow="{{ total_answered }}">
+        <i style="width: {{ overall_pct }}%;"></i>
+      </div>
+      <em>{{ overall_pct }}% engaged across all banks</em>
+      {% if next_set %}
+      <p class="np-hard-progress-next">Up next: {{ next_set.code }} · {{ next_set.title }}</p>
+      {% endif %}
+    </aside>
+  </section>
+
+  <section
+    class="np-hard-studio glass-panel np-glass mp-animate-up"
+    aria-label="Unit topic studio"
+    data-hard-library
+    data-default-index="{{ default_index }}"
+  >
+    <header class="np-hard-studio-head">
+      <div>
+        <p class="np-hard-kicker">Topic library</p>
+        <h2>Practice banks</h2>
+        <p class="np-hard-studio-lead">Select a bank on the left — full set or chapter slice. The panel shows progress, report, and mistake redo for that bank.</p>
+      </div>
+      <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
+        <button type="button" class="is-active" data-hard-filter="all">All <em>{{ topic_stats.done + topic_stats.progress + topic_stats.new }}</em></button>
+        <button type="button" data-hard-filter="new">New <em>{{ topic_stats.new }}</em></button>
+        <button type="button" data-hard-filter="progress">Active <em>{{ topic_stats.progress }}</em></button>
+        <button type="button" data-hard-filter="done">Done <em>{{ topic_stats.done }}</em></button>
+      </div>
+    </header>
+
+    <div class="np-hard-studio-meta">
+      <nav class="np-hard-quick-nav np-hard-quick-nav--unit" aria-label="Jump to a topic bank">
+        {% for set in topic_sets %}
+        <button
+          type="button"
+          class="np-hard-quick-nav-btn np-hard-quick-nav-btn--{{ set.progress_state }}"
+          data-quick-index="{{ set.index }}"
+          aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+        >
+          <strong>{{ set.code }}</strong>
+          <span>{% if set.is_full_bank %}Full bank{% else %}Slice{% endif %}</span>
+          <em>{{ set.answered }}/{{ set.total }}</em>
+        </button>
+        {% endfor %}
+      </nav>
+      <div class="np-hard-studio-meta-row">
+        <div class="np-hard-studio-legend" aria-hidden="true">
+          <span><i class="is-new"></i>New</span>
+          <span><i class="is-progress"></i>Active</span>
+          <span><i class="is-done"></i>Done</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="np-hard-studio-layout">
+      <div class="np-hard-studio-picker">
+        <div class="np-hard-picker-grid np-hard-picker-grid--unit" data-hard-picker role="listbox" aria-label="Choose a topic bank">
+          {% for set in topic_sets %}
+          <button
+            type="button"
+            class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.is_full_bank %} np-hard-picker-tile--featured{% endif %}"
+            data-hard-tile
+            data-index="{{ set.index }}"
+            data-roman="{{ set.code }}"
+            data-state="{{ set.progress_state }}"
+            data-href="{{ set.href }}"
+            data-practice-href="{{ set.practice_href }}"
+            data-report-href="{{ set.report_href or '' }}"
+            data-restart="{{ set.restart_href }}"
+            data-miss-href="{{ set.miss_quiz_href or '' }}"
+            data-wrong-count="{{ set.wrong_count }}"
+            data-subtitle="{{ set.title }}"
+            data-answered="{{ set.answered }}"
+            data-total="{{ set.total }}"
+            data-progress="{{ set.progress_pct }}"
+            role="option"
+            aria-selected="false"
+            aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+            style="--tile-progress: {{ set.progress_pct }}%;"
+          >
+            <span class="np-hard-picker-roman">{{ set.code }}</span>
+            <span class="np-hard-picker-num">{% if set.is_full_bank %}Full bank{% else %}Chapter{% endif %} · {{ set.total }} Q</span>
+            <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
+            <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}{% if set.wrong_count %} · {{ set.wrong_count }} miss{% endif %}</span>
+          </button>
+          {% endfor %}
+        </div>
+        <p class="np-hard-picker-empty" data-hard-empty hidden>No banks in this filter.</p>
+        <p class="np-hard-picker-tip">Tip: arrow keys to browse banks, Enter to open.</p>
+      </div>
+
+      <aside class="np-hard-detail" data-hard-detail aria-live="polite">
+        <div class="np-hard-detail-top">
+          <div class="np-hard-detail-badge" data-hard-detail-badge>01</div>
+          <div class="np-hard-detail-ring" aria-hidden="true">
+            <svg viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" class="np-hard-detail-ring-track"></circle>
+              <circle cx="22" cy="22" r="18" class="np-hard-detail-ring-fill" data-hard-detail-ring></circle>
+            </svg>
+            <span data-hard-detail-ring-label>0%</span>
+          </div>
+        </div>
+
+        <div class="np-hard-detail-body" data-hard-detail-body>
+          <div class="np-hard-detail-head">
+            <p class="np-hard-kicker" data-hard-detail-kicker>Bank 1</p>
+            <h3 data-hard-detail-title>Unit topic</h3>
+            <p data-hard-detail-subtitle>Topic title</p>
+          </div>
+
+          <div class="np-hard-detail-stats">
+            <div class="np-hard-detail-stat">
+              <span>Questions</span>
+              <strong data-hard-detail-count>0 / 0</strong>
+            </div>
+            <div class="np-hard-detail-stat">
+              <span>Status</span>
+              <strong data-hard-detail-status>Not started</strong>
+            </div>
+            <div class="np-hard-detail-stat np-hard-detail-stat--miss" data-hard-detail-miss-stat hidden>
+              <span>Misses logged</span>
+              <strong data-hard-detail-miss-count>0</strong>
+            </div>
+          </div>
+
+          <div class="np-hard-detail-meter" aria-hidden="true">
+            <span data-hard-detail-bar style="width: 0%;"></span>
+          </div>
+
+          {% if unit_pdf %}
+          <div class="np-hard-detail-materials-wrap" data-hard-detail-pdf-wrap>
+            <p class="np-hard-detail-materials-label">Downloads</p>
+            <div class="np-hard-detail-materials">
+              <a href="{{ unit_pdf.href }}" class="np-hard-detail-material">
+                <span>PDF</span>
+                <strong>Unit {{ unit_num }} worksheet</strong>
+                <em>Printable packet for offline practice</em>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="np-hard-detail-actions np-hard-detail-actions--stack">
+            <a href="#" class="np-hard-detail-start" data-hard-detail-start>Begin practice</a>
+            <a href="#" class="np-hard-detail-report" data-hard-detail-report hidden>View report</a>
+            <a href="#" class="np-hard-detail-miss" data-hard-detail-miss hidden>Review mistakes</a>
+            <button type="button" class="np-hard-detail-restart" data-hard-detail-restart>Restart bank</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</div>
+</div>
+
+<script>
+(function () {
+  var library = document.querySelector("[data-hard-library]");
+  if (!library) return;
+
+  var emptyEl = library.querySelector("[data-hard-empty]");
+  var tiles = Array.prototype.slice.call(library.querySelectorAll("[data-hard-tile]"));
+  var filterButtons = Array.prototype.slice.call(library.querySelectorAll("[data-hard-filter]"));
+  var badge = library.querySelector("[data-hard-detail-badge]");
+  var ring = library.querySelector("[data-hard-detail-ring]");
+  var ringLabel = library.querySelector("[data-hard-detail-ring-label]");
+  var kicker = library.querySelector("[data-hard-detail-kicker]");
+  var title = library.querySelector("[data-hard-detail-title]");
+  var subtitle = library.querySelector("[data-hard-detail-subtitle]");
+  var count = library.querySelector("[data-hard-detail-count]");
+  var status = library.querySelector("[data-hard-detail-status]");
+  var bar = library.querySelector("[data-hard-detail-bar]");
+  var startBtn = library.querySelector("[data-hard-detail-start]");
+  var reportBtn = library.querySelector("[data-hard-detail-report]");
+  var missBtn = library.querySelector("[data-hard-detail-miss]");
+  var missStat = library.querySelector("[data-hard-detail-miss-stat]");
+  var missCountEl = library.querySelector("[data-hard-detail-miss-count]");
+  var restartBtn = library.querySelector("[data-hard-detail-restart]");
+  var detail = library.querySelector("[data-hard-detail]");
+  var activeFilter = "all";
+  var activeTile = null;
+  var ringCirc = 2 * Math.PI * 18;
+
+  if (detail) {
+    var nav = document.querySelector(".navbar");
+    var stickyTop = nav ? nav.getBoundingClientRect().height + 8 : 12;
+    detail.style.setProperty("--hard-sticky-top", stickyTop + "px");
+    library.style.setProperty("--hard-sticky-top", stickyTop + "px");
+  }
+
+  var statusLabels = { new: "Not started", progress: "In progress", done: "Completed" };
+  var startLabels = { new: "Begin practice", progress: "Continue practice", done: "View report" };
+
+  function visibleTiles() {
+    return tiles.filter(function (tile) { return !tile.hidden; });
+  }
+
+  function tileMatches(tile) {
+    return activeFilter === "all" || (tile.getAttribute("data-state") || "") === activeFilter;
+  }
+
+  function setRing(progress) {
+    var pct = Math.max(0, Math.min(100, parseInt(progress, 10) || 0));
+    if (ring) {
+      ring.style.strokeDasharray = ringCirc + " " + ringCirc;
+      ring.style.strokeDashoffset = String(ringCirc * (1 - pct / 100));
+    }
+    if (ringLabel) ringLabel.textContent = pct + "%";
+  }
+
+  function selectTile(tile, scrollIntoView) {
+    if (!tile) return;
+    activeTile = tile;
+    var index = tile.getAttribute("data-index");
+    var code = tile.getAttribute("data-roman") || index;
+    var state = tile.getAttribute("data-state") || "new";
+    var progress = tile.getAttribute("data-progress") || "0";
+    var wrongCount = parseInt(tile.getAttribute("data-wrong-count") || "0", 10);
+    var reportHref = tile.getAttribute("data-report-href") || "";
+    var missHref = tile.getAttribute("data-miss-href") || "";
+    var practiceHref = tile.getAttribute("data-practice-href") || tile.getAttribute("data-href") || "#";
+
+    tiles.forEach(function (item) {
+      var selected = item === tile;
+      item.classList.toggle("is-active", selected);
+      item.setAttribute("aria-selected", selected ? "true" : "false");
+    });
+    library.querySelectorAll("[data-quick-index]").forEach(function (btn) {
+      btn.classList.toggle("is-active", btn.getAttribute("data-quick-index") === index);
+    });
+    if (detail) {
+      detail.className = "np-hard-detail np-hard-detail--" + state + " is-updating";
+      window.setTimeout(function () { detail.classList.remove("is-updating"); }, 220);
+    }
+
+    badge.textContent = code;
+    kicker.textContent = "Bank " + code;
+    title.textContent = tile.getAttribute("data-subtitle") || "Topic bank";
+    subtitle.textContent = (tile.querySelector(".np-hard-picker-num") || {}).textContent || "";
+    count.textContent = (tile.getAttribute("data-answered") || "0") + " / " + (tile.getAttribute("data-total") || "0");
+    status.textContent = statusLabels[state] || "Not started";
+    bar.style.width = progress + "%";
+    setRing(progress);
+
+    startBtn.textContent = startLabels[state] || "Begin practice";
+    startBtn.href = tile.getAttribute("data-href") || "#";
+    restartBtn.dataset.restartHref = tile.getAttribute("data-restart") || "#";
+
+    if (reportBtn) {
+      if (reportHref && state !== "done") {
+        reportBtn.hidden = false;
+        reportBtn.href = reportHref;
+      } else {
+        reportBtn.hidden = true;
+        reportBtn.href = "#";
+      }
+    }
+    if (missBtn) {
+      if (missHref && wrongCount > 0) {
+        missBtn.hidden = false;
+        missBtn.href = missHref;
+        missBtn.textContent = "Review mistakes (" + wrongCount + ")";
+      } else {
+        missBtn.hidden = true;
+        missBtn.href = "#";
+      }
+    }
+    if (missStat && missCountEl) {
+      if (wrongCount > 0) {
+        missStat.hidden = false;
+        missCountEl.textContent = String(wrongCount);
+      } else {
+        missStat.hidden = true;
+      }
+    }
+
+    if (scrollIntoView && window.matchMedia("(max-width: 900px)").matches) {
+      detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  function applyFilters() {
+    var visible = [];
+    tiles.forEach(function (tile) {
+      var show = tileMatches(tile);
+      tile.hidden = !show;
+      if (show) visible.push(tile);
+    });
+    if (emptyEl) emptyEl.hidden = visible.length !== 0;
+    if (!activeTile || activeTile.hidden) selectTile(visible[0] || null, false);
+  }
+
+  filterButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      filterButtons.forEach(function (b) { b.classList.toggle("is-active", b === btn); });
+      activeFilter = btn.getAttribute("data-hard-filter") || "all";
+      applyFilters();
+    });
+  });
+
+  tiles.forEach(function (tile) {
+    tile.addEventListener("click", function () { selectTile(tile, true); });
+  });
+
+  Array.prototype.slice.call(library.querySelectorAll("[data-quick-index]")).forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var index = btn.getAttribute("data-quick-index");
+      var target = tiles.find(function (tile) {
+        return tile.getAttribute("data-index") === index;
+      });
+      if (target) { selectTile(target, true); target.focus(); }
+    });
+  });
+
+  if (restartBtn) {
+    restartBtn.addEventListener("click", function () {
+      var href = restartBtn.dataset.restartHref;
+      if (!href) return;
+      var label = activeTile ? (activeTile.getAttribute("data-subtitle") || "this bank") : "this bank";
+      if (window.confirm("Restart " + label + "? Progress for this bank will reset.")) {
+        window.location.href = href;
+      }
+    });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (!library.contains(document.activeElement) && document.activeElement !== document.body) return;
+    var visible = visibleTiles();
+    if (!visible.length) return;
+    var currentIndex = activeTile ? visible.indexOf(activeTile) : -1;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      var next = currentIndex + 1;
+      if (next >= visible.length) next = 0;
+      selectTile(visible[next], true);
+      visible[next].focus();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      var prev = currentIndex - 1;
+      if (prev < 0) prev = visible.length - 1;
+      selectTile(visible[prev], true);
+      visible[prev].focus();
+    } else if (event.key === "Enter" && activeTile && startBtn && startBtn.href) {
+      event.preventDefault();
+      window.location.href = startBtn.href;
+    }
+  });
+
+  var defaultIndex = library.getAttribute("data-default-index");
+  var initial = tiles.find(function (tile) {
+    return String(tile.getAttribute("data-index")) === String(defaultIndex);
+  }) || tiles.find(function (tile) { return tile.getAttribute("data-state") === "progress"; }) || tiles[0];
+  if (initial) selectTile(initial, false);
+})();
+</script>
+
+{% else %}
 <div class="np-domain-page">
   {% if domain == 'placement' %}
   <p class="np-pw-breadcrumb"><a href="{{ url_for('placement_landing') }}">← Placement</a></p>
   {% else %}
-  <p class="np-pw-breadcrumb">
-    <a href="{{ url_for('practice') }}">SAT modules</a>
-    · <a href="{{ url_for('practice_specialized') }}">Specialized</a>
-  </p>
+  <p class="np-pw-breadcrumb"><a href="{{ url_for('practice') }}">← SAT modules</a></p>
   {% endif %}
 
   <header class="np-domain-hero glass-panel np-glass mp-animate-in">
@@ -18,50 +423,27 @@
       <div>
         <p class="np-domain-kicker">Topic bank</p>
         <h1 class="np-domain-title">{{ domain_title|default(domain|replace('_', ' ')|title) }}</h1>
-        <p class="np-domain-lead np-prose-wide">Choose the full bank for mixed review, or start a focused slice. Every attempt feeds your score sheet and mistake log.</p>
+        <p class="np-domain-lead np-prose-wide">Choose a bank to begin.</p>
       </div>
-      {% if topics %}
-      <div class="np-domain-summary" aria-label="Topic bank summary">
-        <span class="np-domain-summary-label">Available</span>
-        <strong>{{ topics|length }}</strong>
-        <span>{{ topics|sum(attribute='count') }} questions</span>
-      </div>
-      {% endif %}
     </div>
   </header>
 
   {% if not topics %}
   <div class="np-domain-empty glass-panel np-glass">
-    <p>No MCQ banks are wired for this domain yet. Add a <code>.tex</code> bank and register it in <code>app.py</code>.</p>
+    <p>No banks are wired for this domain yet.</p>
   </div>
   {% else %}
   <div class="np-topic-grid">
     {% for t in topics %}
-    <article class="np-topic-card glass-panel np-glass{% if loop.first %} np-topic-card--featured{% endif %}">
-      <span class="np-topic-card-index" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span>
-      <div class="np-topic-card-top">
-        <div>
-          <p class="np-topic-card-kicker">{% if loop.first %}Recommended start{% else %}Focused slice{% endif %}</p>
-          <h2 class="np-topic-card-title">{{ t.title }}</h2>
-        </div>
-        <span class="np-topic-card-count">{{ t.count }} items</span>
-      </div>
-      <p class="np-topic-card-desc">
-        {% if loop.first %}
-        Mixed run across the complete bank for this unit. Best for diagnostics and review.
-        {% else %}
-        Focus only this chapter, then review missed items from the session summary.
-        {% endif %}
-      </p>
-      <div class="np-topic-card-bottom">
-        <a href="{% if domain == 'placement' %}{{ url_for('placement_start') }}{% else %}/practice/{{ domain }}/{{ t.key }}/0{% endif %}" class="big-btn mp-btn-pill np-topic-card-btn">Start</a>
-        <span class="np-topic-card-arrow" aria-hidden="true">→</span>
-      </div>
+    <article class="np-topic-card glass-panel np-glass">
+      <h2 class="np-topic-card-title">{{ t.title }}</h2>
+      <span class="np-topic-card-count">{{ t.count }} items</span>
+      <a href="{% if domain == 'placement' %}{{ url_for('placement_start') }}{% else %}/practice/{{ domain }}/{{ t.key }}/0{% endif %}" class="big-btn mp-btn-pill np-topic-card-btn">Start</a>
     </article>
     {% endfor %}
   </div>
   {% endif %}
 </div>
+{% endif %}
 </div>
-
 {% endblock %}

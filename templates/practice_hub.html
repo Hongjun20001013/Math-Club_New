@@ -2,132 +2,113 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-sat-hub">
-    <header class="np-sh-hero np-sh-hero--lux glass-panel np-glass mp-animate-in" id="np-sh-hero">
-        <div class="np-sh-hero-noise" aria-hidden="true"></div>
-        <div class="np-sh-hero-glow" aria-hidden="true"></div>
-        <div class="np-sh-hero-inner">
-            <div class="np-sh-hero-head">
-                <div class="np-sh-hero-copy">
-                    <p class="np-sh-eyebrow">SAT Math Workspace</p>
-                    <h1 class="np-sh-title">Your SAT command center</h1>
-                    <p class="np-sh-subzh">Choose a focused drill, review mistakes, or jump straight into a full Unit 1–4 bank.</p>
-                </div>
-                <button type="button" id="np-sh-theme-toggle" class="sat-theme-toggle np-sh-theme-toggle" title="Appearance" aria-label="Toggle workspace theme" aria-pressed="false">
-                    <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
-                    <span class="sat-theme-toggle-label">Light</span>
-                </button>
-            </div>
-            <p class="np-sh-lead">Units 1–4 are live with instant scoring, per-session summaries, mistake tagging, and topic-level navigation. Start with the training room, or open a unit directly below.</p>
-            <div class="np-upgrade-path" aria-label="Recommended practice flow">
-                <span class="np-upgrade-path-item">
-                    <strong>1</strong>
-                    Pick a unit
-                </span>
-                <span class="np-upgrade-path-line" aria-hidden="true"></span>
-                <span class="np-upgrade-path-item">
-                    <strong>2</strong>
-                    Answer with timer + tools
-                </span>
-                <span class="np-upgrade-path-line" aria-hidden="true"></span>
-                <span class="np-upgrade-path-item">
-                    <strong>3</strong>
-                    Review misses
-                </span>
-            </div>
-            <div class="np-sh-quick-row" aria-label="Quick SAT unit starts">
-                <a href="/practice/algebra/unit_1_all/0">Unit 1 · Algebra</a>
-                <a href="/practice/advanced_math/unit_2_all/0">Unit 2 · Advanced Math</a>
-                <a href="/practice/problem_solving/unit_3_all/0">Unit 3 · Data</a>
-                <a href="/practice/geometry/unit_4_all/0">Unit 4 · Geometry</a>
-            </div>
-        </div>
-    </header>
+<div class="np-sat-atelier">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">SAT Math</span>
+  </nav>
 
-    <div class="np-sh-grid">
-        <a href="{{ url_for('practice_specialized') }}" class="np-sh-card np-sh-card--live np-sh-card--tilt">
-            <span class="np-sh-card-icon" aria-hidden="true">01</span>
-            <span class="np-sh-card-pill np-sh-card-pill--live">Live</span>
-            <h2 class="np-sh-card-title">Specialized training</h2>
-            <p class="np-sh-card-desc">Chapter slices, full banks, and topic lists with one-tap starts.</p>
-            <span class="np-sh-card-cta">Open training room →</span>
-        </a>
-
-        <a href="{{ url_for('practice_challenge') }}" class="np-sh-card np-sh-card--live np-sh-card--tilt">
-            <span class="np-sh-card-icon" aria-hidden="true">02</span>
-            <span class="np-sh-card-pill np-sh-card-pill--live">Live</span>
-            <h2 class="np-sh-card-title">Hard problem drill</h2>
-            <p class="np-sh-card-desc">Hard Question Set 1 is live with advanced algebra and function challenges.</p>
-            <span class="np-sh-card-cta">Open hard drill →</span>
-        </a>
-
-        <a href="{{ url_for('practice_exams') }}" class="np-sh-card np-sh-card--soon np-sh-card--tilt">
-            <span class="np-sh-card-icon" aria-hidden="true">03</span>
-            <span class="np-sh-card-pill">Soon</span>
-            <h2 class="np-sh-card-title">Real exam practice</h2>
-            <p class="np-sh-card-desc">Timed mocks, section pacing, score snapshots, and exam-style review.</p>
-            <span class="np-sh-card-cta np-sh-card-cta--muted">Roadmap</span>
-        </a>
-
-        <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-sh-card np-sh-card--focus np-sh-card--tilt">
-            <span class="np-sh-card-icon" aria-hidden="true">04</span>
-            <span class="np-sh-card-pill np-sh-card-pill--focus">Core</span>
-            <h2 class="np-sh-card-title">Mistake analytics</h2>
-            <p class="np-sh-card-desc">Tags, notes, redo links, and weak-topic patterns after each session.</p>
-            <span class="np-sh-card-cta">Review mistakes →</span>
-        </a>
+  <header class="np-atelier-hero glass-panel np-glass mp-animate-in" id="np-atelier-hero">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div>
+      <p class="np-atelier-kicker">SAT Math Workspace</p>
+      <h1>Your SAT command center.</h1>
+      <p class="np-atelier-hero-lead">Units 1–4 are live with instant scoring, session reports, mistake tagging, and topic-level navigation. Pick a training mode below—or jump straight into a unit.</p>
+      <div class="np-atelier-hero-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>10</strong><span>hard sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>∞</strong><span>retries</span></div>
+      </div>
     </div>
+    <aside class="np-atelier-aside" aria-label="Quick unit starts">
+      <span class="np-atelier-aside-label">Fast lane</span>
+      <strong>Unit 1–4</strong>
+      <div class="np-atelier-aside-track" aria-hidden="true"><i style="width: 100%;"></i></div>
+      <em>Algebra · Advanced Math · Data · Geometry</em>
+      <div class="np-atelier-links">
+        <a href="/practice/algebra/unit_1_all/0">U1 full</a>
+        <a href="/practice/advanced_math/unit_2_all/0">U2 full</a>
+        <a href="/practice/problem_solving/unit_3_all/0">U3 full</a>
+        <a href="/practice/geometry/unit_4_all/0">U4 full</a>
+      </div>
+    </aside>
+  </header>
 
-    <section class="np-upgrade-studio glass-panel np-glass mp-animate-in" aria-label="Study experience highlights">
-        <div>
-            <p class="np-upgrade-eyebrow">Upgraded study flow</p>
-            <h2 class="np-upgrade-title">Practice now feels like a real study room.</h2>
-        </div>
-        <div class="np-upgrade-studio-grid">
-            <div class="np-upgrade-feature">
-                <span>Keyboard answers</span>
-                <strong>A–E</strong>
-            </div>
-            <div class="np-upgrade-feature">
-                <span>Scratch notes</span>
-                <strong>Saved</strong>
-            </div>
-            <div class="np-upgrade-feature">
-                <span>Review flag</span>
-                <strong>Local</strong>
-            </div>
-        </div>
-    </section>
+  <section class="np-atelier-bento np-atelier-bento--equal" aria-label="SAT training modes">
+    <a href="{{ url_for('practice_specialized') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">01</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Units 1–4</span>
+        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+      </div>
+      <h2 class="np-atelier-title">Specialized training</h2>
+      <span class="np-atelier-count">4 units · full banks + chapters</span>
+      <p class="np-atelier-desc">Full banks and chapter slices (1.1–1.5, etc.), session reports, and per-bank mistake redo.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Open training room →</span>
+      </footer>
+    </a>
+
+    <a href="{{ url_for('practice_challenge') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">02</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Advanced drill</span>
+        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+      </div>
+      <h2 class="np-atelier-title">Hard problem drill</h2>
+      <span class="np-atelier-count">10 sets · I–X</span>
+      <p class="np-atelier-desc">Hard Question Sets I–X with Roman numeral picker, PDFs, slides, and session reports.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Open hard drill →</span>
+      </footer>
+    </a>
+
+    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">03</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Review loop</span>
+        <span class="np-atelier-pill np-atelier-pill--core">Core</span>
+      </div>
+      <h2 class="np-atelier-title">Mistake analytics</h2>
+      <span class="np-atelier-count">Tags · patterns</span>
+      <p class="np-atelier-desc">Tags, notes, redo links, and weak-topic patterns after each session.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--primary">Review mistakes →</span>
+      </footer>
+    </a>
+
+    <a href="{{ url_for('practice_exams') }}" class="np-atelier-card np-atelier-card--hub">
+      <span class="np-atelier-card-glow" aria-hidden="true"></span>
+      <span class="np-atelier-card-watermark">04</span>
+      <div class="np-atelier-card-head">
+        <span class="np-atelier-kicker">Exam mode</span>
+        <span class="np-atelier-pill np-atelier-pill--soon">Soon</span>
+      </div>
+      <h2 class="np-atelier-title">Real exam practice</h2>
+      <span class="np-atelier-count">Timed mocks</span>
+      <p class="np-atelier-desc">Timed mocks, section pacing, score snapshots, and exam-style review.</p>
+      <footer class="np-atelier-foot">
+        <span class="np-atelier-btn np-atelier-btn--ghost">Roadmap</span>
+      </footer>
+    </a>
+  </section>
+
+  <section class="np-upgrade-studio glass-panel np-glass mp-animate-in" aria-label="Study experience highlights">
+    <div>
+      <p class="np-upgrade-eyebrow">Upgraded study flow</p>
+      <h2 class="np-upgrade-title">Practice now feels like a real study room.</h2>
+    </div>
+    <div class="np-upgrade-studio-grid">
+      <div class="np-upgrade-feature"><span>Keyboard answers</span><strong>A–E</strong></div>
+      <div class="np-upgrade-feature"><span>Scratch notes</span><strong>Saved</strong></div>
+      <div class="np-upgrade-feature"><span>Session reports</span><strong>Instant</strong></div>
+      <div class="np-upgrade-feature"><span>Mistake redo</span><strong>One tap</strong></div>
+    </div>
+  </section>
 </div>
 </div>
-
-<script>
-(() => {
-    const hero = document.getElementById("np-sh-hero");
-    if (!hero) return;
-    const move = (clientX, clientY) => {
-        const rect = hero.getBoundingClientRect();
-        const x = ((clientX - rect.left) / rect.width) * 100;
-        const y = ((clientY - rect.top) / rect.height) * 100;
-        hero.style.setProperty("--np-sh-glow-x", x + "%");
-        hero.style.setProperty("--np-sh-glow-y", y + "%");
-    };
-    hero.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
-    hero.addEventListener("mouseleave", () => {
-        hero.style.setProperty("--np-sh-glow-x", "70%");
-        hero.style.setProperty("--np-sh-glow-y", "22%");
-    });
-    document.querySelectorAll(".np-sh-card--tilt").forEach((el) => {
-        el.addEventListener("mousemove", (e) => {
-            const r = el.getBoundingClientRect();
-            const px = (e.clientX - r.left) / r.width - 0.5;
-            const py = (e.clientY - r.top) / r.height - 0.5;
-            el.style.transform = `perspective(880px) rotateX(${py * -3}deg) rotateY(${px * 4}deg) translateZ(0)`;
-        });
-        el.addEventListener("mouseleave", () => {
-            el.style.transform = "";
-        });
-    });
-})();
-</script>
 {% endblock %}
