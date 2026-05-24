@@ -1,0 +1,29 @@
+{
+  "_note": "Disaster-recovery seed (password hashes only). Regenerate: python3 scripts/export_users_seed.py",
+  "users": [
+    {
+      "username": "Jack",
+      "password_hash": "scrypt:32768:8:1$ar61fLbV6LdaJtQC$f94c262700b5400f97b4528d6048ac81941bbd991bc1faf2d4a15178bbb6e5bde619d2a53db35bd637f07a6bd632ed75e0cf826ec5d71cfa99c2445162922b40",
+      "role": "admin",
+      "is_active": 1
+    },
+    {
+      "username": "Peter@novelprep.edu",
+      "password_hash": "scrypt:32768:8:1$QR2ZfWr7tgUgBbFi$5bac8259806dd729795de53f7243af959aac02f4e9fa792a1c7ce26084a1c48e4c86ba1b12ba87b2f71a0a080e3af113a3582c4d57829e127670f55addcccab1",
+      "role": "student",
+      "is_active": 1
+    },
+    {
+      "username": "JerryWang@novelprep.edu",
+      "password_hash": "scrypt:32768:8:1$HHjy1b8IBhvHXyOm$22c97385a5c7fc1055e82eee1d102d9a61436988a111e9ea594e9ad735ea6d239da29fc5688e3e6eeb94b5d1400307eb1635d262d501ae578915deb9877fa063",
+      "role": "student",
+      "is_active": 1
+    },
+    {
+      "username": "Nilam.Yu@novelprep.org",
+      "password_hash": "scrypt:32768:8:1$Sw6SgmIDSGxiLQB1$b33fec0577783baaa7410234dd30e2a43e1675b29a9808e58d07b516eed5ea91b3f0004031b199679b0caa70a474587822f1fae2a2958f836a2ae114898dd6e2",
+      "role": "student",
+      "is_active": 1
+    }
+  ]
+}

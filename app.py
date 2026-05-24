@@ -3,10 +3,12 @@ from answer_grader import grade_for_db, response_is_correct
 from latex_parser import parse_placement_tex_file, parse_tex_file
 
 import json
+import glob
 import os
 import random
 import re
 import secrets
+import shutil
 import sqlite3
 import time
 from collections import defaultdict
@@ -60,6 +62,8 @@ def _resolve_db_path() -> str:
 
 
 DB_PATH = _resolve_db_path()
+SEED_USERS_PATH = os.path.join(APP_DIR, "data", "render_users_seed.json")
+RENDER_BACKUP_DIR = os.path.join(RENDER_PERSISTENT_DB_DIR, "backups")
 
 COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
@@ -85,7 +89,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260523-student-guide-v2")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260524-db-backup-seed")
 
 
 def _site_brand_name() -> str:
@@ -220,14 +224,110 @@ def _db_persistence_status() -> dict[str, Any]:
     }
 
 
+def _sqlite_has_admin(db_path: str) -> bool:
+    if not os.path.isfile(db_path):
+        return False
+    try:
+        conn = sqlite3.connect(db_path)
+        row = conn.execute(
+            "SELECT 1 FROM users WHERE role = 'admin' AND is_active = 1 LIMIT 1"
+        ).fetchone()
+        conn.close()
+        return row is not None
+    except sqlite3.Error:
+        return False
+
+
+def _try_restore_from_render_backups() -> None:
+    """If the live DB lost accounts, restore the newest on-disk backup."""
+    target = os.path.abspath(DB_PATH)
+    if _sqlite_has_admin(target):
+        return
+    if not os.path.isdir(RENDER_BACKUP_DIR):
+        return
+    for path in sorted(glob.glob(os.path.join(RENDER_BACKUP_DIR, "sat-*.db")), reverse=True):
+        if _sqlite_has_admin(path):
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            shutil.copy2(path, target)
+            app.logger.warning("Restored SQLite database from backup %s", path)
+            return
+
+
+def _maybe_auto_backup_database() -> None:
+    """Hourly snapshot on Render persistent disk (survives redeploys)."""
+    if not _is_render_runtime() or not _path_on_render_disk(DB_PATH) or not os.path.isfile(DB_PATH):
+        return
+    os.makedirs(RENDER_BACKUP_DIR, exist_ok=True)
+    marker = os.path.join(RENDER_BACKUP_DIR, ".last_backup")
+    now = time.time()
+    if os.path.isfile(marker) and now - os.path.getmtime(marker) < 6 * 3600:
+        return
+    stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    dest = os.path.join(RENDER_BACKUP_DIR, f"sat-{stamp}.db")
+    shutil.copy2(DB_PATH, dest)
+    with open(marker, "w", encoding="utf-8") as fh:
+        fh.write(stamp)
+    backups = sorted(glob.glob(os.path.join(RENDER_BACKUP_DIR, "sat-*.db")))
+    for old in backups[:-15]:
+        try:
+            os.remove(old)
+        except OSError:
+            pass
+    app.logger.info("SQLite backup saved to %s", dest)
+
+
+def _seed_users_if_empty(db: sqlite3.Connection) -> None:
+    """Restore known accounts when Render DB was wiped (hashes only, no plaintext passwords)."""
+    if _admin_exists(db):
+        return
+    if not os.path.isfile(SEED_USERS_PATH):
+        return
+    try:
+        with open(SEED_USERS_PATH, encoding="utf-8") as fh:
+            payload = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return
+    users = payload.get("users") or []
+    if not isinstance(users, list):
+        return
+    inserted = 0
+    for row in users:
+        if not isinstance(row, dict):
+            continue
+        username = str(row.get("username") or "").strip()
+        password_hash = str(row.get("password_hash") or "").strip()
+        if not username or not password_hash:
+            continue
+        role = str(row.get("role") or ROLE_STUDENT)
+        is_active = int(row.get("is_active") or 1)
+        try:
+            db.execute(
+                """
+                INSERT INTO users (
+                    username, password, password_hash, role, is_active,
+                    created_at, password_changed_at
+                )
+                VALUES (?, '', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """,
+                (username, password_hash, role, is_active),
+            )
+            inserted += 1
+        except sqlite3.IntegrityError:
+            pass
+    if inserted:
+        db.commit()
+        app.logger.warning(
+            "Seeded %s account(s) from render_users_seed.json after empty database.",
+            inserted,
+        )
+
+
 def _maybe_migrate_ephemeral_db() -> None:
     """One-time copy if accounts were created before persistent disk was configured."""
     legacy = os.path.abspath(LEGACY_EPHEMERAL_DB_PATH)
     target = os.path.abspath(DB_PATH)
     if legacy == target or os.path.isfile(target) or not os.path.isfile(legacy):
         return
-    import shutil
-
     os.makedirs(os.path.dirname(target), exist_ok=True)
     shutil.copy2(legacy, target)
     app.logger.warning("Copied legacy SQLite database from %s to %s", legacy, target)
@@ -238,6 +338,7 @@ def _bootstrap_db_storage() -> None:
     if parent:
         os.makedirs(parent, exist_ok=True)
     _maybe_migrate_ephemeral_db()
+    _try_restore_from_render_backups()
     status = _db_persistence_status()
     if status["on_render"] and not status["persistence_ok"]:
         app.logger.error(
@@ -363,12 +464,14 @@ def init_db():
         "CREATE INDEX IF NOT EXISTS idx_mistake_progress_learner "
         "ON mistake_learning_progress(learner_key)"
     )
+    _seed_users_if_empty(db)
+    _maybe_auto_backup_database()
     db.commit()
 
 
 @app.before_request
 def ensure_db_initialized():
-    if request.endpoint in ("health", "health_stylesheet_bundle"):
+    if request.endpoint in ("health", "health_db", "health_stylesheet_bundle"):
         return
     init_db()
 
