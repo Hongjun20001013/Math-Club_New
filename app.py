@@ -85,7 +85,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260523-student-guide")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260523-student-guide-v2")
 
 
 def _site_brand_name() -> str:
