@@ -876,6 +876,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_12": "banks/hard/hard_12.tex",
         "hard_13": "banks/hard/hard_13.tex",
         "hard_14": "banks/hard/hard_14.tex",
+        "hard_16": "banks/hard/hard_16.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -1105,6 +1106,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-14-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_16": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_16.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable worksheet — Hard Practice XVI.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-16-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_16_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Slide deck with worked solutions for classroom review.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-16-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -1562,6 +1579,7 @@ TOPIC_TITLES = {
     "hard_12": "SAT Hard Question Set 12 (Practice XII)",
     "hard_13": "SAT Hard Question Set 13 (Practice XIII)",
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
+    "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Course placement (full diagnostic)",
 }
@@ -1804,6 +1822,21 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "1944"},
         {"correct_answer": "A"},
         {"correct_answer": "127"},
+    ],
+    "hard_16": [
+        {"correct_answer": "1.6", "answer_alternates": ["8/5", "1.60"]},
+        {"correct_answer": "51"},
+        {"correct_answer": "14500", "answer_alternates": ["14,500", "14500"]},
+        {"correct_answer": "13"},
+        {"correct_answer": "D"},
+        {"correct_answer": "6.2"},
+        {"correct_answer": "B"},
+        {"correct_answer": "-5/3", "answer_alternates": ["-1.667", "-1.67"]},
+        {"correct_answer": "167"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "31.8"},
     ],
 }
 
@@ -3885,8 +3918,14 @@ def practice_challenge():
                 n -= amount
         return out
 
+    def _hard_set_number(topic: str, fallback_idx: int) -> int:
+        match = re.match(r"^hard_(\d+)$", topic)
+        return int(match.group(1)) if match else fallback_idx
+
     hard_sets = []
     for idx, (topic, tex_path) in enumerate(BANKS.get("hard_problem", {}).items(), start=1):
+        set_number = _hard_set_number(topic, idx)
+        set_roman = _int_to_roman(set_number)
         questions = get_questions_for_topic("hard_problem", topic, tex_path)
         answered_row = db.execute(
             """
@@ -3932,9 +3971,10 @@ def practice_challenge():
         hard_sets.append(
             {
                 "index": idx,
-                "roman": _int_to_roman(idx),
+                "set_number": set_number,
+                "roman": set_roman,
                 "topic": topic,
-                "title": f"Hard Practice {_int_to_roman(idx)}",
+                "title": f"Hard Practice {set_roman}",
                 "subtitle": TOPIC_TITLES.get(topic, f"SAT Hard Question Set {idx}"),
                 "total": total,
                 "answered": answered,
@@ -3945,7 +3985,7 @@ def practice_challenge():
                 "restart_href": url_for("practice_new_session", domain="hard_problem", topic=topic),
                 "status": "Continue" if answered else "Start",
                 "progress_state": progress_state,
-                "range_bucket": (idx - 1) // 10 + 1,
+                "range_bucket": (set_number - 1) // 10 + 1,
                 "is_live": total > 0,
                 "materials": materials,
             }

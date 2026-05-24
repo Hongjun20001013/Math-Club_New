@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against all items in hard_1–hard_14 (May 2026). PPT slide topics cross-checked.",
+  "_notes": "Audited against all items in hard_1–hard_16 (May 2026). PPT slide topics cross-checked.",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -182,5 +182,20 @@
     {"unit": "U2", "skill": "Exponential sequence / percent increase"},
     {"unit": "U4", "skill": "Square pyramid height"},
     {"unit": "U2", "skill": "Radical equation (one solution)"}
+  ],
+  "hard_16": [
+    {"unit": "U2", "skill": "Projectile / quadratic model"},
+    {"unit": "U1", "skill": "Consecutive integers"},
+    {"unit": "U3", "skill": "Percent relationships / survey"},
+    {"unit": "U1", "skill": "Linear system (no solution)"},
+    {"unit": "U3", "skill": "Unit conversion (area density)"},
+    {"unit": "U2", "skill": "Quadratic roots / product"},
+    {"unit": "U4", "skill": "Rectangular prism surface area"},
+    {"unit": "U4", "skill": "Unit circle / trigonometry"},
+    {"unit": "U2", "skill": "Radical quadratic function"},
+    {"unit": "U3", "skill": "Linear cost model"},
+    {"unit": "U3", "skill": "Promotion pricing model"},
+    {"unit": "U2", "skill": "Quadratic vertex form"},
+    {"unit": "U3", "skill": "Percent composition / word problem"}
   ]
 }

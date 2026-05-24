@@ -8121,52 +8121,52 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
 
 .sat-stem-body .stem-figure-img--hard {
     display: block;
-    width: min(100%, 320px);
-    max-height: 240px;
+    width: min(100%, 280px);
+    max-height: 200px;
     object-fit: contain;
-    margin: 0 auto clamp(16px, 3vw, 26px);
-    border-radius: 18px;
-    box-shadow: 0 18px 42px rgba(20, 18, 40, 0.1);
+    margin: 0 auto clamp(12px, 2.5vw, 20px);
+    border-radius: 16px;
+    box-shadow: 0 14px 32px rgba(20, 18, 40, 0.08);
 }
 
 .sat-stem-body .stem-figure-img--hard[src$="hard_2_f1.png"] {
-    width: min(100%, 340px);
-    max-height: 260px;
-}
-
-.sat-stem-body .stem-figure-img--hard[src$="hard_2_f2.jpg"] {
-    width: min(100%, 360px);
-    max-height: 280px;
-}
-
-.sat-stem-body .stem-figure-img--hard[src$="hard_3_f9.png"] {
     width: min(100%, 300px);
     max-height: 220px;
 }
 
-.sat-stem-body .stem-figure-img--hard[src$="hard_7_f4.png"] {
+.sat-stem-body .stem-figure-img--hard[src$="hard_2_f2.jpg"] {
     width: min(100%, 320px);
     max-height: 240px;
+}
+
+.sat-stem-body .stem-figure-img--hard[src$="hard_3_f9.png"] {
+    width: min(100%, 260px);
+    max-height: 190px;
+}
+
+.sat-stem-body .stem-figure-img--hard[src$="hard_7_f4.png"] {
+    width: min(100%, 280px);
+    max-height: 200px;
 }
 
 .sat-stem-body .stem-figure-img--hard[src$="hard_8_f5.png"] {
-    width: min(100%, 340px);
-    max-height: 220px;
+    width: min(100%, 300px);
+    max-height: 190px;
 }
 
 .sat-stem-body .stem-figure-img--hard[src$="hard_9_f7.png"] {
-    width: min(100%, 340px);
-    max-height: 240px;
+    width: min(100%, 300px);
+    max-height: 200px;
 }
 
 .sat-stem-body .stem-figure-img--hard[src$="hard_10_f8.png"] {
-    width: min(100%, 320px);
-    max-height: 240px;
+    width: min(100%, 280px);
+    max-height: 200px;
 }
 
 .sat-stem-body .stem-figure-img--hard[src$="hard_14_f12.png"] {
-    width: min(100%, 360px);
-    max-height: 260px;
+    width: min(100%, 300px);
+    max-height: 220px;
 }
 
 .sat-stem-body .stem-table-wrap + .stem-table-wrap {
@@ -21862,6 +21862,33 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     box-shadow:
         0 16px 36px rgba(79, 50, 240, 0.14),
         inset 0 0 0 1px rgba(91, 77, 255, 0.08);
+}
+
+.np-hard-picker-tile--featured {
+    border-color: rgba(79, 50, 240, 0.16);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 241, 255, 0.88) 100%);
+    box-shadow: inset 0 0 0 1px rgba(91, 77, 255, 0.06);
+}
+
+.np-hard-picker-tile--featured::after {
+    content: "New";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #5b4dff, #4f32f0);
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.np-hard-quick-nav-btn[data-set-number="16"] {
+    border-color: rgba(79, 50, 240, 0.22);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 241, 255, 0.9));
 }
 
 .np-hard-picker-tip {

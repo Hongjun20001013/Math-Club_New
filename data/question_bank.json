@@ -12038,6 +12038,98 @@
         "choices": [],
         "question_kind": "free_response"
       }
+    ],
+    "hard_16": [
+      {
+        "stem": "<p>The function \\(h\\) is defined as:</p>\n<div class=\"stem-math-block\">\\[\nh(t) = -16t^2 + b\n\\]</div>\n<p>The function \\(h\\) estimates an object's height, in feet, above the ground \\(t\\) seconds after the object is dropped, where \\(b\\) is a constant.</p>\n<p>The function estimates that the object is \\(40.96\\) feet above the ground when it is dropped at \\(t = 0\\).</p>\n<p>How many seconds after being dropped does the function estimate the object will hit the ground?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>For a set of three consecutive integers, the result of subtracting the greatest integer from the sum of the other two integers is \\(48\\).</p>\n<p>What is the value of the greatest of the three integers?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A researcher surveyed undergraduate students, graduate students, and postdoctoral students. The number of undergraduate students surveyed was \\(7,150%\\) of the number of postdoctoral students surveyed, and the number of graduate students surveyed was \\(45%\\) of the number of undergraduate students surveyed.</p>\n<p>If there were \\(6,435\\) graduate students surveyed, what was the sum of the number of undergraduate students and postdoctoral students surveyed?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n16x - 20y &= 6y + 8 \\\\\nty &= 8x + \\frac{1}{5}\n\\end{aligned}\n\\]</div>\n<p>In the given system of equations, \\(t\\) is a constant. If the system has no solution, what is the value of \\(t\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>The bone mineral density of a certain person's thoracic spine was estimated to be \\(0.812\\) grams per square centimeter. What is this estimated bone mineral density in grams per square millimeter? (\\(1\\) centimeter \\(= 10\\) millimeters)</p>",
+        "choices": [
+          "\\(81.2\\)",
+          "\\(8.12\\)",
+          "\\(0.0812\\)",
+          "\\(0.00812\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{5}{9}(5x + 9)\\left(x + \\sqrt{5k + 9}\\right)\\left(x - \\sqrt{5k + 9}\\right) = 0\n\\]</div>\n<p>In the given equation, \\(k\\) is a positive constant. The product of the solutions to the equation is \\(72\\).</p>\n<p>What is the value of \\(k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A right rectangular prism has a base area of \\(56t\\) square centimeters (\\(\\text{cm}^2\\)). The length of the base of the rectangular prism is \\(\\frac{14}{3}\\) cm, and the height of the rectangular prism is \\(3\\) cm.</p>\n<p>Which expression represents the surface area, in \\(\\text{cm}^2\\), of the right rectangular prism?</p>",
+        "choices": [
+          "\\(112t + 56\\)",
+          "\\(184t + 28\\)",
+          "\\(1,680t + 28\\)",
+          "\\(168t\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>In the \\(xy\\)-plane, a unit circle with center at the origin \\(O\\) contains point \\(A\\) with coordinates \\((1, 0)\\) and point \\(B\\) with coordinates \\(\\left(\\frac{5}{\\sqrt{34}}, -\\frac{3}{\\sqrt{34}}\\right)\\).</p>\n<p>If the measure of angle \\(AOB\\) is \\(p\\) radians, what is the value of \\(\\frac{\\cos p}{\\sin p}\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>The function \\(h\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nh(x) = -\\sqrt{x^2 + bx + c},\n\\]</div>\n<p>where \\(b\\) and \\(c\\) are constants. In the \\(xy\\)-plane, the graph of \\(y = h(x)\\) contains the points \\((2, 0)\\) and \\(\\left(0, -\\sqrt{334}\\right)\\).</p>\n<p>If \\(h(m) = 0\\), what is the greatest possible value of \\(m\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      },
+      {
+        "stem": "<p>A computer repair specialist charges \\(&#36;160\\) for the first two hours of repair plus an hourly fee for each additional hour. The total cost for \\(6\\) hours of repair is \\(&#36;360\\).</p>\n<p>Which function \\(f\\) gives the total cost, in dollars, for \\(x\\) hours of repair, where \\(x \\geq 2\\)?</p>",
+        "choices": [
+          "\\(f(x) = 50x + 60\\)",
+          "\\(f(x) = 50x + 160\\)",
+          "\\(f(x) = 60x\\)",
+          "\\(f(x) = 60x + 160\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>A painting studio is offering a promotion where the first class is free, the second class is half off the regular price, and the remaining classes are regularly priced. If the regular price of a class is \\(&#36;26.40\\), which function \\(f\\) gives the total cost, in dollars, of \\(x\\) classes taken using this promotion, where \\(x > 2\\)?</p>",
+        "choices": [
+          "\\(f(x) = 26.40(x - 1) + 13.20\\)",
+          "\\(f(x) = 26.40(x - 2) + 13.20\\)",
+          "\\(f(x) = 26.40(x - 1) + 13.20(x - 2)\\)",
+          "\\(f(x) = 26.40(x - 2) + 13.20(x - 1)\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The function \\(f\\) is defined by the given equation:</p>\n<div class=\"stem-math-block\">\\[\nf(x) = x^2 - 4x - 320\n\\]</div>\n<p>Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?</p>",
+        "choices": [
+          "\\(f(x) = x^2 - 4(x + 80)\\)",
+          "\\(f(x) = (x - 2)^2 + (-324)\\)",
+          "\\(f(x) = x(x - 4) + (-320)\\)",
+          "\\(f(x) = (x + 16)(x - 20)\\)"
+        ],
+        "question_kind": "mcq"
+      },
+      {
+        "stem": "<p>The composition of an animal is defined as the muscles, bones, and fat of the animal. A scientist studied the composition of one young swamp buffalo and determined the buffalo had \\(133\\) kilograms of muscle, which made up approximately \\(65.9%\\) of its composition. Of the remaining composition of this buffalo, approximately \\(46.2%\\) was bone, and the remainder was fat. Based on these approximations, to the nearest tenth, how many kilograms of this buffalo's composition was bone?</p>",
+        "choices": [],
+        "question_kind": "free_response"
+      }
     ]
   },
   "placement": {
