@@ -7599,7 +7599,9 @@ html[data-exam-theme="dark"] .sat-stem-body .stem-table th {
 
 .sat-stem-body .stem-table-wrap {
     margin: 1.1em auto 1.25em;
-    max-width: min(100%, 480px);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: visible;
     border-radius: 0;
     box-shadow:
         0 10px 24px rgba(49, 38, 130, 0.055),
@@ -7607,24 +7609,38 @@ html[data-exam-theme="dark"] .sat-stem-body .stem-table th {
 }
 
 .sat-stem-body .stem-table {
-    width: auto;
-    min-width: min(100%, 420px);
+    width: 100%;
+    min-width: 0;
     margin: 0;
     font-family: "DM Sans", system-ui, sans-serif;
-    font-size: 0.92rem;
+    font-size: clamp(0.94rem, 1.05vw, 1.02rem);
+    table-layout: auto;
 }
 
 .sat-stem-body .stem-table th,
 .sat-stem-body .stem-table td {
-    padding: 13px 18px;
+    padding: 14px 18px;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.4;
+    vertical-align: middle;
 }
 
 .sat-stem-body .stem-table th:first-child,
 .sat-stem-body .stem-table td:first-child {
     text-align: left;
     font-weight: 700;
+}
+
+.sat-stem-body .stem-table td:not(:first-child) {
+    white-space: nowrap;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sat-stem-body .stem-table th:not(:first-child) {
+    text-align: center;
+    min-width: 7.5rem;
 }
 
 .sat-stem-body mjx-container {
@@ -8174,10 +8190,12 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
 }
 
 @media (min-width: 640px) {
-    .sat-stem-body p + .stem-table-wrap,
-    .sat-stem-body .stem-table-wrap:not(:only-of-type) {
+    /* Side-by-side small comparison tables only (e.g. A/B/C/D frequency tables) */
+    .sat-stem-body .stem-table-wrap:not(:only-of-type),
+    .sat-stem-body p + .stem-table-wrap:not(:only-of-type) {
         display: inline-block;
         vertical-align: top;
+        width: auto;
         max-width: min(100%, 240px);
         margin-right: 0.85em;
     }
