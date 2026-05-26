@@ -89,7 +89,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260524-stem-table-wide")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-hard-units-keys")
 
 
 def _site_brand_name() -> str:
@@ -795,7 +795,7 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
     if isinstance(topic_questions, list) and topic_questions:
         if domain == "placement":
             return apply_placement_calculator_flags([dict(q) for q in topic_questions])
-        return topic_questions
+        return _finalize_questions(domain, topic, topic_questions)
 
     full_path = os.path.join(APP_DIR, file_path)
     if not os.path.isfile(full_path):
@@ -809,15 +809,7 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         return []
     if domain == "placement":
         return apply_placement_calculator_flags(qs)
-    if domain == "hard_problem":
-        keys = HARD_ANSWER_KEYS.get(topic, [])
-        out = [dict(q) for q in qs]
-        for i, meta in enumerate(keys):
-            if i < len(out):
-                out[i].update(meta)
-        _apply_hard_question_units(topic, out)
-        return out
-    return qs
+    return _finalize_questions(domain, topic, qs)
 
 
 # =====================================================
@@ -1591,6 +1583,14 @@ SAT_UNIT_LABELS: Dict[str, tuple[str, str]] = {
     "U4": ("Unit 4", "Geometry"),
 }
 
+# SAT Math domain → four-unit taxonomy (specialized training banks).
+DOMAIN_SAT_UNIT: Dict[str, tuple[str, str]] = {
+    "algebra": SAT_UNIT_LABELS["U1"],
+    "advanced_math": SAT_UNIT_LABELS["U2"],
+    "problem_solving": SAT_UNIT_LABELS["U3"],
+    "geometry": SAT_UNIT_LABELS["U4"],
+}
+
 # Per-question SAT unit tags for Hard Problem Drill — see data/hard_question_units.json
 _HARD_UNITS_CACHE: Dict[str, List[dict]] | None = None
 
@@ -1615,9 +1615,52 @@ def _load_hard_question_units() -> Dict[str, List[dict]]:
     return out
 
 
+def _enrich_domain_sat_unit(domain: str, questions: List[dict]) -> None:
+    pair = DOMAIN_SAT_UNIT.get(domain)
+    if not pair:
+        return
+    unit_label, unit_title = pair
+    for q in questions:
+        q["sat_unit_label"] = unit_label
+        q["sat_unit_title"] = unit_title
+
+
+def _apply_hard_question_metadata(topic: str, questions: List[dict]) -> None:
+    keys = HARD_ANSWER_KEYS.get(topic, [])
+    for i, meta in enumerate(keys):
+        if i < len(questions):
+            questions[i].update(meta)
+    _apply_hard_question_units(topic, questions)
+
+
+def _finalize_questions(domain: str, topic: str, questions: List[dict]) -> List[dict]:
+    out = [dict(q) for q in questions]
+    if domain == "hard_problem":
+        _apply_hard_question_metadata(topic, out)
+    elif domain in DOMAIN_SAT_UNIT:
+        _enrich_domain_sat_unit(domain, out)
+    return out
+
+
 def _hard_unit_meta(unit_key: str) -> tuple[str, str]:
     sec, title = SAT_UNIT_LABELS.get(unit_key, ("—", ""))
     return sec, title
+
+
+def _summary_topic_fields(domain: str, qobj: dict) -> tuple[str, str, str]:
+    """Return (section tag, unit title, detail line) for session summary topic column."""
+    if domain == "hard_problem":
+        sec = str(qobj.get("knowledge_section") or "—")
+        title = str(qobj.get("knowledge_section_title_en") or "")
+        detail = str(qobj.get("hard_skill") or "")
+        return sec, title, detail
+    if domain in DOMAIN_SAT_UNIT:
+        sec, title = DOMAIN_SAT_UNIT[domain]
+        detail = str(qobj.get("knowledge_section_title_en") or qobj.get("knowledge_section") or "")
+        return sec, title, detail
+    sec = str(qobj.get("knowledge_section") or "—")
+    title = str(qobj.get("knowledge_section_title_en") or "")
+    return sec, title, ""
 
 
 def _apply_hard_question_units(topic: str, questions: List[dict]) -> None:
@@ -3381,6 +3424,7 @@ MISS_PART_BY_DOMAIN: Dict[str, str] = {
     "advanced_math": "unit2",
     "problem_solving": "unit3",
     "geometry": "unit4",
+    "hard_problem": "hard",
 }
 
 
@@ -3573,6 +3617,42 @@ def _analytics_partitions(rows: List[dict]) -> List[dict]:
     if sat_unit_parts:
         for mod in SAT_MISS_MODULE_SPECS:
             used_domains.add(str(mod["domain"]))
+        hard_rows = [r for r in rows if r.get("domain") == "hard_problem"]
+        if hard_rows:
+            used_domains.add("hard_problem")
+            hard_buckets: Dict[str, List[dict]] = defaultdict(list)
+            for row in hard_rows:
+                sec = str(row.get("knowledge_section") or "").strip() or "—"
+                hard_buckets[sec].append(row)
+            hard_units: List[dict] = []
+            for sec in ("Unit 1", "Unit 2", "Unit 3", "Unit 4"):
+                urows = hard_buckets.get(sec, [])
+                if not urows:
+                    continue
+                sec_id = sec.replace(" ", "-").lower()
+                hard_units.append(
+                    {
+                        "id": f"hard-{sec_id}",
+                        "label": sec,
+                        "subtitle": (urows[0].get("knowledge_title") or "")[:120],
+                        "order": _knowledge_section_sort_key(sec)[0],
+                        "rows": urows,
+                        "count": len(urows),
+                        "classifier": _build_mistake_classifier(urows),
+                    }
+                )
+            sat_unit_parts.append(
+                {
+                    "id": "hard",
+                    "label": "Hard Problem Drill",
+                    "subtitle": "Hard sets I–XVI · classified by SAT unit",
+                    "count": len(hard_rows),
+                    "classifier": _build_mistake_classifier(hard_rows),
+                    "domains": {"hard_problem"},
+                    "unit_module_id": "hard",
+                    "units": hard_units,
+                }
+            )
         sat_all_rows: List[dict] = []
         for p in sat_unit_parts:
             for u in p["units"]:
@@ -3754,6 +3834,7 @@ _ANALYTICS_VIZ_PART_COLORS: Dict[str, str] = {
     "unit2": "#7c3aed",
     "unit3": "#db2777",
     "unit4": "#ea580c",
+    "hard": "#6366f1",
 }
 
 
@@ -5535,8 +5616,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         key = extract_correct_answer(qobj)
         r = by_q.get(i)
         disp = qobj.get("display_number", i + 1)
-        sec = qobj.get("knowledge_section", "—")
-        title_en = qobj.get("knowledge_section_title_en", "")
+        sec, title_en, topic_detail = _summary_topic_fields(domain, qobj)
         expl = qobj.get("explanation_en", "")
 
         if r is None:
@@ -5569,6 +5649,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
                 "row_id": f"summary-q-{i}",
                 "knowledge_section": sec,
                 "knowledge_title_en": title_en,
+                "topic_detail": topic_detail,
                 "hard_skill": qobj.get("hard_skill") or "",
                 "yours_display": yours,
                 "key_display": key_display,
@@ -5615,6 +5696,14 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         part_order = ("4.1", "4.2", "4.3", "4.4")
     elif domain == "hard_problem":
         part_order = ("Unit 1", "Unit 2", "Unit 3", "Unit 4")
+        acc_unit = defaultdict(lambda: {"correct": 0, "total": 0, "title": ""})
+        for row, qobj in zip(rows_out, questions):
+            sec = qobj.get("knowledge_section", "—")
+            acc_unit[sec]["total"] += 1
+            acc_unit[sec]["title"] = qobj.get("knowledge_section_title_en", "") or acc_unit[sec]["title"]
+            if row["status"] == "correct":
+                acc_unit[sec]["correct"] += 1
+        acc = acc_unit
     else:
         part_order = tuple(sorted(acc.keys(), key=lambda x: str(x)))
     for sec in part_order:

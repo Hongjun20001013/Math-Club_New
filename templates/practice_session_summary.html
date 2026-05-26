@@ -353,7 +353,7 @@
         <span class="col-topic">
           {% if row.knowledge_title_en %}
             <span class="np-topic-tag np-topic-tag--{{ row.knowledge_section|lower|replace(' ', '-') }}">{{ row.knowledge_section }}</span>
-            <span class="np-topic-name">{{ row.knowledge_title_en }}{% if row.hard_skill %} · {{ row.hard_skill }}{% endif %}</span>
+            <span class="np-topic-name">{{ row.knowledge_title_en }}{% if row.topic_detail %} · {{ row.topic_detail }}{% elif row.hard_skill %} · {{ row.hard_skill }}{% endif %}</span>
           {% else %}
             <span class="np-topic-muted">—</span>
           {% endif %}

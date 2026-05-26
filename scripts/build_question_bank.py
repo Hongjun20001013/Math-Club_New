@@ -12,7 +12,7 @@ _SOLUTION_HTML_PREFIX = '<article class="np-solution-pro"'
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import APP_DIR, BANKS
+from app import APP_DIR, BANKS, DOMAIN_SAT_UNIT, HARD_ANSWER_KEYS, _apply_hard_question_units, _enrich_domain_sat_unit
 from latex_parser import parse_placement_answer_key, parse_placement_tex_file, parse_tex_file
 
 
@@ -841,6 +841,14 @@ def build_bank():
                             q["correct_answer"] = ca
                 else:
                     questions = parse_tex_file(full_path)
+                if domain == "hard_problem":
+                    keys = HARD_ANSWER_KEYS.get(topic_key, [])
+                    for i, meta in enumerate(keys):
+                        if i < len(questions):
+                            questions[i].update(meta)
+                    _apply_hard_question_units(topic_key, questions)
+                elif domain in DOMAIN_SAT_UNIT:
+                    _enrich_domain_sat_unit(domain, questions)
             except Exception as exc:
                 report["failed_topics"].append(
                     {
