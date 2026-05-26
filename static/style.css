@@ -21665,10 +21665,30 @@ html[data-exam-theme="dark"] .np-login-preview-grid span {
 .np-admin-page .np-admin-search button,
 .np-admin-page .np-admin-student-actions button,
 .np-admin-page .np-admin-maintenance-box:not(.np-admin-maintenance-box--danger) button,
-.np-admin-page .np-admin-view-btn {
+.np-admin-page .np-admin-view-btn,
+.np-admin-page .np-admin-drawer-btn:not(.np-admin-drawer-btn--ghost):not(.np-admin-drawer-btn--danger) {
     background: linear-gradient(135deg, #1f7ae0, #2563eb);
     color: #fff;
     box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+}
+
+.np-admin-page .np-admin-drawer-btn--ghost {
+    background: rgba(79, 50, 240, 0.08);
+    color: #4f32f0;
+    box-shadow: none;
+}
+
+.np-admin-page .np-admin-drawer-btn--danger,
+.np-admin-page .np-admin-drawer-block--danger button {
+    background: linear-gradient(135deg, #8f1515, #b91c1c);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(185, 28, 28, 0.16);
+}
+
+.np-admin-page .np-admin-action-trigger {
+    background: rgba(255, 255, 255, 0.92);
+    color: #4f32f0;
+    box-shadow: none;
 }
 
 .np-admin-page .np-admin-maintenance-grid {
@@ -24488,7 +24508,7 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
 .np-admin-directory {
     border: 1px solid rgba(91, 77, 255, 0.1);
     border-radius: 22px;
-    overflow: hidden;
+    overflow: visible;
     background: rgba(255, 255, 255, 0.55);
 }
 
@@ -24499,6 +24519,11 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     gap: 12px 16px;
     align-items: center;
     padding: 14px 18px;
+}
+
+.np-admin-directory--staff .np-admin-directory-head,
+.np-admin-directory--staff .np-admin-directory-row {
+    grid-template-columns: minmax(240px, 1.6fr) 100px minmax(140px, 1fr) 96px;
 }
 
 .np-admin-directory-stats {
@@ -24513,24 +24538,37 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #9b93b0;
+    border-radius: 22px 22px 0 0;
 }
 
 .np-admin-directory-body {
     display: grid;
 }
 
-.np-admin-directory-row {
+.np-admin-dir-entry {
     border-bottom: 1px solid rgba(91, 77, 255, 0.08);
     background: rgba(255, 255, 255, 0.72);
     transition: background 0.14s ease;
 }
 
-.np-admin-directory-row:last-child {
+.np-admin-dir-entry:last-child {
     border-bottom: 0;
+    border-radius: 0 0 22px 22px;
 }
 
-.np-admin-directory-row:hover {
+.np-admin-dir-entry:hover,
+.np-admin-dir-entry.is-drawer-open {
     background: rgba(248, 246, 255, 0.92);
+}
+
+.np-admin-directory-row {
+    border-bottom: none;
+    background: transparent;
+    padding-bottom: 12px;
+}
+
+.np-admin-dir-entry.is-drawer-open .np-admin-directory-row {
+    padding-bottom: 8px;
 }
 
 .np-admin-directory-student {
@@ -24597,13 +24635,7 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     justify-content: flex-end;
 }
 
-.np-admin-directory-tools {
-    position: relative;
-}
-
-.np-admin-directory-tools > summary {
-    list-style: none;
-    cursor: pointer;
+.np-admin-action-trigger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -24614,53 +24646,93 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     background: rgba(255, 255, 255, 0.92);
     color: #4f32f0;
     font: 850 0.82rem / 1 "Manrope", sans-serif;
+    cursor: pointer;
     user-select: none;
+    transition: background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
 }
 
-.np-admin-directory-tools > summary::-webkit-details-marker {
-    display: none;
-}
-
-.np-admin-directory-tools[open] > summary {
+.np-admin-action-trigger:hover,
+.np-admin-action-trigger.is-open {
     background: rgba(79, 50, 240, 0.1);
-    border-color: rgba(79, 50, 240, 0.24);
+    border-color: rgba(79, 50, 240, 0.28);
+    box-shadow: 0 8px 20px rgba(79, 50, 240, 0.1);
 }
 
-.np-admin-directory-tools-panel {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    z-index: 12;
-    width: min(320px, calc(100vw - 48px));
+.np-admin-drawer {
+    padding: 0 16px 16px;
+}
+
+.np-admin-drawer-inner {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
-    padding: 14px;
+    padding: 14px 16px;
     border-radius: 18px;
-    border: 1px solid rgba(91, 77, 255, 0.14);
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 20px 50px rgba(42, 34, 120, 0.14);
+    border: 1px solid rgba(91, 77, 255, 0.12);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.np-admin-directory-form {
+.np-admin-directory--staff .np-admin-drawer-inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.np-admin-drawer-block {
     display: grid;
-    gap: 8px;
+    gap: 10px;
+    align-content: start;
+    min-width: 0;
 }
 
-.np-admin-directory-form label {
-    display: grid;
-    gap: 5px;
+.np-admin-drawer-block--danger {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(185, 28, 28, 0.16);
+    background: rgba(254, 242, 242, 0.65);
 }
 
-.np-admin-directory-form label span {
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.06em;
+.np-admin-drawer-title {
+    margin: 0;
+    font: 900 0.68rem / 1.2 "Manrope", sans-serif;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #9b93b0;
 }
 
-.np-admin-directory-form input {
+.np-admin-drawer-block--danger .np-admin-drawer-title {
+    color: #b91c1c;
+}
+
+.np-admin-drawer-hint {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #7a728d;
+}
+
+.np-admin-drawer-block--danger .np-admin-drawer-hint {
+    color: #991b1b;
+}
+
+.np-admin-drawer-links {
+    display: grid;
+    gap: 8px;
+}
+
+.np-admin-drawer-links form {
+    margin: 0;
+}
+
+.np-admin-drawer-inline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.np-admin-drawer-inline input {
     width: 100%;
+    min-width: 0;
     border: 1px solid rgba(91, 77, 255, 0.14);
     border-radius: 12px;
     padding: 10px 12px;
@@ -24668,8 +24740,11 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     background: rgba(255, 255, 255, 0.96);
 }
 
-.np-admin-directory-form button,
-.np-admin-directory-btn {
+.np-admin-drawer-inline--danger input {
+    border-color: rgba(185, 28, 28, 0.2);
+}
+
+.np-admin-drawer-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -24682,33 +24757,67 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     font: 850 0.84rem / 1 "Manrope", sans-serif;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.16);
+    white-space: nowrap;
 }
 
-.np-admin-directory-quick {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-.np-admin-directory-btn--ghost {
+.np-admin-drawer-btn--ghost {
     background: rgba(79, 50, 240, 0.08);
     color: #4f32f0;
     box-shadow: none;
 }
 
-.np-admin-directory-form--danger {
-    padding-top: 10px;
-    border-top: 1px solid rgba(185, 28, 28, 0.12);
-}
-
-.np-admin-directory-form--danger button {
+.np-admin-drawer-btn--danger {
     background: linear-gradient(135deg, #8f1515, #b91c1c);
-    box-shadow: 0 10px 22px rgba(185, 28, 28, 0.16);
+    box-shadow: 0 8px 18px rgba(185, 28, 28, 0.16);
 }
 
-.np-admin-directory-form--danger input {
-    border-color: rgba(185, 28, 28, 0.18);
+.np-admin-directory-stat--badge {
+    text-align: center;
+}
+
+.np-admin-directory-stat--badge .np-admin-status {
+    margin: 0 auto;
+}
+
+.np-admin-toolbar-form {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) minmax(160px, 0.8fr) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background: rgba(248, 246, 255, 0.72);
+}
+
+.np-admin-toolbar-field {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.np-admin-toolbar-field span {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9b93b0;
+}
+
+.np-admin-toolbar-field input {
+    width: 100%;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.np-admin-empty--inline {
+    margin: 0;
+    padding: 12px 4px 4px;
 }
 
 @media (max-width: 960px) {
@@ -24772,6 +24881,33 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
         color: #9b93b0;
         margin-bottom: 4px;
     }
+
+    .np-admin-directory--staff .np-admin-directory-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "student manage"
+            "stat1 stat2";
+    }
+
+    .np-admin-directory--staff .np-admin-directory-row > .np-admin-directory-stat:nth-of-type(1) {
+        grid-area: stat1;
+    }
+
+    .np-admin-directory--staff .np-admin-directory-row > .np-admin-directory-stat:nth-of-type(2) {
+        grid-area: stat2;
+    }
+
+    .np-admin-drawer-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .np-admin-toolbar-form {
+        grid-template-columns: 1fr;
+    }
+
+    .np-admin-drawer-inline {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 560px) {
@@ -24793,10 +24929,8 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
         width: 100%;
     }
 
-    .np-admin-directory-tools-panel {
-        right: auto;
-        left: 0;
-        width: min(100%, 320px);
+    .np-admin-drawer-inline {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -24823,12 +24957,16 @@ html[data-exam-theme="dark"] .np-admin-safety-note {
     color: #c9bfd9;
 }
 
-html[data-exam-theme="dark"] .np-admin-safety-metric,
 html[data-exam-theme="dark"] .np-admin-directory,
-html[data-exam-theme="dark"] .np-admin-directory-row,
-html[data-exam-theme="dark"] .np-admin-directory-tools-panel {
+html[data-exam-theme="dark"] .np-admin-dir-entry,
+html[data-exam-theme="dark"] .np-admin-drawer-inner {
     background: rgba(28, 24, 46, 0.82);
     border-color: rgba(200, 191, 255, 0.12);
+}
+
+html[data-exam-theme="dark"] .np-admin-drawer-block--danger {
+    background: rgba(69, 10, 10, 0.45);
+    border-color: rgba(248, 113, 113, 0.2);
 }
 
 html[data-exam-theme="dark"] .np-admin-safety-metric strong,
@@ -24843,16 +24981,21 @@ html[data-exam-theme="dark"] .np-admin-directory-head {
 
 html[data-exam-theme="dark"] .np-admin-safety-link,
 html[data-exam-theme="dark"] .np-admin-safety-btn,
-html[data-exam-theme="dark"] .np-admin-directory-tools > summary {
+html[data-exam-theme="dark"] .np-admin-action-trigger {
     background: rgba(18, 16, 30, 0.86);
     border-color: rgba(200, 191, 255, 0.14);
     color: #ddd6fe;
 }
 
-html[data-exam-theme="dark"] .np-admin-directory-form input {
+html[data-exam-theme="dark"] .np-admin-drawer-inline input,
+html[data-exam-theme="dark"] .np-admin-toolbar-field input {
     background: rgba(18, 16, 30, 0.86);
     border-color: rgba(200, 191, 255, 0.14);
     color: #f8f6ff;
+}
+
+html[data-exam-theme="dark"] .np-admin-toolbar-form {
+    background: rgba(24, 21, 38, 0.72);
 }
 
 .np-admin-persist-warn {

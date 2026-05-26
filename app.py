@@ -93,7 +93,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-admin-directory")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260526-admin-drawer")
 
 
 def _site_brand_name() -> str:
@@ -7049,6 +7049,32 @@ def admin_toggle_staff_active(user_id: int):
         db.commit()
         flash("Colleague account status updated.")
         _backup_after_account_change(db)
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/staff/<int:user_id>/delete", methods=["POST"])
+def admin_delete_staff(user_id: int):
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    confirm = _admin_confirm_value(request.form.get("confirm", ""))
+    db = get_db()
+    row = db.execute(
+        "SELECT username FROM users WHERE id = ? AND role = ?",
+        (user_id, ROLE_STAFF),
+    ).fetchone()
+    if row is None:
+        flash("Colleague account not found.")
+        return redirect(url_for("admin"))
+    if confirm != "DELETE":
+        flash("Type DELETE to permanently remove a colleague account.")
+        return redirect(url_for("admin"))
+
+    db.execute("DELETE FROM users WHERE id = ? AND role = ?", (user_id, ROLE_STAFF))
+    db.commit()
+    flash(f"Deleted colleague account {row['username']}.")
+    _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 

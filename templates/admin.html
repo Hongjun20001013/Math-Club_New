@@ -138,49 +138,85 @@
     </section>
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
-      <header class="np-admin-section-head">
+      <header class="np-admin-section-head np-admin-section-head--split">
         <div>
           <p class="np-admin-kicker">Team access</p>
           <h2 id="np-admin-add-staff">Colleague accounts</h2>
           <p>Staff can view students and register accounts — not wipe data or manage other staff.</p>
         </div>
       </header>
-      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-inline-form">
-        <label>
+      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-toolbar-form">
+        <label class="np-admin-toolbar-field">
           <span>Email or username</span>
           <input name="username" type="text" autocomplete="username" placeholder="teacher@example.com" required>
         </label>
-        <label>
+        <label class="np-admin-toolbar-field">
           <span>Password</span>
           <input name="password" type="text" autocomplete="new-password" placeholder="Temporary password" required>
         </label>
         <button type="submit" class="np-admin-btn np-admin-btn--primary">Create colleague</button>
       </form>
+
       {% if staff_members %}
-      <div class="np-admin-student-list np-admin-staff-list">
-        {% for member in staff_members %}
-        <article class="np-admin-student-row np-admin-student-row--studio">
-          <div class="np-admin-student-avatar" aria-hidden="true">{{ member.username[:1]|upper }}</div>
-          <div class="np-admin-student-main">
-            <strong>{{ member.username }}</strong>
-            <span>Staff · {{ member.created_at or "Unknown" }}</span>
-            <span class="np-admin-status{% if not member.is_active %} is-inactive{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
-          </div>
-          <div class="np-admin-student-metrics">
-            <span>Last login · {{ member.last_login_at or "Never" }}</span>
-          </div>
-          <div class="np-admin-student-actions">
-            <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}">
-              <input name="password" type="text" placeholder="New password" aria-label="New password for {{ member.username }}" required>
-              <button type="submit">Reset</button>
-            </form>
-            <form method="post" action="{{ url_for('admin_toggle_staff_active', user_id=member.id) }}">
-              <button type="submit">{{ "Deactivate" if member.is_active else "Reactivate" }}</button>
-            </form>
-          </div>
-        </article>
-        {% endfor %}
+      <div class="np-admin-directory np-admin-directory--staff">
+        <div class="np-admin-directory-head" aria-hidden="true">
+          <span>Colleague</span>
+          <span>Status</span>
+          <span>Last login</span>
+          <span>Manage</span>
+        </div>
+        <div class="np-admin-directory-body">
+          {% for member in staff_members %}
+          <article class="np-admin-dir-entry" data-admin-entry>
+            <div class="np-admin-directory-row">
+              <div class="np-admin-directory-student">
+                <div class="np-admin-student-avatar" aria-hidden="true">{{ member.username[:1]|upper }}</div>
+                <div class="np-admin-directory-identity">
+                  <strong>{{ member.username }}</strong>
+                  <span class="np-admin-directory-meta">Staff · joined {{ member.created_at or "—" }}</span>
+                </div>
+              </div>
+              <div class="np-admin-directory-stat np-admin-directory-stat--badge" data-label="Status">
+                <span class="np-admin-status{% if not member.is_active %} is-inactive{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
+              </div>
+              <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last login">
+                <strong>{{ member.last_login_at or "Never" }}</strong>
+              </div>
+              <div class="np-admin-directory-manage">
+                <button type="button" class="np-admin-action-trigger" data-action-toggle aria-expanded="false">Actions</button>
+              </div>
+            </div>
+            <div class="np-admin-drawer" hidden>
+              <div class="np-admin-drawer-inner">
+                <section class="np-admin-drawer-block">
+                  <h3 class="np-admin-drawer-title">Account status</h3>
+                  <form method="post" action="{{ url_for('admin_toggle_staff_active', user_id=member.id) }}">
+                    <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--ghost">{{ "Deactivate colleague" if member.is_active else "Reactivate colleague" }}</button>
+                  </form>
+                </section>
+                <section class="np-admin-drawer-block">
+                  <h3 class="np-admin-drawer-title">Reset password</h3>
+                  <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}" class="np-admin-drawer-inline">
+                    <input name="password" type="text" placeholder="New password" aria-label="New password for {{ member.username }}" required>
+                    <button type="submit" class="np-admin-drawer-btn">Save password</button>
+                  </form>
+                </section>
+                <section class="np-admin-drawer-block np-admin-drawer-block--danger">
+                  <h3 class="np-admin-drawer-title">Remove account</h3>
+                  <p class="np-admin-drawer-hint">Permanently deletes this colleague login. Type DELETE to confirm.</p>
+                  <form method="post" action="{{ url_for('admin_delete_staff', user_id=member.id) }}" class="np-admin-drawer-inline np-admin-drawer-inline--danger">
+                    <input name="confirm" type="text" placeholder="DELETE" aria-label="Confirm deleting {{ member.username }}">
+                    <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--danger">Delete account</button>
+                  </form>
+                </section>
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
       </div>
+      {% else %}
+      <p class="np-admin-empty np-admin-empty--inline">No colleague accounts yet — create one above.</p>
       {% endif %}
     </section>
     {% endif %}
@@ -278,59 +314,66 @@
 
         <div class="np-admin-directory-body">
           {% for student in students %}
-          <article class="np-admin-directory-row">
-            <div class="np-admin-directory-student">
-              <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
-              <div class="np-admin-directory-identity">
-                <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
-                <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}</span>
-                <div class="np-admin-directory-badges">
-                  <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
-                  <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="np-admin-directory-stats">
-              <div class="np-admin-directory-stat" data-label="Sessions">
-                <strong>{{ student.attempts_total }}</strong>
-              </div>
-              <div class="np-admin-directory-stat" data-label="Accuracy">
-                <strong>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}%{% else %}—{% endif %}</strong>
-              </div>
-              <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last active">
-                <strong>{{ student.last_activity or "—" }}</strong>
-              </div>
-            </div>
-
-            <div class="np-admin-directory-manage">
-              <details class="np-admin-directory-tools">
-                <summary>Actions</summary>
-                <div class="np-admin-directory-tools-panel">
-                  <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}" class="np-admin-directory-form">
-                    <label>
-                      <span>New password</span>
-                      <input name="password" type="text" placeholder="Temporary password" aria-label="New password for {{ student.username }}" required>
-                    </label>
-                    <button type="submit">Reset password</button>
-                  </form>
-                  <div class="np-admin-directory-quick">
-                    <form method="post" action="{{ url_for('admin_toggle_student_active', user_id=student.id) }}">
-                      <button type="submit" class="np-admin-directory-btn np-admin-directory-btn--ghost">{{ "Deactivate" if student.is_active else "Reactivate" }}</button>
-                    </form>
-                    <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-directory-btn">Open record</a>
+          <article class="np-admin-dir-entry" data-admin-entry>
+            <div class="np-admin-directory-row">
+              <div class="np-admin-directory-student">
+                <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
+                <div class="np-admin-directory-identity">
+                  <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
+                  <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}</span>
+                  <div class="np-admin-directory-badges">
+                    <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
+                    <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
                   </div>
-                  {% if user_is_supervisor %}
-                  <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-directory-form np-admin-directory-form--danger">
-                    <label>
-                      <span>Type DELETE to remove account</span>
-                      <input name="confirm" type="text" placeholder="DELETE" aria-label="Confirm deleting {{ student.username }}">
-                    </label>
-                    <button type="submit">Delete student</button>
-                  </form>
-                  {% endif %}
                 </div>
-              </details>
+              </div>
+
+              <div class="np-admin-directory-stats">
+                <div class="np-admin-directory-stat" data-label="Sessions">
+                  <strong>{{ student.attempts_total }}</strong>
+                </div>
+                <div class="np-admin-directory-stat" data-label="Accuracy">
+                  <strong>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}%{% else %}—{% endif %}</strong>
+                </div>
+                <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last active">
+                  <strong>{{ student.last_activity or "—" }}</strong>
+                </div>
+              </div>
+
+              <div class="np-admin-directory-manage">
+                <button type="button" class="np-admin-action-trigger" data-action-toggle aria-expanded="false">Actions</button>
+              </div>
+            </div>
+
+            <div class="np-admin-drawer" hidden>
+              <div class="np-admin-drawer-inner">
+                <section class="np-admin-drawer-block">
+                  <h3 class="np-admin-drawer-title">Quick actions</h3>
+                  <div class="np-admin-drawer-links">
+                    <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-drawer-btn">Open full record</a>
+                    <form method="post" action="{{ url_for('admin_toggle_student_active', user_id=student.id) }}">
+                      <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--ghost">{{ "Deactivate student" if student.is_active else "Reactivate student" }}</button>
+                    </form>
+                  </div>
+                </section>
+                <section class="np-admin-drawer-block">
+                  <h3 class="np-admin-drawer-title">Reset password</h3>
+                  <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}" class="np-admin-drawer-inline">
+                    <input name="password" type="text" placeholder="New password" aria-label="New password for {{ student.username }}" required>
+                    <button type="submit" class="np-admin-drawer-btn">Save password</button>
+                  </form>
+                </section>
+                {% if user_is_supervisor %}
+                <section class="np-admin-drawer-block np-admin-drawer-block--danger">
+                  <h3 class="np-admin-drawer-title">Remove account</h3>
+                  <p class="np-admin-drawer-hint">Deletes the student login and all linked practice sessions. Type DELETE to confirm.</p>
+                  <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-drawer-inline np-admin-drawer-inline--danger">
+                    <input name="confirm" type="text" placeholder="DELETE" aria-label="Confirm deleting {{ student.username }}">
+                    <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--danger">Delete account</button>
+                  </form>
+                </section>
+                {% endif %}
+              </div>
             </div>
           </article>
           {% else %}
@@ -398,20 +441,62 @@
 (function () {
   var form = document.querySelector("[data-access-form]");
   var badge = document.querySelector("[data-access-badge] .np-admin-access-badge-value");
-  if (!form || !badge) return;
-  function refresh() {
-    var checked = form.querySelectorAll(".np-admin-grant-input:checked");
-    if (!checked.length) {
-      badge.textContent = "Full platform";
-      return;
+  if (form && badge) {
+    function refresh() {
+      var checked = form.querySelectorAll(".np-admin-grant-input:checked");
+      if (!checked.length) {
+        badge.textContent = "Full platform";
+        return;
+      }
+      var labels = Array.prototype.map.call(checked, function (el) {
+        return el.getAttribute("data-grant-label") || el.value;
+      });
+      badge.textContent = labels.join(" · ");
     }
-    var labels = Array.prototype.map.call(checked, function (el) {
-      return el.getAttribute("data-grant-label") || el.value;
-    });
-    badge.textContent = labels.join(" · ");
+    form.addEventListener("change", refresh);
+    refresh();
   }
-  form.addEventListener("change", refresh);
-  refresh();
+
+  function closeAllDrawers() {
+    document.querySelectorAll(".np-admin-drawer").forEach(function (drawer) {
+      drawer.hidden = true;
+    });
+    document.querySelectorAll("[data-action-toggle]").forEach(function (btn) {
+      btn.setAttribute("aria-expanded", "false");
+      btn.classList.remove("is-open");
+    });
+    document.querySelectorAll(".np-admin-dir-entry").forEach(function (entry) {
+      entry.classList.remove("is-drawer-open");
+    });
+  }
+
+  document.querySelectorAll("[data-action-toggle]").forEach(function (btn) {
+    btn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      var entry = btn.closest("[data-admin-entry]");
+      if (!entry) return;
+      var drawer = entry.querySelector(".np-admin-drawer");
+      if (!drawer) return;
+      var willOpen = drawer.hidden;
+      closeAllDrawers();
+      if (willOpen) {
+        drawer.hidden = false;
+        entry.classList.add("is-drawer-open");
+        btn.setAttribute("aria-expanded", "true");
+        btn.classList.add("is-open");
+      }
+    });
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest("[data-admin-entry]")) {
+      closeAllDrawers();
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeAllDrawers();
+  });
 })();
 </script>
 {% endblock %}
