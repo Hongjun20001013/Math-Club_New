@@ -36,19 +36,24 @@
           <p>Choose which parts of the platform this student can open. Uncheck everything to restore full access.</p>
         </div>
       </header>
-      <form method="post" action="{{ url_for('admin_update_student_access', user_id=student.id) }}" class="np-admin-grants-form">
-        <fieldset class="np-admin-grants-field">
+      <form method="post" action="{{ url_for('admin_update_student_access', user_id=student.id) }}" class="np-admin-grants-form np-admin-create-form">
+        <div class="np-admin-grant-grid">
+          {% set grant_icons = {'dashboard': 'Home', 'sat': 'SAT', 'placement': 'Test'} %}
           {% for opt in student_resource_grant_options %}
-          <label class="np-admin-grant-option">
-            <input type="checkbox" name="access_grants" value="{{ opt.key }}"{% if student.access_grants_set and opt.key in student.access_grants_set %} checked{% endif %}>
-            <span>
-              <strong>{{ opt.label }}</strong>
-              <em>{{ opt.description }}</em>
+          <label class="np-admin-grant-card">
+            <input type="checkbox" name="access_grants" value="{{ opt.key }}" class="np-admin-grant-input"{% if student.access_grants_set and opt.key in student.access_grants_set %} checked{% endif %}>
+            <span class="np-admin-grant-card-face">
+              <span class="np-admin-grant-glyph">{{ grant_icons.get(opt.key, opt.key[:3]|upper) }}</span>
+              <span class="np-admin-grant-copy">
+                <strong>{{ opt.label }}</strong>
+                <em>{{ opt.description }}</em>
+              </span>
+              <span class="np-admin-grant-tick" aria-hidden="true"></span>
             </span>
           </label>
           {% endfor %}
-        </fieldset>
-        <button type="submit" class="big-btn mp-btn-pill">Save access settings</button>
+        </div>
+        <button type="submit" class="np-admin-btn np-admin-btn--cta">Save access settings</button>
       </form>
     </section>
 

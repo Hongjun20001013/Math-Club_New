@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="np-page-shell">
-  <div class="np-admin-page">
+  <div class="np-admin-page np-admin-studio">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="np-flash-list np-login-flash" role="status">
@@ -15,21 +15,35 @@
     {% if user_is_supervisor and db_persistence and not db_persistence.persistence_ok %}
     <div class="np-admin-persist-warn" role="alert">
       <strong>Account data may reset after each deploy.</strong>
-      Render needs a persistent disk mounted at <code>/var/data</code> with <code>DB_PATH=/var/data/sat.db</code>.
+      Render needs a persistent disk at <code>/var/data</code> with <code>DB_PATH=/var/data/sat.db</code>.
       Check <a href="/health/db" target="_blank" rel="noopener">/health/db</a> — <code>persistence_ok</code> must be <code>true</code>.
     </div>
     {% endif %}
 
-    <section class="np-admin-hero glass-panel np-glass mp-animate-in">
-      <div>
+    <section class="np-admin-hero np-admin-hero--studio glass-panel np-glass mp-animate-in">
+      <div class="np-admin-hero-noise" aria-hidden="true"></div>
+      <div class="np-admin-hero-copy">
         <p class="np-admin-kicker">Administration</p>
-        <h1>{% if user_is_supervisor %}Admin Panel{% else %}Staff Panel{% endif %}</h1>
-        <p>{% if user_is_supervisor %}Manage colleague accounts, student logins, practice records, and launch data.{% else %}View student progress, open session reports, and register new student accounts.{% endif %}</p>
+        <h1>{% if user_is_supervisor %}Command center{% else %}Staff console{% endif %}</h1>
+        <p class="np-admin-hero-lead">{% if user_is_supervisor %}Accounts, access control, practice records, and launch tools — one place for your program.{% else %}Register students, review progress, and open session reports.{% endif %}</p>
+        <div class="np-admin-hero-actions">
+          <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-hero-btn">Export CSV</a>
+          <a href="{{ url_for('student_guide') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost" target="_blank" rel="noopener">Student guide</a>
+        </div>
       </div>
-      <div class="np-admin-stats" aria-label="Admin summary">
-        <div><strong>{{ totals.active_students }}</strong><span>Active students</span></div>
-        <div><strong>{{ totals.students }}</strong><span>Total shown</span></div>
-        <div><strong>{{ totals.responses }}</strong><span>Responses</span></div>
+      <div class="np-admin-stats np-admin-stats--studio" aria-label="Admin summary">
+        <div class="np-admin-stat-tile">
+          <strong>{{ totals.active_students }}</strong>
+          <span>Active students</span>
+        </div>
+        <div class="np-admin-stat-tile">
+          <strong>{{ totals.students }}</strong>
+          <span>In directory</span>
+        </div>
+        <div class="np-admin-stat-tile">
+          <strong>{{ totals.responses }}</strong>
+          <span>Total responses</span>
+        </div>
       </div>
     </section>
 
@@ -37,17 +51,17 @@
     <section class="np-admin-card np-admin-launch-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-launch">
       <header class="np-admin-section-head">
         <div>
-          <p class="np-admin-kicker">Launch Control</p>
-          <h2 id="np-admin-launch">Data Initialization</h2>
-          <p>Use this before sending the site to students. Accounts stay separate from practice history so you can clean test data safely.</p>
+          <p class="np-admin-kicker">Launch control</p>
+          <h2 id="np-admin-launch">Data initialization</h2>
+          <p>Clean test data before go-live. Student login accounts are never removed by these actions.</p>
         </div>
       </header>
       <div class="np-admin-maintenance-grid">
         <article class="np-admin-maintenance-box">
           <div class="np-admin-maintenance-copy">
-          <strong>Clean guest / legacy records</strong>
-          <span>{{ data_snapshot.legacy_attempts }} sessions · {{ data_snapshot.legacy_responses }} responses</span>
-          <p>Removes old anonymous practice records like “Guest / legacy” without touching real student accounts.</p>
+            <strong>Clean guest / legacy records</strong>
+            <span>{{ data_snapshot.legacy_attempts }} sessions · {{ data_snapshot.legacy_responses }} responses</span>
+            <p>Removes anonymous “Guest / legacy” practice rows only.</p>
           </div>
           <form method="post" action="{{ url_for('admin_clear_legacy_data') }}">
             <input name="confirm" type="text" placeholder="Type CLEAR LEGACY" aria-label="Confirm clear legacy records">
@@ -56,9 +70,9 @@
         </article>
         <article class="np-admin-maintenance-box np-admin-maintenance-box--danger">
           <div class="np-admin-maintenance-copy">
-          <strong>Full launch reset</strong>
-          <span>{{ data_snapshot.all_attempts }} sessions · {{ data_snapshot.all_responses }} responses · {{ data_snapshot.progress_rows }} progress rows</span>
-          <p>Clears all practice history and mistake progress, but keeps admin and student login accounts.</p>
+            <strong>Full launch reset</strong>
+            <span>{{ data_snapshot.all_attempts }} sessions · {{ data_snapshot.all_responses }} responses · {{ data_snapshot.progress_rows }} progress rows</span>
+            <p>Wipes all practice history and mistake progress. Accounts stay.</p>
           </div>
           <form method="post" action="{{ url_for('admin_reset_practice_data') }}">
             <input name="confirm" type="text" placeholder="Type LAUNCH RESET" aria-label="Confirm full launch reset">
@@ -67,39 +81,38 @@
         </article>
       </div>
     </section>
-    {% endif %}
 
-    {% if user_is_supervisor %}
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
       <header class="np-admin-section-head">
         <div>
           <p class="np-admin-kicker">Team access</p>
-          <h2 id="np-admin-add-staff">Add Colleague (Staff)</h2>
-          <p>Colleagues can open Admin, view student data, and register students — but cannot wipe data or manage other staff.</p>
+          <h2 id="np-admin-add-staff">Colleague accounts</h2>
+          <p>Staff can view students and register accounts — not wipe data or manage other staff.</p>
         </div>
       </header>
-      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-add-form">
+      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-inline-form">
         <label>
-          <span>Colleague email or username</span>
+          <span>Email or username</span>
           <input name="username" type="text" autocomplete="username" placeholder="teacher@example.com" required>
         </label>
         <label>
           <span>Password</span>
           <input name="password" type="text" autocomplete="new-password" placeholder="Temporary password" required>
         </label>
-        <button type="submit" class="big-btn mp-btn-pill">Create colleague account</button>
+        <button type="submit" class="np-admin-btn np-admin-btn--primary">Create colleague</button>
       </form>
       {% if staff_members %}
       <div class="np-admin-student-list np-admin-staff-list">
         {% for member in staff_members %}
-        <article class="np-admin-student-row">
+        <article class="np-admin-student-row np-admin-student-row--studio">
+          <div class="np-admin-student-avatar" aria-hidden="true">{{ member.username[:1]|upper }}</div>
           <div class="np-admin-student-main">
             <strong>{{ member.username }}</strong>
-            <span>Staff · Created: {{ member.created_at or "Unknown" }}</span>
+            <span>Staff · {{ member.created_at or "Unknown" }}</span>
             <span class="np-admin-status{% if not member.is_active %} is-inactive{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
           </div>
           <div class="np-admin-student-metrics">
-            <span>Login: {{ member.last_login_at or "Never" }}</span>
+            <span>Last login · {{ member.last_login_at or "Never" }}</span>
           </div>
           <div class="np-admin-student-actions">
             <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}">
@@ -117,137 +130,175 @@
     </section>
     {% endif %}
 
-    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-user">
-      <header class="np-admin-section-head">
+    <section class="np-admin-card np-admin-card--create glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-user">
+      <header class="np-admin-section-head np-admin-section-head--create">
         <div>
-          <p class="np-admin-kicker">User Management</p>
-          <h2 id="np-admin-add-user">Add New Student</h2>
+          <p class="np-admin-kicker">Enrollment</p>
+          <h2 id="np-admin-add-user">Register a student</h2>
+          <p>Create credentials and choose exactly which materials this learner can open.</p>
+        </div>
+        <div class="np-admin-access-badge" data-access-badge aria-live="polite">
+          <span class="np-admin-access-badge-label">Access mode</span>
+          <strong class="np-admin-access-badge-value">Full platform</strong>
         </div>
       </header>
-      <form method="post" action="{{ url_for('admin_create_student') }}" class="np-admin-add-form">
-        <label>
-          <span>Student email or username</span>
-          <input name="username" type="text" autocomplete="username" placeholder="student@example.com" required>
-        </label>
-        <label>
-          <span>Student password</span>
-          <input name="password" type="text" autocomplete="new-password" placeholder="Any password you choose" required>
-        </label>
-        <fieldset class="np-admin-grants-field">
-          <legend>Materials this student can use</legend>
-          <p class="np-admin-grants-hint">Leave all unchecked for <strong>full access</strong>. Check only the sections this student should see — e.g. SAT camp → SAT Math only; advising intake → Course placement only.</p>
-          {% for opt in student_resource_grant_options %}
-          <label class="np-admin-grant-option">
-            <input type="checkbox" name="access_grants" value="{{ opt.key }}">
-            <span>
-              <strong>{{ opt.label }}</strong>
-              <em>{{ opt.description }}</em>
-            </span>
-          </label>
-          {% endfor %}
-        </fieldset>
-        <button type="submit" class="big-btn mp-btn-pill">Register</button>
+
+      <form method="post" action="{{ url_for('admin_create_student') }}" class="np-admin-create-form" data-access-form>
+        <div class="np-admin-create-grid">
+          <div class="np-admin-create-panel np-admin-create-panel--identity">
+            <div class="np-admin-panel-cap">
+              <span class="np-admin-panel-icon" aria-hidden="true">01</span>
+              <div>
+                <h3>Account credentials</h3>
+                <p>Email or username plus an initial password you share securely.</p>
+              </div>
+            </div>
+            <div class="np-admin-field-stack">
+              <label class="np-admin-field">
+                <span>Student email or username</span>
+                <input name="username" type="text" autocomplete="username" placeholder="student@example.com" required>
+              </label>
+              <label class="np-admin-field">
+                <span>Password</span>
+                <input name="password" type="text" autocomplete="new-password" placeholder="Choose a starter password" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="np-admin-create-panel np-admin-create-panel--access">
+            <div class="np-admin-panel-cap">
+              <span class="np-admin-panel-icon" aria-hidden="true">02</span>
+              <div>
+                <h3>Material access</h3>
+                <p>Leave all off for <strong>full access</strong>. Toggle only what this student should see.</p>
+              </div>
+            </div>
+            <div class="np-admin-grant-grid">
+              {% set grant_icons = {'dashboard': 'Home', 'sat': 'SAT', 'placement': 'Test'} %}
+              {% for opt in student_resource_grant_options %}
+              <label class="np-admin-grant-card">
+                <input type="checkbox" name="access_grants" value="{{ opt.key }}" class="np-admin-grant-input" data-grant-label="{{ opt.label }}">
+                <span class="np-admin-grant-card-face">
+                  <span class="np-admin-grant-glyph">{{ grant_icons.get(opt.key, opt.key[:3]|upper) }}</span>
+                  <span class="np-admin-grant-copy">
+                    <strong>{{ opt.label }}</strong>
+                    <em>{{ opt.description }}</em>
+                  </span>
+                  <span class="np-admin-grant-tick" aria-hidden="true"></span>
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+            <p class="np-admin-grant-footnote">Examples · SAT summer camp → <strong>SAT Math</strong> only · Advising intake → <strong>Course placement</strong> only</p>
+          </div>
+        </div>
+        <footer class="np-admin-create-foot">
+          <p>New accounts appear in the student directory below. You can change access anytime from the student record.</p>
+          <button type="submit" class="np-admin-btn np-admin-btn--cta">Register student</button>
+        </footer>
       </form>
     </section>
 
-    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-students" style="animation-delay: 0.04s;">
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-students">
       <header class="np-admin-section-head np-admin-section-head--split">
         <div>
-          <p class="np-admin-kicker">Students</p>
-          <h2 id="np-admin-students">User Management</h2>
+          <p class="np-admin-kicker">Directory</p>
+          <h2 id="np-admin-students">Students</h2>
+          <p>{{ totals.students }} account{{ 's' if totals.students != 1 else '' }} · search, reset passwords, or open full records.</p>
         </div>
-        <form method="get" action="{{ url_for('admin') }}" class="np-admin-search">
-          <input name="q" value="{{ q }}" type="search" placeholder="Search by email...">
+        <form method="get" action="{{ url_for('admin') }}" class="np-admin-search np-admin-search--studio">
+          <input name="q" value="{{ q }}" type="search" placeholder="Search by email or username…">
           <button type="submit">Search</button>
         </form>
-        <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-export-btn">Export CSV</a>
-        <a href="{{ url_for('student_guide') }}" class="np-admin-export-btn np-admin-export-btn--ghost" target="_blank" rel="noopener">Student guide</a>
       </header>
 
-      <div class="np-admin-student-list">
+      <div class="np-admin-student-list np-admin-student-list--studio">
         {% for student in students %}
-        <article class="np-admin-student-row">
+        <article class="np-admin-student-row np-admin-student-row--studio">
+          <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
           <div class="np-admin-student-main">
             <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
-            <span>Created: {{ student.created_at or "Unknown" }}</span>
-            <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
-            <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
+            <span>Joined {{ student.created_at or "—" }}</span>
+            <div class="np-admin-student-tags">
+              <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
+              <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
+            </div>
           </div>
-          <div class="np-admin-student-metrics">
-            <span>{{ student.attempts_total }} attempts</span>
-            <span>{{ student.responses_total }} responses</span>
-            <span>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}% correct{% else %}No score yet{% endif %}</span>
-            <span>Last: {{ student.last_activity or "Never" }}</span>
-            <span>Login: {{ student.last_login_at or "Never" }}</span>
+          <div class="np-admin-student-metrics np-admin-student-metrics--studio">
+            <div><strong>{{ student.attempts_total }}</strong><span>Sessions</span></div>
+            <div><strong>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
+            <div><strong>{{ student.last_activity or "—" }}</strong><span>Last active</span></div>
           </div>
-          <div class="np-admin-student-actions">
-            <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}">
+          <div class="np-admin-student-actions np-admin-student-actions--studio">
+            <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}" class="np-admin-mini-form">
               <input name="password" type="text" placeholder="New password" aria-label="New password for {{ student.username }}" required>
               <button type="submit">Reset</button>
             </form>
             <div class="np-admin-student-action-row">
               <form method="post" action="{{ url_for('admin_toggle_student_active', user_id=student.id) }}">
-                <button type="submit">{{ "Deactivate" if student.is_active else "Reactivate" }}</button>
+                <button type="submit" class="np-admin-btn np-admin-btn--ghost">{{ "Deactivate" if student.is_active else "Reactivate" }}</button>
               </form>
-              <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-view-btn">View record</a>
+              <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-view-btn">Open record</a>
             </div>
             {% if user_is_supervisor %}
             <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-delete-form">
-              <input name="confirm" type="text" placeholder="Type DELETE to remove" aria-label="Confirm deleting {{ student.username }}">
+              <input name="confirm" type="text" placeholder="Type DELETE" aria-label="Confirm deleting {{ student.username }}">
               <button type="submit">Delete</button>
             </form>
             {% endif %}
           </div>
         </article>
         {% else %}
-        <p class="np-admin-empty">No students found.</p>
+        <p class="np-admin-empty">No students match your search.</p>
         {% endfor %}
       </div>
     </section>
 
-    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-records" style="animation-delay: 0.08s;">
-      <header class="np-admin-section-head np-admin-section-head--split">
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-records">
+      <header class="np-admin-section-head">
         <div>
-          <p class="np-admin-kicker">All Records</p>
-          <h2 id="np-admin-records">Recent Practice Records</h2>
-          <p>Click any row to inspect the exact submitted questions, answers, and results.</p>
+          <p class="np-admin-kicker">Activity log</p>
+          <h2 id="np-admin-records">Recent practice records</h2>
+          <p>Latest submitted sessions across all students — open any report for item-level detail.</p>
         </div>
       </header>
-      <div class="np-admin-record-table" role="table" aria-label="Recent practice records">
-        <div class="np-admin-record-row np-admin-record-row--head" role="row">
-          <span>Student</span>
-          <span>Domain</span>
-          <span>Topic</span>
-          <span>Responses</span>
-          <span>Correct</span>
-          <span>Last activity</span>
-          <span>Detail</span>
+      <div class="np-admin-record-shell">
+        <div class="np-admin-record-table np-admin-record-table--studio" role="table" aria-label="Recent practice records">
+          <div class="np-admin-record-row np-admin-record-row--head" role="row">
+            <span>Student</span>
+            <span>Domain</span>
+            <span>Topic</span>
+            <span>Responses</span>
+            <span>Correct</span>
+            <span>Last activity</span>
+            <span>Report</span>
+          </div>
+          {% for record in recent_records %}
+          <div class="np-admin-record-row" role="row">
+            <span>{% if record.user_id %}<a href="{{ url_for('admin_student_detail', user_id=record.user_id) }}">{{ record.username }}</a>{% else %}Guest / legacy{% endif %}</span>
+            <span><code class="np-admin-domain-tag">{{ record.domain }}</code></span>
+            <span>{{ record.topic }}</span>
+            <span>{{ record.responses_total or 0 }}</span>
+            <span>{{ record.correct_total or 0 }}</span>
+            <span>{{ record.last_submitted_at or record.created_at }}</span>
+            <span><a href="{{ url_for('practice_session_summary', attempt_id=record.id) }}" class="np-admin-detail-link">Open →</a></span>
+          </div>
+          {% else %}
+          <p class="np-admin-empty">No practice records yet.</p>
+          {% endfor %}
         </div>
-        {% for record in recent_records %}
-        <div class="np-admin-record-row" role="row">
-          <span>{% if record.user_id %}<a href="{{ url_for('admin_student_detail', user_id=record.user_id) }}">{{ record.username }}</a>{% else %}Guest / legacy{% endif %}</span>
-          <span>{{ record.domain }}</span>
-          <span>{{ record.topic }}</span>
-          <span>{{ record.responses_total or 0 }}</span>
-          <span>{{ record.correct_total or 0 }}</span>
-          <span>{{ record.last_submitted_at or record.created_at }}</span>
-          <span><a href="{{ url_for('practice_session_summary', attempt_id=record.id) }}" class="np-admin-detail-link">Report</a></span>
-        </div>
-        {% else %}
-        <p class="np-admin-empty">No practice records yet.</p>
-        {% endfor %}
       </div>
       {% if user_is_supervisor %}
       <aside class="np-admin-record-danger" aria-label="Clear all practice records">
         <div>
           <p class="np-admin-danger-kicker">Danger zone</p>
           <strong>Clear all practice records</strong>
-          <span>This removes every session, response, and mistake-progress row. Student accounts remain.</span>
+          <span>Removes every session, response, and mistake-progress row. Student accounts remain.</span>
         </div>
         <form method="post" action="{{ url_for('admin_clear_all_records') }}" class="np-admin-clear-records-form">
           <label>
             <span>Confirmation phrase</span>
-            <input name="confirm" type="text" placeholder="CLEAR RECORDS" aria-label="Confirm clearing all practice records" pattern="[Cc][Ll][Ee][Aa][Rr]\s+[Rr][Ee][Cc][Oo][Rr][Dd][Ss]|[Cc][Ll][Ee][Aa][Rr]\s+[Aa][Ll][Ll]\s+[Rr][Ee][Cc][Oo][Rr][Dd][Ss]" required>
+            <input name="confirm" type="text" placeholder="CLEAR RECORDS" aria-label="Confirm clearing all practice records" required>
           </label>
           <button type="submit">Clear all records</button>
         </form>
@@ -256,4 +307,25 @@
     </section>
   </div>
 </div>
+
+<script>
+(function () {
+  var form = document.querySelector("[data-access-form]");
+  var badge = document.querySelector("[data-access-badge] .np-admin-access-badge-value");
+  if (!form || !badge) return;
+  function refresh() {
+    var checked = form.querySelectorAll(".np-admin-grant-input:checked");
+    if (!checked.length) {
+      badge.textContent = "Full platform";
+      return;
+    }
+    var labels = Array.prototype.map.call(checked, function (el) {
+      return el.getAttribute("data-grant-label") || el.value;
+    });
+    badge.textContent = labels.join(" · ");
+  }
+  form.addEventListener("change", refresh);
+  refresh();
+})();
+</script>
 {% endblock %}

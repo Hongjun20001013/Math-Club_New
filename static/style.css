@@ -20563,6 +20563,591 @@ html[data-exam-theme="dark"] .np-placement-pdf-doc-stack::after {
     font-weight: 950;
 }
 
+/* ── Admin studio (premium command center) ── */
+.np-admin-studio {
+    gap: clamp(22px, 3vw, 32px);
+}
+
+.np-admin-hero--studio {
+    position: relative;
+    overflow: hidden;
+    align-items: stretch;
+    padding: clamp(26px, 3.5vw, 40px);
+    border: 1px solid rgba(91, 77, 255, 0.12);
+    background:
+        radial-gradient(ellipse 80% 60% at 100% 0%, rgba(79, 50, 240, 0.14), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 0% 100%, rgba(20, 184, 166, 0.1), transparent 50%),
+        linear-gradient(155deg, rgba(255, 255, 255, 0.97), rgba(246, 244, 255, 0.9));
+}
+
+.np-admin-hero-noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.np-admin-hero--studio > *:not(.np-admin-hero-noise) {
+    position: relative;
+    z-index: 1;
+}
+
+.np-admin-hero-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.np-admin-hero-lead {
+    max-width: 42rem;
+    margin: 10px 0 0;
+    font-size: 1.02rem;
+    line-height: 1.6;
+}
+
+.np-admin-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.np-admin-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 240, 0.22);
+    background: rgba(255, 255, 255, 0.88);
+    color: #4f32f0;
+    font-size: 0.82rem;
+    font-weight: 850;
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-hero-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(79, 50, 240, 0.12);
+}
+
+.np-admin-hero-btn--ghost {
+    background: transparent;
+    color: #6f6784;
+    border-color: rgba(91, 77, 255, 0.14);
+}
+
+.np-admin-stats--studio {
+    min-width: min(380px, 100%);
+    align-self: center;
+}
+
+.np-admin-stat-tile {
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(49, 38, 130, 0.05);
+}
+
+.np-admin-stat-tile strong {
+    display: block;
+    font: 950 1.85rem / 1 "Inter Tight", sans-serif;
+    letter-spacing: -0.04em;
+    color: #171326;
+}
+
+.np-admin-stat-tile span {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8b83a8;
+}
+
+.np-admin-card--create {
+    padding: clamp(24px, 3vw, 36px);
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 248, 255, 0.88) 100%);
+}
+
+.np-admin-section-head--create {
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.np-admin-access-badge {
+    flex-shrink: 0;
+    padding: 12px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(79, 50, 240, 0.16);
+    background: linear-gradient(135deg, rgba(237, 233, 255, 0.9), rgba(255, 255, 255, 0.85));
+    text-align: right;
+}
+
+.np-admin-access-badge-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8b83a8;
+}
+
+.np-admin-access-badge-value {
+    display: block;
+    margin-top: 4px;
+    font: 850 0.95rem / 1.3 "Manrope", sans-serif;
+    color: #4f32f0;
+}
+
+.np-admin-create-form {
+    display: grid;
+    gap: 20px;
+}
+
+.np-admin-create-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    gap: clamp(16px, 2.5vw, 22px);
+    align-items: stretch;
+}
+
+.np-admin-create-panel {
+    display: grid;
+    gap: 18px;
+    padding: clamp(18px, 2.5vw, 24px);
+    border-radius: 22px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.np-admin-create-panel--access {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(79, 50, 240, 0.06), transparent 45%),
+        rgba(255, 255, 255, 0.68);
+}
+
+.np-admin-panel-cap {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.np-admin-panel-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(79, 50, 240, 0.14), rgba(79, 50, 240, 0.06));
+    color: #4f32f0;
+    font: 950 0.78rem / 1 "Inter Tight", sans-serif;
+    letter-spacing: 0.04em;
+}
+
+.np-admin-panel-cap h3 {
+    margin: 0;
+    font: 850 1.08rem / 1.25 "Manrope", sans-serif;
+    color: #171326;
+}
+
+.np-admin-panel-cap p {
+    margin: 6px 0 0;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: #8b83a8;
+}
+
+.np-admin-field-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.np-admin-field {
+    display: grid;
+    gap: 8px;
+}
+
+.np-admin-field span {
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6f6784;
+}
+
+.np-admin-field input {
+    width: 100%;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #171326;
+    font: 600 0.96rem / 1.2 "Manrope", sans-serif;
+    padding: 14px 16px;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-field input:focus {
+    outline: none;
+    border-color: rgba(79, 50, 240, 0.45);
+    box-shadow: 0 0 0 3px rgba(79, 50, 240, 0.12);
+}
+
+.np-admin-grant-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.np-admin-grant-card {
+    cursor: pointer;
+}
+
+.np-admin-grant-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.np-admin-grant-card-face {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(91, 77, 255, 0.12);
+    background: rgba(255, 255, 255, 0.88);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.np-admin-grant-card:hover .np-admin-grant-card-face {
+    border-color: rgba(79, 50, 240, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(49, 38, 130, 0.08);
+}
+
+.np-admin-grant-input:checked + .np-admin-grant-card-face {
+    border-color: rgba(79, 50, 240, 0.42);
+    background: linear-gradient(135deg, rgba(237, 233, 255, 0.95), rgba(255, 255, 255, 0.92));
+    box-shadow:
+        0 12px 32px rgba(79, 50, 240, 0.12),
+        inset 0 0 0 1px rgba(79, 50, 240, 0.08);
+}
+
+.np-admin-grant-glyph {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #5240d4, #6c4eff);
+    color: #fff;
+    font: 950 0.72rem / 1 "Inter Tight", sans-serif;
+    letter-spacing: 0.02em;
+}
+
+.np-admin-grant-input:checked + .np-admin-grant-card-face .np-admin-grant-glyph {
+    background: linear-gradient(145deg, #4f32f0, #7c3aed);
+    box-shadow: 0 6px 16px rgba(79, 50, 240, 0.35);
+}
+
+.np-admin-grant-copy strong {
+    display: block;
+    color: #171326;
+    font-size: 0.94rem;
+    font-weight: 850;
+}
+
+.np-admin-grant-copy em {
+    display: block;
+    margin-top: 3px;
+    color: #8b83a8;
+    font-style: normal;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.np-admin-grant-tick {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 2px solid rgba(91, 77, 255, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.np-admin-grant-input:checked + .np-admin-grant-card-face .np-admin-grant-tick {
+    border-color: #4f32f0;
+    background: #4f32f0;
+    box-shadow: inset 0 0 0 2px #fff;
+}
+
+.np-admin-grant-footnote {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #a39db8;
+}
+
+.np-admin-create-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-admin-create-foot p {
+    margin: 0;
+    max-width: 36rem;
+    font-size: 0.84rem;
+    color: #8b83a8;
+    line-height: 1.55;
+}
+
+.np-admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 999px;
+    font: 850 0.88rem / 1 "Manrope", sans-serif;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-btn--primary {
+    background: #1f7ae0;
+    color: #fff;
+}
+
+.np-admin-btn--cta {
+    min-height: 50px;
+    padding: 0 28px;
+    background: linear-gradient(135deg, #5240d4 0%, #4f32f0 45%, #2563eb 100%);
+    color: #fff;
+    box-shadow: 0 14px 36px rgba(79, 50, 240, 0.28);
+}
+
+.np-admin-btn--cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(79, 50, 240, 0.34);
+}
+
+.np-admin-btn--ghost {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(91, 77, 255, 0.16);
+    color: #6f6784;
+}
+
+.np-admin-inline-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+}
+
+.np-admin-inline-form label {
+    display: grid;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6f6784;
+}
+
+.np-admin-inline-form input {
+    width: 100%;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font: 600 0.94rem / 1.2 "Manrope", sans-serif;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.np-admin-student-row--studio {
+    grid-template-columns: auto minmax(200px, 1.1fr) minmax(240px, 1fr) minmax(220px, 1fr);
+    gap: 18px;
+    padding: 16px 18px;
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 248, 255, 0.72));
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-student-row--studio:hover {
+    border-color: rgba(79, 50, 240, 0.22);
+    box-shadow: 0 12px 32px rgba(49, 38, 130, 0.07);
+}
+
+.np-admin-student-avatar {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(79, 50, 240, 0.16), rgba(79, 50, 240, 0.06));
+    color: #4f32f0;
+    font: 950 1.1rem / 1 "Inter Tight", sans-serif;
+}
+
+.np-admin-student-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.np-admin-student-metrics--studio {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.np-admin-student-metrics--studio > div {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(248, 246, 255, 0.85);
+    border: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-admin-student-metrics--studio strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #171326;
+}
+
+.np-admin-student-metrics--studio span {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #a39db8;
+}
+
+.np-admin-student-actions--studio {
+    display: grid;
+    gap: 10px;
+}
+
+.np-admin-mini-form {
+    display: flex;
+    gap: 8px;
+}
+
+.np-admin-mini-form input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.np-admin-search--studio {
+    min-width: min(360px, 100%);
+}
+
+.np-admin-record-shell {
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.np-admin-record-table--studio .np-admin-record-row {
+    min-width: 920px;
+}
+
+.np-admin-record-table--studio .np-admin-record-row--head {
+    background: rgba(248, 246, 255, 0.95);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8b83a8;
+}
+
+.np-admin-record-table--studio .np-admin-record-row:not(.np-admin-record-row--head):hover {
+    background: rgba(237, 233, 255, 0.35);
+}
+
+.np-admin-domain-tag {
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(79, 50, 240, 0.08);
+    color: #4f32f0;
+    font-size: 0.78rem;
+    font-weight: 750;
+}
+
+@media (max-width: 1100px) {
+    .np-admin-create-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .np-admin-hero--studio {
+        flex-direction: column;
+    }
+
+    .np-admin-stats--studio {
+        width: 100%;
+    }
+
+    .np-admin-student-row--studio {
+        grid-template-columns: auto 1fr;
+    }
+
+    .np-admin-student-metrics--studio,
+    .np-admin-student-actions--studio {
+        grid-column: 1 / -1;
+    }
+
+    .np-admin-inline-form {
+        grid-template-columns: 1fr;
+    }
+
+    .np-admin-section-head--create {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .np-admin-access-badge {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+@media (max-width: 640px) {
+    .np-admin-create-foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .np-admin-btn--cta {
+        width: 100%;
+    }
+
+    .np-admin-student-metrics--studio {
+        grid-template-columns: 1fr;
+    }
+}
+
 html[data-exam-theme="dark"] .np-admin-hero h1,
 html[data-exam-theme="dark"] .np-admin-card h2,
 html[data-exam-theme="dark"] .np-admin-stats strong,
