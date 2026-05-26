@@ -186,6 +186,8 @@ def _clean_table_cell(cell: str) -> str:
     cell = cell.replace("--", "–")
     cell = cell.replace(r"\%", "%")
     cell = cell.replace("{,}", ",")
+    # Percent signs must survive clean_latex_junk comment stripping in HTML tables.
+    cell = cell.replace("%", "&#37;")
     return cell.strip()
 
 
@@ -293,10 +295,25 @@ def clean_latex_junk(text: str) -> str:
     """
     # TeX comments: unescaped % through end of line (e.g. \choicebox{A}{% newline)
     def _strip_tex_comments(s: str) -> str:
+        table_vault: list[str] = []
+
+        def _vault_tables(text: str) -> str:
+            pat = re.compile(r'<div class="stem-table-wrap">.*?</div>', re.S)
+
+            def repl(m: re.Match[str]) -> str:
+                table_vault.append(m.group(0))
+                return f"<<<HTML_TABLE_{len(table_vault) - 1}>>>"
+
+            return pat.sub(repl, text)
+
+        s = _vault_tables(s)
         out: list[str] = []
         for ln in s.splitlines():
             out.append(re.sub(r"(?<!\\)%.*$", "", ln).rstrip())
-        return "\n".join(out)
+        s = "\n".join(out)
+        for i, chunk in enumerate(table_vault):
+            s = s.replace(f"<<<HTML_TABLE_{i}>>>", chunk)
+        return s
 
     text = _strip_tex_comments(text)
     text, _amsmath_vault = _shield_amsmath_environments(text)

@@ -239,7 +239,7 @@
           {% else %}
           <span class="np-mistake-card-q">Q {{ m.q_display }}</span>
           {% endif %}
-          <span class="np-mistake-card-topic"><span class="np-topic-tag np-topic-tag--{{ m.knowledge_section|lower|replace(' ', '-') }}">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}{% if m.hard_skill %} · {{ m.hard_skill }}{% endif %}</span>
+          <span class="np-mistake-card-topic"><span class="np-topic-tag np-topic-tag--{{ m.knowledge_section|lower|replace(' ', '-') }}">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}{% if m.topic_detail %} · {{ m.topic_detail }}{% elif m.hard_skill %} · {{ m.hard_skill }}{% endif %}</span>
         </header>
         <div class="np-mistake-card-answers">
           <span>Yours: <strong>{{ m.yours_display }}</strong></span>
