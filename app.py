@@ -89,7 +89,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-hard-units-keys")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-student-access-grants")
 
 
 def _site_brand_name() -> str:
@@ -425,6 +425,25 @@ def init_db():
         db.execute("ALTER TABLE users ADD COLUMN last_login_at TEXT")
     if "password_changed_at" not in user_cols:
         db.execute("ALTER TABLE users ADD COLUMN password_changed_at TEXT")
+    if "access_scope" not in user_cols:
+        db.execute(
+            "ALTER TABLE users ADD COLUMN access_scope TEXT NOT NULL DEFAULT 'full'"
+        )
+    user_cols = _table_columns(db, "users")
+    if "access_grants" not in user_cols:
+        db.execute("ALTER TABLE users ADD COLUMN access_grants TEXT")
+        # Migrate legacy single-scope column into JSON grants when present.
+        if "access_scope" in user_cols:
+            for scope, grants_json in (
+                ("sat", '["sat"]'),
+                ("placement", '["placement"]'),
+                ("full", None),
+            ):
+                if grants_json:
+                    db.execute(
+                        "UPDATE users SET access_grants = ? WHERE access_scope = ? AND (access_grants IS NULL OR access_grants = '')",
+                        (grants_json, scope),
+                    )
     cols = _table_columns(db, "practice_responses")
     if "question_index" not in cols:
         db.execute("ALTER TABLE practice_responses ADD COLUMN question_index INTEGER")
@@ -513,11 +532,35 @@ def inject_template_config():
         or p.startswith("/register")
     )
 
+    grants = current_user_access_grants()
+    visible_tracks = []
+    for t in LEARNING_TRACKS:
+        key = t.get("key")
+        if grants is None:
+            visible_tracks.append(t)
+            continue
+        if key == "sat" and "sat" in grants:
+            visible_tracks.append(t)
+        elif key == "placement" and "placement" in grants:
+            visible_tracks.append(t)
+    nav_show_dashboard = grants is None or "dashboard" in grants
+    nav_show_workspace = grants is None or "sat" in grants
+    nav_show_analytics = grants is None or "sat" in grants
+    student_home_href = url_for("index") if grants is None else _student_home_url(grants)
+
     return {
         "desmos_api_key": DESMOS_API_KEY,
         "active_track_label": active_track,
         "nav_path": p,
-        "learning_tracks": LEARNING_TRACKS,
+        "learning_tracks": visible_tracks if grants is not None else LEARNING_TRACKS,
+        "student_access_grants": grants,
+        "student_access_grants_label": _access_grants_label(session.get("user_access_grants")),
+        "student_resource_grant_options": STUDENT_RESOURCE_GRANTS,
+        "student_has_full_access": grants is None,
+        "nav_show_dashboard": nav_show_dashboard,
+        "nav_show_workspace": nav_show_workspace,
+        "nav_show_analytics": nav_show_analytics,
+        "student_home_href": student_home_href,
         "user_logged_in": "user_id" in session,
         "user_is_admin": current_user_can_access_admin(),
         "user_is_supervisor": current_user_is_supervisor(),
@@ -537,6 +580,236 @@ ROLE_ADMIN = "admin"
 ROLE_STAFF = "staff"
 ROLE_STUDENT = "student"
 STAFF_ROLES = frozenset({ROLE_ADMIN, ROLE_STAFF})
+
+STUDENT_RESOURCE_GRANTS: tuple[dict[str, str], ...] = (
+    {
+        "key": "dashboard",
+        "label": "Home dashboard",
+        "description": "Track catalog, overview, and navigation hub",
+        "home_href": "/",
+    },
+    {
+        "key": "sat",
+        "label": "SAT Math",
+        "description": "Units 1–4, Hard Drill, workspace & mistake analytics",
+        "home_href": "/practice",
+    },
+    {
+        "key": "placement",
+        "label": "Course placement",
+        "description": "70-item placement diagnostic & PDF report",
+        "home_href": "/placement",
+    },
+)
+STUDENT_GRANT_KEYS = frozenset(g["key"] for g in STUDENT_RESOURCE_GRANTS)
+SAT_STUDENT_DOMAINS = frozenset(
+    {"algebra", "advanced_math", "problem_solving", "geometry", "hard_problem"}
+)
+_PRACTICE_PATH_DOMAIN_RE = re.compile(r"^/practice/(?P<dom>[^/]+)")
+_SESSION_ATTEMPT_RE = re.compile(r"^/practice/session/(?P<aid>\d+)")
+
+
+def _grants_full_access(raw: Any) -> bool:
+    if raw is None:
+        return True
+    if isinstance(raw, str):
+        s = raw.strip()
+        if not s or s in ("*", "all", "full"):
+            return True
+        try:
+            parsed = json.loads(s)
+        except (json.JSONDecodeError, TypeError):
+            if s == ACCESS_SCOPE_FULL:
+                return True
+            if s in STUDENT_GRANT_KEYS:
+                return False
+            return True
+        raw = parsed
+    if isinstance(raw, (list, tuple, set)):
+        keys = {str(x).strip() for x in raw if str(x).strip()}
+        if not keys or "all" in keys or "*" in keys:
+            return True
+        return False
+    return True
+
+
+def _normalize_access_grants(raw: Any) -> set[str] | None:
+    """None = unrestricted (all materials). Otherwise a set of grant keys."""
+    if _grants_full_access(raw):
+        return None
+    if isinstance(raw, str):
+        s = raw.strip()
+        if s == ACCESS_SCOPE_SAT:
+            return {"sat"}
+        if s == ACCESS_SCOPE_PLACEMENT:
+            return {"placement"}
+        try:
+            parsed = json.loads(s)
+        except (json.JSONDecodeError, TypeError):
+            return None
+        raw = parsed
+    if isinstance(raw, (list, tuple, set)):
+        keys = {str(x).strip() for x in raw if str(x).strip() in STUDENT_GRANT_KEYS}
+        return keys or None
+    return None
+
+
+def _access_grants_from_form(values: Any) -> str | None:
+    """Serialize admin checkbox list; None stored as NULL (= full access)."""
+    if not values:
+        return None
+    if isinstance(values, str):
+        values = [values]
+    keys = []
+    for v in values:
+        k = str(v).strip()
+        if k == "all":
+            return None
+        if k in STUDENT_GRANT_KEYS and k not in keys:
+            keys.append(k)
+    if not keys:
+        return None
+    return json.dumps(keys)
+
+
+def _access_grants_label(raw: Any) -> str:
+    grants = _normalize_access_grants(raw)
+    if grants is None:
+        return "All materials"
+    labels = []
+    lookup = {g["key"]: g["label"] for g in STUDENT_RESOURCE_GRANTS}
+    for g in STUDENT_RESOURCE_GRANTS:
+        if g["key"] in grants:
+            labels.append(lookup[g["key"]])
+    return ", ".join(labels) if labels else "All materials"
+
+
+def current_user_access_grants() -> set[str] | None:
+    if current_user_can_access_admin():
+        return None
+    return _normalize_access_grants(session.get("user_access_grants"))
+
+
+def student_has_grant(grant_key: str) -> bool:
+    grants = current_user_access_grants()
+    if grants is None:
+        return True
+    return grant_key in grants
+
+
+def _student_home_url(grants: set[str] | None) -> str:
+    if grants is None:
+        return url_for("index")
+    for spec in STUDENT_RESOURCE_GRANTS:
+        if spec["key"] in grants:
+            return spec["home_href"]
+    return url_for("index")
+
+
+def _practice_domain_from_path(path: str) -> str | None:
+    m = _PRACTICE_PATH_DOMAIN_RE.match(path or "")
+    if not m:
+        return None
+    dom = m.group("dom")
+    if dom in (
+        "specialized",
+        "challenge",
+        "analytics",
+        "exams",
+        "submit",
+        "miss-quiz",
+        "mistake-redo",
+        "session",
+        "challenge",
+    ):
+        return None
+    return dom
+
+
+def _domain_allowed_by_grants(domain: str, grants: set[str] | None) -> bool:
+    if grants is None:
+        return True
+    if domain == "placement":
+        return "placement" in grants
+    if domain in SAT_STUDENT_DOMAINS:
+        return "sat" in grants
+    return False
+
+
+def _path_allowed_for_grants(path: str, grants: set[str] | None, db: sqlite3.Connection) -> bool:
+    if grants is None:
+        return True
+    p = (path or "/").split("?")[0].rstrip("/") or "/"
+
+    if p.startswith("/admin"):
+        return False
+    if p == "/guide" or p.startswith("/guide/"):
+        return True
+    if p == "/logout":
+        return True
+
+    if p == "/" or p.startswith("/#"):
+        return "dashboard" in grants
+
+    if p.startswith("/learn/"):
+        return False
+
+    if p.startswith("/placement"):
+        return "placement" in grants
+
+    if p.startswith("/practice"):
+        dom = _practice_domain_from_path(p)
+        if dom:
+            return _domain_allowed_by_grants(dom, grants)
+        if p.startswith("/practice/analytics") or p.startswith("/practice/miss-quiz"):
+            return "sat" in grants
+        if p.startswith("/practice/challenge/materials"):
+            return "sat" in grants
+        if p.startswith("/practice/specialized"):
+            return "sat" in grants
+        if p.startswith("/practice/exams"):
+            return "sat" in grants
+        if p.startswith("/practice/challenge"):
+            return "sat" in grants
+        if p == "/practice":
+            return "sat" in grants
+        m = _SESSION_ATTEMPT_RE.match(p)
+        if m:
+            att = db.execute(
+                "SELECT domain FROM practice_attempts WHERE id = ? AND user_id = ?",
+                (int(m.group("aid")), session.get("user_id")),
+            ).fetchone()
+            if att is None:
+                return True
+            return _domain_allowed_by_grants(str(att["domain"]), grants)
+        return "sat" in grants or "placement" in grants
+
+    return False
+
+
+def _enforce_student_resource_access(db: sqlite3.Connection):
+    if current_user_can_access_admin():
+        return None
+    row = db.execute(
+        "SELECT access_grants, access_scope FROM users WHERE id = ?",
+        (session.get("user_id"),),
+    ).fetchone()
+    raw = row["access_grants"] if row else None
+    if raw is None and row and row["access_scope"]:
+        raw = row["access_scope"]
+    grants = _normalize_access_grants(raw)
+    session["user_access_grants"] = raw
+    path = request.path or "/"
+    if _path_allowed_for_grants(path, grants, db):
+        return None
+    flash("Your account does not include access to this section. Contact your instructor.")
+    return redirect(_student_home_url(grants))
+
+
+# Legacy aliases kept for any in-flight references
+ACCESS_SCOPE_FULL = "full"
+ACCESS_SCOPE_SAT = "sat"
+ACCESS_SCOPE_PLACEMENT = "placement"
 
 
 def current_user_role() -> str:
@@ -606,6 +879,10 @@ def _set_login_session(user: sqlite3.Row) -> None:
     session["user_id"] = int(user["id"])
     session["username"] = str(user["username"])
     session["user_role"] = str(user["role"] or "student")
+    try:
+        session["user_access_grants"] = user["access_grants"]
+    except (KeyError, IndexError, TypeError):
+        session["user_access_grants"] = None
 
 
 def _require_staff_response():
@@ -651,7 +928,7 @@ def require_authenticated_user():
 
     db = get_db()
     user = db.execute(
-        "SELECT username, role, is_active FROM users WHERE id = ?",
+        "SELECT username, role, is_active, access_grants, access_scope FROM users WHERE id = ?",
         (session.get("user_id"),),
     ).fetchone()
     if user is None or int(user["is_active"] or 0) != 1:
@@ -660,6 +937,10 @@ def require_authenticated_user():
         return redirect(url_for("login"))
     session["username"] = str(user["username"])
     session["user_role"] = str(user["role"] or "student")
+    session["user_access_grants"] = user["access_grants"]
+    gate = _enforce_student_resource_access(db)
+    if gate is not None:
+        return gate
 
     return None
 
@@ -2499,6 +2780,9 @@ def health_stylesheet_bundle():
 
 @app.route("/")
 def index():
+    grants = current_user_access_grants()
+    if grants is not None and "dashboard" not in grants:
+        return redirect(_student_home_url(grants))
     return render_template(
         "dashboard.html",
         tracks=LEARNING_TRACKS,
@@ -2537,6 +2821,7 @@ def admin_export_students_csv():
         [
             "username",
             "active",
+            "access",
             "sessions",
             "responses",
             "accuracy_pct",
@@ -2563,6 +2848,7 @@ def admin_export_students_csv():
             [
                 s["username"],
                 "yes" if s["is_active"] else "no",
+                s.get("access_grants_label") or "All materials",
                 s["attempts_total"],
                 s["responses_total"],
                 s["accuracy_pct"] if s["accuracy_pct"] is not None else "",
@@ -6030,7 +6316,7 @@ def login():
 
         user = db.execute(
             """
-            SELECT id, username, password, password_hash, role, is_active
+            SELECT id, username, password, password_hash, role, is_active, access_grants, access_scope
             FROM users
             WHERE username = ?
             """,
@@ -6058,7 +6344,10 @@ def login():
                 next_url = ""
             if current_user_can_access_admin():
                 return redirect(next_url or url_for("admin"))
-            return redirect(next_url or url_for("index"))
+            grants = _normalize_access_grants(user["access_grants"] or user["access_scope"])
+            if next_url and _path_allowed_for_grants(next_url.split("?")[0], grants, db):
+                return redirect(next_url)
+            return redirect(_student_home_url(grants))
         else:
             _record_failed_login(username)
             flash("Invalid username or password.")
@@ -6093,6 +6382,8 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
             u.id,
             u.username,
             u.is_active,
+            u.access_grants,
+            u.access_scope,
             u.created_at,
             u.last_login_at,
             COUNT(DISTINCT pa.id) AS attempts_total,
@@ -6118,6 +6409,13 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
                 "id": int(row["id"]),
                 "username": str(row["username"]),
                 "is_active": int(row["is_active"] or 0) == 1,
+                "access_grants": row["access_grants"],
+                "access_grants_label": _access_grants_label(
+                    row["access_grants"] or row["access_scope"]
+                ),
+                "access_grants_set": _normalize_access_grants(
+                    row["access_grants"] or row["access_scope"]
+                ),
                 "created_at": row["created_at"],
                 "last_login_at": row["last_login_at"],
                 "attempts_total": int(row["attempts_total"] or 0),
@@ -6354,6 +6652,7 @@ def admin():
         q=q,
         user_is_supervisor=current_user_is_supervisor(),
         db_persistence=_db_persistence_status(),
+        student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
     )
 
 
@@ -6365,11 +6664,21 @@ def admin_student_detail(user_id: int):
 
     db = get_db()
     student = db.execute(
-        "SELECT id, username, is_active, created_at FROM users WHERE id = ? AND role = 'student'",
+        """
+        SELECT id, username, is_active, created_at, access_grants, access_scope
+        FROM users WHERE id = ? AND role = 'student'
+        """,
         (user_id,),
     ).fetchone()
     if student is None:
         abort(404)
+    student_dict = dict(student)
+    student_dict["access_grants_label"] = _access_grants_label(
+        student["access_grants"] or student["access_scope"]
+    )
+    student_dict["access_grants_set"] = _normalize_access_grants(
+        student["access_grants"] or student["access_scope"]
+    )
     attempts = _admin_attempt_rows(db, user_id)
     totals = {
         "sessions": len(attempts),
@@ -6381,9 +6690,10 @@ def admin_student_detail(user_id: int):
     )
     return render_template(
         "admin_student.html",
-        student=dict(student),
+        student=student_dict,
         attempts=attempts,
         totals=totals,
+        student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
     )
 
 
@@ -6403,6 +6713,7 @@ def admin_create_student():
 
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
+    grants_json = _access_grants_from_form(request.form.getlist("access_grants"))
 
     if not username or len(username) > 160:
         flash("Enter a student email or username.")
@@ -6413,13 +6724,14 @@ def admin_create_student():
         try:
             db.execute(
                 """
-                INSERT INTO users (username, password, password_hash, role, is_active, created_at)
-                VALUES (?, '', ?, 'student', 1, CURRENT_TIMESTAMP)
+                INSERT INTO users (username, password, password_hash, role, is_active, access_grants, created_at)
+                VALUES (?, '', ?, 'student', 1, ?, CURRENT_TIMESTAMP)
                 """,
-                (username, generate_password_hash(password)),
+                (username, generate_password_hash(password), grants_json),
             )
             db.commit()
-            flash(f"Student account created for {username}.")
+            label = _access_grants_label(grants_json)
+            flash(f"Student account created for {username}. Access: {label}.")
         except sqlite3.IntegrityError:
             flash("That student username already exists.")
 
@@ -6503,6 +6815,30 @@ def admin_toggle_staff_active(user_id: int):
         db.commit()
         flash("Colleague account status updated.")
     return redirect(url_for("admin"))
+
+
+@app.route("/admin/students/<int:user_id>/access", methods=["POST"])
+def admin_update_student_access(user_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    grants_json = _access_grants_from_form(request.form.getlist("access_grants"))
+    db = get_db()
+    row = db.execute(
+        "SELECT id FROM users WHERE id = ? AND role = 'student'",
+        (user_id,),
+    ).fetchone()
+    if row is None:
+        flash("Student not found.")
+        return redirect(url_for("admin"))
+    db.execute(
+        "UPDATE users SET access_grants = ?, access_scope = 'full' WHERE id = ?",
+        (grants_json, user_id),
+    )
+    db.commit()
+    flash(f"Access updated: {_access_grants_label(grants_json)}.")
+    return redirect(url_for("admin_student_detail", user_id=user_id))
 
 
 @app.route("/admin/students/<int:user_id>/reset-password", methods=["POST"])

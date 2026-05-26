@@ -133,6 +133,19 @@
           <span>Student password</span>
           <input name="password" type="text" autocomplete="new-password" placeholder="Any password you choose" required>
         </label>
+        <fieldset class="np-admin-grants-field">
+          <legend>Materials this student can use</legend>
+          <p class="np-admin-grants-hint">Leave all unchecked for <strong>full access</strong>. Check only the sections this student should see — e.g. SAT camp → SAT Math only; advising intake → Course placement only.</p>
+          {% for opt in student_resource_grant_options %}
+          <label class="np-admin-grant-option">
+            <input type="checkbox" name="access_grants" value="{{ opt.key }}">
+            <span>
+              <strong>{{ opt.label }}</strong>
+              <em>{{ opt.description }}</em>
+            </span>
+          </label>
+          {% endfor %}
+        </fieldset>
         <button type="submit" class="big-btn mp-btn-pill">Register</button>
       </form>
     </section>
@@ -157,6 +170,7 @@
           <div class="np-admin-student-main">
             <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
             <span>Created: {{ student.created_at or "Unknown" }}</span>
+            <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
             <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
           </div>
           <div class="np-admin-student-metrics">

@@ -6,17 +6,50 @@
   <div class="np-admin-page">
     <p class="np-pw-breadcrumb"><a href="{{ url_for('admin') }}">← Admin Panel</a></p>
 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="np-flash-list np-login-flash" role="status">
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <section class="np-admin-hero glass-panel np-glass mp-animate-in">
       <div>
         <p class="np-admin-kicker">Student Record</p>
         <h1>{{ student.username }}</h1>
         <p>Created: {{ student.created_at or "Unknown" }} · {{ "Active" if student.is_active else "Inactive" }}</p>
+        <p class="np-admin-grants-summary">Access: <strong>{{ student.access_grants_label }}</strong></p>
       </div>
       <div class="np-admin-stats" aria-label="Student summary">
         <div><strong>{{ totals.sessions }}</strong><span>Sessions</span></div>
         <div><strong>{{ totals.responses }}</strong><span>Responses</span></div>
         <div><strong>{% if totals.accuracy_pct is not none %}{{ totals.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
       </div>
+    </section>
+
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-student-access">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Access control</p>
+          <h2 id="np-admin-student-access">Materials &amp; permissions</h2>
+          <p>Choose which parts of the platform this student can open. Uncheck everything to restore full access.</p>
+        </div>
+      </header>
+      <form method="post" action="{{ url_for('admin_update_student_access', user_id=student.id) }}" class="np-admin-grants-form">
+        <fieldset class="np-admin-grants-field">
+          {% for opt in student_resource_grant_options %}
+          <label class="np-admin-grant-option">
+            <input type="checkbox" name="access_grants" value="{{ opt.key }}"{% if student.access_grants_set and opt.key in student.access_grants_set %} checked{% endif %}>
+            <span>
+              <strong>{{ opt.label }}</strong>
+              <em>{{ opt.description }}</em>
+            </span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        <button type="submit" class="big-btn mp-btn-pill">Save access settings</button>
+      </form>
     </section>
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-student-sessions">

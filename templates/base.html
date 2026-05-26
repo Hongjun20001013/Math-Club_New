@@ -60,38 +60,49 @@
 <!-- Top Navigation -->
 <header class="navbar">
     <div class="nav-title-wrap">
-        <a href="/" class="nav-brand-link" aria-label="{{ site_brand_name }} — Home">
+        <a href="{{ student_home_href if not student_has_full_access else '/' }}" class="nav-brand-link" aria-label="{{ site_brand_name }} — Home">
             <div class="nav-title">{{ site_brand_name }}</div>
         </a>
         <p class="nav-subtitle">Current track: <strong>{{ active_track_label }}</strong></p>
     </div>
     <div class="track-switcher track-switcher--split" role="navigation" aria-label="Track switcher">
+        {% if learning_tracks %}
         <div class="track-switcher-scroll">
+            {% if student_has_full_access or nav_show_dashboard %}
             <span class="track-switcher-label">Exams</span>
+            {% endif %}
             {% for t in learning_tracks %}
             {% if t.catalog == 'standardized' %}
             <a href="{{ t.cta_href }}" class="track-chip track-chip--std{% if active_track_label == t.title %} is-active{% endif %}">{{ t.title }}</a>
             {% endif %}
             {% endfor %}
+            {% set school_tracks = learning_tracks | selectattr('catalog', 'equalto', 'school') | list %}
+            {% if school_tracks %}
             <span class="track-switcher-divider" aria-hidden="true"></span>
             <span class="track-switcher-label">School</span>
-            {% for t in learning_tracks %}
-            {% if t.catalog == 'school' %}
-            {% if t.key != 'placement' or nav_path == '/' or nav_path.startswith('/placement') or nav_path.startswith('/practice/placement') %}
+            {% for t in school_tracks %}
             <a href="{{ t.cta_href }}" class="track-chip track-chip--school{% if active_track_label == t.title %} is-active{% endif %}">{{ t.title }}</a>
-            {% endif %}
-            {% endif %}
             {% endfor %}
+            {% endif %}
         </div>
+        {% endif %}
     </div>
     <nav class="nav-links" aria-label="Primary">
+        {% if nav_show_dashboard %}
         <a href="/" class="{% if nav_path == '/' %}is-active{% endif %}">Dashboard</a>
+        {% endif %}
+        {% if nav_show_workspace %}
         <a href="/practice" class="{% if nav_path.startswith('/practice') and not nav_path.startswith('/practice/analytics') %}is-active{% endif %}">Workspace</a>
+        {% endif %}
+        {% if nav_show_analytics %}
         <a href="{{ url_for('practice_analytics') }}" class="{% if nav_path.startswith('/practice/analytics') %}is-active{% endif %}">Mistake analytics</a>
+        {% endif %}
         {% if user_is_admin %}
         <a href="{{ url_for('admin') }}" class="{% if nav_path.startswith('/admin') %}is-active{% endif %}">Admin</a>
         {% endif %}
+        {% if student_has_full_access %}
         <a href="/#track-catalog" class="{% if nav_path == '/' %}is-active{% endif %}">Catalog</a>
+        {% endif %}
         <button type="button" class="sat-theme-toggle np-nav-theme-toggle" title="Site appearance" aria-label="Toggle light or dark theme" aria-pressed="false">
             <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
             <span class="sat-theme-toggle-label">Light</span>
@@ -110,7 +121,9 @@
         <span class="np-site-footer-sep" aria-hidden="true">·</span>
         <span class="np-site-footer-meta">{{ site_footer_tagline }}</span>
         <a class="np-site-footer-link" href="/">Home</a>
+        {% if nav_show_workspace %}
         <a class="np-site-footer-link" href="/practice">Workspace</a>
+        {% endif %}
         <a class="np-site-footer-link" href="{{ url_for('student_guide') }}">Guide</a>
         {% if user_is_admin %}
         <a class="np-site-footer-link" href="{{ url_for('admin') }}">Admin</a>
