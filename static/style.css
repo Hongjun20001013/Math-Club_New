@@ -24293,6 +24293,568 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     color: #fde68a;
 }
 
+/* Admin: data safety dashboard */
+.np-admin-card--safety .np-admin-section-head p {
+    max-width: 52ch;
+}
+
+.np-admin-safety {
+    display: grid;
+    gap: 16px;
+}
+
+.np-admin-safety-status {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 14px 16px;
+    align-items: center;
+    padding: 18px 20px;
+    border-radius: 22px;
+    border: 1px solid rgba(21, 128, 61, 0.18);
+    background:
+        radial-gradient(circle at 100% 0%, rgba(20, 184, 166, 0.12), transparent 38%),
+        linear-gradient(135deg, rgba(240, 253, 244, 0.95), rgba(255, 255, 255, 0.88));
+}
+
+.np-admin-safety-status.is-warning {
+    border-color: rgba(245, 158, 11, 0.28);
+    background:
+        radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.12), transparent 38%),
+        linear-gradient(135deg, rgba(255, 251, 235, 0.96), rgba(255, 255, 255, 0.9));
+}
+
+.np-admin-safety-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.14);
+}
+
+.np-admin-safety-status.is-warning .np-admin-safety-status-dot {
+    background: #d97706;
+    box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.14);
+}
+
+.np-admin-safety-status-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.np-admin-safety-status-copy strong {
+    color: #14532d;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.np-admin-safety-status.is-warning .np-admin-safety-status-copy strong {
+    color: #92400e;
+}
+
+.np-admin-safety-status-copy span {
+    color: #4d7c5f;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.np-admin-safety-status.is-warning .np-admin-safety-status-copy span {
+    color: #a16207;
+}
+
+.np-admin-safety-status-copy code {
+    font-size: 0.84em;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.np-admin-safety-link {
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 240, 0.16);
+    background: rgba(255, 255, 255, 0.82);
+    color: #4f32f0;
+    font-size: 0.82rem;
+    font-weight: 850;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.np-admin-safety-link:hover {
+    border-color: rgba(79, 50, 240, 0.28);
+    background: #fff;
+}
+
+.np-admin-safety-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.np-admin-safety-metric {
+    display: grid;
+    gap: 6px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.np-admin-safety-metric-label {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9b93b0;
+}
+
+.np-admin-safety-metric strong {
+    color: #171326;
+    font: 950 1.35rem / 1.1 "Inter Tight", sans-serif;
+}
+
+.np-admin-safety-metric strong em {
+    display: block;
+    margin-top: 4px;
+    font: 700 0.72rem / 1.2 "Manrope", sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #9b93b0;
+    font-style: normal;
+}
+
+.np-admin-safety-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 18px;
+    padding-top: 4px;
+}
+
+.np-admin-safety-note {
+    margin: 0;
+    color: #7a728d;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.np-admin-safety-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.np-admin-safety-actions form {
+    margin: 0;
+}
+
+.np-admin-safety-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 240, 0.18);
+    background: rgba(255, 255, 255, 0.9);
+    color: #4f32f0;
+    font: 850 0.88rem / 1 "Manrope", sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.np-admin-safety-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(79, 50, 240, 0.28);
+    box-shadow: 0 10px 24px rgba(79, 50, 240, 0.1);
+}
+
+.np-admin-safety-btn--primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, #4f32f0, #2563eb);
+    color: #fff;
+    box-shadow: 0 14px 28px rgba(79, 50, 240, 0.22);
+}
+
+.np-admin-safety-btn--ghost {
+    background: transparent;
+}
+
+/* Admin: student directory table */
+.np-admin-directory {
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.np-admin-directory-head,
+.np-admin-directory-row {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.6fr) 72px 72px minmax(120px, 0.9fr) 96px;
+    gap: 12px 16px;
+    align-items: center;
+    padding: 14px 18px;
+}
+
+.np-admin-directory-stats {
+    display: contents;
+}
+
+.np-admin-directory-head {
+    background: rgba(248, 246, 255, 0.96);
+    border-bottom: 1px solid rgba(91, 77, 255, 0.1);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9b93b0;
+}
+
+.np-admin-directory-body {
+    display: grid;
+}
+
+.np-admin-directory-row {
+    border-bottom: 1px solid rgba(91, 77, 255, 0.08);
+    background: rgba(255, 255, 255, 0.72);
+    transition: background 0.14s ease;
+}
+
+.np-admin-directory-row:last-child {
+    border-bottom: 0;
+}
+
+.np-admin-directory-row:hover {
+    background: rgba(248, 246, 255, 0.92);
+}
+
+.np-admin-directory-student {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.np-admin-directory-identity {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.np-admin-directory-identity strong {
+    font-size: 0.96rem;
+}
+
+.np-admin-directory-identity strong a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.np-admin-directory-meta {
+    color: #9b93b0 !important;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.np-admin-directory-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.np-admin-directory-badges .np-admin-status {
+    margin-top: 0;
+    padding: 4px 9px;
+    font-size: 0.72rem;
+}
+
+.np-admin-directory-stat {
+    text-align: center;
+}
+
+.np-admin-directory-stat strong {
+    display: block;
+    color: #171326;
+    font: 900 0.98rem / 1.2 "Inter Tight", sans-serif;
+}
+
+.np-admin-directory-stat--time strong {
+    font: 750 0.78rem / 1.35 "Manrope", sans-serif;
+    color: #5c5470;
+    word-break: break-word;
+}
+
+.np-admin-directory-manage {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.np-admin-directory-tools {
+    position: relative;
+}
+
+.np-admin-directory-tools > summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 240, 0.16);
+    background: rgba(255, 255, 255, 0.92);
+    color: #4f32f0;
+    font: 850 0.82rem / 1 "Manrope", sans-serif;
+    user-select: none;
+}
+
+.np-admin-directory-tools > summary::-webkit-details-marker {
+    display: none;
+}
+
+.np-admin-directory-tools[open] > summary {
+    background: rgba(79, 50, 240, 0.1);
+    border-color: rgba(79, 50, 240, 0.24);
+}
+
+.np-admin-directory-tools-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 12;
+    width: min(320px, calc(100vw - 48px));
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 20px 50px rgba(42, 34, 120, 0.14);
+}
+
+.np-admin-directory-form {
+    display: grid;
+    gap: 8px;
+}
+
+.np-admin-directory-form label {
+    display: grid;
+    gap: 5px;
+}
+
+.np-admin-directory-form label span {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #9b93b0;
+}
+
+.np-admin-directory-form input {
+    width: 100%;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.np-admin-directory-form button,
+.np-admin-directory-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1f7ae0, #2563eb);
+    color: #fff;
+    font: 850 0.84rem / 1 "Manrope", sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+}
+
+.np-admin-directory-quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.np-admin-directory-btn--ghost {
+    background: rgba(79, 50, 240, 0.08);
+    color: #4f32f0;
+    box-shadow: none;
+}
+
+.np-admin-directory-form--danger {
+    padding-top: 10px;
+    border-top: 1px solid rgba(185, 28, 28, 0.12);
+}
+
+.np-admin-directory-form--danger button {
+    background: linear-gradient(135deg, #8f1515, #b91c1c);
+    box-shadow: 0 10px 22px rgba(185, 28, 28, 0.16);
+}
+
+.np-admin-directory-form--danger input {
+    border-color: rgba(185, 28, 28, 0.18);
+}
+
+@media (max-width: 960px) {
+    .np-admin-safety-status {
+        grid-template-columns: auto 1fr;
+    }
+
+    .np-admin-safety-link {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+    .np-admin-safety-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .np-admin-directory-head {
+        display: none;
+    }
+
+    .np-admin-directory-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "student manage"
+            "stats stats";
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .np-admin-directory-student {
+        grid-area: student;
+    }
+
+    .np-admin-directory-manage {
+        grid-area: manage;
+        align-self: start;
+    }
+
+    .np-admin-directory-stats {
+        display: grid;
+        grid-area: stats;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .np-admin-directory-stat {
+        text-align: left;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(248, 246, 255, 0.85);
+        border: 1px solid rgba(91, 77, 255, 0.08);
+    }
+
+    .np-admin-directory-stat::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.66rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9b93b0;
+        margin-bottom: 4px;
+    }
+}
+
+@media (max-width: 560px) {
+    .np-admin-safety-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .np-admin-safety-foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .np-admin-safety-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .np-admin-safety-btn {
+        width: 100%;
+    }
+
+    .np-admin-directory-tools-panel {
+        right: auto;
+        left: 0;
+        width: min(100%, 320px);
+    }
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-status {
+    background: rgba(22, 48, 34, 0.55);
+    border-color: rgba(74, 222, 128, 0.18);
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-status.is-warning {
+    background: rgba(69, 45, 10, 0.55);
+    border-color: rgba(251, 191, 36, 0.22);
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-status-copy strong {
+    color: #bbf7d0;
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-status.is-warning .np-admin-safety-status-copy strong {
+    color: #fde68a;
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-status-copy span,
+html[data-exam-theme="dark"] .np-admin-safety-note {
+    color: #c9bfd9;
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-metric,
+html[data-exam-theme="dark"] .np-admin-directory,
+html[data-exam-theme="dark"] .np-admin-directory-row,
+html[data-exam-theme="dark"] .np-admin-directory-tools-panel {
+    background: rgba(28, 24, 46, 0.82);
+    border-color: rgba(200, 191, 255, 0.12);
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-metric strong,
+html[data-exam-theme="dark"] .np-admin-directory-stat strong,
+html[data-exam-theme="dark"] .np-admin-directory-identity strong a {
+    color: #f8f6ff;
+}
+
+html[data-exam-theme="dark"] .np-admin-directory-head {
+    background: rgba(24, 21, 38, 0.92);
+}
+
+html[data-exam-theme="dark"] .np-admin-safety-link,
+html[data-exam-theme="dark"] .np-admin-safety-btn,
+html[data-exam-theme="dark"] .np-admin-directory-tools > summary {
+    background: rgba(18, 16, 30, 0.86);
+    border-color: rgba(200, 191, 255, 0.14);
+    color: #ddd6fe;
+}
+
+html[data-exam-theme="dark"] .np-admin-directory-form input {
+    background: rgba(18, 16, 30, 0.86);
+    border-color: rgba(200, 191, 255, 0.14);
+    color: #f8f6ff;
+}
+
 .np-admin-persist-warn {
     padding: 14px 18px;
     border-radius: 18px;

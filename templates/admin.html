@@ -82,6 +82,61 @@
       </div>
     </section>
 
+    <section class="np-admin-card np-admin-card--safety glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-persistence">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Data safety</p>
+          <h2 id="np-admin-persistence">Account &amp; progress backups</h2>
+          <p>SQLite on Render’s persistent disk · auto snapshots every 4 hours · extra backup after account changes.</p>
+        </div>
+      </header>
+
+      <div class="np-admin-safety">
+        <div class="np-admin-safety-status{% if not db_persistence.persistence_ok %} is-warning{% endif %}">
+          <span class="np-admin-safety-status-dot" aria-hidden="true"></span>
+          <div class="np-admin-safety-status-copy">
+            <strong>{% if db_persistence.persistence_ok %}Persistent disk connected{% else %}Persistence not verified{% endif %}</strong>
+            <span>{% if db_persistence.persistence_ok %}Account and session data survive redeploys.{% else %}Add disk at <code>/var/data</code> and set <code>DB_PATH=/var/data/sat.db</code>.{% endif %}</span>
+          </div>
+          <a href="{{ url_for('health_db') }}" class="np-admin-safety-link" target="_blank" rel="noopener">Health JSON ↗</a>
+        </div>
+
+        <div class="np-admin-safety-metrics" aria-label="Database snapshot summary">
+          <div class="np-admin-safety-metric">
+            <span class="np-admin-safety-metric-label">Accounts</span>
+            <strong>{{ db_persistence.user_count }}</strong>
+          </div>
+          <div class="np-admin-safety-metric">
+            <span class="np-admin-safety-metric-label">Sessions</span>
+            <strong>{{ db_persistence.attempt_count }}</strong>
+          </div>
+          <div class="np-admin-safety-metric">
+            <span class="np-admin-safety-metric-label">Backups on disk</span>
+            <strong>{{ db_persistence.backup_count or 0 }}</strong>
+          </div>
+          <div class="np-admin-safety-metric">
+            <span class="np-admin-safety-metric-label">Last backup</span>
+            <strong>{% if db_persistence.last_backup_at %}{{ db_persistence.last_backup_at[:10] }}<em>{{ db_persistence.last_backup_at[11:16] }} UTC</em>{% else %}—{% endif %}</strong>
+          </div>
+        </div>
+
+        <div class="np-admin-safety-foot">
+          <p class="np-admin-safety-note">
+            {% if db_persistence.seed_snapshot_exists %}Account hash snapshot saved on disk.{% else %}Run “Backup now” to create the first on-disk snapshot.{% endif %}
+          </p>
+          <div class="np-admin-safety-actions">
+            <form method="post" action="{{ url_for('admin_backup_database_now') }}">
+              <button type="submit" class="np-admin-safety-btn np-admin-safety-btn--primary">Backup now</button>
+            </form>
+            <a href="{{ url_for('admin_download_live_database') }}" class="np-admin-safety-btn">Download live DB</a>
+            {% if db_persistence.backup_count %}
+            <a href="{{ url_for('admin_download_database_backup') }}" class="np-admin-safety-btn np-admin-safety-btn--ghost">Latest backup</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
       <header class="np-admin-section-head">
         <div>
@@ -212,45 +267,76 @@
         </form>
       </header>
 
-      <div class="np-admin-student-list np-admin-student-list--studio">
-        {% for student in students %}
-        <article class="np-admin-student-row np-admin-student-row--studio">
-          <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
-          <div class="np-admin-student-main">
-            <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
-            <span>Joined {{ student.created_at or "—" }}</span>
-            <div class="np-admin-student-tags">
-              <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
-              <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
+      <div class="np-admin-directory">
+        <div class="np-admin-directory-head" aria-hidden="true">
+          <span>Student</span>
+          <span>Sessions</span>
+          <span>Accuracy</span>
+          <span>Last active</span>
+          <span>Manage</span>
+        </div>
+
+        <div class="np-admin-directory-body">
+          {% for student in students %}
+          <article class="np-admin-directory-row">
+            <div class="np-admin-directory-student">
+              <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
+              <div class="np-admin-directory-identity">
+                <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
+                <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}</span>
+                <div class="np-admin-directory-badges">
+                  <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
+                  <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="np-admin-student-metrics np-admin-student-metrics--studio">
-            <div><strong>{{ student.attempts_total }}</strong><span>Sessions</span></div>
-            <div><strong>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
-            <div><strong>{{ student.last_activity or "—" }}</strong><span>Last active</span></div>
-          </div>
-          <div class="np-admin-student-actions np-admin-student-actions--studio">
-            <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}" class="np-admin-mini-form">
-              <input name="password" type="text" placeholder="New password" aria-label="New password for {{ student.username }}" required>
-              <button type="submit">Reset</button>
-            </form>
-            <div class="np-admin-student-action-row">
-              <form method="post" action="{{ url_for('admin_toggle_student_active', user_id=student.id) }}">
-                <button type="submit" class="np-admin-btn np-admin-btn--ghost">{{ "Deactivate" if student.is_active else "Reactivate" }}</button>
-              </form>
-              <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-view-btn">Open record</a>
+
+            <div class="np-admin-directory-stats">
+              <div class="np-admin-directory-stat" data-label="Sessions">
+                <strong>{{ student.attempts_total }}</strong>
+              </div>
+              <div class="np-admin-directory-stat" data-label="Accuracy">
+                <strong>{% if student.accuracy_pct is not none %}{{ student.accuracy_pct }}%{% else %}—{% endif %}</strong>
+              </div>
+              <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last active">
+                <strong>{{ student.last_activity or "—" }}</strong>
+              </div>
             </div>
-            {% if user_is_supervisor %}
-            <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-delete-form">
-              <input name="confirm" type="text" placeholder="Type DELETE" aria-label="Confirm deleting {{ student.username }}">
-              <button type="submit">Delete</button>
-            </form>
-            {% endif %}
-          </div>
-        </article>
-        {% else %}
-        <p class="np-admin-empty">No students match your search.</p>
-        {% endfor %}
+
+            <div class="np-admin-directory-manage">
+              <details class="np-admin-directory-tools">
+                <summary>Actions</summary>
+                <div class="np-admin-directory-tools-panel">
+                  <form method="post" action="{{ url_for('admin_reset_student_password', user_id=student.id) }}" class="np-admin-directory-form">
+                    <label>
+                      <span>New password</span>
+                      <input name="password" type="text" placeholder="Temporary password" aria-label="New password for {{ student.username }}" required>
+                    </label>
+                    <button type="submit">Reset password</button>
+                  </form>
+                  <div class="np-admin-directory-quick">
+                    <form method="post" action="{{ url_for('admin_toggle_student_active', user_id=student.id) }}">
+                      <button type="submit" class="np-admin-directory-btn np-admin-directory-btn--ghost">{{ "Deactivate" if student.is_active else "Reactivate" }}</button>
+                    </form>
+                    <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" class="np-admin-directory-btn">Open record</a>
+                  </div>
+                  {% if user_is_supervisor %}
+                  <form method="post" action="{{ url_for('admin_delete_student', user_id=student.id) }}" class="np-admin-directory-form np-admin-directory-form--danger">
+                    <label>
+                      <span>Type DELETE to remove account</span>
+                      <input name="confirm" type="text" placeholder="DELETE" aria-label="Confirm deleting {{ student.username }}">
+                    </label>
+                    <button type="submit">Delete student</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </details>
+            </div>
+          </article>
+          {% else %}
+          <p class="np-admin-empty">No students match your search.</p>
+          {% endfor %}
+        </div>
       </div>
     </section>
 

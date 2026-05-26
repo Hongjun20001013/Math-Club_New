@@ -7,8 +7,8 @@
 #   1. Disks → Add: mount /var/data, 1 GB
 #   2. Environment → DB_PATH=/var/data/sat.db  RENDER=true
 #   3. Manual Deploy once after disk is attached
-#   4. /health/db must show persistence_ok:true, user_count >= 1
-# Backups: /var/data/backups/sat-*.db (auto, every 6h). Account seed: data/render_users_seed.json
+#   4. /health/db must show persistence_ok:true, user_count >= 1, backup_count >= 0
+# Backups: /var/data/backups/sat-*.db (auto every 4h; +1h after account changes). Seed: data/render_users_seed.json + disk snapshot users_seed_latest.json
 services:
   - type: web
     name: novel-prep-sat

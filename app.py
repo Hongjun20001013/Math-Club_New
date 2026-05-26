@@ -64,6 +64,10 @@ def _resolve_db_path() -> str:
 DB_PATH = _resolve_db_path()
 SEED_USERS_PATH = os.path.join(APP_DIR, "data", "render_users_seed.json")
 RENDER_BACKUP_DIR = os.path.join(RENDER_PERSISTENT_DB_DIR, "backups")
+RENDER_SEED_SNAPSHOT_PATH = os.path.join(RENDER_BACKUP_DIR, "users_seed_latest.json")
+BACKUP_INTERVAL_SECONDS = 4 * 3600
+BACKUP_KEEP_COUNT = 30
+BACKUP_AFTER_WRITE_SECONDS = 3600
 
 COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
@@ -89,7 +93,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-admin-studio")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260525-admin-directory")
 
 
 def _site_brand_name() -> str:
@@ -178,6 +182,78 @@ def _path_on_render_disk(path: str) -> bool:
     return False
 
 
+def _sqlite_db_stats(db_path: str) -> dict[str, int]:
+    stats = {"user_count": 0, "admin_count": 0, "attempt_count": 0}
+    if not os.path.isfile(db_path):
+        return stats
+    try:
+        conn = sqlite3.connect(db_path)
+        stats["user_count"] = int(conn.execute("SELECT COUNT(*) FROM users").fetchone()[0])
+        stats["admin_count"] = int(
+            conn.execute(
+                "SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1"
+            ).fetchone()[0]
+        )
+        try:
+            stats["attempt_count"] = int(
+                conn.execute("SELECT COUNT(*) FROM practice_attempts").fetchone()[0]
+            )
+        except sqlite3.Error:
+            stats["attempt_count"] = 0
+        conn.close()
+    except sqlite3.Error:
+        stats["user_count"] = -1
+    return stats
+
+
+def _backup_marker_path() -> str:
+    return os.path.join(RENDER_BACKUP_DIR, ".last_backup")
+
+
+def _list_render_db_backups() -> list[str]:
+    if not os.path.isdir(RENDER_BACKUP_DIR):
+        return []
+    return sorted(glob.glob(os.path.join(RENDER_BACKUP_DIR, "sat-*.db")))
+
+
+def _latest_backup_path() -> str | None:
+    backups = _list_render_db_backups()
+    return backups[-1] if backups else None
+
+
+def _last_backup_timestamp() -> float | None:
+    marker = _backup_marker_path()
+    if os.path.isfile(marker):
+        try:
+            return os.path.getmtime(marker)
+        except OSError:
+            pass
+    backups = _list_render_db_backups()
+    if backups:
+        try:
+            return os.path.getmtime(backups[-1])
+        except OSError:
+            pass
+    return None
+
+
+def _sqlite_backup_file(src_path: str, dest_path: str) -> None:
+    """Hot backup via SQLite API (safe while the app holds the DB open)."""
+    parent = os.path.dirname(dest_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    src = sqlite3.connect(f"file:{os.path.abspath(src_path)}?mode=ro", uri=True)
+    try:
+        dst = sqlite3.connect(dest_path)
+        try:
+            src.backup(dst)
+            dst.commit()
+        finally:
+            dst.close()
+    finally:
+        src.close()
+
+
 def _db_persistence_status() -> dict[str, Any]:
     """Report whether SQLite lives on a volume that survives redeploys."""
     db_path = os.path.abspath(DB_PATH)
@@ -197,17 +273,11 @@ def _db_persistence_status() -> dict[str, Any]:
         except OSError:
             writable = False
 
-    user_count = 0
-    if db_exists:
-        try:
-            conn = sqlite3.connect(db_path)
-            row = conn.execute("SELECT COUNT(*) FROM users").fetchone()
-            user_count = int(row[0]) if row else 0
-            conn.close()
-        except sqlite3.Error:
-            user_count = -1
-
+    stats = _sqlite_db_stats(db_path) if db_exists else _sqlite_db_stats("")
+    backups = _list_render_db_backups()
+    last_backup_ts = _last_backup_timestamp()
     persistence_ok = (not on_render) or (on_persistent_volume and dir_exists and writable)
+
     return {
         "db_path": db_path,
         "on_render": on_render,
@@ -215,8 +285,17 @@ def _db_persistence_status() -> dict[str, Any]:
         "dir_exists": dir_exists,
         "db_exists": db_exists,
         "writable": writable,
-        "user_count": user_count,
+        "user_count": stats["user_count"],
+        "admin_count": stats["admin_count"],
+        "attempt_count": stats["attempt_count"],
         "persistence_ok": persistence_ok,
+        "backup_count": len(backups),
+        "last_backup_at": (
+            datetime.utcfromtimestamp(last_backup_ts).strftime("%Y-%m-%dT%H:%M:%SZ")
+            if last_backup_ts
+            else None
+        ),
+        "seed_snapshot_exists": os.path.isfile(RENDER_SEED_SNAPSHOT_PATH),
         "legacy_ephemeral_exists": (
             os.path.isfile(LEGACY_EPHEMERAL_DB_PATH)
             and os.path.abspath(LEGACY_EPHEMERAL_DB_PATH) != db_path
@@ -224,102 +303,195 @@ def _db_persistence_status() -> dict[str, Any]:
     }
 
 
-def _sqlite_has_admin(db_path: str) -> bool:
-    if not os.path.isfile(db_path):
-        return False
-    try:
-        conn = sqlite3.connect(db_path)
-        row = conn.execute(
-            "SELECT 1 FROM users WHERE role = 'admin' AND is_active = 1 LIMIT 1"
-        ).fetchone()
-        conn.close()
-        return row is not None
-    except sqlite3.Error:
-        return False
-
 
 def _try_restore_from_render_backups() -> None:
     """If the live DB lost accounts, restore the newest on-disk backup."""
     target = os.path.abspath(DB_PATH)
-    if _sqlite_has_admin(target):
+    live_stats = _sqlite_db_stats(target)
+    if live_stats["admin_count"] > 0:
         return
     if not os.path.isdir(RENDER_BACKUP_DIR):
         return
-    for path in sorted(glob.glob(os.path.join(RENDER_BACKUP_DIR, "sat-*.db")), reverse=True):
-        if _sqlite_has_admin(path):
-            os.makedirs(os.path.dirname(target), exist_ok=True)
-            shutil.copy2(path, target)
-            app.logger.warning("Restored SQLite database from backup %s", path)
-            return
+    for path in reversed(_list_render_db_backups()):
+        backup_stats = _sqlite_db_stats(path)
+        if backup_stats["admin_count"] <= 0 and backup_stats["user_count"] <= 0:
+            continue
+        if live_stats["user_count"] > 0 and backup_stats["user_count"] <= live_stats["user_count"]:
+            continue
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        shutil.copy2(path, target)
+        app.logger.warning(
+            "Restored SQLite database from backup %s (users %s→%s, attempts %s→%s)",
+            path,
+            live_stats["user_count"],
+            backup_stats["user_count"],
+            live_stats["attempt_count"],
+            backup_stats["attempt_count"],
+        )
+        return
 
 
-def _maybe_auto_backup_database() -> None:
-    """Hourly snapshot on Render persistent disk (survives redeploys)."""
+def _backup_database_now(
+    *,
+    force: bool = False,
+    min_interval_seconds: int = BACKUP_INTERVAL_SECONDS,
+) -> str | None:
+    """Write a timestamped SQLite snapshot on the Render persistent disk."""
     if not _is_render_runtime() or not _path_on_render_disk(DB_PATH) or not os.path.isfile(DB_PATH):
-        return
+        return None
     os.makedirs(RENDER_BACKUP_DIR, exist_ok=True)
-    marker = os.path.join(RENDER_BACKUP_DIR, ".last_backup")
+    marker = _backup_marker_path()
     now = time.time()
-    if os.path.isfile(marker) and now - os.path.getmtime(marker) < 6 * 3600:
-        return
+    if not force and _last_backup_timestamp() is not None:
+        if now - _last_backup_timestamp() < min_interval_seconds:
+            return None
     stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     dest = os.path.join(RENDER_BACKUP_DIR, f"sat-{stamp}.db")
-    shutil.copy2(DB_PATH, dest)
+    db = g.pop("db", None)
+    if db is not None:
+        db.commit()
+        db.close()
+    _sqlite_backup_file(DB_PATH, dest)
     with open(marker, "w", encoding="utf-8") as fh:
         fh.write(stamp)
-    backups = sorted(glob.glob(os.path.join(RENDER_BACKUP_DIR, "sat-*.db")))
-    for old in backups[:-15]:
+    backups = _list_render_db_backups()
+    for old in backups[:-BACKUP_KEEP_COUNT]:
         try:
             os.remove(old)
         except OSError:
             pass
     app.logger.info("SQLite backup saved to %s", dest)
+    return dest
+
+
+def _maybe_auto_backup_database() -> None:
+    """Periodic snapshot on Render persistent disk (survives redeploys)."""
+    _backup_database_now(force=False, min_interval_seconds=BACKUP_INTERVAL_SECONDS)
+
+
+def _users_seed_payload_from_db(db: sqlite3.Connection) -> dict[str, Any]:
+    rows = db.execute(
+        """
+        SELECT username, password_hash, role, is_active, access_grants
+        FROM users
+        WHERE password_hash IS NOT NULL AND password_hash != ''
+        ORDER BY id
+        """
+    ).fetchall()
+    return {
+        "_note": "Live account snapshot (password hashes only). Auto-written on Render.",
+        "users": [
+            {
+                "username": str(row["username"]),
+                "password_hash": str(row["password_hash"]),
+                "role": str(row["role"] or ROLE_STUDENT),
+                "is_active": int(row["is_active"] or 0),
+                **(
+                    {"access_grants": str(row["access_grants"])}
+                    if row["access_grants"]
+                    else {}
+                ),
+            }
+            for row in rows
+        ],
+    }
+
+
+def _write_users_seed_file(path: str, payload: dict[str, Any]) -> None:
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    tmp = f"{path}.tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, indent=2)
+        fh.write("\n")
+    os.replace(tmp, path)
+
+
+def _sync_render_users_seed_snapshot(db: sqlite3.Connection | None = None) -> None:
+    """Keep a hash-only account snapshot on the persistent disk (second recovery path)."""
+    if not _is_render_runtime() or not _path_on_render_disk(DB_PATH):
+        return
+    close_after = False
+    if db is None:
+        if not os.path.isfile(DB_PATH):
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        db = conn
+        close_after = True
+    try:
+        payload = _users_seed_payload_from_db(db)
+        if not payload["users"]:
+            return
+        _write_users_seed_file(RENDER_SEED_SNAPSHOT_PATH, payload)
+    finally:
+        if close_after:
+            db.close()
+
+
+def _seed_users_sources() -> list[str]:
+    paths: list[str] = []
+    if os.path.isfile(RENDER_SEED_SNAPSHOT_PATH):
+        paths.append(RENDER_SEED_SNAPSHOT_PATH)
+    if os.path.isfile(SEED_USERS_PATH):
+        paths.append(SEED_USERS_PATH)
+    return paths
+
+
+def _backup_after_account_change(db: sqlite3.Connection) -> None:
+    _sync_render_users_seed_snapshot(db)
+    _backup_database_now(force=False, min_interval_seconds=BACKUP_AFTER_WRITE_SECONDS)
 
 
 def _seed_users_if_empty(db: sqlite3.Connection) -> None:
     """Restore known accounts when Render DB was wiped (hashes only, no plaintext passwords)."""
     if _admin_exists(db):
         return
-    if not os.path.isfile(SEED_USERS_PATH):
-        return
-    try:
-        with open(SEED_USERS_PATH, encoding="utf-8") as fh:
-            payload = json.load(fh)
-    except (OSError, json.JSONDecodeError):
-        return
-    users = payload.get("users") or []
-    if not isinstance(users, list):
-        return
-    inserted = 0
-    for row in users:
-        if not isinstance(row, dict):
-            continue
-        username = str(row.get("username") or "").strip()
-        password_hash = str(row.get("password_hash") or "").strip()
-        if not username or not password_hash:
-            continue
-        role = str(row.get("role") or ROLE_STUDENT)
-        is_active = int(row.get("is_active") or 1)
+    for seed_path in _seed_users_sources():
         try:
-            db.execute(
-                """
-                INSERT INTO users (
-                    username, password, password_hash, role, is_active,
-                    created_at, password_changed_at
+            with open(seed_path, encoding="utf-8") as fh:
+                payload = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            continue
+        users = payload.get("users") or []
+        if not isinstance(users, list):
+            continue
+        inserted = 0
+        for row in users:
+            if not isinstance(row, dict):
+                continue
+            username = str(row.get("username") or "").strip()
+            password_hash = str(row.get("password_hash") or "").strip()
+            if not username or not password_hash:
+                continue
+            role = str(row.get("role") or ROLE_STUDENT)
+            is_active = int(row.get("is_active") or 1)
+            access_grants = row.get("access_grants")
+            grants_sql = str(access_grants).strip() if access_grants else None
+            try:
+                db.execute(
+                    """
+                    INSERT INTO users (
+                        username, password, password_hash, role, is_active,
+                        access_grants, created_at, password_changed_at
+                    )
+                    VALUES (?, '', ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    """,
+                    (username, password_hash, role, is_active, grants_sql),
                 )
-                VALUES (?, '', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                """,
-                (username, password_hash, role, is_active),
+                inserted += 1
+            except sqlite3.IntegrityError:
+                pass
+        if inserted:
+            db.commit()
+            app.logger.warning(
+                "Seeded %s account(s) from %s after missing admin.",
+                inserted,
+                seed_path,
             )
-            inserted += 1
-        except sqlite3.IntegrityError:
-            pass
-    if inserted:
-        db.commit()
-        app.logger.warning(
-            "Seeded %s account(s) from render_users_seed.json after empty database.",
-            inserted,
-        )
+            _sync_render_users_seed_snapshot(db)
+            return
 
 
 def _maybe_migrate_ephemeral_db() -> None:
@@ -361,8 +533,11 @@ def get_db() -> sqlite3.Connection:
         parent = os.path.dirname(os.path.abspath(DB_PATH))
         if parent:
             os.makedirs(parent, exist_ok=True)
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA busy_timeout=30000")
         g.db = conn
     return g.db
 
@@ -484,6 +659,7 @@ def init_db():
         "ON mistake_learning_progress(learner_key)"
     )
     _seed_users_if_empty(db)
+    _sync_render_users_seed_snapshot(db)
     _maybe_auto_backup_database()
     db.commit()
 
@@ -2764,8 +2940,62 @@ def health():
 def health_db():
     """Verify SQLite path and persistence (for Render ops; no secrets)."""
     status = _db_persistence_status()
-    ok = status["persistence_ok"] and (status["db_exists"] or status["writable"])
+    ok = (
+        status["persistence_ok"]
+        and (status["db_exists"] or status["writable"])
+        and status["user_count"] != 0
+    )
     return jsonify(ok=ok, **status), (200 if ok else 503)
+
+
+@app.route("/admin/data/backup-now", methods=["POST"])
+def admin_backup_database_now():
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    path = _backup_database_now(force=True)
+    if path:
+        flash(f"Database backup saved ({os.path.basename(path)}).")
+    else:
+        flash("Backup skipped — persistent disk or database not available.")
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/data/download-backup")
+def admin_download_database_backup():
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    path = _latest_backup_path()
+    if not path or not os.path.isfile(path):
+        abort(404, description="No backup file found on disk.")
+    return send_file(
+        path,
+        as_attachment=True,
+        download_name=os.path.basename(path),
+        mimetype="application/x-sqlite3",
+    )
+
+
+@app.route("/admin/data/download-db")
+def admin_download_live_database():
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    if not os.path.isfile(DB_PATH):
+        abort(404, description="Database file not found.")
+    path = _backup_database_now(force=True)
+    if not path or not os.path.isfile(path):
+        abort(503, description="Could not create a database snapshot.")
+    return send_file(
+        path,
+        as_attachment=True,
+        download_name=os.path.basename(path),
+        mimetype="application/x-sqlite3",
+    )
 
 
 @app.route("/health/style")
@@ -6288,6 +6518,7 @@ def admin_setup():
                     (username, generate_password_hash(password)),
                 )
                 db.commit()
+                _backup_after_account_change(db)
             except sqlite3.IntegrityError:
                 flash("That username already exists.")
             else:
@@ -6732,6 +6963,7 @@ def admin_create_student():
             db.commit()
             label = _access_grants_label(grants_json)
             flash(f"Student account created for {username}. Access: {label}.")
+            _backup_after_account_change(db)
         except sqlite3.IntegrityError:
             flash("That student username already exists.")
 
@@ -6763,6 +6995,7 @@ def admin_create_staff():
             )
             db.commit()
             flash(f"Colleague account created for {username}. They can view student data in Admin.")
+            _backup_after_account_change(db)
         except sqlite3.IntegrityError:
             flash("That username already exists.")
 
@@ -6793,6 +7026,7 @@ def admin_reset_staff_password(user_id: int):
     )
     db.commit()
     flash("Colleague password updated.")
+    _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 
@@ -6814,6 +7048,7 @@ def admin_toggle_staff_active(user_id: int):
         db.execute("UPDATE users SET is_active = ? WHERE id = ?", (next_active, user_id))
         db.commit()
         flash("Colleague account status updated.")
+        _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 
@@ -6838,6 +7073,7 @@ def admin_update_student_access(user_id: int):
     )
     db.commit()
     flash(f"Access updated: {_access_grants_label(grants_json)}.")
+    _backup_after_account_change(db)
     return redirect(url_for("admin_student_detail", user_id=user_id))
 
 
@@ -6865,6 +7101,7 @@ def admin_reset_student_password(user_id: int):
     )
     db.commit()
     flash("Student password updated.")
+    _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 
@@ -6886,6 +7123,7 @@ def admin_toggle_student_active(user_id: int):
         db.execute("UPDATE users SET is_active = ? WHERE id = ?", (next_active, user_id))
         db.commit()
         flash("Student account status updated.")
+        _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 
@@ -6913,6 +7151,7 @@ def admin_delete_student(user_id: int):
     db.execute("DELETE FROM users WHERE id = ? AND role = 'student'", (user_id,))
     db.commit()
     flash(f"Deleted {row['username']} and {deleted_attempts} linked practice sessions.")
+    _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
 
