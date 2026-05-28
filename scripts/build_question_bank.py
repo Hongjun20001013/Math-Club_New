@@ -22,6 +22,7 @@ OUTPUT_REPORT = os.path.join(OUTPUT_DIR, "question_bank_report.json")
 UNIT1_MANIFEST = os.path.join(OUTPUT_DIR, "unit1_question_manifest.json")
 UNIT1_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit1_supplement.json")
 UNIT1_EXPL_EN = os.path.join(OUTPUT_DIR, "unit1_explanations_en.json")
+UNIT1_PT_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit1_pt_supplement.json")
 UNIT2_MANIFEST = os.path.join(OUTPUT_DIR, "unit2_question_manifest.json")
 UNIT2_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit2_supplement.json")
 UNIT2_EXPL_EN = os.path.join(OUTPUT_DIR, "unit2_explanations_en.json")
@@ -580,6 +581,41 @@ def _enrich_unit1_algebra_questions(
             )
 
 
+def _enrich_unit1_pt_questions(
+    questions: List[Any],
+    walkthroughs: Optional[dict[str, Any]] = None,
+) -> None:
+    """Attach answers for Unit 1 Practice Test (1_pt), separate from chapter slices."""
+    supp = _load_json(UNIT1_PT_SUPPLEMENT)
+    if not supp:
+        print("Warning: missing unit1_pt_supplement.json; skip 1_pt enrichment.")
+        return
+    cells = list((supp.get("answers_by_topic") or {}).get("1_pt") or [])
+    if len(cells) != len(questions):
+        print(
+            "Warning: 1_pt answer length mismatch; skip enrichment.",
+            len(cells),
+            len(questions),
+        )
+        return
+    titles_zh = supp.get("section_titles_zh", {})
+    titles_en = supp.get("section_titles_en", {})
+    manifest = [
+        {
+            "display_number": i + 1,
+            "section": "PT",
+            "topic_key": "1_pt",
+            "topic_local_index": i,
+        }
+        for i in range(len(questions))
+    ]
+    for j, q in enumerate(questions):
+        _attach_unit1_answer_row(q, cells[j], manifest[j], titles_zh, titles_en, {})
+        _apply_slot_walkthrough(
+            q, "algebra", "1_pt", j, walkthroughs or {},
+        )
+
+
 def _enrich_unit2_algebra_questions(
     topic_key: str,
     questions: List[Any],
@@ -923,6 +959,8 @@ def build_bank():
             for tk in _SLICE_ORDER:
                 if tk in alg:
                     _enrich_unit1_algebra_questions(tk, alg[tk], mrows, sat_wt)
+        if alg.get("1_pt"):
+            _enrich_unit1_pt_questions(alg["1_pt"], sat_wt)
 
     adv = bank.get("advanced_math", {})
     if adv.get("unit_2_all"):

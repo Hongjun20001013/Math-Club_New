@@ -23418,10 +23418,55 @@ html[data-exam-theme="dark"] .np-hard-hero-stat {
     grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
 }
 
+.np-hard-picker-grid--unit {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+    .np-hard-picker-grid--unit {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .np-hard-picker-grid--unit {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 .np-hard-picker-grid--unit .np-hard-picker-tile--featured {
     grid-column: span 2;
     border-color: rgba(79, 50, 240, 0.22);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 241, 255, 0.92));
+}
+
+.np-hard-picker-tile--practice-test {
+    border-color: rgba(13, 148, 136, 0.28);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 253, 250, 0.94));
+    box-shadow: 0 14px 28px rgba(13, 148, 136, 0.08);
+}
+
+.np-hard-picker-tile--practice-test.is-active,
+.np-hard-picker-tile--practice-test:hover {
+    border-color: rgba(13, 148, 136, 0.42);
+}
+
+.np-hard-picker-tile--practice-test .np-hard-picker-roman {
+    color: #0f766e;
+}
+
+.np-hard-picker-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(13, 148, 136, 0.12);
+    color: #0f766e;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 @media (max-width: 720px) {

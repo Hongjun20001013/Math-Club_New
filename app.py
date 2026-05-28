@@ -93,7 +93,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260526-admin-drawer")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-unit1-practice-test")
 
 
 def _site_brand_name() -> str:
@@ -1285,6 +1285,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "1_3": "banks/algebra/1_3.tex",
         "1_4": "banks/algebra/1_4.tex",
         "1_5": "banks/algebra/1_5.tex",
+        "1_pt": "banks/algebra/1_pt.tex",
     },
     # Unit 2 only (advanced math — separate domain from algebra)
     "advanced_math": {
@@ -1588,6 +1589,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
             "Unit 1 Algebra.pdf",
         ],
         "download_name": "NovelPrep-SAT-Unit-1-Algebra.pdf",
+        "practice_test_candidates": ["SAT_Practice_Test_Unit_1.pdf"],
+        "practice_test_download_name": "NovelPrep-SAT-Unit-1-Practice-Test.pdf",
     },
     "advanced_math": {
         "unit": "Unit 2",
@@ -1996,6 +1999,7 @@ TOPIC_TITLES = {
     "1_3": "Unit 1.3 – Linear Equations in Two Variables",
     "1_4": "Unit 1.4 – Systems of Linear Equations",
     "1_5": "Unit 1.5 – Linear Inequalities",
+    "1_pt": "Unit 1 Practice Test",
     "unit_2_all": "Unit 2 – Advanced Math (full bank)",
     "2_1": "Unit 2.1 – Equivalent Expressions",
     "2_2": "Unit 2.2 – Nonlinear Equations & Systems",
@@ -2836,7 +2840,7 @@ def _dashboard_context() -> dict:
         "unit_4": ("geometry", "unit_4_all"),
     }
     unit_desc = {
-        "unit_1": "Linear equations through inequalities—five chapter slices plus one merged full bank.",
+        "unit_1": "Linear equations through inequalities—five chapter slices, a full merged bank, and a 22-question practice test.",
         "unit_2": "Equivalent expressions, nonlinear equations, and nonlinear functions.",
         "unit_3": "Ratios, percentages, probability, charts, inference, and study design.",
         "unit_4": "Volume and area, lines and triangles, trigonometry, and circles.",
@@ -3895,9 +3899,9 @@ SAT_MISS_MODULE_SPECS: List[Dict[str, Any]] = [
     {
         "part_id": "unit1",
         "label": "Unit 1 – Algebra",
-        "subtitle": "Sections 1.1–1.5 (full bank + topic slices)",
+        "subtitle": "Sections 1.1–1.5 + Practice Test (full bank + topic slices)",
         "domain": "algebra",
-        "topics": ("unit_1_all", "1_1", "1_2", "1_3", "1_4", "1_5"),
+        "topics": ("unit_1_all", "1_1", "1_2", "1_3", "1_4", "1_5", "1_pt"),
         "order": 1,
     },
     {
@@ -4485,6 +4489,35 @@ def practice_unit_pdf(domain: str):
     )
 
 
+@app.route("/practice/specialized/practice-test/<domain>.pdf")
+def practice_unit_practice_test_pdf(domain: str):
+    session["active_track_label"] = "SAT Math"
+    meta = UNIT_PDF_MATERIALS.get(domain)
+    if not meta:
+        abort(404)
+    path = _resolve_first_existing_path(list(meta.get("practice_test_candidates") or []))
+    if not path:
+        abort(404)
+    return send_file(
+        path,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=meta.get("practice_test_download_name") or os.path.basename(path),
+    )
+
+
+def _practice_test_pdf_for_domain(domain: str) -> dict[str, Any] | None:
+    meta = UNIT_PDF_MATERIALS.get(domain) or {}
+    found = _resolve_first_existing_path(list(meta.get("practice_test_candidates") or []))
+    if not found:
+        return None
+    return {
+        "href": url_for("practice_unit_practice_test_pdf", domain=domain),
+        "label": "Practice test PDF",
+        "description": "Printable practice test for offline review",
+    }
+
+
 @app.route("/practice/challenge")
 def practice_challenge():
     session["active_track_label"] = "SAT Math"
@@ -4966,9 +4999,24 @@ def _topic_short_label(topic_key: str) -> str:
     if topic_key.startswith("unit_"):
         return "Full"
     parts = topic_key.split("_")
+    if len(parts) == 2 and parts[0].isdigit() and parts[1] == "pt":
+        return "PT"
     if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
         return f"{parts[0]}.{parts[1]}"
     return topic_key
+
+
+def _topic_bank_sort_key(topic_key: str) -> tuple[int, int, str]:
+    """Order banks: full first, then 1.1…1.5, then practice test (PT)."""
+    if topic_key.startswith("unit_"):
+        return (0, 0, topic_key)
+    parts = topic_key.split("_")
+    major = int(parts[0]) if parts and parts[0].isdigit() else 99
+    if len(parts) > 1 and parts[1].isdigit():
+        return (1, int(parts[1]), topic_key)
+    if len(parts) > 1 and parts[1] == "pt":
+        return (1, 99, topic_key)
+    return (2, 0, topic_key)
 
 
 def _unit_chapter_slice_meta(domain: str) -> dict[str, Any]:
@@ -4976,12 +5024,7 @@ def _unit_chapter_slice_meta(domain: str) -> dict[str, Any]:
     topics = BANKS.get(domain) or {}
     slice_keys = sorted(
         (k for k in topics if not str(k).startswith("unit_")),
-        key=lambda k: (
-            int(str(k).split("_")[0]) if "_" in str(k) else 0,
-            int(str(k).split("_")[1])
-            if "_" in str(k) and str(k).split("_")[1].isdigit()
-            else 0,
-        ),
+        key=_topic_bank_sort_key,
     )
     count = len(slice_keys)
     if not slice_keys:
@@ -5014,8 +5057,11 @@ def _build_unit_topic_studio(
     total_questions = 0
     total_answered_sum = 0
     idx = 0
+    practice_test_pdf = _practice_test_pdf_for_domain(domain)
 
-    for topic_key, file_path in domain_data.items():
+    for topic_key, file_path in sorted(
+        domain_data.items(), key=lambda item: _topic_bank_sort_key(item[0])
+    ):
         questions = get_questions_for_topic(domain, topic_key, file_path)
         if not questions:
             continue
@@ -5062,6 +5108,8 @@ def _build_unit_topic_studio(
                 ),
                 "miss_quiz_href": miss_quiz_href,
                 "is_full_bank": topic_key.startswith("unit_"),
+                "is_practice_test": topic_key.endswith("_pt"),
+                "pdf_href": practice_test_pdf.get("href") if topic_key.endswith("_pt") and practice_test_pdf else None,
             }
         )
         total_questions += total

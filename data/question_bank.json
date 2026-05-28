@@ -3023,6 +3023,398 @@
         "display_number": 86,
         "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">1.5</span></p><h3 class=\"np-sol-title\">1.5 Linear inequalities</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Sketch or test regions; note solid vs dashed boundaries and whether endpoints are included.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: \\[ \\begin{aligned} y &amp;&gt; 2x - 1 \\\\ 2x &amp;&gt; 5 \\end{aligned} \\] Which of the following consists of the \\( y \\)-coordinates of all the points that satisfy the system of inequalities above?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Sketch or test regions; note solid vs dashed boundaries and whether endpoints are included.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
       }
+    ],
+    "1_pt": [
+      {
+        "stem": "<p>A line in the \\(\\displaystyle xy\\)-plane is defined by the equation \\(\\displaystyle y = ax + b\\), where \\(\\displaystyle a\\) and \\(\\displaystyle b\\) are constants. The line passes through the points \\(\\displaystyle (0, -79)\\) and \\(\\displaystyle (5, 91)\\). What is the value of \\(\\displaystyle a + b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "-45",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 1,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">-45</code></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: A line in the \\(\\displaystyle xy\\)-plane is defined by the equation \\(\\displaystyle y = ax + b\\), where \\(\\displaystyle a\\) and \\(\\displaystyle b\\) are constants. The line passes through the points \\(\\displaystyle (0, -…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>-45</strong>. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the \\(\\displaystyle xy\\)-plane, the line with equation \\(\\displaystyle ax - \\dfrac{1}{3}y = 8\\), where \\(\\displaystyle a\\) is a constant, passes through the point \\(\\displaystyle (2, 6)\\). What is the \\(\\displaystyle x\\)-coordinate of the \\(\\displaystyle x\\)-intercept of the line?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "1.6",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 2,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">1.6</code></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the \\(\\displaystyle xy\\)-plane, the line with equation \\(\\displaystyle ax - \\dfrac{1}{3}y = 8\\), where \\(\\displaystyle a\\) is a constant, passes through the point \\(\\displaystyle (2, 6)\\). What is the \\(\\displaystyle…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>1.6</strong>. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>The table shows three values of \\(\\displaystyle x\\) and their corresponding values of \\(\\displaystyle y\\), where \\(\\displaystyle p\\) is a constant. There is a linear relationship between \\(\\displaystyle x\\) and \\(\\displaystyle y\\). What is the slope of the line that represents this relationship in the \\(\\displaystyle xy\\)-plane?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\(\\displaystyle x\\)</th><th>\\(\\displaystyle y\\)</th></tr></thead><tbody><tr><td>\\(\\displaystyle -6\\)</td><td>\\(\\displaystyle -114 - p\\)</td></tr><tr><td>\\(\\displaystyle -2\\)</td><td>\\(\\displaystyle -57 - p\\)</td></tr><tr><td>\\(\\displaystyle 2\\)</td><td>\\(\\displaystyle -p\\)</td></tr></tbody></table></div>",
+        "choices": [
+          "\\(\\displaystyle \\dfrac{57}{4}\\)",
+          "\\(\\displaystyle \\dfrac{57}{4}\\)",
+          "\\(\\displaystyle p - \\dfrac{57}{4}\\)",
+          "\\(\\displaystyle 2p + \\dfrac{57}{4}\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "B",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 3,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: The table shows three values of \\(\\displaystyle x\\) and their corresponding values of \\(\\displaystyle y\\), where \\(\\displaystyle p\\) is a constant. There is a linear relationship between \\(\\displaystyle x\\) and \\(\\displ…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>The graph of the equation \\(\\displaystyle 5x - 8y = k\\), where \\(\\displaystyle k\\) is a constant, is a line in the \\(\\displaystyle xy\\)-plane. The line has an \\(\\displaystyle x\\)-intercept at \\(\\displaystyle (m, 0)\\) and a \\(\\displaystyle y\\)-intercept at \\(\\displaystyle (0, n)\\), where \\(\\displaystyle m\\) and \\(\\displaystyle n\\) are constants. What is the value of \\(\\displaystyle \\dfrac{m}{n}\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle -\\dfrac{8}{5}\\)",
+          "\\(\\displaystyle \\dfrac{5}{7}\\)",
+          "\\(\\displaystyle \\dfrac{5}{8}\\)",
+          "\\(\\displaystyle \\dfrac{8}{6}\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 4,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: The graph of the equation \\(\\displaystyle 5x - 8y = k\\), where \\(\\displaystyle k\\) is a constant, is a line in the \\(\\displaystyle xy\\)-plane. The line has an \\(\\displaystyle x\\)-intercept at \\(\\displaystyle (m, 0)\\) an…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the \\(\\displaystyle xy\\)-plane, the graph of the linear function \\(\\displaystyle f\\) has a negative slope and a \\(\\displaystyle y\\)-intercept at \\(\\displaystyle (0, k)\\), where \\(\\displaystyle k\\) is a positive constant. Which of the following must be true?</p>\n<p>I. If \\(\\displaystyle a > b\\), then \\(\\displaystyle f(a) < f(b)\\)</p>\n<p>II. If \\(\\displaystyle a < 0\\), then \\(\\displaystyle f(a) > k\\)</p>\n<p>III. If \\(\\displaystyle a > 0\\), then \\(\\displaystyle f(a) > 0\\)</p>",
+        "choices": [
+          "I and II only",
+          "I and III only",
+          "II and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 5,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: In the \\(\\displaystyle xy\\)-plane, the graph of the linear function \\(\\displaystyle f\\) has a negative slope and a \\(\\displaystyle y\\)-intercept at \\(\\displaystyle (0, k)\\), where \\(\\displaystyle k\\) is a positive const…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the \\(\\displaystyle xy\\)-plane, the points \\(\\displaystyle (-3, 5)\\) and \\(\\displaystyle (6, 8)\\) lie on line \\(\\displaystyle \\ell\\). Which of the following points also lies on line \\(\\displaystyle \\ell\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle (27, 15)\\)",
+          "\\(\\displaystyle (33, 19)\\)",
+          "\\(\\displaystyle (42, 23)\\)",
+          "\\(\\displaystyle (54, 27)\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 6,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: In the \\(\\displaystyle xy\\)-plane, the points \\(\\displaystyle (-3, 5)\\) and \\(\\displaystyle (6, 8)\\) lie on line \\(\\displaystyle \\ell\\). Which of the following points also lies on line \\(\\displaystyle \\ell\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>During a road trip, Carl used 12 gallons of fuel driving a minivan and 17 gallons of fuel driving a campervan. He traveled a total distance of 590 miles driving both vehicles. The equation \\(\\displaystyle 12x + 17y = 590\\) represents this situation. Which is the best interpretation of \\(\\displaystyle y\\) in this context?</p>",
+        "choices": [
+          "The total number of gallons of fuel Carl used driving the campervan",
+          "The total number of miles Carl drove the campervan for",
+          "The fuel efficiency, in miles per gallon, of the campervan",
+          "The average fuel efficiency, in miles per gallon, of the minivan and the campervan"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "C",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 7,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">C</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: During a road trip, Carl used 12 gallons of fuel driving a minivan and 17 gallons of fuel driving a campervan. He traveled a total distance of 590 miles driving both vehicles. The equation \\(\\displaystyle 12x + 17y = 59…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>C</strong> as correct. Substitute <strong>C</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>Of the 585 photos in a photo album, 315 are color photos and the rest are black-and-white. The equation \\(\\displaystyle 6p + 315 = 585\\) describes this situation, where \\(\\displaystyle p\\) represents the number of pages that contain black-and-white photos. What is the best interpretation of \\(\\displaystyle 6p\\) in this context?</p>",
+        "choices": [
+          "There are \\(\\displaystyle 6p\\) black-and-white photos.",
+          "There are \\(\\displaystyle 6p\\) photos on each page.",
+          "There are \\(\\displaystyle 6p\\) pages in total.",
+          "There are \\(\\displaystyle 6p\\) photos in total."
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 8,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: Of the 585 photos in a photo album, 315 are color photos and the rest are black-and-white. The equation \\(\\displaystyle 6p + 315 = 585\\) describes this situation, where \\(\\displaystyle p\\) represents the number of pages…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>Stacy is playing a game in which she needs to collect a certain number of points to win. The function \\(\\displaystyle p(x) = 52 - 4x\\) models the number of additional points Stacy needs to win the game, where \\(\\displaystyle x\\) is the number of rounds played. Which of the following is the best interpretation of \\(\\displaystyle p(8) = 20\\)?</p>",
+        "choices": [
+          "Stacy collected a total of 20 points in the first 8 rounds.",
+          "It will take Stacy 8 rounds to collect the 20 additional points she needs to win the game.",
+          "After the first 8 rounds, Stacy needs to collect 20 more points to win the game.",
+          "In the 8th round, Stacy collected 20 more points than she did the previous round."
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "C",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 9,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">C</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: Stacy is playing a game in which she needs to collect a certain number of points to win. The function \\(\\displaystyle p(x) = 52 - 4x\\) models the number of additional points Stacy needs to win the game, where \\(\\display…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>C</strong> as correct. Substitute <strong>C</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>A party store sells premade banners and custom banners. Yesterday, the store sold a total of 80 banners, earning \\(\\displaystyle x\\) dollars in revenue from premade banners and \\(\\displaystyle y\\) dollars in revenue from custom banners. The equation \\(\\displaystyle \\dfrac{x}{14} + \\dfrac{y}{25} = 80\\) represents this situation. Which of the following is the best interpretation of 14 in this context?</p>",
+        "choices": [
+          "The store sold 14 premade banners yesterday.",
+          "The store earns 14 dollars in revenue for each premade banner sold.",
+          "The store sold 14 custom banners yesterday.",
+          "The store earns 14 dollars in revenue for each custom banner sold."
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "B",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 10,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: A party store sells premade banners and custom banners. Yesterday, the store sold a total of 80 banners, earning \\(\\displaystyle x\\) dollars in revenue from premade banners and \\(\\displaystyle y\\) dollars in revenue fro…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>The given function \\(\\displaystyle h(t) = 100 - 4t\\) models the number of hours until a gallon of milk held at a temperature of \\(\\displaystyle t\\), in degrees Celsius, goes sour. Which of the following is the best interpretation of the number 4 in this context?</p>",
+        "choices": [
+          "An increase of \\(\\displaystyle 1^\\circ\\text{C}\\) will make a gallon of milk go sour 4 hours faster.",
+          "An increase of \\(\\displaystyle 1^\\circ\\text{C}\\) will make 4 gallons of milk go sour 1 hour faster.",
+          "An increase of \\(\\displaystyle 4^\\circ\\text{C}\\) will make a gallon of milk go sour 1 hour faster.",
+          "An increase of \\(\\displaystyle 4^\\circ\\text{C}\\) will make a gallon of milk go sour 4 hours faster."
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 11,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: The given function \\(\\displaystyle h(t) = 100 - 4t\\) models the number of hours until a gallon of milk held at a temperature of \\(\\displaystyle t\\), in degrees Celsius, goes sour. Which of the following is the best inte…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>The given function \\(\\displaystyle h(t) = 3.5\\left(\\dfrac{t}{50} + 2\\right)\\) models the height of a tree, in inches, \\(\\displaystyle t\\) days after it is planted. According to the model, about how many inches does it grow each day?</p>",
+        "choices": [
+          "0.02",
+          "0.07",
+          "1.75",
+          "3.5"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "B",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 12,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: The given function \\(\\displaystyle h(t) = 3.5\\left(\\dfrac{t}{50} + 2\\right)\\) models the height of a tree, in inches, \\(\\displaystyle t\\) days after it is planted. According to the model, about how many inches does it g…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>The given function \\(\\displaystyle C(x) = 1.5 + 2.5x\\) models the cost, in dollars, of mailing a shipment weighing \\(\\displaystyle x\\) pounds. According to the model, an increase of 10 dollars in the mailing cost corresponds to an increase of how many pounds in the weight of the shipment?</p>",
+        "choices": [
+          "2",
+          "2.5",
+          "4",
+          "5"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "C",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 13,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">C</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: The given function \\(\\displaystyle C(x) = 1.5 + 2.5x\\) models the cost, in dollars, of mailing a shipment weighing \\(\\displaystyle x\\) pounds. According to the model, an increase of 10 dollars in the mailing cost corres…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>C</strong> as correct. Substitute <strong>C</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>If \\(\\displaystyle \\dfrac{a}{b} = 4.5\\) and \\(\\displaystyle \\dfrac{a}{kb} = 12.5\\), what is the value of \\(\\displaystyle k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "0.36",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 14,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">0.36</code></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: If \\(\\displaystyle \\dfrac{a}{b} = 4.5\\) and \\(\\displaystyle \\dfrac{a}{kb} = 12.5\\), what is the value of \\(\\displaystyle k\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>0.36</strong>. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(\\displaystyle k\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle k\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n-5x &= 8 - ky \\\\\n18y + 5x &= -10x + 21\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "-6",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 15,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">-6</code></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the given system of equations, \\(\\displaystyle k\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle k\\)? \\[ \\begin{aligned} -5x &amp;= 8 - ky \\\\ 18y + 5x &amp;= -10x + 21 \\end{aligned} \\]</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>-6</strong>. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(\\displaystyle m\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle m\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n\\dfrac{4}{3} + \\dfrac{5}{4}x &= 28y + \\dfrac{5}{8}x \\\\\nmy &= \\dfrac{1}{2}(5x - 8)\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "112",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 16,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">112</code></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the given system of equations, \\(\\displaystyle m\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle m\\)? \\[ \\begin{aligned} \\dfrac{4}{3} + \\dfrac{5}{4}x &amp;= 28y + \\dfrac{5}{8}x \\\\ my …</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>112</strong>. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(\\displaystyle b\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle b\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n\\dfrac{3}{10}y + \\dfrac{b}{3}x &= \\dfrac{3}{4} - \\dfrac{1}{5}y \\\\\n\\dfrac{3}{8}x + \\dfrac{3}{5} &= -\\dfrac{1}{4}y + \\dfrac{8}{5}\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "9/4",
+        "answer_alternates": [
+          "2.25"
+        ],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 17,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">9/4</code></div><div class=\"np-sol-alt-wrap\"><span class=\"np-sol-label\">Also accepted</span><ul class=\"np-sol-alt-list\"><li><code>2.25</code></li></ul></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the given system of equations, \\(\\displaystyle b\\) is a constant. If the system has no solution, what is the value of \\(\\displaystyle b\\)? \\[ \\begin{aligned} \\dfrac{3}{10}y + \\dfrac{b}{3}x &amp;= \\dfrac{3}{4} - \\dfrac{1}…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>9/4</strong>. Equivalent forms such as <strong>2.25</strong> may also be accepted if they match the key. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+      },
+      {
+        "stem": "<p>In the \\(\\displaystyle xy\\)-plane, the point \\(\\displaystyle (18, y)\\) is a solution to the given system of inequalities. Which of the following could be the value of \\(\\displaystyle y\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\nx + y &< 25 \\\\\n2x - 3y &< 77\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(\\displaystyle -14\\)",
+          "\\(\\displaystyle -6\\)",
+          "7",
+          "11"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "B",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 18,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: In the \\(\\displaystyle xy\\)-plane, the point \\(\\displaystyle (18, y)\\) is a solution to the given system of inequalities. Which of the following could be the value of \\(\\displaystyle y\\)? \\[ \\begin{aligned} x + y &amp;</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>Tina works no more than 30 hours at a nail salon each week. She can do a manicure in 20 minutes and a pedicure in 30 minutes. Each manicure earns her &#36;25 and each pedicure earns her &#36;40, and she must earn at least &#36;900 to cover her expenses. If \\(\\displaystyle m\\) represents the number of manicures Tina does in a week and \\(\\displaystyle p\\) represents the number of pedicures she does in a week, which system of inequalities describes all possible values of \\(\\displaystyle m\\) and \\(\\displaystyle p\\) for which Tina covers her expenses?</p>",
+        "choices": [
+          "\\(\\displaystyle 3m + 2p \\leq 30\\), \\(\\displaystyle 25m + 40p \\geq 900\\)",
+          "\\(\\displaystyle 2m + 3p \\leq 30\\), \\(\\displaystyle 25m + 40p \\geq 900\\)",
+          "\\(\\displaystyle \\dfrac{m}{3} + \\dfrac{p}{2} \\leq 30\\), \\(\\displaystyle 25m + 40p \\geq 900\\)",
+          "\\(\\displaystyle \\dfrac{m}{3} + \\dfrac{p}{2} \\geq 900\\), \\(\\displaystyle 25m + 40p \\leq 30\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "C",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 19,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">C</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: Tina works no more than 30 hours at a nail salon each week. She can do a manicure in 20 minutes and a pedicure in 30 minutes. Each manicure earns her $25 and each pedicure earns her $40, and she must earn at least $900 …</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>C</strong> as correct. Substitute <strong>C</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>During hibernation, adult male black bears lose 6 to 12 pounds in weight each week. An adult male black bear weighed 580 pounds after 5 weeks of hibernation. Which of the following inequalities gives all possible values for the black bear's weight \\(\\displaystyle w\\), in pounds, after 15 weeks of hibernation?</p>",
+        "choices": [
+          "\\(\\displaystyle 400 \\leq w \\leq 490\\)",
+          "\\(\\displaystyle 460 \\leq w \\leq 520\\)",
+          "\\(\\displaystyle 460 \\leq w \\leq 580\\)",
+          "\\(\\displaystyle 610 \\leq w \\leq 640\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "B",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 20,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">B</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: During hibernation, adult male black bears lose 6 to 12 pounds in weight each week. An adult male black bear weighed 580 pounds after 5 weeks of hibernation. Which of the following inequalities gives all possible values…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>B</strong> as correct. Substitute <strong>B</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>A window repair specialist charges &#36;220 for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is &#36;400. Which function \\(\\displaystyle f\\) gives the total cost, in dollars, for \\(\\displaystyle x\\) hours of repair, where \\(\\displaystyle x \\geq 2\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle f(x) = 60x + 100\\)",
+          "\\(\\displaystyle f(x) = 60x + 220\\)",
+          "\\(\\displaystyle f(x) = 80x\\)",
+          "\\(\\displaystyle f(x) = 80x + 220\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 21,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: A window repair specialist charges $220 for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is $400. Which function \\(\\displaystyle f\\) gives the total cos…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      },
+      {
+        "stem": "<p>For each real number \\(\\displaystyle r\\), which of the following points lies on the graph of each equation in the \\(\\displaystyle xy\\)-plane for the given system?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n8x + 7y &= 9 \\\\\n24x + 21y &= 27\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(\\displaystyle \\left(r, \\dfrac{-8r + 9}{7}\\right)\\)",
+          "\\(\\displaystyle \\left(\\dfrac{-8r + 9}{7}, r\\right)\\)",
+          "\\(\\displaystyle \\left(\\dfrac{-8r + 63}{7}, \\dfrac{9r + 189}{7}\\right)\\)",
+          "\\(\\displaystyle \\left(\\dfrac{r}{3} + 9, \\dfrac{-r}{3} + 27\\right)\\)"
+        ],
+        "question_kind": "mcq",
+        "sat_unit_label": "Unit 1",
+        "sat_unit_title": "Algebra",
+        "correct_answer": "A",
+        "answer_alternates": [],
+        "knowledge_section": "PT",
+        "knowledge_section_title_zh": "Unit 1 模拟测试",
+        "knowledge_section_title_en": "Unit 1 Practice Test",
+        "display_number": 22,
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--mcq\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">PT</span></p><h3 class=\"np-sol-title\">Unit 1 Practice Test</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Translate the situation into clear structure, then simplify step by step.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-mcq\" aria-label=\"Multiple choice\"><span class=\"np-sol-letter\" aria-hidden=\"true\">A</span><span class=\"np-sol-letter-caption\">Correct letter</span></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem. What quantity or condition is the question really asking for? Note units and constraints. Givens in brief: For each real number \\(\\displaystyle r\\), which of the following points lies on the graph of each equation in the \\(\\displaystyle xy\\)-plane for the given system? \\[ \\begin{aligned} 8x + 7y &amp;= 9 \\\\ 24x + 21y &amp;= 27 \\end{…</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Translate the situation into clear structure, then simplify step by step.</p><p class=\"np-sol-walk-para\">Step 3: Turn the wording into algebra or a table comparison; eliminate answer choices using estimates, impossible signs, or inconsistent units before you commit to heavy computation.</p><p class=\"np-sol-walk-para\">Step 4: The answer key marks choice <strong>A</strong> as correct. Substitute <strong>A</strong> (or test its consequence) back into the stem for a quick consistency check before you move on.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Close the answer choices, restate the task in your own words, then decide from definitions and structure—not from which letter “feels” familiar.</p></footer></article>"
+      }
     ]
   },
   "advanced_math": {

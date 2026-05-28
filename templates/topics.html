@@ -73,7 +73,7 @@
       <div>
         <p class="np-hard-kicker">Topic library</p>
         <h2>Practice banks</h2>
-        <p class="np-hard-studio-lead">Select a bank on the left — full set or chapter slice. The panel shows progress, report, and mistake redo for that bank.</p>
+        <p class="np-hard-studio-lead">Select a bank on the left — full set, chapter slice, or timed practice test. The panel shows progress, report, and mistake redo for that bank.</p>
       </div>
       <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
         <button type="button" class="is-active" data-hard-filter="all">All <em>{{ topic_stats.done + topic_stats.progress + topic_stats.new }}</em></button>
@@ -93,7 +93,7 @@
           aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
         >
           <strong>{{ set.code }}</strong>
-          <span>{% if set.is_full_bank %}Full bank{% else %}Slice{% endif %}</span>
+          <span>{% if set.is_full_bank %}Full bank{% elif set.is_practice_test %}Practice test{% else %}Slice{% endif %}</span>
           <em>{{ set.answered }}/{{ set.total }}</em>
         </button>
         {% endfor %}
@@ -113,7 +113,7 @@
           {% for set in topic_sets %}
           <button
             type="button"
-            class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.is_full_bank %} np-hard-picker-tile--featured{% endif %}"
+            class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.is_full_bank %} np-hard-picker-tile--featured{% endif %}{% if set.is_practice_test %} np-hard-picker-tile--practice-test{% endif %}"
             data-hard-tile
             data-index="{{ set.index }}"
             data-roman="{{ set.code }}"
@@ -123,6 +123,7 @@
             data-report-href="{{ set.report_href or '' }}"
             data-restart="{{ set.restart_href }}"
             data-miss-href="{{ set.miss_quiz_href or '' }}"
+            data-pdf-href="{{ set.pdf_href or '' }}"
             data-wrong-count="{{ set.wrong_count }}"
             data-subtitle="{{ set.title }}"
             data-answered="{{ set.answered }}"
@@ -134,7 +135,8 @@
             style="--tile-progress: {{ set.progress_pct }}%;"
           >
             <span class="np-hard-picker-roman">{{ set.code }}</span>
-            <span class="np-hard-picker-num">{% if set.is_full_bank %}Full bank{% else %}Chapter{% endif %} · {{ set.total }} Q</span>
+            {% if set.is_practice_test %}<span class="np-hard-picker-badge">Test</span>{% endif %}
+            <span class="np-hard-picker-num">{% if set.is_full_bank %}Full bank{% elif set.is_practice_test %}Practice test{% else %}Chapter{% endif %} · {{ set.total }} Q</span>
             <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
             <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}{% if set.wrong_count %} · {{ set.wrong_count }} miss{% endif %}</span>
           </button>
@@ -195,6 +197,17 @@
           </div>
           {% endif %}
 
+          <div class="np-hard-detail-materials-wrap" data-hard-detail-pt-pdf-wrap hidden>
+            <p class="np-hard-detail-materials-label">Practice test</p>
+            <div class="np-hard-detail-materials">
+              <a href="#" class="np-hard-detail-material" data-hard-detail-pt-pdf>
+                <span>PDF</span>
+                <strong>Unit {{ unit_num }} practice test</strong>
+                <em>Printable mock exam for offline review</em>
+              </a>
+            </div>
+          </div>
+
           <div class="np-hard-detail-actions np-hard-detail-actions--stack">
             <a href="#" class="np-hard-detail-start" data-hard-detail-start>Begin practice</a>
             <a href="#" class="np-hard-detail-report" data-hard-detail-report hidden>View report</a>
@@ -232,6 +245,8 @@
   var missCountEl = library.querySelector("[data-hard-detail-miss-count]");
   var restartBtn = library.querySelector("[data-hard-detail-restart]");
   var detail = library.querySelector("[data-hard-detail]");
+  var ptPdfWrap = library.querySelector("[data-hard-detail-pt-pdf-wrap]");
+  var ptPdfLink = library.querySelector("[data-hard-detail-pt-pdf]");
   var activeFilter = "all";
   var activeTile = null;
   var ringCirc = 2 * Math.PI * 18;
@@ -274,6 +289,8 @@
     var reportHref = tile.getAttribute("data-report-href") || "";
     var missHref = tile.getAttribute("data-miss-href") || "";
     var practiceHref = tile.getAttribute("data-practice-href") || tile.getAttribute("data-href") || "#";
+    var isPracticeTest = tile.classList.contains("np-hard-picker-tile--practice-test");
+    var ptPdfHref = tile.getAttribute("data-pdf-href") || "";
 
     tiles.forEach(function (item) {
       var selected = item === tile;
@@ -326,6 +343,15 @@
         missCountEl.textContent = String(wrongCount);
       } else {
         missStat.hidden = true;
+      }
+    }
+    if (ptPdfWrap && ptPdfLink) {
+      if (isPracticeTest && ptPdfHref) {
+        ptPdfWrap.hidden = false;
+        ptPdfLink.href = ptPdfHref;
+      } else {
+        ptPdfWrap.hidden = true;
+        ptPdfLink.href = "#";
       }
     }
 
