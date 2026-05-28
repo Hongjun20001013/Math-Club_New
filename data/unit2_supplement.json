@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source_note": "Parsed from Novel Prep Answer.tex Unit 2 tables; order matches banks/algebra 2_1–2_3.",
+  "source_note": "Parsed from SAT_CB_Bank_Question_New_Answer.pdf; order matches banks/* slices for Unit 1–4.",
   "section_titles_zh": {
     "2.1": "2.1 等价表达式",
     "2.2": "2.2 非线性方程与方程组",
@@ -18,19 +18,19 @@
       "7/6",
       "C",
       {
-        "canonical": "4/225",
+        "canonical": ".0177",
         "alternates": [
-          ".0177",
-          ".0178"
+          ".0178",
+          "4/225"
         ]
       },
       "-419",
       "D",
       "A",
       {
-        "canonical": "9/100",
+        "canonical": ".09",
         "alternates": [
-          ".09"
+          "9/100"
         ]
       },
       "B",
@@ -63,10 +63,10 @@
       "5",
       "D",
       {
-        "canonical": "81/4",
+        "canonical": "20",
         "alternates": [
-          "20",
-          "25"
+          "25",
+          "81/4"
         ]
       },
       "-3",
@@ -105,9 +105,9 @@
       "C",
       "5",
       {
-        "canonical": "1/16",
+        "canonical": ".0625",
         "alternates": [
-          ".0625"
+          "1/16"
         ]
       },
       "D",
@@ -115,9 +115,9 @@
       "C",
       "A",
       {
-        "canonical": "29/2",
+        "canonical": "14.5",
         "alternates": [
-          "14.5"
+          "29/2"
         ]
       },
       "C",
@@ -153,9 +153,9 @@
       "13",
       "C",
       {
-        "canonical": "86/25",
+        "canonical": "3.44",
         "alternates": [
-          "3.44"
+          "86/25"
         ]
       },
       "A",

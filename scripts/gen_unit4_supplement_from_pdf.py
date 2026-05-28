@@ -18,13 +18,22 @@ from pathlib import Path
 from typing import Any, List, Union
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PDF = ROOT / "SAT_CB_Bank_Question - 2026-04-21T141306.525.pdf"
+DEFAULT_PDF = ROOT / "SAT_CB_Bank_Question_New_Answer.pdf"
 OUT = ROOT / "data" / "unit4_supplement.json"
 
 Cell = Union[str, dict[str, Any]]
 
 
+_FOOTER_RE = re.compile(
+    r"Novel Prep SAT Preparation Answer Key Jack Zeng.*",
+    re.I | re.S,
+)
+
+
 def _normalize_answer(ans: str) -> Cell:
+    m = _FOOTER_RE.search(ans)
+    if m:
+        ans = ans[: m.start()]
     ans = ans.strip()
     if re.fullmatch(r"[A-Da-d]", ans):
         return ans.upper()

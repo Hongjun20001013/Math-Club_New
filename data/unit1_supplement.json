@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "source_note": "Answers follow the order of \\noindent\\markforreview blocks in each banks/algebra slice (MCQ and student-produced response). Alternate forms are accepted for numeric SPR items.",
+  "source_note": "Parsed from SAT_CB_Bank_Question_New_Answer.pdf; order matches banks/* slices for Unit 1–4.",
   "section_titles_zh": {
     "1.1": "1.1 一元一次方程",
     "1.2": "1.2 一次函数",
@@ -21,13 +21,18 @@
       "D",
       "C",
       {
-        "canonical": "16/17",
-        "alternates": [".9411", ".9412", "0.9411", "0.9412"]
+        "canonical": ".9411",
+        "alternates": [
+          ".9412",
+          "16/17"
+        ]
       },
       "A",
       {
-        "canonical": "-14/15",
-        "alternates": ["-.9333", "-0.9333"]
+        "canonical": "-.9333",
+        "alternates": [
+          "-14/15"
+        ]
       },
       "-22",
       "B",
@@ -60,8 +65,10 @@
       "D",
       "5",
       {
-        "canonical": "1/2",
-        "alternates": ["0.5", ".5"]
+        "canonical": ".5",
+        "alternates": [
+          "1/2"
+        ]
       },
       "74",
       "24",
@@ -73,7 +80,10 @@
       "A",
       {
         "canonical": "59/9",
-        "alternates": ["6.555", "6.556"]
+        "alternates": [
+          "6.555",
+          "6.556"
+        ]
       },
       "30",
       "B",
@@ -85,10 +95,7 @@
       "1.5"
     ],
     "1_4": [
-      {
-        "canonical": "3/2",
-        "alternates": ["1.5"]
-      },
+      "3/2",
       "6",
       "8",
       "D",
@@ -99,13 +106,12 @@
       "80",
       "180",
       {
-        "canonical": "9/5",
-        "alternates": ["1.8"]
+        "canonical": "1.8",
+        "alternates": [
+          "9/5"
+        ]
       },
-      {
-        "canonical": "1/2",
-        "alternates": [".5", "0.5"]
-      },
+      "1/2",
       "D",
       "A",
       "B",

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source_note": "Parsed from SAT_CB_Bank_Question answer PDF; order matches banks/geometry 4_1–4_4.",
+  "source_note": "Parsed from SAT_CB_Bank_Question_New_Answer.pdf; order matches banks/* slices for Unit 1–4.",
   "section_titles_zh": {
     "4.1": "4.1 体积与面积",
     "4.2": "4.2 直线、角与三角形",
@@ -116,24 +116,24 @@
       "12"
     ],
     "4_4": [
-      "15",
+      "B",
       "10",
       "B",
-      "3",
-      "5",
-      "78",
       "B",
-      "6",
-      "101",
+      "5",
+      "16",
+      "B",
+      "100",
+      "11",
       "A",
       "46",
       "A",
-      "A",
-      "15",
+      "D",
+      "D",
       "C",
       "A",
-      "52",
-      "B",
+      "-52",
+      "A",
       "1/6",
       "D"
     ]

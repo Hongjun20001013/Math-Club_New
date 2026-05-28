@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source_note": "Parsed from SAT_CB_Bank_Question answer PDF; order matches banks/problem_solving 3_1–3_7.",
+  "source_note": "Parsed from SAT_CB_Bank_Question_New_Answer.pdf; order matches banks/* slices for Unit 1–4.",
   "section_titles_zh": {
     "3.1": "3.1 比率、速率与单位",
     "3.2": "3.2 百分数",
