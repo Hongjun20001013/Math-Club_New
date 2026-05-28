@@ -116,6 +116,62 @@ if [[ -z "$SAT_ID" ]]; then
   exit 1
 fi
 
+echo "==> Service detail for '$KEEP_NAME'..."
+svc_json="$(api GET "/services/${SAT_ID}")"
+python3 - <<'PY' "$svc_json" "$KEEP_NAME"
+import json, sys
+raw = sys.argv[1]
+name = sys.argv[2]
+try:
+    wrap = json.loads(raw)
+except json.JSONDecodeError:
+    print("  (could not parse service JSON)")
+    sys.exit(0)
+svc = wrap.get("service") or wrap
+suspended = svc.get("suspended")
+if suspended is None:
+    details = svc.get("serviceDetails") or {}
+    suspended = details.get("suspended")
+url = svc.get("serviceDetails", {}).get("url") if isinstance(svc.get("serviceDetails"), dict) else None
+url = url or svc.get("url") or "(see Dashboard)"
+print(f"  url={url}")
+print(f"  suspended={suspended}")
+if suspended:
+    print("  Service is suspended — will resume before deploy.")
+PY
+
+is_suspended="$(python3 - <<'PY' "$svc_json"
+import json, sys
+try:
+    wrap = json.loads(sys.argv[1])
+except json.JSONDecodeError:
+    print("false")
+    raise SystemExit
+svc = wrap.get("service") or wrap
+s = svc.get("suspended")
+if s is None:
+    s = (svc.get("serviceDetails") or {}).get("suspended")
+print("true" if s else "false")
+PY
+)"
+
+if [[ "$is_suspended" == "true" ]]; then
+  echo "==> Resuming '$KEEP_NAME' ($SAT_ID)..."
+  resume_code="$(curl -sS -o /tmp/render_resume.json -w "%{http_code}" -X POST \
+    -H "Authorization: Bearer $API" \
+    -H "Accept: application/json" \
+    "${BASE}/services/${SAT_ID}/resume")"
+  if [[ "$resume_code" == "202" || "$resume_code" == "200" ]]; then
+    echo "    Resume accepted (HTTP $resume_code). Waiting 15s for instance..."
+    sleep 15
+  else
+    echo "    Resume failed (HTTP $resume_code):"
+    cat /tmp/render_resume.json 2>/dev/null || true
+    echo
+    echo "    Resume manually: Render Dashboard → $KEEP_NAME → Resume"
+  fi
+fi
+
 echo "==> Triggering deploy on '$KEEP_NAME' ($SAT_ID)..."
 deploy_resp="$(api POST "/services/${SAT_ID}/deploys" -d '{"clearCache":"clear"}')"
 echo "$deploy_resp" | python3 - <<'PY'

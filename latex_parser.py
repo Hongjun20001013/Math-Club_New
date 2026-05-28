@@ -73,6 +73,27 @@ def _contains_table_ampersand(text: str) -> bool:
     return "&" in scratch
 
 
+def _convert_align_blocks_to_display_math(text: str) -> str:
+    """Turn amsmath align blocks into \\[ ... \\] so MathJax renders them."""
+    def repl(m: re.Match[str]) -> str:
+        body = m.group(1).strip()
+        return f"\\[\n{body}\n\\]"
+
+    return re.sub(
+        r"\\begin\{align\*?\}(.*?)\\end\{align\*?\}",
+        repl,
+        text,
+        flags=re.S,
+    )
+
+
+def _normalize_arc_notation(text: str) -> str:
+    """Map publisher arc macros to MathJax-safe \\overset{\\frown}{...}."""
+    text = re.sub(r"\\wideparen\{([^{}]+)\}", r"\\overset{\\frown}{\1}", text)
+    text = re.sub(r"\\overarc\{([^{}]+)\}", r"\\overset{\\frown}{\1}", text)
+    return text
+
+
 def clean_math(text: str) -> str:
     """
     Normalize mixed LaTeX math delimiters for MathJax:
@@ -334,10 +355,12 @@ def clean_latex_junk(text: str) -> str:
     # Turn LaTeX table line breaks into readable line breaks (not inside amsmath).
     text = re.sub(r"\\\\", "\n", text)
     text = _unshield_amsmath(text, _amsmath_vault)
+    text = _convert_align_blocks_to_display_math(text)
     # Normalize thousands separator style from 350{,}000 -> 350,000
     text = text.replace("{,}", ",")
     text = text.replace(r"\%", "%")
     text = strip_document_noise(text)
+    text = _normalize_arc_notation(text)
     text = re.sub(r"\n+", "\n", text)
     return text.strip()
 
@@ -493,7 +516,12 @@ def _format_stem_html(text: str) -> str:
 def _replace_includegraphics_static_prefix(text: str, prefix: str) -> str:
     """Turn \\includegraphics{file} into <img> under a static URL prefix (e.g. Unit 3 figures)."""
     base = prefix.rstrip("/")
-    img_class = "stem-figure-img stem-figure-img--hard" if "/hard" in base else "stem-figure-img"
+    # Hard drills and Unit 4 geometry share compact figure sizing (see .stem-figure-img--hard).
+    img_class = (
+        "stem-figure-img stem-figure-img--hard"
+        if "/hard" in base or "/unit4" in base
+        else "stem-figure-img"
+    )
 
     def repl(m: Any) -> str:
         fname = m.group(1).strip()
@@ -515,6 +543,8 @@ def parse_tex_file(path: str):
     norm = path.replace("\\", "/")
     if "Unit_3_PS" in norm or "/problem_solving/" in norm:
         content = _replace_includegraphics_static_prefix(content, "/static/unit3/")
+    if "Unit_4_Geometry" in norm or "/geometry/" in norm:
+        content = _replace_includegraphics_static_prefix(content, "/static/unit4/")
     if "/hard/" in norm:
         content = _replace_includegraphics_static_prefix(content, "/static/hard/")
 
