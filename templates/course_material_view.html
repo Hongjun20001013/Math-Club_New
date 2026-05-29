@@ -16,6 +16,13 @@
         <span>{{ material.section }}</span>
       </nav>
       <div class="np-cm-hero-actions">
+        <button type="button" class="np-cm-btn np-cm-btn--desmos" data-cm-desmos-toggle aria-pressed="false" title="Open Desmos graphing calculator (D)">
+          <svg class="np-cm-desmos-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M3 14c2.5-5 4.5-7 7-7s4.5 2 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            <path d="M3 17h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+          <span class="np-cm-btn-label">Desmos</span>
+        </button>
         <button type="button" class="np-cm-btn np-cm-btn--focus" data-cm-focus-toggle aria-pressed="false" title="Hide chrome for fullscreen slides (F)">
           <span class="np-cm-focus-icon" aria-hidden="true">⛶</span>
           <span class="np-cm-btn-label">Focus</span>
@@ -99,12 +106,21 @@
             </div>
           </div>
           <span class="np-cm-counter" data-cm-counter>1 / {{ material.slide_count }}</span>
-          <button type="button" class="np-cm-focus-exit" data-cm-focus-exit hidden aria-label="Exit focus mode">
-            <svg class="np-cm-focus-exit-icon" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M5 5 15 15M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-            </svg>
-            <span>Exit focus</span>
-          </button>
+          <div class="np-cm-chrome-actions">
+            <button type="button" class="np-cm-desmos-quick" data-cm-desmos-toggle aria-pressed="false" aria-label="Open Desmos">
+              <svg class="np-cm-desmos-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M3 14c2.5-5 4.5-7 7-7s4.5 2 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                <path d="M3 17h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              </svg>
+              <span>Desmos</span>
+            </button>
+            <button type="button" class="np-cm-focus-exit" data-cm-focus-exit hidden aria-label="Exit focus mode">
+              <svg class="np-cm-focus-exit-icon" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 5 15 15M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              </svg>
+              <span>Exit focus</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -172,6 +188,21 @@
 </div>
 </div>
 
+<div class="np-cm-desmos-panel" id="cm-desmos-panel" aria-label="Desmos graphing calculator" aria-hidden="true">
+  <div class="np-cm-desmos-panel-head" id="cm-desmos-drag-handle">
+    <div class="np-cm-desmos-panel-title">
+      <strong>Desmos</strong>
+      <span>Drag header · resize corner · press D to toggle</span>
+    </div>
+    <button type="button" class="np-cm-desmos-reset" data-cm-desmos-reset>Reset</button>
+    <button type="button" class="np-cm-desmos-close" data-cm-desmos-close aria-label="Close Desmos">×</button>
+  </div>
+  <p class="np-cm-desmos-status" data-cm-desmos-status>Click Desmos to load the graphing calculator.</p>
+  <div id="cm-desmos-calculator" class="np-cm-desmos-calculator"></div>
+</div>
+
 <script id="cm-slides-json" type="application/json">{{ material.slides|tojson }}</script>
+<script>window.__CM_DESMOS_KEY__ = {{ desmos_api_key|tojson }};</script>
 <script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
+<script defer src="{{ url_for('static', filename='course_materials_desmos.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}

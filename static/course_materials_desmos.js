@@ -1,0 +1,240 @@
+(function () {
+  "use strict";
+
+  var panel = document.getElementById("cm-desmos-panel");
+  if (!panel) return;
+
+  var calcEl = document.getElementById("cm-desmos-calculator");
+  var statusEl = document.querySelector("[data-cm-desmos-status]");
+  var toggles = Array.prototype.slice.call(document.querySelectorAll("[data-cm-desmos-toggle]"));
+  var closeBtn = document.querySelector("[data-cm-desmos-close]");
+  var resetBtn = document.querySelector("[data-cm-desmos-reset]");
+  var handle = document.getElementById("cm-desmos-drag-handle");
+  var desmosApiKey = window.__CM_DESMOS_KEY__ || "";
+  var calculator = null;
+  var desmosLoadPromise = null;
+  var LAYOUT_KEY = "np-cm-desmos-panel-layout";
+
+  function setStatus(message) {
+    if (statusEl) statusEl.textContent = message;
+  }
+
+  function setOpen(open) {
+    panel.classList.toggle("is-open", open);
+    panel.setAttribute("aria-hidden", open ? "false" : "true");
+    toggles.forEach(function (btn) {
+      btn.classList.toggle("is-active", open);
+      btn.setAttribute("aria-pressed", open ? "true" : "false");
+    });
+    if (open) {
+      initPanelControls();
+      window.setTimeout(resizeCalculator, 80);
+    }
+  }
+
+  function isOpen() {
+    return panel.classList.contains("is-open");
+  }
+
+  function defaultLayout() {
+    var width = Math.min(680, Math.max(420, window.innerWidth - 48));
+    var height = Math.min(760, Math.max(420, window.innerHeight - 96));
+    return {
+      left: Math.max(16, window.innerWidth - width - 24),
+      top: Math.max(16, Math.min(72, window.innerHeight - height - 16)),
+      width: width,
+      height: height
+    };
+  }
+
+  function clampLayout(layout) {
+    var minW = 360;
+    var minH = 360;
+    var width = Math.min(Math.max(layout.width || minW, minW), Math.max(minW, window.innerWidth - 24));
+    var height = Math.min(Math.max(layout.height || minH, minH), Math.max(minH, window.innerHeight - 24));
+    var left = Math.min(Math.max(layout.left || 12, 12), Math.max(12, window.innerWidth - width - 12));
+    var top = Math.min(Math.max(layout.top || 12, 12), Math.max(12, window.innerHeight - height - 12));
+    return { left: left, top: top, width: width, height: height };
+  }
+
+  function applyLayout(layout) {
+    var next = clampLayout(layout || defaultLayout());
+    panel.style.left = next.left + "px";
+    panel.style.top = next.top + "px";
+    panel.style.width = next.width + "px";
+    panel.style.height = next.height + "px";
+  }
+
+  function saveLayout() {
+    try {
+      localStorage.setItem(
+        LAYOUT_KEY,
+        JSON.stringify({
+          left: panel.offsetLeft,
+          top: panel.offsetTop,
+          width: panel.offsetWidth,
+          height: panel.offsetHeight
+        })
+      );
+    } catch (e) {}
+  }
+
+  function restoreLayout() {
+    var layout = null;
+    try {
+      layout = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
+    } catch (e) {
+      layout = null;
+    }
+    applyLayout(layout || defaultLayout());
+  }
+
+  function resizeCalculator() {
+    if (calculator && calculator.resize) calculator.resize();
+  }
+
+  function initPanelControls() {
+    if (!handle || panel.dataset.controlsReady === "1") return;
+    panel.dataset.controlsReady = "1";
+    restoreLayout();
+
+    var dragging = null;
+    handle.addEventListener("pointerdown", function (event) {
+      if (event.target.closest("button")) return;
+      event.preventDefault();
+      var rect = panel.getBoundingClientRect();
+      dragging = {
+        pointerId: event.pointerId,
+        dx: event.clientX - rect.left,
+        dy: event.clientY - rect.top
+      };
+      panel.classList.add("is-dragging");
+      handle.setPointerCapture(event.pointerId);
+    });
+
+    handle.addEventListener("pointermove", function (event) {
+      if (!dragging || dragging.pointerId !== event.pointerId) return;
+      var layout = clampLayout({
+        left: event.clientX - dragging.dx,
+        top: event.clientY - dragging.dy,
+        width: panel.offsetWidth,
+        height: panel.offsetHeight
+      });
+      panel.style.left = layout.left + "px";
+      panel.style.top = layout.top + "px";
+    });
+
+    function stopDrag(event) {
+      if (!dragging || dragging.pointerId !== event.pointerId) return;
+      dragging = null;
+      panel.classList.remove("is-dragging");
+      saveLayout();
+      resizeCalculator();
+    }
+
+    handle.addEventListener("pointerup", stopDrag);
+    handle.addEventListener("pointercancel", stopDrag);
+
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function () {
+        if (!isOpen()) return;
+        saveLayout();
+        resizeCalculator();
+      });
+      ro.observe(panel);
+    }
+
+    window.addEventListener("resize", function () {
+      if (!isOpen()) return;
+      applyLayout({
+        left: panel.offsetLeft,
+        top: panel.offsetTop,
+        width: panel.offsetWidth,
+        height: panel.offsetHeight
+      });
+      resizeCalculator();
+    });
+  }
+
+  function ensureDesmosLoaded() {
+    if (!desmosApiKey) return Promise.resolve(false);
+    if (window.Desmos) return Promise.resolve(true);
+    if (desmosLoadPromise) return desmosLoadPromise;
+
+    desmosLoadPromise = new Promise(function (resolve) {
+      var script = document.createElement("script");
+      script.src =
+        "https://www.desmos.com/api/v1.6/calculator.js?apiKey=" +
+        encodeURIComponent(desmosApiKey);
+      script.async = true;
+      script.onload = function () { resolve(true); };
+      script.onerror = function () { resolve(false); };
+      document.head.appendChild(script);
+      window.setTimeout(function () { resolve(!!window.Desmos); }, 5000);
+    });
+
+    return desmosLoadPromise;
+  }
+
+  async function initCalculator() {
+    if (calculator) return true;
+    setStatus("Loading Desmos...");
+    if (!desmosApiKey) {
+      setStatus("Desmos API key is not configured on the server.");
+      return false;
+    }
+    var ok = await ensureDesmosLoaded();
+    if (!ok || !window.Desmos) {
+      setStatus("Desmos failed to load. Check your network connection.");
+      return false;
+    }
+    if (statusEl) statusEl.hidden = true;
+    calculator = Desmos.GraphingCalculator(calcEl, {
+      keypad: true,
+      expressions: true,
+      settingsMenu: true,
+      zoomButtons: true,
+      expressionsCollapsed: false,
+      border: false,
+      lockViewport: false
+    });
+    resizeCalculator();
+    return true;
+  }
+
+  async function toggleDesmos() {
+    if (isOpen()) {
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+    if (!calculator) await initCalculator();
+    else resizeCalculator();
+  }
+
+  function resetPanel() {
+    try {
+      localStorage.removeItem(LAYOUT_KEY);
+    } catch (e) {}
+    applyLayout(defaultLayout());
+    window.setTimeout(resizeCalculator, 80);
+  }
+
+  toggles.forEach(function (btn) {
+    btn.addEventListener("click", toggleDesmos);
+  });
+  if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
+  if (resetBtn) resetBtn.addEventListener("click", resetPanel);
+
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (e.key === "d" || e.key === "D") {
+      e.preventDefault();
+      toggleDesmos();
+    }
+    if (e.key === "Escape" && isOpen()) {
+      setOpen(false);
+    }
+  });
+})();

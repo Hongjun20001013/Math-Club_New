@@ -26249,9 +26249,18 @@ a.np-cm-card--ready:hover {
 
 .np-cm-deck-chrome-top {
     display: grid;
-    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 10px 14px;
+}
+
+.np-cm-chrome-actions {
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    grid-column: 5;
+    grid-row: 1;
 }
 
 .np-cm-path-open {
@@ -28285,8 +28294,8 @@ a.np-cm-card--ready:hover {
     grid-row: 1;
 }
 
-.np-cm-viewer.is-focus-mode .np-cm-focus-exit {
-    display: inline-flex;
+.np-cm-viewer.is-focus-mode .np-cm-chrome-actions {
+    display: flex;
     grid-column: 3;
     grid-row: 1;
     justify-self: end;
@@ -28343,6 +28352,165 @@ a.np-cm-card--ready:hover {
     .np-cm-viewer.is-focus-mode .np-cm-workspace {
         min-height: 100dvh;
         height: 100dvh;
+    }
+}
+
+/* ── v14 Course materials Desmos panel ── */
+.np-cm-btn--desmos {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08));
+    border-color: rgba(16, 185, 129, 0.24);
+    color: #047857;
+}
+
+.np-cm-btn--desmos.is-active {
+    background: linear-gradient(180deg, #10b981, #059669);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(16, 185, 129, 0.24);
+}
+
+.np-cm-desmos-btn-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.np-cm-desmos-quick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    background: linear-gradient(180deg, rgba(236, 253, 250, 0.98), rgba(255, 255, 255, 0.94));
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #047857;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.1);
+}
+
+.np-cm-desmos-quick.is-active {
+    background: linear-gradient(180deg, #10b981, #059669);
+    border-color: transparent;
+    color: #fff;
+}
+
+.np-cm-desmos-panel {
+    position: fixed;
+    top: 72px;
+    left: auto;
+    width: min(680px, calc(100vw - 32px));
+    height: min(760px, calc(100vh - 96px));
+    min-width: 360px;
+    min-height: 360px;
+    box-sizing: border-box;
+    padding: 14px;
+    border-radius: 22px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: #fff;
+    box-shadow: 0 28px 80px rgba(24, 18, 68, 0.24);
+    z-index: 4000;
+    overflow: auto;
+    resize: both;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s ease, box-shadow 0.18s ease;
+}
+
+.np-cm-desmos-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.np-cm-desmos-panel.is-dragging {
+    user-select: none;
+    box-shadow: 0 34px 96px rgba(24, 18, 68, 0.32);
+}
+
+.np-cm-desmos-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -2px -2px 10px;
+    padding: 10px 10px 12px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(91, 77, 255, 0.08));
+    color: #047857;
+    cursor: grab;
+    touch-action: none;
+}
+
+.np-cm-desmos-panel-head:active {
+    cursor: grabbing;
+}
+
+.np-cm-desmos-panel-title {
+    display: grid;
+    gap: 2px;
+    margin-right: auto;
+}
+
+.np-cm-desmos-panel-title strong {
+    line-height: 1.1;
+    color: #065f46;
+}
+
+.np-cm-desmos-panel-title span {
+    color: #6b7280;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.np-cm-desmos-reset,
+.np-cm-desmos-close {
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    background: #fff;
+    color: #047857;
+    border-radius: 999px;
+    height: 32px;
+    cursor: pointer;
+}
+
+.np-cm-desmos-reset {
+    padding: 0 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.np-cm-desmos-close {
+    width: 32px;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.np-cm-desmos-status {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.np-cm-desmos-calculator {
+    width: 100%;
+    height: calc(100% - 52px);
+    min-height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .np-cm-viewer.is-focus-mode .np-cm-desmos-quick span {
+        display: none;
+    }
+
+    .np-cm-viewer.is-focus-mode .np-cm-desmos-quick {
+        min-width: 36px;
+        padding: 0 10px;
     }
 }
 
