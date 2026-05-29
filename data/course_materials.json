@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-29T00:27:55.122763Z",
+  "generated_at": "2026-05-29T23:31:34.881722Z",
   "total": 21,
-  "available": 1,
+  "available": 3,
   "materials": [
     {
       "slug": "1-1-linear-equations",
@@ -10,28 +10,37 @@
       "section": "1.1",
       "title": "Linear Equations in One Variable",
       "deck_title": "SAT Unit 1.1 · Linear Equations in One Variable",
-      "slide_count": 29,
+      "slide_count": 30,
       "slides": [
         {
           "index": 1,
           "title": "SAT Unit 1.1 · Linear Equations in One Variable",
-          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 1.1</p><h1 class=\"cm-intro-title\">Linear Equations in One Variable</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><span class=\"cm-intro-chip\">Solving for Linear Equation</span><span class=\"cm-intro-chip\">Three Types of Solutions</span><span class=\"cm-intro-chip\">Real World Application</span><span class=\"cm-intro-chip\">Practice</span></div><p class=\"cm-intro-cta\">Press <strong>Next</strong> to begin</p></div></div>",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 1.1</p><h1 class=\"cm-intro-title\">Linear Equations in One Variable</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Solving for Linear Equation</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"6\"><span class=\"cm-intro-chip-num\">02</span><span class=\"cm-intro-chip-label\">Three Types of Solutions</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"13\"><span class=\"cm-intro-chip-num\">03</span><span class=\"cm-intro-chip-label\">Real World Application</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"18\"><span class=\"cm-intro-chip-num\">04</span><span class=\"cm-intro-chip-label\">Practice</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
           "kind": "intro",
           "group": "divider",
           "section": "Introduction",
-          "study_tip": "This is your lesson overview — press Next when you're ready to begin."
+          "study_tip": "This is your lesson overview — tap a section chip or press Next for the full outline."
         },
         {
           "index": 2,
+          "title": "Lesson outline",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Unit 1.1</p><h2 class=\"cm-content-title\">Linear Equations in One Variable</h2><p class=\"cm-content-lede\">30 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Solving for Linear Equation</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"6\"><span class=\"cm-content-num\">02</span><span class=\"cm-content-copy\"><strong>Three Types of Solutions</strong><span>Session 02 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"13\"><span class=\"cm-content-num\">03</span><span class=\"cm-content-copy\"><strong>Real World Application</strong><span>Session 03 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"18\"><span class=\"cm-content-num\">04</span><span class=\"cm-content-copy\"><strong>Practice</strong><span>Session 04 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "kind": "content",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "Use this outline to jump straight to any section — great for review or picking up where you left off."
+        },
+        {
+          "index": 3,
           "title": "Up next Solving for Linear Equation",
-          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Solving for Linear Equation</h3></div>",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">01</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Solving for Linear Equation</h3></div>",
           "kind": "section",
           "group": "divider",
           "section": "Solving for Linear Equation",
           "study_tip": ""
         },
         {
-          "index": 3,
+          "index": 4,
           "title": "Introduction to Linear Equations",
           "html": "<div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong> A <strong>linear equation in one variable</strong> is an equation that can be written in the form:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax + b = 0\n    \\]</div>\n<p>where \\( a \\) and \\( b \\) are constants, and \\( x \\) is the variable.</p>\n<p><strong>Key Characteristics:</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li>The highest exponent of \\( x \\) is 1, making it a <strong>first-degree</strong> equation.</li><li>The solution to a linear equation is the value of \\( x \\) that makes the equation true.</li><li>The equation represents a straight line when graphed on the coordinate plane.</li></ul>",
           "kind": "concept",
@@ -40,7 +49,7 @@
           "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
         },
         {
-          "index": 4,
+          "index": 5,
           "title": "Example: Solve for x",
           "html": "<p>Solve the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2x - 5 = 9\n    \\]</div>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<div class=\"stem-math-block cm-math-block\">\\[\\begin{aligned}\n2x - 5 &= 9 \\\\\n2x &= 14 \\\\\nx &= 7\n\\end{aligned}\\]</div></div>",
           "kind": "example",
@@ -52,16 +61,16 @@
           "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
         },
         {
-          "index": 5,
+          "index": 6,
           "title": "Up next Three Types of Solutions",
-          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Three Types of Solutions</h3></div>",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">02</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Three Types of Solutions</h3></div>",
           "kind": "section",
           "group": "divider",
           "section": "Three Types of Solutions",
           "study_tip": ""
         },
         {
-          "index": 6,
+          "index": 7,
           "title": "Three Types of Solutions",
           "html": "<p><strong>Three Types of Solutions:</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li><strong>One Solution:</strong> The equation simplifies to \\( x = c \\), where \\( c \\) is a constant. Example:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      2x + 3 = 7 \\quad \\Rightarrow \\quad x = 2\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li><strong>No Solution:</strong> The equation simplifies to a contradiction, such as \\( 0 = -3 \\), which is false. Example:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      3x + 2 = 3x + 5 \\quad \\Rightarrow \\quad 2 = 5 \\quad (false)\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li><strong>Infinite Solutions:</strong> The equation simplifies to an identity, such as \\( 0 = 0 \\), meaning any \\( x \\) is a solution. Example:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      4x + 2 = 2(2x + 1) \\quad \\Rightarrow \\quad 4x + 2 = 4x + 2\n      \\]</div>",
           "kind": "lesson",
@@ -70,7 +79,7 @@
           "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
         },
         {
-          "index": 7,
+          "index": 8,
           "title": "Example 3: No Solution Case",
           "html": "<p>Consider the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3(kx + 13) = \\frac{48}{17}x + 36\n    \\]</div>\n<p>Given that the equation has no solution, find \\( k \\).</p>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<div class=\"stem-math-block cm-math-block\">\\[\\begin{aligned}\n3kx + 39 &= \\frac{48}{17}x + 36 \\\\\nx(3k - \\frac{48}{17}) &= -3\n\\end{aligned}\\]</div>\n<p>Since there is no solution, the coefficient of \\( x \\) must be zero:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3k - \\frac{48}{17} = 0\n    \\]</div>\n<p>Solving for \\( k \\):</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    k = \\frac{16}{17}\n    \\]</div></div>",
           "kind": "example",
@@ -82,11 +91,11 @@
           "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
         },
         {
-          "index": 8,
+          "index": 9,
           "title": "Algebra Problem: No Solution Condition",
           "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><strong>Problem Statement:</strong></p>\n<p>Given the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2(kx - n) = (-\\frac{28}{15}) x - \\frac{36}{19}\n    \\]</div>\n<p>where \\( k \\) and \\( n \\) are constants, and \\( n > 1 \\). The equation has no solution.</p>\n<p><strong>Question:</strong> What is the value of \\( k \\)?</p>",
           "kind": "question",
-          "answer_index": 9,
+          "answer_index": 10,
           "interactive": true,
           "group": "practice",
           "section": "Three Types of Solutions",
@@ -94,52 +103,52 @@
           "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
         },
         {
-          "index": 9,
+          "index": 10,
           "title": "Solution: Finding k",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand both sides</strong></p>\n<p>Expanding the left-hand side:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2kx - 2n\n    \\]</div>\n<p>The right-hand side remains:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    -\\frac{28}{15} x - \\frac{36}{19}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Compare coefficients of \\( x \\)</strong></p>\n<p>Since the equation has <strong>no solution</strong>, the coefficients of \\( x \\) must be equal, but the constants must create a contradiction.</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2k = -\\frac{28}{15}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Solve for \\( k \\)</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    k = \\frac{-28}{30} = \\frac{-14}{15}\n    \\]</div>\n<p><strong>Final Answer:</strong> <span class=\"cm-answer-highlight\"><strong>\\( k = -\\frac{14}{15} \\)</strong></span></p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand both sides</strong></p>\n<p>Expanding the left-hand side:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2kx - 2n\n    \\]</div>\n<p>The right-hand side remains:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    -\\frac{28}{15} x - \\frac{36}{19}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Compare coefficients of \\( x \\)</strong></p>\n<p>Since the equation has <strong>no solution</strong>, the coefficients of \\( x \\) must be equal, but the constants must create a contradiction.</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2k = -\\frac{28}{15}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Solve for \\( k \\)</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    k = \\frac{-28}{30} = \\frac{-14}{15}\n    \\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(k = -\\frac{14}{15}\\)</span></div></div></div>",
           "kind": "solution",
-          "question_index": 8,
+          "question_index": 9,
           "group": "practice",
           "section": "Three Types of Solutions",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 10,
+          "index": 11,
           "title": "Question",
           "html": "<p>Consider the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    9x + 5 = a(x + b)\n    \\]</div>\n<p>where \\( a \\) and \\( b \\) are constants. The equation has no solutions.</p>\n<p>Which of the following must be true?</p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>\\( a = 9 \\)</li><li>\\( b = 5 \\)</li><li>\\( b \\neq \\frac{5}{9} \\)</li></ol>\n<p><strong>Answer Choices:</strong></p>\n<div class=\"cm-mcq-interactive\" data-cm-mcq><p class=\"cm-mcq-prompt\">Select your answer, then check when ready.</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">None</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">I only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I and III only</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div>",
           "kind": "question",
           "interactive": true,
-          "answer_index": 11,
+          "answer_index": 12,
           "group": "practice",
           "section": "Three Types of Solutions",
           "study_tip": "No-solution means parallel lines: same slope (coefficient of x), different constants.",
           "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
         },
         {
-          "index": 11,
+          "index": 12,
           "title": "Solution",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Understanding the Equation</strong></p>\n<ul class=\"stem-itemize\"><li>The given equation is:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        9x + 5 = a(x + b)\n        \\]</div></li><li>For the equation to have <strong>no solution</strong>, both sides must be parallel, meaning:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        9 = a, \\quad b \\neq \\frac{5}{9}\n        \\]</div></li></ul>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Answer Choices</strong></p>\n<ul class=\"stem-itemize\"><li>\\( a = 9 \\) must be true (Statement I is correct).</li><li>\\( b = 5 \\) is not necessarily true (Statement II is incorrect).</li><li>\\( b \\neq \\frac{5}{9} \\) must be true (Statement III is correct).</li></ul>\n<p><strong>Final Answer:</strong> Option <strong>D (I and III only)</strong>.</p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Understanding the Equation</strong></p>\n<ul class=\"stem-itemize\"><li>The given equation is:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        9x + 5 = a(x + b)\n        \\]</div></li><li>For the equation to have <strong>no solution</strong>, both sides must be parallel, meaning:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        9 = a, \\quad b \\neq \\frac{5}{9}\n        \\]</div></li></ul>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Answer Choices</strong></p>\n<ul class=\"stem-itemize\"><li>\\( a = 9 \\) must be true (Statement I is correct).</li><li>\\( b = 5 \\) is not necessarily true (Statement II is incorrect).</li><li>\\( b \\neq \\frac{5}{9} \\) must be true (Statement III is correct).</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">Option <strong>D (I and III only)</strong>.</div></div></div>",
           "kind": "solution",
-          "question_index": 10,
+          "question_index": 11,
           "group": "practice",
           "section": "Three Types of Solutions",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 12,
+          "index": 13,
           "title": "Up next Real World Application",
-          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Real World Application</h3></div>",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">03</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Real World Application</h3></div>",
           "kind": "section",
           "group": "divider",
           "section": "Real World Application",
           "study_tip": ""
         },
         {
-          "index": 13,
+          "index": 14,
           "title": "Word Problem: Corn Removal Rate",
           "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><strong>Problem Statement:</strong></p>\n<p>Hector used an auger to remove corn from a storage bin at a constant rate. The bin contained 24,000 bushels of corn when Hector began to use the auger. After 5 hours, 19,350 bushels remained in the bin. If the auger continues to remove corn at this rate, what is the total number of hours Hector will have been using the auger when 12,840 bushels remain?</p>\n<p><strong>Answer Choices:</strong></p>\n<div class=\"cm-mcq-grid\"><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">3</span></div>\n<div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">7</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">8</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">12</span></div></div>",
           "kind": "practice",
-          "answer_index": 14,
+          "answer_index": 15,
           "interactive": true,
           "group": "practice",
           "section": "Real World Application",
@@ -147,21 +156,21 @@
           "strategy_hint": "Find the rate of change first (Δy/Δx), then build the linear model."
         },
         {
-          "index": 14,
+          "index": 15,
           "title": "Solution: Finding the Total Hours",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Find the rate of corn removal</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li>Initial amount of corn: \\( 24,000 \\) bushels</li><li>Remaining after 5 hours: \\( 19,350 \\) bushels</li><li>Corn removed in 5 hours:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      24,000 - 19,350 = 4,650  bushels\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li>Rate of removal:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      \\frac{4,650}{5} = 930  bushels per hour\n      \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Find the total hours needed for 12,840 bushels remaining</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li>Find the total corn removed:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      24,000 - 12,840 = 11,160  bushels\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li>Find the total hours:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      \\frac{11,160}{930} = 12  hours\n      \\]</div>\n<p><strong>Final Answer:</strong> <span class=\"cm-answer-highlight\"><strong>D. 12</strong></span></p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Find the rate of corn removal</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li>Initial amount of corn: \\( 24,000 \\) bushels</li><li>Remaining after 5 hours: \\( 19,350 \\) bushels</li><li>Corn removed in 5 hours:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      24,000 - 19,350 = 4,650  bushels\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li>Rate of removal:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      \\frac{4,650}{5} = 930  bushels per hour\n      \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Find the total hours needed for 12,840 bushels remaining</strong></p>\n<ul class=\"stem-itemize cm-dash-list\"><li>Find the total corn removed:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      24,000 - 12,840 = 11,160  bushels\n      \\]</div>\n\n<ul class=\"stem-itemize cm-dash-list\"><li>Find the total hours:</li></ul>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n      \\frac{11,160}{930} = 12  hours\n      \\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">D. 12</div></div></div>",
           "kind": "solution",
-          "question_index": 13,
+          "question_index": 14,
           "group": "practice",
           "section": "Real World Application",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 15,
+          "index": 16,
           "title": "Glenview Street Property Discount",
           "html": "<p><strong>Table: Townsend Realty Group Investments</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Property address</strong></th><th><strong>Purchase price (&#36;)</strong></th><th><strong>Monthly rental price (&#36;)</strong></th></tr></thead><tbody><tr><td>Clearwater Lane</td><td>128,000</td><td>950</td></tr><tr><td>Driftwood Drive</td><td>176,000</td><td>1,310</td></tr><tr><td>Edgemont Street</td><td>70,000</td><td>515</td></tr><tr><td><strong>Glenview Street</strong></td><td><strong>140,000</strong></td><td><strong>1,040</strong></td></tr><tr><td>Hamilton Circle</td><td>450,000</td><td>3,365</td></tr></tbody></table></div>\n<p>Townsend Realty Group purchased the Glenview Street property and received a 40% discount off the original price along with an additional 20% off the <em>discounted</em> price for purchasing in cash.</p>\n<p>Which of the following best approximates the <strong>original price</strong>, in dollars, of the Glenview Street property?</p>\n<div class=\"cm-mcq-grid\"><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">&#36;350,000</span></div>\n<div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">&#36;291,700</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">&#36;233,300</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">&#36;175,000</span></div></div>",
           "kind": "question",
-          "answer_index": 16,
+          "answer_index": 17,
           "interactive": true,
           "group": "practice",
           "section": "Real World Application",
@@ -169,30 +178,30 @@
           "strategy_hint": "Translate each percentage change into a multiplier, then chain the operations."
         },
         {
-          "index": 16,
+          "index": 17,
           "title": "Solution: Glenview Street Property",
-          "html": "<p>Let \\(\\displaystyle P\\) be the original price of the Glenview Street property.</p>\n<ul class=\"stem-itemize\"><li>First, a 40% discount was applied:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    P \\times 0.60\n    \\]</div></li><li>Then, an additional 20% discount was applied to the new value:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    P \\times 0.60 \\times 0.80 = 0.48P\n    \\]</div></li><li>We are told the final purchase price was &#36;140,000:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    0.48P = 140,000\n    \\Rightarrow P = \\frac{140,000}{0.48} = 291,666.67\n    \\]</div></li></ul>\n<p><strong>Answer:</strong> <span class=\"cm-answer-box\">B.  291,700</span></p>",
+          "html": "<p>Let \\(\\displaystyle P\\) be the original price of the Glenview Street property.</p>\n<ul class=\"stem-itemize\"><li>First, a 40% discount was applied:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    P \\times 0.60\n    \\]</div></li><li>Then, an additional 20% discount was applied to the new value:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    P \\times 0.60 \\times 0.80 = 0.48P\n    \\]</div></li><li>We are told the final purchase price was &#36;140,000:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    0.48P = 140,000\n    \\Rightarrow P = \\frac{140,000}{0.48} = 291,666.67\n    \\]</div></li></ul>\n<p><strong>Answer:</strong> <span class=\"cm-answer-box\">B. 291,700</span></p>",
           "kind": "solution",
-          "question_index": 15,
+          "question_index": 16,
           "group": "practice",
           "section": "Real World Application",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 17,
+          "index": 18,
           "title": "Up next Practice",
-          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Practice</h3></div>",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">04</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Practice</h3></div>",
           "kind": "section",
           "group": "divider",
           "section": "Practice",
           "study_tip": ""
         },
         {
-          "index": 18,
+          "index": 19,
           "title": "Question : Infinitely Many Solutions",
           "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><strong>Given:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{12x + 28}{4} - \\frac{s}{13} = r(x - 8)\n    \\]</div>\n<p>where \\(s\\) and \\(r\\) are constants, and \\(s > 0\\).</p>\n<p><strong>If the equation has infinitely many solutions, what is the value of \\(s\\)?</strong></p>",
           "kind": "question",
-          "answer_index": 19,
+          "answer_index": 20,
           "interactive": true,
           "group": "practice",
           "section": "Practice",
@@ -200,43 +209,21 @@
           "strategy_hint": "Match coefficients of x and constants on both sides — they must be identical."
         },
         {
-          "index": 19,
+          "index": 20,
           "title": "Answer: Infinitely Many Solutions",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Simplify the left side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{12x + 28}{4} = 3x + 7 \\quad \\Rightarrow \\quad 3x + 7 - \\frac{s}{13}\n    \\]</div>\n<p><strong>So the equation becomes:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3x + 7 - \\frac{s}{13} = r(x - 8)\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Expand the right side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    r(x - 8) = rx - 8r\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: For infinitely many solutions, both sides must be identical</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\\begin{aligned}\nMatch coefficients: \\quad & 3 = r \\quad \\Rightarrow r = 3 \\\\\nMatch constants: \\quad & 7 - \\frac{s}{13} = -8r = -24 \\\\\n& \\Rightarrow \\frac{s}{13} = 31 \\Rightarrow s = 403\n\\end{aligned}\\]</div>\n<p><strong>Correct Answer:</strong> \\( <span class=\"cm-answer-box\">s = 403</span> \\)</p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Simplify the left side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{12x + 28}{4} = 3x + 7 \\quad \\Rightarrow \\quad 3x + 7 - \\frac{s}{13}\n    \\]</div>\n<p><strong>So the equation becomes:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3x + 7 - \\frac{s}{13} = r(x - 8)\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Expand the right side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    r(x - 8) = rx - 8r\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: For infinitely many solutions, both sides must be identical</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\\begin{aligned}\n\\text{Match coefficients:} \\quad & 3 = r \\quad \\Rightarrow r = 3 \\\\\n\\text{Match constants:} \\quad & 7 - \\frac{s}{13} = -8r = -24 \\\\\n& \\Rightarrow \\frac{s}{13} = 31 \\Rightarrow s = 403\n\\end{aligned}\\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(s = 403\\)</span></div></div></div>",
           "kind": "answer",
-          "question_index": 18,
+          "question_index": 19,
           "group": "practice",
           "section": "Practice",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
-        },
-        {
-          "index": 20,
-          "title": "Question: No Solution Linear Equation",
-          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><strong>Given the equation:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{1}{3}(bx + c) = \\frac{14}{27}x + \\frac{4}{9}\n    \\]</div>\n<p>where \\(b\\) and \\(c\\) are constants and \\(c > 3\\).</p>\n<p>The equation has <strong>no solution</strong>. What is the value of \\(b\\)?</p>",
-          "kind": "question",
-          "answer_index": 21,
-          "interactive": true,
-          "group": "practice",
-          "section": "Practice",
-          "study_tip": "No-solution means parallel lines: same slope (coefficient of x), different constants.",
-          "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
         },
         {
           "index": 21,
-          "title": "Answer: No Solution Condition",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand the left-hand side:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{1}{3}(bx + c) = \\frac{b}{3}x + \\frac{c}{3}\n    \\]</div>\n<p><strong>Now the equation becomes:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{b}{3}x + \\frac{c}{3} = \\frac{14}{27}x + \\frac{4}{9}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: For a linear equation to have <em>no solution</em>, the coefficients of \\(x\\) must be equal but the constants must be different.</strong></p>\n<p><strong>Match the coefficients:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{b}{3} = \\frac{14}{27} \\Rightarrow b = \\frac{14}{27} \\cdot 3 = \\frac{14}{9}\n    \\]</div>\n<p><strong>Check the constants:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{c}{3} \\neq \\frac{4}{9}, \\quad and  c > 3 \\Rightarrow This guarantees different constants\n    \\]</div>\n<p><strong>Final Answer:</strong> \\(<span class=\"cm-answer-box\">b = \\frac{14}{9}</span>\\)</p></div>",
-          "kind": "answer",
-          "question_index": 20,
-          "group": "practice",
-          "section": "Practice",
-          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
-        },
-        {
-          "index": 22,
-          "title": "Question: No Solution for Linear Equation",
-          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Given the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax - b = 3(2x + 1)\n    \\]</div>\n<p>where \\(a\\) and \\(b\\) are constants, and the equation has <strong>no solution</strong>.</p>\n<p>Which of the following could be the values of \\(a\\) and \\(b\\)?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), \\(b = -3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), \\(b = 3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = -3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = 3\\)</span></li></ul>",
+          "title": "Question: No Solution Linear Equation",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><strong>Given the equation:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{1}{3}(bx + c) = \\frac{14}{27}x + \\frac{4}{9}\n    \\]</div>\n<p>where \\(b\\) and \\(c\\) are constants and \\(c > 3\\).</p>\n<p>The equation has <strong>no solution</strong>. What is the value of \\(b\\)?</p>",
           "kind": "question",
-          "answer_index": 23,
+          "answer_index": 22,
           "interactive": true,
           "group": "practice",
           "section": "Practice",
@@ -244,21 +231,43 @@
           "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
         },
         {
-          "index": 23,
+          "index": 22,
           "title": "Answer: No Solution Condition",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand the right-hand side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax - b = 6x + 3\n    \\]</div>\n<p><strong>For no solution:</strong></p>\n<p>Coefficients of \\(x\\) must match, but constants must not:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    a = 6, \\quad -b \\neq 3 \\Rightarrow b \\neq -3\n    \\]</div>\n<p><strong>Now test options:</strong></p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), not valid</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), not valid</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = -3\\) → \\(-b = 3\\), so both sides match → <em>infinite</em> solutions</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = 3\\) → \\(-b = -3 \\neq 3\\), <strong>valid: no solution</strong></span></li></ul>\n<p><strong>Correct Answer:</strong> \\(<span class=\"cm-answer-box\">D</span>\\)</p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand the left-hand side:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{1}{3}(bx + c) = \\frac{b}{3}x + \\frac{c}{3}\n    \\]</div>\n<p><strong>Now the equation becomes:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{b}{3}x + \\frac{c}{3} = \\frac{14}{27}x + \\frac{4}{9}\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: For a linear equation to have <em>no solution</em>, the coefficients of \\(x\\) must be equal but the constants must be different.</strong></p>\n<p><strong>Match the coefficients:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{b}{3} = \\frac{14}{27} \\Rightarrow b = \\frac{14}{27} \\cdot 3 = \\frac{14}{9}\n    \\]</div>\n<p><strong>Check the constants:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{c}{3} \\neq \\frac{4}{9}, \\quad and  c > 3 \\Rightarrow This guarantees different constants\n    \\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(b = \\frac{14}{9}\\)</span></div></div></div>",
           "kind": "answer",
-          "question_index": 22,
+          "question_index": 21,
           "group": "practice",
           "section": "Practice",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
+          "index": 23,
+          "title": "Question: No Solution for Linear Equation",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Given the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax - b = 3(2x + 1)\n    \\]</div>\n<p>where \\(a\\) and \\(b\\) are constants, and the equation has <strong>no solution</strong>.</p>\n<p>Which of the following could be the values of \\(a\\) and \\(b\\)?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), \\(b = -3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), \\(b = 3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = -3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = 3\\)</span></li></ul>",
+          "kind": "question",
+          "answer_index": 24,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "No-solution means parallel lines: same slope (coefficient of x), different constants.",
+          "strategy_hint": "Set the coefficients of x equal, then verify the constants produce a contradiction."
+        },
+        {
           "index": 24,
+          "title": "Answer: No Solution Condition",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Expand the right-hand side</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax - b = 6x + 3\n    \\]</div>\n<p><strong>For no solution:</strong></p>\n<p>Coefficients of \\(x\\) must match, but constants must not:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    a = 6, \\quad -b \\neq 3 \\Rightarrow b \\neq -3\n    \\]</div>\n<p><strong>Now test options:</strong></p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), not valid</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\(a = 2\\), not valid</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = -3\\) → \\(-b = 3\\), so both sides match → <em>infinite</em> solutions</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\(a = 6\\), \\(b = 3\\) → \\(-b = -3 \\neq 3\\), <strong>valid: no solution</strong></span></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\">D</div></div></div>",
+          "kind": "answer",
+          "question_index": 23,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 25,
           "title": "Question: Absolute Value Equation",
           "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Solve for the <strong>positive solution</strong> to the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3|5 - x| = 42 - 4|5 - x|\n    \\]</div>",
           "kind": "question",
-          "answer_index": 25,
+          "answer_index": 26,
           "interactive": true,
           "group": "practice",
           "section": "Practice",
@@ -266,21 +275,21 @@
           "strategy_hint": "Isolate |expression| first, then split into two linear equations."
         },
         {
-          "index": 25,
+          "index": 26,
           "title": "Answer: Solving Absolute Value Equation",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Let </strong> \\(y = |5 - x|\\), then:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3y = 42 - 4y\n    \\Rightarrow 7y = 42 \\Rightarrow y = 6\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Solve </strong> \\(|5 - x| = 6\\)</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    5 - x = 6 \\Rightarrow x = -1 \\quad or \\quad 5 - x = -6 \\Rightarrow x = 11\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Positive solution:</strong> \\(<span class=\"cm-answer-box\">11</span>\\)</p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Let </strong> \\(y = |5 - x|\\), then:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    3y = 42 - 4y\n    \\Rightarrow 7y = 42 \\Rightarrow y = 6\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Solve </strong> \\(|5 - x| = 6\\)</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    5 - x = 6 \\Rightarrow x = -1 \\quad or \\quad 5 - x = -6 \\Rightarrow x = 11\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Positive solution:</strong> <span class=\"cm-answer-box\">11</span></p></div>",
           "kind": "answer",
-          "question_index": 24,
+          "question_index": 25,
           "group": "practice",
           "section": "Practice",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 26,
+          "index": 27,
           "title": "Question: Popcorn Word Problem",
           "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Joey and Matt were tasked with bringing popcorn to a certain event. Joey brought \\(x\\) pounds of popcorn and Matt brought 4 fewer pounds than Joey did.</p>\n<p>During the event, 60% of the popcorn they had brought was consumed.</p>\n<p>If Joey and Matt divided the leftover popcorn evenly between them, which of the following represents the number of pounds of leftover popcorn each of them took?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\(0.2x - 0.8\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\(0.4x - 0.8\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\(0.6x - 1.2\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\(0.8x - 1.6\\)</span></li></ul>",
           "kind": "question",
-          "answer_index": 27,
+          "answer_index": 28,
           "interactive": true,
           "group": "practice",
           "section": "Practice",
@@ -288,17 +297,17 @@
           "strategy_hint": "Find the rate of change first (Δy/Δx), then build the linear model."
         },
         {
-          "index": 27,
+          "index": 28,
           "title": "Answer: Popcorn Division",
-          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Total popcorn brought</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\nJoey:  x, \\quad Matt:  x - 4 \\Rightarrow Total:  x + (x - 4) = 2x - 4\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: 60% consumed → 40% remaining</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\nLeftover:  0.4(2x - 4) = 0.8x - 1.6\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Divided evenly between 2 people</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\frac{0.8x - 1.6}{2} = 0.4x - 0.8\n\\]</div>\n<p><strong>Final Answer:</strong> \\(<span class=\"cm-answer-box\">B.  0.4x - 0.8</span>\\)</p></div>",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Total popcorn brought</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\nJoey:  x, \\quad Matt:  x - 4 \\Rightarrow Total:  x + (x - 4) = 2x - 4\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: 60% consumed → 40% remaining</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\nLeftover:  0.4(2x - 4) = 0.8x - 1.6\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Divided evenly between 2 people</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\frac{0.8x - 1.6}{2} = 0.4x - 0.8\n\\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(B.  0.4x - 0.8\\)</span></div></div></div>",
           "kind": "answer",
-          "question_index": 26,
+          "question_index": 27,
           "group": "practice",
           "section": "Practice",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 28,
+          "index": 29,
           "title": "Summary",
           "html": "<div class=\"cm-recap-banner\"><span class=\"cm-recap-icon\" aria-hidden=\"true\">◆</span><div class=\"cm-recap-copy\"><strong>Lesson recap</strong><span>Review these ideas before moving to practice tests.</span></div></div><ul class=\"stem-itemize\"><li>A linear equation in one variable has <strong>one solution, no solution, or infinitely many solutions</strong>.</li><li>Contradictions (e.g., \\( 0 = -3 \\)) mean <strong>no solution</strong>.</li><li>Identities (e.g., \\( 0 = 0 \\)) mean <strong>infinite solutions</strong>.</li></ul>",
           "kind": "lesson",
@@ -307,9 +316,9 @@
           "study_tip": "Quick recap — make sure you can recall each bullet without looking."
         },
         {
-          "index": 29,
+          "index": 30,
           "title": "Thank You",
-          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 29 slides on <strong>Linear Equations in One Variable</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Solving for Linear Equation</span><span class=\"cm-closing-chip\">Three Types of Solutions</span><span class=\"cm-closing-chip\">Real World Application</span><span class=\"cm-closing-chip\">Practice</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 30 slides on <strong>Linear Equations in One Variable</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Solving for Linear Equation</span><span class=\"cm-closing-chip\">Three Types of Solutions</span><span class=\"cm-closing-chip\">Real World Application</span><span class=\"cm-closing-chip\">Practice</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
           "kind": "closing",
           "group": "review",
           "section": "Practice",
@@ -325,19 +334,19 @@
       "practice_slide_count": 18,
       "lesson_path": [
         {
-          "index": 2,
+          "index": 3,
           "title": "Solving for Linear Equation"
         },
         {
-          "index": 5,
+          "index": 6,
           "title": "Three Types of Solutions"
         },
         {
-          "index": 12,
+          "index": 13,
           "title": "Real World Application"
         },
         {
-          "index": 17,
+          "index": 18,
           "title": "Practice"
         }
       ]
@@ -348,13 +357,366 @@
       "unit_name": "Algebra",
       "section": "1.2",
       "title": "Linear Functions",
-      "deck_title": "Linear Functions",
-      "slide_count": 0,
-      "slides": [],
-      "tex_available": false,
-      "pdf_available": false,
-      "tex_file": null,
-      "pdf_file": null
+      "deck_title": "SAT Unit 1.2 · Linear Function",
+      "slide_count": 32,
+      "slides": [
+        {
+          "index": 1,
+          "title": "SAT Unit 1.2 · Linear Function",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 1.2</p><h1 class=\"cm-intro-title\">Linear Function</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Linear Function</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"7\"><span class=\"cm-intro-chip-num\">02</span><span class=\"cm-intro-chip-label\">Slope</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"13\"><span class=\"cm-intro-chip-num\">03</span><span class=\"cm-intro-chip-label\">Graphs of Linear Function</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"20\"><span class=\"cm-intro-chip-num\">04</span><span class=\"cm-intro-chip-label\">Practice</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
+          "kind": "intro",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "This is your lesson overview — tap a section chip or press Next for the full outline."
+        },
+        {
+          "index": 2,
+          "title": "Lesson outline",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Unit 1.2</p><h2 class=\"cm-content-title\">Linear Function</h2><p class=\"cm-content-lede\">32 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Linear Function</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"7\"><span class=\"cm-content-num\">02</span><span class=\"cm-content-copy\"><strong>Slope</strong><span>Session 02 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"13\"><span class=\"cm-content-num\">03</span><span class=\"cm-content-copy\"><strong>Graphs of Linear Function</strong><span>Session 03 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"20\"><span class=\"cm-content-num\">04</span><span class=\"cm-content-copy\"><strong>Practice</strong><span>Session 04 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "kind": "content",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "Use this outline to jump straight to any section — great for review or picking up where you left off."
+        },
+        {
+          "index": 3,
+          "title": "Up next Linear Function",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">01</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Linear Function</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Linear Function",
+          "study_tip": ""
+        },
+        {
+          "index": 4,
+          "title": "Linear Functions",
+          "html": "<ul class=\"stem-itemize\"><li>A linear function is an equation that models a <strong>straight line</strong>.</li><li>General form:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        f(x) = mx + b\n        \\]</div>\n        where \\( m \\) is the slope and \\( b \\) is the y-intercept.</li><li>Properties:\n        <ul class=\"stem-itemize\"><li>Constant rate of change.</li><li>Graph is a straight line.</li><li>Slope \\( m \\) determines the steepness.</li></ul>\n</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Linear Function",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 5,
+          "title": "Evaluating Functions",
+          "html": "<p><strong>Topic: Evaluating a Function at a Given Input</strong></p>\n<ul class=\"stem-itemize\"><li>A function such as \\( h(x) = 4x - 9 \\) describes a relationship between input \\(x\\) and output \\(h(x)\\).</li><li>To evaluate the function at a specific value (e.g., \\(x = -3\\)), substitute that value into the expression.</li><li>Carefully apply arithmetic operations: multiplication first, then addition/subtraction.</li><li>This process gives the function's output for that input, also known as the value of the function.</li></ul>\n<p><strong>Key Skill:</strong></p>\n<p>Mastery of function evaluation builds the foundation for function tables, graphing, and understanding function behavior.</p>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Linear Function",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 6,
+          "title": "Question : X-Intercept of Combined Functions",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The functions \\( f \\) and \\( g \\) are defined as:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    f(x) = \\frac{1}{4}x - 9, \\quad g(x) = \\frac{3}{4}x + 21.\n    \\]</div>\n<p>If the function \\( h \\) is defined as:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    h(x) = f(x) + g(x),\n    \\]</div>\n<p>what is the x-coordinate of the x-intercept of the graph of \\( y = h(x) \\) in the \\( xy \\)-plane?</p>",
+          "kind": "question",
+          "answer_index": 12,
+          "interactive": true,
+          "group": "practice",
+          "section": "Linear Function",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 7,
+          "title": "Up next Slope",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">02</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Slope</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Slope",
+          "study_tip": ""
+        },
+        {
+          "index": 8,
+          "title": "Understanding Slope",
+          "html": "<div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong></p>\n<p>The <strong>slope</strong> of a line measures the steepness and direction of the line. It is represented as:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    m = \\frac{\\Delta y}{\\Delta x} = \\frac{y_2 - y_1}{x_2 - x_1}\n    \\]</div>\n<p>where:</p>\n<ul class=\"stem-itemize\"><li>\\( m \\) is the slope,</li><li>\\( (x_1, y_1) \\) and \\( (x_2, y_2) \\) are two points on the line,</li><li>\\( \\Delta y \\) represents the vertical change (rise),</li><li>\\( \\Delta x \\) represents the horizontal change (run).</li></ul>\n<p><strong>Real-World Applications of Slope:</strong></p>\n<ul class=\"stem-itemize\"><li><strong>Road Inclines:</strong> The slope of a highway ramp or a hill indicates how steep the road is.</li><li><strong>Construction:</strong> Roofs have slopes to allow rainwater to flow off properly.</li></ul>",
+          "kind": "concept",
+          "group": "learn",
+          "section": "Slope",
+          "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
+        },
+        {
+          "index": 9,
+          "title": "Understanding Slope Visually",
+          "html": "<p><strong>Slope (\\(m\\)) measures the steepness and direction of a line.</strong></p>\n<p>Slope shows how much \\(y\\) increases or decreases as \\(x\\) increases.</p>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Slope",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 10,
+          "title": "Question : Temperature Conversion",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>A.</strong></th><th>3.78</th></tr></thead><tbody><tr><td><strong>B.</strong></td><td>35.78</td></tr><tr><td><strong>C.</strong></td><td>487.89</td></tr><tr><td><strong>D.</strong></td><td>519.89</td></tr></tbody></table></div>",
+          "kind": "question",
+          "answer_index": 12,
+          "interactive": true,
+          "group": "practice",
+          "section": "Slope",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 11,
+          "title": "Question: Meaning of the Constant in the Equation",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>An object hangs from a spring. The formula</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\ell = 30 + 2w\n    \\]</div>\n<p>relates the length \\( \\ell \\), in centimeters, of the spring to the weight \\( w \\), in newtons, of the object.</p>\n<p>Which of the following describes the meaning of the \\( 2 \\) in this context?</p>\n<p><strong>Options:</strong></p>\n<div class=\"cm-mcq-grid\"><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">The length, in centimeters, of the spring with no weight attached.</span></div>\n<div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">The weight, in newtons, of an object that will stretch the spring 30 centimeters.</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">The increase in the weight, in newtons, of the object for each one-centimeter increase in the length of the spring.</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">The increase in the length, in centimeters, of the spring for each one-newton increase in the weight of the object.</span></div></div>",
+          "kind": "question",
+          "answer_index": 12,
+          "interactive": true,
+          "group": "practice",
+          "section": "Slope",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 12,
+          "title": "Answer Explanation: Meaning of the Constant in the Equation",
+          "html": "<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>The given equation is \\( \\ell = 30 + 2w \\).</li><li>The coefficient \\( 2 \\) represents the rate at which the length of the spring increases as the weight increases.</li><li>This means that for each additional newton of weight, the length of the spring increases by \\( 2 \\) centimeters.</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 11,
+          "group": "learn",
+          "section": "Slope",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 13,
+          "title": "Up next Graphs of Linear Function",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">03</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Graphs of Linear Function</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Graphs of Linear Function",
+          "study_tip": ""
+        },
+        {
+          "index": 14,
+          "title": "Interpreting Piecewise Linear Graphs",
+          "html": "<p><strong>Topic: Interpreting Piecewise Linear Graphs \\& Calculating Rate of Change</strong></p>\n<ul class=\"stem-itemize\"><li>A graph showing a quantity over time helps visualize how that quantity changes.</li><li>The <strong>rate of change</strong> (e.g., rainfall per hour) is calculated as:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        Rate = \\frac{Change in  y}{Change in  x} = \\frac{\\Delta y}{\\Delta x}\n        \\]</div></li><li>A <strong>horizontal segment</strong> means the quantity is not changing during that time (rate = 0).</li><li>A <strong>steeper line</strong> means a faster rate of change.</li><li>When analyzing the graph:\n        <ul class=\"stem-itemize\"><li>Look for intervals with different slopes.</li><li>Compare slope values to find where the rate is greatest or increasing/decreasing.</li></ul>\n</li></ul>\n\n    <strong>Key Skill:</strong>\n    Understanding graphs requires both visual reading and numerical slope calculation.",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Graphs of Linear Function",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 15,
+          "title": "Interpreting Piecewise Linear Graphs",
+          "html": "<p><strong>Concept:</strong> Use graphs to visualize how quantities change over time.</p>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Graphs of Linear Function",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 16,
+          "title": "Question : Rainfall Rate Interpretation",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E73.svg\" alt=\"\" loading=\"lazy\" /></div></p>\n<p>The graph shows the total amount of rainfall \\(y\\), in centimeters, from the start of a 10-hour period,</p>\n<p>where \\(x\\) is the number of hours after the start of the period.</p>\n<p>Which of the following statements about the rainfall during this time period is true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">The rate of rainfall was 2 centimeters per hour between \\(x = 2\\) and \\(x = 4\\).</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">The rate of rainfall was the greatest between \\(x = 4\\) and \\(x = 10\\).</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">The rate of rainfall increased between \\(x = 0\\) and \\(x = 2\\).</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">The rate of rainfall was 0 centimeters per hour between \\(x = 2\\) and \\(x = 4\\).</span></li></ul>",
+          "kind": "question",
+          "answer_index": 17,
+          "interactive": true,
+          "group": "practice",
+          "section": "Graphs of Linear Function",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 17,
+          "title": "Answer : Rainfall Rate Interpretation",
+          "html": "<p><strong>Analyzing the Graph:</strong></p>\n<ul class=\"stem-itemize\"><li>From \\(x = 0\\) to \\(x = 2\\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        Rate = \\frac{2 - 0}{2 - 0} = 1  cm/hr\n        \\]</div></li><li>From \\(x = 2\\) to \\(x = 4\\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        Rate = \\frac{2 - 2}{4 - 2} = 0  cm/hr (flat segment)\n        \\]</div></li><li>From \\(x = 4\\) to \\(x = 10\\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        Rate = \\frac{3 - 2}{10 - 4} = \\frac{1}{6} \\approx 0.167  cm/hr\n        \\]</div></li></ul>\n<p><strong>Evaluating the Choices:</strong></p>\n<ul class=\"stem-itemize\"><li><strong>A.</strong> Incorrect — rate was 0, not 2</li><li><strong>B.</strong> Incorrect — greatest rate was from \\(x = 0\\) to \\(2\\)</li><li><strong>C.</strong> Incorrect — rate did not increase; it was constant at 1</li><li><strong>D.</strong> <strong>Correct</strong> — rate was 0 cm/hr between \\(x = 2\\) and \\(x = 4\\)</li></ul>\n<p><strong>Correct Answer: D</strong></p>",
+          "kind": "lesson",
+          "question_index": 16,
+          "group": "learn",
+          "section": "Graphs of Linear Function",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 18,
+          "title": "Question : Window Repair Cost",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>A.</strong></th><th>f(x) = 60x + 100</th></tr></thead><tbody><tr><td><strong>B.</strong></td><td>f(x) = 60x + 220</td></tr><tr><td><strong>C.</strong></td><td>f(x) = 80x</td></tr><tr><td><strong>D.</strong></td><td>f(x) = 80x + 220</td></tr></tbody></table></div>",
+          "kind": "question",
+          "answer_index": 19,
+          "interactive": true,
+          "group": "practice",
+          "section": "Graphs of Linear Function",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 19,
+          "title": "Answer to Question",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>To determine the hourly fee, subtract the base cost from the total cost for 5 hours:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    400 - 220 = 180 \\quad \\Rightarrow \\quad for 3 extra hours\n    \\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n    Hourly fee = \\frac{180}{3} = 60\n    \\]</div>\n<p>So, the cost function is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    f(x) = 220 + 60(x - 2)\n    \\]</div>\n<p>Simplifying:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    f(x) = 60x + 100\n    \\]</div>\n<p><strong>Correct Answer: A.</strong> \\( f(x) = 60x + 100 \\)</p>",
+          "kind": "question",
+          "question_index": 18,
+          "answer_index": 22,
+          "interactive": true,
+          "group": "practice",
+          "section": "Graphs of Linear Function",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 20,
+          "title": "Up next Practice",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">04</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Practice</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Practice",
+          "study_tip": ""
+        },
+        {
+          "index": 21,
+          "title": "Question: Interpreting Constants in a Function",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The given function \\( h(t) = 100 - 4t \\) models the number of hours until a gallon of milk held at a temperature of \\( t \\), in degrees Celsius, goes sour.</p>\n<p>Which of the following is the best interpretation of the number \\( 4 \\) in this context?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">An increase of \\(1^\\circC\\) will make a gallon of milk go sour 4 hours faster.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">An increase of \\(1^\\circC\\) will make 4 gallons of milk go sour 1 hour faster.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">An increase of \\(4^\\circC\\) will make a gallon of milk go sour 1 hour faster.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">An increase of \\(4^\\circC\\) will make a gallon of milk go sour 4 hours faster.</span></li></ul>",
+          "kind": "question",
+          "answer_index": 22,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 22,
+          "title": "Answer: Interpreting Constants in a Function",
+          "html": "<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>A</strong></div></div>\n<p><strong>Reasoning:</strong></p>\n<ul class=\"stem-itemize\"><li>The function is \\( h(t) = 100 - 4t \\), which means the number of hours until souring <em>decreases</em> as temperature increases.</li><li>The coefficient \\( -4 \\) represents the rate of change: for each \\(1^\\circC\\) increase in temperature, the milk sours 4 hours <strong>sooner</strong>.</li><li>This matches exactly with Choice A.</li></ul>\n<p><strong>Interpretation:</strong></p>\n<p>The number 4 means that <strong>for every \\(1^\\circC\\) rise in temperature, the souring time decreases by 4 hours</strong>.</p>",
+          "kind": "answer",
+          "question_index": 21,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 23,
+          "title": "Question : Phone Plan Cost Increase",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The function \\( C(x) = 0.07(x - 180) + 62.6 \\) gives the monthly cost, in dollars, of using an international phone plan for \\( x \\) minutes each month.</p>\n<p>If the phone plan is used for 75 more minutes each month, by how many dollars does the monthly cost of the plan increase?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">1.75</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">5.25</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">55.25</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">67.85</span></li></ul>",
+          "kind": "question",
+          "answer_index": 24,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 24,
+          "title": "Answer",
+          "html": "<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>\n<p><strong>Reasoning:</strong></p>\n<ul class=\"stem-itemize\"><li>The slope of the function is \\( 0.07 \\), which is the cost per additional minute.</li><li>An increase of 75 minutes leads to:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    \\Delta C = 0.07 \\times 75 = 5.25\n    \\]</div></li><li>So the cost increases by \\textdollar5.25.</li></ul>",
+          "kind": "lesson",
+          "question_index": 23,
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 25,
+          "title": "Question : Shipment Cost and Weight",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The function \\( C(x) = 1.5 + 2.5x \\) models the cost, in dollars, of mailing a shipment weighing \\( x \\) pounds.</p>\n<p>According to the model, an increase of 10 dollars in the mailing cost corresponds to an increase of how many pounds in the weight of the shipment?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">2</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">2.5</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">4</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">5</span></li></ul>",
+          "kind": "question",
+          "answer_index": 26,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 26,
+          "title": "Answer",
+          "html": "<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>\n<p><strong>Reasoning:</strong></p>\n<ul class=\"stem-itemize\"><li>The slope \\( 2.5 \\) is the cost per pound.</li><li>To find the weight change that corresponds to a \\textdollar10 increase:\n    <div class=\"stem-math-block cm-math-block\">\\[\n    \\frac{10}{2.5} = 4 \\quad (Oops!)\n    \\]</div>\n\n    Correction:\n    <div class=\"stem-math-block cm-math-block\">\\[\\frac{10}{2.5} =\\] <span class=\"cm-answer-box\">4</span></div>\n\n    <strong>Correct Answer is: <span class=\"cm-answer-highlight\">C. 4</span></strong>, not D.</li></ul>",
+          "kind": "lesson",
+          "question_index": 25,
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 27,
+          "title": "Question: Alternating Context – Lawn Care Service",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>A.</strong></th><th>f(x) = 80x + 150</th></tr></thead><tbody><tr><td><strong>B.</strong></td><td>f(x) = 80x + 30</td></tr><tr><td><strong>C.</strong></td><td>f(x) = 60x + 30</td></tr><tr><td><strong>D.</strong></td><td>f(x) = 60x + 150</td></tr></tbody></table></div>",
+          "kind": "question",
+          "answer_index": 28,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 28,
+          "title": "Answer: Lawn Care Service Question",
+          "html": "<p>The total cost for 6 hours is &#36;390, and the first 2 hours cost &#36;150.</p>\n<p>So, the cost for the additional 4 hours is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    390 - 150 = 240\n    \\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n    Hourly rate = \\frac{240}{4} = 60\n    \\]</div>\n<p>The cost function is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    f(x) = 150 + 60(x - 2)\n    \\]</div>\n<p>Simplifying:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    f(x) = 60x + 30\n    \\]</div>\n<p><strong>Correct Answer: C.</strong> \\( f(x) = 60x + 30 \\)</p>",
+          "kind": "answer",
+          "question_index": 27,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 29,
+          "title": "Question: Alternating Context – Aquarium Fish Population",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>A.</strong></th><th>p(w) = 1200 - 200w</th></tr></thead><tbody><tr><td><strong>B.</strong></td><td>p(w) = -150 + 200w</td></tr><tr><td><strong>C.</strong></td><td>p(w) = 1350 - 200w</td></tr><tr><td><strong>D.</strong></td><td>p(w) = 2100 - 200w</td></tr></tbody></table></div>",
+          "kind": "question",
+          "answer_index": 30,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 30,
+          "title": "Answer: Aquarium Fish Population",
+          "html": "<div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1: Calculate fish after the first 3 weeks</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    Initial population:  900 \\\\\n    Increase over 3 weeks:  3 \\times 150 = 450 \\\\\n    Population after 3 weeks:  900 + 450 = 1350\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2: Fish still needed after week 3:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2100 - 1350 = 750\n    \\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3: Model for weeks beyond 3</strong></p>\n<p>Each week adds 200 more fish. So fish still needed is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    p(w) = 750 - 200(w - 3) = 750 - 200w + 600 = 1350 - 200w\n    \\]</div>\n<p><strong>Correct Answer: C.</strong> \\(p(w) = 1350 - 200w\\)</p></div>",
+          "kind": "answer",
+          "question_index": 29,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 31,
+          "title": "Summary of Unit 1.2: Linear Functions",
+          "html": "<div class=\"cm-recap-banner\"><span class=\"cm-recap-icon\" aria-hidden=\"true\">◆</span><div class=\"cm-recap-copy\"><strong>Lesson recap</strong><span>Review these ideas before moving to practice tests.</span></div></div><ul class=\"stem-itemize\"><li><strong>Linear functions</strong> model constant rates of change — the graph is always a straight line.</li><li>The general form \\( f(x) = mx + b \\) helps identify slope (\\(m\\)) and y-intercept (\\(b\\)).</li><li><strong>Slope</strong> \\( m = \\frac{\\Delta y}{\\Delta x} \\): Describes steepness and direction of a line.</li><li>Real-world problems often involve interpreting slope, intercept, or evaluating the function.</li><li>Graph interpretation includes understanding intervals of change and comparing rates.</li><li>Applications range from temperature conversion to business pricing models and population growth.</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Quick recap — make sure you can recall each bullet without looking."
+        },
+        {
+          "index": 32,
+          "title": "Thank You",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 32 slides on <strong>Linear Function</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Linear Function</span><span class=\"cm-closing-chip\">Slope</span><span class=\"cm-closing-chip\">Graphs of Linear Function</span><span class=\"cm-closing-chip\">Practice</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "kind": "closing",
+          "group": "review",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        }
+      ],
+      "tex_available": true,
+      "pdf_available": true,
+      "tex_file": "SAT_1.2.tex",
+      "pdf_file": "SAT_1.2.pdf",
+      "interactive_count": 12,
+      "learn_count": 11,
+      "practice_slide_count": 14,
+      "lesson_path": [
+        {
+          "index": 3,
+          "title": "Linear Function"
+        },
+        {
+          "index": 7,
+          "title": "Slope"
+        },
+        {
+          "index": 13,
+          "title": "Graphs of Linear Function"
+        },
+        {
+          "index": 20,
+          "title": "Practice"
+        }
+      ]
     },
     {
       "slug": "1-3-linear-equations-two-variables",
@@ -362,13 +724,462 @@
       "unit_name": "Algebra",
       "section": "1.3",
       "title": "Linear Equations in Two Variables",
-      "deck_title": "Linear Equations in Two Variables",
-      "slide_count": 0,
-      "slides": [],
-      "tex_available": false,
-      "pdf_available": false,
-      "tex_file": null,
-      "pdf_file": null
+      "deck_title": "SAT Unit 1.3 · Linear Equation in Two Variables",
+      "slide_count": 41,
+      "slides": [
+        {
+          "index": 1,
+          "title": "SAT Unit 1.3 · Linear Equation in Two Variables",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 1.3</p><h1 class=\"cm-intro-title\">Linear Equation in Two Variables</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"4\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Three Forms of Linear Equations</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"14\"><span class=\"cm-intro-chip-num\">02</span><span class=\"cm-intro-chip-label\">Transformation of a Linear Line</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"19\"><span class=\"cm-intro-chip-num\">03</span><span class=\"cm-intro-chip-label\">Special Lines</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"25\"><span class=\"cm-intro-chip-num\">04</span><span class=\"cm-intro-chip-label\">Real World Application</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
+          "kind": "intro",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "This is your lesson overview — tap a section chip or press Next for the full outline."
+        },
+        {
+          "index": 2,
+          "title": "Lesson outline",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Unit 1.3</p><h2 class=\"cm-content-title\">Linear Equation in Two Variables</h2><p class=\"cm-content-lede\">41 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"4\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Three Forms of Linear Equations</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"14\"><span class=\"cm-content-num\">02</span><span class=\"cm-content-copy\"><strong>Transformation of a Linear Line</strong><span>Session 02 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"19\"><span class=\"cm-content-num\">03</span><span class=\"cm-content-copy\"><strong>Special Lines</strong><span>Session 03 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"25\"><span class=\"cm-content-num\">04</span><span class=\"cm-content-copy\"><strong>Real World Application</strong><span>Session 04 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"29\"><span class=\"cm-content-num\">05</span><span class=\"cm-content-copy\"><strong>Practice</strong><span>Session 05 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "kind": "content",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "Use this outline to jump straight to any section — great for review or picking up where you left off."
+        },
+        {
+          "index": 3,
+          "title": "Introduction to Linear Equations in Two Variables",
+          "html": "<div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong></p>\n<p>A linear equation in two variables is an equation that can be written in the form:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax + by = c\n    \\]</div>\n<p>where:</p>\n<ul class=\"stem-itemize\"><li>\\( a, b, c \\) are real numbers.</li><li>\\( x \\) and \\( y \\) are variables.</li><li>\\( a \\) and \\( b \\) are not both zero.</li></ul>\n<p><strong>Example:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2x + 3y = 6\n    \\]</div>\n<p>is a linear equation because it has two variables and forms a straight line when graphed.</p>",
+          "kind": "concept",
+          "group": "learn",
+          "section": "Introduction",
+          "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
+        },
+        {
+          "index": 4,
+          "title": "Up next Three Forms of Linear Equations",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">01</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Three Forms of Linear Equations</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": ""
+        },
+        {
+          "index": 5,
+          "title": "Standard Form of a Linear Equation",
+          "html": "<p><strong>Standard Form:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    Ax + By = C\n    \\]</div>\n\n<ul class=\"stem-itemize\"><li>\\( A, B, C \\) are real numbers.</li><li>\\( A \\) and \\( B \\) are not both zero.</li></ul>\n<p><strong>Examples:</strong></p>\n<ul class=\"stem-itemize\"><li>\\( 5x - 2y = 10 \\)</li><li>\\( 3x + 4y = 8 \\)</li><li>\\( y = -2x + 7 \\) (This is not in standard form, but can be rewritten as \\( 2x + y = 7 \\)).</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 6,
+          "title": "Question: Training Course Duration Difference",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>A certain apprentice has enrolled in <strong>85</strong> hours of training courses. The equation</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    10x + 15y = 85\n    \\]</div>\n<p>represents this situation, where \\( x \\) is the number of on-site training courses and \\( y \\) is the number of online training courses this apprentice has enrolled in.</p>\n<p>How many more hours does <strong>each</strong> online training course take than <strong>each</strong> on-site training course?</p>",
+          "kind": "question",
+          "answer_index": 7,
+          "interactive": true,
+          "group": "practice",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 7,
+          "title": "Answer Explanation: Training Course Duration Difference",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>The coefficient of \\( x \\) (on-site training) is <strong>10</strong>, meaning each on-site training course lasts 10 hours.</li><li>The coefficient of \\( y \\) (online training) is <strong>15</strong>, meaning <strong>each</strong> online training course lasts 15 hours.</li><li>The difference in duration per course:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        15 - 10 = 5.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(Each online training course takes \\(5\\) more hours than each on-site training course.\\)</span></div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 6,
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 8,
+          "title": "Understanding X-Intercept and Y-Intercept",
+          "html": "<div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong></p>\n<ul class=\"stem-itemize\"><li>The <strong>x-intercept</strong> is the point where the line crosses the x-axis. At this point, \\( y = 0 \\).</li><li>The <strong>y-intercept</strong> is the point where the line crosses the y-axis. At this point, \\( x = 0 \\).</li></ul>\n<p><strong>How to Find Intercepts:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>To find the <strong>x-intercept</strong>, set \\( y = 0 \\) in the equation and solve for \\( x \\).</li><li>To find the <strong>y-intercept</strong>, set \\( x = 0 \\) in the equation and solve for \\( y \\).</li></ol>",
+          "kind": "concept",
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
+        },
+        {
+          "index": 9,
+          "title": "Understanding X-Intercept and Y-Intercept",
+          "html": "<p><strong>Example: Given the equation \\( 3x - 2y = 6 \\)</strong></p>\n<ul class=\"stem-itemize\"><li><strong>Find the x-intercept:</strong> Set \\( y = 0 \\), solve for \\( x \\).\n        <div class=\"stem-math-block cm-math-block\">\\[\n        3x - 2(0) = 6  \\quad \\Rightarrow \\quad 3x = 6 \\quad \\Rightarrow \\quad x = 2\n        \\]</div>\n        The x-intercept is \\( (2, 0) \\).</li><li><strong>Find the y-intercept:</strong> Set \\( x = 0 \\), solve for \\( y \\).\n        <div class=\"stem-math-block cm-math-block\">\\[\n        3(0) - 2y = 6  \\quad \\Rightarrow \\quad -2y = 6 \\quad \\Rightarrow \\quad y = -3\n        \\]</div>\n        The y-intercept is \\( (0, -3) \\).</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 10,
+          "title": "Question: Finding \\( ba \\)",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The graph of \\( 7x + 2y = -31 \\) in the \\( xy \\)-plane has an \\( x \\)-intercept at \\( (a, 0) \\) and a \\( y \\)-intercept at \\( (0, b) \\), where \\( a \\) and \\( b \\) are constants.</p>\n<p>What is the value of \\( \\frac{b}{a} \\)?</p>\n<p><strong>Options:</strong></p>\n<div class=\"cm-mcq-grid\"><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\( -\\frac{7}{2} \\)</span></div>\n<div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\( -\\frac{2}{7} \\)</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\( \\frac{2}{7} \\)</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\( \\frac{7}{2} \\)</span></div></div>",
+          "kind": "question",
+          "answer_index": 11,
+          "interactive": true,
+          "group": "practice",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 11,
+          "title": "Answer Explanation: Finding \\( ba \\)",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>The \\( x \\)-intercept is found by setting \\( y = 0 \\) in the equation \\( 7x + 2y = -31 \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        7x + 2(0) = -31 \\Rightarrow x = -\\frac{31}{7}.\n        \\]</div>\n        Thus, \\( a = -\\frac{31}{7} \\).</li><li>The \\( y \\)-intercept is found by setting \\( x = 0 \\) in the equation:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        7(0) + 2y = -31 \\Rightarrow y = -\\frac{31}{2}.\n        \\]</div>\n        Thus, \\( b = -\\frac{31}{2} \\).</li><li>Compute \\( \\frac{b}{a} \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        \\frac{b}{a} = \\frac{-\\frac{31}{2}}{-\\frac{31}{7}} = \\frac{31}{2} \\times \\frac{7}{31} = \\frac{7}{2}.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\frac{7}{2}.\\)</span></div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 10,
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 12,
+          "title": "Slope-Intercept Form",
+          "html": "<p><strong>Equation:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y = mx + b\n    \\]</div>\n<p>where:</p>\n<ul class=\"stem-itemize\"><li>\\( m \\) is the slope (rate of change).</li><li>\\( b \\) is the y-intercept (where the line crosses the y-axis).</li></ul>\n<p><strong>Example:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y = 2x + 3\n    \\]</div>\n\n<ul class=\"stem-itemize\"><li>Slope = 2 (the line rises 2 units for every 1 unit increase in \\( x \\)).</li><li>Y-intercept = 3 (crosses the y-axis at 3).</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 13,
+          "title": "Point-Slope Form",
+          "html": "<p><strong>Equation:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y - y_1 = m(x - x_1)\n    \\]</div>\n<p>where:</p>\n<ul class=\"stem-itemize\"><li>\\( (x_1, y_1) \\) is a given point on the line.</li><li>\\( m \\) is the slope.</li></ul>\n<p><strong>Example:</strong> Given a point \\( (2, 5) \\) and slope \\( m = 3 \\), the equation is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y - 5 = 3(x - 2)\n    \\]</div>\n<p>which can be rewritten in slope-intercept form as:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y = 3x - 1\n    \\]</div>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Three Forms of Linear Equations",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 14,
+          "title": "Up next Transformation of a Linear Line",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">02</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Transformation of a Linear Line</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Transformation of a Linear Line",
+          "study_tip": ""
+        },
+        {
+          "index": 15,
+          "title": "Graphing a Linear Line",
+          "html": "<p><strong>Graphing Steps:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Rewrite the equation in slope-intercept form (\\( y = mx + b \\)).</li><li>Identify the slope (\\( m \\)) and y-intercept (\\( b \\)).</li><li>Plot the y-intercept.</li><li>Use the slope to find another point.</li><li>Draw a straight line through the points.</li></ol>\n<p><strong>Example:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    2x + 3y = 6\n    \\]</div>\n<p>Convert to slope-intercept form:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y = -\\frac{2}{3}x + 2\n    \\]</div>\n\n<ul class=\"stem-itemize\"><li>Slope (\\( m \\)) = \\( -\\frac{2}{3} \\)</li><li>Y-intercept (\\( b \\)) = 2</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Transformation of a Linear Line",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 16,
+          "title": "Transformation of a Linear Equation",
+          "html": "<p><strong>Transformations of the linear function \\( y = 2x + 1 \\):</strong></p>\n<ul class=\"stem-itemize\"><li><strong>Vertical Shift:</strong> \\( y = 2x + 4 \\) shifts the line up by 3 units.</li><li><strong>Horizontal Shift:</strong> \\( y = 2(x - 2) + 1 \\) shifts the line right by 2 units.</li><li><strong>Reflection:</strong> \\( y = -2x + 1 \\) reflects the line over the x-axis.</li><li><strong>Change in Slope:</strong> \\( y = 4x + 1 \\) steepens the line, increasing its rate of change.</li></ul>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E74.svg\" alt=\"\" loading=\"lazy\" /></div></p>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Transformation of a Linear Line",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 17,
+          "title": "Question: Identifying Function f(x \\)",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E14.svg\" alt=\"\" loading=\"lazy\" /></div></p>\n<p>The graph of \\( y = f(x) + 14 \\) is shown.</p>\n<p>Which equation defines function \\( f \\)?</p>\n<p><strong>Options:</strong></p>\n<div class=\"cm-mcq-grid\"><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\( f(x) = -\\frac{1}{4}x - 12 \\)</span></div>\n<div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\( f(x) = -\\frac{1}{4}x + 16 \\)</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\( f(x) = -\\frac{1}{4}x + 2 \\)</span></div><div class=\"cm-mcq-choice\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\( f(x) = -\\frac{1}{4}x - 14 \\)</span></div></div>",
+          "kind": "question",
+          "answer_index": 18,
+          "interactive": true,
+          "group": "practice",
+          "section": "Transformation of a Linear Line",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 18,
+          "title": "Answer Explanation: Identifying Function f(x \\)",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>The given equation is \\( y = f(x) + 14 \\), so the graph represents \\( f(x) \\) shifted upward by 14 units.</li><li>Identify the equation of the given graph:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        y = -\\frac{1}{4}x + 2.\n        \\]</div></li><li>Since \\( y = f(x) + 14 \\), we solve for \\( f(x) \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        f(x) = y - 14 = -\\frac{1}{4}x + 2 - 14 = -\\frac{1}{4}x - 12.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><strong>A</strong></div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 17,
+          "group": "learn",
+          "section": "Transformation of a Linear Line",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 19,
+          "title": "Up next Special Lines",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">03</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Special Lines</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Special Lines",
+          "study_tip": ""
+        },
+        {
+          "index": 20,
+          "title": "Parallel and Perpendicular Line Theorems",
+          "html": "<p><strong>Parallel Line Theorem:</strong></p>\n<ul class=\"stem-itemize\"><li>Two non-vertical lines are <strong>parallel</strong> if and only if they have the <strong>same slope</strong>.</li><li>Mathematically, if two lines have equations:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        y = m_1x + b_1 \\quad and \\quad y = m_2x + b_2\n        \\]</div>\n        then the lines are parallel if:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        m_1 = m_2\n        \\]</div></li></ul>\n<p><strong>Perpendicular Line Theorem:</strong></p>\n<ul class=\"stem-itemize\"><li>Two non-vertical lines are <strong>perpendicular</strong> if and only if the product of their slopes is \\(-1\\).</li><li>Mathematically, if two lines have slopes \\( m_1 \\) and \\( m_2 \\), then they are perpendicular if:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        m_1 \\cdot m_2 = -1\n        \\]</div></li></ul>\n<p><strong>Example:</strong></p>\n<ul class=\"stem-itemize\"><li>The lines \\( y = 2x + 3 \\) and \\( y = 2x - 5 \\) are parallel because their slopes are both \\( 2 \\).</li><li>The lines \\( y = \\frac{3}{4}x + 1 \\) and \\( y = -\\frac{4}{3}x - 2 \\) are perpendicular because:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        \\left(\\frac{3}{4} \\right) \\times \\left(-\\frac{4}{3} \\right) = -1\n        \\]</div></li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Special Lines",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 21,
+          "title": "Question: Finding the Value of d",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>In the \\( xy \\)-plane, line \\( \\ell \\) passes through the point \\( (0,0) \\) and is parallel to the line represented by the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    y = 8x + 2.\n    \\]</div>\n<p>If line \\( \\ell \\) also passes through the point \\( (3,d) \\), what is the value of \\( d \\)?</p>",
+          "kind": "question",
+          "answer_index": 22,
+          "interactive": true,
+          "group": "practice",
+          "section": "Special Lines",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 22,
+          "title": "Answer Explanation: Finding the Value of d",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Since line \\( \\ell \\) is parallel to \\( y = 8x + 2 \\), it has the same slope \\( m = 8 \\).</li><li>The equation of line \\( \\ell \\), passing through \\( (0,0) \\), is:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        y = 8x.\n        \\]</div></li><li>Substitute \\( x = 3 \\) to find \\( d \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        d = 8(3) = 24.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-box\">24</span>.</div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 21,
+          "group": "learn",
+          "section": "Special Lines",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 23,
+          "title": "Question: Finding the Slope of Line r",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Line \\( p \\) is defined by the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    4y + 8x = 6.\n    \\]</div>\n<p>Line \\( r \\) is perpendicular to line \\( p \\) in the \\( xy \\)-plane.</p>\n<p>What is the slope of line \\( r \\)?</p>",
+          "kind": "question",
+          "answer_index": 24,
+          "interactive": true,
+          "group": "practice",
+          "section": "Special Lines",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 24,
+          "title": "Answer Explanation: Finding the Slope of Line r",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Rewrite the equation of line \\( p \\) in slope-intercept form:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        4y = -8x + 6.\n        \\]</div>\n        <div class=\"stem-math-block cm-math-block\">\\[\n        y = -2x + \\frac{3}{2}.\n        \\]</div></li><li>The slope of line \\( p \\) is \\( m_p = -2 \\).</li><li>Since line \\( r \\) is perpendicular to line \\( p \\), its slope is the negative reciprocal of \\( -2 \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        m_r = \\frac{1}{2}.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\frac{1}{2}.\\)</span></div></div></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 23,
+          "group": "learn",
+          "section": "Special Lines",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 25,
+          "title": "Up next Real World Application",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">04</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Real World Application</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Real World Application",
+          "study_tip": ""
+        },
+        {
+          "index": 26,
+          "title": "Real-World Applications",
+          "html": "<p>Linear equations in two variables appear in various real-life scenarios:</p>\n<ul class=\"stem-itemize\"><li><strong>Business:</strong> Predicting profit and expenses.</li><li><strong>Physics:</strong> Calculating velocity and motion.</li><li><strong>Economics:</strong> Supply and demand relationships.</li><li><strong>Engineering:</strong> Designing bridges and buildings.</li></ul>\n<p><strong>Example:</strong></p>\n<p>A company's total cost equation is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    C = 50x + 200\n    \\]</div>\n<p>where:</p>\n<ul class=\"stem-itemize\"><li>\\( C \\) is the total cost.</li><li>\\( x \\) is the number of products made.</li><li>\\( 50 \\) is the cost per product.</li><li>\\( 200 \\) is the fixed cost.</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Real World Application",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 27,
+          "title": "Question: Mixing Saline Solutions",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>How many liters of a 25% saline solution must be added to 3 liters of a 10% saline solution to obtain a 15% saline solution?</p>",
+          "kind": "question",
+          "answer_index": 28,
+          "interactive": true,
+          "group": "practice",
+          "section": "Real World Application",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 28,
+          "title": "Solution",
+          "html": "<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Let \\( x \\) be the amount of 25% saline solution to be added.</li><li>The total salt in the solutions:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        0.10(3) + 0.25(x) = 0.15(3 + x).\n        \\]</div></li><li>Solve for \\( x \\):\n        <div class=\"stem-math-block cm-math-block\">\\[\n        0.3 + 0.25x = 0.45 + 0.15x.\n        \\]</div>\n        <div class=\"stem-math-block cm-math-block\">\\[\n        0.25x - 0.15x = 0.45 - 0.3.\n        \\]</div>\n        <div class=\"stem-math-block cm-math-block\">\\[\n        0.10x = 0.15.\n        \\]</div>\n        <div class=\"stem-math-block cm-math-block\">\\[\n        x = 1.5.\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-box\">1.5</span> liters.</div></div></div>",
+          "kind": "solution",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 27,
+          "group": "practice",
+          "section": "Real World Application",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 29,
+          "title": "Up next Practice",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">05</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Practice</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Practice",
+          "study_tip": ""
+        },
+        {
+          "index": 30,
+          "title": "Question: Sticker Sheet Interpretation",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>A teacher printed sticker sheets with 7 stickers on each sheet. At a school party, she gave out 2 stickers to each student who attended. The relationship between the number of students who attended the party, \\(x\\), and the number of sticker sheets that the teacher printed, \\(y\\), is represented by the equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n7y - 32 = 2x\n\\]</div>\n<p>What is the best interpretation of the number \\(32\\) in this context?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">The teacher gave out a total of 32 stickers at the party.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">The teacher had 32 sticker sheets remaining after the party.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">The teacher printed 32 more stickers than she gave out at the party.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">The teacher printed a total of 32 sticker sheets.</span></li></ul>",
+          "kind": "question",
+          "answer_index": 31,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 31,
+          "title": "Answer: Sticker Sheet Interpretation",
+          "html": "<p>We are given:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n7y - 32 = 2x\n\\]</div>\n<p>Here, \\(7y\\) represents the total number of stickers printed (7 stickers per sheet × \\(y\\) sheets),</p>\n<p>and \\(2x\\) represents the total number of stickers given out (2 stickers per student × \\(x\\) students).</p>\n<p>So, \\(7y - 32 = 2x\\) means the teacher gave out 32 fewer stickers than she printed.</p>\n<p><strong>Correct Interpretation:</strong></p>\n<p><strong>C.</strong> The teacher printed 32 more stickers than she gave out at the party.</p>",
+          "kind": "answer",
+          "question_index": 30,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 32,
+          "title": "Question: Perpendicular Line",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Line \\( m \\) passes through the point \\( (-2, 4) \\) and is <strong>perpendicular</strong> to the line:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\ny = \\frac{1}{2}x - 3\n\\]</div>\n<p>Which of the following is the equation of line \\( m \\)?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">\\( y = -2x \\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">\\( y = -2x + 4 \\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">\\( y = 2x + 8 \\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">\\( y = -2x + 2 \\)</span></li></ul>",
+          "kind": "question",
+          "answer_index": 33,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 33,
+          "title": "Answer: Perpendicular Line",
+          "html": "<p>The original slope is \\( \\frac{1}{2} \\), so the perpendicular slope is the <strong>negative reciprocal</strong>:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nm = -2\n\\]</div>\n<p>Use point-slope form with point \\( (-2, 4) \\):</p>\n<div class=\"stem-math-block cm-math-block\">\\[y - 4 = -2(x + 2) \\Rightarrow y = -2x - 4 + 4 = -2x \\Rightarrow\\] <span class=\"cm-answer-box\">A. y = -2x</span></div>",
+          "kind": "answer",
+          "question_index": 32,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 34,
+          "title": "Challenge: Relationship Between Two Lines",
+          "html": "<p>Lines \\( L_1 \\) and \\( L_2 \\) have the following equations:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nL_1: 3x + 4y = 12\n\\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\nL_2: 4x - 3y = 5\\]</div>\n<p>Which of the following best describes the relationship between \\( L_1 \\) and \\( L_2 \\)?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span> <span class=\"stem-li-body\">The lines are parallel.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span> <span class=\"stem-li-body\">The lines are perpendicular.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span> <span class=\"stem-li-body\">The lines intersect but are neither perpendicular nor parallel.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span> <span class=\"stem-li-body\">The lines are identical.</span></li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 35,
+          "title": "Answer: Line Relationship",
+          "html": "<p>Convert both to slope-intercept form:</p>\n<p><strong>Line 1:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n3x + 4y = 12 \\Rightarrow 4y = -3x + 12 \\Rightarrow y = -\\frac{3}{4}x + 3\n\\]</div>\n<p><strong>Line 2:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n4x - 3y = 5 \\Rightarrow -3y = -4x + 5 \\Rightarrow y = \\frac{4}{3}x - \\frac{5}{3}\n\\]</div>\n<p>Slopes: \\( m_1 = -\\frac{3}{4}, m_2 = \\frac{4}{3} \\Rightarrow m_1 \\cdot m_2 = -1 \\)</p>\n<p><strong>Result: The lines are perpendicular.</strong></p>\n<div class=\"stem-math-block cm-math-block\"><span class=\"cm-answer-box\">Correct Answer: B.</span></div>",
+          "kind": "answer",
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 36,
+          "title": "Question",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>The table below shows the coordinates of three points on a line in the \\(\\displaystyle xy\\)-plane, where \\(\\displaystyle k\\) and \\(\\displaystyle n\\) are constants. If the slope of the line is \\(\\displaystyle 2\\), what is the value of \\(\\displaystyle k + n\\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>7</td></tr><tr><td>k</td><td>11</td></tr><tr><td>12</td><td>n</td></tr></tbody></table></div>",
+          "kind": "question",
+          "answer_index": 37,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 37,
+          "title": "Answer",
+          "html": "<p><strong>Step 1.</strong> The slope of the line is \\(\\displaystyle 2\\), so:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nslope = \\frac{y_2 - y_1}{x_2 - x_1} = 2\n\\]</div>\n<p><strong>Step 2.</strong> Use points \\(\\displaystyle (3,7)\\) and \\(\\displaystyle (k,11)\\):</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n2 = \\frac{11 - 7}{k - 3}\n\\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\nk = 5\n\\]</div>\n<p><strong>Step 3.</strong> Use points \\(\\displaystyle (3,7)\\) and \\(\\displaystyle (12,n)\\):</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n2 = \\frac{n - 7}{12 - 3}\n\\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\nn = 25\n\\]</div>\n<p><strong>Step 4.</strong> Then:</p>\n<div class=\"stem-math-block cm-math-block\">\\[k + n = 5 + 25 =\\] <span class=\"cm-answer-box\">30</span></div>",
+          "kind": "lesson",
+          "question_index": 36,
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 38,
+          "title": "Question: Identifying Perpendicular Line Pairs",
+          "html": "<div class=\"cm-try-banner cm-try-banner--question\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">?</div><div class=\"cm-try-banner-copy\"><strong>Try it yourself</strong><span>Pause here and attempt the problem before viewing the solution.</span></div><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer>Go to solution →</button></div><p>Consider the given system of equations:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    5x + 7y = 1\n    \\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n    ax + by = 1\n    \\]</div>\n<p>where \\( a \\) and \\( b \\) are constants. The graph of these equations represents a pair of perpendicular lines.</p>\n<p>Which of the following systems also represents a pair of perpendicular lines?</p>\n<p><strong>Options:</strong></p>\n<ul class=\"stem-itemize\"><li><strong>A:</strong> \\( 10x + 7y = 1 \\), \\quad \\( ax - 2by = 1 \\)</li><li><strong>B:</strong> \\( 10x + 7y = 1 \\), \\quad \\( ax + 2by = 1 \\)</li><li><strong>C:</strong> \\( 10x + 7y = 1 \\), \\quad \\( 2ax + by = 1 \\)</li><li><strong>D:</strong> \\( 5x - 7y = 1 \\), \\quad \\( ax + by = 1 \\)</li></ul>",
+          "kind": "question",
+          "answer_index": 39,
+          "interactive": true,
+          "group": "practice",
+          "section": "Practice",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 39,
+          "title": "Answer Explanation: Identifying Perpendicular Line Pairs",
+          "html": "<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Find the slope of the first equation by rewriting it in slope-intercept form:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        5x + 7y = 1 \\implies y = -\\frac{5}{7}x + \\frac{1}{7}.\n        \\]</div>\n        The slope is \\( -\\frac{5}{7} \\).</li><li>Since the lines are perpendicular, the second equation should have a slope that is the negative reciprocal of \\( -\\frac{5}{7} \\), which is \\( \\frac{7}{5} \\).</li><li>Checking the options, the correct system with perpendicular slopes is:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        10x + 7y = 1, \\quad ax + 2by = 1.\n        \\]</div>\n        This corresponds to:\n        <div class=\"stem-math-block cm-math-block\"><span class=\"cm-answer-box\">B.</span></div></li></ul></div>",
+          "kind": "lesson",
+          "inline_solution": true,
+          "interactive": true,
+          "question_index": 38,
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 40,
+          "title": "Summary",
+          "html": "<div class=\"cm-recap-banner\"><span class=\"cm-recap-icon\" aria-hidden=\"true\">◆</span><div class=\"cm-recap-copy\"><strong>Lesson recap</strong><span>Review these ideas before moving to practice tests.</span></div></div><ul class=\"stem-itemize\"><li>A linear equation in two variables is written as \\( Ax + By = C \\).</li><li>The slope (\\( m \\)) determines the steepness of the line.</li><li>Graphing requires finding intercepts or using the slope-intercept form.</li><li>Systems of linear equations can have one solution, no solution, or infinitely many solutions.</li></ul>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Practice",
+          "study_tip": "Quick recap — make sure you can recall each bullet without looking."
+        },
+        {
+          "index": 41,
+          "title": "Thank You",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 41 slides on <strong>Linear Equation in Two Variables</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Three Forms of Linear Equations</span><span class=\"cm-closing-chip\">Transformation of a Linear Line</span><span class=\"cm-closing-chip\">Special Lines</span><span class=\"cm-closing-chip\">Real World Application</span><span class=\"cm-closing-chip\">Practice</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "kind": "closing",
+          "group": "review",
+          "section": "Practice",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        }
+      ],
+      "tex_available": true,
+      "pdf_available": true,
+      "tex_file": "SAT_1.3.tex",
+      "pdf_file": "SAT_1.3.pdf",
+      "interactive_count": 17,
+      "learn_count": 19,
+      "practice_slide_count": 14,
+      "lesson_path": [
+        {
+          "index": 4,
+          "title": "Three Forms of Linear Equations"
+        },
+        {
+          "index": 14,
+          "title": "Transformation of a Linear Line"
+        },
+        {
+          "index": 19,
+          "title": "Special Lines"
+        },
+        {
+          "index": 25,
+          "title": "Real World Application"
+        },
+        {
+          "index": 29,
+          "title": "Practice"
+        }
+      ]
     },
     {
       "slug": "1-4-systems-of-equations",

@@ -159,18 +159,20 @@ def _convert_latex_lists(text: str) -> str:
                 lis.append(f"<li>{chunk}</li>")
         return '<ol class="stem-enumerate">' + "".join(lis) + "</ol>"
 
-    text = re.sub(
-        r"\\begin\{itemize\}(.*?)\\end\{itemize\}",
-        itemize_repl,
-        text,
-        flags=re.S,
+    # Convert innermost list environments first so nested itemize/enumerate parse correctly.
+    inner_itemize = re.compile(
+        r"\\begin\{itemize\}((?:[^\\]|\\(?!begin\{itemize\}))*?)\\end\{itemize\}",
+        re.S,
     )
-    text = re.sub(
-        r"\\begin\{enumerate\}(?:\[[^\]]*\])?(.*?)\\end\{enumerate\}",
-        enumerate_repl,
-        text,
-        flags=re.S,
+    while inner_itemize.search(text):
+        text = inner_itemize.sub(itemize_repl, text, count=1)
+    inner_enumerate = re.compile(
+        r"\\begin\{enumerate\}(?:\[[^\]]*\])?"
+        r"((?:[^\\]|\\(?!begin\{enumerate\}))*?)\\end\{enumerate\}",
+        re.S,
     )
+    while inner_enumerate.search(text):
+        text = inner_enumerate.sub(enumerate_repl, text, count=1)
     return text
 
 

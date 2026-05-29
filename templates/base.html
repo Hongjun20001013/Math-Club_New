@@ -26,6 +26,7 @@
 
     <!-- Main Style: serve only via this Flask app (/static/). file:// breaks absolute /static URLs. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ style_css_revision }}" type="text/css">
+    {% block extra_css %}{% endblock %}
 
     {% if load_mathjax|default(true) %}
     <!-- MathJax Config (omitted on light pages — see inject_template_config load_mathjax) -->

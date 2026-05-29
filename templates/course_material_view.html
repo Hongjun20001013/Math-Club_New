@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block title %}{{ material.section }} · {{ material.title }} · {{ site_brand_name }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
 {% block content %}
 <div class="np-cm-cinema">
+<div class="np-cm-cinema-ambient" aria-hidden="true"></div>
 <div class="np-page-shell np-page-shell--cm">
 <div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}">
 
@@ -23,7 +28,7 @@
           </svg>
           <span class="np-cm-btn-label">Desmos</span>
         </button>
-        <button type="button" class="np-cm-btn np-cm-btn--focus" data-cm-focus-toggle aria-pressed="false" title="Hide chrome for fullscreen slides (F)">
+        <button type="button" class="np-cm-btn np-cm-btn--focus" data-cm-focus-toggle aria-pressed="false" title="Hide chrome for fullscreen slides (F). Press Esc to exit.">
           <span class="np-cm-focus-icon" aria-hidden="true">⛶</span>
           <span class="np-cm-btn-label">Focus</span>
         </button>
@@ -81,7 +86,7 @@
           <button type="button" class="np-cm-outline-btn{% if loop.first %} is-active{% endif %}" data-cm-index="{{ slide.index }}" aria-current="{{ 'true' if loop.first else 'false' }}">
             <span class="np-cm-outline-num">{{ slide.index }}</span>
             <span class="np-cm-outline-copy">
-              <em class="np-cm-outline-kind">{{ slide.kind|default('lesson')|replace('practice','Practice')|replace('question','Question')|replace('example','Example')|replace('answer','Answer')|replace('solution','Solution')|replace('concept','Concept')|replace('closing','Closing')|replace('section','Section')|replace('intro','Intro')|replace('lesson','Lesson') }}</em>
+              <em class="np-cm-outline-kind">{{ slide.kind|default('lesson')|replace('practice','Practice')|replace('question','Question')|replace('example','Example')|replace('answer','Answer')|replace('solution','Solution')|replace('concept','Concept')|replace('closing','Closing')|replace('content','Outline')|replace('section','Section')|replace('intro','Intro')|replace('lesson','Lesson') }}</em>
               <span class="np-cm-outline-title">{{ slide.title }}</span>
             </span>
           </button>
@@ -93,6 +98,11 @@
     <section class="np-cm-deck" aria-label="Slide viewer">
       <header class="np-cm-deck-chrome">
         <div class="np-cm-deck-chrome-top">
+          <button type="button" class="np-cm-focus-inline-exit" data-cm-focus-exit hidden aria-label="Exit focus mode (Esc)" title="Exit focus (Esc)">
+            <svg class="np-cm-focus-exit-icon" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M5 5 15 15M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+          </button>
           <button type="button" class="np-cm-path-open" data-cm-toggle-outline aria-pressed="false" aria-label="Open lesson path">
             <svg class="np-cm-path-open-icon" viewBox="0 0 20 20" aria-hidden="true">
               <path d="M4 6h12M4 10h12M4 14h8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
@@ -113,12 +123,6 @@
                 <path d="M3 17h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
               </svg>
               <span>Desmos</span>
-            </button>
-            <button type="button" class="np-cm-focus-exit" data-cm-focus-exit hidden aria-label="Exit focus mode">
-              <svg class="np-cm-focus-exit-icon" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5 5 15 15M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-              </svg>
-              <span>Exit focus</span>
             </button>
           </div>
         </div>

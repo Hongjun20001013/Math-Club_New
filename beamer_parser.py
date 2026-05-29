@@ -62,12 +62,25 @@ def _split_title_lines(deck_title: str) -> tuple[str, str]:
     return "SAT Course Material", title or "Lesson overview"
 
 
-def _build_intro_html(meta: dict[str, str], section_titles: list[str]) -> str:
+def _build_intro_html(meta: dict[str, str], lesson_path: list[dict[str, Any]]) -> str:
     unit_line, topic_line = _split_title_lines(meta.get("title", ""))
     author = meta.get("author", "")
     institute = meta.get("institute", "Novel Prep")
-    chips = section_titles[:4] if section_titles else ["Concepts", "Examples", "Practice", "Review"]
-    chip_html = "".join(f'<span class="cm-intro-chip">{name}</span>' for name in chips)
+    chip_parts: list[str] = []
+    for i, item in enumerate(lesson_path[:4], 1):
+        title = str(item.get("title") or "").strip()
+        idx = int(item.get("index") or 0)
+        if title and idx:
+            chip_parts.append(
+                f'<button type="button" class="cm-intro-chip" data-cm-jump-section="{idx}">'
+                f'<span class="cm-intro-chip-num">{i:02d}</span>'
+                f'<span class="cm-intro-chip-label">{title}</span>'
+                f"</button>"
+            )
+    if not chip_parts:
+        for name in ("Concepts", "Examples", "Practice", "Review"):
+            chip_parts.append(f'<span class="cm-intro-chip">{name}</span>')
+    chip_html = "".join(chip_parts)
     author_html = (
         f'<span class="cm-intro-meta-item"><em>Presenter</em>{author}</span>'
         if author
@@ -90,7 +103,48 @@ def _build_intro_html(meta: dict[str, str], section_titles: list[str]) -> str:
         f'<span class="cm-intro-meta-item"><em>From</em>{institute}</span>'
         "</div>"
         f'<div class="cm-intro-chips">{chip_html}</div>'
-        '<p class="cm-intro-cta">Press <strong>Next</strong> to begin</p>'
+        '<p class="cm-intro-cta">Tap a section above, or press <strong>Next</strong> for the full outline</p>'
+        "</div>"
+        "</div>"
+    )
+
+
+def _build_contents_html(
+    meta: dict[str, str],
+    deck_title: str,
+    lesson_path: list[dict[str, Any]],
+    slide_count: int,
+) -> str:
+    unit_line, topic_line = _split_title_lines(meta.get("title", "") or deck_title)
+    rows: list[str] = []
+    for i, item in enumerate(lesson_path, 1):
+        title = str(item.get("title") or "").strip()
+        idx = int(item.get("index") or 0)
+        if not title or not idx:
+            continue
+        rows.append(
+            f'<li><button type="button" class="cm-content-item" data-cm-jump-section="{idx}">'
+            f'<span class="cm-content-num">{i:02d}</span>'
+            f'<span class="cm-content-copy"><strong>{title}</strong>'
+            f'<span>Session {i:02d} · jump to section start</span></span>'
+            f'<span class="cm-content-arrow" aria-hidden="true">→</span>'
+            f"</button></li>"
+        )
+    list_html = "".join(rows) or "<li><p class=\"cm-content-empty\">Sections will appear here once parsed.</p></li>"
+    count_label = f"{slide_count} slides" if slide_count else "this lesson"
+    return (
+        '<div class="cm-content-canvas">'
+        '<div class="cm-content-bg" aria-hidden="true">'
+        '<span class="cm-content-orb cm-content-orb--1"></span>'
+        '<span class="cm-content-orb cm-content-orb--2"></span>'
+        '<span class="cm-content-grid"></span>'
+        "</div>"
+        '<div class="cm-content-inner">'
+        '<span class="cm-content-kicker">Lesson outline</span>'
+        f'<p class="cm-content-unit">{unit_line}</p>'
+        f'<h2 class="cm-content-title">{topic_line}</h2>'
+        f'<p class="cm-content-lede">{count_label} · tap any section to jump there instantly.</p>'
+        f'<ol class="cm-content-list">{list_html}</ol>'
         "</div>"
         "</div>"
     )
@@ -110,6 +164,46 @@ def _remove_environment(text: str, env: str) -> str:
             continue
         out = out[: m.start()] + out[end_idx + len(end) :]
     return out
+
+
+def _unwrap_environment(text: str, env: str) -> str:
+    """Replace \\begin{env}…\\end{env} with its inner content (keep figures/text)."""
+    out = text
+    begin = rf"\begin{{{env}}}"
+    end = rf"\end{{{env}}}"
+    while True:
+        m = re.search(re.escape(begin), out)
+        if not m:
+            break
+        end_idx = out.find(end, m.end())
+        if end_idx == -1:
+            out = out[: m.start()] + out[m.end() :]
+            continue
+        inner = out[m.end() : end_idx].strip()
+        out = out[: m.start()] + inner + out[end_idx + len(end) :]
+    return out
+
+
+def _replace_course_material_figures(text: str) -> str:
+    """Turn \\includegraphics{file} into slide figures under /static/course_materials/."""
+
+    def repl(m: re.Match[str]) -> str:
+        fname = m.group(1).strip()
+        safe = re.sub(r"[^a-zA-Z0-9._-]", "", fname)
+        if not safe:
+            return ""
+        if safe == "E73.png":
+            safe = "E73.svg"
+        if safe == "E74.png":
+            safe = "E74.svg"
+        if safe == "E14.png":
+            safe = "E14.svg"
+        return (
+            f'<div class="cm-slide-figure"><img class="stem-figure-img cm-slide-figure-img" '
+            f'src="/static/course_materials/{safe}" alt="" loading="lazy" /></div>'
+        )
+
+    return re.sub(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", repl, text)
 
 
 def _unwrap_inline_markup(text: str) -> str:
@@ -400,6 +494,88 @@ def _repair_math_delimiters(text: str) -> str:
     return text
 
 
+_HTML_IN_MATH_TAG = re.compile(
+    r"<(?:span|strong|em)\b[^>]*>.*?</(?:span|strong|em)>",
+    re.S | re.I,
+)
+
+
+def _split_latex_and_html(inner: str) -> tuple[str, str]:
+    html_chunks = _HTML_IN_MATH_TAG.findall(inner)
+    if not html_chunks:
+        return inner.strip(), ""
+    latex = _HTML_IN_MATH_TAG.sub("", inner)
+    latex = re.sub(r"\s+", " ", latex).strip()
+    return latex, " ".join(html_chunks)
+
+
+def _fix_html_in_display_math(text: str) -> str:
+    """Move HTML answer highlights out of \\[ \\] / \\( \\) so MathJax can render."""
+
+    def fix_delimited(open_d: str, close_d: str, body: str) -> str:
+        out: list[str] = []
+        i = 0
+        olen, clen = len(open_d), len(close_d)
+        while i < len(body):
+            idx = body.find(open_d, i)
+            if idx == -1:
+                out.append(body[i:])
+                break
+            out.append(body[i:idx])
+            end = body.find(close_d, idx + olen)
+            if end == -1:
+                out.append(body[idx:])
+                break
+            inner = body[idx + olen : end]
+            if "<" not in inner:
+                out.append(body[idx : end + clen])
+            else:
+                latex, html = _split_latex_and_html(inner)
+                if latex:
+                    out.append(f"{open_d}{latex}{close_d}")
+                if html:
+                    if latex:
+                        out.append(" ")
+                    out.append(html)
+            i = end + clen
+        return "".join(out)
+
+    text = fix_delimited(r"\[", r"\]", text)
+
+    def fix_inline(m: re.Match[str]) -> str:
+        inner = m.group(1)
+        if "<" not in inner:
+            return m.group(0)
+        latex, html = _split_latex_and_html(inner)
+        parts: list[str] = []
+        if latex:
+            parts.append(r"\(" + latex + r"\)")
+        if html:
+            parts.append(html)
+        return " ".join(parts)
+
+    return re.sub(r"\\?\((.*?)\\?\)", fix_inline, text, flags=re.S)
+
+
+def _sanitize_answer_boxes(html: str) -> str:
+    """Strip leftover LaTeX text commands inside rendered answer boxes."""
+
+    def clean_inner(inner: str) -> str:
+        out = inner.strip()
+        out = re.sub(r"\\text\{([^}]*)\}", r"\1", out)
+        out = re.sub(r"\\mathbf\{([^}]*)\}", r"\1", out)
+        out = re.sub(r"\\(?:textbf|textit|emph)\{([^}]*)\}", r"\1", out)
+        out = re.sub(r"\{,\}", ",", out)
+        return re.sub(r"\s+", " ", out).strip()
+
+    return re.sub(
+        r'(<span class="cm-answer-box">)(.*?)(</span>)',
+        lambda m: f"{m.group(1)}{clean_inner(m.group(2))}{m.group(3)}",
+        html,
+        flags=re.S,
+    )
+
+
 def _normalize_display_math(text: str) -> str:
     """Wrap \\[ ... \\] blocks anywhere (including inside list items)."""
     out: list[str] = []
@@ -478,6 +654,7 @@ def _format_beamer_html(text: str) -> str:
         r'|<div class="cm-section-divider">.*?</div>'
         r'|<div class="cm-slide-closing">.*?</div>'
         r'|<div class="cm-intro-canvas">.*?</div>'
+        r'|<div class="cm-content-canvas">.*?</div>'
         r'|<div class="cm-closing-canvas">.*?</div>)'
     )
     parts = re.split(block_pat, text, flags=re.S)
@@ -674,6 +851,151 @@ def _wrap_question_challenge(html: str, title: str) -> str:
     return banner + html
 
 
+def _needs_math_delimiters(text: str) -> bool:
+    t = re.sub(r"<[^>]+>", "", text).strip()
+    if not t:
+        return False
+    if re.search(r"Option\s+[A-D]|only\)", t, re.I):
+        return False
+    if re.match(r"^[A-D]\.$", t.strip()):
+        return False
+    return bool(re.search(r"\\frac|\\Rightarrow|\\neq|=|\^|_[{]|\\boxed|\d+\.?\d*[a-z]|[a-z]\s*[-+]", t))
+
+
+def _strip_inline_math_delimiters(text: str) -> str:
+    out = text.strip()
+    out = re.sub(r"^\\?\(", "", out)
+    out = re.sub(r"\\?\)$", "", out)
+    out = re.sub(r"\\text\{([^}]*)\}", r"\1", out)
+    out = re.sub(r"\\mathbf\{([^}]*)\}", r"\1", out)
+    return out.strip()
+
+
+def _answer_card(label: str, value_html: str) -> str:
+    clean_label = label.rstrip(":").strip()
+    return (
+        f'<div class="cm-answer-card">'
+        f'<span class="cm-answer-card-label">{clean_label}</span>'
+        f'<div class="cm-answer-card-value">{value_html}</div>'
+        f"</div>"
+    )
+
+
+def _format_answer_value(raw: str) -> str:
+    raw = raw.strip()
+    raw = re.sub(
+        r'^\\?\(\s*(<span class="cm-answer-box">.*?</span>)\s*\\?\)$',
+        r"\1",
+        raw,
+        flags=re.S,
+    )
+    box_m = re.search(r'<span class="cm-answer-box">(.*?)</span>', raw, flags=re.S)
+    if box_m and raw.strip() in {box_m.group(0), f"\\({box_m.group(0)}\\)"}:
+        inner = _strip_inline_math_delimiters(box_m.group(1))
+        if _needs_math_delimiters(inner):
+            return f'<span class="cm-answer-card-math">\\({inner}\\)</span>'
+        return inner
+    hl_m = re.search(
+        r'<span class="cm-answer-highlight"><strong>(.*?)</strong></span>',
+        raw,
+        flags=re.S,
+    )
+    if hl_m:
+        inner = _strip_inline_math_delimiters(hl_m.group(1))
+        if _needs_math_delimiters(inner):
+            return f'<span class="cm-answer-card-math">\\({inner}\\)</span>'
+        return inner
+    hl_m = re.search(
+        r'<span class="cm-answer-highlight">(.*?)</span>',
+        raw,
+        flags=re.S,
+    )
+    if hl_m:
+        inner = _strip_inline_math_delimiters(hl_m.group(1))
+        if inner in {"A", "B", "C", "D"} or re.match(r"^[A-D]\.?$", inner):
+            return f"<strong>{inner.rstrip('.')}</strong>"
+        if _needs_math_delimiters(inner):
+            return f'<span class="cm-answer-card-math">\\({inner}\\)</span>'
+        return inner
+    plain = re.sub(r"<[^>]+>", "", raw).strip()
+    plain = _strip_inline_math_delimiters(plain)
+    if plain in {"A", "B", "C", "D"} or re.match(r"^[A-D]\.?$", plain):
+        return f"<strong>{plain.rstrip('.')}</strong>"
+    if _needs_math_delimiters(plain):
+        return f'<span class="cm-answer-card-math">\\({plain}\\)</span>'
+    if plain and not re.search(r"[<>]", raw):
+        return plain
+    return raw
+
+
+def _polish_answer_lines(html: str) -> str:
+    """Turn legacy \\( … \\) answer markup into premium answer cards."""
+    html = re.sub(
+        r'<p><strong>(Final Answer|Correct Answer):\s*</strong>\s*(.*?)</p>',
+        lambda m: _answer_card(m.group(1), _format_answer_value(m.group(2))),
+        html,
+        flags=re.S | re.I,
+    )
+    html = re.sub(
+        r'<p><strong>(Final Answer|Correct Answer):\s*<span class="cm-answer-highlight">(.*?)</span></strong></p>',
+        lambda m: _answer_card(m.group(1), _format_answer_value(m.group(2))),
+        html,
+        flags=re.S | re.I,
+    )
+    html = re.sub(
+        r'<p><strong>(Step \d+:[^<]*)</strong>\s*\\?\(\s*<span class="cm-answer-box">(.*?)</span>\s*\\?\)\s*</p>',
+        lambda m: _answer_card(
+            "Answer",
+            _format_answer_value(f'<span class="cm-answer-box">{m.group(2)}</span>'),
+        ),
+        html,
+        flags=re.S | re.I,
+    )
+    html = re.sub(
+        r'<p><strong>(Positive solution:)\s*</strong>\s*\\?\(\s*<span class="cm-answer-box">(.*?)</span>\s*\\?\)\s*</p>',
+        lambda m: _answer_card(
+            "Positive solution",
+            _format_answer_value(f'<span class="cm-answer-box">{m.group(2)}</span>'),
+        ),
+        html,
+        flags=re.S | re.I,
+    )
+    html = re.sub(r"\\?\(\s*(<span class=\"cm-answer-box\">.*?</span>)\s*\\?\)", r"\1", html, flags=re.S)
+    html = re.sub(r"\\?\(\s*(<span class=\"cm-answer-highlight\">.*?</span>)\s*\\?\)", r"\1", html, flags=re.S)
+    html = _sanitize_answer_boxes(html)
+    return html
+
+
+def _fix_aligned_prose(text: str) -> str:
+    """Wrap English labels inside aligned math blocks with \\text{}."""
+
+    def fix_inner(inner: str) -> str:
+        inner = re.sub(
+            r"(?<!\\text\{)([A-Z][A-Za-z]*(?:\s+[a-z]+)*:)(?=\s|\\quad|&|$)",
+            r"\\text{\1}",
+            inner,
+        )
+        inner = re.sub(r",\s+(and)\s+", r", \\text{\1} ", inner)
+        inner = re.sub(
+            r"\\Rightarrow\s+(This\s+[A-Za-z\s]+)",
+            r"\\Rightarrow \\text{\1}",
+            inner,
+        )
+        inner = re.sub(
+            r"\\Rightarrow\s+(For\s+[A-Za-z\s]+)",
+            r"\\Rightarrow \\text{\1}",
+            inner,
+        )
+        return inner
+
+    return re.sub(
+        r"\\begin\{aligned\}(.*?)\\end\{aligned\}",
+        lambda m: f"\\begin{{aligned}}{fix_inner(m.group(1))}\\end{{aligned}}",
+        text,
+        flags=re.S,
+    )
+
+
 def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     html = _wrap_answer_choices(html)
     html = _wrap_concept_focus(html, kind)
@@ -684,6 +1006,7 @@ def _enrich_slide_html(html: str, kind: str, title: str) -> str:
         html = _wrap_solution_steps(html)
     if kind in {"question", "practice"}:
         html = _wrap_question_challenge(html, title)
+    html = _polish_answer_lines(html)
     return html
 
 
@@ -692,6 +1015,8 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
     tl = title.lower().strip()
     if "cm-intro-canvas" in html:
         return "intro"
+    if "cm-content-canvas" in html:
+        return "content"
     if "thank you" in t or "cm-slide-closing" in html or "cm-closing-canvas" in html:
         return "closing"
     if tl.startswith("answer:"):
@@ -745,7 +1070,7 @@ def _link_question_answer_slides(slides: list[dict[str, Any]]) -> None:
 
 
 def _slide_group(kind: str) -> str:
-    if kind in {"intro", "section"}:
+    if kind in {"intro", "content", "section"}:
         return "divider"
     if kind in {"concept", "lesson", "example"}:
         return "learn"
@@ -759,7 +1084,9 @@ def _slide_group(kind: str) -> str:
 def _study_hint_for(kind: str, title: str, plain: str) -> str:
     t = (title + " " + plain).lower()
     if kind == "intro":
-        return "This is your lesson overview — press Next when you're ready to begin."
+        return "This is your lesson overview — tap a section chip or press Next for the full outline."
+    if kind == "content":
+        return "Use this outline to jump straight to any section — great for review or picking up where you left off."
     if kind == "concept":
         return "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
     if kind == "example":
@@ -858,6 +1185,25 @@ def _build_lesson_path(slides: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return path
 
 
+def _enrich_section_slides(slides: list[dict[str, Any]], lesson_path: list[dict[str, Any]]) -> None:
+    """Add premium section numbers to section divider canvases."""
+    index_to_num = {int(item["index"]): i for i, item in enumerate(lesson_path, 1)}
+    for slide in slides:
+        if slide.get("kind") != "section":
+            continue
+        num = index_to_num.get(int(slide.get("index") or 0))
+        if not num:
+            continue
+        html = slide.get("html") or ""
+        if "cm-section-num" in html:
+            continue
+        slide["html"] = html.replace(
+            '<div class="cm-section-divider">',
+            f'<div class="cm-section-divider"><span class="cm-section-num">{num:02d}</span>',
+            1,
+        )
+
+
 def _count_interactive_stats(slides: list[dict[str, Any]]) -> dict[str, int]:
     questions = sum(
         1
@@ -891,7 +1237,8 @@ def _clean_frame_body(body: str) -> str:
 
     body = _remove_environment(body, "tikzpicture")
     body = _remove_environment(body, "columns")
-    body = _remove_environment(body, "center")
+    body = _replace_course_material_figures(body)
+    body = _unwrap_environment(body, "center")
     body = _remove_environment(body, "flushright")
     body = _remove_environment(body, "flushleft")
     body = _strip_beamer_layout_commands(body)
@@ -900,12 +1247,14 @@ def _clean_frame_body(body: str) -> str:
     body = latex_array_and_tabular_to_html(body)
     body = _convert_beamer_enumerate(body)
     body = _convert_align_blocks_for_mathjax(body)
+    body = _fix_aligned_prose(body)
     body = _convert_latex_lists(body)
     body = _convert_dash_bullets(body)
     body = _clean_beamer_noise(body)
     body = _normalize_display_math(body)
     body = clean_math(body)
     body = _repair_math_delimiters(body)
+    body = _fix_html_in_display_math(body)
     body = _scrub_latex_remnants(body)
     body = _convert_markdown_bold(body)
     body = _format_beamer_html(body)
@@ -1007,20 +1356,33 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
         for s in slides
         if s.get("kind") == "section"
     ]
-    intro_html = _build_intro_html(meta, section_titles)
     intro_slide: dict[str, Any] = {
         "index": 1,
         "title": deck_title or "Lesson overview",
-        "html": intro_html,
+        "html": "",
         "kind": "intro",
     }
+    content_slide: dict[str, Any] = {
+        "index": 2,
+        "title": "Lesson outline",
+        "html": "",
+        "kind": "content",
+    }
     for i, slide in enumerate(slides):
-        slide["index"] = i + 2
-    slides = [intro_slide] + slides
+        slide["index"] = i + 3
+    slides = [intro_slide, content_slide] + slides
 
     _link_question_answer_slides(slides)
     _annotate_slides(slides)
     lesson_path = _build_lesson_path(slides)
+    _enrich_section_slides(slides, lesson_path)
+    slides[0]["html"] = _build_intro_html(meta, lesson_path)
+    slides[1]["html"] = _build_contents_html(
+        meta,
+        deck_title or "",
+        lesson_path,
+        len(slides),
+    )
 
     if slides and slides[-1].get("kind") == "closing":
         closing_body = ""

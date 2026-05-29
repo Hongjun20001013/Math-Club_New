@@ -42,7 +42,8 @@
   var hintPanel = root.querySelector("[data-cm-hint-panel]");
   var nextChallengeBtn = root.querySelector("[data-cm-next-challenge]");
   var focusToggle = root.querySelector("[data-cm-focus-toggle]");
-  var focusExitBtn = root.querySelector("[data-cm-focus-exit]");
+  var focusInlineExit = root.querySelector(".np-cm-focus-inline-exit");
+  var focusExitBtns = Array.prototype.slice.call(root.querySelectorAll("[data-cm-focus-exit]"));
   var focusKey = "np-cm-focus-" + lessonSlug;
   var pathOpenBeforeFocus = false;
   var coachEl = root.querySelector("[data-cm-coach]");
@@ -64,6 +65,7 @@
     answer: "Answer",
     section: "Section",
     intro: "Intro",
+    content: "Outline",
     closing: "Closing"
   };
 
@@ -248,10 +250,21 @@
       var label = focusToggle.querySelector(".np-cm-btn-label");
       if (label) label.textContent = on ? "Exit focus" : "Focus";
     }
-    if (focusExitBtn) {
-      focusExitBtn.hidden = !on;
+    if (focusInlineExit) {
+      focusInlineExit.hidden = !on;
+    }
+    if (coachEl && on) {
+      coachEl.hidden = true;
+    } else if (!on && slides[idx]) {
+      updateCoach(slides[idx]);
     }
     saveFocusMode(on);
+  }
+
+  function exitFocusMode() {
+    if (root.classList.contains("is-focus-mode")) {
+      setFocusMode(false);
+    }
   }
 
   function toggleFocusMode() {
@@ -260,7 +273,7 @@
 
   function isCanvasSlide(slide) {
     var kind = slide.kind || "lesson";
-    return kind === "section" || kind === "closing" || kind === "intro";
+    return kind === "section" || kind === "closing" || kind === "intro" || kind === "content";
   }
 
   function updateCoach(slide) {
@@ -402,6 +415,12 @@
   }
 
   function bindInteractivity(slide) {
+    bodyEl.querySelectorAll("[data-cm-jump-section]").forEach(function (btn) {
+      btn.onclick = function () {
+        var target = parseInt(btn.getAttribute("data-cm-jump-section"), 10);
+        if (target) goToSlideNumber(target);
+      };
+    });
     bodyEl.querySelectorAll("[data-cm-solution-panel]").forEach(initSolutionPanel);
     bodyEl.querySelectorAll("[data-cm-reveal-solution]").forEach(function (btn) {
       btn.onclick = function () {
@@ -446,7 +465,7 @@
     if (slideHeadEl) {
       slideHeadEl.hidden = canvas;
     }
-    window.setTimeout(function () { slideEl.classList.remove("is-entering"); }, 280);
+    window.setTimeout(function () { slideEl.classList.remove("is-entering"); }, 420);
 
     bodyEl.innerHTML = slide.html || "";
     titleEl.textContent = slide.title || ("Slide " + slide.index);
@@ -517,9 +536,9 @@
   if (focusToggle) {
     focusToggle.addEventListener("click", toggleFocusMode);
   }
-  if (focusExitBtn) {
-    focusExitBtn.addEventListener("click", toggleFocusMode);
-  }
+  focusExitBtns.forEach(function (btn) {
+    btn.addEventListener("click", exitFocusMode);
+  });
 
   if (hintBtn && hintPanel) {
     hintBtn.addEventListener("click", function () {
@@ -577,6 +596,10 @@
     if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(1); }
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(-1); }
     if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFocusMode(); }
+    if (e.key === "Escape" && root.classList.contains("is-focus-mode")) {
+      e.preventDefault();
+      exitFocusMode();
+    }
   });
 
   saveStudyMode();

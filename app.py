@@ -96,7 +96,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-course-materials-v17")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260529-course-materials-v24")
 
 
 def _site_brand_name() -> str:
@@ -1310,10 +1310,24 @@ def _course_materials_hub_context() -> dict[str, Any]:
             }
         )
     payload = load_course_materials()
+    ready_materials = sorted(
+        [m for m in materials if m.get("tex_available")],
+        key=lambda m: tuple(
+            int(p) if p.isdigit() else 0
+            for p in str(m.get("section") or "0").split(".")
+        ),
+    )
+    materials_total = int(payload.get("total") or len(materials))
+    materials_ready = int(payload.get("available") or len(ready_materials))
+    coverage_pct = round(100 * materials_ready / materials_total) if materials_total else 0
+    featured = ready_materials[-1] if ready_materials else None
     return {
         "unit_groups": unit_groups,
-        "materials_total": int(payload.get("total") or len(materials)),
-        "materials_ready": int(payload.get("available") or 0),
+        "materials_total": materials_total,
+        "materials_ready": materials_ready,
+        "coverage_pct": coverage_pct,
+        "ready_materials": ready_materials,
+        "featured_material": featured,
     }
 
 
