@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-sat-atelier">
+<div class="np-sat-atelier np-sat-atelier--hub">
   <nav class="np-atelier-rail" aria-label="SAT navigation">
     <a href="{{ url_for('index') }}">Home</a>
     <span class="np-atelier-rail-sep">·</span>
@@ -14,11 +14,11 @@
     <div>
       <p class="np-atelier-kicker">SAT Math Workspace</p>
       <h1>Your SAT command center.</h1>
-      <p class="np-atelier-hero-lead">Units 1–4 are live with instant scoring, session reports, mistake tagging, and topic-level navigation. Pick a training mode below—or jump straight into a unit.</p>
+      <p class="np-atelier-hero-lead">Start with chapter slide decks, then drill with unit banks, hard sets, and mistake analytics — all in one studio.</p>
       <div class="np-atelier-hero-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>{% if cm_total is defined %}{{ cm_total }}{% else %}21{% endif %}</strong><span>lessons</span></div>
         <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
         <div class="np-atelier-stat" role="listitem"><strong>15</strong><span>hard sets</span></div>
-        <div class="np-atelier-stat" role="listitem"><strong>∞</strong><span>retries</span></div>
       </div>
     </div>
     <aside class="np-atelier-aside" aria-label="Quick unit starts">
@@ -35,45 +35,84 @@
     </aside>
   </header>
 
-  <section class="np-atelier-bento np-atelier-bento--equal np-atelier-bento--modes" aria-label="SAT training modes">
-    <a href="{{ url_for('practice_specialized') }}" class="np-atelier-card np-atelier-card--hub">
+  <section class="np-hub-spotlight mp-animate-up" aria-label="Course materials">
+    <a href="{{ url_for('practice_course_materials') }}" class="np-hub-spotlight-card">
+      <span class="np-hub-spotlight-glow" aria-hidden="true"></span>
+      <div class="np-hub-spotlight-copy">
+        <div class="np-hub-spotlight-head">
+          <span class="np-atelier-kicker">Study materials</span>
+          <span class="np-atelier-pill np-atelier-pill--live">Live</span>
+        </div>
+        <h2 class="np-hub-spotlight-title">SAT course materials</h2>
+        <p class="np-hub-spotlight-lede">Interactive slide decks for every chapter — math rendering, study mode, Desmos, and printable PDFs for Units 1–4.</p>
+        <div class="np-hub-spotlight-stats">
+          <span class="np-hub-spotlight-stat"><strong>{% if cm_total is defined %}{{ cm_total }}{% else %}21{% endif %}</strong> lessons cataloged</span>
+          <span class="np-hub-spotlight-stat"><strong>{% if cm_ready is defined %}{{ cm_ready }}{% else %}1{% endif %}</strong> online now</span>
+          <span class="np-hub-spotlight-stat">Slides + PDF</span>
+        </div>
+        <span class="np-atelier-btn np-atelier-btn--primary np-hub-spotlight-cta">Browse courseware →</span>
+      </div>
+      <div class="np-hub-spotlight-visual" aria-hidden="true">
+        <div class="np-hub-slide-stack">
+          <div class="np-hub-slide np-hub-slide--back"></div>
+          <div class="np-hub-slide np-hub-slide--mid"></div>
+          <div class="np-hub-slide np-hub-slide--front">
+            <span class="np-hub-slide-badge">Unit 1.1</span>
+            <strong>Linear Equations</strong>
+            <em>29 slides · Study mode</em>
+          </div>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <div class="np-hub-modes-head mp-animate-up">
+    <div>
+      <p class="np-atelier-kicker">Practice</p>
+      <h2 class="np-hub-modes-title">Training modes</h2>
+    </div>
+    <p class="np-hub-modes-lede">Drill questions, review mistakes, and prepare for exam day.</p>
+  </div>
+
+  <section class="np-atelier-bento np-atelier-bento--hub-modes mp-animate-up" aria-label="SAT training modes">
+    <a href="{{ url_for('practice_specialized') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
       <span class="np-atelier-card-watermark">01</span>
       <div class="np-atelier-card-head">
         <span class="np-atelier-kicker">Units 1–4</span>
         <span class="np-atelier-pill np-atelier-pill--live">Live</span>
       </div>
-      <h2 class="np-atelier-title">Specialized training</h2>
-      <span class="np-atelier-count">4 units · full banks + chapters</span>
-      <p class="np-atelier-desc">Full banks and chapter slices (1.1–1.5, etc.), session reports, and per-bank mistake redo.</p>
+      <h3 class="np-atelier-title">Specialized training</h3>
+      <span class="np-atelier-count">Full banks + chapter slices</span>
+      <p class="np-atelier-desc">Session reports and per-bank mistake redo across Algebra, Advanced Math, Data, and Geometry.</p>
       <footer class="np-atelier-foot">
         <span class="np-atelier-btn np-atelier-btn--primary">Open training room →</span>
       </footer>
     </a>
 
-    <a href="{{ url_for('practice_challenge') }}" class="np-atelier-card np-atelier-card--hub">
+    <a href="{{ url_for('practice_challenge') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
       <span class="np-atelier-card-watermark">02</span>
       <div class="np-atelier-card-head">
         <span class="np-atelier-kicker">Advanced drill</span>
         <span class="np-atelier-pill np-atelier-pill--live">Live</span>
       </div>
-      <h2 class="np-atelier-title">Hard problem drill</h2>
+      <h3 class="np-atelier-title">Hard problem drill</h3>
       <span class="np-atelier-count">15 sets · I–XVI</span>
-      <p class="np-atelier-desc">Hard Question Sets with Roman numeral picker, worksheet PDFs, teaching slides, and session reports.</p>
+      <p class="np-atelier-desc">Roman numeral picker, worksheet PDFs, teaching slides, and session reports.</p>
       <footer class="np-atelier-foot">
         <span class="np-atelier-btn np-atelier-btn--primary">Open hard drill →</span>
       </footer>
     </a>
 
-    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-card np-atelier-card--hub">
+    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
       <span class="np-atelier-card-watermark">03</span>
       <div class="np-atelier-card-head">
         <span class="np-atelier-kicker">Review loop</span>
         <span class="np-atelier-pill np-atelier-pill--core">Core</span>
       </div>
-      <h2 class="np-atelier-title">Mistake analytics</h2>
+      <h3 class="np-atelier-title">Mistake analytics</h3>
       <span class="np-atelier-count">Tags · patterns</span>
       <p class="np-atelier-desc">Tags, notes, redo links, and weak-topic patterns after each session.</p>
       <footer class="np-atelier-foot">
@@ -81,33 +120,18 @@
       </footer>
     </a>
 
-    <a href="{{ url_for('practice_exams') }}" class="np-atelier-card np-atelier-card--hub">
+    <a href="{{ url_for('practice_exams') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode np-atelier-card--soon">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
       <span class="np-atelier-card-watermark">04</span>
       <div class="np-atelier-card-head">
         <span class="np-atelier-kicker">Exam mode</span>
         <span class="np-atelier-pill np-atelier-pill--soon">Soon</span>
       </div>
-      <h2 class="np-atelier-title">Real exam practice</h2>
+      <h3 class="np-atelier-title">Real exam practice</h3>
       <span class="np-atelier-count">Timed mocks</span>
       <p class="np-atelier-desc">Timed mocks, section pacing, score snapshots, and exam-style review.</p>
       <footer class="np-atelier-foot">
         <span class="np-atelier-btn np-atelier-btn--ghost">Roadmap</span>
-      </footer>
-    </a>
-
-    <a href="{{ url_for('practice_course_materials') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--materials">
-      <span class="np-atelier-card-glow" aria-hidden="true"></span>
-      <span class="np-atelier-card-watermark">05</span>
-      <div class="np-atelier-card-head">
-        <span class="np-atelier-kicker">Teaching library</span>
-        <span class="np-atelier-pill np-atelier-pill--live">Live</span>
-      </div>
-      <h2 class="np-atelier-title">SAT course materials</h2>
-      <span class="np-atelier-count">21 lessons · slides + PDF{% if cm_ready is defined and cm_ready < cm_total %} · {{ cm_ready }} live{% endif %}</span>
-      <p class="np-atelier-desc">Chapter slide decks for Units 1–4 — read online with math rendering, or download printable PDFs.</p>
-      <footer class="np-atelier-foot">
-        <span class="np-atelier-btn np-atelier-btn--primary">Browse courseware →</span>
       </footer>
     </a>
   </section>
