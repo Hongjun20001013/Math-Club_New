@@ -28514,3 +28514,173 @@ a.np-cm-card--ready:hover {
     }
 }
 
+/* ── v15 Global Desmos (all /practice pages) ── */
+.np-desmos-panel,
+.np-cm-desmos-panel {
+    position: fixed;
+    top: 72px;
+    left: auto;
+    width: min(680px, calc(100vw - 32px));
+    height: min(760px, calc(100vh - 96px));
+    min-width: 360px;
+    min-height: 360px;
+    box-sizing: border-box;
+    padding: 14px;
+    border-radius: 22px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: #fff;
+    box-shadow: 0 28px 80px rgba(24, 18, 68, 0.24);
+    z-index: 4000;
+    overflow: auto;
+    resize: both;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s ease, box-shadow 0.18s ease;
+}
+
+.np-desmos-panel.is-open,
+.np-cm-desmos-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.np-desmos-panel.is-dragging,
+.np-cm-desmos-panel.is-dragging {
+    user-select: none;
+    box-shadow: 0 34px 96px rgba(24, 18, 68, 0.32);
+}
+
+.np-desmos-panel-head,
+.np-cm-desmos-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -2px -2px 10px;
+    padding: 10px 10px 12px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(91, 77, 255, 0.08));
+    color: #047857;
+    cursor: grab;
+    touch-action: none;
+}
+
+.np-desmos-panel-head:active,
+.np-cm-desmos-panel-head:active {
+    cursor: grabbing;
+}
+
+.np-desmos-panel-title,
+.np-cm-desmos-panel-title {
+    display: grid;
+    gap: 2px;
+    margin-right: auto;
+}
+
+.np-desmos-panel-title strong,
+.np-cm-desmos-panel-title strong {
+    line-height: 1.1;
+    color: #065f46;
+}
+
+.np-desmos-panel-title span,
+.np-cm-desmos-panel-title span {
+    color: #6b7280;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.np-desmos-reset,
+.np-desmos-close,
+.np-cm-desmos-reset,
+.np-cm-desmos-close {
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    background: #fff;
+    color: #047857;
+    border-radius: 999px;
+    height: 32px;
+    cursor: pointer;
+}
+
+.np-desmos-reset,
+.np-cm-desmos-reset {
+    padding: 0 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.np-desmos-close,
+.np-cm-desmos-close {
+    width: 32px;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.np-desmos-status,
+.np-cm-desmos-status {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.np-desmos-calculator,
+.np-cm-desmos-calculator {
+    width: 100%;
+    height: calc(100% - 52px);
+    min-height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.np-desmos-fab {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 3900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 16px 0 14px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #10b981, #059669);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 14px 36px rgba(16, 185, 129, 0.34);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-desmos-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(16, 185, 129, 0.4);
+}
+
+.np-desmos-fab.is-active {
+    background: linear-gradient(180deg, #047857, #065f46);
+}
+
+.np-desmos-fab-icon {
+    width: 18px;
+    height: 18px;
+}
+
+body:has(.sat-practice-page-wrap[data-calculator-allowed="false"]) .np-desmos-fab {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .np-desmos-fab span {
+        display: none;
+    }
+
+    .np-desmos-fab {
+        min-width: 46px;
+        padding: 0 14px;
+    }
+}
+

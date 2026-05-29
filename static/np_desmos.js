@@ -1,22 +1,28 @@
 (function () {
   "use strict";
 
-  var panel = document.getElementById("cm-desmos-panel");
+  var config = window.__NP_DESMOS__ || {};
+  var panel = document.getElementById("np-desmos-panel");
   if (!panel) return;
 
-  var calcEl = document.getElementById("cm-desmos-calculator");
-  var statusEl = document.querySelector("[data-cm-desmos-status]");
-  var toggles = Array.prototype.slice.call(document.querySelectorAll("[data-cm-desmos-toggle]"));
-  var closeBtn = document.querySelector("[data-cm-desmos-close]");
-  var resetBtn = document.querySelector("[data-cm-desmos-reset]");
-  var handle = document.getElementById("cm-desmos-drag-handle");
-  var desmosApiKey = window.__CM_DESMOS_KEY__ || "";
+  var calcEl = document.getElementById("np-desmos-calculator");
+  var statusEl = panel.querySelector("[data-np-desmos-status]");
+  var toggles = Array.prototype.slice.call(
+    document.querySelectorAll("[data-np-desmos-toggle], [data-cm-desmos-toggle]")
+  );
+  var closeBtn = panel.querySelector("[data-np-desmos-close]");
+  var resetBtn = panel.querySelector("[data-np-desmos-reset]");
+  var handle = document.getElementById("np-desmos-drag-handle");
+  var desmosApiKey = config.apiKey || "";
   var calculator = null;
   var desmosLoadPromise = null;
-  var LAYOUT_KEY = "np-cm-desmos-panel-layout";
+  var LAYOUT_KEY = config.layoutKey || "np-desmos-panel-layout";
 
   function setStatus(message) {
-    if (statusEl) statusEl.textContent = message;
+    if (statusEl) {
+      statusEl.hidden = false;
+      statusEl.textContent = message;
+    }
   }
 
   function setOpen(open) {
@@ -202,7 +208,7 @@
     return true;
   }
 
-  async function toggleDesmos() {
+  async function toggle() {
     if (isOpen()) {
       setOpen(false);
       return;
@@ -221,7 +227,7 @@
   }
 
   toggles.forEach(function (btn) {
-    btn.addEventListener("click", toggleDesmos);
+    btn.addEventListener("click", toggle);
   });
   if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
   if (resetBtn) resetBtn.addEventListener("click", resetPanel);
@@ -229,12 +235,16 @@
   document.addEventListener("keydown", function (e) {
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (config.enableShortcut === false) return;
     if (e.key === "d" || e.key === "D") {
       e.preventDefault();
-      toggleDesmos();
+      toggle();
     }
     if (e.key === "Escape" && isOpen()) {
       setOpen(false);
     }
   });
+
+  window.NpDesmos = { toggle: toggle, open: function () { if (!isOpen()) toggle(); }, close: function () { setOpen(false); }, reset: resetPanel };
+  window.toggleCalc = toggle;
 })();

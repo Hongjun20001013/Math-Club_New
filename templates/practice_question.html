@@ -2,7 +2,7 @@
 {% block content %}
 {% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
 
-<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}">
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
 <div class="exam-container practice-run sat-practice sat-practice--split-lock{% if placement_mode %} sat-practice--placement{% endif %}{% if chrome_focus %} sat-practice--miss-quiz{% endif %}">
 
     <div class="sat-exam-chrome{% if placement_mode %} sat-exam-chrome--placement{% endif %}" aria-label="Session controls">
@@ -153,7 +153,7 @@
             <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
         </button>
         {% if calculator_allowed %}
-        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" onclick="toggleCalc()">Calculator</button>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" data-np-desmos-toggle>Desmos</button>
         {% else %}
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc-off" disabled title="Calculator is not available on this item (paper Section 1 rules)">Calculator</button>
         {% endif %}
@@ -165,7 +165,7 @@
         </button>
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" onclick="openQuestionPicker()">Jump</button>
         {% if calculator_allowed %}
-        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" onclick="toggleCalc()">Calculator</button>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" data-np-desmos-toggle>Desmos</button>
         {% endif %}
         <span id="sat-review-status" class="sat-review-status" aria-live="polite"></span>
         </div>
@@ -314,46 +314,6 @@
 {% endif %}
 
 
-<!-- ============================= -->
-<!-- DESMOS CALCULATOR PANEL -->
-<!-- ============================= -->
-{% if calculator_allowed %}
-<div id="calculator-panel">
-    <div class="calculator-panel-header" id="calculator-drag-handle">
-        <div class="calculator-panel-title">
-            <strong>Calculator</strong>
-            <span>Drag header · resize from corner</span>
-        </div>
-        <button type="button" class="calculator-reset-btn" onclick="resetCalcPanel()" aria-label="Reset calculator position and size">Reset</button>
-        <button type="button" class="calculator-close-btn" onclick="closeCalc()" aria-label="Close calculator">×</button>
-    </div>
-    <div id="calculator-status" style="font-size: 14px; color: #555; margin-bottom: 10px;">
-        Click calculator button to load Desmos...
-    </div>
-    <div id="fallback-calculator" style="display:none;">
-        <div style="margin-bottom: 10px;">
-            <label for="fallback-calc-input" style="font-size: 13px; color: #666;">Offline calculator</label>
-            <input
-                id="fallback-calc-input"
-                type="text"
-                placeholder="Example: (12+5)*3/9"
-                style="width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"
-            >
-        </div>
-        <div style="display:flex; gap:8px;">
-            <button type="button" id="fallback-calc-eval" class="calc-btn">Compute</button>
-            <button type="button" id="fallback-calc-clear" class="calc-btn">Clear</button>
-        </div>
-        <div id="fallback-calc-result" style="margin-top: 10px; min-height: 20px; font-weight: 600; color: #333;"></div>
-    </div>
-    <div id="calculator" style="width:100%; height:400px;"></div>
-</div>
-{% endif %}
-
-
-<!-- ============================= -->
-<!-- SCRIPTS -->
-<!-- ============================= -->
 <script>
 /* Theme toggles: global handler in base.html (all .sat-theme-toggle). */
 if ("scrollRestoration" in history) {
@@ -705,279 +665,7 @@ document.querySelector("form").addEventListener("submit", (event) => {
 });
 
 
-/* ================= DESMOS (RIGHT DRAWER) ================= */
 
-let calculator = null;
-let desmosLoadPromise = null;
-let fallbackInitialized = false;
-const desmosApiKey = "{{ desmos_api_key }}";
-const placementCalcAllowed = {{ calculator_allowed|tojson }};
-const CALC_PANEL_KEY = "sat-calc-panel-layout-v1";
-
-function setCalcStatus(message) {
-    const status = document.getElementById("calculator-status");
-    if (status) status.innerText = message;
-}
-
-function defaultCalcPanelLayout() {
-    const width = Math.min(640, Math.max(420, window.innerWidth - 40));
-    const height = Math.min(720, Math.max(420, window.innerHeight - 120));
-    return {
-        left: Math.max(16, window.innerWidth - width - 24),
-        top: Math.max(16, Math.min(88, window.innerHeight - height - 16)),
-        width,
-        height
-    };
-}
-
-function clampCalcPanelLayout(layout) {
-    const minW = 360;
-    const minH = 360;
-    const width = Math.min(Math.max(layout.width || minW, minW), Math.max(minW, window.innerWidth - 24));
-    const height = Math.min(Math.max(layout.height || minH, minH), Math.max(minH, window.innerHeight - 24));
-    const left = Math.min(Math.max(layout.left || 12, 12), Math.max(12, window.innerWidth - width - 12));
-    const top = Math.min(Math.max(layout.top || 12, 12), Math.max(12, window.innerHeight - height - 12));
-    return { left, top, width, height };
-}
-
-function saveCalcPanelLayout(panel) {
-    if (!panel) return;
-    const layout = {
-        left: panel.offsetLeft,
-        top: panel.offsetTop,
-        width: panel.offsetWidth,
-        height: panel.offsetHeight
-    };
-    try {
-        localStorage.setItem(CALC_PANEL_KEY, JSON.stringify(layout));
-    } catch (e) { /* ignore */ }
-}
-
-function applyCalcPanelLayout(panel, layout) {
-    if (!panel) return;
-    const next = clampCalcPanelLayout(layout || defaultCalcPanelLayout());
-    panel.style.left = `${next.left}px`;
-    panel.style.top = `${next.top}px`;
-    panel.style.width = `${next.width}px`;
-    panel.style.height = `${next.height}px`;
-    panel.style.right = "auto";
-    panel.style.bottom = "auto";
-    panel.style.transform = "none";
-}
-
-function restoreCalcPanelLayout(panel) {
-    let layout = null;
-    try {
-        layout = JSON.parse(localStorage.getItem(CALC_PANEL_KEY) || "null");
-    } catch (e) {
-        layout = null;
-    }
-    applyCalcPanelLayout(panel, layout || defaultCalcPanelLayout());
-}
-
-function resetCalcPanel() {
-    const panel = document.getElementById("calculator-panel");
-    try {
-        localStorage.removeItem(CALC_PANEL_KEY);
-    } catch (e) { /* ignore */ }
-    applyCalcPanelLayout(panel, defaultCalcPanelLayout());
-    setTimeout(() => {
-        if (calculator && calculator.resize) calculator.resize();
-    }, 80);
-}
-
-function initCalculatorPanelControls() {
-    const panel = document.getElementById("calculator-panel");
-    const handle = document.getElementById("calculator-drag-handle");
-    if (!panel || !handle || panel.dataset.controlsReady === "1") return;
-    panel.dataset.controlsReady = "1";
-    restoreCalcPanelLayout(panel);
-
-    let dragging = null;
-    handle.addEventListener("pointerdown", (event) => {
-        if (event.target.closest("button")) return;
-        event.preventDefault();
-        const rect = panel.getBoundingClientRect();
-        dragging = {
-            pointerId: event.pointerId,
-            dx: event.clientX - rect.left,
-            dy: event.clientY - rect.top
-        };
-        panel.classList.add("is-dragging");
-        handle.setPointerCapture(event.pointerId);
-    });
-
-    handle.addEventListener("pointermove", (event) => {
-        if (!dragging || dragging.pointerId !== event.pointerId) return;
-        const layout = clampCalcPanelLayout({
-            left: event.clientX - dragging.dx,
-            top: event.clientY - dragging.dy,
-            width: panel.offsetWidth,
-            height: panel.offsetHeight
-        });
-        panel.style.left = `${layout.left}px`;
-        panel.style.top = `${layout.top}px`;
-        panel.style.right = "auto";
-        panel.style.bottom = "auto";
-    });
-
-    function stopDrag(event) {
-        if (!dragging || dragging.pointerId !== event.pointerId) return;
-        dragging = null;
-        panel.classList.remove("is-dragging");
-        saveCalcPanelLayout(panel);
-        if (calculator && calculator.resize) calculator.resize();
-    }
-    handle.addEventListener("pointerup", stopDrag);
-    handle.addEventListener("pointercancel", stopDrag);
-
-    if (window.ResizeObserver) {
-        const ro = new ResizeObserver(() => {
-            if (!panel.classList.contains("active")) return;
-            saveCalcPanelLayout(panel);
-            if (calculator && calculator.resize) calculator.resize();
-        });
-        ro.observe(panel);
-    }
-
-    window.addEventListener("resize", () => {
-        applyCalcPanelLayout(panel, {
-            left: panel.offsetLeft,
-            top: panel.offsetTop,
-            width: panel.offsetWidth,
-            height: panel.offsetHeight
-        });
-        if (calculator && calculator.resize) calculator.resize();
-    });
-}
-
-function ensureDesmosLoaded() {
-    if (!desmosApiKey) return Promise.resolve(false);
-    if (window.Desmos) return Promise.resolve(true);
-    if (desmosLoadPromise) return desmosLoadPromise;
-
-    desmosLoadPromise = new Promise((resolve) => {
-        const script = document.createElement("script");
-        script.src = `https://www.desmos.com/api/v1.6/calculator.js?apiKey=${encodeURIComponent(desmosApiKey)}`;
-        script.async = true;
-
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.head.appendChild(script);
-
-        // Fallback timeout for blocked network/CDN.
-        setTimeout(() => resolve(!!window.Desmos), 5000);
-    });
-
-    return desmosLoadPromise;
-}
-
-function evaluateFallbackExpression(expr) {
-    // Allow only basic calculator characters for safety.
-    if (!/^[0-9+\-*/().\s]+$/.test(expr)) {
-        throw new Error("Only numbers and + - * / ( ) are allowed.");
-    }
-    // eslint-disable-next-line no-new-func
-    const value = Function(`"use strict"; return (${expr});`)();
-    if (typeof value !== "number" || Number.isNaN(value) || !Number.isFinite(value)) {
-        throw new Error("Invalid expression.");
-    }
-    return value;
-}
-
-function showFallbackCalculator(message) {
-    setCalcStatus(message);
-    const fallback = document.getElementById("fallback-calculator");
-    const desmosEl = document.getElementById("calculator");
-    if (fallback) fallback.style.display = "block";
-    if (desmosEl) desmosEl.style.display = "none";
-
-    if (fallbackInitialized) return;
-    fallbackInitialized = true;
-
-    const input = document.getElementById("fallback-calc-input");
-    const resultEl = document.getElementById("fallback-calc-result");
-    const evalBtn = document.getElementById("fallback-calc-eval");
-    const clearBtn = document.getElementById("fallback-calc-clear");
-
-    const runEval = () => {
-        const expr = (input?.value || "").trim();
-        if (!expr) {
-            if (resultEl) resultEl.innerText = "Please enter an expression.";
-            return;
-        }
-        try {
-            const val = evaluateFallbackExpression(expr);
-            if (resultEl) resultEl.innerText = `Result: ${val}`;
-        } catch (err) {
-            if (resultEl) resultEl.innerText = err.message || "Calculation failed.";
-        }
-    };
-
-    if (evalBtn) evalBtn.addEventListener("click", runEval);
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            if (input) input.value = "";
-            if (resultEl) resultEl.innerText = "";
-        });
-    }
-    if (input) {
-        input.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") runEval();
-        });
-    }
-}
-
-async function toggleCalc() {
-    if (placementCalcAllowed === false) return;
-    const panel = document.getElementById("calculator-panel");
-    const calcEl = document.getElementById("calculator");
-    if (!panel) return;
-    initCalculatorPanelControls();
-    // Clear any stale inline fallback style from previous close.
-    panel.style.opacity = "";
-    panel.style.visibility = "";
-    panel.style.pointerEvents = "";
-    panel.classList.toggle("active");
-
-    if (!panel.classList.contains("active")) return;
-
-    if (!calculator) {
-        setCalcStatus("Loading Desmos...");
-        if (!desmosApiKey) {
-            showFallbackCalculator("DESMOS_API_KEY is not configured. Switched to offline calculator.");
-            return;
-        }
-        const ok = await ensureDesmosLoaded();
-        if (!ok || !window.Desmos) {
-            showFallbackCalculator("Desmos failed to load. Switched to offline calculator.");
-            return;
-        }
-
-        setCalcStatus("");
-        const fallback = document.getElementById("fallback-calculator");
-        if (fallback) fallback.style.display = "none";
-        if (calcEl) calcEl.style.display = "block";
-        calculator = Desmos.GraphingCalculator(calcEl, {
-            expressions: true,
-            settingsMenu: false
-        });
-    }
-
-    // Force reflow when drawer opens to avoid blank / wrong size
-    setTimeout(() => {
-        if (calculator && calculator.resize) calculator.resize();
-    }, 350);
-}
-
-function closeCalc() {
-    const panel = document.getElementById("calculator-panel");
-    if (!panel) return;
-    saveCalcPanelLayout(panel);
-    panel.classList.remove("active");
-}
-
-initCalculatorPanelControls();
 </script>
 
 {% endblock %}

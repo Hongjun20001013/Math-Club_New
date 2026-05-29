@@ -96,7 +96,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-course-materials-v14")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-course-materials-v15")
 
 
 def _site_brand_name() -> str:
@@ -727,8 +727,16 @@ def inject_template_config():
     nav_show_analytics = grants is None or "sat" in grants
     student_home_href = url_for("index") if grants is None else _student_home_url(grants)
 
+    show_np_desmos = bool(
+        DESMOS_API_KEY
+        and p.startswith("/practice")
+        and not p.startswith("/practice/analytics")
+    )
+
     return {
         "desmos_api_key": DESMOS_API_KEY,
+        "show_np_desmos": show_np_desmos,
+        "np_desmos_shortcut": True,
         "active_track_label": active_track,
         "nav_path": p,
         "learning_tracks": visible_tracks if grants is not None else LEARNING_TRACKS,

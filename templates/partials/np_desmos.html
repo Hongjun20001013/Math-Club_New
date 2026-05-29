@@ -1,0 +1,29 @@
+<button type="button" class="np-desmos-fab" data-np-desmos-toggle aria-pressed="false" aria-label="Open Desmos graphing calculator" title="Desmos (D)">
+  <svg class="np-desmos-fab-icon" viewBox="0 0 20 20" aria-hidden="true">
+    <path d="M3 14c2.5-5 4.5-7 7-7s4.5 2 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+    <path d="M3 17h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+  </svg>
+  <span>Desmos</span>
+</button>
+
+<div class="np-desmos-panel" id="np-desmos-panel" aria-label="Desmos graphing calculator" aria-hidden="true">
+  <div class="np-desmos-panel-head" id="np-desmos-drag-handle">
+    <div class="np-desmos-panel-title">
+      <strong>Desmos</strong>
+      <span>Drag header · resize corner · press D to toggle</span>
+    </div>
+    <button type="button" class="np-desmos-reset" data-np-desmos-reset>Reset</button>
+    <button type="button" class="np-desmos-close" data-np-desmos-close aria-label="Close Desmos">×</button>
+  </div>
+  <p class="np-desmos-status" data-np-desmos-status>Click Desmos to load the graphing calculator.</p>
+  <div id="np-desmos-calculator" class="np-desmos-calculator"></div>
+</div>
+
+<script>
+window.__NP_DESMOS__ = {
+  apiKey: {{ desmos_api_key|tojson }},
+  layoutKey: "np-desmos-panel-layout",
+  enableShortcut: {{ np_desmos_shortcut|default(true)|tojson }}
+};
+</script>
+<script defer src="{{ url_for('static', filename='np_desmos.js') }}?v={{ style_css_revision }}"></script>
