@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}{{ material.section }} · {{ material.title }} · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-cm-cinema">
+<div class="np-page-shell np-page-shell--cm">
+<div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}">
+
+  <header class="np-cm-hero glass-panel np-glass mp-animate-in">
+    <div class="np-cm-hero-top">
+      <nav class="np-cm-cinema-rail" aria-label="SAT navigation">
+        <a href="{{ url_for('practice') }}">SAT modules</a>
+        <span aria-hidden="true">·</span>
+        <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
+        <span aria-hidden="true">·</span>
+        <span>{{ material.section }}</span>
+      </nav>
+      <div class="np-cm-hero-actions">
+        <button type="button" class="np-cm-btn np-cm-btn--focus" data-cm-focus-toggle aria-pressed="false" title="Hide chrome for fullscreen slides (F)">
+          <span class="np-cm-focus-icon" aria-hidden="true">⛶</span>
+          <span class="np-cm-btn-label">Focus</span>
+        </button>
+        <button type="button" class="np-cm-btn np-cm-btn--study is-active" data-cm-study-toggle aria-pressed="true" title="Guided study: try problems before revealing solutions">
+          <span class="np-cm-study-icon" aria-hidden="true">✦</span>
+          <span class="np-cm-btn-label">Study mode</span>
+        </button>
+        {% if pdf_href %}
+        <a href="{{ pdf_href }}" class="np-cm-btn np-cm-btn--pdf">PDF</a>
+        {% endif %}
+        <a href="{{ url_for('practice_course_materials') }}" class="np-cm-btn np-cm-btn--ghost">All lessons</a>
+      </div>
+    </div>
+    <div class="np-cm-hero-main">
+      <div class="np-cm-hero-copy">
+        <p class="np-cm-cinema-kicker">Unit {{ material.unit }} · {{ material.unit_name }}</p>
+        <h1>{{ material.section }} — {{ material.title }}</h1>
+      </div>
+      <div class="np-cm-hero-stats">
+        <div class="np-cm-mastery" aria-label="Lesson mastery">
+          <svg class="np-cm-mastery-ring" viewBox="0 0 44 44" aria-hidden="true">
+            <circle class="np-cm-mastery-track" cx="22" cy="22" r="18"></circle>
+            <circle class="np-cm-mastery-fill" cx="22" cy="22" r="18" data-cm-mastery-ring></circle>
+          </svg>
+          <span class="np-cm-mastery-pct" data-cm-mastery-pct>0%</span>
+        </div>
+        <div class="np-cm-hero-stat-copy">
+          {% if material.interactive_count %}
+          <strong data-cm-study-stat>0 / {{ material.interactive_count }} challenges</strong>
+          {% endif %}
+          <span data-cm-section-label>{{ material.slide_count }} slides</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="np-cm-workspace glass-panel np-glass mp-animate-up">
+    <aside class="np-cm-path" aria-label="Lesson path" data-cm-outline-panel>
+      <div class="np-cm-path-head">
+        <button type="button" class="np-cm-path-toggle" data-cm-toggle-outline aria-pressed="false" aria-label="Toggle lesson path">
+          <span>Lesson path</span>
+          <span class="np-cm-path-toggle-icon" aria-hidden="true">☰</span>
+        </button>
+        <button type="button" class="np-cm-outline-close" data-cm-toggle-outline aria-label="Close lesson path">×</button>
+      </div>
+      <div class="np-cm-path-filters" role="tablist" aria-label="Filter slides">
+        <button type="button" class="np-cm-filter is-active" data-cm-filter="all" role="tab" aria-selected="true">All</button>
+        <button type="button" class="np-cm-filter" data-cm-filter="learn" role="tab" aria-selected="false">Learn</button>
+        <button type="button" class="np-cm-filter" data-cm-filter="practice" role="tab" aria-selected="false">Practice</button>
+      </div>
+      <p class="np-cm-path-current" data-cm-path-current>Introduction</p>
+      <ol class="np-cm-outline-list" data-cm-outline>
+        {% for slide in material.slides %}
+        <li class="np-cm-outline-item" data-cm-group="{{ slide.group|default('learn') }}" data-cm-kind="{{ slide.kind|default('lesson') }}">
+          <button type="button" class="np-cm-outline-btn{% if loop.first %} is-active{% endif %}" data-cm-index="{{ slide.index }}" aria-current="{{ 'true' if loop.first else 'false' }}">
+            <span class="np-cm-outline-num">{{ slide.index }}</span>
+            <span class="np-cm-outline-copy">
+              <em class="np-cm-outline-kind">{{ slide.kind|default('lesson')|replace('practice','Practice')|replace('question','Question')|replace('example','Example')|replace('answer','Answer')|replace('solution','Solution')|replace('concept','Concept')|replace('closing','Closing')|replace('section','Section')|replace('intro','Intro')|replace('lesson','Lesson') }}</em>
+              <span class="np-cm-outline-title">{{ slide.title }}</span>
+            </span>
+          </button>
+        </li>
+        {% endfor %}
+      </ol>
+    </aside>
+
+    <section class="np-cm-deck" aria-label="Slide viewer">
+      <header class="np-cm-deck-chrome">
+        <div class="np-cm-deck-chrome-top">
+          <span class="np-cm-kind-pill" data-cm-kind-pill>{{ material.slides[0].kind|default('lesson') if material.slides else 'lesson' }}</span>
+          <div class="np-cm-progress-wrap" aria-hidden="true">
+            <div class="np-cm-progress-track">
+              <i data-cm-progress style="width: {{ (100 / material.slide_count)|round(1) if material.slide_count else 0 }}%;"></i>
+            </div>
+          </div>
+          <span class="np-cm-counter" data-cm-counter>1 / {{ material.slide_count }}</span>
+          <button type="button" class="np-cm-focus-exit" data-cm-focus-exit hidden aria-label="Exit focus mode">
+            <svg class="np-cm-focus-exit-icon" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M5 5 15 15M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+            <span>Exit focus</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="np-cm-coach" data-cm-coach>
+        <div class="np-cm-coach-icon" aria-hidden="true">💡</div>
+        <div class="np-cm-coach-body">
+          <strong class="np-cm-coach-label">Study coach</strong>
+          <p class="np-cm-coach-tip" data-cm-coach-tip>Work through each slide at your own pace.</p>
+        </div>
+        <div class="np-cm-coach-actions">
+          <button type="button" class="np-cm-coach-btn" data-cm-show-hint hidden>Strategy hint</button>
+          <button type="button" class="np-cm-coach-btn np-cm-coach-btn--accent" data-cm-next-challenge hidden>Next challenge →</button>
+        </div>
+      </div>
+      <div class="np-cm-hint-panel" data-cm-hint-panel hidden></div>
+
+      <div class="np-cm-slide-stage">
+        <article class="np-cm-slide np-cm-slide--{{ material.slides[0].kind|default('lesson') if material.slides else 'lesson' }}" data-cm-slide>
+          <div class="np-cm-slide-glow" aria-hidden="true"></div>
+          <div class="np-cm-slide-aurora" aria-hidden="true"></div>
+          <header class="np-cm-slide-head">
+            <span class="np-cm-slide-badge" data-cm-badge>01</span>
+            <div class="np-cm-slide-head-copy">
+              <p class="np-cm-slide-section" data-cm-slide-section></p>
+              <h2 data-cm-title>{{ material.slides[0].title if material.slides else material.title }}</h2>
+            </div>
+          </header>
+          <div class="np-cm-slide-body np-prose stem-content" data-cm-body>
+            {% if material.slides %}
+            {{ material.slides[0].html|safe }}
+            {% else %}
+            <p>No slides parsed yet for this lesson.</p>
+            {% endif %}
+          </div>
+        </article>
+      </div>
+
+      <div class="np-cm-reflect" data-cm-reflect hidden>
+        <p class="np-cm-reflect-q">Does this solution make sense to you?</p>
+        <div class="np-cm-reflect-actions">
+          <button type="button" class="np-cm-reflect-btn np-cm-reflect-btn--yes" data-cm-got-it>Yes, got it</button>
+          <button type="button" class="np-cm-reflect-btn" data-cm-review-again>Review steps again</button>
+        </div>
+      </div>
+
+      <footer class="np-cm-deck-rail" aria-label="Slide navigation">
+        <div class="np-cm-rail-shell">
+          <button type="button" class="np-cm-rail-btn" data-cm-prev aria-label="Previous slide">
+            <svg class="np-cm-rail-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 5 7.5 10l5 5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Previous</span>
+          </button>
+          <div class="np-cm-rail-indicator" aria-live="polite">
+            <span class="np-cm-rail-dot" aria-hidden="true"></span>
+            <span data-cm-rail-counter>1 / {{ material.slide_count }}</span>
+          </div>
+          <button type="button" class="np-cm-rail-btn np-cm-rail-btn--accent" data-cm-next aria-label="Next slide">
+            <span>Next</span>
+            <svg class="np-cm-rail-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 5 12.5 10l-5 5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </footer>
+    </section>
+  </div>
+</div>
+</div>
+</div>
+
+<script id="cm-slides-json" type="application/json">{{ material.slides|tojson }}</script>
+<script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
+{% endblock %}

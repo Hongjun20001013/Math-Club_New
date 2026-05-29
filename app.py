@@ -70,9 +70,12 @@ BACKUP_KEEP_COUNT = 30
 BACKUP_AFTER_WRITE_SECONDS = 3600
 
 COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
+COURSE_MATERIALS_PATH = os.path.join(APP_DIR, "data", "course_materials.json")
+COURSE_MATERIALS_MANIFEST_PATH = os.path.join(APP_DIR, "data", "course_materials_manifest.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
 DESMOS_API_KEY = os.environ.get("DESMOS_API_KEY", "").strip()
 COMPILED_BANK_CACHE = None
+COURSE_MATERIALS_CACHE = None
 
 STATIC_DIR = os.path.join(APP_DIR, "static")
 TEMPLATES_DIR = os.path.join(APP_DIR, "templates")
@@ -93,7 +96,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-unit1-practice-test")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260528-course-materials-v12")
 
 
 def _site_brand_name() -> str:
@@ -1246,6 +1249,73 @@ def load_compiled_bank() -> Dict[str, Dict[str, List[dict]]]:
     return COMPILED_BANK_CACHE
 
 
+def load_course_materials() -> dict[str, Any]:
+    global COURSE_MATERIALS_CACHE
+    if COURSE_MATERIALS_CACHE is not None:
+        return COURSE_MATERIALS_CACHE
+    if not os.path.isfile(COURSE_MATERIALS_PATH):
+        COURSE_MATERIALS_CACHE = {"materials": [], "total": 0, "available": 0}
+        return COURSE_MATERIALS_CACHE
+    try:
+        with open(COURSE_MATERIALS_PATH, "r", encoding="utf-8") as f:
+            COURSE_MATERIALS_CACHE = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        COURSE_MATERIALS_CACHE = {"materials": [], "total": 0, "available": 0}
+    return COURSE_MATERIALS_CACHE
+
+
+def _course_material_manifest_row(slug: str) -> dict[str, Any] | None:
+    if not os.path.isfile(COURSE_MATERIALS_MANIFEST_PATH):
+        return None
+    try:
+        with open(COURSE_MATERIALS_MANIFEST_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+    for row in data.get("materials") or []:
+        if row.get("slug") == slug:
+            return row
+    return None
+
+
+def _course_material_by_slug(slug: str) -> dict[str, Any] | None:
+    for row in load_course_materials().get("materials") or []:
+        if row.get("slug") == slug:
+            return row
+    return None
+
+
+def _course_materials_hub_context() -> dict[str, Any]:
+    materials = list(load_course_materials().get("materials") or [])
+    unit_groups: list[dict[str, Any]] = []
+    for unit_num in (1, 2, 3, 4):
+        rows = [m for m in materials if int(m.get("unit") or 0) == unit_num]
+        if not rows:
+            continue
+        unit_groups.append(
+            {
+                "unit": unit_num,
+                "unit_name": rows[0].get("unit_name") or f"Unit {unit_num}",
+                "materials": rows,
+                "ready_count": sum(1 for m in rows if m.get("tex_available")),
+                "pdf_count": sum(1 for m in rows if m.get("pdf_available")),
+            }
+        )
+    payload = load_course_materials()
+    return {
+        "unit_groups": unit_groups,
+        "materials_total": int(payload.get("total") or len(materials)),
+        "materials_ready": int(payload.get("available") or 0),
+    }
+
+
+def _course_material_pdf_path(slug: str) -> str | None:
+    manifest = _course_material_manifest_row(slug)
+    if not manifest:
+        return None
+    return _resolve_first_existing_path(list(manifest.get("pdf_candidates") or []))
+
+
 def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dict]:
     compiled = load_compiled_bank()
     topic_questions = compiled.get(domain, {}).get(topic)
@@ -1293,6 +1363,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "2_1": "banks/algebra/2_1.tex",
         "2_2": "banks/algebra/2_2.tex",
         "2_3": "banks/algebra/2_3.tex",
+        "2_pt": "banks/algebra/2_pt.tex",
     },
     "problem_solving": {
         "unit_3_all": "Unit_3_PS_and_Stats.tex",
@@ -1303,6 +1374,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "3_5": "banks/problem_solving/3_5.tex",
         "3_6": "banks/problem_solving/3_6.tex",
         "3_7": "banks/problem_solving/3_7.tex",
+        "3_pt": "banks/problem_solving/3_pt.tex",
     },
     "geometry": {
         "unit_4_all": "Unit_4_Geometry.tex",
@@ -1310,6 +1382,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "4_2": "banks/geometry/4_2.tex",
         "4_3": "banks/geometry/4_3.tex",
         "4_4": "banks/geometry/4_4.tex",
+        "4_pt": "banks/geometry/4_pt.tex",
     },
     "hard_problem": {
         "hard_1": "banks/hard/hard_1.tex",
@@ -1602,6 +1675,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
             "Unit 2 Advanced Math.pdf",
         ],
         "download_name": "NovelPrep-SAT-Unit-2-Advanced-Math.pdf",
+        "practice_test_candidates": ["SAT_Practice_Test_Unit_2.pdf"],
+        "practice_test_download_name": "NovelPrep-SAT-Unit-2-Practice-Test.pdf",
     },
     "problem_solving": {
         "unit": "Unit 3",
@@ -1614,6 +1689,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
             "Unit 3 Problem Solving and Data.pdf",
         ],
         "download_name": "NovelPrep-SAT-Unit-3-Problem-Solving-Data.pdf",
+        "practice_test_candidates": ["SAT_Practice_Test_Unit_3.pdf"],
+        "practice_test_download_name": "NovelPrep-SAT-Unit-3-Practice-Test.pdf",
     },
     "geometry": {
         "unit": "Unit 4",
@@ -1625,6 +1702,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
             "Unit 4 Geometry.pdf",
         ],
         "download_name": "NovelPrep-SAT-Unit-4-Geometry.pdf",
+        "practice_test_candidates": ["SAT_Practice_Test_Unit_4.pdf"],
+        "practice_test_download_name": "NovelPrep-SAT-Unit-4-Practice-Test.pdf",
     },
 }
 
@@ -2004,6 +2083,9 @@ TOPIC_TITLES = {
     "2_1": "Unit 2.1 – Equivalent Expressions",
     "2_2": "Unit 2.2 – Nonlinear Equations & Systems",
     "2_3": "Unit 2.3 – Nonlinear Functions",
+    "2_pt": "Unit 2 Practice Test",
+    "3_pt": "Unit 3 Practice Test",
+    "4_pt": "Unit 4 Practice Test",
     "unit_3_all": "Unit 3 – Problem Solving & Data (full bank)",
     "3_1": "Unit 3.1 – Ratios, rates, proportional relationships, and units",
     "3_2": "Unit 3.2 – Percentages",
@@ -2841,9 +2923,9 @@ def _dashboard_context() -> dict:
     }
     unit_desc = {
         "unit_1": "Linear equations through inequalities—five chapter slices, a full merged bank, and a 22-question practice test.",
-        "unit_2": "Equivalent expressions, nonlinear equations, and nonlinear functions.",
-        "unit_3": "Ratios, percentages, probability, charts, inference, and study design.",
-        "unit_4": "Volume and area, lines and triangles, trigonometry, and circles.",
+        "unit_2": "Equivalent expressions, nonlinear equations, and nonlinear functions—three chapter slices, full bank, and practice test.",
+        "unit_3": "Ratios, percentages, probability, charts, inference, and study design—seven chapter slices, full bank, and practice test.",
+        "unit_4": "Volume and area, lines and triangles, trigonometry, and circles—four chapter slices, full bank, and practice test.",
     }
     for u in sat_unit_progress:
         u["pct"] = _unit_pct(int(u["engaged"]), int(u["cap"] or 0))
@@ -3907,9 +3989,9 @@ SAT_MISS_MODULE_SPECS: List[Dict[str, Any]] = [
     {
         "part_id": "unit2",
         "label": "Unit 2 – Advanced Math",
-        "subtitle": "Sections 2.1–2.3",
+        "subtitle": "Sections 2.1–2.3 + Practice Test (full bank + topic slices)",
         "domain": "advanced_math",
-        "topics": ("unit_2_all", "2_1", "2_2", "2_3"),
+        "topics": ("unit_2_all", "2_1", "2_2", "2_3", "2_pt"),
         "order": 2,
     },
     {
@@ -3926,6 +4008,7 @@ SAT_MISS_MODULE_SPECS: List[Dict[str, Any]] = [
             "3_5",
             "3_6",
             "3_7",
+            "3_pt",
         ),
         "order": 3,
     },
@@ -3934,7 +4017,7 @@ SAT_MISS_MODULE_SPECS: List[Dict[str, Any]] = [
         "label": "Unit 4 – Geometry",
         "subtitle": "Sections 4.1–4.4",
         "domain": "geometry",
-        "topics": ("unit_4_all", "4_1", "4_2", "4_3", "4_4"),
+        "topics": ("unit_4_all", "4_1", "4_2", "4_3", "4_4", "4_pt"),
         "order": 4,
     },
 ]
@@ -4457,7 +4540,12 @@ def placement_begin():
 def practice():
     """SAT Math home: four modules (specialized, challenge, exams, analytics)."""
     session["active_track_label"] = "SAT Math"
-    return render_template("practice_hub.html")
+    cm = load_course_materials()
+    return render_template(
+        "practice_hub.html",
+        cm_total=int(cm.get("total") or 0),
+        cm_ready=int(cm.get("available") or 0),
+    )
 
 
 @app.route("/practice/specialized")
@@ -4516,6 +4604,47 @@ def _practice_test_pdf_for_domain(domain: str) -> dict[str, Any] | None:
         "label": "Practice test PDF",
         "description": "Printable practice test for offline review",
     }
+
+
+@app.route("/practice/materials")
+def practice_course_materials():
+    session["active_track_label"] = "SAT Math"
+    ctx = _course_materials_hub_context()
+    return render_template("course_materials.html", **ctx)
+
+
+@app.route("/practice/materials/<slug>")
+def practice_course_material_view(slug: str):
+    session["active_track_label"] = "SAT Math"
+    material = _course_material_by_slug(slug)
+    if not material:
+        abort(404)
+    pdf_href = (
+        url_for("practice_course_material_pdf", slug=slug)
+        if material.get("pdf_available")
+        else None
+    )
+    return render_template(
+        "course_material_view.html",
+        material=material,
+        pdf_href=pdf_href,
+    )
+
+
+@app.route("/practice/materials/<slug>.pdf")
+def practice_course_material_pdf(slug: str):
+    session["active_track_label"] = "SAT Math"
+    path = _course_material_pdf_path(slug)
+    if not path:
+        abort(404)
+    manifest = _course_material_manifest_row(slug) or {}
+    download_name = f"NovelPrep-SAT-{manifest.get('section', slug).replace('.', '-')}-{slug}.pdf"
+    return send_file(
+        path,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=download_name,
+    )
 
 
 @app.route("/practice/challenge")
@@ -5023,7 +5152,11 @@ def _unit_chapter_slice_meta(domain: str) -> dict[str, Any]:
     """Chapter slice count + range label (e.g. 1.1 – 1.5) for unit cards."""
     topics = BANKS.get(domain) or {}
     slice_keys = sorted(
-        (k for k in topics if not str(k).startswith("unit_")),
+        (
+            k
+            for k in topics
+            if not str(k).startswith("unit_") and not str(k).endswith("_pt")
+        ),
         key=_topic_bank_sort_key,
     )
     count = len(slice_keys)
@@ -5150,8 +5283,17 @@ def _build_unit_topic_studio(
         None,
     )
 
+    bank_groups = {
+        "full": [s for s in topic_sets if s["is_full_bank"]],
+        "chapters": [
+            s for s in topic_sets if not s["is_full_bank"] and not s["is_practice_test"]
+        ],
+        "practice_tests": [s for s in topic_sets if s["is_practice_test"]],
+    }
+
     return {
         "topic_sets": topic_sets,
+        "bank_groups": bank_groups,
         "total_questions": total_questions,
         "total_answered": total_answered_sum,
         "overall_pct": (

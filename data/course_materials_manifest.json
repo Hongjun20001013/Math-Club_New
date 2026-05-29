@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "materials": [
+    {
+      "slug": "1-1-linear-equations",
+      "unit": 1,
+      "unit_name": "Algebra",
+      "section": "1.1",
+      "title": "Linear Equations in One Variable",
+      "tex_candidates": ["SAT_1.1_Linear_Equation.tex", "1.1_Linear_Equation.tex"],
+      "pdf_candidates": ["SAT_1.1_Linear_Equation.pdf", "1.1_Linear_Equation.pdf"]
+    },
+    {
+      "slug": "1-2-linear-functions",
+      "unit": 1,
+      "unit_name": "Algebra",
+      "section": "1.2",
+      "title": "Linear Functions",
+      "tex_candidates": ["SAT_1.2_Linear_Function.tex", "SAT_1.2_linear_Function.tex", "1.2_linear_Function.tex", "1.2_Linear_Function.tex"],
+      "pdf_candidates": ["SAT_1.2_Linear_Function.pdf", "SAT_1.2_linear_Function.pdf", "1.2_linear_Function.pdf"]
+    },
+    {
+      "slug": "1-3-linear-equations-two-variables",
+      "unit": 1,
+      "unit_name": "Algebra",
+      "section": "1.3",
+      "title": "Linear Equations in Two Variables",
+      "tex_candidates": ["SAT_1.3_Linear_Equation_in_two_variables.tex", "1.3_Linear Equation in two variables.tex", "1.3_Linear_Equation_in_two_variables.tex"],
+      "pdf_candidates": ["SAT_1.3_Linear_Equation_in_two_variables.pdf", "1.3_Linear Equation in two variables.pdf"]
+    },
+    {
+      "slug": "1-4-systems-of-equations",
+      "unit": 1,
+      "unit_name": "Algebra",
+      "section": "1.4",
+      "title": "Systems of Linear Equations",
+      "tex_candidates": ["SAT_1.4_System_of_the_equation.tex", "1.4_System of the equation tex", "1.4_System_of_the_equation.tex"],
+      "pdf_candidates": ["SAT_1.4_System_of_the_equation.pdf", "1.4_System of the equation.pdf"]
+    },
+    {
+      "slug": "1-5-inequalities",
+      "unit": 1,
+      "unit_name": "Algebra",
+      "section": "1.5",
+      "title": "Linear Inequalities",
+      "tex_candidates": ["SAT_1.5_Inequality.tex", "1.5_Inequality .tex", "1.5_Inequality.tex"],
+      "pdf_candidates": ["SAT_1.5_Inequality.pdf", "1.5_Inequality.pdf"]
+    },
+    {
+      "slug": "2-1-1-exponents-radicals",
+      "unit": 2,
+      "unit_name": "Advanced Math",
+      "section": "2.1.1",
+      "title": "Exponents and Radicals",
+      "tex_candidates": ["SAT_2.1.1_Exponents_and_Radicals.tex", "2.1.1_Exponents and Radicals.tex"],
+      "pdf_candidates": ["SAT_2.1.1_Exponents_and_Radicals.pdf", "2.1.1_Exponents and Radicals.pdf"]
+    },
+    {
+      "slug": "2-1-2-expressions",
+      "unit": 2,
+      "unit_name": "Advanced Math",
+      "section": "2.1.2",
+      "title": "Equivalent Expressions",
+      "tex_candidates": ["SAT_2.1.2_Expression.tex", "2.1.2_Expression.tex"],
+      "pdf_candidates": ["SAT_2.1.2_Expression.pdf", "2.1.2_Expression.pdf"]
+    },
+    {
+      "slug": "2-2-quadratic-functions",
+      "unit": 2,
+      "unit_name": "Advanced Math",
+      "section": "2.2",
+      "title": "Quadratic Functions",
+      "tex_candidates": ["SAT_2.2_Quadratic_Function.tex", "2.2_Quadratic_Function.tex"],
+      "pdf_candidates": ["SAT_2.2_Quadratic_Function.pdf", "2.2_Quadratic_Function.pdf"]
+    },
+    {
+      "slug": "2-3-1-rational-polynomial",
+      "unit": 2,
+      "unit_name": "Advanced Math",
+      "section": "2.3.1",
+      "title": "Rational and Polynomial Functions",
+      "tex_candidates": ["SAT_2.3.1_Rational_and_Polynomial.tex", "2.3.1_Rational and Polynomial.tex"],
+      "pdf_candidates": ["SAT_2.3.1_Rational_and_Polynomial.pdf", "2.3.1_Rational and Polynomial.pdf"]
+    },
+    {
+      "slug": "2-3-2-exponential-functions",
+      "unit": 2,
+      "unit_name": "Advanced Math",
+      "section": "2.3.2",
+      "title": "Exponential Functions",
+      "tex_candidates": ["SAT_2.3.2_Exponential_Function.tex", "2.3.2_Exponential Function.tex"],
+      "pdf_candidates": ["SAT_2.3.2_Exponential_Function.pdf", "2.3.2_Exponential Function.pdf"]
+    },
+    {
+      "slug": "3-1-ratios-rates",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.1",
+      "title": "Ratios, Rates, and Units",
+      "tex_candidates": ["SAT_3.1_Ratio_Rates.tex", "3.1_Ratio_Rates.tex"],
+      "pdf_candidates": ["SAT_3.1_Ratio_Rates.pdf", "3.1_Ratio_Rates.pdf"]
+    },
+    {
+      "slug": "3-2-percent",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.2",
+      "title": "Percentages",
+      "tex_candidates": ["SAT_3.2_Percent.tex", "3.2_Percent.tex"],
+      "pdf_candidates": ["SAT_3.2_Percent.pdf", "3.2_Percent.pdf"]
+    },
+    {
+      "slug": "3-3-one-variable-data",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.3",
+      "title": "One-Variable Data",
+      "tex_candidates": ["SAT_3.3_One_Variable_Data.tex", "3.3_One Variable Data.tex"],
+      "pdf_candidates": ["SAT_3.3_One_Variable_Data.pdf", "3.3_One Variable Data.pdf"]
+    },
+    {
+      "slug": "3-4-models-scatterplots",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.4",
+      "title": "Models and Scatterplots",
+      "tex_candidates": ["SAT_3.4_Model_and_Scatterplots.tex", "3.4_Model and Scatterplots.tex"],
+      "pdf_candidates": ["SAT_3.4_Model_and_Scatterplots.pdf", "3.4_Model and Scatterplots.pdf"]
+    },
+    {
+      "slug": "3-5-probability",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.5",
+      "title": "Probability",
+      "tex_candidates": ["SAT_3.5_Probability.tex", "3.5_Probability.tex"],
+      "pdf_candidates": ["SAT_3.5_Probability.pdf", "3.5_Probability.pdf"]
+    },
+    {
+      "slug": "3-6-inference-margin-of-error",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.6",
+      "title": "Inference and Margin of Error",
+      "tex_candidates": ["SAT_3.6_Inference_from_sample_statistics_and_margin_or_error.tex", "3.6 Inference from sample statistics and margin or error.tex"],
+      "pdf_candidates": ["SAT_3.6_Inference_from_sample_statistics_and_margin_or_error.pdf", "3.6 Inference from sample statistics and margin or error.pdf"]
+    },
+    {
+      "slug": "3-7-statistical-claims",
+      "unit": 3,
+      "unit_name": "Problem Solving & Data",
+      "section": "3.7",
+      "title": "Evaluating Statistical Claims",
+      "tex_candidates": ["SAT_3.7_Evaluating_Statistical_Claims.tex", "3.7 Evaluating Statistical Claims.tex"],
+      "pdf_candidates": ["SAT_3.7_Evaluating_Statistical_Claims.pdf", "3.7 Evaluating Statistical Claims.pdf"]
+    },
+    {
+      "slug": "4-1-volume-area",
+      "unit": 4,
+      "unit_name": "Geometry",
+      "section": "4.1",
+      "title": "Volume and Area",
+      "tex_candidates": ["SAT_4.1_Volume_and_Area.tex", "4.1_Volume and Area.tex"],
+      "pdf_candidates": ["SAT_4.1_Volume_and_Area.pdf", "4.1_Volume and Area.pdf"]
+    },
+    {
+      "slug": "4-2-lines-angles-triangles",
+      "unit": 4,
+      "unit_name": "Geometry",
+      "section": "4.2",
+      "title": "Lines, Angles, and Triangles",
+      "tex_candidates": ["SAT_4.2_Line_Angel_Triangle.tex", "SAT_4.2_Line_Angle_Triangle.tex", "4.2_Line_Angel_Triangle.tex"],
+      "pdf_candidates": ["SAT_4.2_Line_Angel_Triangle.pdf", "4.2_Line_Angel_Triangle.pdf"]
+    },
+    {
+      "slug": "4-3-trigonometry",
+      "unit": 4,
+      "unit_name": "Geometry",
+      "section": "4.3",
+      "title": "Trigonometry",
+      "tex_candidates": ["SAT_4.3_Trigonometry.tex", "4.3_Trigonometry.tex"],
+      "pdf_candidates": ["SAT_4.3_Trigonometry.pdf", "4.3_Trigonometry.pdf"]
+    },
+    {
+      "slug": "4-4-circles",
+      "unit": 4,
+      "unit_name": "Geometry",
+      "section": "4.4",
+      "title": "Circles",
+      "tex_candidates": ["SAT_4.4_Circle.tex", "4.4_Circle.tex"],
+      "pdf_candidates": ["SAT_4.4_Circle.pdf", "4.4_Circle.pdf"]
+    }
+  ]
+}

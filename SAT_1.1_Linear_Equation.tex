@@ -1,0 +1,687 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 自定义颜色
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{lightgray}{RGB}{230, 230, 230}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
+\definecolor{darkgray}{RGB}{50, 50, 50}
+
+% 主题设置
+\usetheme{Madrid}  
+\usecolortheme{dolphin} 
+
+% 设置字体
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+% 封面信息
+\title[SAT Unit 1.1 Linear Equations]{\textbf{SAT Unit 1.1 \\ Linear Equations in One Variable}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today} 
+
+\begin{document}
+
+% --- Title Slide ---
+\begin{frame}
+
+
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+% --- Custom Background Slide ---
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Solving for Linear Equation}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Solving for Linear Equation}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+% --- Introduction Slide ---
+\begin{frame}{Introduction to Linear Equations}
+    \textbf{Definition:} A \textbf{linear equation in one variable} is an equation that can be written in the form:
+    \[
+    ax + b = 0
+    \]
+    where \( a \) and \( b \) are constants, and \( x \) is the variable.
+
+    \vspace{0.5cm}
+    \textbf{Key Characteristics:}
+    
+    - The highest exponent of \( x \) is 1, making it a \textbf{first-degree} equation.
+    - The solution to a linear equation is the value of \( x \) that makes the equation true.
+    - The equation represents a straight line when graphed on the coordinate plane.
+
+    
+
+\end{frame}
+
+
+
+
+% --- Example 1: Basic Linear Equation ---
+\begin{frame}{Example: Solve for \( x \)}
+    Solve the equation:
+    \[
+    2x - 5 = 9
+    \]
+    \pause
+    \textbf{Solution:}
+    \begin{align*}
+        2x - 5 &= 9 \\
+        2x &= 14 \\
+        x &= 7
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+\section{Three Types of Solutions}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Three Types of Solutions}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+% --- Solution Slide ---
+
+
+\begin{frame}{Three Types of Solutions}
+    \textbf{Three Types of Solutions:}
+    
+    - \textbf{One Solution:} The equation simplifies to \( x = c \), where \( c \) is a constant. Example:
+      \[
+      2x + 3 = 7 \quad \Rightarrow \quad x = 2
+      \]
+
+      \pause
+    
+    - \textbf{No Solution:} The equation simplifies to a contradiction, such as \( 0 = -3 \), which is false. Example:
+      \[
+      3x + 2 = 3x + 5 \quad \Rightarrow \quad 2 = 5 \quad \text{(false)}
+      \]
+
+\pause
+
+    - \textbf{Infinite Solutions:} The equation simplifies to an identity, such as \( 0 = 0 \), meaning any \( x \) is a solution. Example:
+      \[
+      4x + 2 = 2(2x + 1) \quad \Rightarrow \quad 4x + 2 = 4x + 2
+      \]
+    
+\end{frame}
+
+% --- Example 2: No Solution Case ---
+\begin{frame}{Example 3: No Solution Case}
+    Consider the equation:
+    \[
+    3(kx + 13) = \frac{48}{17}x + 36
+    \]
+    Given that the equation has no solution, find \( k \).
+
+    \pause
+    \textbf{Solution:}
+    \begin{align*}
+        3kx + 39 &= \frac{48}{17}x + 36 \\
+        x(3k - \frac{48}{17}) &= -3
+    \end{align*}
+    Since there is no solution, the coefficient of \( x \) must be zero:
+    \[
+    3k - \frac{48}{17} = 0
+    \]
+    Solving for \( k \):
+    \[
+    k = \frac{16}{17}
+    \]
+\end{frame}
+
+\begin{frame}{Algebra Problem: No Solution Condition}
+    \textbf{Problem Statement:}
+    
+    Given the equation:
+    \[
+    2(kx - n) = (-\frac{28}{15}) x - \frac{36}{19}
+    \]
+    where \( k \) and \( n \) are constants, and \( n > 1 \). The equation has no solution.
+
+    \vspace{0.5cm}
+    \textbf{Question:} What is the value of \( k \)?
+\end{frame}
+
+% --- Solution Slide ---
+\begin{frame}{Solution: Finding \( k \)}
+    \textbf{Step 1: Expand both sides}
+    
+    Expanding the left-hand side:
+    \[
+    2kx - 2n
+    \]
+    The right-hand side remains:
+    \[
+    -\frac{28}{15} x - \frac{36}{19}
+    \]
+
+    \vspace{0.3cm}
+
+    \textbf{Step 2: Compare coefficients of \( x \)}
+    
+    Since the equation has **no solution**, the coefficients of \( x \) must be equal, but the constants must create a contradiction.
+
+    \[
+    2k = -\frac{28}{15}
+    \]
+
+    
+    \textbf{Step 3: Solve for \( k \)}
+    
+    \[
+    k = \frac{-28}{30} = \frac{-14}{15}
+    \]
+
+    \textbf{Final Answer:} \textcolor{novelPurple}{\textbf{\( k = -\frac{14}{15} \)}}
+\end{frame}
+
+
+\begin{frame}{Question}
+    Consider the equation:
+    \[
+    9x + 5 = a(x + b)
+    \]
+    where \( a \) and \( b \) are constants. The equation has no solutions.
+
+    \vspace{0.5cm}
+    Which of the following must be true?
+    
+    \begin{enumerate}
+        \item \( a = 9 \)
+        \item \( b = 5 \)
+        \item \( b \neq \frac{5}{9} \)
+    \end{enumerate}
+
+    \vspace{0.5cm}
+    \textbf{Answer Choices:}
+    
+    \begin{itemize}
+        \item[A.] None
+        \item[B.] I only
+        \item[C.] I and II only
+        \item[D.] I and III only
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Solution}
+    \textbf{Step 1: Understanding the Equation}
+    \begin{itemize}
+        \item The given equation is:
+        \[
+        9x + 5 = a(x + b)
+        \]
+        \item For the equation to have \textbf{no solution}, both sides must be parallel, meaning:
+        \[
+        9 = a, \quad b \neq \frac{5}{9}
+        \]
+    \end{itemize}
+
+    \textbf{Step 2: Answer Choices}
+    \begin{itemize}
+        \item \( a = 9 \) must be true (Statement I is correct).
+        \item \( b = 5 \) is not necessarily true (Statement II is incorrect).
+        \item \( b \neq \frac{5}{9} \) must be true (Statement III is correct).
+    \end{itemize}
+    
+    \textbf{Final Answer:} Option \textbf{D (I and III only)}.
+\end{frame}
+
+\begin{frame}
+\section{Real World Application}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Real World Application}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Word Problem: Corn Removal Rate}
+    \textbf{Problem Statement:}
+    
+    Hector used an auger to remove corn from a storage bin at a constant rate. The bin contained 24,000 bushels of corn when Hector began to use the auger. After 5 hours, 19,350 bushels remained in the bin. If the auger continues to remove corn at this rate, what is the total number of hours Hector will have been using the auger when 12,840 bushels remain?
+    
+    \vspace{0.5cm}
+    
+    \textbf{Answer Choices:}
+    
+    \begin{enumerate}
+        \item[A] 3
+        \item[B] 7
+        \item[C] 8
+        \item[D] 12
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution: Finding the Total Hours}
+    \textbf{Step 1: Find the rate of corn removal}
+    
+    - Initial amount of corn: \( 24,000 \) bushels  
+    - Remaining after 5 hours: \( 19,350 \) bushels  
+    - Corn removed in 5 hours:
+      \[
+      24,000 - 19,350 = 4,650 \text{ bushels}
+      \]
+    - Rate of removal:
+      \[
+      \frac{4,650}{5} = 930 \text{ bushels per hour}
+      \]
+
+    \vspace{0.3cm}
+
+    \textbf{Step 2: Find the total hours needed for 12,840 bushels remaining}
+    
+    - Find the total corn removed:
+      \[
+      24,000 - 12,840 = 11,160 \text{ bushels}
+      \]
+    - Find the total hours:
+      \[
+      \frac{11,160}{930} = 12 \text{ hours}
+      \]
+
+    \vspace{0.3cm}
+    \textbf{Final Answer:} \textcolor{novelPurple}{\textbf{D. 12}}
+\end{frame}
+
+
+\begin{frame}{Glenview Street Property Discount}
+\small
+\textbf{Table: Townsend Realty Group Investments}
+
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Property address} & \textbf{Purchase price (\$)} & \textbf{Monthly rental price (\$)} \\
+\hline
+Clearwater Lane & 128{,}000 & 950 \\
+Driftwood Drive & 176{,}000 & 1{,}310 \\
+Edgemont Street & 70{,}000 & 515 \\
+\textbf{Glenview Street} & \textbf{140{,}000} & \textbf{1{,}040} \\
+Hamilton Circle & 450{,}000 & 3{,}365 \\
+\hline
+\end{tabular}
+
+\vspace{0.3cm}
+
+Townsend Realty Group purchased the Glenview Street property and received a 40\% discount off the original price along with an additional 20\% off the \textit{discounted} price for purchasing in cash.
+
+\medskip
+
+Which of the following best approximates the \textbf{original price}, in dollars, of the Glenview Street property?
+
+\begin{enumerate}
+    \item[A.] \$350{,}000
+    \item[B.] \$291{,}700
+    \item[C.] \$233{,}300
+    \item[D.] \$175{,}000
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Solution: Glenview Street Property}
+\small
+Let $P$ be the original price of the Glenview Street property.
+
+\begin{itemize}
+    \item First, a 40\% discount was applied:
+    \[
+    P \times 0.60
+    \]
+    \item Then, an additional 20\% discount was applied to the new value:
+    \[
+    P \times 0.60 \times 0.80 = 0.48P
+    \]
+    \item We are told the final purchase price was \$140,000:
+    \[
+    0.48P = 140{,}000
+    \Rightarrow P = \frac{140{,}000}{0.48} = 291{,}666.67
+    \]
+\end{itemize}
+
+\textbf{Answer:} \boxed{\text{B. } 291{,}700}
+\end{frame}
+
+
+\begin{frame}
+\section{Practice}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Question : Infinitely Many Solutions}
+    \textbf{Given:}
+    \[
+    \frac{12x + 28}{4} - \frac{s}{13} = r(x - 8)
+    \]
+    where \(s\) and \(r\) are constants, and \(s > 0\).
+
+    \vspace{1em}
+    \textbf{If the equation has infinitely many solutions, what is the value of \(s\)?}
+\end{frame}
+
+\begin{frame}{Answer: Infinitely Many Solutions}
+\small
+    \textbf{Step 1: Simplify the left side}
+    \[
+    \frac{12x + 28}{4} = 3x + 7 \quad \Rightarrow \quad 3x + 7 - \frac{s}{13}
+    \]
+
+    \textbf{So the equation becomes:}
+    \[
+    3x + 7 - \frac{s}{13} = r(x - 8)
+    \]
+
+    \textbf{Step 2: Expand the right side}
+    \[
+    r(x - 8) = rx - 8r
+    \]
+
+    \textbf{Step 3: For infinitely many solutions, both sides must be identical}
+    \begin{align*}
+        \text{Match coefficients:} \quad & 3 = r \quad \Rightarrow r = 3 \\
+        \text{Match constants:} \quad & 7 - \frac{s}{13} = -8r = -24  \\
+        & \Rightarrow \frac{s}{13} = 31 \Rightarrow s = 403
+    \end{align*}
+
+    \textbf{Correct Answer:} \( \boxed{s = 403} \)
+\end{frame}
+
+\begin{frame}{Question: No Solution Linear Equation}
+    \textbf{Given the equation:}
+    \[
+    \frac{1}{3}(bx + c) = \frac{14}{27}x + \frac{4}{9}
+    \]
+    where \(b\) and \(c\) are constants and \(c > 3\). 
+
+    \vspace{1em}
+    The equation has \textbf{no solution}. What is the value of \(b\)?
+\end{frame}
+
+\begin{frame}{Answer: No Solution Condition}
+    \textbf{Step 1: Expand the left-hand side:}
+    \[
+    \frac{1}{3}(bx + c) = \frac{b}{3}x + \frac{c}{3}
+    \]
+
+    \textbf{Now the equation becomes:}
+    \[
+    \frac{b}{3}x + \frac{c}{3} = \frac{14}{27}x + \frac{4}{9}
+    \]
+
+    \vspace{1em}
+    \textbf{Step 2: For a linear equation to have \emph{no solution}, the coefficients of \(x\) must be equal but the constants must be different.}
+
+    \vspace{0.5em}
+    \textbf{Match the coefficients:}
+    \[
+    \frac{b}{3} = \frac{14}{27} \Rightarrow b = \frac{14}{27} \cdot 3 = \frac{14}{9}
+    \]
+
+    \textbf{Check the constants:}
+    \[
+    \frac{c}{3} \neq \frac{4}{9}, \quad \text{and } c > 3 \Rightarrow \text{This guarantees different constants}
+    \]
+
+    \vspace{1em}
+    \textbf{Final Answer:} \(\boxed{b = \frac{14}{9}}\)
+\end{frame}
+
+
+\begin{frame}{Question: No Solution for Linear Equation}
+    Given the equation:
+    \[
+    ax - b = 3(2x + 1)
+    \]
+    where \(a\) and \(b\) are constants, and the equation has \textbf{no solution}.  
+    Which of the following could be the values of \(a\) and \(b\)?
+
+    \vspace{1em}
+    \begin{itemize}
+        \item[\textbf{A.}] \(a = 2\), \(b = -3\)
+        \item[\textbf{B.}] \(a = 2\), \(b = 3\)
+        \item[\textbf{C.}] \(a = 6\), \(b = -3\)
+        \item[\textbf{D.}] \(a = 6\), \(b = 3\)
+    \end{itemize}
+\end{frame}
+\begin{frame}{Answer: No Solution Condition}
+    \textbf{Step 1: Expand the right-hand side}
+    \[
+    ax - b = 6x + 3
+    \]
+
+    \textbf{For no solution:}  
+    Coefficients of \(x\) must match, but constants must not:
+    \[
+    a = 6, \quad -b \neq 3 \Rightarrow b \neq -3
+    \]
+
+    \textbf{Now test options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(a = 2\), not valid
+        \item[\textbf{B.}] \(a = 2\), not valid
+        \item[\textbf{C.}] \(a = 6\), \(b = -3\) → \(-b = 3\), so both sides match → \emph{infinite} solutions
+        \item[\textbf{D.}] \(a = 6\), \(b = 3\) → \(-b = -3 \neq 3\), \textbf{valid: no solution}
+    \end{itemize}
+
+    \vspace{0.5em}
+    \textbf{Correct Answer:} \(\boxed{\text{D}}\)
+\end{frame}
+\begin{frame}{Question: Absolute Value Equation}
+    Solve for the \textbf{positive solution} to the equation:
+    \[
+    3|5 - x| = 42 - 4|5 - x|
+    \]
+\end{frame}
+\begin{frame}{Answer: Solving Absolute Value Equation}
+    \textbf{Step 1: Let } \(y = |5 - x|\), then:
+    \[
+    3y = 42 - 4y
+    \Rightarrow 7y = 42 \Rightarrow y = 6
+    \]
+
+    \textbf{Step 2: Solve } \(|5 - x| = 6\)
+    \[
+    5 - x = 6 \Rightarrow x = -1 \quad \text{or} \quad 5 - x = -6 \Rightarrow x = 11
+    \]
+
+    \textbf{Step 3: Positive solution:} \(\boxed{11}\)
+\end{frame}
+
+\begin{frame}{Question: Popcorn Word Problem}
+Joey and Matt were tasked with bringing popcorn to a certain event. Joey brought \(x\) pounds of popcorn and Matt brought 4 fewer pounds than Joey did.
+
+During the event, 60\% of the popcorn they had brought was consumed.
+
+If Joey and Matt divided the leftover popcorn evenly between them, which of the following represents the number of pounds of leftover popcorn each of them took?
+
+\vspace{1em}
+
+\begin{itemize}
+    \item[\textbf{A.}] \(0.2x - 0.8\)
+    \item[\textbf{B.}] \(0.4x - 0.8\)
+    \item[\textbf{C.}] \(0.6x - 1.2\)
+    \item[\textbf{D.}] \(0.8x - 1.6\)
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Answer: Popcorn Division}
+\textbf{Step 1: Total popcorn brought}
+\[
+\text{Joey: } x, \quad \text{Matt: } x - 4 \Rightarrow \text{Total: } x + (x - 4) = 2x - 4
+\]
+
+\textbf{Step 2: 60\% consumed → 40\% remaining}
+\[
+\text{Leftover: } 0.4(2x - 4) = 0.8x - 1.6
+\]
+
+\textbf{Step 3: Divided evenly between 2 people}
+\[
+\frac{0.8x - 1.6}{2} = 0.4x - 0.8
+\]
+
+\textbf{Final Answer:} \(\boxed{\text{B. } 0.4x - 0.8}\)
+\end{frame}
+
+
+
+
+
+
+% --- Summary Slide ---
+\begin{frame}{Summary}
+    \begin{itemize}
+        \item A linear equation in one variable has **one solution, no solution, or infinitely many solutions**.
+        \item Contradictions (e.g., \( 0 = -3 \)) mean **no solution**.
+        \item Identities (e.g., \( 0 = 0 \)) mean **infinite solutions**.
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+
+    \centering
+    \vspace{5em}
+
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
+    \vfill
+\end{frame}
+
+
+
+
+
+\end{document}
+
+

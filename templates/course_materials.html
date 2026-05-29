@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}SAT Course Materials · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-cm-hub">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Course materials</span>
+  </nav>
+
+  <header class="np-atelier-hero np-cm-hero glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div>
+      <p class="np-atelier-kicker">Teaching library</p>
+      <h1>SAT course materials.</h1>
+      <p class="np-atelier-hero-lead">Premium slide decks for every chapter — read online with full math rendering, or download the printable PDF for class and review.</p>
+      <div class="np-atelier-hero-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>{{ materials_total }}</strong><span>lessons cataloged</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ materials_ready }}</strong><span>ready now</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units</span></div>
+      </div>
+    </div>
+    <aside class="np-atelier-aside np-cm-aside" aria-label="Library status">
+      <span class="np-atelier-aside-label">Coverage</span>
+      <strong>{{ materials_ready }}<small>/{{ materials_total }}</small></strong>
+      <div class="np-atelier-aside-track" role="progressbar" aria-valuemin="0" aria-valuemax="{{ materials_total }}" aria-valuenow="{{ materials_ready }}">
+        <i style="width: {{ (100 * materials_ready / materials_total)|round|int if materials_total else 0 }}%;"></i>
+      </div>
+      <em>Slides go live as each .tex + PDF pair is added to the repo.</em>
+    </aside>
+  </header>
+
+  <section class="np-cm-library" aria-label="Course materials by unit">
+    {% for group in unit_groups %}
+    <article class="np-cm-unit glass-panel np-glass mp-animate-up np-cm-unit--u{{ group.unit }}">
+      <header class="np-cm-unit-head">
+        <div>
+          <p class="np-atelier-kicker">Unit {{ group.unit }}</p>
+          <h2>{{ group.unit_name }}</h2>
+        </div>
+        <span class="np-cm-unit-meta">{{ group.ready_count }}/{{ group.materials|length }} online · {{ group.pdf_count }} PDF</span>
+      </header>
+      <div class="np-cm-grid">
+        {% for m in group.materials %}
+        {% if m.tex_available %}
+        <a href="{{ url_for('practice_course_material_view', slug=m.slug) }}" class="np-cm-card np-cm-card--ready">
+        {% else %}
+        <div class="np-cm-card np-cm-card--pending">
+        {% endif %}
+          <span class="np-cm-card-section">{{ m.section }}</span>
+          <h3>{{ m.title }}</h3>
+          {% if m.tex_available %}
+          <p class="np-cm-card-meta">{{ m.slide_count }} slides{% if m.pdf_available %} · PDF ready{% endif %}</p>
+          <span class="np-cm-card-cta">Open deck →</span>
+          {% else %}
+          <p class="np-cm-card-meta">Waiting for LaTeX + PDF upload</p>
+          <span class="np-cm-card-cta np-cm-card-cta--muted">Coming soon</span>
+          {% endif %}
+        {% if m.tex_available %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+</div>
+</div>
+{% endblock %}
