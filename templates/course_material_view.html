@@ -86,6 +86,12 @@
     <section class="np-cm-deck" aria-label="Slide viewer">
       <header class="np-cm-deck-chrome">
         <div class="np-cm-deck-chrome-top">
+          <button type="button" class="np-cm-path-open" data-cm-toggle-outline aria-pressed="false" aria-label="Open lesson path">
+            <svg class="np-cm-path-open-icon" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M4 6h12M4 10h12M4 14h8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+            <span>Path</span>
+          </button>
           <span class="np-cm-kind-pill" data-cm-kind-pill>{{ material.slides[0].kind|default('lesson') if material.slides else 'lesson' }}</span>
           <div class="np-cm-progress-wrap" aria-hidden="true">
             <div class="np-cm-progress-track">
