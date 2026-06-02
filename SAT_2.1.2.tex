@@ -1,0 +1,1186 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 自定义颜色
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{lightgray}{RGB}{230, 230, 230}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
+\definecolor{darkgray}{RGB}{50, 50, 50}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+% 主题设置
+\usetheme{Madrid}  
+\usecolortheme{dolphin} 
+
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+% 封面信息
+\title[SAT Unit 2.1.2]{\textbf{SAT Unit 2.1.2 \\Equivalent Expressions}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today} 
+
+\begin{document}
+
+% --- Title Slide ---
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+ \tableofcontents
+    
+\end{frame}
+
+
+% Slide: Title Page Already Included
+% Slide: Second Title Design Already Included
+
+\begin{frame}
+\section{Combine Like Terms and Simplify}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Combine Like Terms \& Simplify}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Combining Like Terms}
+    \textbf{Definition:} Combine terms with the exact same variables and powers.
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+2(2a^2 - 3a^2b^2 - 4b^2) - (a^2 + 5a^2b^2 - 10b^2)
+\]
+Distribute:
+\[
+= 4a^2 - 6a^2b^2 - 8b^2 - a^2 - 5a^2b^2 + 10b^2
+\]
+Combine like terms:
+\[
+= 3a^2 - 11a^2b^2 + 2b^2
+\]
+
+\end{frame}
+
+
+
+\begin{frame}{Simplifying Fractional Expressions}
+    \textbf{Rules for Simplifying:}
+\begin{itemize}
+    \item Look for common factors in numerator and denominator.
+    \item Apply factoring where possible.
+    \item Cancel shared factors.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+\frac{4xy(x+y)(x-y)}{6x(x-y)} = \frac{2y(x+y)}{3}
+\]
+
+\vspace{0.2cm}
+\textbf{Note:} Do not cancel terms unless they are factors!
+\end{frame}
+
+
+
+\begin{frame}{\textbf{Question: Combining Like Terms}}
+    Which expression is equivalent to
+    \[
+    (3x^3 + 8x^2 - 4x) + (7x^2 - 11x - 7)\ ?
+    \]
+
+    \textbf{Options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(3x^3 + x^2 - 15x - 7\)
+        \item[\textbf{B.}] \(3x^3 + 15x^2 - 15x - 7\)
+        \item[\textbf{C.}] \(10x^5 - 7x - 7\)
+        \item[\textbf{D.}] \(15x^4 + 3x^3 - 15x^2 - 7\)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Combining Like Terms}}
+    Combine like terms:
+
+\[
+(3x^3 + 8x^2 - 4x) + (7x^2 - 11x - 7)
+= 3x^3 + (8x^2 + 7x^2) + (-4x - 11x) - 7
+= 3x^3 + 15x^2 - 15x - 7
+\]
+
+\textbf{Correct Answer:} \( \boxed{B} \)
+\end{frame}
+
+
+
+\begin{frame}
+\section{Expansion}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Expansion}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Expansion Using FOIL}
+    \textbf{FOIL Method} is a technique used to expand the product of two binomials.
+
+    \vspace{0.2cm}
+    \textbf{FOIL stands for:}
+    \begin{itemize}
+        \item \textbf{F} – First: Multiply the first terms in each binomial
+        \item \textbf{O} – Outer: Multiply the outer terms
+        \item \textbf{I} – Inner: Multiply the inner terms
+        \item \textbf{L} – Last: Multiply the last terms in each binomial
+    \end{itemize}
+
+    \vspace{0.3cm}
+    \textbf{Example:} Expand \((x + 3)(x - 5)\)
+    \[
+    \begin{aligned}
+    \text{First: } & x \cdot x = x^2 \\
+    \text{Outer: } & x \cdot (-5) = -5x \\
+    \text{Inner: } & 3 \cdot x = 3x \\
+    \text{Last: } & 3 \cdot (-5) = -15 \\
+    \end{aligned}
+    \]
+
+    \textbf{Combine like terms:}
+    \[
+    x^2 - 5x + 3x - 15 = x^2 - 2x - 15
+    \]
+
+    \textbf{Correct Answer:} \( \boxed{x^2 - 2x - 15} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Find the Value of \(ab\)}}
+The equation below is true for all \( x \), where \( a \) and \( b \) are constants:
+\[
+(ax + 3)(5x^2 - bx + 4) = 20x^3 - 9x^2 - 2x + 12
+\]
+
+What is the value of \( ab \)?
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] 18
+    \item[\textbf{B.}] 20
+    \item[\textbf{C.}] 24
+    \item[\textbf{D.}] 40
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Find the Value of \(ab\)}}
+    We expand the left-hand side:
+\[
+(ax + 3)(5x^2 - bx + 4)= 5a x^3 - ab x^2 + 4a x + 15x^2 - 3b x + 12
+\]
+
+Now combine like terms:
+\[
+5a x^3 + (-ab + 15)x^2 + (4a - 3b)x + 12
+\]
+
+Match with the right-hand side:
+\[
+20x^3 - 9x^2 - 2x + 12
+\]
+
+Equating coefficients:
+\[
+5a = 20 \Rightarrow a = 4
+\]
+\[
+-ab + 15 = -9 \Rightarrow -ab = -24 \Rightarrow ab = 24
+\]
+
+    \textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Finding the Value of \( h \)}}
+    The expression \(5x^5 + 6x^4 - 8x^3\) can be rewritten as 
+\[
+(x^3 - hx^2)(5x^2 + 10x),
+\]
+    where \(h\) is a constant. What is the value of \(h\)?
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Finding the Value of \( h \)}}
+    We are given:
+\[
+(x^3 - hx^2)(5x^2 + 10x)
+\]
+
+Use distributive property:
+\[
+x^3(5x^2 + 10x) - hx^2(5x^2 + 10x) = 5x^5 + 10x^4 - 5h x^4 - 10h x^3
+\]
+
+Combine like terms:
+\[
+5x^5 + (10 - 5h)x^4 - 10h x^3
+\]
+
+Compare with the original expression:
+\[
+5x^5 + 6x^4 - 8x^3
+\]
+
+Match coefficients:
+\[
+10 - 5h = 6 \Rightarrow 5h = 4 \Rightarrow h = \frac{4}{5}
+\]
+
+    \textbf{Correct Answer:} \( \boxed{\dfrac{4}{5}} \)
+\end{frame}
+
+\begin{frame}
+\section{Factoring}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Factoring}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+\begin{frame}{Factoring Basics}
+    \textbf{Factoring} is the process of expressing a polynomial as a product of simpler expressions.
+
+\vspace{0.3cm}
+\textbf{Step 1: Factor out the Greatest Common Factor (GCF)}
+\[
+6x^2 + 9x = 3x(2x + 3)
+\]
+
+\vspace{0.3cm}
+\textbf{Step 2: Factoring Trinomials when \(a = 1\)}
+
+\textbf{Method:} Find two numbers that:
+\begin{itemize}
+    \item Multiply to \(c\)
+    \item Add to \(b\)
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Example:}
+\[
+x^2 + 5x + 6 = (x + 2)(x + 3)
+\]
+
+\vspace{0.3cm}
+\textbf{Tip:} Always factor out the GCF before factoring the trinomial.
+\end{frame}
+
+
+\begin{frame}{Factoring When \(a \ne 1\) (Cross Method)}
+    \textbf{When the leading coefficient \(a \ne 1\)}, we use the trial-and-error or \textbf{Chinese Cross Method }:
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+6x^2 + 7x + 2
+\Rightarrow (3x + 2)(2x + 1)
+\]
+
+\textbf{Reasoning:}
+\begin{itemize}
+    \item \(3x \cdot 1 = 3x\)
+    \item \(2x \cdot 2 = 4x\)
+    \item \(3x + 4x = 7x\)
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{General Tip:}
+\begin{itemize}
+    \item Look for two pairs of factors of \(a\) and \(c\) whose cross-products add to \(b\).
+    \item Always check your result by expanding (FOIL method).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Factoring a Quadratic Expression}}
+Which of the following expressions is(are) a factor of 
+\[
+3x^2 + 20x - 63?
+\]
+
+\begin{itemize}
+    \item[I.] \(x - 9\)
+    \item[II.] \(3x - 7\)
+\end{itemize}
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] I only
+    \item[\textbf{B.}] II only
+    \item[\textbf{C.}] I and II
+    \item[\textbf{D.}] Neither I nor II
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Factoring a Quadratic Expression}}
+
+    We are given the quadratic expression:
+\[
+3x^2 + 20x - 63
+\]
+
+Let's factor it:
+\[
+3x^2 + 20x - 63 = (x - 3)(3x + 21)
+\]
+
+But:
+\[
+(x - 9)(3x - 7) = 3x^2 - 7x - 27x + 63 = 3x^2 - 34x + 63 \neq 3x^2 + 20x - 63
+\]
+
+Let’s check factoring by grouping:
+\[
+3x^2 + 27x - 7x - 63 = 3x(x + 9) -7(x + 9) = (x + 9)(3x - 7)
+\]
+
+So the factors are:
+\[
+(x + 9)(3x - 7)
+\]
+
+    \textbf{Correct Answer:} \( \boxed{B} \)
+\end{frame}
+
+
+
+
+
+\begin{frame}{\textbf{Question: Finding the Smallest Possible Factor Constant}}
+One of the factors of 
+\[
+2x^3 + 42x^2 + 208x
+\]
+is \(x + b\), where \(b\) is a positive constant.
+
+\bigskip
+What is the smallest possible value of \(b\)?
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Finding the Smallest Possible Factor Constant}}
+    We are given:
+\[
+2x^3 + 42x^2 + 208x
+\]
+
+First, factor out the GCF:
+\[
+2x(x^2 + 21x + 104)
+\]
+
+Now, factor the quadratic using cross multiplication (a.k.a. the AC method). We're looking for two numbers that multiply to:
+\[
+1 \cdot 104 = 104 \quad \text{and add up to } 21.
+\]
+
+The pair is \(13\) and \(8\), since:
+\[
+13 \cdot 8 = 104 \quad \text{and} \quad 13 + 8 = 21.
+\]
+
+So we factor the quadratic:
+\[
+x^2 + 21x + 104 = (x + 13)(x + 8)
+\]
+
+Therefore, the full factorization is:
+\[
+2x(x + 13)(x + 8)
+\]
+
+    Since the question asks for the smallest possible positive value of \(b\) such that \(x + b\) is a factor, the answer is \(8\).
+
+    \textbf{Correct Answer:} \( \boxed{8} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Factoring with Decimal Coefficients}}
+The expression 
+\[
+0.36x^2 + 0.63x + 1.17
+\]
+can be rewritten as 
+\[
+a(4x^2 + 7x + 13),
+\]
+where \(a\) is a constant. What is the value of \(a\)?
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Factoring with Decimal Coefficients}}
+    We are given:
+\[
+0.36x^2 + 0.63x + 1.17 = a(4x^2 + 7x + 13)
+\]
+
+Match the coefficients:
+\[
+a \cdot 4 = 0.36 \Rightarrow a = \frac{0.36}{4} = 0.09
+\]
+
+    \textbf{Correct Answer:} \( \boxed{0.09} \)
+\end{frame}
+
+
+
+
+\begin{frame}{Factoring Rational Expressions (Part 1)}
+    \textbf{Definition:} A rational expression is a fraction where both the numerator and the denominator are polynomials.
+
+\vspace{0.3cm}
+\textbf{Goal:} Simplify by factoring both the numerator and denominator, then cancelling common factors.
+
+\vspace{0.4cm}
+\textbf{Steps to Simplify:}
+\begin{itemize}
+    \item \textbf{Factor} the numerator and denominator completely.
+    \item \textbf{Identify common factors} in both.
+    \item \textbf{Cancel out} the common factors.
+    \item \textbf{State restrictions:} Any value that makes the denominator zero must be excluded from the domain.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Note:} Only factors (not terms) can be cancelled.
+
+\[
+\frac{x^2 - 9}{x^2 - x - 6} = \frac{(x - 3)(x + 3)}{(x - 3)(x + 2)} = \frac{x + 3}{x + 2} \quad \text{with } x \ne 3, -2
+\]
+\end{frame}
+
+
+
+
+\begin{frame}{Factoring Rational Expressions (Part 2)}
+    \textbf{Special Factoring Patterns to Know:}
+\begin{itemize}
+    \item Difference of squares: \(a^2 - b^2 = (a - b)(a + b)\)
+    \item Perfect square trinomials: \(a^2 \pm 2ab + b^2 = (a \pm b)^2\)
+    \item Difference and sum of cubes:
+    \[
+    a^3 - b^3 = (a - b)(a^2 + ab + b^2)
+    \]
+    \[
+    a^3 + b^3 = (a + b)(a^2 - ab + b^2)
+    \]
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+\frac{4x^2 - 9}{2x + 3} = \frac{(2x - 3)(2x + 3)}{2x + 3} = 2x - 3 \quad \text{with } x \ne -\frac{3}{2}
+\]
+
+\vspace{0.3cm}
+\textbf{Tip:}
+\begin{itemize}
+    \item Always check if the polynomial is factorable before attempting to cancel.
+    \item Watch for common mistakes like cancelling terms instead of factors.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Polynomial Division}}
+\textbf{Given:}
+\[
+\frac{x^2 + 6x - 7}{x + 7} = ax + d
+\]
+The equation is true for all \( x \ne -7 \), where \( a \) and \( d \) are integers.
+
+\textbf{What is the value of \( a + d \)?}
+
+\begin{itemize}
+    \item[\textbf{A.}] \(-6\)
+    \item[\textbf{B.}] \(-1\)
+    \item[\textbf{C.}] \(0\)
+    \item[\textbf{D.}] \(1\)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Polynomial Division}}
+    We are dividing a quadratic by a linear binomial:
+\[
+\frac{x^2 + 6x - 7}{x + 7}
+\]
+
+We use polynomial division or factoring. First, factor the numerator:
+\[
+x^2 + 6x - 7 = (x + 7)(x - 1)
+\]
+
+So:
+\[
+\frac{(x + 7)(x - 1)}{x + 7} = x - 1 \quad \text{for } x \ne -7
+\]
+
+Thus,
+\[
+ax + d = x - 1 \Rightarrow a = 1, \quad d = -1
+\]
+
+    Therefore,
+    \[
+    a + d = 1 + (-1) = 0
+    \]
+
+    \textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Simplifying Rational Expressions}}
+Let:
+\[
+f(x) = x^3 - 9x, \quad g(x) = x^2 - 2x - 3
+\]
+Which of the following expressions is equivalent to:
+\[
+\frac{f(x)}{g(x)} \quad \text{for } x > 3
+\]
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] \(\frac{1}{x + 1}\)
+    \item[\textbf{B.}] \(\frac{x + 3}{x + 1}\)
+    \item[\textbf{C.}] \(\frac{x(x - 3)}{x + 1}\)
+    \item[\textbf{D.}] \(\frac{x(x + 3)}{x + 1}\)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Simplifying Rational Expressions}}
+    We start by factoring both the numerator and denominator:
+
+\[
+f(x) = x^3 - 9x = x(x^2 - 9) = x(x - 3)(x + 3)
+\]
+\[
+g(x) = x^2 - 2x - 3 = (x - 3)(x + 1)
+\]
+
+Now simplify:
+\[
+\frac{f(x)}{g(x)} = \frac{x(x - 3)(x + 3)}{(x - 3)(x + 1)} = \frac{x(x + 3)}{x + 1}
+\]
+
+    \textbf{Correct Answer:} \( \boxed{D} \)
+\end{frame}
+
+
+
+\begin{frame}
+\section{Fraction}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Fraction}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Adding Algebraic Fractions}
+    \textbf{To add or subtract algebraic fractions:}
+\begin{itemize}
+    \item Step 1: Find a common denominator.
+    \item Step 2: Rewrite each fraction with the common denominator.
+    \item Step 3: Combine the numerators.
+    \item Step 4: Simplify if possible.
+\end{itemize}
+
+\textbf{Example:} 
+\[
+\frac{1}{x} + \frac{1}{x+1}
+\]
+
+\textbf{Step 1:} Common denominator is \(x(x+1)\)
+
+\[
+\frac{1}{x} = \frac{x+1}{x(x+1)}, \quad 
+\frac{1}{x+1} = \frac{x}{x(x+1)}
+\]
+
+\textbf{Step 2:} Add the numerators:
+\[
+\frac{x+1}{x(x+1)} + \frac{x}{x(x+1)} = \frac{(x+1) + x}{x(x+1)} = \frac{2x+1}{x(x+1)}
+\]
+
+\textbf{Tip:} Always check if you can factor or simplify the final expression.
+\end{frame}
+
+
+
+\begin{frame}{Flipping and Splitting Fractions}
+    \textbf{1. Flipping Fractions (Reciprocals):}
+
+\textbf{Rule:} When dividing by a fraction, multiply by its reciprocal.
+
+\[
+\frac{a}{b} \div \frac{c}{d} = \frac{a}{b} \cdot \frac{d}{c}
+\]
+
+\vspace{0.2cm}
+\textbf{Example:}
+\[
+\frac{3}{4} \div \frac{2}{5} = \frac{3}{4} \cdot \frac{5}{2} = \frac{15}{8}
+\]
+
+\textbf{Tip:} Always flip the \textbf{second} fraction and multiply.
+
+\vspace{0.4cm}
+\textbf{2. Splitting Fractions:}
+
+\textbf{Rule:} A fraction with addition or subtraction in the numerator can be split into two separate fractions:
+
+\[
+\frac{a + b}{c} = \frac{a}{c} + \frac{b}{c}, \quad \frac{a - b}{c} = \frac{a}{c} - \frac{b}{c}
+\]
+
+\textbf{But:} You \textbf{cannot} split a denominator:
+\[
+\frac{a}{b + c} \ne \frac{a}{b} + \frac{a}{c}
+\]
+
+\vspace{0.2cm}
+\textbf{Example:}
+\[
+\frac{2x + 6}{x} = \frac{2x}{x} + \frac{6}{x} = 2 + \frac{6}{x}
+\]
+
+\textbf{Tip:} Only split the numerator when the denominator is a single term.
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Adding Rational Expressions}}
+    \[
+    \frac{2}{x - 2} + \frac{3}{x + 5} = \frac{rx + t}{(x - 2)(x + 5)}
+    \]
+
+    This equation is true for all \(x > 2\), where \(r\) and \(t\) are positive constants.
+    What is the value of \(rt\)?
+
+    \textbf{Options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(-20\)
+        \item[\textbf{B.}] \(15\)
+        \item[\textbf{C.}] \(20\)
+        \item[\textbf{D.}] \(60\)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Adding Rational Expressions}}
+    Start by finding a common denominator:
+
+\[
+\frac{2}{x - 2} + \frac{3}{x + 5} = \frac{2(x + 5) + 3(x - 2)}{(x - 2)(x + 5)}
+\]
+
+Now expand the numerator:
+
+\[
+2(x + 5) + 3(x - 2) = 2x + 10 + 3x - 6 = 5x + 4
+\]
+
+So the left-hand side becomes:
+
+\[
+\frac{5x + 4}{(x - 2)(x + 5)}
+\]
+
+Compare with the right-hand side:
+
+\[
+\frac{rx + t}{(x - 2)(x + 5)} \Rightarrow rx + t = 5x + 4
+\]
+
+    So:
+    \[
+    r = 5,\quad t = 4 \Rightarrow rt = 5 \cdot 4 = 20
+    \]
+
+    \textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+\begin{frame}
+\section{Isolate a Variable}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Isolate a Variable}} \\[0.5cm]
+            {\LARGE\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{Cross-Multiplication Technique}
+    When you have an equation of the form:
+\[
+\frac{A}{B} = \frac{C}{D}
+\]
+You can use \textbf{cross-multiplication} to eliminate denominators:
+\[
+A \cdot D = B \cdot C
+\]
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+\frac{u - 3}{1} = \frac{6}{t - 2} \quad \Rightarrow \quad (u - 3)(t - 2) = 6
+\]
+
+\vspace{0.3cm}
+\textbf{Why it works:} This is based on the property of proportions. Multiplying both sides by the least common denominator (LCD) clears all denominators in one step.
+\end{frame}
+
+\begin{frame}{Clearing Square Roots: Squaring Both Sides}
+    If a variable is under a square root, square both sides to eliminate the radical.
+
+\textbf{General Rule:}
+\[
+\sqrt{E} = F \quad \Rightarrow \quad E = F^2
+\]
+
+\vspace{0.3cm}
+\textbf{Example:}
+\[
+2\sqrt{w + 19} = \frac{14x}{7y}
+\quad \Rightarrow \quad
+\sqrt{w + 19} = \frac{2x}{y}
+\quad \Rightarrow \quad
+w + 19 = \left( \frac{2x}{y} \right)^2
+\]
+
+\vspace{0.3cm}
+\textbf{Tip:} Always isolate the radical before squaring both sides.
+\end{frame}
+
+
+
+\begin{frame}{Solving Literal Equations (Isolate a Variable)}
+    Literal equations are formulas or equations involving multiple variables. The goal is to \textbf{solve for one variable in terms of the others}.
+
+\vspace{0.2cm}
+\textbf{Key Steps:}
+\begin{itemize}
+    \item Step 1: Identify the variable you want to isolate (make it the subject).
+    \item Step 2: Use inverse operations (addition, subtraction, multiplication, division) to isolate that variable.
+    \item Step 3: If needed, eliminate radicals or simplify fractions.
+\end{itemize}
+
+
+
+\vspace{0.3cm}
+\textbf{Tips:}
+\begin{itemize}
+    \item Use cross-multiplication when variables appear in denominators.
+    \item Clear square roots by squaring both sides of the equation.
+    \item Watch for extraneous solutions if squaring or multiplying both sides.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Question: Solving for \(w\) in terms of \(x\) and \(y\)}}
+Given the equation:
+\[
+\frac{14x}{7y} = 2\sqrt{w + 19}
+\]
+The equation relates the distinct positive real numbers \(w\), \(x\), and \(y\).
+
+Which equation correctly expresses \(w\) in terms of \(x\) and \(y\)?
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] \(w = \sqrt{\frac{x}{y}} - 19\)
+    \item[\textbf{B.}] \(w = \sqrt{\frac{28x}{14y}} - 19\)
+    \item[\textbf{C.}] \(w = \left(\frac{x}{y}\right)^2 - 19\)
+    \item[\textbf{D.}] \(w = \left(\frac{28x}{14y}\right)^2 - 19\)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Solving for \(w\) in terms of \(x\) and \(y\)}}
+    Start with the equation:
+\[
+\frac{14x}{7y} = 2\sqrt{w + 19}
+\Rightarrow 2\sqrt{w + 19} = 2\sqrt{w + 19}
+\Rightarrow \frac{14x}{7y} = 2\sqrt{w + 19}
+\Rightarrow \frac{2x}{y} = \sqrt{w + 19}
+\]
+
+Square both sides:
+\[
+\left(\frac{2x}{y}\right)^2 = w + 19
+\Rightarrow \frac{4x^2}{y^2} = w + 19
+\Rightarrow w = \frac{4x^2}{y^2} - 19
+\]
+
+Now compare this with the answer choices. Only option \textbf{C} correctly represents the structure:
+\[
+w = \left(\frac{x}{y}\right)^2 - 19
+\]
+
+    \textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Solving for \(t\) in terms of \(u\)}}
+Given the equation:
+\[
+u - 3 = \frac{6}{t - 2}
+\]
+What is \(t\) in terms of \(u\)?
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] \(t = \frac{1}{u}\)
+    \item[\textbf{B.}] \(t = \frac{2u + 9}{u}\)
+    \item[\textbf{C.}] \(t = \frac{1}{u - 3}\)
+    \item[\textbf{D.}] \(t = \frac{2u}{u - 3}\)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Solving for \(t\) in terms of \(u\)}}
+    Starting from the equation:
+\[
+u - 3 = \frac{6}{t - 2}
+\]
+
+Multiply both sides by \((t - 2)\):
+\[
+(u - 3)(t - 2) = 6
+\]
+
+Expand the left-hand side:
+\[
+ut - 2u - 3t + 6 = 6
+\Rightarrow ut - 3t = 2u
+\Rightarrow t(u - 3) = 2u
+\Rightarrow t = \frac{2u}{u - 3}
+\]
+
+    \textbf{Correct Answer:} \( \boxed{D} \)
+\end{frame}
+
+
+\begin{frame}
+\section{Practice}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\LARGE\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{\textbf{Question: Adding Algebraic Fractions}}
+    Which expression is equivalent to
+    \[
+    \frac{y - 3xy}{2x^2 - 2xy} + \frac{1 + 3y}{x - y}\ ?
+    \]
+
+    \textbf{Options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(\dfrac{2x - 3xy + 4y}{2x^2 - 2xy}\)
+        \item[\textbf{B.}] \(\dfrac{2x + 3xy + y}{2x^2 - 2xy}\)
+        \item[\textbf{C.}] \(\dfrac{2x + 3xy + y}{2x^3 - 4x^2y + 2xy^2}\)
+        \item[\textbf{D.}] \(\dfrac{4y - 3xy + 1}{2x^3 - 4x^2y + 2xy^2}\)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Adding Algebraic Fractions}}
+    We simplify each term separately:
+
+First term:
+\[
+\frac{y - 3xy}{2x^2 - 2xy} = \frac{y(1 - 3x)}{2x(x - y)}
+\]
+
+Second term:
+\[
+\frac{1 + 3y}{x - y}
+\]
+
+To combine these, we need a common denominator. The least common denominator (LCD) is \(2x(x - y)\).
+
+Rewrite the second term using LCD:
+\[
+\frac{1 + 3y}{x - y} = \frac{(1 + 3y) \cdot 2x}{2x(x - y)} = \frac{2x + 6xy}{2x(x - y)}
+\]
+
+Now add the two terms:
+\[
+\frac{y - 3xy + 2x + 6xy}{2x^2 - 2xy} = \frac{2x + 3xy + y}{2x^2 - 2xy}
+\]
+
+\textbf{Correct Answer:} \( \boxed{B} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Solving for \(k\) in terms of \(x\)}}
+    If \(\dfrac{4}{k + 2} = \dfrac{x}{3}\), where \(k \ne -2\), which equation correctly expresses \(k\) in terms of \(x\)?
+
+    \textbf{Options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(k = \dfrac{12 - 2x}{x}\)
+        \item[\textbf{B.}] \(k = \dfrac{12 + 2x}{x}\)
+        \item[\textbf{C.}] \(k = \dfrac{x}{12 + 2x}\)
+        \item[\textbf{D.}] \(k = 12x - 2\)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Solving for \(k\) in terms of \(x\)}}
+    We are given:
+\[
+\frac{4}{k + 2} = \frac{x}{3}
+\]
+
+Cross-multiply:
+\[
+4 \cdot 3 = x(k + 2) \Rightarrow 12 = xk + 2x
+\]
+
+Solve for \(k\):
+\[
+12 - 2x = xk \Rightarrow k = \frac{12 - 2x}{x}
+\]
+
+\textbf{Correct Answer:} \( \boxed{A} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Solving for \(G\) in terms of \(L\), \(P\), and \(T\)}}
+    \[
+    T = 2P \sqrt{\frac{L}{G}}
+    \]
+
+    The given equation relates the positive real numbers \(G\), \(L\), \(P\), and \(T\). Which equation correctly expresses \(G\) in terms of \(L\), \(P\), and \(T\)?
+
+    \textbf{Options:}
+    \begin{itemize}
+        \item[\textbf{A.}] \(\dfrac{2PL}{T^2}\)
+        \item[\textbf{B.}] \(\dfrac{T^2}{4LP^2}\)
+        \item[\textbf{C.}] \(\dfrac{LT^2}{4P^2}\)
+        \item[\textbf{D.}] \(\dfrac{4LP^2}{T^2}\)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Solving for \(G\) in terms of \(L\), \(P\), and \(T\)}}
+    We start with the equation:
+\[
+T = 2P \sqrt{\frac{L}{G}}
+\]
+
+Divide both sides by \(2P\):
+\[
+\frac{T}{2P} = \sqrt{\frac{L}{G}}
+\]
+
+Square both sides:
+\[
+\left( \frac{T}{2P} \right)^2 = \frac{L}{G}
+\Rightarrow \frac{T^2}{4P^2} = \frac{L}{G}
+\]
+
+Solve for \(G\):
+\[
+G = \frac{4P^2 L}{T^2}
+\]
+
+\textbf{Correct Answer:} \( \boxed{D} \)
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}{\textbf{Question: Integer Relationship in Factored Form}}
+The expression 
+\[
+4x^2 + bx - 45
+\]
+where \(b\) is a constant, can be rewritten as 
+\[
+(hx + k)(x + j),
+\]
+where \(h\), \(k\), and \(j\) are \textbf{integer constants}. Which of the following must be an integer?
+
+\textbf{Options:}
+\begin{itemize}
+    \item[\textbf{A.}] \(\frac{b}{h}\)
+    \item[\textbf{B.}] \(\frac{b}{k}\)
+    \item[\textbf{C.}] \(\frac{45}{h}\)
+    \item[\textbf{D.}] \(\frac{45}{k}\)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Integer Relationship in Factored Form}}
+    We are given:
+\[
+4x^2 + bx - 45 = (hx + k)(x + j)
+\]
+Expanding the right-hand side:
+\[
+hx^2 + (hj + k)x + kj
+\]
+By comparing coefficients:
+\[
+h = 4, \quad b = hj + k, \quad kj = -45
+\]
+
+Since \(k\) and \(j\) are integers and their product \(kj = -45\), it follows that \(k\) must divide \(45\). Therefore:
+\[
+\frac{45}{k} \text{ must be an integer}.
+\]
+
+    \textbf{Correct Answer:} \( \boxed{D} \)
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+
+    \centering
+    \vspace{5em}
+
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
+    \vfill
+\end{frame}
+
+
+
+
+
+\end{document}

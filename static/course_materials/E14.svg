@@ -1,29 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 280" role="img" aria-label="Linear graph with negative slope">
-  <rect width="360" height="280" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 320" role="img" aria-label="Graph of y equals negative one fourth x plus 2">
   <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L6,3 L0,6 Z" fill="#374151"/>
-    </marker>
+    <style>
+      .grid { stroke: #e3e3e3; stroke-width: 1; }
+      .axis { stroke: #2d2d2d; stroke-width: 1.6; }
+      .label { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; fill: #333; }
+      .line { stroke: #c74440; stroke-width: 2.8; stroke-linecap: round; }
+      .tip { font-family: "Times New Roman", Georgia, serif; font-size: 13px; fill: #222; }
+    </style>
   </defs>
-  <line x1="40" y1="220" x2="320" y2="220" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="40" y1="220" x2="40" y2="30" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="312" y="238" font-family="system-ui,sans-serif" font-size="12" fill="#374151">x</text>
-  <text x="18" y="38" font-family="system-ui,sans-serif" font-size="12" fill="#374151">y</text>
-  <!-- grid -->
-  <g stroke="#e5e7eb" stroke-width="1">
-    <line x1="40" y1="170" x2="320" y2="170"/>
-    <line x1="40" y1="120" x2="320" y2="120"/>
-    <line x1="40" y1="70" x2="320" y2="70"/>
-    <line x1="90" y1="30" x2="90" y2="220"/>
-    <line x1="140" y1="30" x2="140" y2="220"/>
-    <line x1="190" y1="30" x2="190" y2="220"/>
-    <line x1="240" y1="30" x2="240" y2="220"/>
-    <line x1="290" y1="30" x2="290" y2="220"/>
+  <rect width="420" height="320" fill="#fff"/>
+
+  <g>
+    <line x1="12" y1="264" x2="408" y2="264" class="grid"/>
+    <line x1="12" y1="240" x2="408" y2="240" class="grid"/>
+    <line x1="12" y1="216" x2="408" y2="216" class="grid"/>
+    <line x1="12" y1="192" x2="408" y2="192" class="grid"/>
+    <line x1="12" y1="168" x2="408" y2="168" class="grid"/>
+    <line x1="12" y1="144" x2="408" y2="144" class="grid"/>
+    <line x1="12" y1="120" x2="408" y2="120" class="grid"/>
+    <line x1="12" y1="96" x2="408" y2="96" class="grid"/>
+    <line x1="12" y1="72" x2="408" y2="72" class="grid"/>
+    <line x1="12" y1="48" x2="408" y2="48" class="grid"/>
+    <line x1="12" y1="288" x2="408" y2="288" class="grid"/>
+    <line x1="12" y1="12" x2="12" y2="300" class="grid"/>
+    <line x1="36" y1="12" x2="36" y2="300" class="grid"/>
+    <line x1="60" y1="12" x2="60" y2="300" class="grid"/>
+    <line x1="84" y1="12" x2="84" y2="300" class="grid"/>
+    <line x1="108" y1="12" x2="108" y2="300" class="grid"/>
+    <line x1="132" y1="12" x2="132" y2="300" class="grid"/>
+    <line x1="156" y1="12" x2="156" y2="300" class="grid"/>
+    <line x1="180" y1="12" x2="180" y2="300" class="grid"/>
+    <line x1="204" y1="12" x2="204" y2="300" class="grid"/>
+    <line x1="228" y1="12" x2="228" y2="300" class="grid"/>
+    <line x1="252" y1="12" x2="252" y2="300" class="grid"/>
+    <line x1="276" y1="12" x2="276" y2="300" class="grid"/>
+    <line x1="300" y1="12" x2="300" y2="300" class="grid"/>
+    <line x1="324" y1="12" x2="324" y2="300" class="grid"/>
+    <line x1="348" y1="12" x2="348" y2="300" class="grid"/>
+    <line x1="372" y1="12" x2="372" y2="300" class="grid"/>
+    <line x1="396" y1="12" x2="396" y2="300" class="grid"/>
   </g>
-  <!-- y = -1/4 x + 2, scale 25px per unit, origin (140,170) -->
-  <line x1="40" y1="220" x2="320" y2="70" stroke="#5b4dff" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="140" cy="170" r="4" fill="#5b4dff"/>
-  <text x="148" y="164" font-family="system-ui,sans-serif" font-size="11" fill="#4338ca">(0, 2)</text>
-  <circle cx="240" cy="120" r="4" fill="#5b4dff"/>
-  <text x="248" y="114" font-family="system-ui,sans-serif" font-size="11" fill="#4338ca">(4, 1)</text>
+
+  <line x1="12" y1="264" x2="408" y2="264" class="axis"/>
+  <line x1="132" y1="12" x2="132" y2="300" class="axis"/>
+
+  <text x="8" y="268" class="label">0</text>
+  <text x="118" y="278" class="label">-5</text>
+  <text x="244" y="278" class="label">5</text>
+  <text x="112" y="128" class="label">5</text>
+
+  <!-- y = -1/4 x + 2 -->
+  <line x1="12" y1="186" x2="324" y2="264" class="line"/>
+
+  <circle cx="132" cy="216" r="5.5" fill="#111"/>
+  <rect x="148" y="202" width="58" height="26" rx="4" fill="#fff" stroke="#ccc" stroke-width="1"/>
+  <text x="156" y="219" class="tip">(0, 2)</text>
 </svg>

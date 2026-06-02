@@ -1,0 +1,389 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{unicode-math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+\usepackage{eso-pic} % for page background
+
+% --------- 主题颜色设置 ---------
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{headerbg}{RGB}{240,240,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
+
+% --------- 页眉背景色条 ---------
+\newcommand{\headbackground}{
+  \AddToShipoutPictureBG*{
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+% --------- 页眉设置 ---------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
+\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+
+\newtcolorbox{SATCard}[1][]{%
+  enhanced,
+  colback=white,
+  colframe=novelblue,
+  coltitle=white,
+  boxrule=0.6pt,
+  arc=4pt,
+  boxsep=5pt,
+  left=8pt, right=8pt, top=10pt, bottom=10pt,
+  sharp corners=south,
+  drop shadow south east,
+  #1
+}
+
+% --------- 顶部 Mark for Review 栏 ---------
+\newcommand{\markforreview}{
+  \stepcounter{questionnum} % 自动递增题号
+  \begin{tikzpicture}[scale=1.1]
+    % 黑色题号
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+
+    % 灰底主栏
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+
+    % Mark for Review
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+
+    % ABC 按钮区域
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+
+
+  \newcommand{\choiceboxcircled}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    rounded corners=6pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+    \textbf{\large\textcircled{\textbf{#1}}} \ #2
+  \end{tcolorbox}
+}
+}
+
+% --------- 选项框样式 ---------
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white, 
+    colframe=novelblue,
+    boxrule=0.5pt, 
+    rounded corners=4pt, 
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+
+\begin{document}
+\section*{Unit 4 Geometry}
+
+\noindent\markforreview
+\vspace{1em}
+
+The surface area, in square inches, of a cube can be represented by the expression $24a^2$, where $a$ is a positive constant. Which expression represents the volume, in cubic inches, of the cube?
+
+\choicebox{A}{$8a^3$}  
+\choicebox{B}{$16a^3$}  
+\choicebox{C}{$64a^6$}  
+\choicebox{D}{$216a^6$}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Given the function $f(x) = \pi x^3 + \pi x^2$, where $f$ represents the volume (in cubic feet) of a right circular cylinder with radius $x$ feet, which expression represents the height (in feet) of the cylinder?
+
+\choicebox{A}{$x + 1$}  
+\choicebox{B}{$\pi x^3$}  
+\choicebox{C}{$x$}  
+\choicebox{D}{$x^3 + 1$}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+Identical rectangles $X$ and $Y$ each have an area of $\frac{49}{5}$ square meters and a perimeter of $P$ meters. If one of the shorter sides of rectangle $X$ is glued to one of the shorter sides of rectangle $Y$, the resulting rectangle has a perimeter of $\frac{14}{9}P$ meters. What is the value of $P$?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The hypotenuse of an isosceles right triangle has a length of $12$ units. What is the area of the triangle, in square units?
+
+\choicebox{A}{$18\sqrt{2}$}  
+\choicebox{B}{$36$}  
+\choicebox{C}{$48$}  
+\choicebox{D}{$36\sqrt{2}$}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In triangles $LMN$ and $RST$, angles $L$ and $R$ each have measure $127^\circ$. Which additional piece of information is sufficient to determine whether triangle $LMN$ is similar to triangle $RST$?
+
+\choicebox{A}{The measures of angles $N$ and $T$.}  
+\choicebox{B}{The lengths of sides $LM$ and $RS$.}  
+\choicebox{C}{The measures of angles $S$ and $T$.}  
+\choicebox{D}{The lengths of sides $MN$ and $ST$.}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+In triangles $LMN$ and $PQR$, angles $M$ and $Q$ each have measure $54^\circ$, $MN = 16$, and $QR = 16$. Which additional piece of information is sufficient to prove that triangle $LMN$ is congruent to triangle $PQR$?
+
+\choicebox{A}{Angles $L$ and $R$ each have measure $44^\circ$.}  
+\choicebox{B}{Angles $N$ and $P$ each have measure $44^\circ$.}  
+\choicebox{C}{$LM = 11$ and $PQ = 11$.}  
+\choicebox{D}{$LN = 11$ and $PR = 11$.}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+In triangles $LMN$ and $PQR$, angles $M$ and $Q$ each have measure $54^\circ$, $MN = 16$, and $QR = 16$. Which additional piece of information is sufficient to prove that triangle $LMN$ is congruent to triangle $PQR$?
+
+\choicebox{A}{Angles $L$ and $R$ each have measure $44^\circ$.}  
+\choicebox{B}{Angles $N$ and $P$ each have measure $44^\circ$.}  
+\choicebox{C}{$LM = 11$ and $PQ = 11$.}  
+\choicebox{D}{$LN = 11$ and $PR = 11$.}
+
+\newpage
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+In triangle $ABC$, the measure of angle $A$ is $25^\circ$, angle $C$ is a right angle, and the length of $BC$ is $16$. Which of the following represents the length of $AC$?
+
+\choicebox{A}{$16 \sin 25^\circ$}  
+\choicebox{B}{$16 \tan 25^\circ$}  
+\choicebox{C}{$\frac{16}{\sin 25^\circ}$}  
+\choicebox{D}{$\frac{16}{\tan 25^\circ}$}
+
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+Triangle $JKL$ is similar to triangle $RST$, where angle $J$ corresponds to angle $R$ and angles $K$ and $S$ are right angles. If $\cos(L) = \frac{119}{169}$, what is the value of $\tan(T)$?
+
+\choicebox{A}{$\frac{120}{169}$}  
+\choicebox{B}{$\frac{119}{120}$}  
+\choicebox{C}{$\frac{120}{119}$}  
+\choicebox{D}{$\frac{169}{119}$}
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+Point $O$ is the center of a circle. The measure of arc $MN$ on this circle is $\frac{4\pi}{3}$ radians. The length of arc $MN$ is what fraction of the circumference of the circle?
+
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+In the $xy$-plane, segment $OA$ has endpoints $(0,0)$ and $(\sqrt{3}, \sqrt{3})$. What is the measure, in radians, of the acute angle formed by segment $OA$ and the line $y = 0$?
+
+\choicebox{A}{$\frac{\pi}{6}$}  
+\choicebox{B}{$\frac{\pi}{4}$}  
+\choicebox{C}{$\frac{\pi}{3}$}  
+\choicebox{D}{$\frac{\pi}{2}$}
+
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+Triangle $ABC$ is similar to triangle $DEF$, where angle $A$ corresponds to angle $D$ and angles $B$ and $E$ are right angles. If $AB = 2$, $DF = 12\sqrt{2}$, and $\tan(A) = \sqrt{7}$, what is the length of $DE$?
+
+
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+In the $xy$-plane, circle $A$ is defined by the equation $(x - 3)^2 + (y - 4)^2 = 16$, and circle $B$ is defined by the equation $(x - 3)^2 + (y - 4)^2 = n$, where $n$ is a constant. The diameter of circle $B$ is $48$ units longer than the diameter of circle $A$. What is the value of $n$?
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+The given equation represents a circle in the $xy$-plane:
+\[
+x^2 + y^2 + 7x + y = -\frac{7}{2}
+\]
+What is the length of the radius of the circle?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the $xy$-plane, a circle has center $D$ with coordinates $(m,16)$, where $m$ is a constant. Points $E$ and $F$ lie on the circle. Point $E$ lies on the circle and has coordinates $\bigl(m + 4\sqrt{10}, 34\bigr)$, and point $F$ has coordinates $(n,16)$, where $n$ is a constant greater than $m$. What is the area, in square units, of triangle $DEF$?
+
+\choicebox{A}{$198$}  
+\choicebox{B}{$72\sqrt{10}$}  
+\choicebox{C}{$242$}  
+\choicebox{D}{$99\sqrt{10}$}
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+In the $xy$-plane, a circle has center $D$ with coordinates $(m,16)$, where $m$ is a constant. Points $E$ and $F$ lie on the circle. Point $E$ lies on the circle and has coordinates $\bigl(m + 4\sqrt{10}, 34\bigr)$, and point $F$ has coordinates $(n,16)$, where $n$ is a constant greater than $m$. What is the area, in square units, of triangle $DEF$?
+
+\choicebox{A}{$198$}  
+\choicebox{B}{$72\sqrt{10}$}  
+\choicebox{C}{$242$}  
+\choicebox{D}{$99\sqrt{10}$}
+
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+A circle in the $xy$-plane has the equation:
+\[
+(x - 2)^2 + (y - 2)^2 = 25.
+\]
+Line $m$ is tangent to this circle at the point $(5,6)$. What is the $y$-coordinate of the $y$-intercept of line $m$?
+
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+If $\theta = 3x+4$, and $\beta=6x-5$, What is the value of x so that sin($\theta$)=cos($\beta$)?
+
+\vspace{2em}
+
+
+\noindent\markforreview
+\vspace{1em}
+
+A circle has center $O$, and points $M$ and $N$ lie on the circle. The measure of arc $MN$ is $24^\circ$ and the length of arc $MN$ is $8\pi$ centimeters. What is the length, in centimeters, of the radius of the circle?
+
+\choicebox{A}{$15$}  
+\choicebox{B}{$45$}  
+\choicebox{-C}{$60$}  
+\choicebox{D}{$120$}
+\vspace{2em}
+
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+Which of the following equations represents a circle in the $xy$-plane that intersects the line $x = 5$ at exactly one point?
+
+\choicebox{A}{$(x - 1)^2 + (y - 7)^2 = 4$}  
+\choicebox{B}{$(x - 5)^2 + (y - 1)^2 = 4$}  
+\choicebox{C}{$(x - 7)^2 + (y - 5)^2 = 4$}  
+\choicebox{D}{$(x - 13)^2 + (y - 13)^2 = 4$}
+
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+A circle has center $A$, and points $B$ and $C$ lie on the circle. Line segment $BD$ is tangent to the circle at point $B$, line segment $CD$ is tangent to the circle at point $C$, and the length of line segment $BD$ is $63$ units. If the circle has a radius of $16$ units, what is the area, in square units, of quadrilateral $ABCD$?
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the $xy$-plane, a circle with a radius of $1$ has its center at $(9, -12)$. This circle can be represented by the equation $x^2 + y^2 + ax + by + c = 0$, where $a$, $b$, and $c$ are constants. What is the value of $a + b + c$?
+
+
+
+
+
+
+
+
+
+\definecolor{novelblue}{RGB}{70,60,150}
+\definecolor{softblue}{RGB}{245,245,255}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{novelblue}{\textbf{Novel Prep}}}
+\fancyhead[C]{\textcolor{novelblue}{\textbf{SAT Geometry Answer Key}}}
+\fancyhead[R]{\textcolor{novelblue}{\textbf{Step-by-Step}}}
+\fancyfoot[C]{\thepage}
+
+\newtcolorbox{answerbox}{
+colback=softblue,
+colframe=novelblue,
+boxrule=0.7pt,
+arc=4pt,
+left=8pt,
+right=8pt,
+top=8pt,
+bottom=8pt
+}
+
+\newcommand{\q}[1]{\subsection*{\textcolor{novelblue}{Question #1}}}
+\newpage
+\begin{document}
+
+\begin{center}
+{\LARGE \textbf{SAT Geometry Unit 4}}\\[0.2cm]
+{\Large \textbf{Complete Step-by-Step Answer Key}}\\[0.2cm]
+\textbf{Novel Prep Learning Center}
+\end{center}
+

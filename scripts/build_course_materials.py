@@ -28,9 +28,12 @@ def build() -> dict:
 
     items: list[dict] = []
     available = 0
-    for row in manifest.get("materials") or []:
+    manifest_rows = list(manifest.get("materials") or [])
+    for i, row in enumerate(manifest_rows):
         tex_path = _resolve(list(row.get("tex_candidates") or []))
         pdf_path = _resolve(list(row.get("pdf_candidates") or []))
+        prev_slug = manifest_rows[i - 1]["slug"] if i > 0 else None
+        next_slug = manifest_rows[i + 1]["slug"] if i + 1 < len(manifest_rows) else None
         entry = {
             "slug": row["slug"],
             "unit": row["unit"],
@@ -40,6 +43,8 @@ def build() -> dict:
             "deck_title": row["title"],
             "slide_count": 0,
             "slides": [],
+            "prev_lesson_slug": prev_slug,
+            "next_lesson_slug": next_slug,
             "tex_available": tex_path is not None,
             "pdf_available": pdf_path is not None,
             "tex_file": os.path.basename(tex_path) if tex_path else None,
@@ -55,6 +60,9 @@ def build() -> dict:
                 entry["learn_count"] = parsed.get("learn_count") or 0
                 entry["practice_slide_count"] = parsed.get("practice_slide_count") or 0
                 entry["lesson_path"] = parsed.get("lesson_path") or []
+                entry["checkpoint"] = parsed.get("checkpoint") or []
+                entry["checkpoint_count"] = parsed.get("checkpoint_count") or 0
+                entry["knowledge_map"] = parsed.get("knowledge_map") or []
                 available += 1
             except Exception as exc:
                 print("Warning: failed to parse", tex_path, exc)

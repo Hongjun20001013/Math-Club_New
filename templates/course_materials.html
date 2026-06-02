@@ -54,6 +54,45 @@
         </aside>
       </header>
 
+      {% if continue_material %}
+      <a href="{{ url_for('practice_course_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide }}" class="np-cm-hub-resume mp-animate-up" data-cm-hub-resume-server>
+        <div class="np-cm-hub-resume-copy">
+          <p class="np-cm-hub-resume-kicker">Pick up where you left off</p>
+          <h2>{{ continue_material.section }} — {{ continue_material.title }}</h2>
+          <p>Slide {{ continue_material.continue_slide }} of {{ continue_material.slide_count }}{% if continue_material.continue_mastery_pct %} · {{ continue_material.continue_mastery_pct }}% mastery{% endif %}</p>
+          <span class="np-cm-hub-resume-cta">Resume lesson →</span>
+        </div>
+        <div class="np-cm-hub-resume-ring" style="--cm-pct: {{ continue_material.continue_mastery_pct or 0 }};" aria-hidden="true">
+          <svg viewBox="0 0 80 80"><circle class="np-cm-hub-resume-track" cx="40" cy="40" r="34"></circle><circle class="np-cm-hub-resume-fill" cx="40" cy="40" r="34"></circle></svg>
+          <span>{{ continue_material.continue_mastery_pct or 0 }}%</span>
+        </div>
+      </a>
+      {% else %}
+      <div class="np-cm-hub-resume np-cm-hub-resume--guest mp-animate-up" data-cm-hub-resume hidden></div>
+      {% endif %}
+
+      {% if unit1_path|length >= 2 %}
+      <section class="np-cm-hub-unit-path mp-animate-up" aria-label="Unit 1 learning path">
+        <div class="np-cm-hub-unit-path-head">
+          <p class="np-cm-hub-kicker">Unit 1 · Algebra</p>
+          <h2>Your learning path</h2>
+        </div>
+        <ol class="np-cm-hub-unit-path-track">
+          {% for m in unit1_path %}
+          <li class="np-cm-hub-unit-path-node{% if m.user_mastery_pct >= 100 %} is-complete{% elif m.user_mastery_pct %} is-started{% endif %}">
+            <a href="{{ url_for('practice_course_material_view', slug=m.slug) }}" title="{{ m.title }}">
+              <span class="np-cm-hub-unit-path-num">{{ m.section }}</span>
+              <span class="np-cm-hub-unit-path-label">{{ m.title }}</span>
+              {% if user_logged_in and m.user_mastery_pct %}
+              <span class="np-cm-hub-unit-path-pct">{{ m.user_mastery_pct }}%</span>
+              {% endif %}
+            </a>
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endif %}
+
       {% if ready_materials %}
       <section class="np-cm-hub-continue mp-animate-up" aria-label="Ready lessons">
         <div class="np-cm-hub-continue-head">
@@ -66,14 +105,14 @@
             <span class="np-cm-hub-continue-unit">Unit {{ m.unit }}</span>
             <strong>{{ m.section }}</strong>
             <em>{{ m.title }}</em>
-            <span class="np-cm-hub-continue-meta">{{ m.slide_count or '—' }} slides{% if m.pdf_available %} · PDF{% endif %}</span>
+            <span class="np-cm-hub-continue-meta">{{ m.slide_count or '—' }} slides{% if m.pdf_available %} · PDF{% endif %}{% if user_logged_in and m.user_mastery_pct %} · {{ m.user_mastery_pct }}% mastery{% endif %}</span>
           </a>
           {% endfor %}
         </div>
       </section>
       {% endif %}
 
-      {% if featured_material %}
+      {% if featured_material and (not continue_material or continue_material.slug != featured_material.slug) %}
       <a href="{{ url_for('practice_course_material_view', slug=featured_material.slug) }}" class="np-cm-hub-featured mp-animate-up">
         <div class="np-cm-hub-featured-copy">
           <p class="np-cm-hub-featured-kicker">Latest lesson · Unit {{ featured_material.unit }}</p>
@@ -156,4 +195,37 @@
     </div>
   </div>
 </div>
+{% if not continue_material %}
+<script>
+(function () {
+  var slot = document.querySelector("[data-cm-hub-resume]");
+  if (!slot) return;
+  try {
+    var raw = localStorage.getItem("np-cm-last-visit");
+    if (!raw) return;
+    var visit = JSON.parse(raw);
+    if (!visit || !visit.slug) return;
+    var chips = document.querySelectorAll(".np-cm-hub-continue-chip, .np-cm-hub-card--ready");
+    var match = null;
+    chips.forEach(function (el) {
+      if (el.href && el.href.indexOf("/practice/materials/" + visit.slug) !== -1) match = el;
+    });
+    if (!match) return;
+    var title = match.querySelector("em");
+    var section = match.querySelector("strong");
+    var meta = match.querySelector(".np-cm-hub-continue-meta, .np-cm-hub-card-meta");
+    slot.hidden = false;
+    slot.className = "np-cm-hub-resume mp-animate-up";
+    slot.innerHTML =
+      '<a href="/practice/materials/' + visit.slug + "?slide=" + (visit.slide_index || 1) + '" class="np-cm-hub-resume-link">' +
+      '<div class="np-cm-hub-resume-copy">' +
+      '<p class="np-cm-hub-resume-kicker">Pick up where you left off</p>' +
+      "<h2>" + (section ? section.textContent : visit.slug) + " — " + (title ? title.textContent : "Lesson") + "</h2>" +
+      "<p>Slide " + (visit.slide_index || 1) + (meta ? " · " + meta.textContent.split("·")[0].trim() : "") + "</p>" +
+      '<span class="np-cm-hub-resume-cta">Resume lesson →</span>' +
+      "</div></a>";
+  } catch (e) {}
+})();
+</script>
+{% endif %}
 {% endblock %}

@@ -26,12 +26,15 @@ UNIT1_PT_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit1_pt_supplement.json")
 UNIT2_MANIFEST = os.path.join(OUTPUT_DIR, "unit2_question_manifest.json")
 UNIT2_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit2_supplement.json")
 UNIT2_EXPL_EN = os.path.join(OUTPUT_DIR, "unit2_explanations_en.json")
+UNIT2_PT_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit2_pt_supplement.json")
 UNIT3_MANIFEST = os.path.join(OUTPUT_DIR, "unit3_question_manifest.json")
 UNIT3_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit3_supplement.json")
 UNIT3_EXPL_EN = os.path.join(OUTPUT_DIR, "unit3_explanations_en.json")
+UNIT3_PT_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit3_pt_supplement.json")
 UNIT4_MANIFEST = os.path.join(OUTPUT_DIR, "unit4_question_manifest.json")
 UNIT4_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit4_supplement.json")
 UNIT4_EXPL_EN = os.path.join(OUTPUT_DIR, "unit4_explanations_en.json")
+UNIT4_PT_SUPPLEMENT = os.path.join(OUTPUT_DIR, "unit4_pt_supplement.json")
 SAT_EXTENDED_WALKTHROUGHS = os.path.join(OUTPUT_DIR, "sat_extended_walkthroughs.json")
 
 SECTION_HINT_EN = {
@@ -690,6 +693,41 @@ def _enrich_unit2_algebra_questions(
             )
 
 
+def _enrich_unit2_pt_questions(
+    questions: List[Any],
+    walkthroughs: Optional[dict[str, Any]] = None,
+) -> None:
+    """Attach answers for Unit 2 Practice Test (2_pt), separate from chapter slices."""
+    supp = _load_json(UNIT2_PT_SUPPLEMENT)
+    if not supp:
+        print("Warning: missing unit2_pt_supplement.json; skip 2_pt enrichment.")
+        return
+    cells = list((supp.get("answers_by_topic") or {}).get("2_pt") or [])
+    if len(cells) != len(questions):
+        print(
+            "Warning: 2_pt answer length mismatch; skip enrichment.",
+            len(cells),
+            len(questions),
+        )
+        return
+    titles_zh = supp.get("section_titles_zh", {})
+    titles_en = supp.get("section_titles_en", {})
+    manifest = [
+        {
+            "display_number": i + 1,
+            "section": "PT",
+            "topic_key": "2_pt",
+            "topic_local_index": i,
+        }
+        for i in range(len(questions))
+    ]
+    for j, q in enumerate(questions):
+        _attach_unit1_answer_row(q, cells[j], manifest[j], titles_zh, titles_en, {})
+        _apply_slot_walkthrough(
+            q, "advanced_math", "2_pt", j, walkthroughs or {},
+        )
+
+
 def _enrich_unit3_questions(
     topic_key: str,
     questions: List[Any],
@@ -764,6 +802,41 @@ def _enrich_unit3_questions(
             )
 
 
+def _enrich_unit3_pt_questions(
+    questions: List[Any],
+    walkthroughs: Optional[dict[str, Any]] = None,
+) -> None:
+    """Attach answers for Unit 3 Practice Test (3_pt), separate from chapter slices."""
+    supp = _load_json(UNIT3_PT_SUPPLEMENT)
+    if not supp:
+        print("Warning: missing unit3_pt_supplement.json; skip 3_pt enrichment.")
+        return
+    cells = list((supp.get("answers_by_topic") or {}).get("3_pt") or [])
+    if len(cells) != len(questions):
+        print(
+            "Warning: 3_pt answer length mismatch; skip enrichment.",
+            len(cells),
+            len(questions),
+        )
+        return
+    titles_zh = supp.get("section_titles_zh", {})
+    titles_en = supp.get("section_titles_en", {})
+    manifest = [
+        {
+            "display_number": i + 1,
+            "section": "PT",
+            "topic_key": "3_pt",
+            "topic_local_index": i,
+        }
+        for i in range(len(questions))
+    ]
+    for j, q in enumerate(questions):
+        _attach_unit1_answer_row(q, cells[j], manifest[j], titles_zh, titles_en, {})
+        _apply_slot_walkthrough(
+            q, "problem_solving", "3_pt", j, walkthroughs or {},
+        )
+
+
 def _enrich_unit4_questions(
     topic_key: str,
     questions: List[Any],
@@ -836,6 +909,41 @@ def _enrich_unit4_questions(
                 int(sj.get("topic_local_index", j)),
                 walkthroughs or {},
             )
+
+
+def _enrich_unit4_pt_questions(
+    questions: List[Any],
+    walkthroughs: Optional[dict[str, Any]] = None,
+) -> None:
+    """Attach answers for Unit 4 Practice Test (4_pt), separate from chapter slices."""
+    supp = _load_json(UNIT4_PT_SUPPLEMENT)
+    if not supp:
+        print("Warning: missing unit4_pt_supplement.json; skip 4_pt enrichment.")
+        return
+    cells = list((supp.get("answers_by_topic") or {}).get("4_pt") or [])
+    if len(cells) != len(questions):
+        print(
+            "Warning: 4_pt answer length mismatch; skip enrichment.",
+            len(cells),
+            len(questions),
+        )
+        return
+    titles_zh = supp.get("section_titles_zh", {})
+    titles_en = supp.get("section_titles_en", {})
+    manifest = [
+        {
+            "display_number": i + 1,
+            "section": "PT",
+            "topic_key": "4_pt",
+            "topic_local_index": i,
+        }
+        for i in range(len(questions))
+    ]
+    for j, q in enumerate(questions):
+        _attach_unit1_answer_row(q, cells[j], manifest[j], titles_zh, titles_en, {})
+        _apply_slot_walkthrough(
+            q, "geometry", "4_pt", j, walkthroughs or {},
+        )
 
 
 def build_bank():
@@ -977,6 +1085,8 @@ def build_bank():
             for tk in _SLICE_ORDER_U2:
                 if tk in adv:
                     _enrich_unit2_algebra_questions(tk, adv[tk], mrows2, sat_wt)
+        if adv.get("2_pt"):
+            _enrich_unit2_pt_questions(adv["2_pt"], sat_wt)
 
     ps = bank.get("problem_solving", {})
     if ps.get("unit_3_all"):
@@ -993,6 +1103,8 @@ def build_bank():
             for tk in _SLICE_ORDER_U3:
                 if tk in ps:
                     _enrich_unit3_questions(tk, ps[tk], mrows3, sat_wt)
+        if ps.get("3_pt"):
+            _enrich_unit3_pt_questions(ps["3_pt"], sat_wt)
 
     geo = bank.get("geometry", {})
     if geo.get("unit_4_all"):
@@ -1009,6 +1121,8 @@ def build_bank():
             for tk in _SLICE_ORDER_U4:
                 if tk in geo:
                     _enrich_unit4_questions(tk, geo[tk], mrows4, sat_wt)
+        if geo.get("4_pt"):
+            _enrich_unit4_pt_questions(geo["4_pt"], sat_wt)
 
     with open(OUTPUT_BANK, "w", encoding="utf-8") as f:
         json.dump(bank, f, ensure_ascii=False, indent=2)
@@ -1024,3 +1138,11 @@ def build_bank():
 
 if __name__ == "__main__":
     build_bank()
+    cm_script = os.path.join(os.path.dirname(__file__), "build_course_materials.py")
+    if os.path.isfile(cm_script):
+        try:
+            import runpy
+
+            runpy.run_path(cm_script, run_name="__main__")
+        except Exception as exc:
+            print("Warning: course materials build skipped:", exc)

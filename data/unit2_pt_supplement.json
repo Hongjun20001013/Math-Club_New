@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "source_note": "Answer key from SAT_Practice_Test_Unit_2.pdf (Unit 2 Practice Test, 22 questions).",
+  "section_titles_zh": {
+    "PT": "Unit 2 模拟测试"
+  },
+  "section_titles_en": {
+    "PT": "Unit 2 Practice Test"
+  },
+  "answers_by_topic": {
+    "2_pt": [
+      "7/120",
+      "4096",
+      "7",
+      "D",
+      "B",
+      "A",
+      "B",
+      "40",
+      "D",
+      "A",
+      "C",
+      "21",
+      "A",
+      "3",
+      "C",
+      "B",
+      "C",
+      "10",
+      "39",
+      "D",
+      "A",
+      "B"
+    ]
+  }
+}

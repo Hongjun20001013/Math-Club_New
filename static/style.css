@@ -28381,6 +28381,26 @@ button.cm-intro-chip:focus-visible {
     opacity: 0.88;
 }
 
+.cm-mcq-interactive .cm-mcq-choice.is-correct {
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.cm-mcq-interactive .cm-mcq-choice.is-incorrect {
+    border-color: rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.cm-mcq-interactive.is-correct-answer {
+    border-color: rgba(16, 185, 129, 0.28);
+}
+
+.cm-mcq-interactive.is-wrong-answer {
+    border-color: rgba(239, 68, 68, 0.24);
+}
+
 .cm-mcq-actions {
     display: flex;
     flex-wrap: wrap;

@@ -1,5 +1,13 @@
 from __future__ import annotations
 from answer_grader import grade_for_db, response_is_correct
+from course_materials_progress import (
+    build_coach_system_prompt,
+    build_coach_user_message,
+    mastery_pct_from_progress,
+    merge_progress,
+    openai_chat_completion,
+    strip_html,
+)
 from latex_parser import parse_placement_tex_file, parse_tex_file
 
 import json
@@ -74,8 +82,10 @@ COURSE_MATERIALS_PATH = os.path.join(APP_DIR, "data", "course_materials.json")
 COURSE_MATERIALS_MANIFEST_PATH = os.path.join(APP_DIR, "data", "course_materials_manifest.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
 DESMOS_API_KEY = os.environ.get("DESMOS_API_KEY", "").strip()
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 COMPILED_BANK_CACHE = None
 COURSE_MATERIALS_CACHE = None
+COURSE_MATERIALS_CACHE_MTIME: float | None = None
 
 STATIC_DIR = os.path.join(APP_DIR, "static")
 TEMPLATES_DIR = os.path.join(APP_DIR, "templates")
@@ -96,7 +106,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260529-course-materials-v24")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260531-course-materials-v39")
 
 
 def _site_brand_name() -> str:
@@ -660,6 +670,23 @@ def init_db():
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_mistake_progress_learner "
         "ON mistake_learning_progress(learner_key)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS course_material_progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            lesson_slug TEXT NOT NULL,
+            progress_json TEXT NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, lesson_slug),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_cm_progress_user "
+        "ON course_material_progress(user_id)"
     )
     _seed_users_if_empty(db)
     _sync_render_users_seed_snapshot(db)
@@ -1257,18 +1284,116 @@ def load_compiled_bank() -> Dict[str, Dict[str, List[dict]]]:
     return COMPILED_BANK_CACHE
 
 
+def _resolve_course_material_file(candidates: list[str], *, require_content: bool = False) -> str | None:
+    for rel in candidates:
+        path = os.path.join(APP_DIR, rel)
+        if not os.path.isfile(path):
+            continue
+        if require_content and os.path.getsize(path) <= 0:
+            continue
+        return path
+    return None
+
+
+def _course_materials_manifest_index() -> dict[str, dict[str, Any]]:
+    if not os.path.isfile(COURSE_MATERIALS_MANIFEST_PATH):
+        return {}
+    try:
+        with open(COURSE_MATERIALS_MANIFEST_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {
+        str(row.get("slug") or ""): row
+        for row in (data.get("materials") or [])
+        if row.get("slug")
+    }
+
+
+def _apply_parsed_course_material(entry: dict[str, Any], parsed: dict[str, Any]) -> None:
+    entry["deck_title"] = parsed.get("title") or entry.get("title")
+    entry["slide_count"] = parsed.get("slide_count") or 0
+    entry["slides"] = parsed.get("slides") or []
+    entry["interactive_count"] = parsed.get("interactive_count") or 0
+    entry["learn_count"] = parsed.get("learn_count") or 0
+    entry["practice_slide_count"] = parsed.get("practice_slide_count") or 0
+    entry["lesson_path"] = parsed.get("lesson_path") or []
+    entry["checkpoint"] = parsed.get("checkpoint") or []
+    entry["checkpoint_count"] = parsed.get("checkpoint_count") or 0
+    entry["knowledge_map"] = parsed.get("knowledge_map") or []
+
+
+def _sync_course_materials_with_disk(payload: dict[str, Any]) -> dict[str, Any]:
+    """Align lesson availability with files on disk; parse LaTeX when JSON is stale."""
+    manifest_index = _course_materials_manifest_index()
+    if not manifest_index:
+        return payload
+
+    from beamer_parser import parse_beamer_file
+
+    available = 0
+    for entry in payload.get("materials") or []:
+        slug = str(entry.get("slug") or "")
+        manifest_row = manifest_index.get(slug)
+        if not manifest_row:
+            continue
+
+        tex_path = _resolve_course_material_file(
+            list(manifest_row.get("tex_candidates") or []),
+            require_content=True,
+        )
+        pdf_path = _resolve_course_material_file(list(manifest_row.get("pdf_candidates") or []))
+
+        entry["tex_available"] = tex_path is not None
+        entry["pdf_available"] = pdf_path is not None
+        entry["tex_file"] = os.path.basename(tex_path) if tex_path else None
+        entry["pdf_file"] = os.path.basename(pdf_path) if pdf_path else None
+
+        if not tex_path:
+            continue
+
+        needs_parse = not entry.get("slides") or int(entry.get("slide_count") or 0) <= 0
+        if needs_parse:
+            try:
+                _apply_parsed_course_material(entry, parse_beamer_file(tex_path))
+            except Exception as exc:
+                app.logger.warning("Failed to parse course material %s: %s", slug, exc)
+                entry["tex_available"] = False
+                continue
+
+        if entry.get("tex_available"):
+            available += 1
+
+    payload["available"] = available
+    payload["total"] = len(payload.get("materials") or [])
+    return payload
+
+
 def load_course_materials() -> dict[str, Any]:
-    global COURSE_MATERIALS_CACHE
-    if COURSE_MATERIALS_CACHE is not None:
+    global COURSE_MATERIALS_CACHE, COURSE_MATERIALS_CACHE_MTIME
+    json_mtime: float | None = None
+    if os.path.isfile(COURSE_MATERIALS_PATH):
+        try:
+            json_mtime = os.path.getmtime(COURSE_MATERIALS_PATH)
+        except OSError:
+            json_mtime = None
+
+    if COURSE_MATERIALS_CACHE is not None and json_mtime == COURSE_MATERIALS_CACHE_MTIME:
         return COURSE_MATERIALS_CACHE
+
     if not os.path.isfile(COURSE_MATERIALS_PATH):
         COURSE_MATERIALS_CACHE = {"materials": [], "total": 0, "available": 0}
+        COURSE_MATERIALS_CACHE_MTIME = json_mtime
         return COURSE_MATERIALS_CACHE
+
     try:
         with open(COURSE_MATERIALS_PATH, "r", encoding="utf-8") as f:
-            COURSE_MATERIALS_CACHE = json.load(f)
+            payload = json.load(f)
     except (OSError, json.JSONDecodeError):
-        COURSE_MATERIALS_CACHE = {"materials": [], "total": 0, "available": 0}
+        payload = {"materials": [], "total": 0, "available": 0}
+
+    COURSE_MATERIALS_CACHE = _sync_course_materials_with_disk(payload)
+    COURSE_MATERIALS_CACHE_MTIME = json_mtime
     return COURSE_MATERIALS_CACHE
 
 
@@ -1290,6 +1415,59 @@ def _course_material_by_slug(slug: str) -> dict[str, Any] | None:
     for row in load_course_materials().get("materials") or []:
         if row.get("slug") == slug:
             return row
+    return None
+
+
+def _course_material_neighbors(material: dict[str, Any]) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    prev_m = next_m = None
+    prev_slug = material.get("prev_lesson_slug")
+    next_slug = material.get("next_lesson_slug")
+    if prev_slug:
+        row = _course_material_by_slug(str(prev_slug))
+        if row and row.get("tex_available"):
+            prev_m = row
+    if next_slug:
+        row = _course_material_by_slug(str(next_slug))
+        if row and row.get("tex_available"):
+            next_m = row
+    return prev_m, next_m
+
+
+def _pick_continue_material(
+    ready_materials: list[dict[str, Any]],
+    user_progress: dict[str, dict[str, Any]],
+) -> dict[str, Any] | None:
+    """Best lesson to resume: most recently active, else first incomplete."""
+    best: dict[str, Any] | None = None
+    best_at = 0
+    for m in ready_materials:
+        slug = str(m.get("slug") or "")
+        prog = user_progress.get(slug) or {}
+        at = int(prog.get("last_active_at") or 0)
+        if at > best_at:
+            best_at = at
+            best = m
+    if best and best_at > 0:
+        prog = user_progress.get(str(best.get("slug") or "")) or {}
+        return {
+            **best,
+            "continue_slide": int(prog.get("last_slide_index") or 1),
+            "continue_mastery_pct": int(best.get("user_mastery_pct") or 0),
+        }
+    for m in ready_materials:
+        slug = str(m.get("slug") or "")
+        prog = user_progress.get(slug) or {}
+        pct = mastery_pct_from_progress(
+            prog,
+            int(m.get("slide_count") or 0),
+            int(m.get("checkpoint_count") or 0),
+        )
+        if pct < 100:
+            return {
+                **m,
+                "continue_slide": int(prog.get("last_slide_index") or 1),
+                "continue_mastery_pct": pct,
+            }
     return None
 
 
@@ -1321,6 +1499,32 @@ def _course_materials_hub_context() -> dict[str, Any]:
     materials_ready = int(payload.get("available") or len(ready_materials))
     coverage_pct = round(100 * materials_ready / materials_total) if materials_total else 0
     featured = ready_materials[-1] if ready_materials else None
+    user_progress: dict[str, dict[str, Any]] = {}
+    uid = session.get("user_id")
+    if uid:
+        db = get_db()
+        rows = db.execute(
+            "SELECT lesson_slug, progress_json FROM course_material_progress WHERE user_id = ?",
+            (int(uid),),
+        ).fetchall()
+        for row in rows:
+            try:
+                user_progress[str(row["lesson_slug"])] = json.loads(row["progress_json"] or "{}")
+            except json.JSONDecodeError:
+                continue
+    for m in ready_materials:
+        slug = str(m.get("slug") or "")
+        prog = user_progress.get(slug) or {}
+        m["user_mastery_pct"] = mastery_pct_from_progress(
+            prog,
+            int(m.get("slide_count") or 0),
+            int(m.get("checkpoint_count") or 0),
+        )
+    continue_material = _pick_continue_material(ready_materials, user_progress)
+    unit1_path = [
+        m for m in ready_materials
+        if int(m.get("unit") or 0) == 1
+    ]
     return {
         "unit_groups": unit_groups,
         "materials_total": materials_total,
@@ -1328,7 +1532,110 @@ def _course_materials_hub_context() -> dict[str, Any]:
         "coverage_pct": coverage_pct,
         "ready_materials": ready_materials,
         "featured_material": featured,
+        "continue_material": continue_material,
+        "unit1_path": unit1_path,
+        "user_progress_map": user_progress,
     }
+
+
+def _cm_progress_row(db: sqlite3.Connection, user_id: int, slug: str) -> dict[str, Any] | None:
+    row = db.execute(
+        "SELECT progress_json, updated_at FROM course_material_progress "
+        "WHERE user_id = ? AND lesson_slug = ?",
+        (user_id, slug),
+    ).fetchone()
+    if not row:
+        return None
+    try:
+        data = json.loads(row["progress_json"] or "{}")
+    except json.JSONDecodeError:
+        data = {}
+    return {"progress": data, "updated_at": row["updated_at"]}
+
+
+def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress: dict[str, Any]) -> None:
+    db.execute(
+        """
+        INSERT INTO course_material_progress (user_id, lesson_slug, progress_json, updated_at)
+        VALUES (?, ?, ?, datetime('now'))
+        ON CONFLICT(user_id, lesson_slug) DO UPDATE SET
+            progress_json = excluded.progress_json,
+            updated_at = datetime('now')
+        """,
+        (user_id, slug, json.dumps(progress, ensure_ascii=False)),
+    )
+    db.commit()
+
+
+@app.route("/practice/materials/api/progress/<slug>", methods=["GET", "POST"])
+def practice_course_material_progress_api(slug: str):
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    uid = int(session["user_id"])
+    db = get_db()
+    if request.method == "GET":
+        row = _cm_progress_row(db, uid, slug)
+        return jsonify({"ok": True, "progress": (row or {}).get("progress") or {}, "updated_at": (row or {}).get("updated_at")})
+    data = request.get_json(silent=True) or {}
+    progress = data.get("progress")
+    if not isinstance(progress, dict):
+        return jsonify({"ok": False, "error": "invalid progress payload"}), 400
+    _cm_progress_save(db, uid, slug, progress)
+    return jsonify({"ok": True})
+
+
+@app.route("/practice/materials/api/coach", methods=["POST"])
+def practice_course_material_coach_api():
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    if not OPENAI_API_KEY:
+        return jsonify({"ok": False, "error": "AI coach is not configured on this server."}), 503
+    data = request.get_json(silent=True) or {}
+    slug = str(data.get("slug") or "").strip()
+    slide_index = data.get("slide_index")
+    question = str(data.get("question") or "").strip()
+    mode = str(data.get("mode") or "explain").strip().lower()
+    if not slug or slide_index is None or not question:
+        return jsonify({"ok": False, "error": "slug, slide_index, and question are required"}), 400
+    if len(question) > 1200:
+        return jsonify({"ok": False, "error": "question too long"}), 400
+    if mode not in {"explain", "hint", "why", "ask"}:
+        mode = "ask"
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    slide = next(
+        (s for s in material.get("slides") or [] if int(s.get("index") or 0) == int(slide_index)),
+        None,
+    )
+    if not slide:
+        return jsonify({"ok": False, "error": "slide not found"}), 404
+    slide_plain = strip_html(str(slide.get("html") or ""))
+    user_msg = build_coach_user_message(
+        lesson_section=str(material.get("section") or ""),
+        lesson_title=str(material.get("title") or ""),
+        slide_title=str(slide.get("title") or ""),
+        slide_section=str(slide.get("section") or ""),
+        slide_kind=str(slide.get("kind") or "lesson"),
+        study_tip=str(slide.get("study_tip") or ""),
+        strategy_hint=str(slide.get("strategy_hint") or ""),
+        slide_plain=slide_plain,
+        student_question=question,
+        mode=mode,
+    )
+    try:
+        reply = openai_chat_completion(
+            build_coach_system_prompt(),
+            user_msg,
+            api_key=OPENAI_API_KEY,
+        )
+    except RuntimeError as exc:
+        app.logger.warning("AI coach error: %s", exc)
+        return jsonify({"ok": False, "error": str(exc)}), 502
+    return jsonify({"ok": True, "reply": reply})
 
 
 def _course_material_pdf_path(slug: str) -> str | None:
@@ -4646,10 +4953,14 @@ def practice_course_material_view(slug: str):
         if material.get("pdf_available")
         else None
     )
+    prev_material, next_material = _course_material_neighbors(material)
     return render_template(
         "course_material_view.html",
         material=material,
         pdf_href=pdf_href,
+        prev_material=prev_material,
+        next_material=next_material,
+        cm_progress_api=url_for("practice_course_material_progress_api", slug=slug),
     )
 
 

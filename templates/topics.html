@@ -4,6 +4,38 @@
 {% block content %}
 <div class="np-page-shell">
 {% if studio_mode %}
+{% macro unit_picker_tile(set) %}
+<button
+  type="button"
+  class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.is_full_bank %} np-hard-picker-tile--featured{% endif %}{% if set.is_practice_test %} np-hard-picker-tile--practice-test{% endif %}"
+  data-hard-tile
+  data-index="{{ set.index }}"
+  data-roman="{{ set.code }}"
+  data-state="{{ set.progress_state }}"
+  data-bank-type="{% if set.is_full_bank %}full{% elif set.is_practice_test %}practice_test{% else %}chapter{% endif %}"
+  data-href="{{ set.href }}"
+  data-practice-href="{{ set.practice_href }}"
+  data-report-href="{{ set.report_href or '' }}"
+  data-restart="{{ set.restart_href }}"
+  data-miss-href="{{ set.miss_quiz_href or '' }}"
+  data-pdf-href="{{ set.pdf_href or '' }}"
+  data-wrong-count="{{ set.wrong_count }}"
+  data-subtitle="{{ set.title }}"
+  data-answered="{{ set.answered }}"
+  data-total="{{ set.total }}"
+  data-progress="{{ set.progress_pct }}"
+  role="option"
+  aria-selected="false"
+  aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+  style="--tile-progress: {{ set.progress_pct }}%;"
+>
+  <span class="np-hard-picker-roman">{{ set.code }}</span>
+  {% if set.is_practice_test %}<span class="np-hard-picker-badge">Test</span>{% endif %}
+  <span class="np-hard-picker-num">{% if set.is_full_bank %}Full bank{% elif set.is_practice_test %}Practice test{% else %}Chapter{% endif %} · {{ set.total }} Q</span>
+  <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
+  <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}{% if set.wrong_count %} · {{ set.wrong_count }} miss{% endif %}</span>
+</button>
+{% endmacro %}
 <div class="np-sat-atelier">
 <div class="np-hard-page np-unit-studio np-unit-studio--u{{ unit_num }}">
   <nav class="np-atelier-rail" aria-label="SAT navigation">
@@ -20,9 +52,15 @@
       <p class="np-hard-kicker">SAT Math · Unit {{ unit_num }}</p>
       <div class="np-hard-hero-title-row">
         <h1>{{ unit_name }} studio.</h1>
-        <span class="np-hard-hero-pill">{{ topic_sets|length }} banks</span>
+        <span class="np-hard-hero-pill">
+          {% if bank_groups %}
+          {{ bank_groups.chapters|length }} chapters{% if bank_groups.practice_tests %} · practice test{% endif %}
+          {% else %}
+          {{ topic_sets|length }} banks
+          {% endif %}
+        </span>
       </div>
-      <p>Full bank plus focused chapter slices — start practice, open your session report, or redo mistakes in one place.</p>
+      <p>Full bank, chapter slices, and a timed practice test — pick a bank, track progress, and redo mistakes in one studio.</p>
       <div class="np-hard-hero-stats">
         <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ topic_stats.done }} completed</span>
         <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ topic_stats.progress }} active</span>
@@ -73,13 +111,27 @@
       <div>
         <p class="np-hard-kicker">Topic library</p>
         <h2>Practice banks</h2>
-        <p class="np-hard-studio-lead">Select a bank on the left — full set, chapter slice, or timed practice test. The panel shows progress, report, and mistake redo for that bank.</p>
+        <p class="np-hard-studio-lead">Browse by bank type — full set, chapter slice, or practice test. Select a tile to see progress, PDF, report, and mistake redo.</p>
       </div>
-      <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
+      <div class="np-unit-studio-controls">
+        <div class="np-bank-group-tabs" role="tablist" aria-label="Bank type">
+          <button type="button" class="is-active" data-bank-group="all" role="tab" aria-selected="true">All banks</button>
+          {% if bank_groups.full %}
+          <button type="button" data-bank-group="full" role="tab" aria-selected="false">Full bank <em>{{ bank_groups.full|length }}</em></button>
+          {% endif %}
+          {% if bank_groups.chapters %}
+          <button type="button" data-bank-group="chapters" role="tab" aria-selected="false">Chapters <em>{{ bank_groups.chapters|length }}</em></button>
+          {% endif %}
+          {% if bank_groups.practice_tests %}
+          <button type="button" data-bank-group="practice_tests" role="tab" aria-selected="false">Practice test <em>{{ bank_groups.practice_tests|length }}</em></button>
+          {% endif %}
+        </div>
+        <div class="np-hard-studio-filters" role="group" aria-label="Progress filter">
         <button type="button" class="is-active" data-hard-filter="all">All <em>{{ topic_stats.done + topic_stats.progress + topic_stats.new }}</em></button>
         <button type="button" data-hard-filter="new">New <em>{{ topic_stats.new }}</em></button>
         <button type="button" data-hard-filter="progress">Active <em>{{ topic_stats.progress }}</em></button>
         <button type="button" data-hard-filter="done">Done <em>{{ topic_stats.done }}</em></button>
+        </div>
       </div>
     </header>
 
@@ -109,38 +161,51 @@
 
     <div class="np-hard-studio-layout">
       <div class="np-hard-studio-picker">
-        <div class="np-hard-picker-grid np-hard-picker-grid--unit" data-hard-picker role="listbox" aria-label="Choose a topic bank">
-          {% for set in topic_sets %}
-          <button
-            type="button"
-            class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.is_full_bank %} np-hard-picker-tile--featured{% endif %}{% if set.is_practice_test %} np-hard-picker-tile--practice-test{% endif %}"
-            data-hard-tile
-            data-index="{{ set.index }}"
-            data-roman="{{ set.code }}"
-            data-state="{{ set.progress_state }}"
-            data-href="{{ set.href }}"
-            data-practice-href="{{ set.practice_href }}"
-            data-report-href="{{ set.report_href or '' }}"
-            data-restart="{{ set.restart_href }}"
-            data-miss-href="{{ set.miss_quiz_href or '' }}"
-            data-pdf-href="{{ set.pdf_href or '' }}"
-            data-wrong-count="{{ set.wrong_count }}"
-            data-subtitle="{{ set.title }}"
-            data-answered="{{ set.answered }}"
-            data-total="{{ set.total }}"
-            data-progress="{{ set.progress_pct }}"
-            role="option"
-            aria-selected="false"
-            aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
-            style="--tile-progress: {{ set.progress_pct }}%;"
-          >
-            <span class="np-hard-picker-roman">{{ set.code }}</span>
-            {% if set.is_practice_test %}<span class="np-hard-picker-badge">Test</span>{% endif %}
-            <span class="np-hard-picker-num">{% if set.is_full_bank %}Full bank{% elif set.is_practice_test %}Practice test{% else %}Chapter{% endif %} · {{ set.total }} Q</span>
-            <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
-            <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}{% if set.wrong_count %} · {{ set.wrong_count }} miss{% endif %}</span>
-          </button>
-          {% endfor %}
+        <div class="np-hard-picker-groups" data-hard-picker-groups>
+          {% if bank_groups.full %}
+          <section class="np-bank-group" data-bank-group-section="full">
+            <header class="np-bank-group-head">
+              <div>
+                <p class="np-hard-kicker">Complete set</p>
+                <h3>Full bank</h3>
+              </div>
+              <span class="np-bank-group-count">{{ bank_groups.full|length }} bank · {{ bank_groups.full[0].total if bank_groups.full else 0 }} Q</span>
+            </header>
+            <div class="np-hard-picker-grid np-hard-picker-grid--unit np-hard-picker-grid--full" data-hard-picker role="listbox" aria-label="Full bank">
+              {% for set in bank_groups.full %}{{ unit_picker_tile(set) }}{% endfor %}
+            </div>
+          </section>
+          {% endif %}
+
+          {% if bank_groups.chapters %}
+          <section class="np-bank-group" data-bank-group-section="chapters">
+            <header class="np-bank-group-head">
+              <div>
+                <p class="np-hard-kicker">Focused drills</p>
+                <h3>Chapter slices</h3>
+              </div>
+              <span class="np-bank-group-count">{{ bank_groups.chapters|length }} chapters</span>
+            </header>
+            <div class="np-hard-picker-grid np-hard-picker-grid--unit np-hard-picker-grid--chapters" data-hard-picker role="listbox" aria-label="Chapter slices">
+              {% for set in bank_groups.chapters %}{{ unit_picker_tile(set) }}{% endfor %}
+            </div>
+          </section>
+          {% endif %}
+
+          {% if bank_groups.practice_tests %}
+          <section class="np-bank-group np-bank-group--practice" data-bank-group-section="practice_tests">
+            <header class="np-bank-group-head">
+              <div>
+                <p class="np-hard-kicker">Mock exam</p>
+                <h3>Practice test</h3>
+              </div>
+              <span class="np-bank-group-count">{{ bank_groups.practice_tests[0].total if bank_groups.practice_tests else 0 }} questions · printable PDF</span>
+            </header>
+            <div class="np-hard-picker-grid np-hard-picker-grid--unit np-hard-picker-grid--practice" data-hard-picker role="listbox" aria-label="Practice tests">
+              {% for set in bank_groups.practice_tests %}{{ unit_picker_tile(set) }}{% endfor %}
+            </div>
+          </section>
+          {% endif %}
         </div>
         <p class="np-hard-picker-empty" data-hard-empty hidden>No banks in this filter.</p>
         <p class="np-hard-picker-tip">Tip: arrow keys to browse banks, Enter to open.</p>
@@ -229,6 +294,8 @@
   var emptyEl = library.querySelector("[data-hard-empty]");
   var tiles = Array.prototype.slice.call(library.querySelectorAll("[data-hard-tile]"));
   var filterButtons = Array.prototype.slice.call(library.querySelectorAll("[data-hard-filter]"));
+  var groupButtons = Array.prototype.slice.call(library.querySelectorAll("[data-bank-group]"));
+  var groupSections = Array.prototype.slice.call(library.querySelectorAll("[data-bank-group-section]"));
   var badge = library.querySelector("[data-hard-detail-badge]");
   var ring = library.querySelector("[data-hard-detail-ring]");
   var ringLabel = library.querySelector("[data-hard-detail-ring-label]");
@@ -248,6 +315,7 @@
   var ptPdfWrap = library.querySelector("[data-hard-detail-pt-pdf-wrap]");
   var ptPdfLink = library.querySelector("[data-hard-detail-pt-pdf]");
   var activeFilter = "all";
+  var activeBankGroup = "all";
   var activeTile = null;
   var ringCirc = 2 * Math.PI * 18;
 
@@ -266,7 +334,22 @@
   }
 
   function tileMatches(tile) {
-    return activeFilter === "all" || (tile.getAttribute("data-state") || "") === activeFilter;
+    var stateOk = activeFilter === "all" || (tile.getAttribute("data-state") || "") === activeFilter;
+    if (!stateOk) return false;
+    if (activeBankGroup === "all") return true;
+    var bankType = tile.getAttribute("data-bank-type") || "";
+    if (activeBankGroup === "full") return bankType === "full";
+    if (activeBankGroup === "chapters") return bankType === "chapter";
+    if (activeBankGroup === "practice_tests") return bankType === "practice_test";
+    return true;
+  }
+
+  function syncGroupSections() {
+    groupSections.forEach(function (section) {
+      var key = section.getAttribute("data-bank-group-section") || "";
+      var showSection = activeBankGroup === "all" || activeBankGroup === key;
+      section.hidden = !showSection;
+    });
   }
 
   function setRing(progress) {
@@ -361,6 +444,7 @@
   }
 
   function applyFilters() {
+    syncGroupSections();
     var visible = [];
     tiles.forEach(function (tile) {
       var show = tileMatches(tile);
@@ -375,6 +459,17 @@
     btn.addEventListener("click", function () {
       filterButtons.forEach(function (b) { b.classList.toggle("is-active", b === btn); });
       activeFilter = btn.getAttribute("data-hard-filter") || "all";
+      applyFilters();
+    });
+  });
+
+  groupButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      groupButtons.forEach(function (b) {
+        b.classList.toggle("is-active", b === btn);
+        b.setAttribute("aria-selected", b === btn ? "true" : "false");
+      });
+      activeBankGroup = btn.getAttribute("data-bank-group") || "all";
       applyFilters();
     });
   });

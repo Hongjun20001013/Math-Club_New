@@ -1,0 +1,483 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 自定义颜色
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{lightgray}{RGB}{230, 230, 230}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{darkgray}{RGB}{50, 50, 50}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+\graphicspath{{static/course_materials/}{./}}
+
+% 主题设置
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Unit 3.1]{\textbf{SAT Unit 3.1 \\Ratios, Rates, and Units}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+
+% --- Title Slide ---
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Ratio}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Ratio}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+
+% Slide 3: What is a Ratio?
+\begin{frame}{What is a Ratio?}
+    A \textbf{ratio} is a comparison between two numbers. It can be written in three different ways:
+    
+    \[
+    \frac{a}{b}, \quad a:b, \quad \text{or } a \text{ to } b
+    \]
+
+    \textbf{Example:} The ratio of boys to girls in a class is 3 to 4.  
+    - This means for every 3 boys, there are 4 girls.  
+    - The fraction form is \( \frac{3}{4} \).
+\end{frame}
+
+
+
+
+\begin{frame}{Example: Growth Factor Calculation}
+
+        \begin{tabular}{|l|c|}
+            \hline
+            \textbf{Species of tree} & \textbf{Growth factor} \\ \hline
+            River birch & 3.5 \\ \hline
+            Cottonwood & 2.0 \\ \hline
+            Black walnut & 4.5 \\ \hline
+            White birch & 5.0 \\ \hline
+            American elm & 4.0 \\ \hline
+            Pin oak & 3.0 \\ \hline
+            Shagbark hickory & 7.5 \\ \hline
+        \end{tabular}
+
+        One method of calculating the approximate age, in years, of a tree of a particular species is to multiply the diameter of the tree, in inches, by a constant called the growth factor for that species.
+
+        The table on the previous slide provides the growth factors for eight species of trees.
+
+        If a white birch tree and a pin oak tree each now have a diameter of 1 foot (12 inches), which of the following will be closest to the difference in inches of their diameters 10 years from now?  
+\end{frame}
+
+% Slide 4: Solution Explanation
+\begin{frame}{Example: Solution}
+    \textbf{Step 1: Calculate the diameter increase for each tree in 10 years}
+    \(Age = Diameter \times Growth\ Factor \)
+
+    
+
+    \textbf{Correct Answer:} \( \boxed{1.3} \)
+\end{frame}
+
+
+
+\begin{frame}
+\section{Rates and Units}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Rates and Units}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+% Slide 4: Rates and Unit Rates
+\begin{frame}{Rates and Unit Rates}
+    A \textbf{rate} is a special type of ratio that compares different units.
+
+    \textbf{Example:} A car travels 180 miles in 3 hours. The rate is:
+
+    \[
+    \frac{180 \text{ miles}}{3 \text{ hours}} = 60 \text{ miles per hour}
+    \]
+
+    A \textbf{unit rate} simplifies the rate so that the denominator is 1.
+
+    \textbf{Example:} If 12 apples cost \$6, the unit price per apple is:
+
+    \[
+    \frac{6 \text{ dollars}}{12 \text{ apples}} = 0.50 \text{ dollars per apple}
+    \]
+\end{frame}
+
+\begin{frame}{Unit Conversion}
+
+\textbf{Key Idea:} Multiply by a conversion factor equal to 1.
+
+\[
+\text{Quantity in old unit} \times \frac{\text{new unit}}{\text{old unit}} = \text{Quantity in new unit}
+\]
+
+\vspace{0.5em}
+\textbf{Example 1: Inches to Feet}
+\[
+36 \text{ inches} \times \frac{\frac{1}{12} \text{ foot}}{{} \text{ 1 inches}} = 3 \text{ feet}
+\]
+
+\vspace{0.5em}
+\textbf{Example 2: Minutes to Seconds}
+\[
+5 \text{ minutes} \times \frac{60 \text{ seconds}}{1 \text{ minute}} = 300 \text{ seconds}
+\]
+
+\vspace{1em}
+\textbf{Tips:}
+\begin{itemize}
+    \item Always write units clearly.
+    \item Cancel the units you don’t need.
+    \item Use a conversion factor that equals 1.
+    \item Check your final units!
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{\textbf{Question: Unit Conversion (Square Miles to Square Yards)}}
+
+A certain town has an area of 4.36 square miles. What is the area, in \textbf{square yards}, of this town?
+
+\textbf{Given:} \(1 \text{ mile} = 1,760 \text{ yards}\)
+
+\begin{itemize}
+    \item[\textbf{A.}] 404
+    \item[\textbf{B.}] 7,674
+    \item[\textbf{C.}] 710,459
+    \item[\textbf{D.}] 13,505,536
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}{\textbf{Answer Explanation: Unit Conversion}}
+
+\textbf{Step 1: Understanding the conversion factor}
+We know that:
+\[
+1 \text{ mile} = 1,760 \text{ yards}
+\]
+Since we are dealing with square miles, we square both sides:
+\[
+1 \text{ square mile} = (1,760 \text{ yards})^2 = 3,097,600 \text{ square yards}
+\]
+
+\textbf{Step 2: Multiply by given area}
+The given area is \( 4.36 \) square miles. Converting to square yards:
+\[
+4.36 \times 3,097,600 = 13,505,536 \text{ square yards}
+\]
+
+\textbf{Correct Answer:} \( \boxed{D} \)
+
+\end{frame}
+
+\begin{frame}
+\section{Proportions}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Proportions}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+
+
+% Slide 5: Solving Proportions
+\begin{frame}{Solving Proportions}
+    A \textbf{proportion} is an equation stating that two ratios are equal:
+
+    \[
+    \frac{a}{b} = \frac{c}{d}
+    \]
+
+    \textbf{Cross Multiplication:} If \( \frac{3}{4} = \frac{x}{12} \), solve for \( x \):
+
+    \[
+    3 \times 12 = 4 \times x
+    \]
+
+    \[
+    36 = 4x \quad \Rightarrow \quad x = 9
+    \]
+\end{frame}
+
+
+\begin{frame}{Question: Solving for \( n \)}
+\textbf{Problem Statement:} 
+
+If 
+
+\[
+\frac{4a}{b} = 6.7 \quad \text{and} \quad \frac{a}{bn} = 26.8,
+\]
+
+what is the value of \( n \)?
+
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Solving for \( n \)}}
+
+\textbf{Step 1: Express \( a/b \) in terms of known values}
+From the first equation:
+\[
+\frac{4a}{b} = 6.7
+\]
+Dividing both sides by 4:
+\[
+\frac{a}{b} = \frac{6.7}{4} = 1.675
+\]
+
+\textbf{Step 2: Substitute into the second equation}
+\[
+\frac{a}{bn} = 26.8
+\]
+Rewriting using \( \frac{a}{b} = 1.675 \):
+\[
+\frac{1.675}{n} = 26.8
+\]
+
+
+
+\textbf{Final Answer:}
+\[
+\boxed{0.0625}
+\]
+
+\end{frame}
+
+
+
+
+
+% Slide 6: Practice Questions
+\begin{frame}{Practice Questions}
+    \textbf{Question 1:} If the ratio of boys to girls in a school is 5:8, and there are 200 boys, how many girls are there?
+
+    \textbf{Question 2:} A car travels 240 miles in 4 hours. What is its speed in miles per hour?
+
+    \textbf{Question 3:} If \( \frac{7}{9} = \frac{x}{36} \), solve for \( x \).
+\end{frame}
+
+% Slide 7: Conclusion
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item Ratios compare two quantities
+        \item Rates involve different units, and unit rates have a denominator of 1
+        \item Proportions are equations that show two equal ratios
+        \item Use cross multiplication to solve proportions
+        \item These concepts are frequently tested on the SAT!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{Ratio Word Problem}
+The ratio of blueberries to grapes in a fruit salad is \(5\) to \(12\). If there are \(x\) blueberries in the fruit salad, which expression represents the number of grapes in the fruit salad?
+\begin{itemize}
+    \item[\textbf{A.}] \(\dfrac{5}{12}x\)
+    \item[\textbf{B.}] \(\dfrac{12}{5}x\)
+    \item[\textbf{C.}] \(\dfrac{12}{17}x\)
+    \item[\textbf{D.}] \(60x\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation}}
+To maintain the ratio \(5:12\) (blueberries to grapes), we set up the proportion:
+\[
+\dfrac{5}{12} = \dfrac{x}{g} \Rightarrow g = \dfrac{12}{5}x
+\]
+\textbf{Correct Answer:} \( \boxed{B} \)\(\dfrac{12}{5}x\)
+\end{frame}
+
+\begin{frame}{Unit Conversion: Area}
+The area of Wompatuck State Park in Massachusetts is \(5.5\) square miles. Which of the following is closest to the area of this park, in \textbf{square kilometers}? (Use \(1\) kilometer \(= 0.62\) mile.)
+\begin{itemize}
+    \item[\textbf{A.}] \(2.1\)
+    \item[\textbf{B.}] \(3.4\)
+    \item[\textbf{C.}] \(8.9\)
+    \item[\textbf{D.}] \(14.3\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation}}
+We are given:
+\[
+\text{Area in square miles} = 5.5, \quad 1 \text{ kilometer} = 0.62 \text{ mile}
+\]
+So,
+\[
+1 \text{ square mile} = \left(\dfrac{1}{0.62}\right)^2 \approx 2.6 \text{ square kilometers}
+\]
+\[
+5.5 \text{ square miles} \approx 5.5 \times 2.6 = 14.3 \text{ square kilometers}
+\]
+\textbf{Correct Answer:} \( \boxed{D} \)\(14.3\)
+\end{frame}
+
+
+\begin{frame}{Scale Modeling}
+A model of a building has a scale where a width of \(5\) inches in the model represents an actual width of \(16\) feet. A room in the building has an actual width of \(10w\) feet. Which expression represents the width, in inches, of the room in the model?
+\begin{itemize}
+    \item[\textbf{A.}] \(\dfrac{5}{8}w\)
+    \item[\textbf{B.}] \(\dfrac{25}{8}w\)
+    \item[\textbf{C.}] \(8w\)
+    \item[\textbf{D.}] \(32w\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation}}
+The scale is \(5\) inches in the model : \(16\) feet in reality.
+
+Let the actual width be \(10w\) feet. To find the width in the model, apply the ratio:
+\[
+\frac{5}{16} = \frac{\text{model width}}{10w} \Rightarrow \text{model width} = \frac{5}{16} \cdot 10w = \frac{50}{16}w = \frac{25}{8}w
+\]
+\textbf{Correct Answer:} \( \boxed{B} \)\(\dfrac{25}{8}w\)
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

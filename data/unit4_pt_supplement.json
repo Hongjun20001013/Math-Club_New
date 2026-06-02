@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "source_note": "Answer key from SAT_Practice_Test_Unit_4.pdf (Unit 4 Practice Test, 22 questions).",
+  "section_titles_zh": {
+    "PT": "Unit 4 模拟测试"
+  },
+  "section_titles_en": {
+    "PT": "Unit 4 Practice Test"
+  },
+  "answers_by_topic": {
+    "4_pt": [
+      "A",
+      "A",
+      {
+        "canonical": "63/5",
+        "alternates": ["12.6", "12.60"]
+      },
+      "B",
+      "A",
+      "C",
+      "C",
+      "D",
+      "C",
+      {
+        "canonical": "2/3",
+        "alternates": ["0.666", "0.667", ".6666", ".6667"]
+      },
+      "B",
+      "6",
+      "784",
+      "3",
+      "A",
+      "A",
+      {
+        "canonical": "39/4",
+        "alternates": ["9.75", "9.750"]
+      },
+      {
+        "canonical": "91/9",
+        "alternates": ["10.111", "10.1111"]
+      },
+      "C",
+      "C",
+      "1008",
+      "230"
+    ]
+  }
+}

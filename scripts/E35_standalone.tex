@@ -1,0 +1,42 @@
+\documentclass[tikz,border=2pt]{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel={$x$},
+        ylabel={$y$},
+        xmin=0, xmax=8,
+        ymin=0, ymax=24,
+        grid=major,
+        width=16cm, height=9cm,
+        axis lines=left,
+        legend style={at={(0.5,-0.15)},anchor=north, font=\small},
+        title={Scatterplot with Regression Line},
+        font=\small
+    ]
+    \addplot[
+        only marks,
+        mark=*,
+        color=blue
+    ] coordinates {
+        (0,21)
+        (1,17)
+        (2,17)
+        (3,15)
+        (4,13)
+        (5,11)
+        (6,9)
+        (7,7)
+        (8,6)
+    };
+    \addlegendentry{Data Points}
+    \addplot[
+        domain=0:8,
+        color=red,
+        thick
+    ] {-1.33*x + 18};
+    \addlegendentry{Line of Best Fit}
+    \end{axis}
+\end{tikzpicture}
+\end{document}

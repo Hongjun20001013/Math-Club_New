@@ -101,6 +101,19 @@ def clean_math(text: str) -> str:
     - $...$    -> \\(...\\)  (only unescaped dollars)
     - \\$      -> $
     """
+    text_vault: list[str] = []
+
+    def _shield_text_block(match: re.Match[str]) -> str:
+        idx = len(text_vault)
+        text_vault.append(match.group(0))
+        return f"%%CMTEXT{idx}%%"
+
+    # Keep \\text{...} literal so $...$ inside labels (e.g. underbrace) is not broken.
+    text = re.sub(
+        r"\\text\{((?:[^{}]|\{[^{}]*\})*)\}",
+        _shield_text_block,
+        text,
+    )
     # Protect escaped currency dollars first so they are never parsed as math delimiters.
     text = text.replace(r"\$", "&#36;")
     # Display math first to avoid being consumed by inline conversion.
@@ -108,6 +121,8 @@ def clean_math(text: str) -> str:
     # Inline math, skipping escaped currency dollars such as \$5.
     # Use \displaystyle for more "math-like" rendering (clearer fractions/radicals).
     text = re.sub(r"(?<!\\)\$(.+?)(?<!\\)\$", r"\\(\\displaystyle \1\\)", text, flags=re.S)
+    for idx, block in enumerate(text_vault):
+        text = text.replace(f"%%CMTEXT{idx}%%", block)
     return text
 
 
@@ -214,11 +229,20 @@ def _clean_table_cell(cell: str) -> str:
     return cell.strip()
 
 
+def _parse_table_cell(cell: str) -> tuple[int, str]:
+    """Return (colspan, cleaned cell HTML) for a tabular cell."""
+    cell = cell.strip()
+    m = re.match(r"\\multicolumn\{(\d+)\}\{[^}]*\}\{(.*)\}\s*$", cell, re.S)
+    if m:
+        return int(m.group(1)), _clean_table_cell(m.group(2))
+    return 1, _clean_table_cell(cell)
+
+
 def _array_body_to_html_table(body: str) -> str:
     """Turn LaTeX array/tabular body (rows split by \\\\, cols by &) into an HTML table."""
     body = body.strip()
     rows_raw = re.split(r"\\\\", body)
-    rows: list[list[str]] = []
+    rows: list[list[tuple[int, str]]] = []
     for raw in rows_raw:
         r = raw.strip()
         if not r:
@@ -229,20 +253,26 @@ def _array_body_to_html_table(body: str) -> str:
         r = re.sub(r"\s*\\hline\s*$", "", r).strip()
         if not r:
             continue
-        rows.append([_clean_table_cell(c) for c in r.split("&")])
+        rows.append([_parse_table_cell(c) for c in r.split("&")])
     if not rows:
         return ""
     parts = [
         '<div class="stem-table-wrap"><table class="stem-table">',
         "<thead><tr>",
     ]
-    for c in rows[0]:
-        parts.append(f"<th>{c}</th>")
+    for span, c in rows[0]:
+        if span > 1:
+            parts.append(f'<th colspan="{span}">{c}</th>')
+        else:
+            parts.append(f"<th>{c}</th>")
     parts.extend(["</tr></thead>", "<tbody>"])
     for row in rows[1:]:
         parts.append("<tr>")
-        for c in row:
-            parts.append(f"<td>{c}</td>")
+        for span, c in row:
+            if span > 1:
+                parts.append(f'<td colspan="{span}">{c}</td>')
+            else:
+                parts.append(f"<td>{c}</td>")
         parts.append("</tr>")
     parts.extend(["</tbody></table></div>"])
     return "".join(parts)

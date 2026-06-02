@@ -1,0 +1,745 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 自定义颜色
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{lightgray}{RGB}{230, 230, 230}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
+\definecolor{darkgray}{RGB}{50, 50, 50}
+
+% 主题设置
+\usetheme{Madrid}  
+\usecolortheme{dolphin} 
+
+% 设置字体
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+% 封面信息
+\title[SAT Unit 1.4 ]{\textbf{SAT Unit 1.4 \\System of Two Linear Equation in Two Variables }}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today} 
+
+\begin{document}
+
+% --- Title Slide ---
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+% --- Custom Background Slide ---
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+
+
+\end{frame}
+
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+
+\begin{frame}
+\section{Solving System of the Equation}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\huge\bfseries\textcolor{purpleblue}{Solving System of the Equation}} \\[0.5cm]
+            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+
+% Slide: What is a system of equations?
+\begin{frame}{What is a System of Equations?}
+  \begin{itemize}
+    \item A system of equations is a set of two or more equations with the same variables.
+    \item We look for a solution that satisfies all equations simultaneously.
+    \item In two variables (usually $x$ and $y$), a system of linear equations is:
+    \[
+    \begin{cases}
+    a_1x + b_1y = c_1 \\
+    a_2x + b_2y = c_2
+    \end{cases}
+    \]
+    \item The solution is the point $(x, y)$ where the two lines intersect.
+  \end{itemize}
+
+      \begin{center}
+        \includegraphics[width=0.3\linewidth]{E15.png}
+    \end{center}
+\end{frame}
+
+
+% Slide: Solving by Graphing
+\begin{frame}{Solving by Graphing}
+  \begin{itemize}
+    \item Graph both equations on the coordinate plane.
+    \item The point of intersection is the solution.
+    \item This method is visual but not always accurate without graphing tools.
+  \end{itemize}
+
+  \textbf{Example:}
+  \[
+  \begin{cases}
+  y = 2x + 1 \\
+  y = -x + 4
+  \end{cases}
+  \quad \Rightarrow \quad \text{Intersect at } (1, 3)
+  \]
+\end{frame}
+
+% Slide: Solving by Substitution
+\begin{frame}{Solving by Substitution}
+  \textbf{Steps:}
+  \begin{enumerate}
+    \item Solve one equation for one variable.
+    \item Substitute that expression into the other equation.
+    \item Solve for the remaining variable, then back-substitute to find the other.
+  \end{enumerate}
+
+  \textbf{Example:}
+  \[
+  \begin{cases}
+  y = 3x + 2 \\
+  2x + y = 16
+  \end{cases}
+  \Rightarrow 2x + (3x + 2) = 16 
+  \]
+\end{frame}
+
+% Slide: Solving by Elimination
+\begin{frame}{Solving by Elimination}
+  \textbf{Steps:}
+  \begin{enumerate}
+    \item Align both equations.
+    \item Multiply one or both equations to make coefficients cancel.
+    \item Add/subtract to eliminate one variable.
+    \item Solve for one variable, then substitute to find the other.
+  \end{enumerate}
+
+  \textbf{Example:}
+  \[
+  \begin{cases}
+  3x + 2y = 16 \\
+  5x - 2y = 4
+  \end{cases}
+  \Rightarrow 8x = 20 \Rightarrow x = 2, \ y = 5
+  \]
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Solve for \( y \)}}
+    Solve for \( y \) in the system of equations:
+    \[
+    \begin{aligned}
+        -x + y &= -3.5 \\
+        x + 3y &= 9.5
+    \end{aligned}
+    \]
+    If \( (x, y) \) satisfies the system above, what is the value of \( y \)?
+\end{frame}
+
+% --- Solution Slide ---
+\begin{frame}{\textbf{Answer Explanation: Solve for \( y \)}}
+\small
+\begin{columns}
+    % Left column for solution steps
+    \column{0.65\textwidth}
+    
+    \textbf{Step 1: Solve for \( x \)}
+    \begin{itemize}
+        \item Rewrite the first equation for \( x \):
+        \[
+        x = y + 3.5
+        \]
+        \item Substitute into the second equation:
+        \[
+        (y + 3.5) + 3y = 9.5
+        \]
+    \end{itemize}
+
+    \textbf{Step 2: Solve for \( y \)}
+    \begin{itemize}
+        \item Simplify:
+        \[
+        4y + 3.5 = 9.5
+        \]
+        \item Divide by 4:
+        \[
+        y = \frac{6}{4} = 1.5
+        \]
+    \end{itemize}
+
+    % Right column for the image
+    \column{0.35\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{E16.png}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{\textbf{Question: Parametric Point on Equivalent Lines}}
+    \textbf{Given:}
+    \[
+    \begin{aligned}
+        2x + 3y &= 7 \\
+        10x + 15y &= 35
+    \end{aligned}
+    \]
+
+    For each real number $r$, which of the following points lies on the graph of \textbf{each} equation in the $xy$-plane?
+
+    \begin{itemize}
+        \item[(A)] $\left( \frac{r}{5} + 7,\ -\frac{r}{5} + 35 \right)$
+        \item[(B)] $\left( -\frac{3r}{2} + \frac{7}{2},\ r \right)$
+        \item[(C)] $\left( r,\ \frac{2r}{3} + \frac{7}{3} \right)$
+        \item[(D)] $\left( r,\ -\frac{3r}{2} + \frac{7}{2} \right)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Parametric Point on Equivalent Lines}}
+    \[
+    \begin{aligned}
+        2x + 3y &= 7 \\
+        10x + 15y &= 35
+    \end{aligned}
+    \]
+
+    \begin{itemize}
+        \item Second equation is a multiple of the first: $5(2x + 3y) = 10x + 15y = 35$.
+        \item Therefore, both equations are equivalent — they represent the same line.
+    \end{itemize}
+
+    \textbf{Step 2: Pick a parametric form}
+    \begin{itemize}
+        \item Solve $2x + 3y = 7$ for $x$:
+        \[
+        x = -\frac{3}{2}y + \frac{7}{2}
+        \]
+        \item Let $y = r$, then:
+        \[
+        x = -\frac{3}{2}r + \frac{7}{2}
+        \]
+        \item So the point on the line is $\left(  -\frac{3}{2}r + \frac{7}{2},r \right)$
+    \end{itemize}
+
+    \textbf{Final Answer:} \( \boxed{B} \)
+
+\end{frame}
+
+
+\begin{frame}{Another Solution — Answer: B}
+    \small
+    \textbf{Step 1: Observe the system of equations}
+    \[
+    \begin{aligned}
+        2x + 3y &= 7 \\
+        10x + 15y &= 35
+    \end{aligned}
+    \]
+
+    \begin{itemize}
+        \item Second equation is a multiple of the first:
+        \[
+        5(2x + 3y) = 10x + 15y = 35
+        \]
+        \item So both equations describe the same line.
+    \end{itemize}
+
+    \textbf{Step 2: Plug the coordinates of each choice into the first equation}
+
+    \begin{itemize}
+        \item Choice (B): \( x = -\dfrac{3r}{2} + \dfrac{7}{2}, \quad y = r \)
+        \item Plug into: \( 2x + 3y = 7 \)
+        \[
+        2\left( -\dfrac{3r}{2} + \dfrac{7}{2} \right) + 3r = -3r + 7 + 3r = 7
+        \]
+        \item True! So this point lies on the line.
+    \end{itemize}
+
+    \textbf{Answer:} \( \boxed{B} \)
+\end{frame}
+
+\begin{frame}
+    \section{Types of Solutions}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\huge\bfseries\textcolor{purpleblue}{Types of Solutions}} \\[0.5cm]
+            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+% Slide: Types of Solutions
+\begin{frame}{Types of Solutions}
+  \begin{itemize}
+    \item \textbf{One solution:} The lines intersect at one point.
+    \item \textbf{No solution:} The lines are parallel and never intersect.
+    \item \textbf{Infinitely many solutions:} The lines are identical.
+  \end{itemize}
+\begin{center}
+
+\includegraphics[width=0.9\linewidth]{E17.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{\textbf{Question: Types of Solutions}}
+\small
+In the given system of equations, $p$ is a constant. If the system has no solution, what is the value of $p$?
+\[
+\frac{3}{2}y - \frac{1}{4}x = \frac{2}{3} - \frac{3}{2}y
+\]
+\[
+\frac{1}{2}x + \frac{3}{2} = py + \frac{9}{2}
+\]
+\end{frame}
+\begin{frame}{\textbf{Answer Explanation: Types of Solutions}}
+\small
+
+First equation:
+\[
+\frac{3}{2}y - \frac{1}{4}x = \frac{2}{3} - \frac{3}{2}y
+\Rightarrow \frac{3}{2}y + \frac{3}{2}y - \frac{1}{4}x = \frac{2}{3}
+\Rightarrow 3y - \frac{1}{4}x = \frac{2}{3}
+\]
+
+Second equation:
+\[
+\frac{1}{2}x + \frac{3}{2} = py + \frac{9}{2}
+\Rightarrow \frac{1}{2}x + \frac{3}{2} - \frac{9}{2} = py
+\Rightarrow \frac{1}{2}x - 3 = py
+\]
+
+\textbf{Step 2: Write both in standard form}
+
+From the first:
+\[
+\frac{1}{4}x - 3y = -\frac{2}{3}
+\]
+
+From the second:
+\[
+\frac{1}{2}x - py = 3
+\]
+
+\textbf{Step 3: No solution condition}
+
+To have no solution, the lines must be parallel — same slope, different intercepts.
+
+\[
+\frac{\frac{1}{4}}{-3} = \frac{\frac{1}{2}}{-p}
+\Rightarrow \frac{1}{4} \cdot (-p) = \frac{1}{2} \cdot (-3)
+\Rightarrow -\frac{p}{4} = -\frac{3}{2}
+\Rightarrow \frac{p}{4} = \frac{3}{2}
+\Rightarrow p = 6
+\]
+
+\[
+\boxed{p = 6}
+\]
+\end{frame}
+
+\begin{frame}{\textbf{Question: No Solution — Value of \( t \)}}
+    \textbf{Given:}
+    \[
+    \begin{aligned}
+        4x - 6y &= 10y + 2 \\
+        ty &= \frac{1}{2} + 2x
+    \end{aligned}
+    \]
+    In the given system of equations, $t$ is a constant. If the system has no solution, what is the value of $t$?
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: No Solution — Value of \( t \)}}
+    \small
+    \textbf{Step 1: Rearrange both equations}
+    \begin{itemize}
+        \item Move all terms to one side in the first equation:
+        \[
+        4x - 6y - 10y = 2 \Rightarrow 4x - 16y = 2
+        \]
+        \item Rearranged second equation:
+        \[
+        ty = \frac{1}{2} + 2x \Rightarrow -2x + ty = \frac{1}{2}
+        \]
+    \end{itemize}
+
+    \textbf{Step 2: Identify slope condition for no solution}
+    \begin{itemize}
+        \item Coefficients must give the same slope:
+        \[
+        \frac{4}{-16} = \frac{-2}{t} \Rightarrow -\frac{1}{4} = \frac{-2}{t}
+        \Rightarrow t = 8
+        \]
+    \end{itemize}
+
+    \begin{center}
+        \textbf{Final Answer:} \( \boxed{t = 8} \)
+    \end{center}
+\end{frame}
+
+
+
+\begin{frame}
+\section{Real World Application}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\huge\bfseries\textcolor{purpleblue}{Real World Application}} \\[0.5cm]
+            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+% Slide: Real-World Example
+\begin{frame}{Real-World Application}
+  \textbf{Problem:}  
+  At a concert, 2 adult tickets and 3 student tickets cost \$54.  
+  3 adult tickets and 2 student tickets cost \$56.  
+  What is the price of each ticket?
+
+  \textbf{Let:}
+  \begin{itemize}
+    \item $x$: adult ticket price
+    \item $y$: student ticket price
+  \end{itemize}
+
+  \[
+  \begin{cases}
+  2x + 3y = 54 \\
+  3x + 2y = 56
+  \end{cases}
+
+  \]
+
+\end{frame}
+
+\begin{frame}
+    \section{Practice}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{\textbf{Question: Infinitely Many Solutions — System of Equations}}
+Consider the following system of equations:
+
+\[
+\begin{aligned}
+mx - 6y &= 10 \\
+2x - ny &= 5
+\end{aligned}
+\]
+
+In the given system, \( m \) and \( n \) are constants.  
+The system has \textbf{infinitely many solutions}. What is the value of \( \dfrac{m}{n} \)?
+
+\begin{itemize}
+    \item[\textbf{A.}] \( \dfrac{1}{12} \)
+    \item[\textbf{B.}] \( \dfrac{1}{3} \)
+    \item[\textbf{C.}] \( \dfrac{4}{3} \)
+    \item[\textbf{D.}] \( 3 \)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Infinitely Many Solutions}}
+\small
+
+
+To compare, write Equation (2) in the form of Equation (1) by multiplying both sides by a constant \( k \):
+\[
+k(2x - ny) = k \cdot 5 \Rightarrow 2k x - kn y = 5k
+\]
+
+Compare with:
+\[
+mx - 6y = 10
+\]
+
+Matching coefficients:
+\[
+2k = m, \quad kn = 6, \quad 5k = 10 \Rightarrow k = 2
+\]
+
+Substitute \( k = 2 \):
+\[
+m = 2k = 4, \quad n = \frac{6}{k} = 3 \Rightarrow \frac{m}{n} = \frac{4}{3}
+\]
+
+\textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: No Solution — System with Fractions}}
+Consider the system of equations below:
+
+\[
+\begin{aligned}
+\frac{3}{10}y + \frac{b}{3}x &= \frac{3}{4} - \frac{1}{5}y \\
+\frac{3}{8}x + \frac{3}{5} &= -\frac{1}{4}y + \frac{8}{5}
+\end{aligned}
+\]
+
+In the given system, \( b \) is a constant.  
+If the system has \textbf{no solution}, what is the value of \( b \)?
+
+\begin{itemize}
+    \item[\textbf{A.}] \( \dfrac{3}{2} \)
+    \item[\textbf{B.}] \( \dfrac{4}{9} \)
+    \item[\textbf{C.}] \( \dfrac{9}{4} \)
+    \item[\textbf{D.}] \( \dfrac{9}{2} \)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: No Solution — System with Fractions}}
+\small
+\textbf{Step 1: Rewrite both equations in standard form}
+
+\begin{itemize}
+    \item First equation:
+    \[
+    \frac{3}{10}y + \frac{b}{3}x = \frac{3}{4} - \frac{1}{5}y
+    \Rightarrow \left( \frac{3}{10} + \frac{1}{5} \right)y + \frac{b}{3}x = \frac{3}{4}
+    \Rightarrow \frac{1}{2}y + \frac{b}{3}x = \frac{3}{4}
+    \]
+
+    \item Second equation:
+    \[
+    \frac{3}{8}x + \frac{3}{5} = -\frac{1}{4}y + \frac{8}{5}
+    \Rightarrow \frac{3}{8}x + \frac{3}{5} - \frac{8}{5} = -\frac{1}{4}y
+    \Rightarrow \frac{3}{8}x - 1 = -\frac{1}{4}y
+    \Rightarrow \frac{1}{4}y + \frac{3}{8}x = 1
+    \]
+\end{itemize}
+
+\textbf{Step 2: Standard forms for comparison}
+
+\[
+\text{First: } \frac{b}{3}x + \frac{1}{2}y = \frac{3}{4}
+\qquad
+\text{Second: } \frac{3}{8}x + \frac{1}{4}y = 1
+\]
+
+\textbf{Step 3: No solution requires same slope, different intercepts}
+
+Make slopes equal:
+\[
+\frac{b}{3} : \frac{1}{2} = \frac{3}{8} : \frac{1}{4}
+\Rightarrow \frac{b/3}{1/2} = \frac{3/8}{1/4} \Rightarrow \frac{2b}{3} = \frac{3}{2}
+\Rightarrow b = \frac{9}{4}
+\]
+
+\textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Parametric Point — \( 3x - 2y = 6 \)}}
+\textbf{Given:}
+\[
+3x - 2y = 6 
+\]
+\[6x - 4y = 12\]
+
+For each real number \( r \), which of the following points lies on the graph of \textbf{each} equation in the \( xy \)-plane?
+
+\begin{itemize}
+    \item[\textbf{A.}] \( \left( r, \frac{3r}{2} - 3 \right) \)
+    \item[\textbf{B.}] \( \left( \frac{2r - 6}{3}, r \right) \)
+    \item[\textbf{C.}] \( \left( r, \frac{3r}{2} - 6 \right) \)
+    \item[\textbf{D.}] \( \left( \frac{r - 6}{2}, r \right) \)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Parametric Point — \( 3x - 2y = 6 \)}}
+\textbf{Step 1: Note the system of equations}
+\[
+3x - 2y = 6 \quad \text{and} \quad 6x - 4y = 12
+\]
+These are equivalent (the second is just the first multiplied by 2), so any point that satisfies one will satisfy the other.
+
+\textbf{Step 2: Check point from Option A:}  
+\[
+(x, y) = \left( r, \frac{3r}{2} - 3 \right)
+\]
+Substitute into the first equation:
+\[
+3r - 2\left( \frac{3r}{2} - 3 \right) = 3r - (3r - 6) = 6
+\Rightarrow \text{True!}
+\]
+
+So this point lies on both lines for any real \( r \).
+
+\textbf{Correct Answer:} \( \boxed{A} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: Parametric Point — \( 4x + y = 10 \)}}
+\textbf{Given:}
+\[
+4x + y = 10 
+\]
+\[12x + 3y = 30\]
+
+For each real number \( r \), which of the following points lies on the graph of \textbf{both} equations in the \( xy \)-plane?
+
+\begin{itemize}
+    \item[\textbf{A.}] \( \left( r, -4r + 10 \right) \)
+    \item[\textbf{B.}] \( \left( \frac{r - 10}{4}, r \right) \)
+    \item[\textbf{C.}] \( \left( r, 4r + 10 \right) \)
+    \item[\textbf{D.}] \( \left( r, \frac{10 - r}{4} \right) \)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Parametric Point — \( 4x + y = 10 \)}}
+\textbf{Step 1: Recognize proportional system.}  
+The second equation is exactly 3 times the first:
+\[
+12x + 3y = 3(4x + y) = 30
+\]
+So any point satisfying the first also satisfies the second — they are the same line.
+
+\textbf{Step 2: Try Option A:}  
+\[
+(x, y) = \left( r, -4r + 10 \right)
+\]
+Substitute into the first equation:
+\[
+4r + (-4r + 10) = 10 \Rightarrow 10 = 10 \quad \text{✓ True!}
+\]
+
+\textbf{Correct Answer:} \( \boxed{A} \)
+\end{frame}
+
+\begin{frame}{\textbf{Question: No Solution — Fractions (Value of \( m \))}}
+Given the following system of equations:
+
+\[
+\frac{4}{3} + \frac{5}{4}x = 28y + \frac{5}{8}x
+\]
+\[
+my = \frac{1}{2}(5x - 8)
+\]
+
+In the given system of equations, \( m \) is a constant.  
+If the system has \textbf{no solution}, what is the value of \( m \)?
+
+\begin{itemize}
+    \item[\textbf{A.}] \( 28 \)
+    \item[\textbf{B.}] \( 56 \)
+    \item[\textbf{C.}] \( 112 \)
+    \item[\textbf{D.}] \( 224 \)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: No Solution — Fractions (Value of \( m \))}}
+\small
+
+
+\textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+
+
+
+
+
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+
+    \centering
+    \vspace{5em}
+
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
+    \vfill
+\end{frame}
+
+\end{document}

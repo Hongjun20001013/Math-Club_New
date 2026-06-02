@@ -1,12 +1,16 @@
 """Parse Beamer slide decks (.tex) into rich HTML slides for the course materials viewer."""
 from __future__ import annotations
 
+import json
+import os
+import html as html_module
 import re
 from typing import Any, Optional
 
 from latex_parser import (
     _convert_latex_lists,
     _extract_braced_content,
+    _mathjax_safe_lt_in_tex_math,
     clean_math,
     latex_array_and_tabular_to_html,
     strip_document_noise,
@@ -23,6 +27,17 @@ def _strip_beamer_preamble(tex: str) -> str:
     return tex
 
 
+def _normalize_tex_text_escapes(text: str) -> str:
+    """Turn LaTeX text-mode escapes into plain characters for UI strings."""
+    if not text:
+        return text
+    text = text.replace(r"\&", "&")
+    text = text.replace(r"\$", "$")
+    text = text.replace(r"\%", "%")
+    text = text.replace(r"\_", "_")
+    return text
+
+
 def _extract_beamer_field(tex: str, command: str) -> str:
     m = re.search(
         r"\\" + command + r"(?:\[[^\]]*\])?\{((?:[^{}]|\{[^{}]*\})*)\}",
@@ -31,7 +46,7 @@ def _extract_beamer_field(tex: str, command: str) -> str:
     )
     if not m:
         return ""
-    raw = _unwrap_inline_markup(m.group(1))
+    raw = _normalize_tex_text_escapes(_unwrap_inline_markup(m.group(1)))
     raw = re.sub(r"\\\\", " · ", raw)
     return re.sub(r"\s+", " ", raw).strip()
 
@@ -150,6 +165,18 @@ def _build_contents_html(
     )
 
 
+def _flatten_columns(text: str) -> str:
+    """Unwrap beamer columns/column blocks but keep all inner content."""
+    out = text
+    col_inner = re.compile(
+        r"\\begin\{column\}\{[^}]*\}(.*?)\\end\{column\}",
+        re.S,
+    )
+    while col_inner.search(out):
+        out = col_inner.sub(r"\n\1\n", out)
+    return _unwrap_environment(out, "columns")
+
+
 def _remove_environment(text: str, env: str) -> str:
     out = text
     begin = rf"\begin{{{env}}}"
@@ -186,18 +213,23 @@ def _unwrap_environment(text: str, env: str) -> str:
 
 def _replace_course_material_figures(text: str) -> str:
     """Turn \\includegraphics{file} into slide figures under /static/course_materials/."""
+    static_dir = os.path.join(os.path.dirname(__file__), "static", "course_materials")
 
     def repl(m: re.Match[str]) -> str:
         fname = m.group(1).strip()
         safe = re.sub(r"[^a-zA-Z0-9._-]", "", fname)
         if not safe:
             return ""
-        if safe == "E73.png":
-            safe = "E73.svg"
-        if safe == "E74.png":
-            safe = "E74.svg"
-        if safe == "E14.png":
-            safe = "E14.svg"
+        base, ext = os.path.splitext(safe)
+        if not ext:
+            ext = ".png"
+            safe = base + ext
+        png_name = base + ".png"
+        svg_name = base + ".svg"
+        if os.path.isfile(os.path.join(static_dir, svg_name)):
+            safe = svg_name
+        elif os.path.isfile(os.path.join(static_dir, png_name)):
+            safe = png_name
         return (
             f'<div class="cm-slide-figure"><img class="stem-figure-img cm-slide-figure-img" '
             f'src="/static/course_materials/{safe}" alt="" loading="lazy" /></div>'
@@ -362,6 +394,12 @@ def _scrub_latex_remnants(text: str) -> str:
     )
     text = re.sub(r"\\color\{[^}]+\}\s*", "", text)
     text = re.sub(
+        r"<p>\\(?:tiny|scriptsize|small|footnotesize|renewcommand|setlength)[^<]*</p>\s*",
+        "",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
         r"\\(?:textrm|textsf|textit|textbf|textit|emph|bfseries|itshape)\b\s*",
         "",
         text,
@@ -371,10 +409,19 @@ def _scrub_latex_remnants(text: str) -> str:
 
 
 def _strip_beamer_layout_commands(text: str) -> str:
-    text = re.sub(r"\\(?:small|footnotesize|normalsize|large|Large|LARGE|Huge|huge)\b\s*", "", text)
+    text = re.sub(
+        r"\\(?:tiny|scriptsize|small|footnotesize|normalsize|large|Large|LARGE|Huge|huge)\b\s*",
+        "",
+        text,
+    )
+    text = re.sub(r"\\renewcommand\{[^}]+\}\{[^}]*\}\s*", "", text)
+    text = re.sub(r"\\setlength\{[^}]+\}\{[^}]*\}\s*", "", text)
+    text = re.sub(r"\\begin\{minipage\}\{[^}]*\}\s*", "", text)
+    text = re.sub(r"\\end\{minipage\}\s*", "", text)
     text = re.sub(r"\\centering\b\s*", "", text)
     text = re.sub(r"\\(?:raggedright|raggedleft)\b\s*", "", text)
     text = re.sub(r"\\(?:medskip|bigskip|smallskip|vfill)\b\s*", "\n", text)
+    text = re.sub(r"\\hfill\b\s*", " %%HFILL%% ", text)
     text = re.sub(r"\\vspace\*?\{[^}]*\}", "\n", text)
     text = re.sub(r"\\hspace\*?\{[^}]*\}", " ", text)
     text = re.sub(r"\\(?:noindent|newline|linebreak)\b\s*", "\n", text)
@@ -476,9 +523,52 @@ def _convert_align_blocks_for_mathjax(text: str) -> str:
     )
 
 
+def _shield_vaulted_blocks(text: str, pattern: str, vault: list[str]) -> str:
+    pat = re.compile(pattern, re.S)
+    while True:
+        m = pat.search(text)
+        if not m:
+            break
+        vault.append(m.group(0))
+        text = pat.sub(f"<<<MATHVAULT_{len(vault) - 1}>>>", text, count=1)
+    return text
+
+
+def _unshield_vaulted_blocks(text: str, vault: list[str]) -> str:
+    for i, chunk in enumerate(vault):
+        text = text.replace(f"<<<MATHVAULT_{i}>>>", chunk)
+    return text
+
+
 def _repair_math_delimiters(text: str) -> str:
     """Fix inline/display delimiters broken by legacy cleanup passes."""
-    text = re.sub(r"\\\(\s*([^)]+?)\s+\)", r"\\(\1\\)", text)
+    # Fix `\(... )` typos where the closing delimiter lost its backslash.
+    out: list[str] = []
+    i = 0
+    open_d, close_d = r"\(", r"\)"
+    while True:
+        idx = text.find(open_d, i)
+        if idx == -1:
+            out.append(text[i:])
+            break
+        out.append(text[i:idx])
+        end = text.find(close_d, idx + 2)
+        if end == -1:
+            bare = idx + 2
+            while bare < len(text):
+                if text[bare] == ")" and (bare + 1 >= len(text) or text[bare + 1] != ")"):
+                    inner = text[idx + 2 : bare].strip()
+                    out.append(f"\\({inner}\\)")
+                    i = bare + 1
+                    break
+                bare += 1
+            else:
+                out.append(text[idx:])
+                break
+            continue
+        out.append(text[idx : end + 2])
+        i = end + 2
+    text = "".join(out)
     text = re.sub(
         r"(<div class=\"stem-math-block cm-math-block\">\\\[.*?)\n\s*\]",
         r"\1\n\\]",
@@ -542,10 +632,9 @@ def _fix_html_in_display_math(text: str) -> str:
 
     text = fix_delimited(r"\[", r"\]", text)
 
-    def fix_inline(m: re.Match[str]) -> str:
-        inner = m.group(1)
+    def fix_inline_inner(inner: str) -> str:
         if "<" not in inner:
-            return m.group(0)
+            return r"\(" + inner + r"\)"
         latex, html = _split_latex_and_html(inner)
         parts: list[str] = []
         if latex:
@@ -554,7 +643,24 @@ def _fix_html_in_display_math(text: str) -> str:
             parts.append(html)
         return " ".join(parts)
 
-    return re.sub(r"\\?\((.*?)\\?\)", fix_inline, text, flags=re.S)
+    out: list[str] = []
+    i = 0
+    open_d, close_d = r"\(", r"\)"
+    olen, clen = len(open_d), len(close_d)
+    while i < len(text):
+        idx = text.find(open_d, i)
+        if idx == -1:
+            out.append(text[i:])
+            break
+        out.append(text[i:idx])
+        end = text.find(close_d, idx + olen)
+        if end == -1:
+            out.append(text[idx:])
+            break
+        inner = text[idx + olen : end]
+        out.append(fix_inline_inner(inner))
+        i = end + clen
+    return "".join(out)
 
 
 def _sanitize_answer_boxes(html: str) -> str:
@@ -605,6 +711,14 @@ def _normalize_display_math(text: str) -> str:
 
 
 def _clean_beamer_noise(text: str) -> str:
+    math_vault: list[str] = []
+
+    def _vault_math(m: re.Match[str]) -> str:
+        math_vault.append(m.group(0))
+        return f"<<<MATHVAULT_{len(math_vault) - 1}>>>"
+
+    text = re.sub(r"\\\[.*?\\\]", _vault_math, text, flags=re.S)
+    text = re.sub(r"\\\(.*?\\\)", _vault_math, text, flags=re.S)
     lines_out = []
     for raw in text.splitlines():
         line = re.sub(r"(?<!\\)%.*$", "", raw).rstrip()
@@ -616,6 +730,8 @@ def _clean_beamer_noise(text: str) -> str:
     text = re.sub(r"\\pagebreak\s*", "", text)
     text = text.replace("{,}", ",")
     text = text.replace(r"\%", "%")
+    for idx, block in enumerate(math_vault):
+        text = text.replace(f"<<<MATHVAULT_{idx}>>>", block)
     return strip_document_noise(text)
 
 
@@ -786,37 +902,57 @@ def _wrap_solution_steps(html: str) -> str:
     return toolbar + "".join(blocks)
 
 
-def _wrap_answer_choices(html: str) -> str:
-    """Turn A–D answer choice lists into interactive pickers."""
-    m = re.search(
-        r"(<p><strong>Answer Choices:\s*</strong></p>\s*)"
-        r'(<ul class="stem-itemize">(.*?)</ul>)',
-        html,
-        flags=re.I | re.S,
-    )
-    if not m:
-        return html
-    choices: list[str] = []
+def _normalize_mcq_marker(marker: str) -> str | None:
+    clean = re.sub(r"<[^>]+>", "", marker).strip().rstrip(".:").strip()
+    clean = clean.strip("()")
+    m = re.match(r"^([A-D])", clean)
+    return m.group(1) if m else None
+
+
+def _clean_mcq_body(body: str) -> str:
+    body = re.sub(r"\\quad\s*", " ", body)
+    body = re.sub(r"\s+", " ", body).strip()
+    return body
+
+
+def _extract_mcq_choices_from_ul(ul_html: str) -> list[tuple[str, str]]:
+    choices: list[tuple[str, str]] = []
     for item in re.finditer(
-        r'<li class="stem-li-labeled"><span class="stem-li-marker">([A-D])\.?</span>\s*'
-        r'<span class="stem-li-body">(.*?)</span></li>',
-        m.group(3),
+        r'<li class="stem-li-labeled">\s*<span class="stem-li-marker">(.*?)</span>\s*'
+        r'<span class="stem-li-body">(.*?)</span>\s*</li>',
+        ul_html,
         flags=re.S,
     ):
-        letter, body = item.group(1), item.group(2)
-        choices.append(
+        letter = _normalize_mcq_marker(item.group(1))
+        if letter:
+            choices.append((letter, _clean_mcq_body(item.group(2))))
+    if not choices:
+        for item in re.finditer(
+            r"<li><strong>([A-D]):\s*</strong>\s*(.*?)</li>",
+            ul_html,
+            flags=re.S,
+        ):
+            choices.append((item.group(1), _clean_mcq_body(item.group(2))))
+    return choices
+
+
+def _build_mcq_interactive(
+    choices: list[tuple[str, str]], *, correct: str | None = None
+) -> str:
+    correct_attr = f' data-cm-correct="{correct}"' if correct else ""
+    buttons = []
+    for letter, body in choices:
+        buttons.append(
             f'<button type="button" class="cm-mcq-choice" data-choice="{letter}">'
             f'<span class="cm-mcq-letter">{letter}</span>'
             f'<span class="cm-mcq-text">{body}</span>'
             "</button>"
         )
-    if not choices:
-        return html
-    grid = (
-        '<div class="cm-mcq-interactive" data-cm-mcq>'
-        '<p class="cm-mcq-prompt">Select your answer, then check when ready.</p>'
+    return (
+        f'<div class="cm-mcq-interactive" data-cm-mcq{correct_attr}>'
+        '<p class="cm-mcq-prompt">Choose your answer</p>'
         '<div class="cm-mcq-grid">'
-        + "".join(choices)
+        + "".join(buttons)
         + "</div>"
         '<div class="cm-mcq-actions">'
         '<button type="button" class="cm-mcq-check" data-cm-check-mcq disabled>Check answer</button>'
@@ -824,31 +960,171 @@ def _wrap_answer_choices(html: str) -> str:
         "</div>"
         "</div>"
     )
-    return html[: m.start()] + m.group(1) + grid + html[m.end() :]
+
+
+def _wrap_answer_choices(html: str) -> str:
+    """Turn A–D answer choice lists into interactive pickers."""
+    if "cm-mcq-interactive" in html:
+        return html
+
+    m = re.search(
+        r"(<p><strong>(?:Answer Choices|Options):\s*</strong></p>\s*)"
+        r'(<div class="cm-mcq-grid">((?:\s*<div class="cm-mcq-choice">.*?</div>)+)\s*</div>)',
+        html,
+        flags=re.I | re.S,
+    )
+    if m:
+        choices: list[tuple[str, str]] = []
+        for item in re.finditer(
+            r'<div class="cm-mcq-choice"><span class="cm-mcq-letter">([A-D])</span>'
+            r'<span class="cm-mcq-text">(.*?)</span></div>',
+            m.group(3),
+            flags=re.S,
+        ):
+            choices.append((item.group(1), _clean_mcq_body(item.group(2))))
+        if len(choices) >= 2:
+            return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
+
+    m = re.search(
+        r"(<p><strong>(?:Answer Choices|Options):\s*</strong></p>\s*)"
+        r'(<ul class="stem-itemize">(.*?)</ul>)',
+        html,
+        flags=re.I | re.S,
+    )
+    if m:
+        choices = _extract_mcq_choices_from_ul(m.group(3))
+        if len(choices) >= 2:
+            return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
+
+    m = re.search(
+        r"(<p><strong>Answer Choices:\s*</strong></p>\s*)"
+        r'(<ul class="stem-itemize">(.*?)</ul>)',
+        html,
+        flags=re.I | re.S,
+    )
+    if m:
+        choices = _extract_mcq_choices_from_ul(m.group(3))
+        if not choices:
+            for item in re.finditer(
+                r'<li class="stem-li-labeled"><span class="stem-li-marker">([A-D])\.?</span>\s*'
+                r'<span class="stem-li-body">(.*?)</span></li>',
+                m.group(3),
+                flags=re.S,
+            ):
+                choices.append((item.group(1), _clean_mcq_body(item.group(2))))
+        if len(choices) >= 2:
+            return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
+
+    return html
+
+
+def _wrap_standalone_mcq_list(html: str) -> str:
+    """Wrap trailing A–D itemize lists (Practice section style) as MCQ grids."""
+    if "cm-mcq-interactive" in html:
+        return html
+    matches = list(
+        re.finditer(r'(<ul class="stem-itemize">(.*?)</ul>)', html, flags=re.S)
+    )
+    if not matches:
+        return html
+    m = matches[-1]
+    choices = _extract_mcq_choices_from_ul(m.group(2))
+    if len(choices) != 4 or not all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
+        return html
+    return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
 
 
 def _wrap_question_challenge(html: str, title: str) -> str:
-    """Add a try-first banner on standalone question slides."""
-    if "cm-try-banner" in html or "cm-mcq-interactive" in html:
+    """Question slides use cm-question-workspace (stem + interact) — no legacy banner."""
+    if "cm-mcq-interactive" in html or "cm-grid-in-interactive" in html or "cm-question-workspace" in html:
         return html
-    tl = title.lower()
-    if not any(k in tl for k in ("question", "problem", "word problem", "example")):
+    return html
+
+
+def _extract_div_block(html: str, class_substr: str) -> tuple[str, str]:
+    if class_substr == "cm-grid-in-interactive":
+        pat = re.compile(
+            r'(<div class="cm-grid-in-interactive"[\s\S]*?'
+            r'<p class="cm-grid-in-feedback"[^>]*></p>\s*</div>)',
+            re.S,
+        )
+    elif class_substr == "cm-mcq-interactive":
+        pat = re.compile(
+            r'(<div class="cm-mcq-interactive"[\s\S]*?'
+            r'<div class="cm-mcq-actions">[\s\S]*?</div>\s*</div>)',
+            re.S,
+        )
+    elif class_substr == "cm-try-banner":
+        pat = re.compile(
+            r'(<div class="cm-try-banner[^"]*"[\s\S]*?</div>\s*(?:</div>\s*)?)',
+            re.S,
+        )
+    else:
+        pat = re.compile(
+            rf'(<div class="[^"]*{re.escape(class_substr)}[^"]*"[\s\S]*?</div>)',
+            re.S,
+        )
+    m = pat.search(html)
+    if not m:
+        return html, ""
+    block = m.group(1)
+    rest = (html[: m.start()] + html[m.end() :]).strip()
+    return rest, block
+
+
+def _remove_try_banners(html: str) -> str:
+    for _ in range(12):
+        if "cm-try-banner" not in html:
+            break
+        rest, block = _extract_div_block(html, "cm-try-banner")
+        if not block:
+            break
+        html = rest
+    return html.strip()
+
+
+def _finalize_question_slide_layout(html: str, strategy_hint: str = "") -> str:
+    if "cm-question-workspace" in html:
         return html
-    if re.search(r"<p><strong>Step\s+\d+", html, re.I):
+    html = _remove_try_banners(html)
+    stem = html
+    interact = ""
+    for cls in ("cm-grid-in-interactive", "cm-mcq-interactive"):
+        stem, block = _extract_div_block(stem, cls)
+        if block:
+            interact = block
+            break
+    stem = stem.strip()
+    if not interact:
         return html
-    banner = (
-        '<div class="cm-try-banner cm-try-banner--question" data-cm-try-banner>'
-        '<div class="cm-try-banner-icon" aria-hidden="true">?</div>'
-        '<div class="cm-try-banner-copy">'
-        "<strong>Try it yourself</strong>"
-        "<span>Pause here and attempt the problem before viewing the solution.</span>"
-        "</div>"
-        '<button type="button" class="cm-reveal-btn cm-reveal-btn--ghost" data-cm-go-answer>'
-        "Go to solution →"
-        "</button>"
-        "</div>"
+    strategy_html = ""
+    if strategy_hint.strip():
+        safe_hint = html_module.escape(strategy_hint.strip())
+        strategy_html = (
+            f'<div class="cm-strategy-chip">'
+            f'<span class="cm-strategy-chip-label">Strategy</span>'
+            f"<p>{safe_hint}</p>"
+            f"</div>"
+        )
+    return (
+        f'<div class="cm-question-workspace">'
+        f'<div class="cm-question-stem">{strategy_html}{stem}</div>'
+        f'<div class="cm-question-interact">{interact}</div>'
+        f"</div>"
     )
-    return banner + html
+
+
+def _finalize_all_question_slides(slides: list[dict[str, Any]]) -> None:
+    for slide in slides:
+        if slide.get("kind") not in {"question", "practice", "example"}:
+            continue
+        html = slide.get("html") or ""
+        if "data-cm-mcq" not in html and "data-cm-grid-in" not in html:
+            continue
+        slide["html"] = _finalize_question_slide_layout(
+            html,
+            str(slide.get("strategy_hint") or ""),
+        )
 
 
 def _needs_math_delimiters(text: str) -> bool:
@@ -859,7 +1135,15 @@ def _needs_math_delimiters(text: str) -> bool:
         return False
     if re.match(r"^[A-D]\.$", t.strip()):
         return False
-    return bool(re.search(r"\\frac|\\Rightarrow|\\neq|=|\^|_[{]|\\boxed|\d+\.?\d*[a-z]|[a-z]\s*[-+]", t))
+    if len(re.findall(r"[A-Za-z]{2,}", t)) >= 5:
+        return False
+    return bool(
+        re.search(
+            r"\\(?:d|t)?frac|\\sqrt|\\left|\\right|\\Rightarrow|\\neq"
+            r"|=|\^|_[{]|\\boxed|\d+\.?\d*[a-z]|[a-z]\s*[-+]\s*(?:\d|\\)",
+            t,
+        )
+    )
 
 
 def _strip_inline_math_delimiters(text: str) -> str:
@@ -881,8 +1165,110 @@ def _answer_card(label: str, value_html: str) -> str:
     )
 
 
+def _format_mixed_prose_answer(raw: str) -> str:
+    text = raw.strip()
+    text = re.sub(
+        r"\\?\(\s*\\mathbf\{([^}]*)\}\s*\\?\)",
+        r"<strong>\1</strong>",
+        text,
+    )
+
+    out: list[str] = []
+    i = 0
+    open_d, close_d = r"\(", r"\)"
+    olen, clen = len(open_d), len(close_d)
+    while i < len(text):
+        idx = text.find(open_d, i)
+        if idx == -1:
+            out.append(text[i:])
+            break
+        out.append(text[i:idx])
+        end = text.find(close_d, idx + olen)
+        if end == -1:
+            out.append(text[idx:])
+            break
+        inner = text[idx + olen : end].strip()
+        if _needs_math_delimiters(inner):
+            out.append(f"\\({inner}\\)")
+        else:
+            out.append(inner)
+        i = end + clen
+    return "".join(out)
+
+
+def _repair_latex_garble(html: str) -> str:
+    """Fix LaTeX fragments left outside MathJax delimiters after HTML conversion."""
+    while True:
+        merged = re.sub(
+            r"\\?\(\s*\\displaystyle\s+(.*?)\\?\)\s*,?\s*\\quad\s*\\?\(\s*\\displaystyle\s+(.*?)\\?\)",
+            lambda m: f"\\(\\displaystyle {m.group(1)}, \\quad {m.group(2)}\\)",
+            html,
+            flags=re.S,
+        )
+        if merged == html:
+            break
+        html = merged
+
+    html = re.sub(
+        r"\\?\(\s*\\displaystyle\s*\\?\)\s*(?=<span class=\"cm-answer-box\">)",
+        "",
+        html,
+        flags=re.S,
+    )
+
+    def fix_broken_card_math(m: re.Match[str]) -> str:
+        inner = _strip_inline_math_delimiters(m.group(2))
+        if _needs_math_delimiters(inner):
+            return f"{m.group(1)}\\(\displaystyle {inner}\\){m.group(3)}"
+        return f"{m.group(1)}{inner}{m.group(3)}"
+
+    html = re.sub(
+        r'(<span class="cm-answer-card-math">)\\?\(\s*\\displaystyle\s*\\?\)\s*(.*?)(</span>)',
+        fix_broken_card_math,
+        html,
+        flags=re.S,
+    )
+
+    html = re.sub(
+        r'(<div class="cm-answer-card-value">)\\?\(\s*\\displaystyle\s*\\?\)\s*(<span class="cm-answer-box">(.*?)</span>)(</div>)',
+        lambda m: f'{m.group(1)}{_format_answer_value(m.group(2))}{m.group(4)}',
+        html,
+        flags=re.S,
+    )
+
+    return html
+
+
+def _format_mcq_letter_with_math(inner: str) -> str | None:
+    """Format 'Correct Answer: C. \\frac{4}{3}' style boxed content."""
+    text = re.sub(r"<[^>]+>", "", inner).strip()
+    text = re.sub(r"\\text\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    m = re.match(
+        r"^(?:Correct Answer:\s*)?([A-D])\.?\s*(.*)$",
+        text,
+        flags=re.I | re.S,
+    )
+    if not m:
+        return None
+    letter = m.group(1).upper()
+    rest = m.group(2).strip()
+    if not rest:
+        return f"<strong>{letter}</strong>"
+    if _needs_math_delimiters(rest):
+        return (
+            f'<strong>{letter}</strong> '
+            f'<span class="cm-answer-card-math">\\({rest}\\)</span>'
+        )
+    return f"<strong>{letter}</strong> {rest}"
+
+
 def _format_answer_value(raw: str) -> str:
     raw = raw.strip()
+    raw = re.sub(r"\\?\(\s*\\displaystyle\s*\\?\)\s*", "", raw)
+    plain_preview = re.sub(r"<[^>]+>", "", raw)
+    if len(re.findall(r"[A-Za-z]{2,}", plain_preview)) >= 5:
+        return _format_mixed_prose_answer(raw)
     raw = re.sub(
         r'^\\?\(\s*(<span class="cm-answer-box">.*?</span>)\s*\\?\)$',
         r"\1",
@@ -892,6 +1278,9 @@ def _format_answer_value(raw: str) -> str:
     box_m = re.search(r'<span class="cm-answer-box">(.*?)</span>', raw, flags=re.S)
     if box_m and raw.strip() in {box_m.group(0), f"\\({box_m.group(0)}\\)"}:
         inner = _strip_inline_math_delimiters(box_m.group(1))
+        mcq_formatted = _format_mcq_letter_with_math(inner)
+        if mcq_formatted:
+            return mcq_formatted
         if _needs_math_delimiters(inner):
             return f'<span class="cm-answer-card-math">\\({inner}\\)</span>'
         return inner
@@ -930,8 +1319,9 @@ def _format_answer_value(raw: str) -> str:
 
 def _polish_answer_lines(html: str) -> str:
     """Turn legacy \\( … \\) answer markup into premium answer cards."""
+    html = _repair_latex_garble(html)
     html = re.sub(
-        r'<p><strong>(Final Answer|Correct Answer):\s*</strong>\s*(.*?)</p>',
+        r'<p><strong>(Final Answer|Correct Answer|Answer):\s*</strong>\s*(.*?)</p>',
         lambda m: _answer_card(m.group(1), _format_answer_value(m.group(2))),
         html,
         flags=re.S | re.I,
@@ -963,6 +1353,26 @@ def _polish_answer_lines(html: str) -> str:
     html = re.sub(r"\\?\(\s*(<span class=\"cm-answer-box\">.*?</span>)\s*\\?\)", r"\1", html, flags=re.S)
     html = re.sub(r"\\?\(\s*(<span class=\"cm-answer-highlight\">.*?</span>)\s*\\?\)", r"\1", html, flags=re.S)
     html = _sanitize_answer_boxes(html)
+    html = re.sub(
+        r'<div class="stem-math-block cm-math-block"><span class="cm-answer-box">(.*?)</span></div>',
+        lambda m: _answer_card(
+            "Correct Answer",
+            _format_answer_value(f'<span class="cm-answer-box">{m.group(1)}</span>'),
+        ),
+        html,
+        flags=re.S,
+    )
+    html = _repair_latex_garble(html)
+    html = re.sub(
+        r'(<div class="cm-answer-card-value">)(\\(?:d|t)?frac\{[^}]+\}\{[^}]+\}(?:[^<]*?)?)(</div>)',
+        lambda m: (
+            f'{m.group(1)}<span class="cm-answer-card-math">\\({m.group(2).strip()}\\)</span>{m.group(3)}'
+            if _needs_math_delimiters(m.group(2))
+            else m.group(0)
+        ),
+        html,
+        flags=re.S,
+    )
     return html
 
 
@@ -997,8 +1407,13 @@ def _fix_aligned_prose(text: str) -> str:
 
 
 def _enrich_slide_html(html: str, kind: str, title: str) -> str:
+    html = html.replace("%%HFILL%%", " ")
     html = _wrap_answer_choices(html)
+    if kind in {"question", "practice", "example"}:
+        html = _wrap_standalone_mcq_list(html)
     html = _wrap_concept_focus(html, kind)
+    html = _wrap_law_rule_slides(html, title)
+    html = _wrap_property_formula_list(html, title)
     html = _wrap_summary_recap(html, title)
     if kind == "example" or re.search(r"<p><strong>Solution:\s*</strong></p>", html, re.I):
         html = _wrap_inline_solution(html)
@@ -1010,6 +1425,14 @@ def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     return html
 
 
+def _body_has_mcq_choices(html: str) -> bool:
+    for ul in re.finditer(r'<ul class="stem-itemize">(.*?)</ul>', html, flags=re.S):
+        choices = _extract_mcq_choices_from_ul(ul.group(1))
+        if len(choices) == 4 and all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
+            return True
+    return False
+
+
 def _detect_slide_kind(title: str, plain: str, html: str) -> str:
     t = (title + " " + plain).lower()
     tl = title.lower().strip()
@@ -1019,10 +1442,17 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
         return "content"
     if "thank you" in t or "cm-slide-closing" in html or "cm-closing-canvas" in html:
         return "closing"
-    if tl.startswith("answer:"):
+    if (
+        tl.startswith("answer:")
+        or tl.startswith("answer explanation:")
+        or tl == "answer"
+        or tl.startswith("answer explanation")
+    ):
         return "answer"
     if tl.startswith("solution:") or (tl.startswith("solution") and "finding" in tl):
         return "solution"
+    if tl.startswith("challenge:"):
+        return "question"
     if re.search(r"\bquestion:\s", plain, re.I) and not re.search(
         r"step\s*1", plain, re.I
     ):
@@ -1037,6 +1467,8 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
             return "practice"
     if tl.startswith("solution") or ": solution" in tl:
         return "solution"
+    if _body_has_mcq_choices(html) and not tl.startswith("answer"):
+        return "question"
     if "introduction" in t or "overview" in t or "definition" in t:
         return "concept"
     if "summary" in tl:
@@ -1046,6 +1478,423 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
     if len(plain) < 40 and not re.search(r"\\[\(\[]", plain):
         return "section"
     return "lesson"
+
+
+def _normalize_math_snippet(text: str) -> str:
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\\displaystyle\s*", "", text)
+    text = re.sub(r"\\?\(\s*", "", text)
+    text = re.sub(r"\s*\\?\)", "", text)
+    text = re.sub(r"\s+", "", text)
+    return text.strip().rstrip(".,;")
+
+
+def _extract_correct_choice(answer_html: str, question_html: str = "") -> str | None:
+    plain = _plain_text_from_html(answer_html)
+    for pattern in (
+        r"correct answer[^a-zA-Z]*([A-D])\b",
+        r"correct interpretation[^a-zA-Z]*([A-D])\b",
+        r"correct answer is[^a-zA-Z]*([A-D])\b",
+        r"option\s*<strong>\s*([A-D])\b",
+        r"option\s+\**([A-D])\b",
+        r'cm-answer-box">([A-D])\.',
+        r'cm-answer-card-value">\s*<strong>\s*([A-D])\s*</strong>',
+        r'cm-answer-card-value">\s*([A-D])\.(?:\s|<|</)',
+        r"\\boxed\{\\text\{Correct Answer:\s*([A-D])",
+        r"\\boxed\{\\text\{([A-D])\.",
+        r"\\boxed\{([A-D])\.?\}",
+        r"\\boxed\{\\text\{([A-D])\}\}",
+    ):
+        m = re.search(pattern, answer_html, flags=re.I | re.S)
+        if m:
+            return m.group(1).upper()
+
+    m = re.search(
+        r'cm-answer-box"><strong>([A-D])</strong>',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if m:
+        return m.group(1).upper()
+
+    m = re.search(
+        r'cm-answer-card-label">(?:Correct Answer|Final Answer)</span>.*?cm-answer-card-value">(?:\s*<strong>\s*)?([A-D])\b',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if m:
+        return m.group(1).upper()
+
+    m = re.search(
+        r'cm-answer-card-label">Correct Answer</span>.*?cm-answer-card-value">(?:<strong>)?([A-D])',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if m:
+        return m.group(1).upper()
+
+    m = re.search(
+        r"<p><strong>([A-D])\.?</strong>",
+        answer_html,
+    )
+    if m and re.search(r"correct interpretation", plain, re.I):
+        return m.group(1).upper()
+
+    final_m = re.search(
+        r'cm-answer-card-label">Final Answer</span>.*?cm-answer-card-value">(.*?)</div>',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if final_m and question_html and "cm-mcq-interactive" in question_html:
+        final_value = _normalize_math_snippet(final_m.group(1))
+        if re.fullmatch(r"[A-D]", final_value, flags=re.I):
+            return final_value.upper()
+        for item in re.finditer(
+            r'data-choice="([A-D])".*?cm-mcq-text">(.*?)</span>',
+            question_html,
+            flags=re.S,
+        ):
+            option_value = _normalize_math_snippet(item.group(2))
+            if option_value and option_value == final_value:
+                return item.group(1).upper()
+
+    return None
+
+
+def _inject_mcq_correct_answers(slides: list[dict[str, Any]]) -> None:
+    by_index = {slide["index"]: slide for slide in slides}
+    for slide in slides:
+        html = slide.get("html", "")
+        if "data-cm-mcq" not in html or "data-cm-correct" in html:
+            continue
+        answer_index = slide.get("answer_index")
+        if not answer_index:
+            continue
+        answer_slide = by_index.get(answer_index)
+        if not answer_slide:
+            continue
+        letter = _extract_correct_choice(answer_slide.get("html", ""), html)
+        if not letter:
+            continue
+        slide["html"] = html.replace(
+            "data-cm-mcq>",
+            f'data-cm-mcq data-cm-correct="{letter}">',
+            1,
+        )
+        slide["correct_choice"] = letter
+
+
+def _replace_dfracs(text: str) -> str:
+    out = text
+    marker = r"\dfrac"
+    while True:
+        idx = out.find(marker)
+        if idx == -1:
+            break
+        pos = idx + len(marker)
+        while pos < len(out) and out[pos].isspace():
+            pos += 1
+        num, pos = _extract_braced_content(out, pos)
+        if num is None:
+            break
+        while pos < len(out) and out[pos].isspace():
+            pos += 1
+        den, pos = _extract_braced_content(out, pos)
+        if den is None:
+            break
+        out = out[:idx] + f"{num}/{den}" + out[pos:]
+    return out
+
+
+def _latex_to_compare_forms(latex: str) -> list[str]:
+    s = latex.strip()
+    boxed_m = re.match(r"\\boxed\{(.+)\}\s*$", s, flags=re.S)
+    if boxed_m:
+        s = boxed_m.group(1).strip()
+    s = re.sub(r"\\displaystyle\s*", "", s)
+    s = re.sub(r"\\(?:left|right)\b", "", s)
+    s = _replace_dfracs(s)
+    s = re.sub(r"\\(?:d|t)?frac\{([^{}]+)\}\{([^{}]+)\}", r"\1/\2", s)
+    s = re.sub(r"\^\{([^{}]+)\}", r"^(\1)", s)
+    s = re.sub(r"\^([^{\s(])", r"^\1", s)
+    s = re.sub(r"_\{([^{}]+)\}", r"_\1", s)
+    s = re.sub(r"\\cdot", "*", s)
+    s = re.sub(r"\\times", "*", s)
+    s = re.sub(r"\s+", "", s)
+    forms: list[str] = []
+    if s:
+        forms.append(s)
+    var_m = re.match(r"([a-zA-Z]+)=(.+)", s)
+    if var_m:
+        forms.append(var_m.group(2))
+        forms.append(f"{var_m.group(1)}={var_m.group(2)}")
+    alt = s.replace("^(", "^").replace(")", "")
+    if alt and alt not in forms:
+        forms.append(alt)
+    for f in list(forms):
+        frac_m = re.fullmatch(r"(-?\d+)/(-?\d+)", f)
+        if frac_m:
+            num, den = int(frac_m.group(1)), int(frac_m.group(2))
+            if den:
+                val = num / den
+                forms.append(str(val))
+                forms.append(f"{val:.4f}".rstrip("0").rstrip("."))
+    return list(dict.fromkeys(x for x in forms if x))
+
+
+def _boxed_latex_values(text: str) -> list[str]:
+    values: list[str] = []
+    for m in re.finditer(r"\\boxed\{([^{}]*(?:\{[^{}]*\})*)\}", text):
+        value = m.group(1).strip()
+        if value:
+            values.append(value)
+    return values
+
+
+def _looks_like_grid_in_value(value: str) -> bool:
+    if not value or len(value) > 48:
+        return False
+    if value.upper() in {"A", "B", "C", "D"}:
+        return False
+    if re.match(r"^[A-D]\.", value):
+        return False
+    if re.search(r"\b(is|greater|less|median|group|option)\b", value, re.I):
+        return False
+    return bool(
+        re.search(
+            r"[\d./\\^\-]|\\(?:d|t)?frac|\\sqrt|pi\b|[a-z]=|[a-z]\^",
+            value,
+            re.I,
+        )
+    )
+
+
+def _grid_in_from_latex(latex: str) -> dict[str, Any] | None:
+    latex = latex.strip()
+    if not _looks_like_grid_in_value(latex):
+        return None
+    accept = _latex_to_compare_forms(latex)
+    if accept:
+        return {"display": latex, "accept": accept}
+    return None
+
+
+def _extract_grid_in_answer(answer_html: str) -> dict[str, Any] | None:
+    """Extract a numeric or expression answer for fill-in-the-blank widgets."""
+    if re.search(
+        r'cm-answer-card-value">\s*<strong>[A-D]</strong>\s*</div>',
+        answer_html,
+        flags=re.S | re.I,
+    ):
+        return None
+    if re.search(
+        r'cm-answer-card-value"><strong>[A-D]</strong>\s*[\d,]',
+        answer_html,
+        flags=re.S | re.I,
+    ):
+        return None
+
+    for boxed in reversed(_boxed_latex_values(answer_html)):
+        extracted = _grid_in_from_latex(boxed)
+        if extracted:
+            return extracted
+
+    eq_boxed = re.search(r"=\s*\\boxed\{([^}]+)\}", answer_html)
+    if eq_boxed:
+        extracted = _grid_in_from_latex(eq_boxed.group(1).strip())
+        if extracted:
+            return extracted
+
+    math_matches = list(
+        re.finditer(r'cm-answer-card-math">\\?\((.*?)\\?\)</span>', answer_html, flags=re.S)
+    )
+    if math_matches:
+        latex = math_matches[-1].group(1).strip()
+        for boxed in reversed(_boxed_latex_values(latex)):
+            extracted = _grid_in_from_latex(boxed)
+            if extracted:
+                return extracted
+        extracted = _grid_in_from_latex(latex)
+        if extracted:
+            return extracted
+
+    card_m = re.search(r'cm-answer-card-value">(.*?)</div>', answer_html, flags=re.S)
+    if card_m:
+        raw = re.sub(r"<[^>]+>", "", card_m.group(1)).strip()
+        raw = re.sub(r"^\\mathbf\{([^}]+)\}$", r"\1", raw)
+        for boxed in reversed(_boxed_latex_values(raw)):
+            extracted = _grid_in_from_latex(boxed)
+            if extracted:
+                return extracted
+        if raw and raw.upper() not in {"A", "B", "C", "D"}:
+            extracted = _grid_in_from_latex(raw)
+            if extracted:
+                return extracted
+
+    final_m = re.search(
+        r'cm-answer-card-label">Final Answer</span>\s*'
+        r'<div class="cm-answer-card-value">(.*?)</div>',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if final_m:
+        raw = re.sub(r"<[^>]+>", "", final_m.group(1)).strip()
+        raw = re.sub(r"^\\mathbf\{([^}]+)\}$", r"\1", raw)
+        for boxed in reversed(_boxed_latex_values(raw)):
+            extracted = _grid_in_from_latex(boxed)
+            if extracted:
+                return extracted
+        if raw and raw.upper() not in {"A", "B", "C", "D"}:
+            extracted = _grid_in_from_latex(raw)
+            if extracted:
+                return extracted
+
+    for boxed in reversed(re.findall(r'cm-answer-box">([^<]+)</span>', answer_html, flags=re.S)):
+        boxed = boxed.strip()
+        extracted = _grid_in_from_latex(boxed)
+        if extracted:
+            return extracted
+
+    return None
+
+
+def _build_grid_in_interactive(data: dict[str, Any]) -> str:
+    accept_json = html_module.escape(json.dumps(data.get("accept") or []), quote=True)
+    display = str(data.get("display") or "")
+    if re.search(r"[a-zA-Z]", display) and re.search(r"[/^]", display):
+        placeholder = "Expression, e.g. x^(4/3)/(3y^2)"
+        hint = (
+            '<p class="cm-grid-in-hint">Use <code>^</code> for exponents and '
+            "<code>/</code> for fractions.</p>"
+        )
+    elif re.search(r"frac|/", display):
+        placeholder = "Fraction or decimal, e.g. 7/6"
+        hint = '<p class="cm-grid-in-hint">Enter an exact fraction or decimal equivalent.</p>'
+    else:
+        placeholder = "Your answer"
+        hint = ""
+    return (
+        f'<div class="cm-grid-in-interactive" data-cm-grid-in data-cm-accept="{accept_json}">'
+        '<p class="cm-grid-in-prompt">Your answer</p>'
+        '<div class="cm-grid-in-row">'
+        f'<input type="text" class="cm-grid-in-input" inputmode="text" '
+        f'placeholder="{html_module.escape(placeholder, quote=True)}" '
+        'autocomplete="off" spellcheck="false" aria-label="Your answer" />'
+        '<button type="button" class="cm-grid-in-check" data-cm-check-grid-in disabled>'
+        "Check</button>"
+        "</div>"
+        f"{hint}"
+        '<div class="cm-grid-in-actions">'
+        '<button type="button" class="cm-reveal-btn cm-reveal-btn--ghost" data-cm-go-answer">'
+        "View worked solution →"
+        "</button>"
+        "</div>"
+        '<p class="cm-grid-in-feedback" aria-live="polite"></p>'
+        "</div>"
+    )
+
+
+def _find_grid_in_answer(slides: list[dict[str, Any]], answer_index: int | None) -> dict[str, Any] | None:
+    if not answer_index:
+        return None
+    by_index = {slide["index"]: slide for slide in slides}
+    for offset in range(3):
+        slide = by_index.get(answer_index + offset)
+        if not slide:
+            break
+        if offset > 0:
+            title = slide.get("title", "").lower()
+            if slide.get("kind") not in {"answer", "solution", "lesson"}:
+                break
+            if not re.search(r"answer|explanation|solution", title):
+                break
+        extracted = _extract_grid_in_answer(slide.get("html") or "")
+        if extracted:
+            return extracted
+    return None
+
+
+def _inject_grid_in_widgets(slides: list[dict[str, Any]]) -> None:
+    by_index = {slide["index"]: slide for slide in slides}
+    for slide in slides:
+        html = slide.get("html") or ""
+        if slide.get("kind") not in {"question", "practice", "example"}:
+            continue
+        if slide.get("inline_solution"):
+            continue
+        if "data-cm-mcq" in html or "data-cm-grid-in" in html:
+            continue
+        if slide.get("kind") == "example" and _body_has_mcq_choices(html):
+            continue
+        answer_index = slide.get("answer_index")
+        if not answer_index:
+            continue
+        extracted = _find_grid_in_answer(slides, answer_index)
+        if not extracted:
+            continue
+        html = _remove_try_banners(html)
+        slide["html"] = html.strip() + "\n" + _build_grid_in_interactive(extracted)
+        slide["grid_in_answer"] = extracted
+        slide["interactive"] = True
+
+
+_FILL_IN_TEACHING_HINTS = (
+    "definition",
+    "introduction",
+    "overview",
+    "summary",
+    "key takeaway",
+    "understanding",
+    "visual",
+    "properties",
+    "types of",
+    "standard form",
+    "vertex form",
+    "factored form",
+    "parabolas",
+    "axis of symmetry",
+    "conditional probability (concept)",
+    "more on mean",
+    "percent greater or less",
+    "rationalizing denomin",
+    "real-world application",
+)
+
+
+def _looks_like_fill_in_question(title: str, plain: str) -> bool:
+    tl = title.lower()
+    if any(hint in tl for hint in _FILL_IN_TEACHING_HINTS):
+        return False
+    if "?" in plain:
+        return True
+    return bool(
+        re.search(
+            r"\b(what is|how many|how much|find the|calculate|probability|express your answer)\b",
+            plain,
+            re.I,
+        )
+    )
+
+
+def _promote_fill_in_slides(slides: list[dict[str, Any]]) -> None:
+    """Turn lesson/example slides followed by numeric answers into questions."""
+    for i, slide in enumerate(slides):
+        if slide.get("kind") not in {"lesson", "example"}:
+            continue
+        html = slide.get("html") or ""
+        if _body_has_mcq_choices(html):
+            continue
+        plain = _plain_text_from_html(html)
+        if not _looks_like_fill_in_question(slide.get("title", ""), plain):
+            continue
+        if i + 1 >= len(slides):
+            continue
+        nxt = slides[i + 1]
+        if nxt.get("kind") not in {"answer", "solution"}:
+            continue
+        if not _extract_grid_in_answer(nxt.get("html") or ""):
+            continue
+        slide["kind"] = "question"
 
 
 def _link_question_answer_slides(slides: list[dict[str, Any]]) -> None:
@@ -1092,6 +1941,16 @@ def _study_hint_for(kind: str, title: str, plain: str) -> str:
     if kind == "example":
         return "Watch the method, then close the solution and redo the problem from scratch."
     if kind == "question" or kind == "practice":
+        if "triangle inequality" in t:
+            return "Triangle inequality: the third side must be greater than the difference and less than the sum of the other two sides."
+        if "system" in t and "inequal" in t:
+            return "For a system, test each point in every inequality — only the overlap region counts."
+        if "inequal" in t and ("table" in t or "array" in plain.lower()):
+            return "Substitute each table row into the inequality — all three rows must satisfy it."
+        if "inequal" in t and "graph" in t:
+            return "Sketch or test regions; note solid vs dashed boundaries and whether endpoints are included."
+        if "inequal" in t:
+            return "When you multiply or divide by a negative, flip the inequality sign — then check with a test value."
         if "no solution" in t:
             return "No-solution means parallel lines: same slope (coefficient of x), different constants."
         if "infinitely many" in t or "infinitely many solutions" in t:
@@ -1114,6 +1973,14 @@ def _study_hint_for(kind: str, title: str, plain: str) -> str:
 
 def _strategy_hint_for(title: str, plain: str) -> str:
     t = (title + " " + plain).lower()
+    if "triangle inequality" in t:
+        return "Use a + b > c, a + c > b, and b + c > a — combine to get the valid range for the unknown side."
+    if "system" in t and "inequal" in t:
+        return "Plug the point into each inequality separately; both must be true."
+    if "inequal" in t and ("table" in t or "6x + 2" in plain):
+        return "Compute the boundary 6x + 2 at each x, then confirm every y is strictly below it."
+    if "inequal" in t:
+        return "Boundary first: rewrite as an equation, then pick a test point to decide which side to shade."
     if "no solution" in t:
         return "Set the coefficients of x equal, then verify the constants produce a contradiction."
     if "infinitely many" in t:
@@ -1144,6 +2011,163 @@ def _wrap_summary_recap(html: str, title: str) -> str:
         "</div>"
     )
     return banner + html
+
+
+def _convert_hfill_examples(text: str) -> str:
+    """Neutralize \\hfill examples before math/list conversion breaks on nested parens."""
+    marker = "%%HFILL%%"
+    out: list[str] = []
+    i = 0
+    while True:
+        idx = text.find(marker, i)
+        if idx == -1:
+            out.append(text[i:])
+            break
+        out.append(text[i:idx])
+        pos = idx + len(marker)
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+        if pos < len(text) and text[pos] == "(":
+            group = _extract_paren_group(text, pos)
+            if group:
+                inner, end = group
+                if re.match(r"e\.g\.,\s*", inner, flags=re.I):
+                    example = re.sub(r"^e\.g\.,\s*", "", inner, flags=re.I).strip()
+                    out.append(f" (e.g., {example})")
+                    i = end
+                    continue
+        out.append(marker)
+        i = idx + len(marker)
+    return "".join(out)
+
+
+def _extract_paren_group(text: str, start: int) -> tuple[str, int] | None:
+    if start >= len(text) or text[start] != "(":
+        return None
+    depth = 0
+    j = start
+    while j < len(text):
+        if j + 1 < len(text) and text[j : j + 2] == r"\(":
+            j += 2
+            continue
+        if j + 1 < len(text) and text[j : j + 2] == r"\)":
+            j += 2
+            continue
+        ch = text[j]
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return text[start + 1 : j], j + 1
+        j += 1
+    return None
+
+
+def _split_rule_formula_example(rest: str) -> tuple[str, str]:
+    rest = rest.replace("%%HFILL%%", " ").strip()
+    m = re.search(r"\(e\.g\.,\s*(.*?)\)\s*$", rest, flags=re.S | re.I)
+    if m:
+        return rest[: m.start()].strip(), m.group(1).strip()
+    return rest.strip(), ""
+
+
+def _build_rule_card(name: str, formula: str, example: str = "") -> str:
+    example_html = ""
+    if example:
+        ex = example if example.lower().startswith("e.g.") else f"e.g., {example}"
+        example_html = f'<span class="cm-rule-example">{ex}</span>'
+    return (
+        f'<div class="cm-rule-card">'
+        f'<span class="cm-rule-name">{name}</span>'
+        f'<span class="cm-rule-formula">{formula}</span>'
+        f"{example_html}"
+        f"</div>"
+    )
+
+
+def _wrap_law_rule_slides(html: str, title: str) -> str:
+    """Turn exponent-law bullet lists into premium rule cards."""
+    if "cm-rule-grid" in html:
+        return html
+    tl = title.lower()
+    if "laws of exponents" not in tl and "%%HFILL%%" not in html:
+        return html
+
+    groups: list[str] = []
+    for m in re.finditer(
+        r'<p><strong>([^<]+)</strong></p>\s*(<ul class="stem-itemize">.*?</ul>)',
+        html,
+        flags=re.S,
+    ):
+        group_name = _normalize_tex_text_escapes(m.group(1).strip())
+        cards: list[str] = []
+        for li_m in re.finditer(r"<li>.*?</li>", m.group(2), flags=re.S):
+            li = li_m.group(0)
+            rule_m = re.match(
+                r"<li><strong>([^:]+):</strong>\s*(.*?)</li>",
+                li.strip(),
+                flags=re.S,
+            )
+            if not rule_m:
+                continue
+            formula, example = _split_rule_formula_example(rule_m.group(2))
+            if formula:
+                cards.append(_build_rule_card(rule_m.group(1).strip(), formula, example))
+        if cards:
+            groups.append(
+                f'<div class="cm-rule-group">'
+                f'<h4 class="cm-rule-group-title">{group_name}</h4>'
+                f'<div class="cm-rule-cards">{"".join(cards)}</div>'
+                f"</div>"
+            )
+
+    if not groups:
+        return html.replace("%%HFILL%%", " ").strip()
+
+    return (
+        f'<div class="cm-rule-grid">'
+        f'<span class="cm-rule-grid-tag">Key rules</span>'
+        f'{"".join(groups)}'
+        f"</div>"
+    )
+
+
+def _wrap_property_formula_list(html: str, title: str) -> str:
+    """Format compact property lists (e.g. radical identities) as rule cards."""
+    if "cm-rule-grid" in html or "cm-rule-card" in html:
+        return html
+    tl = title.lower()
+    if "properties of" not in tl:
+        return html
+    ul_m = re.search(r'(<ul class="stem-itemize">.*?</ul>)', html, flags=re.S)
+    if not ul_m:
+        return html
+    cards: list[str] = []
+    for li_m in re.finditer(r"<li>(.*?)</li>", ul_m.group(1), flags=re.S):
+        body = li_m.group(1).strip()
+        if not body:
+            continue
+        name = ""
+        formula = body
+        label_m = re.match(r"<strong>([^:]+):</strong>\s*(.*)", body, flags=re.S)
+        if label_m:
+            name = label_m.group(1).strip()
+            formula = label_m.group(2).strip()
+        cards.append(_build_rule_card(name or "Property", formula))
+    if len(cards) < 2:
+        return html
+    prefix = html[: ul_m.start()].strip()
+    suffix = html[ul_m.end() :].strip()
+    grid = (
+        f'<div class="cm-rule-grid cm-rule-grid--compact">'
+        f'<span class="cm-rule-grid-tag">Properties</span>'
+        f'<div class="cm-rule-group">'
+        f'<div class="cm-rule-cards">{"".join(cards)}</div>'
+        f"</div></div>"
+    )
+    parts = [p for p in (prefix, grid, suffix) if p]
+    return "\n".join(parts)
 
 
 def _wrap_concept_focus(html: str, kind: str) -> str:
@@ -1183,6 +2207,101 @@ def _build_lesson_path(slides: list[dict[str, Any]]) -> list[dict[str, Any]]:
         title = re.sub(r"^up next\s*", "", slide.get("title", ""), flags=re.I).strip()
         path.append({"index": slide["index"], "title": title or slide.get("title", "")})
     return path
+
+
+def _extract_checkpoint_item(slide: dict[str, Any]) -> dict[str, Any] | None:
+    """Build a compact checkpoint item from an interactive MCQ slide."""
+    html = slide.get("html", "")
+    if "data-cm-mcq" not in html:
+        return None
+    stem_html = html.split('<div class="cm-mcq-interactive"', 1)[0].strip()
+    if not stem_html:
+        return None
+    correct_m = re.search(r'data-cm-correct="([A-D])"', html, flags=re.I)
+    correct = slide.get("correct_choice") or (correct_m.group(1).upper() if correct_m else None)
+    choices: list[dict[str, str]] = []
+    for m in re.finditer(
+        r'data-choice="([A-D])".*?class="cm-mcq-text">(.*?)</span>',
+        html,
+        flags=re.S | re.I,
+    ):
+        choices.append({"letter": m.group(1).upper(), "text": m.group(2).strip()})
+    if len(choices) != 4:
+        return None
+    title = slide.get("title", "")
+    title = re.sub(r"^(Question|Practice|Example):\s*", "", title, flags=re.I).strip()
+    return {
+        "slide_index": slide["index"],
+        "title": title or f"Question {slide['index']}",
+        "section": slide.get("section", ""),
+        "kind": slide.get("kind", "question"),
+        "correct": correct,
+        "answer_index": slide.get("answer_index"),
+        "stem_html": stem_html,
+        "choices": choices,
+    }
+
+
+def _build_lesson_checkpoint(slides: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Collect all MCQ slides from the lesson for end-of-lesson review."""
+    by_index = {slide["index"]: slide for slide in slides}
+    items: list[dict[str, Any]] = []
+    for slide in slides:
+        if slide.get("kind") in {"intro", "content", "section", "closing"}:
+            continue
+        item = _extract_checkpoint_item(slide)
+        if not item:
+            continue
+        if not item.get("correct"):
+            ans_idx = slide.get("answer_index")
+            answer_slide = by_index.get(ans_idx) if ans_idx else None
+            if answer_slide:
+                letter = _extract_correct_choice(
+                    answer_slide.get("html", ""),
+                    slide.get("html", ""),
+                )
+                if letter:
+                    item["correct"] = letter
+        if item.get("correct"):
+            items.append(item)
+    return items
+
+
+def _build_knowledge_map(slides: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group lesson slides into sections for mastery tracking."""
+    sections: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for slide in slides:
+        kind = slide.get("kind", "lesson")
+        if kind == "section":
+            title = re.sub(r"^up next\s*", "", slide.get("title", ""), flags=re.I).strip()
+            current = {
+                "title": title or slide.get("title", "Section"),
+                "start_index": slide["index"],
+                "items": [],
+            }
+            sections.append(current)
+            continue
+        if kind in {"intro", "content", "closing"}:
+            continue
+        if current is None:
+            current = {
+                "title": "Introduction",
+                "start_index": slide["index"],
+                "items": [],
+            }
+            sections.append(current)
+        if kind in {"concept", "lesson", "example", "question", "practice", "answer", "solution"}:
+            current["items"].append(
+                {
+                    "index": slide["index"],
+                    "kind": kind,
+                    "title": (slide.get("title") or "")[:96],
+                    "interactive": bool(slide.get("interactive")),
+                    "has_mcq": "data-cm-mcq" in (slide.get("html") or ""),
+                }
+            )
+    return sections
 
 
 def _enrich_section_slides(slides: list[dict[str, Any]], lesson_path: list[dict[str, Any]]) -> None:
@@ -1227,23 +2346,35 @@ def _clean_frame_body(body: str) -> str:
     ):
         section_m = re.search(r"\\section\*?\{([^{}]+)\}", body)
         if section_m:
+            section_title = _normalize_tex_text_escapes(section_m.group(1).strip())
             return (
                 f'<div class="cm-section-divider">'
                 f'<span class="cm-section-kicker">Up next</span>'
-                f'<h3 class="cm-section-title">{section_m.group(1).strip()}</h3>'
+                f'<h3 class="cm-section-title">{section_title}</h3>'
                 f"</div>"
             )
         return ""
 
+    body = _strip_beamer_layout_commands(body)
+    body = _convert_hfill_examples(body)
     body = _remove_environment(body, "tikzpicture")
-    body = _remove_environment(body, "columns")
+    body = _flatten_columns(body)
     body = _replace_course_material_figures(body)
     body = _unwrap_environment(body, "center")
     body = _remove_environment(body, "flushright")
     body = _remove_environment(body, "flushleft")
     body = _strip_beamer_layout_commands(body)
+    math_vault: list[str] = []
+    body = _shield_vaulted_blocks(body, r"\\\[.*?\\\]", math_vault)
+    body = _shield_vaulted_blocks(body, r"\\\(.*?\\\)", math_vault)
+    body = _shield_vaulted_blocks(
+        body,
+        r"\\begin\{(?:align\*?|equation\*?|gather\*?)\}.*?\\end\{(?:align\*?|equation\*?|gather\*?)\}",
+        math_vault,
+    )
     body = _convert_semantic_markup(body)
     body = _unwrap_inline_markup(body)
+    body = _unshield_vaulted_blocks(body, math_vault)
     body = latex_array_and_tabular_to_html(body)
     body = _convert_beamer_enumerate(body)
     body = _convert_align_blocks_for_mathjax(body)
@@ -1258,6 +2389,7 @@ def _clean_frame_body(body: str) -> str:
     body = _scrub_latex_remnants(body)
     body = _convert_markdown_bold(body)
     body = _format_beamer_html(body)
+    body = _mathjax_safe_lt_in_tex_math(body)
     body = re.sub(r"<p>\s*</p>", "", body)
     body = re.sub(r"\n{3,}", "\n\n", body)
     return body.strip()
@@ -1303,9 +2435,47 @@ def _plain_text_from_html(html: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _strip_inline_math_from_title(text: str) -> str:
+    """Remove \\( … \\) from slide titles, respecting nested parentheses."""
+    result: list[str] = []
+    i = 0
+    while i < len(text):
+        if i + 1 < len(text) and text[i : i + 2] == "\\(":
+            j = i + 2
+            depth = 0
+            matched = False
+            while j < len(text):
+                if j + 1 < len(text) and text[j : j + 2] == "\\(":
+                    depth += 1
+                    j += 2
+                    continue
+                if j + 1 < len(text) and text[j : j + 2] == "\\)":
+                    if depth == 0:
+                        result.append(text[i + 2 : j].strip())
+                        i = j + 2
+                        matched = True
+                        break
+                    depth -= 1
+                    j += 2
+                    continue
+                if text[j] == "(":
+                    depth += 1
+                elif text[j] == ")":
+                    depth -= 1
+                j += 1
+            if not matched:
+                result.append(text[i])
+                i += 1
+        else:
+            result.append(text[i])
+            i += 1
+    return "".join(result)
+
+
 def _clean_slide_title(title: str) -> str:
-    title = _unwrap_inline_markup(title)
-    title = re.sub(r"\\\(\s*([^\\]*?)\\?\s*\)", r"\1", title)
+    title = _normalize_tex_text_escapes(_unwrap_inline_markup(title))
+    title = _strip_inline_math_from_title(title)
+    title = re.sub(r"\\frac\{([^{}]*)\}\{([^{}]*)\}", r"\1/\2", title)
     title = re.sub(r"\\[a-zA-Z]+\b", " ", title)
     title = re.sub(r"[{}]", "", title)
     return re.sub(r"\s+", " ", title).strip()
@@ -1372,8 +2542,12 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
         slide["index"] = i + 3
     slides = [intro_slide, content_slide] + slides
 
+    _promote_fill_in_slides(slides)
     _link_question_answer_slides(slides)
+    _inject_mcq_correct_answers(slides)
+    _inject_grid_in_widgets(slides)
     _annotate_slides(slides)
+    _finalize_all_question_slides(slides)
     lesson_path = _build_lesson_path(slides)
     _enrich_section_slides(slides, lesson_path)
     slides[0]["html"] = _build_intro_html(meta, lesson_path)
@@ -1404,10 +2578,15 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
         deck_title = slides[0]["title"]
 
     stats = _count_interactive_stats(slides)
+    checkpoint = _build_lesson_checkpoint(slides)
+    knowledge_map = _build_knowledge_map(slides)
     return {
         "title": deck_title or "SAT Course Material",
         "slides": slides,
         "slide_count": len(slides),
         "lesson_path": lesson_path,
+        "checkpoint": checkpoint,
+        "checkpoint_count": len(checkpoint),
+        "knowledge_map": knowledge_map,
         **stats,
     }

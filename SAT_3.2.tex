@@ -1,0 +1,436 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 自定义颜色
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{lightgray}{RGB}{230, 230, 230}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{darkgray}{RGB}{50, 50, 50}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+\graphicspath{{static/course_materials/}{./}}
+
+% 主题设置
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Unit 3.2]{\textbf{SAT Unit 3.2 \\Percentages}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+
+% --- Title Slide ---
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Introduction to Percent}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Introduction to Percent}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+% Slide 2: Introduction to Percent
+\begin{frame}{Introduction to Percent}
+    \textbf{Definition:} Percent means "per hundred." It represents a ratio of a number to 100.
+    \[
+    \text{Percent} = \frac{\text{Part}}{\text{Whole}} \times 100
+    \]
+    \textbf{Example:} 25 out of 100 is written as 25\%.
+\end{frame}
+
+% Slide 3: Percent Change Formula
+\begin{frame}{Percent Change Formula}
+    \textbf{Formula:}
+    \[
+    \text{Percent Change} = \frac{\text{New Value} - \text{Original Value}}{\text{Original Value}} \times 100
+    \]
+    \textbf{Example:} If a price increases from \$80 to \$90:
+    \[
+    \frac{90 - 80}{80} \times 100 = 12.5\%
+    \]
+    \textbf{Key Concept:} Positive percent change indicates an increase, negative indicates a decrease.
+\end{frame}
+
+
+\begin{frame}
+\section{Percent Greater or Less Than}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Percent Greater or Less Than}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+% Slide 4: Percent Greater or Less Than
+\begin{frame}{Percent Greater or Less Than}
+
+\begin{center}
+\begin{tabular}{|l|c|c|}
+        \hline
+        & \textbf{Translates to...} & \textbf{Example} \\
+        \hline
+        \(p\%\) of \(x\) & \(\dfrac{p}{100} \times x\) & \(15\%\) of \(x \Rightarrow \dfrac{15}{100} \times x = 0.15x\) \\
+        \hline
+        \(p\%\) greater than \(x\) & \(\left(1 + \dfrac{p}{100} \right)x\) & \(15\%\) greater than \(x \Rightarrow \left(1 + \dfrac{15}{100} \right)x = 1.15x\) \\
+        \hline
+        \(p\%\) less than \(x\) & \(\left(1 - \dfrac{p}{100} \right)x\) & \(15\%\) less than \(x \Rightarrow \left(1 - \dfrac{15}{100} \right)x = 0.85x\) \\
+        \hline
+    \end{tabular}
+\end{center}
+
+
+    \textbf{Example:} If 200 is \textbf{x}\% greater than 50, what is \textbf{x}?
+    \[
+   50 \times \left(1 + \frac{x}{100}\right) = 200
+    \]
+    \textbf{Key Takeaway:} If something is \textbf{50\% greater than} a value, multiply by 1.5.
+\end{frame}
+
+\begin{frame}{\textbf{Question: Percent Relationship Between \(a\), \(b\), and \(c\)}}
+    The number \( a \) is \textbf{70\% less} than the positive number \( b \).
+
+    The number \( c \) is \textbf{60\% greater} than \( a \).
+
+    The number \( c \) is how many times \( b \)?
+\end{frame}
+
+\begin{frame}{\textbf{Answer Explanation: Percent Relationship Between \(a\), \(b\), and \(c\)}}
+    \begin{itemize}
+        \item Since \( a \) is 70\% less than \( b \), we express it as:
+        \[
+        a = (1 - 0.7)b = 0.3b
+        \]
+        \item Since \( c \) is 60\% greater than \( a \), we express it as:
+        \[
+        c = (1 + 0.6)a = 1.6a
+        \]
+        \item Substituting \( a = 0.3b \):
+        \[
+        c = 1.6(0.3b) = 0.48b
+        \]
+        \item Thus, the number \( c \) is \(\mathbf{0.48}\) times \( b \).
+    \end{itemize}
+
+    \textbf{Correct Answer:} \( \boxed{0.48} \)
+\end{frame}
+
+% Slide 7: Summary and Key Takeaways
+\begin{frame}{Key Takeaways}
+    \begin{itemize}
+        \item Percent represents "per hundred."
+        \item Use the \textbf{percent change formula} to calculate increases and decreases.
+        \item "Percent greater than" and "percent less than" refer to the original value.
+        \item Use division to find the original value when given the increased price.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Store Cost from Sale Price}}
+The regular price of a shirt at a store is \(\$11.70\).
+
+The sale price of the shirt is \textbf{80\% less} than the regular price,
+and the sale price is \textbf{30\% greater} than the store's cost for the shirt.
+
+What was the store's cost, in dollars, for the shirt?
+
+\textbf{(Disregard the \$ sign when entering your answer.)}
+\end{frame}
+
+% Slide 3: Answer
+\begin{frame}{\textbf{Answer Explanation: Store Cost from Sale Price}}
+    \begin{itemize}
+        \item \textbf{Step 1: Find the sale price of the shirt}
+        \[
+        \text{Sale Price} = (1 - 0.80) \times 11.70 = 0.20 \times 11.70 = 2.34
+        \]
+        \item \textbf{Step 2: Set up equation for the store’s cost}
+        \[
+        \text{Sale Price} = (1 + 0.30) \times \text{Cost}
+        \]
+        \[
+        2.34 = 1.30 \times \text{Cost}
+        \]
+        \item \textbf{Step 3: Solve for Cost}
+        \[
+        \text{Cost} = \frac{2.34}{1.30} = 1.80
+        \]
+    \end{itemize}
+
+    \textbf{Correct Answer:} \( \boxed{1.80} \)
+\end{frame}
+\begin{frame}
+\section{Increased By vs. Decreased By}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Increased By vs. Decreased By}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+\begin{frame}{ ``Increased By'' vs. ``Decreased By''}
+    
+\textbf{Definitions:}
+\begin{itemize}
+    \item \textbf{Increased by \(p\%\):} Multiply by \(\left(1 + \frac{p}{100}\right)\)
+    \item \textbf{Decreased by \(p\%\):} Multiply by \(\left(1 - \frac{p}{100}\right)\)
+\end{itemize}
+
+\textbf{Examples:}
+\begin{itemize}
+    \item \(120\) increased by \(25\%\): 
+    \[
+    120 \times \left(1 + \frac{25}{100}\right) = 120 \times 1.25 = 150
+    \]
+    \item \(150\) decreased by \(20\%\): 
+    \[
+    150 \times \left(1 - \frac{20}{100}\right) = 150 \times 0.8 = 120
+    \]
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Important Notes}
+
+\vspace{0.1cm}
+\textbf{Important Notes:}
+\begin{itemize}
+    \item \textbf{Be careful:} A 20\% decrease followed by a 20\% increase does \textbf{not} return to the original value!
+    \[
+    100 \to 80 \to 96
+    \]
+    \item Always treat \textbf{``increased by'' and ``decreased by''} as multiplicative — not additive.
+    \item If you are given a final value and percentage, \textbf{reverse the multiplier} to solve for the original.
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Key Insight:} Think in terms of \textbf{scaling}, not just adding or subtracting!
+    
+\end{frame}
+
+\begin{frame}{\textbf{Question: Net Percentage Increase}}
+The value of a collectible comic book increased by \(167\%\) from the end of \textbf{2011} to the end of \textbf{2012}, and then decreased by \(16\%\) from the end of \textbf{2012} to the end of \textbf{2013}. 
+
+What was the net percentage increase in the value of the collectible comic book from the end of \textbf{2011} to the end of \textbf{2013}?
+
+\begin{itemize}
+    \item[\textbf{A.}] \(124.28\%\)
+    \item[\textbf{B.}] \(140.28\%\)
+    \item[\textbf{C.}] \(151.00\%\)
+    \item[\textbf{D.}] \(209.72\%\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Net Percentage Increase}}
+Let the original value at the end of 2011 be \(100\) (for simplicity).
+
+\begin{itemize}
+    \item After a \(167\%\) increase: 
+    \[
+    100 + 1.67 \times 100 = 267
+    \]
+    \item After a \(16\%\) decrease: 
+    \[
+    267 \times (1 - 0.16) = 267 \times 0.84 = 224.28
+    \]
+    \item Net increase from original \(100\): 
+    \[
+    224.28 - 100 = 124.28
+    \]
+    The net increase is \(124.28\%\).
+\end{itemize}
+
+\textbf{Correct Answer:} \( \boxed{A} \)
+\end{frame}
+
+
+\begin{frame}
+\section{Practice}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+        ;
+    \end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Percent Greater Relationship}}
+In 2010, the number of houses built in Town A was \(n\) percent greater than the number of houses built in Town B. If \(700\) houses were built in Town A in 2010, which expression represents the number of houses built in Town B in 2010?
+\begin{itemize}
+    \item[\textbf{A.}] \(700 \left( \dfrac{100 + n}{100} \right)\)
+    \item[\textbf{B.}] \(700 \left( \dfrac{100}{100 + n} \right)\)
+    \item[\textbf{C.}] \(700 \left( \dfrac{100 - n}{100} \right)\)
+    \item[\textbf{D.}] \(700 \left( \dfrac{100}{100 - n} \right)\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Percent Greater Relationship}}
+Let \(x\) be the number of houses in Town B.
+
+Town A had \(n\%\) more than Town B, so:
+\[
+700 = x \left( \dfrac{100 + n}{100} \right)
+\quad \Rightarrow \quad
+x = 700 \cdot \left( \dfrac{100}{100 + n} \right)
+\]
+
+\textbf{Correct Answer:} \( \boxed{B} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Percent of \(c\) that is \(a\)}}
+The sum of positive numbers \(a\) and \(b\) is \(4.76\) times the positive number \(c\), and \(a\) is \(124\%\) of \(b\). What percent of \(c\) is \(a\)?
+\begin{itemize}
+    \item[\textbf{A.}] \(216.85\%\)
+    \item[\textbf{B.}] \(238.00\%\)
+    \item[\textbf{C.}] \(263.50\%\)
+    \item[\textbf{D.}] \(295.12\%\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Percent of \(c\) that is \(a\)}}
+We are given:
+\[
+a + b = 4.76c \quad \text{and} \quad a = 1.24b
+\]
+
+Substitute \(a\) into the sum:
+\[
+1.24b + b = 4.76c \Rightarrow 2.24b = 4.76c \Rightarrow b = \dfrac{4.76c}{2.24}
+\]
+
+Now substitute \(b\) into \(a = 1.24b\):
+\[
+a = 1.24 \cdot \dfrac{4.76c}{2.24} = \dfrac{1.24 \cdot 4.76}{2.24}c = 2.635c
+\]
+
+Convert to percent:
+\[
+a = 263.5\% \text{ of } c
+\]
+
+\textbf{Correct Answer:} \( \boxed{C} \)
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Percent of \(z\) that is \(x\)}}
+The sum of positive numbers \(x\) and \(y\) is \(3.5\) times the positive number \(z\), and \(x\) is \(160\%\) of \(y\). What percent of \(z\) is \(x\)?
+\begin{itemize}
+    \item[\textbf{A.}] \(212.00\%\)
+    \item[\textbf{B.}] \(233.33\%\)
+    \item[\textbf{C.}] \(256.00\%\)
+    \item[\textbf{D.}] \(280.00\%\)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\textbf{Answer Explanation: Percent of \(z\) that is \(x\)}}
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

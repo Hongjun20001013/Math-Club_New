@@ -9,7 +9,7 @@
 <div class="np-cm-cinema">
 <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
 <div class="np-page-shell np-page-shell--cm">
-<div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}">
+<div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}"{% if user_logged_in %} data-cm-sync="1" data-cm-progress-api="{{ cm_progress_api }}"{% endif %}>
 
   <header class="np-cm-hero glass-panel np-glass mp-animate-in">
     <div class="np-cm-hero-top">
@@ -36,6 +36,12 @@
           <span class="np-cm-study-icon" aria-hidden="true">✦</span>
           <span class="np-cm-btn-label">Study mode</span>
         </button>
+        {% if material.checkpoint_count %}
+        <button type="button" class="np-cm-btn np-cm-btn--checkpoint" data-cm-open-checkpoint title="Quick review quiz from this lesson's practice questions">
+          <span aria-hidden="true">✓</span>
+          <span class="np-cm-btn-label">Lesson check ({{ material.checkpoint_count }})</span>
+        </button>
+        {% endif %}
         {% if pdf_href %}
         <a href="{{ pdf_href }}" class="np-cm-btn np-cm-btn--pdf">PDF</a>
         {% endif %}
@@ -63,6 +69,22 @@
         </div>
       </div>
     </div>
+    {% if prev_material or next_material %}
+    <nav class="np-cm-lesson-nav" aria-label="Adjacent lessons">
+      {% if prev_material %}
+      <a href="{{ url_for('practice_course_material_view', slug=prev_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--prev" title="{{ prev_material.title }}">
+        <span class="np-cm-lesson-nav-dir">← {{ prev_material.section }}</span>
+        <span class="np-cm-lesson-nav-title">{{ prev_material.title }}</span>
+      </a>
+      {% endif %}
+      {% if next_material %}
+      <a href="{{ url_for('practice_course_material_view', slug=next_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--next" title="{{ next_material.title }}">
+        <span class="np-cm-lesson-nav-dir">{{ next_material.section }} →</span>
+        <span class="np-cm-lesson-nav-title">{{ next_material.title }}</span>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
   </header>
 
   <div class="np-cm-workspace glass-panel np-glass mp-animate-up">
@@ -80,6 +102,12 @@
         <button type="button" class="np-cm-filter" data-cm-filter="practice" role="tab" aria-selected="false">Practice</button>
       </div>
       <p class="np-cm-path-current" data-cm-path-current>Introduction</p>
+      {% if material.knowledge_map %}
+      <div class="np-cm-knowledge" data-cm-knowledge aria-label="Knowledge map">
+        <p class="np-cm-knowledge-label">Knowledge map</p>
+        <ul class="np-cm-knowledge-list" data-cm-knowledge-list></ul>
+      </div>
+      {% endif %}
       <ol class="np-cm-outline-list" data-cm-outline>
         {% for slide in material.slides %}
         <li class="np-cm-outline-item" data-cm-group="{{ slide.group|default('learn') }}" data-cm-kind="{{ slide.kind|default('lesson') }}">
@@ -131,7 +159,7 @@
       <div class="np-cm-coach" data-cm-coach>
         <div class="np-cm-coach-icon" aria-hidden="true">💡</div>
         <div class="np-cm-coach-body">
-          <strong class="np-cm-coach-label">Study coach</strong>
+          <strong class="np-cm-coach-label">Study tip</strong>
           <p class="np-cm-coach-tip" data-cm-coach-tip>Work through each slide at your own pace.</p>
         </div>
         <div class="np-cm-coach-actions">
@@ -140,6 +168,14 @@
         </div>
       </div>
       <div class="np-cm-hint-panel" data-cm-hint-panel hidden></div>
+
+      <div class="np-cm-resume" data-cm-resume hidden>
+        <p class="np-cm-resume-text" data-cm-resume-text></p>
+        <div class="np-cm-resume-actions">
+          <button type="button" class="np-cm-resume-btn np-cm-resume-btn--accent" data-cm-resume-go>Resume</button>
+          <button type="button" class="np-cm-resume-btn" data-cm-resume-dismiss>Start over</button>
+        </div>
+      </div>
 
       <div class="np-cm-slide-stage">
         <article class="np-cm-slide np-cm-slide--{{ material.slides[0].kind|default('lesson') if material.slides else 'lesson' }}" data-cm-slide>
@@ -192,6 +228,48 @@
 </div>
 </div>
 
+{% if material.checkpoint_count %}
+<div class="np-cm-checkpoint" data-cm-checkpoint hidden aria-hidden="true">
+  <div class="np-cm-checkpoint-backdrop" data-cm-checkpoint-close></div>
+  <div class="np-cm-checkpoint-dialog" role="dialog" aria-modal="true" aria-labelledby="cm-checkpoint-title">
+    <header class="np-cm-checkpoint-head">
+      <div>
+        <p class="np-cm-checkpoint-kicker">Lesson check · {{ material.section }}</p>
+        <h2 id="cm-checkpoint-title" data-cm-checkpoint-title>Knowledge review</h2>
+        <p class="np-cm-checkpoint-sub" data-cm-checkpoint-sub></p>
+      </div>
+      <button type="button" class="np-cm-checkpoint-close" data-cm-checkpoint-close aria-label="Close lesson check">×</button>
+    </header>
+    <div class="np-cm-checkpoint-progress" aria-hidden="true">
+      <div class="np-cm-checkpoint-progress-track"><i data-cm-checkpoint-bar></i></div>
+      <span data-cm-checkpoint-counter></span>
+    </div>
+    <div class="np-cm-checkpoint-body np-prose stem-content" data-cm-checkpoint-body></div>
+    <footer class="np-cm-checkpoint-foot" data-cm-checkpoint-foot>
+      <button type="button" class="np-cm-checkpoint-btn np-cm-checkpoint-btn--ghost" data-cm-checkpoint-close>Back to slides</button>
+      <button type="button" class="np-cm-checkpoint-btn" data-cm-checkpoint-next hidden>Next question →</button>
+    </footer>
+    <div class="np-cm-checkpoint-results" data-cm-checkpoint-results hidden></div>
+  </div>
+</div>
+{% endif %}
+
 <script id="cm-slides-json" type="application/json">{{ material.slides|tojson }}</script>
+{% if material.checkpoint %}
+<script id="cm-checkpoint-json" type="application/json">{{ material.checkpoint|tojson }}</script>
+{% endif %}
+{% if material.knowledge_map %}
+<script id="cm-knowledge-json" type="application/json">{{ material.knowledge_map|tojson }}</script>
+{% endif %}
+<script id="cm-lesson-meta-json" type="application/json">{{ {
+  'slug': material.slug,
+  'section': material.section,
+  'title': material.title,
+  'next_lesson_slug': material.next_lesson_slug,
+  'prev_lesson_slug': material.prev_lesson_slug,
+  'checkpoint_count': material.checkpoint_count|default(0),
+  'interactive_count': material.interactive_count|default(0),
+  'slide_count': material.slide_count|default(0)
+}|tojson }}</script>
 <script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}

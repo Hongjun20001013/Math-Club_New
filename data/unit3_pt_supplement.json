@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "source_note": "Answer key from SAT_Practice_Test_Unit_3.pdf (Unit 3 Practice Test, 22 questions).",
+  "section_titles_zh": {
+    "PT": "Unit 3 模拟测试"
+  },
+  "section_titles_en": {
+    "PT": "Unit 3 Practice Test"
+  },
+  "answers_by_topic": {
+    "3_pt": [
+      "650",
+      {
+        "canonical": "44400",
+        "alternates": ["44,400", "44400.0"]
+      },
+      "33.75",
+      "0.46",
+      "B",
+      "D",
+      "B",
+      "B",
+      "A",
+      "A",
+      "C",
+      "C",
+      "42",
+      "C",
+      "B",
+      "B",
+      "A",
+      "B",
+      "A",
+      "C",
+      "A",
+      "D"
+    ]
+  }
+}
