@@ -3,7 +3,8 @@
 # CRITICAL — accounts & student progress live in SQLite on the persistent disk.
 # If Disks is empty or DB_PATH is wrong, every deploy wipes Jack/staff/student accounts.
 #
-# Render Dashboard (novel-prep-sat only — delete duplicate novel-prep-math):
+# Render Dashboard: keep novel-prep-sat only (Math-Club_New → novel-prep-sat-0f9q.onrender.com).
+# Delete any duplicate services (e.g. novel-prep-math, old novel-prep-sat-sf9o instances) in Settings.
 #   1. Disks → Add: mount /var/data, 1 GB
 #   2. Environment → DB_PATH=/var/data/sat.db  RENDER=true
 #   3. Manual Deploy once after disk is attached

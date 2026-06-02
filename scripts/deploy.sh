@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Push local changes to GitHub; Render auto-deploys from Math-Club_New (main).
 #
+#   origin → https://github.com/Hongjun20001013/Math-Club_New.git
+#   Render → novel-prep-sat @ https://novel-prep-sat-0f9q.onrender.com
 # Usage:
 #   ./scripts/deploy.sh
 #   ./scripts/deploy.sh "Update hard drill layout"
@@ -9,7 +11,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-REMOTE="${DEPLOY_REMOTE:-math-club-new}"
+REMOTE="${DEPLOY_REMOTE:-origin}"
 BRANCH="${DEPLOY_BRANCH:-main}"
 MSG="${1:-Site update $(date +%Y-%m-%d)}"
 
@@ -20,7 +22,7 @@ fi
 
 if ! git remote get-url "$REMOTE" >/dev/null 2>&1; then
   echo "Error: remote '$REMOTE' not found."
-  echo "Add it with: git remote add math-club-new https://github.com/Hongjun20001013/Math-Club_New.git"
+  echo "Add it with: git remote add origin https://github.com/Hongjun20001013/Math-Club_New.git"
   exit 1
 fi
 
@@ -45,5 +47,5 @@ echo "Check deploy status:"
 echo "  https://dashboard.render.com"
 echo
 echo "After Deploy live, refresh your site:"
+echo "  https://novel-prep-sat-0f9q.onrender.com/guide"
 echo "  https://novelmathprep.org"
-echo "  (or your onrender.com URL if the domain is not ready yet)"

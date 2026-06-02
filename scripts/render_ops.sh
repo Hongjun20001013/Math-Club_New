@@ -188,5 +188,5 @@ PY
 
 echo
 echo "==> Done. Wait 2–5 min, then check:"
-echo "  https://novel-prep-sat-sf9o.onrender.com/guide"
-echo "  https://novel-prep-sat-sf9o.onrender.com/health/db"
+echo "  https://novel-prep-sat-0f9q.onrender.com/guide"
+echo "  https://novel-prep-sat-0f9q.onrender.com/health/db"
