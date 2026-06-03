@@ -7,29 +7,30 @@
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
 \definecolor{softPurple}{RGB}{180, 170, 255}
 \definecolor{softGray}{RGB}{235, 235, 245}
 \definecolor{lightText}{RGB}{90, 90, 110}
-\graphicspath{{static/course_materials/}{./}}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
-\title[SAT Unit 3.2]{\textbf{SAT Unit 3.2 \\Percentages}}
+% 封面信息
+\title[SAT Unit 3.2 ]{\textbf{SAT Unit 3.2\\ Percent}}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
-\date{\today}
+\date{\today} 
 
 \begin{document}
-
 
 % --- Title Slide ---
 \begin{frame}
@@ -40,24 +41,36 @@
     \end{flushright}
 \end{frame}
 
+
 \begin{frame}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
+
+
 
 \begin{frame}
 \section{Introduction to Percent}
@@ -128,37 +141,39 @@
 % Slide 4: Percent Greater or Less Than
 \begin{frame}{Percent Greater or Less Than}
 
-\begin{center}
-\begin{tabular}{|l|c|c|}
+\begin{table}[h]
+    \centering
+    \scriptsize % 调整表格大小，可以改为 \scriptsize 进一步缩小
+    \renewcommand{\arraystretch}{1}
+    \begin{tabular}{|c|c|c|}
         \hline
         & \textbf{Translates to...} & \textbf{Example} \\
         \hline
-        \(p\%\) of \(x\) & \(\dfrac{p}{100} \times x\) & \(15\%\) of \(x \Rightarrow \dfrac{15}{100} \times x = 0.15x\) \\
+        $p\%$ of $x$ & $\dfrac{p}{100} \times x$ & $15\%$ of $x \Rightarrow \dfrac{15}{100} \times x = 0.15x$ \\
         \hline
-        \(p\%\) greater than \(x\) & \(\left(1 + \dfrac{p}{100} \right)x\) & \(15\%\) greater than \(x \Rightarrow \left(1 + \dfrac{15}{100} \right)x = 1.15x\) \\
+        $p\%$ greater than $x$ & $\left(1 + \dfrac{p}{100} \right)x$ & $15\%$ greater than $x \Rightarrow \left(1 + \dfrac{15}{100} \right)x = 1.15x$ \\
         \hline
-        \(p\%\) less than \(x\) & \(\left(1 - \dfrac{p}{100} \right)x\) & \(15\%\) less than \(x \Rightarrow \left(1 - \dfrac{15}{100} \right)x = 0.85x\) \\
+        $p\%$ less than $x$ & $\left(1 - \dfrac{p}{100} \right)x$ & $15\%$ less than $x \Rightarrow \left(1 - \dfrac{15}{100} \right)x = 0.85x$ \\
         \hline
     \end{tabular}
-\end{center}
+\end{table}
 
 
     \textbf{Example:} If 200 is \textbf{x}\% greater than 50, what is \textbf{x}?
     \[
-   50 \times \left(1 + \frac{x}{100}\right) = 200
+   50\times(1+x\%)=200
     \]
     \textbf{Key Takeaway:} If something is \textbf{50\% greater than} a value, multiply by 1.5.
 \end{frame}
 
-\begin{frame}{\textbf{Question: Percent Relationship Between \(a\), \(b\), and \(c\)}}
-    The number \( a \) is \textbf{70\% less} than the positive number \( b \).
-
-    The number \( c \) is \textbf{60\% greater} than \( a \).
-
+\begin{frame}{{Example of the Percent}}
+    The number \( a \) is \textbf{70\% less} than the positive number \( b \). \\
+    The number \( c \) is \textbf{60\% greater} than \( a \). \\
     The number \( c \) is how many times \( b \)?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Percent Relationship Between \(a\), \(b\), and \(c\)}}
+% Slide 3: Answer
+\begin{frame}{\textbf{Answer}}
     \begin{itemize}
         \item Since \( a \) is 70\% less than \( b \), we express it as:
         \[
@@ -175,7 +190,7 @@
         \item Thus, the number \( c \) is \(\mathbf{0.48}\) times \( b \).
     \end{itemize}
 
-    \textbf{Correct Answer:} \( \boxed{0.48} \)
+    \textbf{Final Answer:} \( \mathbf{0.48} \)
 \end{frame}
 
 % Slide 7: Summary and Key Takeaways
@@ -189,19 +204,18 @@
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Store Cost from Sale Price}}
-The regular price of a shirt at a store is \(\$11.70\).
+\begin{frame}{{Example of the Percent}}
+    The regular price of a shirt at a store is \(\mathbf{\$11.70}\). \\
+    The sale price of the shirt is \textbf{80\% less} than the regular price, \\
+    and the sale price is \textbf{30\% greater} than the store’s cost for the shirt. \\
+    
+    What was the store’s cost, in dollars, for the shirt? 
 
-The sale price of the shirt is \textbf{80\% less} than the regular price,
-and the sale price is \textbf{30\% greater} than the store's cost for the shirt.
-
-What was the store's cost, in dollars, for the shirt?
-
-\textbf{(Disregard the \$ sign when entering your answer.)}
+    \textbf{(Disregard the \$ sign when entering your answer.)}
 \end{frame}
 
 % Slide 3: Answer
-\begin{frame}{\textbf{Answer Explanation: Store Cost from Sale Price}}
+\begin{frame}{{Answer}}
     \begin{itemize}
         \item \textbf{Step 1: Find the sale price of the shirt}
         \[
@@ -220,10 +234,10 @@ What was the store's cost, in dollars, for the shirt?
         \]
     \end{itemize}
 
-    \textbf{Correct Answer:} \( \boxed{1.80} \)
+    \textbf{Final Answer:} \( \mathbf{1.80} \)
 \end{frame}
 \begin{frame}
-\section{Increased By vs. Decreased By}
+\section{“Increased By” vs. “Decreased By}
     \begin{tikzpicture}[remember picture, overlay]
 
         \shade[top color=softPurple, bottom color=softGray] 
@@ -233,7 +247,7 @@ What was the store's cost, in dollars, for the shirt?
         
 
         \node[align=center] at (current page.center) {
-            {\LARGE\bfseries\textcolor{purpleblue}{Increased By vs. Decreased By}} \\[0.5cm]
+            {\LARGE\bfseries\textcolor{purpleblue}{“Increased By” vs. “Decreased By}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -243,20 +257,21 @@ What was the store's cost, in dollars, for the shirt?
     \end{tikzpicture}
 \end{frame}
 \begin{frame}{ ``Increased By'' vs. ``Decreased By''}
-    
+\small
+
 \textbf{Definitions:}
 \begin{itemize}
-    \item \textbf{Increased by \(p\%\):} Multiply by \(\left(1 + \frac{p}{100}\right)\)
-    \item \textbf{Decreased by \(p\%\):} Multiply by \(\left(1 - \frac{p}{100}\right)\)
+    \item \textbf{Increased by $p\%$:} Multiply by $\left(1 + \frac{p}{100}\right)$
+    \item \textbf{Decreased by $p\%$:} Multiply by $\left(1 - \frac{p}{100}\right)$
 \end{itemize}
 
 \textbf{Examples:}
 \begin{itemize}
-    \item \(120\) increased by \(25\%\): 
+    \item $120$ increased by $25\%$: 
     \[
     120 \times \left(1 + \frac{25}{100}\right) = 120 \times 1.25 = 150
     \]
-    \item \(150\) decreased by \(20\%\): 
+    \item $150$ decreased by $20\%$: 
     \[
     150 \times \left(1 - \frac{20}{100}\right) = 150 \times 0.8 = 120
     \]
@@ -296,7 +311,7 @@ What was the net percentage increase in the value of the collectible comic book 
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Net Percentage Increase}}
+\begin{frame}{\textbf{Answer and Explanation}}
 Let the original value at the end of 2011 be \(100\) (for simplicity).
 
 \begin{itemize}
@@ -310,17 +325,16 @@ Let the original value at the end of 2011 be \(100\) (for simplicity).
     \]
     \item Net increase from original \(100\): 
     \[
-    224.28 - 100 = 124.28
+    224.28 - 100 = 124.28 \Rightarrow \text{Net increase is } \boxed{124.28\%}
     \]
-    The net increase is \(124.28\%\).
 \end{itemize}
 
-\textbf{Correct Answer:} \( \boxed{A} \)
+\textbf{Correct Answer: A. \(124.28\%\)}
 \end{frame}
 
 
 \begin{frame}
-\section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
 
         \shade[top color=softPurple, bottom color=softGray] 
@@ -330,7 +344,7 @@ Let the original value at the end of 2011 be \(100\) (for simplicity).
         
 
         \node[align=center] at (current page.center) {
-            {\LARGE\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\LARGE\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -341,96 +355,134 @@ Let the original value at the end of 2011 be \(100\) (for simplicity).
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Percent Greater Relationship}}
-In 2010, the number of houses built in Town A was \(n\) percent greater than the number of houses built in Town B. If \(700\) houses were built in Town A in 2010, which expression represents the number of houses built in Town B in 2010?
+\begin{frame}{Percent Greater Relationship}
+In 2010, the number of houses built in Town A was $n$ percent greater than the number of houses built in Town B. If $700$ houses were built in Town A in 2010, which expression represents the number of houses built in Town B in 2010?
 \begin{itemize}
-    \item[\textbf{A.}] \(700 \left( \dfrac{100 + n}{100} \right)\)
-    \item[\textbf{B.}] \(700 \left( \dfrac{100}{100 + n} \right)\)
-    \item[\textbf{C.}] \(700 \left( \dfrac{100 - n}{100} \right)\)
-    \item[\textbf{D.}] \(700 \left( \dfrac{100}{100 - n} \right)\)
+    \item[(A)] $700 \left( \dfrac{100 + n}{100} \right)$
+    \item[(B)] $700 \left( \dfrac{100}{100 + n} \right)$
+    \item[(C)] $700 \left( \dfrac{100 - n}{100} \right)$
+    \item[(D)] $700 \left( \dfrac{100}{100 - n} \right)$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Percent Greater Relationship}}
-Let \(x\) be the number of houses in Town B.
+\begin{frame}{Answer}
+Let $x$ be the number of houses in Town B.
 
-Town A had \(n\%\) more than Town B, so:
+Town A had $n\%$ more than Town B, so:
 \[
 700 = x \left( \dfrac{100 + n}{100} \right)
 \quad \Rightarrow \quad
 x = 700 \cdot \left( \dfrac{100}{100 + n} \right)
 \]
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Correct answer:} (B) $700 \left( \dfrac{100}{100 + n} \right)$
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Percent of \(c\) that is \(a\)}}
-The sum of positive numbers \(a\) and \(b\) is \(4.76\) times the positive number \(c\), and \(a\) is \(124\%\) of \(b\). What percent of \(c\) is \(a\)?
+\begin{frame}{Percent Relationship Problem}
+The sum of positive numbers $a$ and $b$ is $4.76$ times the positive number $c$, and $a$ is $124\%$ of $b$. What percent of $c$ is $a$?
 \begin{itemize}
-    \item[\textbf{A.}] \(216.85\%\)
-    \item[\textbf{B.}] \(238.00\%\)
-    \item[\textbf{C.}] \(263.50\%\)
-    \item[\textbf{D.}] \(295.12\%\)
+    \item[(A)] $216.85\%$
+    \item[(B)] $238.00\%$
+    \item[(C)] $263.50\%$
+    \item[(D)] $295.12\%$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Percent of \(c\) that is \(a\)}}
+\begin{frame}{Answer}
 We are given:
 \[
 a + b = 4.76c \quad \text{and} \quad a = 1.24b
 \]
 
-Substitute \(a\) into the sum:
+Substitute $a$ into the sum:
 \[
 1.24b + b = 4.76c \Rightarrow 2.24b = 4.76c \Rightarrow b = \dfrac{4.76c}{2.24}
 \]
 
-Now substitute \(b\) into \(a = 1.24b\):
+Now substitute $b$ into $a = 1.24b$:
 \[
 a = 1.24 \cdot \dfrac{4.76c}{2.24} = \dfrac{1.24 \cdot 4.76}{2.24}c = 2.635c
 \]
 
 Convert to percent:
 \[
-a = 263.5\% \text{ of } c
+\boxed{a = 263.5\% \text{ of } c}
 \]
 
-\textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Correct answer:} (C) $263.50\%$
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Percent of \(z\) that is \(x\)}}
-The sum of positive numbers \(x\) and \(y\) is \(3.5\) times the positive number \(z\), and \(x\) is \(160\%\) of \(y\). What percent of \(z\) is \(x\)?
+\begin{frame}{Percent Relationship Problem}
+The sum of positive numbers $x$ and $y$ is $3.5$ times the positive number $z$, and $x$ is $160\%$ of $y$. What percent of $z$ is $x$?
 \begin{itemize}
-    \item[\textbf{A.}] \(212.00\%\)
-    \item[\textbf{B.}] \(233.33\%\)
-    \item[\textbf{C.}] \(256.00\%\)
-    \item[\textbf{D.}] \(280.00\%\)
+    \item[(A)] $212.00\%$
+    \item[(B)] $233.33\%$
+    \item[(C)] $256.00\%$
+    \item[(D)] $280.00\%$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Percent of \(z\) that is \(x\)}}
+\begin{frame}{Answer}
+We are given:
+\[
+x + y = 3.5z \quad \text{and} \quad x = 1.6y
+\]
+
+Substitute $x$ into the sum:
+\[
+1.6y + y = 3.5z \Rightarrow 2.6y = 3.5z \Rightarrow y = \dfrac{3.5z}{2.6}
+\]
+
+Now substitute $y$ into $x = 1.6y$:
+\[
+x = 1.6 \cdot \dfrac{3.5z}{2.6} = \dfrac{1.6 \cdot 3.5}{2.6}z = \dfrac{5.6}{2.6}z \approx 2.1538z
+\]
+
+Convert to percent:
+\[
+x \approx 215.38\% \text{ of } z
+\]
+
+\textbf{Closest answer:} \boxed{(A) 212.00\%}
 \end{frame}
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
     \end{tikzpicture}
+
     \centering
     \vspace{5em}
+
     {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
     {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
     {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
     \vfill
 \end{frame}
+
+
+
 
 \end{document}

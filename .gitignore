@@ -9,3 +9,11 @@ __pycache__
 build/
 _pdf_img_probe/
 _unit3_img_probe/
+.tmp_sat_source/
+tmp_pdf_*/
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc

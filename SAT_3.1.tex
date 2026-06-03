@@ -7,29 +7,30 @@
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
 \definecolor{softPurple}{RGB}{180, 170, 255}
 \definecolor{softGray}{RGB}{235, 235, 245}
 \definecolor{lightText}{RGB}{90, 90, 110}
-\graphicspath{{static/course_materials/}{./}}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
-\title[SAT Unit 3.1]{\textbf{SAT Unit 3.1 \\Ratios, Rates, and Units}}
+% 封面信息
+\title[SAT Unit 3.1 ]{\textbf{SAT Unit 3.1\\ Ratio, Rates, and Proportions }}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
-\date{\today}
+\date{\today} 
 
 \begin{document}
-
 
 % --- Title Slide ---
 \begin{frame}
@@ -40,24 +41,36 @@
     \end{flushright}
 \end{frame}
 
+
 \begin{frame}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
+
 
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
+
 
 \begin{frame}
 \section{Ratio}
@@ -126,11 +139,11 @@
 % Slide 4: Solution Explanation
 \begin{frame}{Example: Solution}
     \textbf{Step 1: Calculate the diameter increase for each tree in 10 years}
-    \(Age = Diameter \times Growth\ Factor \)
+    $Age = Diameter \times Growth\ Factor $
 
     
 
-    \textbf{Correct Answer:} \( \boxed{1.3} \)
+    \textbf{Final Answer:} \textcolor{blue}{ 1.3}
 \end{frame}
 
 
@@ -212,18 +225,18 @@
 
 
 
-\begin{frame}{\textbf{Question: Unit Conversion (Square Miles to Square Yards)}}
+\begin{frame}{Example: Unit Conversion}
 
-A certain town has an area of 4.36 square miles. What is the area, in \textbf{square yards}, of this town?
+\textbf{Question:} A certain town has an area of 4.36 square miles. What is the area, in \textbf{square yards}, of this town? \\
 
-\textbf{Given:} \(1 \text{ mile} = 1,760 \text{ yards}\)
+\textbf{Given:} \(1 \text{ mile} = 1,760 \text{ yards}\) \\
 
-\begin{itemize}
-    \item[\textbf{A.}] 404
-    \item[\textbf{B.}] 7,674
-    \item[\textbf{C.}] 710,459
-    \item[\textbf{D.}] 13,505,536
-\end{itemize}
+\begin{enumerate}[(A)]
+    \item 404
+    \item 7,674
+    \item 710,459
+    \item 13,505,536
+\end{enumerate}
 
 \end{frame}
 
@@ -233,9 +246,9 @@ A certain town has an area of 4.36 square miles. What is the area, in \textbf{sq
 
 
 
-\begin{frame}{\textbf{Answer Explanation: Unit Conversion}}
+\begin{frame}{Solution:Unit Conversion}
 
-\textbf{Step 1: Understanding the conversion factor}
+\textbf{Step 1: Understanding the conversion factor} \\
 We know that:
 \[
 1 \text{ mile} = 1,760 \text{ yards}
@@ -245,13 +258,16 @@ Since we are dealing with square miles, we square both sides:
 1 \text{ square mile} = (1,760 \text{ yards})^2 = 3,097,600 \text{ square yards}
 \]
 
-\textbf{Step 2: Multiply by given area}
+\textbf{Step 2: Multiply by given area} \\
 The given area is \( 4.36 \) square miles. Converting to square yards:
 \[
 4.36 \times 3,097,600 = 13,505,536 \text{ square yards}
 \]
 
-\textbf{Correct Answer:} \( \boxed{D} \)
+\textbf{Final Answer:} \\
+\[
+\boxed{13,505,536} \quad \text{(Option D)}
+\]
 
 \end{frame}
 
@@ -316,9 +332,9 @@ what is the value of \( n \)?
 
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Solving for \( n \)}}
+\begin{frame}{Solution: Solving for \( n \)}
 
-\textbf{Step 1: Express \( a/b \) in terms of known values}
+\textbf{Step 1: Express \( a/b \) in terms of known values} \\
 From the first equation:
 \[
 \frac{4a}{b} = 6.7
@@ -328,7 +344,7 @@ Dividing both sides by 4:
 \frac{a}{b} = \frac{6.7}{4} = 1.675
 \]
 
-\textbf{Step 2: Substitute into the second equation}
+\textbf{Step 2: Substitute into the second equation} \\
 \[
 \frac{a}{bn} = 26.8
 \]
@@ -339,7 +355,7 @@ Rewriting using \( \frac{a}{b} = 1.675 \):
 
 
 
-\textbf{Final Answer:}
+\textbf{Final Answer:} \\
 \[
 \boxed{0.0625}
 \]
@@ -381,7 +397,7 @@ Rewriting using \( \frac{a}{b} = 1.675 \):
         
         % 主标题
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
 
@@ -397,36 +413,36 @@ Rewriting using \( \frac{a}{b} = 1.675 \):
 
 
 \begin{frame}{Ratio Word Problem}
-The ratio of blueberries to grapes in a fruit salad is \(5\) to \(12\). If there are \(x\) blueberries in the fruit salad, which expression represents the number of grapes in the fruit salad?
+The ratio of blueberries to grapes in a fruit salad is $5$ to $12$. If there are $x$ blueberries in the fruit salad, which expression represents the number of grapes in the fruit salad?
 \begin{itemize}
-    \item[\textbf{A.}] \(\dfrac{5}{12}x\)
-    \item[\textbf{B.}] \(\dfrac{12}{5}x\)
-    \item[\textbf{C.}] \(\dfrac{12}{17}x\)
-    \item[\textbf{D.}] \(60x\)
+    \item[(A)] $\dfrac{5}{12}x$
+    \item[(B)] $\dfrac{12}{5}x$
+    \item[(C)] $\dfrac{12}{17}x$
+    \item[(D)] $60x$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation}}
-To maintain the ratio \(5:12\) (blueberries to grapes), we set up the proportion:
+\begin{frame}{Answer}
+To maintain the ratio $5:12$ (blueberries to grapes), we set up the proportion:
 \[
 \dfrac{5}{12} = \dfrac{x}{g} \Rightarrow g = \dfrac{12}{5}x
 \]
-\textbf{Correct Answer:} \( \boxed{B} \)\(\dfrac{12}{5}x\)
+\textbf{Correct answer:} (B) $\dfrac{12}{5}x$
 \end{frame}
 
 \begin{frame}{Unit Conversion: Area}
-The area of Wompatuck State Park in Massachusetts is \(5.5\) square miles. Which of the following is closest to the area of this park, in \textbf{square kilometers}? (Use \(1\) kilometer \(= 0.62\) mile.)
+The area of Wompatuck State Park in Massachusetts is $5.5$ square miles. Which of the following is closest to the area of this park, in \textbf{square kilometers}? (Use $1$ kilometer $= 0.62$ mile.)
 \begin{itemize}
-    \item[\textbf{A.}] \(2.1\)
-    \item[\textbf{B.}] \(3.4\)
-    \item[\textbf{C.}] \(8.9\)
-    \item[\textbf{D.}] \(14.3\)
+    \item[(A)] $2.1$
+    \item[(B)] $3.4$
+    \item[(C)] $8.9$
+    \item[(D)] $14.3$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation}}
+\begin{frame}{Answer}
 We are given:
 \[
 \text{Area in square miles} = 5.5, \quad 1 \text{ kilometer} = 0.62 \text{ mile}
@@ -438,45 +454,61 @@ So,
 \[
 5.5 \text{ square miles} \approx 5.5 \times 2.6 = 14.3 \text{ square kilometers}
 \]
-\textbf{Correct Answer:} \( \boxed{D} \)\(14.3\)
+\textbf{Correct answer:} (D) $14.3$
 \end{frame}
 
 
 \begin{frame}{Scale Modeling}
-A model of a building has a scale where a width of \(5\) inches in the model represents an actual width of \(16\) feet. A room in the building has an actual width of \(10w\) feet. Which expression represents the width, in inches, of the room in the model?
+A model of a building has a scale where a width of $5$ inches in the model represents an actual width of $16$ feet. A room in the building has an actual width of $10w$ feet. Which expression represents the width, in inches, of the room in the model?
 \begin{itemize}
-    \item[\textbf{A.}] \(\dfrac{5}{8}w\)
-    \item[\textbf{B.}] \(\dfrac{25}{8}w\)
-    \item[\textbf{C.}] \(8w\)
-    \item[\textbf{D.}] \(32w\)
+    \item[(A)] $\dfrac{5}{8}w$
+    \item[(B)] $\dfrac{25}{8}w$
+    \item[(C)] $8w$
+    \item[(D)] $32w$
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation}}
-The scale is \(5\) inches in the model : \(16\) feet in reality.
+\begin{frame}{Answer}
+The scale is $5$ inches in the model : $16$ feet in reality.
 
-Let the actual width be \(10w\) feet. To find the width in the model, apply the ratio:
+Let the actual width be $10w$ feet. To find the width in the model, apply the ratio:
 \[
 \frac{5}{16} = \frac{\text{model width}}{10w} \Rightarrow \text{model width} = \frac{5}{16} \cdot 10w = \frac{50}{16}w = \frac{25}{8}w
 \]
-\textbf{Correct Answer:} \( \boxed{B} \)\(\dfrac{25}{8}w\)
+\textbf{Correct answer:} (B) $\dfrac{25}{8}w$
 \end{frame}
+
+
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
     \end{tikzpicture}
+
     \centering
     \vspace{5em}
+
     {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
     {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
     {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
     \vfill
 \end{frame}
 

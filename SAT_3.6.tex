@@ -4,32 +4,40 @@
 \usepackage{tikz}
 \usepackage{amsmath}
 
+\usepackage{colortbl}     % 支持 \rowcolor
+\usepackage[table]{xcolor}  % 增强颜色支持，特别是灰色背景
+\usepackage{array}        % 增强表格功能（对齐方式等）
+\usepackage{booktabs
+
+
+
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
 \definecolor{softPurple}{RGB}{180, 170, 255}
 \definecolor{softGray}{RGB}{235, 235, 245}
 \definecolor{lightText}{RGB}{90, 90, 110}
-\graphicspath{{static/course_materials/}{./}}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
-\title[SAT Unit 3.6]{\textbf{SAT Unit 3.6 \\Inference and Margin of Error}}
+% 封面信息
+\title[SAT Unit 3.6 ]{\textbf{SAT Unit 3.6\\ Inference from Sample Statistics and Margin Error }}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
-\date{\today}
+\date{\today} 
 
 \begin{document}
-
 
 % --- Title Slide ---
 \begin{frame}
@@ -39,101 +47,138 @@
         \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
     \end{flushright}
 \end{frame}
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
+        \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+        };
+
+        % 添加柔和光点（点缀）
+        \foreach \x in {1,2,3,4,5} {
+            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+
+        ;
+    \end{tikzpicture}
+\end{frame}
 
 \begin{frame}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
+
+
+
+
 
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
 
+
+
 \begin{frame}
 \section{Inference from Sample Statistics}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\LARGE\bfseries\textcolor{purpleblue}{Inference from Sample Statistics}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
-% --- Part 1: Inference basics ---
-\begin{frame}{Step 1 — What Is Statistical Inference?}
 
-\textbf{Inference} = using data from a \textbf{sample} to draw conclusions about a \textbf{population}.
+\begin{frame}{What is Inference from Sample Statistics?}
+\small
 
-\vspace{0.2cm}
-\textbf{Why use a sample?}
+\textbf{Definition:}  
+\textbf{Inference} refers to the process of using data from a sample to draw conclusions about a population.
+
+\vspace{0.3cm}
+\textbf{Why do we use samples?}
 \begin{itemize}
-    \item Studying an entire population is often impractical.
-    \item A \textbf{random sample} can give a reliable estimate.
+    \item Studying an entire population is often impractical or impossible.
+    \item A well-designed sample provides useful, reliable insight.
 \end{itemize}
 
-\vspace{0.2cm}
-\textbf{Important:} Conclusions are \textbf{estimates}, not certainties.
+\vspace{0.3cm}
+\textbf{Example:}  
+If we randomly sample 200 voters and 65\% support a policy, we can estimate the population support is around 65\%.
 
-\vspace{0.2cm}
-\textbf{Example:} If 65\% of 200 randomly selected voters support a policy, we \textbf{estimate} that about 65\% of the population supports it.
+\textbf{Important:} Conclusions are not certain — they are probabilistic.
 
 \end{frame}
 
-\begin{frame}{Step 2 — Parameter vs.\ Statistic}
 
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
- & \textbf{Population (unknown)} & \textbf{Sample (known)} \\
-\hline
-\textbf{Name} & Parameter & Statistic \\
-\hline
-\textbf{Mean} & \(\mu\) & \(\bar{x}\) \\
-\hline
-\textbf{Proportion} & \(p\) & \(\hat{p}\) \\
-\hline
-\end{tabular}
-\end{center}
+\begin{frame}{Key Properties and Considerations}
+\small
 
-\vspace{0.2cm}
-\textbf{On the SAT:}
+\textbf{1. Random Sampling:}  
+A sample must be random to avoid bias and make valid inferences.
+
+\textbf{2. Sample Size:}  
+Larger samples tend to yield more accurate estimates (smaller margin of error).
+
+\textbf{3. Variability:}  
+Different random samples produce slightly different statistics. This is expected.
+
+\textbf{4. Population vs. Sample:}
 \begin{itemize}
-    \item Use the \textbf{sample proportion} to predict the population.
-    \item Scale up: \(\text{population count} \approx \text{sample proportion} \times \text{total population}\).
+    \item \textbf{Parameter} – a fixed value describing the population (unknown).
+    \item \textbf{Statistic} – a computed value from a sample (known).
+\end{itemize}
+
+\textbf{Notation:}
+\begin{itemize}
+    \item Population mean: $\mu$, Sample mean: $\bar{x}$
+    \item Population proportion: $p$, Sample proportion: $\hat{p}$
 \end{itemize}
 
 \end{frame}
 
-\begin{frame}{Step 3 — Using a Poll to Predict an Election}
-
-\textbf{Three-step method (very common on the SAT):}
-
-\begin{enumerate}
-    \item \textbf{Find each proportion in the sample.}
-    \item \textbf{Multiply each proportion by the total number of voters.}
-    \item \textbf{Subtract} to find the expected margin of victory.
-\end{enumerate}
-
-\vspace{0.2cm}
-\textbf{Example setup:} Poll of 803 voters \(\Rightarrow\) apply those proportions to 6,424 actual voters.
-
-\end{frame}
 
 \begin{frame}{\textbf{Question: Predicting Election Outcome from Poll Data}}
 The table shows the results of a poll. A total of \( 803 \) voters selected at random were asked which candidate they would vote for in the upcoming election.
@@ -152,94 +197,119 @@ Terry Smith & 320 \\
 According to the poll, if \( 6{,}424 \) people vote in the election, by how many votes would Angel Cruz be expected to win?
 
 \begin{itemize}
-    \item[\textbf{A.}] 163
-    \item[\textbf{B.}] 1,304
-    \item[\textbf{C.}] 3,864
-    \item[\textbf{D.}] 5,621
+    \item[A.] 163
+    \item[B.] 1,304
+    \item[C.] 3,864
+    \item[D.] 5,621
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Predicting Election Outcome from Poll Data}}
-\textbf{Step 1.} Find proportions from the poll:
+
+
+\begin{frame}{\textbf{Answer: Calculating Predicted Vote Margin}}
+
+\textbf{Step 1:} Compute proportions of votes from the poll.
 \[
-\frac{483}{803} \text{ for Cruz}, \qquad \frac{320}{803} \text{ for Smith}.
+\text{Angel Cruz's proportion: } \frac{483}{803}, \quad
+\text{Terry Smith's proportion: } \frac{320}{803}
 \]
 
-\textbf{Step 2.} Scale to 6,424 voters:
+\textbf{Step 2:} Apply these proportions to the total of \( 6{,}424 \) voters.
 \[
-\text{Cruz: } \frac{483}{803} \times 6424 \approx 3864, \qquad
-\text{Smith: } \frac{320}{803} \times 6424 \approx 2560.
+\text{Votes for Cruz: } \frac{483}{803} \times 6424 \approx 3864.01
+\]
+\[
+\text{Votes for Smith: } \frac{320}{803} \times 6424 \approx 2560.00
 \]
 
-\textbf{Step 3.} Find the margin:
+\textbf{Step 3:} Subtract to find the expected margin.
 \[
-3864 - 2560 = 1304.
+3864 - 2560 = \boxed{1304}
 \]
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Correct Answer:} \boxed{\text{B. } 1,304}
 \end{frame}
 
 \begin{frame}
+
 \section{Margin of Error}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\LARGE\bfseries\textcolor{purpleblue}{ Margin of Error}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Step 4 — What Margin of Error Means}
+\begin{frame}{Understanding Margin of Error}
+\small
 
-\textbf{Margin of error (MOE)} = how far the sample estimate might be from the true population value.
+\textbf{Definition:}  
+The \textbf{margin of error (MOE)} is the maximum expected difference between the true population parameter and a sample estimate.
 
-\vspace{0.2cm}
-If the estimate is \(30\%\) with MOE \(3\%\), the plausible range is:
+\vspace{0.3cm}
+\textbf{General Formula:}
 \[
-30\% \pm 3\% = [27\%,\ 33\%]
+\text{Margin of Error} = z^* \cdot \frac{\sigma}{\sqrt{n}}
+\]
+or for proportions:
+\[
+\text{MOE} = z^* \cdot \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
 \]
 
-\vspace{0.2cm}
-\textbf{Plain-language guide for the SAT:}
+\textbf{Where:}
 \begin{itemize}
-    \item \textbf{Inside the interval:} plausible / reasonable / could be true
-    \item \textbf{Outside the interval:} doubtful / unlikely (but usually not ``impossible'')
-    \item MOE is \textbf{not} about misclassified individuals in the sample
+    \item $z^*$ is the z-score based on confidence level (e.g., 1.96 for 95\%),
+    \item $\sigma$ is the population standard deviation (or estimate),
+    \item $n$ is the sample size,
+    \item $\hat{p}$ is the sample proportion.
 \end{itemize}
+
+\vspace{0.3cm}
+
 
 \end{frame}
 
-\begin{frame}{Step 5 — What Changes Margin of Error?}
-
-\textbf{Factors that affect MOE:}
+\begin{frame}{Properties of Margin Error}
+    \textbf{Properties:}
 \begin{itemize}
-    \item \textbf{Sample size (\(n\)):} Larger \(n\) \(\Rightarrow\) \textbf{smaller} MOE \hfill (most tested on SAT)
-    \item \textbf{Variability:} More spread in data \(\Rightarrow\) larger MOE
-    \item \textbf{Confidence level:} Higher confidence \(\Rightarrow\) larger MOE
+    \item \textbf{Smaller MOE} = more precise estimate.
+    \item \textbf{Larger MOE} = more uncertainty.
+\end{itemize}
+
+\textbf{Factors that Affect Margin of Error:}
+\begin{itemize}
+    \item \textbf{Sample size ($n$)}: Larger $n$ → smaller MOE.
+    \item \textbf{Confidence level:} Higher confidence → larger $z^*$ → larger MOE.
+    \item \textbf{Population variability:} More variation → larger MOE.
 \end{itemize}
 
 \vspace{0.2cm}
-\textbf{SAT shortcut:} If two samples use the same method and one MOE is bigger, the bigger MOE usually means a \textbf{smaller sample size}.
-
-\vspace{0.2cm}
-\textbf{Reference formula (proportion):}
-\[
-\text{MOE} = z^* \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}
-\]
-
+\textbf{Key Idea:}  
+To decrease MOE, increase the sample size or reduce the confidence level.
 \end{frame}
 
-\begin{frame}{\textbf{Question: Interpreting Margin of Error}}
+\begin{frame}{\textbf{Question: Interpreting Margin of Error }}
+\footnotesize
 In a study of cell phone use, 799 randomly selected US teens were asked how often they talked on a cell phone and about their texting behavior. The data are summarized in the table below.
 
 \begin{center}
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|c｜}
 \hline
 \textbf{Texting behavior} & \textbf{Talks on cell phone daily} & \textbf{Does not talk on cell phone daily}  \\
 \hline
@@ -255,30 +325,40 @@ Total & 415 & 384  \\
 Based on the data from the study, an estimate of the percent of US teens who are heavy texters is \( 30\% \), and the associated margin of error is \( 3\% \). Which of the following is a correct statement based on the given margin of error?
 
 \begin{itemize}
-    \item[\textbf{A.}] Approximately \( 3\% \) of the teens in the study who are classified as heavy texters are not really heavy texters.
-    \item[\textbf{B.}] It is not possible that the percent of all US teens who are heavy texters is less than \( 27\% \).
-    \item[\textbf{C.}] The percent of all US teens who are heavy texters is \( 33\% \).
-    \item[\textbf{D.}] It is doubtful that the percent of all US teens who are heavy texters is \( 35\% \).
+    \item[A.] Approximately \( 3\% \) of the teens in the study who are classified as heavy texters are not really heavy texters.
+    \item[B.] It is not possible that the percent of all US teens who are heavy texters is less than \( 27\% \).
+    \item[C.] The percent of all US teens who are heavy texters is \( 33\% \).
+    \item[D.] It is doubtful that the percent of all US teens who are heavy texters is \( 35\% \).
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Interpreting Margin of Error}}
-The confidence interval is \(30\% \pm 3\% = [27\%,\ 33\%]\).
+\begin{frame}{\textbf{Answer: Margin of Error Interpretation}}
+
+\textbf{Estimated percent:} \( 30\% \) \\
+\textbf{Margin of error:} \( \pm 3\% \)
+
+\[
+\text{Confidence interval: } [30\% - 3\%, 30\% + 3\%] = [27\%, 33\%]
+\]
 
 \begin{itemize}
-    \item A is wrong: MOE does not measure misclassification in the sample.
-    \item B is wrong: values below 27\% are less likely, not impossible.
-    \item C is wrong: 33\% is only the upper bound, not the exact value.
-    \item D is correct: 35\% is outside the interval, so it is doubtful.
+    \item \textbf{A.} Incorrect: Margin of error relates to population estimates, not misclassification of sample responses.
+    \item \textbf{B.} Incorrect: While values outside the interval are less likely, we cannot claim impossibility.
+    \item \textbf{C.} Incorrect: 33\% is the upper bound; the true value could be anywhere in the interval.
+    \item \textbf{D.} \textbf{Correct:} 35\% is outside the margin of error range. Therefore, it is \emph{doubtful} that the true percentage is as high as 35\%.
 \end{itemize}
 
-\textbf{Correct Answer:} \( \boxed{D} \)
+\textbf{Correct Answer:} \(\boxed{\text{D}}\)
+
 \end{frame}
 
-\begin{frame}{\textbf{Question: Margin of Error and Sample Size}}
+\begin{frame}{\textbf{Question: Margin of Error and Sample Size (Statistics)}}
+\small
 The table below shows the results of two random samples of votes for a proposition.
 
 \begin{center}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{12pt}
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Sample} & \textbf{Percent in favor} & \textbf{Margin of error} \\
@@ -292,102 +372,141 @@ B & 48\% & 1.6\% \\
 The samples were selected from the same population, and the margins of error were calculated using the same method. Which of the following is the most appropriate reason that the margin of error for sample A is greater than the margin of error for sample B?
 
 \begin{itemize}
-    \item[\textbf{A.}] Sample A had a smaller number of votes that could not be recorded.
-    \item[\textbf{B.}] Sample A had a higher percent of favorable responses.
-    \item[\textbf{C.}] Sample A had a larger sample size.
-    \item[\textbf{D.}] Sample A had a smaller sample size.
+    \item[A.] Sample A had a smaller number of votes that could not be recorded.
+    \item[B.] Sample A had a higher percent of favorable responses.
+    \item[C.] Sample A had a larger sample size.
+    \item[D.] Sample A had a smaller sample size.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Margin of Error and Sample Size}}
-Margin of error \textbf{decreases} as sample size \textbf{increases}. Since both samples used the same method, the larger MOE for Sample A means it had a smaller sample size.
 
-\textbf{Correct Answer:} \( \boxed{D} \)
+
+
+\begin{frame}{\textbf{Answer: Margin of Error and Sample Size}}
+\textbf{Correct Answer:} \textbf{D.} Sample A had a smaller sample size.
+
+\textbf{Explanation:} 
+Margin of error decreases as sample size increases. Since both samples were selected from the same population and analyzed using the same method, the greater margin of error in Sample A suggests it had a smaller sample size.
 \end{frame}
+
 
 
 \begin{frame}
-\section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{\textbf{Question: Gymnasts Under Pressure Study}}
+\begin{frame}{Question}
 In a psychological study, 600 college gymnasts were randomly selected and put in high-stakes competitions to determine whether they performed better under pressure. Based on the results of this study, it is estimated that 65\% of all college gymnasts perform better under pressure, with an associated margin of error of 4\%. Which of the following inferences can appropriately be drawn based on the given margin of error?
 
-\begin{itemize}
- \item[\textbf{A.}] The percentage of all college gymnasts who perform better under pressure is between 65\% and 69\%.
- \item[\textbf{B.}] Approximately 4\% of the college gymnasts in the study who performed better under pressure do not actually perform better under pressure.
- \item[\textbf{C.}] It is unlikely that the percentage of all college gymnasts who perform better under pressure is 60\%.
- \item[\textbf{D.}] It is not possible that the percentage of all college gymnasts who perform better under pressure is 70\%.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\textbf{Answer Explanation: Gymnasts Under Pressure Study}}
-The interval is \(65\% \pm 4\% = [61\%,\ 69\%]\).
-
-\begin{itemize}
-    \item A is wrong: the interval includes 61\%, not just 65\% to 69\%.
-    \item B is wrong: MOE is not about individual misclassification.
-    \item C is correct: 60\% is below 61\%, so it is unlikely.
-    \item D is wrong: 70\% is outside the interval but not strictly impossible.
-\end{itemize}
-
-\textbf{Correct Answer:} \( \boxed{C} \)
+\begin{enumerate}[A.]
+    \item The percentage of all college gymnasts who perform better under pressure is between 65\% and 69\%.
+    \item Approximately 4\% of the college gymnasts in the study who performed better under pressure do not actually perform better under pressure.
+    \item It is unlikely that the percentage of all college gymnasts who perform better under pressure is 60\%.
+    \item It is not possible that the percentage of all college gymnasts who perform better under pressure is 70\%.
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Governor Election Vote Margin}}
+\begin{frame}{Answer}
+\textbf{Step 1.} The estimate is 65\% with a margin of error of 4\%. So the confidence interval is:
+\[
+65\% \pm 4\% = (61\%, 69\%).
+\]
+
+\textbf{Step 2.} Analyze the choices:
+\begin{itemize}
+    \item A: Incorrect, as 65\% to 69\% does not include the lower bound (61\%).
+    \item B: Incorrect interpretation of margin of error; it doesn't refer to individual gymnasts.
+    \item C: Correct—60\% is outside the confidence interval, making it unlikely.
+    \item D: Incorrect—70\% is outside the confidence interval but not strictly impossible.
+\end{itemize}
+
+\textbf{Answer:} C.
+\end{frame}
+
+
+
+\begin{frame}{Question}
 Two candidates are running for governor of a state. A recent poll reports that out of a random sample of 250 voters, 110 support candidate A and 140 support candidate B. An estimated 500{,}000 state residents are expected to vote on election day. According to the poll, candidate B is expected to receive how many more votes than candidate A?
 
-\begin{itemize}
- \item[\textbf{A.}] 60{,}000
- \item[\textbf{B.}] 130{,}000
- \item[\textbf{C.}] 220{,}000
- \item[\textbf{D.}] 280{,}000
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\textbf{Answer Explanation: Governor Election Vote Margin}}
-\textbf{Step 1.} Sample proportions: \(110/250 = 0.44\) for A, \(140/250 = 0.56\) for B.
-
-\textbf{Step 2.} Expected votes: \(500{,}000 \times 0.44 = 220{,}000\) and \(500{,}000 \times 0.56 = 280{,}000\).
-
-\textbf{Step 3.} Difference: \(280{,}000 - 220{,}000 = 60{,}000\).
-
-\textbf{Correct Answer:} \( \boxed{A} \)
+\begin{enumerate}[A.]
+    \item 60{,}000
+    \item 130{,}000
+    \item 220{,}000
+    \item 280{,}000
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Town Survey Response Bias}}
-All the residents of a town were mailed a survey about proposed renovations to the town's high school. Approximately 10\% of the residents completed the survey and mailed it back. Based on the responses, it was estimated that 72\% of the residents support the proposed renovations, with an associated margin of error of 12\%. Which of the following best explains why these survey results are unlikely to represent the opinions of all the town's residents?
+\begin{frame}{Answer}
+\textbf{Step 1. Find the proportion supporting each candidate in the sample:}
+\[
+\text{Candidate A: } \frac{110}{250} = 0.44 \quad \quad
+\text{Candidate B: } \frac{140}{250} = 0.56.
+\]
 
-\begin{itemize}
- \item[\textbf{A.}] The survey included residents who do not attend the high school.
- \item[\textbf{B.}] Not all residents were aware of the proposed renovations before the survey.
- \item[\textbf{C.}] Responses to the survey were not obtained from a random sample of the town's residents.
- \item[\textbf{D.}] The margin of error is greater than the percentage of residents who responded to the survey.
-\end{itemize}
+\textbf{Step 2. Find the expected number of votes for each candidate:}
+\[
+\text{Candidate A: } 500{,}000 \times 0.44 = 220{,}000
+\]
+\[
+\text{Candidate B: } 500{,}000 \times 0.56 = 280{,}000.
+\]
+
+\textbf{Step 3. Calculate the difference:}
+\[
+280{,}000 - 220{,}000 = 60{,}000.
+\]
+
+\textbf{Answer:} A.
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Town Survey Response Bias}}
-Only about 10\% responded, and those who chose to respond may have stronger opinions. This is \textbf{voluntary response bias}, so the sample is not representative of all residents.
 
-\textbf{Correct Answer:} \( \boxed{C} \)
+
+\begin{frame}{Question}
+All the residents of a town were mailed a survey about proposed renovations to the town’s high school. Approximately 10\% of the residents completed the survey and mailed it back. Based on the responses, it was estimated that 72\% of the residents support the proposed renovations, with an associated margin of error of 12\%. Which of the following best explains why these survey results are unlikely to represent the opinions of all the town’s residents?
+
+\begin{enumerate}[A.]
+    \item The survey included residents who do not attend the high school.
+    \item Not all residents were aware of the proposed renovations before the survey.
+    \item Responses to the survey were not obtained from a random sample of the town’s residents.
+    \item The margin of error is greater than the percentage of residents who responded to the survey.
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Pet Store Sample Size and MOE}}
+
+\begin{frame}{Answer}
+\textbf{Explanation:}  
+Since only about 10\% of the residents responded—and those who chose to respond might have stronger opinions or more vested interest—this is an example of voluntary response bias. This means the results are not representative of all town residents.
+
+\textbf{Answer:} C.
+\end{frame}
+
+
+\begin{frame}{Question}
+\small
 For a study, a pet supply store selected two random samples of its customers. Based on data gathered from each sample, the percentage of customers who own a cat was estimated. The results are shown in the table.
 
 \begin{center}
@@ -403,35 +522,73 @@ B & 30\% & 6\% \\
 
 If the margin of error was calculated the same way for both samples, which of the following is the most likely reason that the margin of error for sample B is greater than the margin of error for sample A?
 
-\begin{itemize}
- \item[\textbf{A.}] Sample B included a greater number of customers who own a cat than sample A.
- \item[\textbf{B.}] Sample B included a greater percentage of customers who own a cat than sample A.
- \item[\textbf{C.}] Sample B included more customers than sample A.
- \item[\textbf{D.}] Sample B included fewer customers than sample A.
-\end{itemize}
+\begin{enumerate}[A.]
+    \item Sample B included a greater number of customers who own a cat than sample A.
+    \item Sample B included a greater percentage of customers who own a cat than sample A.
+    \item Sample B included more customers than sample A.
+    \item Sample B included fewer customers than sample A.
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Pet Store Sample Size and MOE}}
-A larger margin of error usually means a \textbf{smaller sample size}. Sample B's larger MOE most likely means it included fewer customers.
 
-\textbf{Correct Answer:} \( \boxed{D} \)
+\begin{frame}{Answer}
+\textbf{Explanation:}  
+A larger margin of error typically occurs when the sample size is smaller (fewer data points lead to more variability in the estimate). So the most likely reason is:
+
+\textbf{Answer:} D.
 \end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
     \end{tikzpicture}
+
     \centering
     \vspace{5em}
+
     {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
     {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
     {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
     \vfill
 \end{frame}
+
+
+
+
+
+
+
+
 
 \end{document}

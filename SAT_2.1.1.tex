@@ -7,25 +7,28 @@
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
-% 设置字体
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
 % 封面信息
-\title[SAT Unit 2.1.1]{\textbf{SAT Unit 2.1.1 \\Exponents \& Radicals}}
+\title[SAT Unit 2.1.1 Exponents \& Radicals]{\textbf{SAT Unit 2.1.1\\ Exponents \& Radicals}}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
 \date{\today}
-
 \begin{document}
 
 % --- Title Slide ---
@@ -37,12 +40,17 @@
     \end{flushright}
 \end{frame}
 
-% --- Custom Background Slide ---
+
 \begin{frame}
+\section{Exponent Expression}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
@@ -54,19 +62,27 @@
     \end{tikzpicture}
 \end{frame}
 
+
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
 
+
+% Slide: Title Page Already Included
+% Slide: Second Title Design Already Included
+
 \begin{frame}
-\section{Exponents}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
         \node[align=center] at (current page.center) {
-            {\huge\bfseries\textcolor{purpleblue}{Exponents}} \\[0.5cm]
-            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+            {\Huge\bfseries\textcolor{purpleblue}{Exponent}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
@@ -75,97 +91,123 @@
     \end{tikzpicture}
 \end{frame}
 
+% --- Frame 1: Definition ---
 \begin{frame}{Definition of Exponents}
-    \textbf{Definition:} An exponential expression has the form \(x^n\), where:
-    \begin{itemize}
-        \item \(x\) is the \textbf{base}
-        \item \(n\) is the \textbf{exponent} or power
-    \end{itemize}
+\textbf{Definition:} An exponential expression has the form $x^n$, where:
+\begin{itemize}
+    \item $x$ is the \textbf{base}
+    \item $n$ is the \textbf{exponent} or power
+\end{itemize}
 
-    \vspace{0.3cm}
-    This represents the base \(x\) being multiplied by itself \(n\) times.
-    \[
-    x^n = \underbrace{x \cdot x \cdot x \cdots x}_{n \text{ factors}}
-    \]
+\vspace{0.3cm}
+This represents the base $x$ being multiplied by itself $n$ times.
+
+\[
+x^n = \underbrace{x \cdot x \cdot x \cdots x}_{n \text{ times}}
+\]
 \end{frame}
 
+% --- Frame 2: Laws of Exponents ---
 \begin{frame}{Laws of Exponents (Part 1)}
-    \textbf{Basic Properties}
-    \begin{itemize}
-        \item \textbf{Identity:} \(x^1 = x\) \text{\small (e.g., \(3^1 = 3\))}
-        \item \textbf{Zero Exponent:} \(x^0 = 1\) \text{\small (e.g., \(3^0 = 1\))}
-    \end{itemize}
 
-    \vspace{0.4cm}
-    \textbf{Multiplication and Division Rules}
-    \begin{itemize}
-        \item \textbf{Product Rule:} \(x^m \cdot x^n = x^{m+n}\) \text{\small (e.g., \(3^4 \cdot 3^5 = 3^9\))}
-        \item \textbf{Quotient Rule:} \(\dfrac{x^m}{x^n} = x^{m-n}\) \text{\small (e.g., \(\dfrac{3^7}{3^3} = 3^4\))}
-    \end{itemize}
+\begin{block}{Basic Properties}
+
+\begin{itemize}
+    \item \textbf{Identity:} \quad $x^1 = x$ \hfill (e.g., $3^1 = 3$)
+    \item \textbf{Zero Exponent:} \quad $x^0 = 1$ \hfill (e.g., $3^0 = 1$)
+\end{itemize}
+\end{block}
+
+\begin{block}{Multiplication and Division Rules}
+\vspace{0.2cm}
+\begin{itemize}
+    \item \textbf{Product Rule:} \quad $x^m \cdot x^n = x^{m+n}$ \hfill (e.g., $3^4 \cdot 3^5 = 3^9$)
+    \item \textbf{Quotient Rule:} \quad $\dfrac{x^m}{x^n} = x^{m-n}$ \hfill (e.g., $\dfrac{3^7}{3^3} = 3^4$)
+\end{itemize}
+\end{block}
+
 \end{frame}
 
 \begin{frame}{Laws of Exponents (Part 2)}
-    \textbf{Power Rules}
-    \begin{itemize}
-        \item \textbf{Power of a Power:} \((x^m)^n = x^{mn}\) \text{\small (e.g., \((3^2)^4 = 3^8\))}
-        \item \textbf{Power of a Product:} \((xy)^m = x^m y^m\) \text{\small (e.g., \((2 \cdot 3)^3 = 2^3 \cdot 3^3\))}
-        \item \textbf{Power of a Quotient:} \(\left(\dfrac{x}{y}\right)^m = \dfrac{x^m}{y^m}\) \text{\small (e.g., \(\left(\dfrac{2}{3}\right)^3 = \dfrac{2^3}{3^3}\))}
-    \end{itemize}
 
-    \vspace{0.4cm}
-    \textbf{Negative Exponent}
-    \begin{itemize}
-        \item \textbf{Rule:} \(x^{-m} = \dfrac{1}{x^m}\) \text{\small (e.g., \(3^{-4} = \dfrac{1}{3^4}\))}
-    \end{itemize}
+\begin{block}{Power Rules}
+
+\begin{itemize}
+    \item \textbf{Power of a Power:} \quad $(x^m)^n = x^{mn}$ \hfill (e.g., $(3^2)^4 = 3^8$)
+    \item \textbf{Power of a Product:} \quad $(xy)^m = x^m y^m$ \hfill (e.g., $(2 \cdot 3)^3 = 2^3 \cdot 3^3$)
+    \item \textbf{Power of a Quotient:} \quad $\left(\dfrac{x}{y}\right)^m = \dfrac{x^m}{y^m}$ \hfill (e.g., $\left(\dfrac{2}{3}\right)^3 = \dfrac{2^3}{3^3}$)
+\end{itemize}
+\end{block}
+
+\begin{block}{Negative Exponent}
+
+\begin{itemize}
+    \item \textbf{Rule:} \quad $x^{-m} = \dfrac{1}{x^m}$ \hfill (e.g., $3^{-4} = \dfrac{1}{3^4}$)
+\end{itemize}
+\end{block}
+
 \end{frame}
 
 \begin{frame}{\textbf{Question: Product of Exponential Expressions}}
-    Which expression represents the product of
-    \[
-    (b^6 c^{-2} d^{-5}) \quad \text{and} \quad (b^8 c^{-3} + c^4 d^5),
-    \]
-    where \(b\), \(c\), and \(d\) are positive?
+Which expression represents the product of 
+\[
+(b^6 c^{-2} d^{-5}) \quad \text{and} \quad (b^8 c^{-3}+c^4 d^5),
+\]
+where \( b, c, \) and \( d \) are positive?
 
-    \vspace{0.5em}
-    \begin{itemize}
-        \item[\textbf{A.}] \(b^{14} c^{-5} + c^2 d^{-10}\)
-        \item[\textbf{B.}] \(b^{14} c^{-5} + c^2\)
-        \item[\textbf{C.}] \(b^{14} c^{-5} d^{-5} + b^6 c^2\)
-        \item[\textbf{D.}] \(b^{14} c^{-5} d^{-5} + c^2\)
-    \end{itemize}
+\vspace{0.5em}
+\textbf{Options:}
+\begin{enumerate}
+    \item[A.] \( b^{14} c^{-5} + c^2 d^{-10} \)
+    \item[B.] \( b^{14} c^{-5} + c^2 \)
+    \item[C.] \( b^{14} c^{-5} d^{-5} + b^6 c^2 \)
+    \item[D.] \( b^{14} c^{-5} d^{-5} + c^2 \)
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Product of Exponential Expressions}}
-    We are asked to find the product of:
-    \[
-    (b^6 c^{-2} d^{-5}) \quad \text{and} \quad (b^8 c^{-3} + c^4 d^5)
-    \]
 
-    Distribute the first term across both terms in the second expression:
-    \[
-    b^6 c^{-2} d^{-5} \cdot b^8 c^{-3} = b^{14} c^{-5} d^{-5}
-    \]
-    \[
-    b^6 c^{-2} d^{-5} \cdot c^4 d^5 = b^6 c^2
-    \]
+\begin{frame}{\textbf{Answer and Explanation}}
 
-    Putting it together:
-    \[
-    b^{14} c^{-5} d^{-5} + b^6 c^2
-    \]
 
-    \textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Explanation:}
+
+We are asked to find the product of:
+\[
+(b^6 c^{-2} d^{-5}) \quad \text{and} \quad (b^8 c^{-3} + c^4 d^5)
+\]
+
+Distribute the first term across both terms in the second expression:
+\[
+b^6 c^{-2} d^{-5} \cdot b^8 c^{-3} = b^{6+8} c^{-2-3} d^{-5} = b^{14} c^{-5} d^{-5}
+\]
+\[
+b^6 c^{-2} d^{-5} \cdot c^4 d^5 = b^6 c^{2} d^{0} = b^6 c^2
+\]
+
+Putting it together:
+\[
+b^{14} c^{-5} d^{-5} + b^6 c^2
+\]
+
+Now check the answer choices. Only choice \textbf{C} has this exact expression.
+
+\textbf{Final Answer:} \textbf{C.} \( b^{14} c^{-5} d^{-5} + b^6 c^2 \)
 \end{frame}
+
 
 \begin{frame}
-\section{Radicals \& Roots}
+\section{Radical \& Roots }
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
         \node[align=center] at (current page.center) {
-            {\huge\bfseries\textcolor{purpleblue}{Radicals \& Roots}} \\[0.5cm]
-            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+            {\Huge\bfseries\textcolor{purpleblue}{Radical \& Roots}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
@@ -174,126 +216,151 @@
     \end{tikzpicture}
 \end{frame}
 
+% --- Frame 4: Definition of Radicals ---
 \begin{frame}{Radicals and Roots}
-    \textbf{Definition:} A radical is the inverse of an exponent.
-    \[
-    \sqrt[n]{x} = x^{\frac{1}{n}}
-    \]
+\textbf{Definition:} A radical is the inverse of an exponent.
 
-    \begin{itemize}
-        \item \(\sqrt{x} = x^{\frac{1}{2}}\) (square root)
-        \item \(\sqrt[3]{x} = x^{\frac{1}{3}}\) (cube root)
-        \item \(\sqrt[4]{x^3} = x^{\frac{3}{4}}\) (fractional exponent)
-    \end{itemize}
+\[
+\sqrt[n]{x} = x^{\frac{1}{n}}
+\]
+
+\begin{itemize}
+    \item $\sqrt{x} = x^{\frac{1}{2}}$ (square root)
+    \item $\sqrt[3]{x} = x^{\frac{1}{3}}$ (cube root)
+    \item $\sqrt[4]{x^3} = x^{\frac{3}{4}}$ (fractional exponent)
+\end{itemize}
 \end{frame}
 
+% --- Frame 5: Properties of Radicals ---
 \begin{frame}{Properties of Radicals}
-    \begin{itemize}
-        \item \(\sqrt{a} \cdot \sqrt{b} = \sqrt{ab}\)
-        \item \(\dfrac{\sqrt{a}}{\sqrt{b}} = \sqrt{\dfrac{a}{b}}\)
-        \item \(\sqrt[n]{x^m} = x^{\frac{m}{n}}\)
-    \end{itemize}
+\begin{itemize}
+    \item $\sqrt{a} \cdot \sqrt{b} = \sqrt{ab}$
+    \item $\dfrac{\sqrt{a}}{\sqrt{b}} = \sqrt{\dfrac{a}{b}}$
+    \item $\sqrt[n]{x^m} = x^{\frac{m}{n}}$
+\end{itemize}
 
-    \vspace{0.2cm}
-    \textbf{Important:} All radicals can be rewritten using fractional exponents!
+\vspace{0.2cm}
+\textbf{Important:} All radicals can be rewritten using fractional exponents!
 \end{frame}
 
+% --- Frame 6: Rationalizing Denominators ---
 \begin{frame}{Rationalizing Denominators}
-    \textbf{Goal:} Remove square roots from denominators.
-    \[
-    \dfrac{1}{\sqrt{2}} \quad \Rightarrow \quad \dfrac{1}{\sqrt{2}} \cdot \dfrac{\sqrt{2}}{\sqrt{2}} = \dfrac{\sqrt{2}}{2}
-    \]
+\textbf{Goal:} Remove square roots from denominators.
 
-    \vspace{0.3cm}
-    Use the \textbf{conjugate} if the denominator is a binomial:
-    \[
-    \dfrac{1}{\sqrt{2} + 1} \cdot \dfrac{\sqrt{2} - 1}{\sqrt{2} - 1} = \dfrac{\sqrt{2} - 1}{(\sqrt{2})^2 - 1^2} = \sqrt{2} - 1
-    \]
+\[
+\dfrac{1}{\sqrt{2}} \quad \Rightarrow \quad \dfrac{1}{\sqrt{2}} \cdot \dfrac{\sqrt{2}}{\sqrt{2}} = \dfrac{\sqrt{2}}{2}
+\]
+
+\vspace{0.3cm}
+Use the \textbf{conjugate} if the denominator is a binomial:
+\[
+\dfrac{1}{\sqrt{2} + 1} \cdot \dfrac{\sqrt{2} - 1}{\sqrt{2} - 1} = \dfrac{\sqrt{2} - 1}{(\sqrt{2})^2 - 1^2} = \dfrac{\sqrt{2} - 1}{1}
+\]
 \end{frame}
 
-\begin{frame}{\textbf{Question: Simplifying an Exponential Expression}}
-    Simplify the expression:
-    \[
-    \left( \dfrac{27x^6 y^3}{81x^2 y^9} \right)^{\frac{1}{3}}
-    \]
+% --- Frame 7: Challenge Problem ---
+\begin{frame}{Question}
+\textbf{Simplify the expression:}
+\[
+\left( \dfrac{27x^6 y^3}{81x^2 y^9} \right)^{\frac{1}{3}}
+\]
+
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Simplifying an Exponential Expression}}
-    \[
-    = \left( \dfrac{27}{81} \cdot x^{6-2} \cdot y^{3-9} \right)^{\frac{1}{3}}
-    = \left( \dfrac{1}{3} \cdot x^4 \cdot y^{-6} \right)^{\frac{1}{3}}
-    = \dfrac{x^{\frac{4}{3}}}{3 y^2}
-    \]
+\begin{frame}{Solution}
+    
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{x^{4/3}}{3y^2}} \)
+\textbf{Solution:}
+\[
+= \left( \dfrac{27}{81} \cdot x^{6-2} \cdot y^{3-9} \right)^{\frac{1}{3}} 
+= \left( \dfrac{1}{3} \cdot x^4 \cdot y^{-6} \right)^{\frac{1}{3}} 
+= \dfrac{x^{\frac{4}{3}}}{3 \cdot y^2}
+\]
 \end{frame}
 
 \begin{frame}{\textbf{Question: Rational Exponents and Roots}}
-    If
-    \[
-    \frac{\sqrt{x^5}}{\sqrt[3]{x^4}} = x^{\frac{a}{b}}
-    \]
-    for all positive values of \(x\), what is the value of \(\dfrac{a}{b}\)?
+If 
+\[
+\frac{\sqrt{x^5}}{\sqrt[3]{x^4}} = x^{\frac{a}{b}}
+\]
+for all positive values of \( x \), what is the value of \( \frac{a}{b} \)?
+
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Rational Exponents and Roots}}
-    We use the property of radicals and exponents:
-    \[
-    \sqrt{x^5} = x^{5/2}, \quad \sqrt[3]{x^4} = x^{4/3}
-    \]
-    \[
-    \frac{x^{5/2}}{x^{4/3}} = x^{5/2 - 4/3}
-    \]
+\begin{frame}{Solution}
+\textbf{Solution:}
 
-    Find a common denominator:
-    \[
-    \frac{5}{2} = \frac{15}{6}, \quad \frac{4}{3} = \frac{8}{6}
-    \]
-    \[
-    x^{15/6 - 8/6} = x^{7/6}
-    \]
+We use the property of radicals and exponents:
+\[
+\sqrt{x^5} = x^{5/2}, \quad \sqrt[3]{x^4} = x^{4/3}
+\]
+\[
+\frac{x^{5/2}}{x^{4/3}} = x^{5/2 - 4/3}
+\]
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{7}{6}} \)
+Find a common denominator:
+\[
+\frac{5}{2} = \frac{15}{6}, \quad \frac{4}{3} = \frac{8}{6}
+\]
+\[
+x^{15/6 - 8/6} = x^{7/6}
+\]
+
+Thus,
+\[
+\frac{a}{b} = \frac{7}{6}
+\]
+
+\textbf{Answer:} \( \boxed{\frac{7}{6}} \)
+    
 \end{frame}
+
 
 \begin{frame}{\textbf{Question: Exponent and Radical Expression Equivalence}}
-    For what value of \(x\) is the given expression equivalent to \((70n)^{30x}\), where \(n > 1\)?
-    \[
-    \sqrt[5]{70n \left( \sqrt[6]{70n} \right)^2}
-    \]
+For what value of \( x \) is the given expression equivalent to \( (70n)^{30x} \), where \( n > 1 \)?
+\[
+\sqrt[5]{70n \left( \sqrt[6]{70n} \right)^2}
+\]
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Exponent and Radical Expression Equivalence}}
-    We begin with:
-    \[
-    \sqrt[5]{70n \left( \sqrt[6]{70n} \right)^2}
-    = \sqrt[5]{70n \cdot (70n)^{2/6}}
-    = \sqrt[5]{(70n)^{1 + \frac{2}{6}}}
-    = \sqrt[5]{(70n)^{\frac{4}{3}}}
-    \]
 
-    Now apply the outer root:
-    \[
-    \left( (70n)^{\frac{4}{3}} \right)^{1/5} = (70n)^{\frac{4}{15}}
-    \]
+\begin{frame}{\textbf{Solution: Simplifying the Expression}}
+We begin with:
+\[
+\sqrt[5]{70n \left( \sqrt[6]{70n} \right)^2}
+= \sqrt[5]{70n \cdot (70n)^{2/6}}
+= \sqrt[5]{(70n)^{1 + \frac{2}{6}}}
+= \sqrt[5]{(70n)^{\frac{4}{3}}}
+\]
 
-    We are told this is equal to \((70n)^{30x}\), so:
-    \[
-    30x = \frac{4}{15} \Rightarrow x = \frac{4}{450} = \frac{2}{225}
-    \]
+Now apply the outer root:
+\[
+\left( (70n)^{\frac{4}{3}} \right)^{1/5} = (70n)^{\frac{4}{15}}
+\]
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{2}{225}} \)
+We are told this is equal to:
+\[
+(70n)^{30x}
+\Rightarrow 30x = \frac{4}{15}
+\Rightarrow x = \frac{4}{450} = \frac{2}{225}
+\]
+
+\textbf{Answer:} \( \boxed{\frac{2}{225}} \)
 \end{frame}
 
 \begin{frame}
-    \section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+
         \node[align=center] at (current page.center) {
-            {\huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
-            {\large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
@@ -301,110 +368,167 @@
         ;
     \end{tikzpicture}
 \end{frame}
+\begin{frame}{Question}
+If $\left(5^3\right)^{4k} = \left(5^{\frac{1}{3}}\right)^{24}$, what is the value of $k$?
 
-\begin{frame}{\textbf{Question: Solving for \(k\)}}
-    If \(\left(5^3\right)^{4k} = \left(5^{\frac{1}{3}}\right)^{24}\), what is the value of \(k\)?
+
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Solving for \(k\)}}
-    We simplify both sides:
-    \[
-    (5^3)^{4k} = 5^{12k}, \quad \left(5^{\frac{1}{3}}\right)^{24} = 5^{\frac{24}{3}} = 5^8
-    \]
+\begin{frame}{Answer}
+We simplify both sides:
 
-    So:
-    \[
-    5^{12k} = 5^8 \Rightarrow 12k = 8 \Rightarrow k = \frac{2}{3}
-    \]
+\[
+(5^3)^{4k} = 5^{12k}, \quad \left(5^{\frac{1}{3}}\right)^{24} = 5^{\frac{24}{3}} = 5^8
+\]
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{2}{3}} \)
+So,
+
+\[
+5^{12k} = 5^8 \Rightarrow 12k = 8 \Rightarrow k = \frac{2}{3}
+\]
+
+\textbf{Correct answer:} B
 \end{frame}
 
-\begin{frame}{\textbf{Question: Equivalent Exponential Expression}}
-    Which expression is equivalent to \(4^{m+2}\)?
 
-    \vspace{0.5em}
-    \begin{itemize}
-        \item[\textbf{A.}] \(16^m\)
-        \item[\textbf{B.}] \(16 + 4^m\)
-        \item[\textbf{C.}] \(8(4^m)\)
-        \item[\textbf{D.}] \(16(4^m)\)
-    \end{itemize}
+\begin{frame}{Question}
+Which expression is equivalent to $4^{m+2}$?
+
+A) $16^m$ \\
+B) $16 + 4^m$ \\
+C) $8(4^m)$ \\
+D) $16(4^m)$
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Equivalent Exponential Expression}}
-    We simplify the original expression:
-    \[
-    4^{m+2} = 4^m \cdot 4^2 = 4^m \cdot 16 = 16(4^m)
-    \]
 
-    \textbf{Correct Answer:} \( \boxed{D} \)
+\begin{frame}{Answer}
+We simplify the original expression:
+
+\[
+4^{m+2} = 4^m \cdot 4^2 = 4^m \cdot 16 = 16(4^m)
+\]
+
+\textbf{Correct answer:} D
 \end{frame}
 
-\begin{frame}{\textbf{Question: Nested Radicals and Exponents}}
-    \[
-    \sqrt[8]{41k} \left( \sqrt[9]{41k} \right)^{12}
-    \]
+\begin{frame}{Question}
+\[
+\sqrt[8]{41k} \left( \sqrt[9]{41k} \right)^{12}
+\]
 
-    For what value of \(x\) is the given expression equivalent to \((41k)^{25x}\), where \(k > 1\)?
+For what value of $x$ is the given expression equivalent to $(41k)^{25x}$, where $k > 1$?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Nested Radicals and Exponents}}
-    \textbf{Correct Answer:} \( \boxed{\dfrac{7}{120}} \)
+\begin{frame}{Answer}
+
+
+\textbf{Correct answer:} $x = \dfrac{7}{120}$
 \end{frame}
 
-\begin{frame}{\textbf{Question: Simplifying Radical Expressions}}
-    \[
-    \frac{10 \sqrt[6]{9^3 \cdot x^{48}}}{\sqrt[4]{6^4 x}}
-    \]
+\begin{frame}{Question}
+\[
+\frac{10 \sqrt[6]{9^3 \cdot x^{48}}}{\sqrt[4]{6^4 x}}
+\]
 
-    The given expression is equivalent to \(a x^b\), where \(a > 0\), \(b > 0\), and \(x > 1\). What is the value of \(ab\)?
+The given expression is equivalent to $a x^b$, where $a > 0$, $b > 0$, and $x > 1$. What is the value of $ab$?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Simplifying Radical Expressions}}
-    Numerator:
-    \[
-    10 \cdot \sqrt[6]{9^3 \cdot x^{48}} = 10 \cdot (9^3 \cdot x^{48})^{1/6} = 10 \cdot 9^{1/2} \cdot x^8 = 30x^8
-    \]
+\begin{frame}{Answer}
+We simplify numerator and denominator:
 
-    Denominator:
-    \[
-    \sqrt[4]{6^4 x} = (6^4 x)^{1/4} = 6 \cdot x^{1/4}
-    \]
+Numerator:
+\[
+10 \cdot \sqrt[6]{9^3 \cdot x^{48}} = 10 \cdot (9^3 \cdot x^{48})^{1/6} = 10 \cdot 9^{1/2} \cdot x^8
+\]
 
-    Entire expression:
-    \[
-    \frac{30x^8}{6x^{1/4}} = 5x^{8 - 1/4} = 5x^{\frac{31}{4}}
-    \]
+Since $9 = 3^2$, so $9^{1/2} = 3$, hence numerator becomes:
+\[
+10 \cdot 3 \cdot x^8 = 30x^8
+\]
 
-    So \(a = 5\), \(b = \dfrac{31}{4}\), and \(ab = \dfrac{155}{4}\).
+Denominator:
+\[
+\sqrt[4]{6^4 x} = (6^4 x)^{1/4} = 6 \cdot x^{1/4}
+\]
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{155}{4}} \)
+Entire expression:
+\[
+\frac{30x^8}{6x^{1/4}} = 5x^{8 - 1/4} = 5x^{\frac{31}{4}}
+\]
+
+So $a = 5$, $b = \frac{31}{4}$
+
+\[
+ab = 5 \cdot \frac{31}{4} = \frac{155}{4}
+\]
+
+
 \end{frame}
 
-\begin{frame}{\textbf{Question: Combining Radical Expressions}}
-    \[
-    \sqrt[4]{x^3} \cdot \sqrt[12]{x^5}
-    \]
 
-    The given expression is equivalent to \(\sqrt[n]{x^m}\), where \(m\) and \(n\) are positive constants each less than 10 and \(x > 1\). What is the value of \(\dfrac{m}{n}\)?
+\begin{frame}{Question}
+\[
+\sqrt[4]{x^3} \cdot \sqrt[12]{x^5}
+\]
+
+The given expression is equivalent to $\sqrt[n]{x^m}$, where $m$ and $n$ are positive constants each less than 10 and $x > 1$. What is the value of $\dfrac{m}{n}$?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Combining Radical Expressions}}
-    \[
-    \sqrt[4]{x^3} \cdot \sqrt[12]{x^5} = x^{\frac{3}{4}} \cdot x^{\frac{5}{12}} = x^{\frac{9}{12} + \frac{5}{12}} = x^{\frac{14}{12}} = x^{\frac{7}{6}} = \sqrt[6]{x^7}
-    \]
 
-    Therefore, \(m = 7\), \(n = 6\), and \(\dfrac{m}{n} = \dfrac{7}{6}\).
+\begin{frame}{Answer}
+We simplify the expression:
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{7}{6}} \)
+\[
+\sqrt[4]{x^3} \cdot \sqrt[12]{x^5} = x^{\frac{3}{4}} \cdot x^{\frac{5}{12}} = x^{\frac{3}{4} + \frac{5}{12}}
+\]
+
+To add the exponents:
+
+\[
+\frac{3}{4} = \frac{9}{12}, \quad \frac{9}{12} + \frac{5}{12} = \frac{14}{12} = \frac{7}{6}
+\]
+
+So the expression becomes:
+\[
+x^{\frac{7}{6}} = \sqrt[6]{x^7}
+\]
+
+Therefore, $m = 7$, $n = 6$, and
+
+\[
+\frac{m}{n} = \frac{7}{6}
+\]
+
+\textbf{Correct answer:} $\dfrac{7}{6}$
 \end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
@@ -420,5 +544,8 @@
 
     \vfill
 \end{frame}
+
+
+
 
 \end{document}

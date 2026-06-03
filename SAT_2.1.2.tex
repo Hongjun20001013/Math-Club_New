@@ -15,7 +15,8 @@
 
 % 主题设置
 \usetheme{Madrid}  
-\usecolortheme{dolphin} 
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
 % 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
@@ -24,7 +25,7 @@
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
 % 封面信息
-\title[SAT Unit 2.1.2]{\textbf{SAT Unit 2.1.2 \\Equivalent Expressions}}
+\title[SAT Unit 2.1.2 Expression ]{\textbf{SAT Unit 2.1.2\\ Expression}}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
 \date{\today} 
@@ -81,7 +82,7 @@
         
 
         \node[align=center] at (current page.center) {
-            {\LARGE\bfseries\textcolor{purpleblue}{Combine Like Terms \& Simplify}} \\[0.5cm]
+            {\LARGE\bfseries\textcolor{purpleblue}{Combine Like Terms \& Simplify  }} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -92,7 +93,8 @@
 \end{frame}
 
 \begin{frame}{Combining Like Terms}
-    \textbf{Definition:} Combine terms with the exact same variables and powers.
+\small
+\textbf{Definition:} Combine terms with the exact same variables and powers.
 
 \vspace{0.3cm}
 \textbf{Example:}
@@ -113,7 +115,8 @@ Combine like terms:
 
 
 \begin{frame}{Simplifying Fractional Expressions}
-    \textbf{Rules for Simplifying:}
+\small
+\textbf{Rules for Simplifying:}
 \begin{itemize}
     \item Look for common factors in numerator and denominator.
     \item Apply factoring where possible.
@@ -132,23 +135,21 @@ Combine like terms:
 
 
 
-\begin{frame}{\textbf{Question: Combining Like Terms}}
-    Which expression is equivalent to
-    \[
-    (3x^3 + 8x^2 - 4x) + (7x^2 - 11x - 7)\ ?
-    \]
+\begin{frame}{Question}
+Which expression is equivalent to
+\[
+(3x^3 + 8x^2 - 4x) + (7x^2 - 11x - 7)\ ?
+\]
 
-    \textbf{Options:}
-    \begin{itemize}
-        \item[\textbf{A.}] \(3x^3 + x^2 - 15x - 7\)
-        \item[\textbf{B.}] \(3x^3 + 15x^2 - 15x - 7\)
-        \item[\textbf{C.}] \(10x^5 - 7x - 7\)
-        \item[\textbf{D.}] \(15x^4 + 3x^3 - 15x^2 - 7\)
-    \end{itemize}
+A) $3x^3 + x^2 - 15x - 7$ \\
+B) $3x^3 + 15x^2 - 15x - 7$ \\
+C) $10x^5 - 7x - 7$ \\
+D) $15x^4 + 3x^3 - 15x^2 - 7$
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Combining Like Terms}}
-    Combine like terms:
+
+\begin{frame}{Answer}
+Combine like terms:
 
 \[
 (3x^3 + 8x^2 - 4x) + (7x^2 - 11x - 7)
@@ -156,7 +157,7 @@ Combine like terms:
 = 3x^3 + 15x^2 - 15x - 7
 \]
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Correct answer:} B
 \end{frame}
 
 
@@ -172,7 +173,7 @@ Combine like terms:
         
 
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Expansion}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{ Expansion}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -183,38 +184,49 @@ Combine like terms:
 \end{frame}
 
 \begin{frame}{Expansion Using FOIL}
-    \textbf{FOIL Method} is a technique used to expand the product of two binomials.
+\small
+\textbf{FOIL Method} is a technique used to expand the product of two binomials.
 
-    \vspace{0.2cm}
-    \textbf{FOIL stands for:}
-    \begin{itemize}
-        \item \textbf{F} – First: Multiply the first terms in each binomial
-        \item \textbf{O} – Outer: Multiply the outer terms
-        \item \textbf{I} – Inner: Multiply the inner terms
-        \item \textbf{L} – Last: Multiply the last terms in each binomial
-    \end{itemize}
+\vspace{0.2cm}
+\textbf{FOIL stands for:}
+\begin{itemize}
+    \item \textbf{F} – First: Multiply the first terms in each binomial
+    \item \textbf{O} – Outer: Multiply the outer terms
+    \item \textbf{I} – Inner: Multiply the inner terms
+    \item \textbf{L} – Last: Multiply the last terms in each binomial
+\end{itemize}
 
-    \vspace{0.3cm}
-    \textbf{Example:} Expand \((x + 3)(x - 5)\)
-    \[
-    \begin{aligned}
-    \text{First: } & x \cdot x = x^2 \\
-    \text{Outer: } & x \cdot (-5) = -5x \\
-    \text{Inner: } & 3 \cdot x = 3x \\
-    \text{Last: } & 3 \cdot (-5) = -15 \\
-    \end{aligned}
-    \]
-
-    \textbf{Combine like terms:}
-    \[
-    x^2 - 5x + 3x - 15 = x^2 - 2x - 15
-    \]
-
-    \textbf{Correct Answer:} \( \boxed{x^2 - 2x - 15} \)
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Find the Value of \(ab\)}}
+\begin{frame}{Expansion Using FOIL}
+    
+
+\textbf{Example:} Expand $(x + 3)(x - 5)$
+
+\[
+\begin{aligned}
+\text{First: } & x \cdot x = x^2 \\
+\text{Outer: } & x \cdot (-5) = -5x \\
+\text{Inner: } & 3 \cdot x = 3x \\
+\text{Last: } & 3 \cdot (-5) = -15 \\
+\end{aligned}
+\]
+
+
+
+
+\textbf{Combine like terms:}
+\[
+x^2 - 5x + 3x - 15 = x^2 - 2x - 15
+\]
+
+
+\textbf{Final Answer:} $x^2 - 2x - 15$
+\end{frame}
+
+
+\begin{frame}{\textbf{Question: Find the Value of } \( ab \)}
 The equation below is true for all \( x \), where \( a \) and \( b \) are constants:
 \[
 (ax + 3)(5x^2 - bx + 4) = 20x^3 - 9x^2 - 2x + 12
@@ -223,17 +235,17 @@ The equation below is true for all \( x \), where \( a \) and \( b \) are consta
 What is the value of \( ab \)?
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] 18
-    \item[\textbf{B.}] 20
-    \item[\textbf{C.}] 24
-    \item[\textbf{D.}] 40
-\end{itemize}
+\begin{enumerate}
+    \item[A.] 18
+    \item[B.] 20
+    \item[C.] 24
+    \item[D.] 40
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Find the Value of \(ab\)}}
-    We expand the left-hand side:
+\begin{frame}{\textbf{Solution: Matching Coefficients}}
+We expand the left-hand side:
 \[
 (ax + 3)(5x^2 - bx + 4)= 5a x^3 - ab x^2 + 4a x + 15x^2 - 3b x + 12
 \]
@@ -256,19 +268,19 @@ Equating coefficients:
 -ab + 15 = -9 \Rightarrow -ab = -24 \Rightarrow ab = 24
 \]
 
-    \textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Answer:} \(\boxed{24}\)
 \end{frame}
 
-\begin{frame}{\textbf{Question: Finding the Value of \( h \)}}
-    The expression \(5x^5 + 6x^4 - 8x^3\) can be rewritten as 
+\begin{frame}{Question}
+The expression $5x^5 + 6x^4 - 8x^3$ can be rewritten as 
 \[
 (x^3 - hx^2)(5x^2 + 10x),
 \]
-    where \(h\) is a constant. What is the value of \(h\)?
+where $h$ is a constant. What is the value of $h$?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Finding the Value of \( h \)}}
-    We are given:
+\begin{frame}{Answer}
+We are given:
 \[
 (x^3 - hx^2)(5x^2 + 10x)
 \]
@@ -293,7 +305,7 @@ Match coefficients:
 10 - 5h = 6 \Rightarrow 5h = 4 \Rightarrow h = \frac{4}{5}
 \]
 
-    \textbf{Correct Answer:} \( \boxed{\dfrac{4}{5}} \)
+\textbf{Correct answer:} $h = \dfrac{4}{5}$
 \end{frame}
 
 \begin{frame}
@@ -307,7 +319,7 @@ Match coefficients:
         
 
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Factoring}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{  Factoring}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -317,7 +329,8 @@ Match coefficients:
     \end{tikzpicture}
 \end{frame}
 \begin{frame}{Factoring Basics}
-    \textbf{Factoring} is the process of expressing a polynomial as a product of simpler expressions.
+\small
+\textbf{Factoring} is the process of expressing a polynomial as a product of simpler expressions.
 
 \vspace{0.3cm}
 \textbf{Step 1: Factor out the Greatest Common Factor (GCF)}
@@ -326,12 +339,12 @@ Match coefficients:
 \]
 
 \vspace{0.3cm}
-\textbf{Step 2: Factoring Trinomials when \(a = 1\)}
+\textbf{Step 2: Factoring Trinomials when $a = 1$}
 
 \textbf{Method:} Find two numbers that:
 \begin{itemize}
-    \item Multiply to \(c\)
-    \item Add to \(b\)
+    \item Multiply to $c$
+    \item Add to $b$
 \end{itemize}
 
 \vspace{0.2cm}
@@ -345,8 +358,9 @@ x^2 + 5x + 6 = (x + 2)(x + 3)
 \end{frame}
 
 
-\begin{frame}{Factoring When \(a \ne 1\) (Cross Method)}
-    \textbf{When the leading coefficient \(a \ne 1\)}, we use the trial-and-error or \textbf{Chinese Cross Method }:
+\begin{frame}{Factoring When $a \ne 1$ (Cross Method)}
+\small
+\textbf{When the leading coefficient $a \ne 1$}, we use the trial-and-error or \textbf{Chinese Cross Method }:
 
 \vspace{0.3cm}
 \textbf{Example:}
@@ -357,15 +371,15 @@ x^2 + 5x + 6 = (x + 2)(x + 3)
 
 \textbf{Reasoning:}
 \begin{itemize}
-    \item \(3x \cdot 1 = 3x\)
-    \item \(2x \cdot 2 = 4x\)
-    \item \(3x + 4x = 7x\)
+    \item $3x \cdot 1 = 3x$
+    \item $2x \cdot 2 = 4x$
+    \item $3x + 4x = 7x$
 \end{itemize}
 
 \vspace{0.2cm}
 \textbf{General Tip:}
 \begin{itemize}
-    \item Look for two pairs of factors of \(a\) and \(c\) whose cross-products add to \(b\).
+    \item Look for two pairs of factors of $a$ and $c$ whose cross-products add to $b$.
     \item Always check your result by expanding (FOIL method).
 \end{itemize}
 \end{frame}
@@ -383,18 +397,18 @@ Which of the following expressions is(are) a factor of
 \end{itemize}
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] I only
-    \item[\textbf{B.}] II only
-    \item[\textbf{C.}] I and II
-    \item[\textbf{D.}] Neither I nor II
-\end{itemize}
+\begin{enumerate}
+    \item[A.] I only
+    \item[B.] II only
+    \item[C.] I and II
+    \item[D.] Neither I nor II
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: Factoring a Quadratic Expression}}
+\begin{frame}{\textbf{Solution: Use Factoring or Substitution}}
 
-    We are given the quadratic expression:
+We are given the quadratic expression:
 \[
 3x^2 + 20x - 63
 \]
@@ -419,7 +433,9 @@ So the factors are:
 (x + 9)(3x - 7)
 \]
 
-    \textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Correct Factor:} \(3x - 7\)
+\vspace{1mm}
+\textbf{Answer:} \(\boxed{\text{B. II only}}\)
 \end{frame}
 
 
@@ -437,8 +453,9 @@ is \(x + b\), where \(b\) is a positive constant.
 What is the smallest possible value of \(b\)?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Finding the Smallest Possible Factor Constant}}
-    We are given:
+\begin{frame}{\textbf{Solution: Factor by Grouping and Cross Multiplication}}
+\scriptsize
+We are given:
 \[
 2x^3 + 42x^2 + 208x
 \]
@@ -468,9 +485,10 @@ Therefore, the full factorization is:
 2x(x + 13)(x + 8)
 \]
 
-    Since the question asks for the smallest possible positive value of \(b\) such that \(x + b\) is a factor, the answer is \(8\).
-
-    \textbf{Correct Answer:} \( \boxed{8} \)
+Since the question asks for the smallest possible positive value of \(b\) such that \(x + b\) is a factor, the answer is:
+\[
+\boxed{8}
+\]
 \end{frame}
 
 \begin{frame}{\textbf{Question: Factoring with Decimal Coefficients}}
@@ -482,11 +500,11 @@ can be rewritten as
 \[
 a(4x^2 + 7x + 13),
 \]
-where \(a\) is a constant. What is the value of \(a\)?
+where $a$ is a constant. What is the value of $a$?
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Factoring with Decimal Coefficients}}
-    We are given:
+\begin{frame}{\textbf{Answer and Explanation}}
+We are given:
 \[
 0.36x^2 + 0.63x + 1.17 = a(4x^2 + 7x + 13)
 \]
@@ -496,26 +514,27 @@ Match the coefficients:
 a \cdot 4 = 0.36 \Rightarrow a = \frac{0.36}{4} = 0.09
 \]
 
-    \textbf{Correct Answer:} \( \boxed{0.09} \)
+\textbf{Correct Answer:} $a = \boxed{0.09}$
 \end{frame}
 
 
 
 
 \begin{frame}{Factoring Rational Expressions (Part 1)}
-    \textbf{Definition:} A rational expression is a fraction where both the numerator and the denominator are polynomials.
+\small
+\textbf{Definition:} A rational expression is a fraction where both the numerator and the denominator are polynomials.
 
 \vspace{0.3cm}
 \textbf{Goal:} Simplify by factoring both the numerator and denominator, then cancelling common factors.
 
 \vspace{0.4cm}
 \textbf{Steps to Simplify:}
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{Factor} the numerator and denominator completely.
     \item \textbf{Identify common factors} in both.
     \item \textbf{Cancel out} the common factors.
     \item \textbf{State restrictions:} Any value that makes the denominator zero must be excluded from the domain.
-\end{itemize}
+\end{enumerate}
 
 \vspace{0.4cm}
 \textbf{Note:} Only factors (not terms) can be cancelled.
@@ -529,10 +548,11 @@ a \cdot 4 = 0.36 \Rightarrow a = \frac{0.36}{4} = 0.09
 
 
 \begin{frame}{Factoring Rational Expressions (Part 2)}
-    \textbf{Special Factoring Patterns to Know:}
+\small
+\textbf{Special Factoring Patterns to Know:}
 \begin{itemize}
-    \item Difference of squares: \(a^2 - b^2 = (a - b)(a + b)\)
-    \item Perfect square trinomials: \(a^2 \pm 2ab + b^2 = (a \pm b)^2\)
+    \item Difference of squares: $a^2 - b^2 = (a - b)(a + b)$
+    \item Perfect square trinomials: $a^2 \pm 2ab + b^2 = (a \pm b)^2$
     \item Difference and sum of cubes:
     \[
     a^3 - b^3 = (a - b)(a^2 + ab + b^2)
@@ -566,16 +586,16 @@ The equation is true for all \( x \ne -7 \), where \( a \) and \( d \) are integ
 
 \textbf{What is the value of \( a + d \)?}
 
-\begin{itemize}
-    \item[\textbf{A.}] \(-6\)
-    \item[\textbf{B.}] \(-1\)
-    \item[\textbf{C.}] \(0\)
-    \item[\textbf{D.}] \(1\)
-\end{itemize}
+\begin{enumerate}
+    \item[A.] $-6$
+    \item[B.] $-1$
+    \item[C.] $0$
+    \item[D.] $1$
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Polynomial Division}}
-    We are dividing a quadratic by a linear binomial:
+\begin{frame}{\textbf{Answer and Explanation}}
+We are dividing a quadratic by a linear binomial:
 \[
 \frac{x^2 + 6x - 7}{x + 7}
 \]
@@ -595,12 +615,10 @@ Thus,
 ax + d = x - 1 \Rightarrow a = 1, \quad d = -1
 \]
 
-    Therefore,
-    \[
-    a + d = 1 + (-1) = 0
-    \]
-
-    \textbf{Correct Answer:} \( \boxed{C} \)
+Therefore,
+\[
+a + d = 1 + (-1) = \boxed{0}
+\]
 \end{frame}
 
 
@@ -615,16 +633,16 @@ Which of the following expressions is equivalent to:
 \]
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] \(\frac{1}{x + 1}\)
-    \item[\textbf{B.}] \(\frac{x + 3}{x + 1}\)
-    \item[\textbf{C.}] \(\frac{x(x - 3)}{x + 1}\)
-    \item[\textbf{D.}] \(\frac{x(x + 3)}{x + 1}\)
-\end{itemize}
+\begin{enumerate}
+    \item[A.] $\frac{1}{x + 1}$
+    \item[B.] $\frac{x + 3}{x + 1}$
+    \item[C.] $\frac{x(x - 3)}{x + 1}$
+    \item[D.] $\frac{x(x + 3)}{x + 1}$
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Simplifying Rational Expressions}}
-    We start by factoring both the numerator and denominator:
+\begin{frame}{\textbf{Answer and Explanation}}
+We start by factoring both the numerator and denominator:
 
 \[
 f(x) = x^3 - 9x = x(x^2 - 9) = x(x - 3)(x + 3)
@@ -638,7 +656,10 @@ Now simplify:
 \frac{f(x)}{g(x)} = \frac{x(x - 3)(x + 3)}{(x - 3)(x + 1)} = \frac{x(x + 3)}{x + 1}
 \]
 
-    \textbf{Correct Answer:} \( \boxed{D} \)
+So the correct answer is:
+\[
+\boxed{\text{D. } \frac{x(x + 3)}{x + 1}}
+\]
 \end{frame}
 
 
@@ -665,7 +686,8 @@ Now simplify:
 \end{frame}
 
 \begin{frame}{Adding Algebraic Fractions}
-    \textbf{To add or subtract algebraic fractions:}
+\small
+\textbf{To add or subtract algebraic fractions:}
 \begin{itemize}
     \item Step 1: Find a common denominator.
     \item Step 2: Rewrite each fraction with the common denominator.
@@ -678,7 +700,7 @@ Now simplify:
 \frac{1}{x} + \frac{1}{x+1}
 \]
 
-\textbf{Step 1:} Common denominator is \(x(x+1)\)
+\textbf{Step 1:} Common denominator is $x(x+1)$
 
 \[
 \frac{1}{x} = \frac{x+1}{x(x+1)}, \quad 
@@ -696,7 +718,8 @@ Now simplify:
 
 
 \begin{frame}{Flipping and Splitting Fractions}
-    \textbf{1. Flipping Fractions (Reciprocals):}
+\small
+\textbf{1. Flipping Fractions (Reciprocals):}
 
 \textbf{Rule:} When dividing by a fraction, multiply by its reciprocal.
 
@@ -736,25 +759,28 @@ Now simplify:
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Adding Rational Expressions}}
-    \[
-    \frac{2}{x - 2} + \frac{3}{x + 5} = \frac{rx + t}{(x - 2)(x + 5)}
-    \]
+\begin{frame}{Question:Rational Expressions}
+\small
+\textbf{Question:}
 
-    This equation is true for all \(x > 2\), where \(r\) and \(t\) are positive constants.
-    What is the value of \(rt\)?
+\[
+\frac{2}{x - 2} + \frac{3}{x + 5} = \frac{rx + t}{(x - 2)(x + 5)}
+\]
 
-    \textbf{Options:}
-    \begin{itemize}
-        \item[\textbf{A.}] \(-20\)
-        \item[\textbf{B.}] \(15\)
-        \item[\textbf{C.}] \(20\)
-        \item[\textbf{D.}] \(60\)
-    \end{itemize}
+This equation is true for all $x > 2$, where $r$ and $t$ are positive constants.  
+\textbf{What is the value of $rt$?}
+
+\begin{itemize}
+    \item[A.] $-20$
+    \item[B.] $15$
+    \item[C.] $20$
+    \item[D.] $60$
+\end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Adding Rational Expressions}}
-    Start by finding a common denominator:
+\begin{frame}{Solution: Rational Expressions}
+\small
+Start by finding a common denominator:
 
 \[
 \frac{2}{x - 2} + \frac{3}{x + 5} = \frac{2(x + 5) + 3(x - 2)}{(x - 2)(x + 5)}
@@ -778,12 +804,13 @@ Compare with the right-hand side:
 \frac{rx + t}{(x - 2)(x + 5)} \Rightarrow rx + t = 5x + 4
 \]
 
-    So:
-    \[
-    r = 5,\quad t = 4 \Rightarrow rt = 5 \cdot 4 = 20
-    \]
+So:
+\[
+r = 5,\quad t = 4
+\Rightarrow rt = 5 \cdot 4 = \boxed{20}
+\]
 
-    \textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Answer: (C) 20}
 \end{frame}
 
 
@@ -798,7 +825,8 @@ Compare with the right-hand side:
         
 
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Isolate a Variable}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Isolate a
+Variable}} \\[0.5cm]
             {\LARGE\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -810,7 +838,8 @@ Compare with the right-hand side:
 
 
 \begin{frame}{Cross-Multiplication Technique}
-    When you have an equation of the form:
+\small
+When you have an equation of the form:
 \[
 \frac{A}{B} = \frac{C}{D}
 \]
@@ -830,7 +859,8 @@ A \cdot D = B \cdot C
 \end{frame}
 
 \begin{frame}{Clearing Square Roots: Squaring Both Sides}
-    If a variable is under a square root, square both sides to eliminate the radical.
+\small
+If a variable is under a square root, square both sides to eliminate the radical.
 
 \textbf{General Rule:}
 \[
@@ -854,7 +884,8 @@ w + 19 = \left( \frac{2x}{y} \right)^2
 
 
 \begin{frame}{Solving Literal Equations (Isolate a Variable)}
-    Literal equations are formulas or equations involving multiple variables. The goal is to \textbf{solve for one variable in terms of the others}.
+\small
+Literal equations are formulas or equations involving multiple variables. The goal is to \textbf{solve for one variable in terms of the others}.
 
 \vspace{0.2cm}
 \textbf{Key Steps:}
@@ -875,26 +906,26 @@ w + 19 = \left( \frac{2x}{y} \right)^2
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Question: Solving for \(w\) in terms of \(x\) and \(y\)}}
+\begin{frame}{\textbf{Question: Solving for } $w$ \textbf{ in terms of } $x$ \textbf{ and } $y$}
 Given the equation:
 \[
 \frac{14x}{7y} = 2\sqrt{w + 19}
 \]
-The equation relates the distinct positive real numbers \(w\), \(x\), and \(y\).
+The equation relates the distinct positive real numbers $w$, $x$, and $y$.
 
-Which equation correctly expresses \(w\) in terms of \(x\) and \(y\)?
+Which equation correctly expresses $w$ in terms of $x$ and $y$?
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] \(w = \sqrt{\frac{x}{y}} - 19\)
-    \item[\textbf{B.}] \(w = \sqrt{\frac{28x}{14y}} - 19\)
-    \item[\textbf{C.}] \(w = \left(\frac{x}{y}\right)^2 - 19\)
-    \item[\textbf{D.}] \(w = \left(\frac{28x}{14y}\right)^2 - 19\)
-\end{itemize}
+\begin{enumerate}
+    \item[A.] $w = \sqrt{\frac{x}{y}} - 19$
+    \item[B.] $w = \sqrt{\frac{28x}{14y}} - 19$
+    \item[C.] $w = \left(\frac{x}{y}\right)^2 - 19$
+    \item[D.] $w = \left(\frac{28x}{14y}\right)^2 - 19$
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Solving for \(w\) in terms of \(x\) and \(y\)}}
-    Start with the equation:
+\begin{frame}{\textbf{Answer and Explanation}}
+Start with the equation:
 \[
 \frac{14x}{7y} = 2\sqrt{w + 19}
 \Rightarrow 2\sqrt{w + 19} = 2\sqrt{w + 19}
@@ -914,32 +945,33 @@ Now compare this with the answer choices. Only option \textbf{C} correctly repre
 w = \left(\frac{x}{y}\right)^2 - 19
 \]
 
-    \textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Correct Answer: C}
 \end{frame}
 
-\begin{frame}{\textbf{Question: Solving for \(t\) in terms of \(u\)}}
+
+\begin{frame}{\textbf{Question: Solving for } $t$ \textbf{ in terms of } $u$}
 Given the equation:
 \[
 u - 3 = \frac{6}{t - 2}
 \]
-What is \(t\) in terms of \(u\)?
+What is $t$ in terms of $u$?
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] \(t = \frac{1}{u}\)
-    \item[\textbf{B.}] \(t = \frac{2u + 9}{u}\)
-    \item[\textbf{C.}] \(t = \frac{1}{u - 3}\)
-    \item[\textbf{D.}] \(t = \frac{2u}{u - 3}\)
-\end{itemize}
+\begin{enumerate}
+    \item[A.] $t = \frac{1}{u}$
+    \item[B.] $t = \frac{2u + 9}{u}$
+    \item[C.] $t = \frac{1}{u - 3}$
+    \item[D.] $t = \frac{2u}{u - 3}$
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Solving for \(t\) in terms of \(u\)}}
-    Starting from the equation:
+\begin{frame}{\textbf{Answer and Explanation}}
+Starting from the equation:
 \[
 u - 3 = \frac{6}{t - 2}
 \]
 
-Multiply both sides by \((t - 2)\):
+Multiply both sides by $(t - 2)$:
 \[
 (u - 3)(t - 2) = 6
 \]
@@ -952,12 +984,12 @@ ut - 2u - 3t + 6 = 6
 \Rightarrow t = \frac{2u}{u - 3}
 \]
 
-    \textbf{Correct Answer:} \( \boxed{D} \)
+\textbf{Correct Answer: D}
 \end{frame}
 
 
 \begin{frame}
-\section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
 
         \shade[top color=softPurple, bottom color=softGray] 
@@ -967,7 +999,7 @@ ut - 2u - 3t + 6 = 6
         
 
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\LARGE\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
         \foreach \x in {1,2,3,4,5} {
@@ -977,23 +1009,21 @@ ut - 2u - 3t + 6 = 6
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{\textbf{Question: Adding Algebraic Fractions}}
-    Which expression is equivalent to
-    \[
-    \frac{y - 3xy}{2x^2 - 2xy} + \frac{1 + 3y}{x - y}\ ?
-    \]
+\begin{frame}{Question}
+Which expression is equivalent to
+\[
+\frac{y - 3xy}{2x^2 - 2xy} + \frac{1 + 3y}{x - y}\ ?
+\]
 
-    \textbf{Options:}
-    \begin{itemize}
-        \item[\textbf{A.}] \(\dfrac{2x - 3xy + 4y}{2x^2 - 2xy}\)
-        \item[\textbf{B.}] \(\dfrac{2x + 3xy + y}{2x^2 - 2xy}\)
-        \item[\textbf{C.}] \(\dfrac{2x + 3xy + y}{2x^3 - 4x^2y + 2xy^2}\)
-        \item[\textbf{D.}] \(\dfrac{4y - 3xy + 1}{2x^3 - 4x^2y + 2xy^2}\)
-    \end{itemize}
+A) $\dfrac{2x - 3xy + 4y}{2x^2 - 2xy}$ \\
+B) $\dfrac{2x + 3xy + y}{2x^2 - 2xy}$ \\
+C) $\dfrac{2x + 3xy + y}{2x^3 - 4x^2y + 2xy^2}$ \\
+D) $\dfrac{4y - 3xy + 1}{2x^3 - 4x^2y + 2xy^2}$
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Adding Algebraic Fractions}}
-    We simplify each term separately:
+
+\begin{frame}{Answer}
+We simplify each term separately:
 
 First term:
 \[
@@ -1005,7 +1035,7 @@ Second term:
 \frac{1 + 3y}{x - y}
 \]
 
-To combine these, we need a common denominator. The least common denominator (LCD) is \(2x(x - y)\).
+To combine these, we need a common denominator. The least common denominator (LCD) is $2x(x - y)$.
 
 Rewrite the second term using LCD:
 \[
@@ -1017,23 +1047,23 @@ Now add the two terms:
 \frac{y - 3xy + 2x + 6xy}{2x^2 - 2xy} = \frac{2x + 3xy + y}{2x^2 - 2xy}
 \]
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Correct answer:} B
 \end{frame}
 
-\begin{frame}{\textbf{Question: Solving for \(k\) in terms of \(x\)}}
-    If \(\dfrac{4}{k + 2} = \dfrac{x}{3}\), where \(k \ne -2\), which equation correctly expresses \(k\) in terms of \(x\)?
+\begin{frame}{Question}
+If $\dfrac{4}{k + 2} = \dfrac{x}{3}$, where $k \ne -2$, which equation correctly expresses $k$ in terms of $x$?
 
-    \textbf{Options:}
-    \begin{itemize}
-        \item[\textbf{A.}] \(k = \dfrac{12 - 2x}{x}\)
-        \item[\textbf{B.}] \(k = \dfrac{12 + 2x}{x}\)
-        \item[\textbf{C.}] \(k = \dfrac{x}{12 + 2x}\)
-        \item[\textbf{D.}] \(k = 12x - 2\)
-    \end{itemize}
+\vspace{2em}
+
+A) $k = \dfrac{12 - 2x}{x}$ \\
+B) $k = \dfrac{12 + 2x}{x}$ \\
+C) $k = \dfrac{x}{12 + 2x}$ \\
+D) $k = 12x - 2$
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Solving for \(k\) in terms of \(x\)}}
-    We are given:
+
+\begin{frame}{Answer}
+We are given:
 \[
 \frac{4}{k + 2} = \frac{x}{3}
 \]
@@ -1043,37 +1073,38 @@ Cross-multiply:
 4 \cdot 3 = x(k + 2) \Rightarrow 12 = xk + 2x
 \]
 
-Solve for \(k\):
+Solve for $k$:
 \[
 12 - 2x = xk \Rightarrow k = \frac{12 - 2x}{x}
 \]
 
-\textbf{Correct Answer:} \( \boxed{A} \)
+\textbf{Correct answer:} A
 \end{frame}
 
-\begin{frame}{\textbf{Question: Solving for \(G\) in terms of \(L\), \(P\), and \(T\)}}
-    \[
-    T = 2P \sqrt{\frac{L}{G}}
-    \]
-
-    The given equation relates the positive real numbers \(G\), \(L\), \(P\), and \(T\). Which equation correctly expresses \(G\) in terms of \(L\), \(P\), and \(T\)?
-
-    \textbf{Options:}
-    \begin{itemize}
-        \item[\textbf{A.}] \(\dfrac{2PL}{T^2}\)
-        \item[\textbf{B.}] \(\dfrac{T^2}{4LP^2}\)
-        \item[\textbf{C.}] \(\dfrac{LT^2}{4P^2}\)
-        \item[\textbf{D.}] \(\dfrac{4LP^2}{T^2}\)
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{\textbf{Answer Explanation: Solving for \(G\) in terms of \(L\), \(P\), and \(T\)}}
-    We start with the equation:
+\begin{frame}{Question}
 \[
 T = 2P \sqrt{\frac{L}{G}}
 \]
 
-Divide both sides by \(2P\):
+The given equation relates the positive real numbers $G$, $L$, $P$, and $T$. Which equation correctly expresses $G$ in terms of $L$, $P$, and $T$?
+
+\begin{enumerate}
+  \renewcommand{\labelenumi}{\Alph{enumi})}
+  \item[A] $\dfrac{2PL}{T^2}$
+  \item[B] $\dfrac{T^2}{4LP^2}$
+  \item[C] $\dfrac{LT^2}{4P^2}$
+  \item[D] $\dfrac{4LP^2}{T^2}$
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Answer}
+We start with the equation:
+\[
+T = 2P \sqrt{\frac{L}{G}}
+\]
+
+Divide both sides by $2P$:
 \[
 \frac{T}{2P} = \sqrt{\frac{L}{G}}
 \]
@@ -1084,12 +1115,12 @@ Square both sides:
 \Rightarrow \frac{T^2}{4P^2} = \frac{L}{G}
 \]
 
-Solve for \(G\):
+Solve for $G$:
 \[
 G = \frac{4P^2 L}{T^2}
 \]
 
-\textbf{Correct Answer:} \( \boxed{D} \)
+\textbf{Correct answer:} D
 \end{frame}
 
 
@@ -1103,23 +1134,23 @@ The expression
 \[
 4x^2 + bx - 45
 \]
-where \(b\) is a constant, can be rewritten as 
+where $b$ is a constant, can be rewritten as 
 \[
 (hx + k)(x + j),
 \]
-where \(h\), \(k\), and \(j\) are \textbf{integer constants}. Which of the following must be an integer?
+where $h$, $k$, and $j$ are 、\textbf{integer constants}. Which of the following must be an integer?
 
 \textbf{Options:}
-\begin{itemize}
-    \item[\textbf{A.}] \(\frac{b}{h}\)
-    \item[\textbf{B.}] \(\frac{b}{k}\)
-    \item[\textbf{C.}] \(\frac{45}{h}\)
-    \item[\textbf{D.}] \(\frac{45}{k}\)
-\end{itemize}
+\begin{enumerate}
+    \item[A.] $\frac{b}{h}$
+    \item[B.] $\frac{b}{k}$
+    \item[C.] $\frac{45}{h}$
+    \item[D.] $\frac{45}{k}$
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Integer Relationship in Factored Form}}
-    We are given:
+\begin{frame}{\textbf{Answer: Integer Relationship in Factored Form}}
+We are given:
 \[
 4x^2 + bx - 45 = (hx + k)(x + j)
 \]
@@ -1132,12 +1163,12 @@ By comparing coefficients:
 h = 4, \quad b = hj + k, \quad kj = -45
 \]
 
-Since \(k\) and \(j\) are integers and their product \(kj = -45\), it follows that \(k\) must divide \(45\). Therefore:
+Since $k$ and $j$ are integers and their product $kj = -45$, it follows that $k$ must divide $45$. Therefore:
 \[
 \frac{45}{k} \text{ must be an integer}.
 \]
 
-    \textbf{Correct Answer:} \( \boxed{D} \)
+\textbf{Correct Answer:} \textbf{D. } $\frac{45}{k}$
 \end{frame}
 
 

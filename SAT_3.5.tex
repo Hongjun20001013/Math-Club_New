@@ -4,32 +4,40 @@
 \usepackage{tikz}
 \usepackage{amsmath}
 
+\usepackage{colortbl}     % 支持 \rowcolor
+\usepackage[table]{xcolor}  % 增强颜色支持，特别是灰色背景
+\usepackage{array}        % 增强表格功能（对齐方式等）
+\usepackage{booktabs
+
+
+
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
 \definecolor{softPurple}{RGB}{180, 170, 255}
 \definecolor{softGray}{RGB}{235, 235, 245}
 \definecolor{lightText}{RGB}{90, 90, 110}
-\graphicspath{{static/course_materials/}{./}}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
-\title[SAT Unit 3.5]{\textbf{SAT Unit 3.5 \\Probability}}
+% 封面信息
+\title[SAT Unit 3.5 ]{\textbf{SAT Unit 3.5\\ Probability}}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
-\date{\today}
+\date{\today} 
 
 \begin{document}
-
 
 % --- Title Slide ---
 \begin{frame}
@@ -40,24 +48,37 @@
     \end{flushright}
 \end{frame}
 
+
+
+
 \begin{frame}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
+
 
 \begin{frame}
 \section{Probability}
@@ -86,7 +107,8 @@
 
 
 \begin{frame}{Definition of Probability}
-    
+\small
+
 \textbf{Probability} is a measure of how likely an event is to occur. It is defined as:
 
 \[
@@ -95,11 +117,11 @@ P(\text{Event}) = \frac{\text{Number of favorable outcomes}}{\text{Total number 
 
 \textbf{Key Properties:}
 \begin{itemize}
-    \item \(0 \leq P(A) \leq 1\) for any event \(A\)
-    \item \(P(\text{certain event}) = 1\)
-    \item \(P(\text{impossible event}) = 0\)
-    \item \(P(\text{not A}) = 1 - P(A)\)
-    \item For mutually exclusive events \(A\) and \(B\):
+    \item $0 \leq P(A) \leq 1$ for any event $A$
+    \item $P(\text{certain event}) = 1$
+    \item $P(\text{impossible event}) = 0$
+    \item $P(\text{not A}) = 1 - P(A)$
+    \item For mutually exclusive events $A$ and $B$:
     \[
     P(A \text{ or } B) = P(A) + P(B)
     \]
@@ -108,7 +130,8 @@ P(\text{Event}) = \frac{\text{Number of favorable outcomes}}{\text{Total number 
 \end{frame}
 
 \begin{frame}{Simple Probability Examples}
-    
+\small
+
 \textbf{Example 1:} A fair die is rolled. What is the probability of getting an even number?
 
 \[
@@ -129,8 +152,9 @@ P(\text{Event}) = \frac{\text{Number of favorable outcomes}}{\text{Total number 
 
 
 \begin{frame}{Conditional Probability (Concept)}
-    
-\textbf{Conditional Probability} is the probability of event \(A\) occurring \textbf{given} that event \(B\) has occurred.
+\small
+
+\textbf{Conditional Probability} is the probability of event $A$ occurring \textbf{given} that event $B$ has occurred.
 
 \[
 P(A \mid B) = \frac{P(A \cap B)}{P(B)}
@@ -138,18 +162,19 @@ P(A \mid B) = \frac{P(A \cap B)}{P(B)}
 
 \textbf{Key Points:}
 \begin{itemize}
-    \item \(P(A \mid B)\) narrows the sample space to only outcomes where \(B\) happens.
-    \item Only defined if \(P(B) \ne 0\).
+    \item $P(A \mid B)$ narrows the sample space to only outcomes where $B$ happens.
+    \item Only defined if $P(B) \ne 0$.
 \end{itemize}
 
 \textbf{Visual:}
 
-Think of "restricting" the universe to \(B\), and checking how many of those are also \(A\)
+Think of "restricting" the universe to $B$, and checking how many of those are also $A$
 
 
 \end{frame}
 
-\begin{frame}{\textbf{Question: Probability - Score Distribution Table}}
+\begin{frame}{\textbf{Probability - Score Distribution Table}}
+\small
 
 The same 20 contestants, on each of 3 days, answered 5 questions in order to win a prize. Each contestant received 1 point for each correct answer. The number of contestants receiving a given score on each day is shown in the table below.
 
@@ -174,19 +199,20 @@ No contestant received the same score on two different days. If a contestant is 
 
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Probability - Score Distribution Table}}
-    
+\begin{frame}{Answer: Conditional Probability}
+\small
+
 \textbf{Problem Context:}
 \begin{itemize}
     \item 20 contestants each day, over 3 days (no repeat scores).
     \item Table shows number of contestants scoring 0–5 on each day.
-    \item Total scores of 5 across all days: \(2 + 2 + 3 = 7\)
+    \item Total scores of 5 across all days: $2 + 2 + 3 = 7$
 \end{itemize}
 
 
-\textbf{Given:} A contestant received a score of \(5\) on \textbf{one of the days}.
+\textbf{Given:} A contestant received a score of $5$ on \textbf{one of the days}.
 
-\textbf{Find:} Probability that this contestant scored \(5\) on Day 2 or Day 3.
+\textbf{Find:} Probability that this contestant scored $5$ on Day 2 or Day 3.
 
 
 \textbf{Step 1: Count favorable outcomes}
@@ -206,14 +232,14 @@ No contestant received the same score on two different days. If a contestant is 
 P(\text{Day 2 or Day 3} \mid \text{Score 5}) = \frac{5}{7}
 \]
 
-\textbf{Correct Answer:} \( \boxed{\frac{5}{7}} \)
+\textbf{Final Answer:} $\boxed{\frac{5}{7}}$
 
 \end{frame}
 
 
 
 \begin{frame}
-\section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
         % 设置浅色渐变背景
         \shade[top color=softPurple, bottom color=softGray] 
@@ -224,7 +250,7 @@ P(\text{Day 2 or Day 3} \mid \text{Score 5}) = \frac{5}{7}
         
         % 主标题
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
 
@@ -238,7 +264,7 @@ P(\text{Day 2 or Day 3} \mid \text{Score 5}) = \frac{5}{7}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: The table summarizes the distribution of age and…}}
+\begin{frame}{Question}
 The table summarizes the distribution of age and favorite sport for 150 members of a country club.
 
 \begin{center}
@@ -257,7 +283,7 @@ Total & 50 & 50 & 50 & 150 \\
 
 One of these members will be selected at random. What is the probability of selecting a member whose favorite sport is tennis, given that the member is at least 45 years of age? (Express your answer as a decimal or fraction, not as a percent.)
 \end{frame}
-\begin{frame}{\textbf{Answer Explanation: The table summarizes the distribution of age and…}}
+\begin{frame}{Answer}
 \textbf{Step 1. Identify the relevant group:}
 \[
 \text{At least 45 years of age} = (45–59) + (60+) = 50 + 50 = 100.
@@ -273,11 +299,11 @@ One of these members will be selected at random. What is the probability of sele
 P(\text{Tennis} \mid \text{At least 45}) = \frac{40}{100} = 0.4.
 \]
 
-\textbf{Answer:} \(\boxed{0.4}\).
+\textbf{Answer:} $\boxed{0.4}$.
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: A new medical test is designed to give a positive…}}
+\begin{frame}{Question}
 A new medical test is designed to give a positive indicator to a patient who has a certain virus and a negative indicator to a patient who does not. The table summarizes the results for 1,000 patients who have taken this test.
 
 \begin{center}
@@ -295,16 +321,16 @@ Total & 580 & 420 & 1,000 \\
 
 Based on the table, what is the probability that the test gives the wrong indicator?
 
-\begin{itemize}
- \item[\textbf{A.}] 5\%
- \item[\textbf{B.}] 8\%
- \item[\textbf{C.}] 10\%
- \item[\textbf{D.}] 12\%
-\end{itemize}
+\begin{enumerate}[A.]
+    \item 5\%
+    \item 8\%
+    \item 10\%
+    \item 12\%
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: A new medical test is designed to give a positive…}}
+\begin{frame}{Answer}
 \textbf{Step 1. Count the number of wrong indicators:}
 \begin{itemize}
     \item False negatives (Has virus, but test negative): 30
@@ -324,11 +350,12 @@ Based on the table, what is the probability that the test gives the wrong indica
 0.08 = 8\%
 \]
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Answer:} B.
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: The table shows the results of a survey in which…}}
+\begin{frame}{Question}
+\small
 The table shows the results of a survey in which students at three colleges were asked whether they live on campus or off campus.
 
 \begin{center}
@@ -347,23 +374,23 @@ Total & 1,055 & 1,445 & 2,500 \\
 
 If one of the students surveyed is selected at random, which of the following probabilities has the greatest value?
 
-\begin{itemize}
- \item[\textbf{A.}] The probability that the student lives off campus, given that the student attends College C.
- \item[\textbf{B.}] The probability that the student lives on campus, given that the student attends College C.
- \item[\textbf{C.}] The probability that the student attends College C, given that the student lives off campus.
- \item[\textbf{D.}] The probability that the student attends College C, given that the student lives on campus.
-\end{itemize}
+\begin{enumerate}[A.]
+    \item The probability that the student lives off campus, given that the student attends College C.
+    \item The probability that the student lives on campus, given that the student attends College C.
+    \item The probability that the student attends College C, given that the student lives off campus.
+    \item The probability that the student attends College C, given that the student lives on campus.
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Answer Explanation: The table shows the results of a survey in which…}}
+\begin{frame}{Answer}
 \textbf{Step 1. Calculate each conditional probability:}
 
 \begin{itemize}
-    \item A: \(\frac{596}{870} \approx 0.685\)
-    \item B: \(\frac{274}{870} \approx 0.315\)
-    \item C: \(\frac{596}{1055} \approx 0.565\)
-    \item D: \(\frac{274}{1445} \approx 0.19\)
+    \item A: $\frac{596}{870} \approx 0.685$
+    \item B: $\frac{274}{870} \approx 0.315$
+    \item C: $\frac{596}{1055} \approx 0.565$
+    \item D: $\frac{274}{1445} \approx 0.19$
 \end{itemize}
 
 \textbf{Step 2. Compare:}
@@ -371,24 +398,41 @@ If one of the students surveyed is selected at random, which of the following pr
 0.685 > 0.565 > 0.315 > 0.19
 \]
 
-\textbf{Correct Answer:} \( \boxed{A} \)
+\textbf{Answer:} A.
 \end{frame}
+
+
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
     \end{tikzpicture}
+
     \centering
     \vspace{5em}
+
     {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
     {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
     {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
     \vfill
 \end{frame}
+
 
 \end{document}

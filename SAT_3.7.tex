@@ -4,32 +4,40 @@
 \usepackage{tikz}
 \usepackage{amsmath}
 
+\usepackage{colortbl}    
+\usepackage[table]{xcolor}  
+\usepackage{array}        
+\usepackage{booktabs
+
+
+
 % 自定义颜色
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{lightgray}{RGB}{230, 230, 230}
-\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{novelPurple}{RGB}{98, 54, 255} 
 \definecolor{darkgray}{RGB}{50, 50, 50}
 \definecolor{softPurple}{RGB}{180, 170, 255}
 \definecolor{softGray}{RGB}{235, 235, 245}
 \definecolor{lightText}{RGB}{90, 90, 110}
-\graphicspath{{static/course_materials/}{./}}
 
 % 主题设置
-\usetheme{Madrid}
+\usetheme{Madrid}  
 \usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{./}} 
 
+% 设置字体（移除 fontspec，确保 pdfLaTeX 兼容）
 \setbeamerfont{title}{size=\Large,series=\bfseries}
 \setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
 \setbeamercolor{frametitle}{fg=white, bg=novelPurple}
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
-\title[SAT Unit 3.7]{\textbf{SAT Unit 3.7 \\Evaluating Statistical Claims}}
+% 封面信息
+\title[SAT Unit 3.7 ]{\textbf{SAT Unit 3.7\\ Evaluating Statistical Claims }}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
-\date{\today}
+\date{\today} 
 
 \begin{document}
-
 
 % --- Title Slide ---
 \begin{frame}
@@ -40,328 +48,348 @@
     \end{flushright}
 \end{frame}
 
+
+
+
 \begin{frame}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
+
 
 \begin{frame}{Overview}
     \tableofcontents
 \end{frame}
 
+
+
 \begin{frame}
 \section{Observation Study and Experiments}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
             {\LARGE\bfseries\textcolor{purpleblue}{Observation Study and Experiments}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
-% --- Part 1: Population & Sample ---
-\begin{frame}{Step 1 — Population and Sample}
 
-\textbf{Population:} The entire group you want information about.
+\begin{frame}{Population vs. Sample}
+\small
 
-\textbf{Sample:} A subset of the population used to make inferences.
+\textbf{Population:}  
+The entire group you want information about.  
+\textbf{Sample:}  
+A subset of the population used to make inferences.
 
 \vspace{0.2cm}
-\textbf{Goal:} Use data from a sample to draw conclusions about the population.
+\textbf{Goal of  Statistical Reasoning:}  
+Use data from a sample to draw conclusions about the population.
 
 \begin{itemize}
-    \item \textbf{Random sample:} Every member of the population has an equal chance of being selected.
-    \item \textbf{Representative sample:} The sample reflects the population you care about.
-    \item \textbf{Larger sample:} Usually gives a more reliable estimate.
+    \item \textbf{Representative Sample:} Accurately reflects the entire population.
+    \item \textbf{Random Sampling:} Each member of the population has an equal chance of being selected.
+    \item \textbf{Sample Size:} Larger samples reduce variability and give more accurate estimates.
 \end{itemize}
 
-\textbf{Caution:} A biased or non-random sample can make conclusions invalid.
+\textbf{⚠️ Caution:} A biased or small sample can lead to invalid conclusions.
 
 \end{frame}
 
-\begin{frame}{Step 2 — Statistical Generalization (SAT Core)}
+\begin{frame}{Observational Studies vs. Experiments}
+\small
 
-\textbf{Question the SAT asks:} ``To which group can we apply these results?''
+\textbf{Observational Study:}  
+Researchers observe outcomes without assigning treatments.
+
+\textbf{Experiment:}  
+Researchers impose a treatment to measure its effect.
 
 \vspace{0.2cm}
-\textbf{Golden rule:}
+\textbf{Key Differences:}
 \begin{itemize}
-    \item You can generalize to the \textbf{population that was randomly sampled}.
-    \item You \textbf{cannot} generalize to a larger group that was \textbf{not} sampled.
+    \item \textbf{Observational Study:} Can identify associations, but not causation.
+    \item \textbf{Experiment:} Can show causation if well-designed (randomized, controlled).
 \end{itemize}
 
 \vspace{0.2cm}
-\textbf{Example:} A random sample of 40 \textbf{fourth-graders at one school} \(\Rightarrow\) results apply to \textbf{all fourth-graders at that school} — not the whole county or all students.
-
-\vspace{0.2cm}
-\textbf{SAT shortcut:} Pick the \textbf{largest population that still matches the sampling group}.
+\textbf{ Tip:}  
+If the study doesn’t include random assignment or control groups, it's likely \textbf{observational} — so don’t claim causation.
 
 \end{frame}
 
-% --- Part 2: Study Types ---
-\begin{frame}{Step 3 — Three Types of Studies}
+\begin{frame}{Differences Between Sample Survey, Observational Study, and Experiment}
 
-\begin{center}
-\begin{tabular}{|p{2.4cm}|p{4.2cm}|p{4.2cm}|}
-\hline
-\textbf{Type} & \textbf{What happens?} & \textbf{Can show causation?} \\
-\hline
-\textbf{Sample survey} & Ask questions; no treatment assigned & No \\
-\hline
-\textbf{Observational study} & Observe subjects; researcher does not impose a treatment & No — association only \\
-\hline
-\textbf{Experiment} & Researcher assigns a treatment and compares outcomes & Yes — if well designed \\
-\hline
-\end{tabular}
-\end{center}
-
-\vspace{0.2cm}
-\textbf{Key SAT distinction:}
+\textbf{Differences:}
 \begin{itemize}
-    \item \textbf{Observational:} ``We watched what happened.''
-    \item \textbf{Experiment:} ``We assigned groups and compared results.''
+    \item \textbf{Sample Survey}: Collects data by asking questions, no control over variables.
+    \item \textbf{Observational Study}: Observes subjects without manipulating them.
+    \item \textbf{Experiment}: Researcher manipulates variables and assigns treatments to test cause-and-effect.
 \end{itemize}
 
-\end{frame}
 
-\begin{frame}{Step 4 — Experiments vs.\ Observational Studies}
-
-\textbf{Observational study:}
-\begin{itemize}
-    \item Researchers observe outcomes without assigning treatments.
-    \item Can identify \textbf{association}, not \textbf{causation}.
-\end{itemize}
-
-\vspace{0.2cm}
-\textbf{Experiment:}
-\begin{itemize}
-    \item Researchers impose a treatment and measure its effect.
-    \item Can support \textbf{causation} if \textbf{random assignment} and a \textbf{control group} are used.
-\end{itemize}
-
-\vspace{0.2cm}
-\textbf{SAT alert:} If there is no random assignment, do \textbf{not} claim the treatment \textbf{caused} the outcome.
-
-\end{frame}
-
-% --- Part 3: Bias ---
-\begin{frame}{Step 5 — Bias and Invalid Conclusions}
-
-\textbf{Bias:} A systematic error that makes results misleading.
-
-\vspace{0.2cm}
-\textbf{Common types on the SAT:}
-\begin{itemize}
-    \item \textbf{Sampling bias:} Sample does not represent the population (e.g., survey only at a playground).
-    \item \textbf{Voluntary response bias:} People choose whether to respond (e.g., online poll after a TV show).
-    \item \textbf{Nonresponse bias:} Many selected people do not respond.
-    \item \textbf{Question wording bias:} Leading or confusing questions.
-\end{itemize}
-
-\vspace{0.2cm}
-\textbf{If the sample is biased, the conclusion is not reliable — even if the math is correct.}
-
-\end{frame}
-
-\begin{frame}{SAT Strategy — Evaluating a Statistical Claim}
-
-\textbf{Use this checklist on every question:}
-
-\begin{enumerate}
-    \item \textbf{Who was sampled?} (Identify the exact group.)
-    \item \textbf{Was the sample random?} (If not, generalization fails.)
-    \item \textbf{Is the sample biased?} (Location, voluntary response, etc.)
-    \item \textbf{Survey, observational study, or experiment?} (Causation only in experiments.)
-    \item \textbf{Largest valid population?} (Match the sampled group — no bigger.)
-\end{enumerate}
-
-\vspace{0.2cm}
-\textbf{Teaching tip:} Students often pick an answer that sounds ``bigger'' or ``more general.'' On the SAT, \textbf{valid beats broad}.
 
 \end{frame}
 
 
-% --- Examples ---
+\begin{frame}{Bias in Sampling and Survey Design}
+\small
+
+\textbf{Bias:} A systematic error that leads to inaccurate or misleading results.
+
+\vspace{0.2cm}
+\textbf{Types of Bias to Watch For:}
+\begin{itemize}
+    \item \textbf{Sampling Bias:} Sample does not represent the population.
+    \item \textbf{Nonresponse Bias:} Selected individuals do not respond.
+    \item \textbf{Voluntary Response Bias:} Participants self-select, often leading to extreme views.
+    \item \textbf{Question Wording Bias:} Leading or confusing questions distort responses.
+\end{itemize}
+
+\textbf{SAT Alert:}  
+If the question hints that the sample was not random or the survey was biased — the conclusions are not reliable.
+
+\end{frame}
+
+
+
+
+
 \begin{frame}{\textbf{Question: Statistical Generalization}}
-A sample of 40 fourth-grade students was selected at random from a certain school.
-The 40 students completed a survey about the morning announcements, and 32 thought the announcements were helpful.
+A sample of 40 fourth-grade students was selected at random from a certain school. 
+The 40 students completed a survey about the morning announcements, and 32 thought the announcements were helpful. 
 
 Which of the following is the \textbf{largest population} to which the results of the survey can be applied?
 
 \begin{itemize}
-    \item[\textbf{A.}] The 40 students who were surveyed
-    \item[\textbf{B.}] All fourth-grade students at the school
-    \item[\textbf{C.}] All students at the school
-    \item[\textbf{D.}] All fourth-grade students in the county in which the school is located
+    \item[A.] The 40 students who were surveyed
+    \item[B.] All fourth-grade students at the school
+    \item[C.] All students at the school
+    \item[D.] All fourth-grade students in the county in which the school is located
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Statistical Generalization}}
-The 40 students were selected \textit{at random} from fourth-grade students \textbf{at the school}. So the results can be generalized to that group — but not to all students at the school or to the whole county.
+\begin{frame}{\textbf{Answer: Statistical Generalization}}
+\textbf{Correct Answer:} \textbf{B.} All fourth-grade students at the school.
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Explanation:} 
+Because the 40 students were selected \textit{at random} from the population of fourth-grade students at the school, the results can be generalized to that group—but not beyond it.
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Interpreting Poll Validity}}
-Near the end of a US cable news show, the host invited viewers to respond to a poll on the show's website that asked, ``Do you support the new federal policy discussed during the show?''
 
-At the end of the show, the host reported that \(28\%\) responded ``Yes,'' and \(70\%\) responded ``No.''
+\begin{frame}{\textbf{Question: Interpreting Poll Validity}}
+Near the end of a US cable news show, the host invited viewers to respond to a poll on the show’s website that asked, “Do you support the new federal policy discussed during the show?” 
+
+At the end of the show, the host reported that \(28\%\) responded “Yes,” and \(70\%\) responded “No.” 
 
 Which of the following best explains why the results are unlikely to represent the sentiments of the population of the United States?
 
 \begin{itemize}
-    \item[\textbf{A.}] The percentages do not add up to \(100\%\), so any possible conclusions from the poll are invalid.
-    \item[\textbf{B.}] Those who responded to the poll were not a random sample of the population of the United States.
-    \item[\textbf{C.}] There were not \(50\%\) ``Yes'' responses and \(50\%\) ``No'' responses.
-    \item[\textbf{D.}] The show did not allow viewers enough time to respond to the poll.
+    \item[A.] The percentages do not add up to \(100\%\), so any possible conclusions from the poll are invalid.
+    \item[B.] Those who responded to the poll were not a random sample of the population of the United States.
+    \item[C.] There were not \(50\%\) “Yes” responses and \(50\%\) “No” responses.
+    \item[D.] The show did not allow viewers enough time to respond to the poll.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Interpreting Poll Validity}}
-Viewers who chose to respond are a \textbf{voluntary, non-random sample}. They are not representative of all US residents, so the poll cannot reliably estimate national opinion.
+\begin{frame}{\textbf{Answer: Interpreting Poll Validity}}
+\textbf{Correct Answer:} \textbf{B.} Those who responded to the poll were not a random sample of the population of the United States.
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Explanation:} 
+Because the poll was open only to viewers of the show who chose to respond, the respondents are not a random or representative sample of the broader US population.
 \end{frame}
 
 
+
 \begin{frame}{\textbf{Question: Survey Sampling and Bias}}
-To determine the mean number of children per household in a community, Tabitha surveyed 20 families at a playground. For the 20 families surveyed, the mean number of children per household was \( 2.4 \).
+To determine the mean number of children per household in a community, Tabitha surveyed 20 families at a playground. For the 20 families surveyed, the mean number of children per household was \( 2.4 \). 
 
 Which of the following statements must be true?
 
 \begin{itemize}
-    \item[\textbf{A.}] The mean number of children per household in the community is \( 2.4 \).
-    \item[\textbf{B.}] A determination about the mean number of children per household in the community should not be made because the sample size is too small.
-    \item[\textbf{C.}] The sampling method is flawed and may produce a biased estimate of the mean number of children per household in the community.
-    \item[\textbf{D.}] The sampling method is not flawed and is likely to produce an unbiased estimate of the mean number of children per household in the community.
+    \item[A.] The mean number of children per household in the community is \( 2.4 \).
+    \item[B.] A determination about the mean number of children per household in the community should not be made because the sample size is too small.
+    \item[C.] The sampling method is flawed and may produce a biased estimate of the mean number of children per household in the community.
+    \item[D.] The sampling method is not flawed and is likely to produce an unbiased estimate of the mean number of children per household in the community.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Survey Sampling and Bias}}
-Surveying only families at a playground introduces \textbf{sampling bias}: these families are more likely to have children and may not represent all households in the community.
+\begin{frame}{\textbf{Answer: Survey Sampling and Bias}}
+\textbf{Correct Answer:} \textbf{C.} The sampling method is flawed and may produce a biased estimate of the mean number of children per household in the community.
 
-\textbf{Correct Answer:} \( \boxed{C} \)
+\textbf{Explanation:} 
+Surveying families only at a playground introduces sampling bias, as these families are more likely to have children and may not represent the entire community.
 \end{frame}
 
 
 \begin{frame}
-\section{Practice}
+\section{Practices}
     \begin{tikzpicture}[remember picture, overlay]
-        \shade[top color=softPurple, bottom color=softGray]
+        % 设置浅色渐变背景
+        \shade[top color=softPurple, bottom color=softGray] 
             (current page.north west) rectangle (current page.south east);
+        
+        % 添加高斯模糊光晕
         \fill[white, opacity=0.3] (current page.center) circle (4cm);
+        
+        % 主标题
         \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practice}} \\[0.5cm]
+            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
             {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
         };
+
+        % 添加柔和光点（点缀）
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
+
+        ;
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{\textbf{Question: Chess Memorization Study Generalization}}
+\begin{frame}{Question}
 A researcher conducted a study to determine if certain memorization strategies could improve the performance of chess players. For the study, the researcher selected a random sample of adults who are competing in a chess tournament. At the end of the study, 80\% of those sampled reported that they did not find the memorization strategies to be useful during their chess games. Which of the following is the largest population to which the results of this study can be applied?
 
-\begin{itemize}
- \item[\textbf{A.}] All chess players who compete in tournaments.
- \item[\textbf{B.}] All adults who compete in chess tournaments.
- \item[\textbf{C.}] All chess players competing in the tournament.
- \item[\textbf{D.}] All adults competing in the tournament.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\textbf{Answer Explanation: Chess Memorization Study Generalization}}
-The sample was drawn from \textbf{adults competing in a chess tournament}. The largest valid generalization matches that exact population.
-
-\textbf{Correct Answer:} \( \boxed{B} \)
+\begin{enumerate}[A.]
+    \item All chess players who compete in tournaments.
+    \item All adults who compete in chess tournaments.
+    \item All chess players competing in the tournament.
+    \item All adults competing in the tournament.
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Teacher Certification Survey}}
+\begin{frame}{Answer}
+\textbf{Explanation:}  
+The sample was drawn from adults who were competing in a chess tournament. Therefore, the results can be generalized only to that same population: all adults who compete in chess tournaments.
+
+\textbf{Answer:} B.
+\end{frame}
+
+
+\begin{frame}{Question}
 A group of school administrators wanted to gather opinions on new teacher certification requirements that were introduced in a certain state. The group surveyed a random sample of math teachers from one of the school districts in the state. The survey showed that the majority of the teachers in the sample support the new requirements. Which of the following is the largest population to which the results of the survey can be generalized?
 
-\begin{itemize}
- \item[\textbf{A.}] All math teachers in the school district.
- \item[\textbf{B.}] All teachers in the school district.
- \item[\textbf{C.}] All math teachers in the state.
- \item[\textbf{D.}] The teachers in the sample.
-\end{itemize}
+\begin{enumerate}[A.]
+    \item All math teachers in the school district.
+    \item All teachers in the school district.
+    \item All math teachers in the state.
+    \item The teachers in the sample.
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Teacher Certification Survey}}
-The random sample came from \textbf{math teachers in one school district}. Generalizing to the whole state or to all teachers in the district would go beyond the sampled population.
+\begin{frame}{Answer}
+\textbf{Explanation:}  
+Since the sample was drawn from math teachers from one school district, the results can be generalized to all math teachers in that school district. Generalizing to all math teachers in the state or all teachers in the school district would not be appropriate because those groups were not sampled.
 
-\textbf{Correct Answer:} \( \boxed{A} \)
+\textbf{Answer:} A.
 \end{frame}
 
-\begin{frame}{\textbf{Question: Library vs.\ Home Study Experiment}}
+\begin{frame}{Question}
 A researcher wanted to determine whether studying at a library is more effective than studying at home. He selected a random sample of 200 students and gave them three days to study for the same test. The 100 students who lived closest to a library were asked to study at a library, and the remaining 100 students were asked to study at home. After the students took the test, the scores of those who studied at a library were compared to the scores of those who studied at home. How should this experiment be changed so that the researcher can conclude whether studying at a library is more effective than studying at home?
 
-\begin{itemize}
- \item[\textbf{A.}] The students assigned to study at a library should study at the same library.
- \item[\textbf{B.}] The students should be randomly assigned to study either at a library or at home.
- \item[\textbf{C.}] The students assigned to study at a library should take a more difficult test than the students assigned to study at home.
- \item[\textbf{D.}] No changes to the experiment are necessary.
-\end{itemize}
+\begin{enumerate}[A.]
+    \item The students assigned to study at a library should study at the same library.
+    \item The students should be randomly assigned to study either at a library or at home.
+    \item The students assigned to study at a library should take a more difficult test than the students assigned to study at home.
+    \item No changes to the experiment are necessary.
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Library vs.\ Home Study Experiment}}
-Assignment by \textbf{proximity to a library} is not random and may confound the results (e.g., location, schedule, or background differences). \textbf{Random assignment} to study location isolates the effect of where students study.
+\begin{frame}{Answer}
+\textbf{Explanation:}  
+The current design introduces confounding because the assignment to study location is based on proximity to a library, which could be correlated with other factors (e.g. socioeconomic status, prior academic experience). Random assignment to study location would eliminate this confounding variable and allow the researcher to isolate the effect of study location.
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+\textbf{Answer:} B.
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Company Social Events Survey}}
+
+\begin{frame}{Question}
 A company consists of full-time and part-time employees. A sample of 60 employees was selected at random from the company and given a survey to determine how many social events the company should have each year. There are 59 part-time employees and 1 full-time employee in the sample. Which of the following is the largest population to which the results of the survey can be generalized?
 
-\begin{itemize}
- \item[\textbf{A.}] All part-time employees at the company.
- \item[\textbf{B.}] All employees at the company.
- \item[\textbf{C.}] The 59 part-time employees in the sample.
- \item[\textbf{D.}] The 60 employees in the sample.
-\end{itemize}
+\begin{enumerate}[A.]
+    \item All part-time employees at the company.
+    \item All employees at the company.
+    \item The 59 part-time employees in the sample.
+    \item The 60 employees in the sample.
+\end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer Explanation: Company Social Events Survey}}
-The sample was selected at random from \textbf{all employees at the company} (both full-time and part-time). Even though the sample happened to include mostly part-time workers, the valid generalization is still the full employee population.
+\begin{frame}{Answer}
 
-\textbf{Correct Answer:} \( \boxed{B} \)
+
+\textbf{Answer:} B.
 \end{frame}
+
+
+
+
+
+
+
 
 \begin{frame}{}
     \begin{tikzpicture}[remember picture, overlay]
+        % 背景渐变色：蓝紫到白
         \shade[top color=novelPurple!40, bottom color=white]
             (current page.north west) rectangle (current page.south east);
+
+        % 中心柔光
         \fill[white, opacity=0.15] (current page.center) circle (5cm);
+
+        % 柔和光点点缀
         \foreach \x in {1,2,3,4,5} {
             \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
     \end{tikzpicture}
+
     \centering
     \vspace{5em}
+
     {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
     {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+
     {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+
     \vfill
 \end{frame}
+
+
 
 \end{document}
