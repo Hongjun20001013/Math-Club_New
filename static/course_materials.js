@@ -88,17 +88,17 @@
   };
 
   var kindLabels = {
-    lesson: "Lesson",
-    concept: "Concept",
-    practice: "Practice",
-    question: "Question",
-    example: "Example",
-    solution: "Solution",
-    answer: "Answer",
-    section: "Section",
-    intro: "Intro",
-    content: "Outline",
-    closing: "Closing"
+    lesson: "Knowledge Point",
+    concept: "Knowledge Point",
+    practice: "Question Practice",
+    question: "Question Practice",
+    example: "Guided Example",
+    solution: "Solution Review",
+    answer: "Answer Review",
+    section: "Lesson Section",
+    intro: "Lesson Preview",
+    content: "Lesson Path",
+    closing: "Wrap Up"
   };
 
   var progress = loadProgress();
@@ -812,7 +812,38 @@
     } catch (e) {}
   }
 
-  function setFocusMode(on) {
+  function getFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement || null;
+  }
+
+  function requestProjectionFullscreen() {
+    var target = document.documentElement || root;
+    var request =
+      target.requestFullscreen ||
+      target.webkitRequestFullscreen ||
+      target.msRequestFullscreen;
+    if (!request) return;
+    try {
+      var result = request.call(target);
+      if (result && result.catch) result.catch(function () {});
+    } catch (e) {}
+  }
+
+  function exitProjectionFullscreen() {
+    if (!getFullscreenElement()) return;
+    var exit =
+      document.exitFullscreen ||
+      document.webkitExitFullscreen ||
+      document.msExitFullscreen;
+    if (!exit) return;
+    try {
+      var result = exit.call(document);
+      if (result && result.catch) result.catch(function () {});
+    } catch (e) {}
+  }
+
+  function setFocusMode(on, options) {
+    options = options || {};
     if (on) {
       pathOpenBeforeFocus = root.classList.contains("is-path-open");
       setOutlineOpen(false);
@@ -820,11 +851,13 @@
       setOutlineOpen(true);
     }
     root.classList.toggle("is-focus-mode", on);
+    document.documentElement.classList.toggle("is-cm-projector", on);
+    document.body.classList.toggle("is-cm-projector", on);
     if (focusToggle) {
       focusToggle.classList.toggle("is-active", on);
       focusToggle.setAttribute("aria-pressed", on ? "true" : "false");
       var label = focusToggle.querySelector(".np-cm-btn-label");
-      if (label) label.textContent = on ? "Exit focus" : "Focus";
+      if (label) label.textContent = on ? "Exit projector" : "Projector";
     }
     if (focusInlineExit) {
       focusInlineExit.hidden = !on;
@@ -833,6 +866,10 @@
       coachEl.hidden = true;
     } else if (!on && slides[idx]) {
       updateCoach(slides[idx]);
+    }
+    if (options.fullscreen !== false) {
+      if (on) requestProjectionFullscreen();
+      else exitProjectionFullscreen();
     }
     saveFocusMode(on);
   }
@@ -1229,6 +1266,13 @@
   focusExitBtns.forEach(function (btn) {
     btn.addEventListener("click", exitFocusMode);
   });
+  ["fullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"].forEach(function (eventName) {
+    document.addEventListener(eventName, function () {
+      if (!getFullscreenElement() && root.classList.contains("is-focus-mode")) {
+        setFocusMode(false, { fullscreen: false });
+      }
+    });
+  });
 
   if (hintBtn && hintPanel) {
     hintBtn.addEventListener("click", function () {
@@ -1344,7 +1388,7 @@
       setOutlineOpen(true);
     }
   }
-  setFocusMode(loadFocusMode());
+  setFocusMode(loadFocusMode(), { fullscreen: false });
   var initialSlide = parseInitialSlide();
   if (initialSlide > 0) {
     goToSlideNumber(initialSlide);

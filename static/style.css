@@ -26875,8 +26875,13 @@ a.np-cm-card--ready:hover {
     color: #43318f;
 }
 
-.np-cm-kind-pill--practice { background: rgba(13, 148, 136, 0.12); color: #0f766e; }
-.np-cm-kind-pill--solution { background: rgba(79, 50, 240, 0.12); color: #43318f; }
+.np-cm-kind-pill--lesson,
+.np-cm-kind-pill--concept { background: rgba(91, 77, 255, 0.12); color: #4f32f0; }
+.np-cm-kind-pill--practice,
+.np-cm-kind-pill--question { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+.np-cm-kind-pill--example { background: rgba(59, 130, 246, 0.13); color: #1d4ed8; }
+.np-cm-kind-pill--solution,
+.np-cm-kind-pill--answer { background: rgba(16, 185, 129, 0.13); color: #047857; }
 .np-cm-kind-pill--closing { background: rgba(219, 39, 119, 0.1); color: #be185d; }
 .np-cm-kind-pill--section { background: rgba(91, 77, 255, 0.14); color: #43318f; }
 .np-cm-kind-pill--intro { background: rgba(91, 77, 255, 0.16); color: #43318f; }
@@ -28758,6 +28763,49 @@ button.cm-intro-chip:focus-visible {
     display: none !important;
 }
 
+html.is-cm-projector,
+body.is-cm-projector {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(1100px 620px at 10% -12%, rgba(91, 77, 255, 0.12), transparent 58%),
+        linear-gradient(180deg, #fbfaff 0%, #f5f2ff 100%) !important;
+}
+
+body.is-cm-projector > .navbar,
+body.is-cm-projector > .np-site-footer,
+body.is-cm-projector .np-skip-link,
+body.is-cm-projector .np-cm-hero {
+    display: none !important;
+}
+
+body.is-cm-projector > .np-app-container {
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.is-cm-projector .np-cm-cinema {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+body.is-cm-projector .np-page-shell--cm,
+body.is-cm-projector .np-cm-viewer {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 .np-cm-viewer.is-focus-mode .np-cm-cinema {
     padding: 0;
 }
@@ -28781,6 +28829,70 @@ button.cm-intro-chip:focus-visible {
     min-width: 0;
 }
 
+.np-cm-viewer:fullscreen,
+.np-cm-viewer.is-focus-mode:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    background:
+        radial-gradient(1100px 620px at 10% -12%, rgba(91, 77, 255, 0.12), transparent 58%),
+        linear-gradient(180deg, #fbfaff 0%, #f5f2ff 100%);
+}
+
+:fullscreen {
+    background:
+        radial-gradient(1100px 620px at 10% -12%, rgba(91, 77, 255, 0.12), transparent 58%),
+        linear-gradient(180deg, #fbfaff 0%, #f5f2ff 100%);
+}
+
+.np-cm-viewer:-webkit-full-screen,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    background:
+        radial-gradient(1100px 620px at 10% -12%, rgba(91, 77, 255, 0.12), transparent 58%),
+        linear-gradient(180deg, #fbfaff 0%, #f5f2ff 100%);
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .np-cm-workspace,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .np-cm-workspace,
+:fullscreen .np-cm-viewer.is-focus-mode .np-cm-workspace {
+    height: 100vh;
+    min-height: 100vh;
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .np-cm-slide,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .np-cm-slide,
+:fullscreen .np-cm-viewer.is-focus-mode .np-cm-slide {
+    padding: clamp(34px, 4.2vw, 72px) clamp(48px, 6vw, 96px);
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .np-cm-slide-body,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .np-cm-slide-body,
+:fullscreen .np-cm-viewer.is-focus-mode .np-cm-slide-body {
+    font-size: clamp(1.18rem, 1.55vw, 1.48rem);
+    line-height: 1.75;
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .np-cm-slide-head h2,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .np-cm-slide-head h2,
+:fullscreen .np-cm-viewer.is-focus-mode .np-cm-slide-head h2 {
+    font-size: clamp(1.72rem, 3vw, 3.05rem);
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .cm-slide-role,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .cm-slide-role,
+:fullscreen .np-cm-viewer.is-focus-mode .cm-slide-role {
+    margin-bottom: 28px;
+}
+
+.np-cm-viewer.is-focus-mode:fullscreen .cm-slide-role strong,
+.np-cm-viewer.is-focus-mode:-webkit-full-screen .cm-slide-role strong,
+:fullscreen .np-cm-viewer.is-focus-mode .cm-slide-role strong {
+    font-size: clamp(1.05rem, 1.45vw, 1.35rem);
+}
+
 .np-cm-focus-inline-exit {
     display: none;
     align-items: center;
@@ -28802,7 +28914,7 @@ button.cm-intro-chip:focus-visible {
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-deck-chrome {
-    padding: 10px clamp(16px, 2.5vw, 28px) 8px;
+    padding: 8px clamp(16px, 2.5vw, 28px) 6px;
     border-bottom-color: rgba(91, 77, 255, 0.05);
     background: rgba(255, 255, 255, 0.72);
 }
@@ -28862,11 +28974,11 @@ button.cm-intro-chip:focus-visible {
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-desmos-quick span {
-    display: none;
+    display: inline;
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-progress-track {
-    height: 4px;
+    height: 3px;
     background: rgba(91, 77, 255, 0.08);
 }
 
@@ -28875,17 +28987,78 @@ button.cm-intro-chip:focus-visible {
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-deck-rail {
-    padding: 12px clamp(18px, 3vw, 32px) max(14px, env(safe-area-inset-bottom));
+    padding: 8px clamp(18px, 3vw, 32px) max(8px, env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86));
+    backdrop-filter: blur(16px);
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-rail-shell {
-    width: min(100%, 640px);
-    gap: 16px;
+    width: min(100%, 560px);
+    gap: 12px;
 }
 
 .np-cm-viewer.is-focus-mode .np-cm-rail-btn {
-    max-width: 180px;
-    height: 48px;
+    max-width: 190px;
+    height: 40px;
+    font-size: 0.78rem;
+}
+
+body.is-cm-projector .np-cm-counter {
+    font-size: 0.7rem;
+}
+
+body.is-cm-projector .np-cm-slide-stage {
+    background: transparent;
+}
+
+body.is-cm-projector .np-cm-slide:not(.np-cm-slide--canvas) {
+    padding: clamp(16px, 2.1vw, 34px) clamp(34px, 4.5vw, 78px) clamp(18px, 2.2vw, 36px);
+}
+
+body.is-cm-projector .np-cm-slide-head {
+    position: relative;
+    top: auto;
+    margin-bottom: clamp(10px, 1.4vw, 18px);
+    padding-bottom: clamp(8px, 1.1vw, 14px);
+}
+
+body.is-cm-projector .np-cm-slide-badge {
+    width: clamp(42px, 4vw, 58px);
+    height: clamp(42px, 4vw, 58px);
+    font-size: clamp(0.78rem, 0.9vw, 1rem);
+}
+
+body.is-cm-projector .np-cm-slide-section {
+    margin-bottom: 2px;
+    font-size: clamp(0.58rem, 0.72vw, 0.78rem);
+}
+
+body.is-cm-projector .np-cm-slide-head h2 {
+    font-size: clamp(2rem, 3.6vw, 4rem);
+    line-height: 1.02;
+}
+
+body.is-cm-projector .np-cm-slide-body {
+    font-size: clamp(1.18rem, 1.7vw, 1.72rem);
+    line-height: 1.6;
+}
+
+body.is-cm-projector .np-cm-slide-body p {
+    margin-bottom: 0.72em;
+}
+
+body.is-cm-projector .np-cm-slide-body .stem-itemize,
+body.is-cm-projector .np-cm-slide-body .stem-enumerate {
+    margin: 0.46em 0 0.7em;
+}
+
+body.is-cm-projector .np-cm-slide-body .stem-math-block,
+body.is-cm-projector .np-cm-slide-body .cm-math-block {
+    margin: clamp(10px, 1.3vw, 18px) 0;
+}
+
+body.is-cm-projector .np-cm-slide-body mjx-container {
+    font-size: 112% !important;
 }
 
 @media (max-width: 640px) {
@@ -29181,5 +29354,43 @@ button.cm-intro-chip:focus-visible {
     min-height: 280px;
     border-radius: 14px;
     overflow: hidden;
+}
+
+:fullscreen .np-desmos-panel,
+:fullscreen .np-cm-desmos-panel {
+    z-index: 2147483600;
+    width: min(760px, calc(100vw - 40px));
+    height: min(820px, calc(100vh - 72px));
+    border-radius: 24px;
+    box-shadow:
+        0 36px 100px rgba(24, 18, 68, 0.36),
+        0 0 0 1px rgba(16, 185, 129, 0.2);
+}
+
+:fullscreen .np-desmos-panel-head,
+:fullscreen .np-cm-desmos-panel-head {
+    padding: 12px 12px 14px;
+}
+
+:fullscreen .np-desmos-panel-title strong,
+:fullscreen .np-cm-desmos-panel-title strong {
+    font-size: 1rem;
+}
+
+:fullscreen .np-desmos-panel-title span,
+:fullscreen .np-cm-desmos-panel-title span {
+    font-size: 0.75rem;
+}
+
+:fullscreen .np-desmos-reset,
+:fullscreen .np-cm-desmos-reset,
+:fullscreen .np-desmos-close,
+:fullscreen .np-cm-desmos-close {
+    height: 36px;
+}
+
+:fullscreen .np-desmos-close,
+:fullscreen .np-cm-desmos-close {
+    width: 36px;
 }
 

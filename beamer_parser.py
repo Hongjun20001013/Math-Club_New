@@ -1532,6 +1532,59 @@ def _fix_aligned_prose(text: str) -> str:
     )
 
 
+_SLIDE_ROLE_META: dict[str, tuple[str, str, str]] = {
+    "concept": (
+        "Knowledge Point",
+        "Learn the rule",
+        "Understand the definition, formula, or theorem before trying a problem.",
+    ),
+    "lesson": (
+        "Knowledge Point",
+        "Build the method",
+        "Focus on the worked idea and the steps you will reuse later.",
+    ),
+    "example": (
+        "Guided Example",
+        "Watch the process",
+        "Follow the model first, then try the next similar problem yourself.",
+    ),
+    "question": (
+        "Question Practice",
+        "Try it first",
+        "Pause and solve before checking the answer or worked solution.",
+    ),
+    "practice": (
+        "Question Practice",
+        "Independent attempt",
+        "Treat this like a test question: choose a strategy, solve, then verify.",
+    ),
+    "answer": (
+        "Answer Review",
+        "Check and correct",
+        "Compare your work with the final answer and fix any missed step.",
+    ),
+    "solution": (
+        "Solution Review",
+        "Study the reasoning",
+        "Read the steps carefully, then summarize the method in your own words.",
+    ),
+}
+
+
+def _slide_role_banner(kind: str) -> str:
+    meta = _SLIDE_ROLE_META.get(kind)
+    if not meta:
+        return ""
+    label, action, guidance = meta
+    return (
+        f'<div class="cm-slide-role cm-slide-role--{kind}">'
+        f'<span class="cm-slide-role-label">{label}</span>'
+        f'<strong>{action}</strong>'
+        f'<p>{guidance}</p>'
+        f"</div>"
+    )
+
+
 def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     html = html.replace("%%HFILL%%", " ")
     html = _wrap_answer_choices(html)
@@ -1548,6 +1601,9 @@ def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     if kind in {"question", "practice"}:
         html = _wrap_question_challenge(html, title)
     html = _polish_answer_lines(html)
+    banner = _slide_role_banner(kind)
+    if banner and "cm-slide-role" not in html:
+        html = banner + html
     return html
 
 

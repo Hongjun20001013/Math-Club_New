@@ -42,12 +42,21 @@
     return panel.classList.contains("is-open");
   }
 
+  function isProjectorMode() {
+    return !!document.querySelector(".np-cm-viewer.is-focus-mode");
+  }
+
   function defaultLayout() {
-    var width = Math.min(680, Math.max(420, window.innerWidth - 48));
-    var height = Math.min(760, Math.max(420, window.innerHeight - 96));
+    var projector = isProjectorMode();
+    var width = projector
+      ? Math.min(780, Math.max(520, Math.round(window.innerWidth * 0.42)))
+      : Math.min(680, Math.max(420, window.innerWidth - 48));
+    var height = projector
+      ? Math.min(820, Math.max(520, window.innerHeight - 88))
+      : Math.min(760, Math.max(420, window.innerHeight - 96));
     return {
       left: Math.max(16, window.innerWidth - width - 24),
-      top: Math.max(16, Math.min(72, window.innerHeight - height - 16)),
+      top: projector ? 58 : Math.max(16, Math.min(72, window.innerHeight - height - 16)),
       width: width,
       height: height
     };
@@ -87,6 +96,10 @@
 
   function restoreLayout() {
     var layout = null;
+    if (isProjectorMode()) {
+      applyLayout(defaultLayout());
+      return;
+    }
     try {
       layout = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
     } catch (e) {
@@ -243,6 +256,14 @@
     if (e.key === "Escape" && isOpen()) {
       setOpen(false);
     }
+  });
+
+  ["fullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"].forEach(function (eventName) {
+    document.addEventListener(eventName, function () {
+      if (!isOpen()) return;
+      applyLayout(defaultLayout());
+      window.setTimeout(resizeCalculator, 80);
+    });
   });
 
   window.NpDesmos = { toggle: toggle, open: function () { if (!isOpen()) toggle(); }, close: function () { setOpen(false); }, reset: resetPanel };
