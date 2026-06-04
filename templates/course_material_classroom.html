@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% block title %}Classroom · {{ material.section }} · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<section class="np-classroom-shell" data-classroom-dashboard data-summary-api="{{ summary_api }}" data-start-api="{{ start_api }}" data-end-api="{{ end_api }}" data-students='{{ student_roster|tojson }}'>
+  <header class="np-classroom-hero glass-panel np-glass">
+    <nav class="np-cm-cinema-rail" aria-label="Classroom navigation">
+      <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
+      <span aria-hidden="true">·</span>
+      <a href="{{ lesson_href }}">{{ material.section }} slides</a>
+      <span aria-hidden="true">·</span>
+      <span>Live classroom</span>
+    </nav>
+    <div class="np-classroom-hero-main">
+      <div>
+        <p class="np-classroom-kicker">Live response dashboard</p>
+        <h1>{{ material.section }} · {{ material.title }}</h1>
+        <p>Students answer directly on the lesson slides. This dashboard aggregates accuracy and per-student results.</p>
+      </div>
+      <div class="np-classroom-actions">
+        <button type="button" class="np-classroom-btn np-classroom-btn--primary" data-classroom-start>Start live class</button>
+        <button type="button" class="np-classroom-btn" data-classroom-end>End class</button>
+        <a class="np-classroom-btn" href="{{ lesson_href }}">Open slides</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="np-classroom-roster glass-panel np-glass">
+    <div class="np-classroom-roster-head">
+      <div>
+        <p>Class roster</p>
+        <h2>Choose SAT students for this live class</h2>
+      </div>
+      <div class="np-classroom-roster-actions">
+        <button type="button" class="np-classroom-btn np-classroom-btn--small" data-roster-select-all>Select all</button>
+        <button type="button" class="np-classroom-btn np-classroom-btn--small" data-roster-clear>Clear</button>
+      </div>
+    </div>
+    <div class="np-classroom-roster-grid" data-roster-grid></div>
+    <p class="np-classroom-roster-note" data-roster-note></p>
+  </div>
+
+  <div class="np-classroom-status glass-panel np-glass">
+    <div>
+      <span class="np-classroom-live-dot" data-classroom-live-dot></span>
+      <strong data-classroom-status>Loading classroom data...</strong>
+      <p data-classroom-meta></p>
+    </div>
+    <button type="button" class="np-classroom-btn np-classroom-btn--small" data-classroom-refresh>Refresh now</button>
+  </div>
+
+  <div class="np-classroom-report glass-panel np-glass" data-classroom-report></div>
+
+  <div class="np-classroom-grid" data-classroom-questions></div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.querySelector("[data-classroom-dashboard]");
+  if (!root) return;
+  var summaryApi = root.getAttribute("data-summary-api");
+  var startApi = root.getAttribute("data-start-api");
+  var endApi = root.getAttribute("data-end-api");
+  var students = [];
+  try {
+    students = JSON.parse(root.getAttribute("data-students") || "[]") || [];
+  } catch (err) {
+    students = [];
+  }
+  var statusEl = root.querySelector("[data-classroom-status]");
+  var metaEl = root.querySelector("[data-classroom-meta]");
+  var dotEl = root.querySelector("[data-classroom-live-dot]");
+  var questionsEl = root.querySelector("[data-classroom-questions]");
+  var reportEl = root.querySelector("[data-classroom-report]");
+  var rosterGrid = root.querySelector("[data-roster-grid]");
+  var rosterNote = root.querySelector("[data-roster-note]");
+  var refreshTimer = null;
+  var renderedSessionId = null;
+
+  function pct(value) {
+    return value === null || value === undefined ? "—" : String(value) + "%";
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function selectedStudentIds() {
+    return Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]:checked")).map(function (input) {
+      return parseInt(input.value, 10);
+    }).filter(Boolean);
+  }
+
+  function updateRosterNote() {
+    if (!rosterNote) return;
+    var selected = selectedStudentIds().length;
+    rosterNote.textContent = selected + " selected for this SAT class. Only selected students count toward completion, not-submitted, and class statistics.";
+  }
+
+  function renderRosterSelector() {
+    if (!rosterGrid) return;
+    if (!students.length) {
+      rosterGrid.innerHTML = '<div class="np-classroom-roster-empty">No active student accounts found.</div>';
+      updateRosterNote();
+      return;
+    }
+    rosterGrid.innerHTML = students.map(function (student) {
+      return '<label class="np-classroom-roster-card">' +
+        '<input type="checkbox" data-roster-student value="' + escapeHtml(student.id) + '" checked>' +
+        '<span><strong>' + escapeHtml(student.username) + '</strong><em>' + escapeHtml(student.access_label || "Student") + '</em></span>' +
+      '</label>';
+    }).join("");
+    Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
+      input.addEventListener("change", updateRosterNote);
+    });
+    updateRosterNote();
+  }
+
+  function syncRosterSelection(data) {
+    var session = data.session || null;
+    if (!session || renderedSessionId === session.id) return;
+    var rosterStudents = data.roster_students || [];
+    if (!rosterStudents.length) return;
+    var selected = {};
+    rosterStudents.forEach(function (student) {
+      selected[parseInt(student.user_id, 10)] = true;
+    });
+    Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
+      input.checked = !!selected[parseInt(input.value, 10)];
+    });
+    renderedSessionId = session.id;
+    updateRosterNote();
+  }
+
+  function renderReport(data, questions) {
+    var report = data.report || {};
+    if (!reportEl) return;
+    if (!data.session) {
+      reportEl.innerHTML = '<div class="np-classroom-report-empty">Start a live class to build the full example report.</div>';
+      return;
+    }
+    var overall = pct(report.overall_accuracy);
+    var completion = pct(report.completion_rate);
+    var ready = report.completed_questions || 0;
+    var total = report.question_count || questions.length || 0;
+    var chart = questions.map(function (q) {
+      var acc = q.accuracy == null ? 0 : q.accuracy;
+      var done = q.completion == null ? 0 : q.completion;
+      var status = q.teach_ready ? "Ready" : (q.almost_ready ? "Almost" : "Waiting");
+      return '<li>' +
+        '<div><strong>Slide ' + escapeHtml(q.slide_index) + '</strong><span>' + escapeHtml(status) + '</span></div>' +
+        '<div class="np-classroom-chart-bars">' +
+          '<span><b style="width:' + done + '%"></b><em>Done ' + pct(q.completion) + '</em></span>' +
+          '<span><b style="width:' + acc + '%"></b><em>Accuracy ' + pct(q.accuracy) + '</em></span>' +
+        '</div>' +
+      '</li>';
+    }).join("");
+    if (!chart) chart = '<li class="is-empty">No questions yet</li>';
+    var weak = (report.weakest_questions || []).map(function (q) {
+      return '<li><span>Slide ' + escapeHtml(q.slide_index) + '</span><strong>' + pct(q.accuracy) + '</strong><em>' + escapeHtml(q.title || "") + '</em></li>';
+    }).join("");
+    if (!weak) weak = '<li class="is-empty">No weak questions yet</li>';
+    var studentRows = report.student_breakdown || [];
+    var students = studentRows.map(function (s) {
+      var submitted = s.submitted || 0;
+      var correct = s.correct || 0;
+      var accuracy = s.accuracy == null ? "Not started" : pct(s.accuracy);
+      var studentCompletion = s.completion == null ? 0 : s.completion;
+      var status = submitted === 0 ? "Not started" : (studentCompletion >= 100 ? "Complete" : "In progress");
+      return '<li>' +
+        '<div><span>' + escapeHtml(s.username) + '</span><em>' + escapeHtml(status) + '</em></div>' +
+        '<strong>' + escapeHtml(correct) + '/' + escapeHtml(submitted) + '</strong>' +
+        '<div class="np-classroom-student-progress"><b style="width:' + studentCompletion + '%"></b><small>' + escapeHtml(studentCompletion) + '% done · ' + escapeHtml(accuracy) + '</small></div>' +
+      '</li>';
+    }).join("");
+    if (!students) students = '<li class="is-empty">No student data yet</li>';
+    reportEl.innerHTML =
+      '<div class="np-classroom-report-head">' +
+        '<div><p>Full class report</p><h2>Example set statistics</h2></div>' +
+        '<span>' + escapeHtml(ready) + '/' + escapeHtml(total) + ' ready to teach</span>' +
+      '</div>' +
+      '<div class="np-classroom-report-metrics">' +
+        '<div><b>' + escapeHtml(overall) + '</b><span>overall accuracy</span></div>' +
+        '<div><b>' + escapeHtml(completion) + '</b><span>completion</span></div>' +
+        '<div><b>' + escapeHtml(report.total_correct || 0) + '/' + escapeHtml(report.total_submitted || 0) + '</b><span>correct answers</span></div>' +
+      '</div>' +
+      '<div class="np-classroom-report-body">' +
+        '<section><h3>Question performance chart</h3><ul class="np-classroom-chart">' + chart + '</ul></section>' +
+        '<section><h3>Questions to review first</h3><ul class="np-classroom-weak-list">' + weak + '</ul></section>' +
+        '<section><h3>Student summary</h3><ul class="np-classroom-student-list">' + students + '</ul></section>' +
+      '</div>';
+  }
+
+  function render(data) {
+    var session = data.session || null;
+    var active = !!(session && session.is_active);
+    dotEl.classList.toggle("is-live", active);
+    syncRosterSelection(data);
+    statusEl.textContent = active ? "Live class is active" : (session ? "Class ended" : "No classroom session yet");
+    metaEl.textContent = session
+      ? ("Session #" + session.id + " · " + (data.student_count || 0) + " submitted · roster " + (data.roster_count || 0))
+      : "Click Start live class, then ask students to open the lesson and answer questions.";
+
+    var questions = data.questions || [];
+    renderReport(data, questions);
+    if (!questions.length) {
+      questionsEl.innerHTML = '<div class="np-classroom-empty">No classroom questions found for this lesson.</div>';
+      return;
+    }
+    questionsEl.innerHTML = questions.map(function (q) {
+      var rows = q.responses || [];
+      var responseHtml = rows.length
+        ? rows.map(function (r) {
+            return '<li class="' + (r.is_correct ? 'is-correct' : 'is-wrong') + '">' +
+              '<span>' + escapeHtml(r.username) + '</span>' +
+              '<strong>' + escapeHtml(r.selected_answer || "—") + '</strong>' +
+              '<em>' + (r.is_correct ? 'Correct' : 'Wrong') + '</em>' +
+              '</li>';
+          }).join("")
+        : '<li class="is-empty"><span>No submissions yet</span></li>';
+      var choiceCounts = q.choice_counts || {};
+      var distribution = Object.keys(choiceCounts).sort().map(function (choice) {
+        var count = choiceCounts[choice] || 0;
+        var width = q.submitted ? Math.round(100 * count / q.submitted) : 0;
+        return '<li><span>' + escapeHtml(choice) + '</span><b style="width:' + width + '%"></b><em>' + escapeHtml(count) + '</em></li>';
+      }).join("");
+      if (!distribution) distribution = '<li class="is-empty"><span>No choices yet</span></li>';
+      var missing = (q.missing_students || []).map(function (r) {
+        return '<span>' + escapeHtml(r.username) + '</span>';
+      }).join("");
+      if (!missing) missing = '<span>None</span>';
+      return '<article class="np-classroom-card">' +
+        '<div class="np-classroom-card-head">' +
+          '<span>Slide ' + q.slide_index + '</span>' +
+          '<strong>' + escapeHtml(q.title) + '</strong>' +
+        '</div>' +
+        '<div class="np-classroom-metric-row">' +
+          '<div><b>' + q.submitted + '</b><span>submitted</span></div>' +
+          '<div><b>' + q.correct + '</b><span>correct</span></div>' +
+          '<div><b>' + pct(q.accuracy) + '</b><span>accuracy</span></div>' +
+        '</div>' +
+        '<div class="np-classroom-distribution"><strong>Choice distribution</strong><ul>' + distribution + '</ul></div>' +
+        '<details class="np-classroom-details">' +
+          '<summary>Student responses</summary>' +
+          '<ul>' + responseHtml + '</ul>' +
+        '</details>' +
+        '<details class="np-classroom-missing"><summary>Not submitted (' + (q.missing_students || []).length + ')</summary><div>' + missing + '</div></details>' +
+      '</article>';
+    }).join("");
+  }
+
+  function load() {
+    return fetch(summaryApi, { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { render(data || {}); })
+      .catch(function () {
+        statusEl.textContent = "Could not load classroom data.";
+      });
+  }
+
+  function post(url) {
+    var options = { method: "POST", credentials: "same-origin" };
+    if (url === startApi) {
+      options.headers = { "Content-Type": "application/json" };
+      options.body = JSON.stringify({ student_ids: selectedStudentIds() });
+      renderedSessionId = null;
+    }
+    return fetch(url, options)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.ok === false) {
+          statusEl.textContent = data.error || "Could not update classroom.";
+          return data;
+        }
+        return load();
+      });
+  }
+
+  root.querySelector("[data-roster-select-all]").addEventListener("click", function () {
+    Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
+      input.checked = true;
+    });
+    updateRosterNote();
+  });
+  root.querySelector("[data-roster-clear]").addEventListener("click", function () {
+    Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
+      input.checked = false;
+    });
+    updateRosterNote();
+  });
+  root.querySelector("[data-classroom-start]").addEventListener("click", function () { post(startApi); });
+  root.querySelector("[data-classroom-end]").addEventListener("click", function () { post(endApi); });
+  root.querySelector("[data-classroom-refresh]").addEventListener("click", load);
+
+  renderRosterSelector();
+  load();
+  refreshTimer = window.setInterval(load, 4000);
+  window.addEventListener("beforeunload", function () {
+    if (refreshTimer) window.clearInterval(refreshTimer);
+  });
+})();
+</script>
+{% endblock %}

@@ -700,6 +700,24 @@ def _novel_prep_placement_graph_svg(tikz_block: str) -> Optional[str]:
             f'<path d="{d}" fill="none" stroke="{_STROKE}" stroke-width="2.5" stroke-linecap="round"/>'
         )
 
+    # SAT mini graph choices often use a plain answer line:
+    # ``\draw[thick] (x0,y0) -- (x1,y1);``. Keep axes/grid separate by ignoring
+    # arrowed and step/grid draw commands.
+    for sm in re.finditer(
+        r"\\draw\[([^\]]*\bthick\b[^\]]*)\]\s*"
+        r"\(([-\d.]+),([-\d.]+)\)\s*--\s*\(([-\d.]+),([-\d.]+)\)",
+        tikz_block,
+    ):
+        opts = sm.group(1)
+        if "->" in opts or "step" in opts or "very thick" in opts:
+            continue
+        lx0, ly0, lx1, ly1 = map(float, sm.groups()[1:])
+        d = f"M {tx(lx0):.2f},{ty(ly0):.2f} L {tx(lx1):.2f},{ty(ly1):.2f}"
+        parts.append(
+            f'<path d="{d}" fill="none" stroke="{_STROKE}" stroke-width="2.5" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'
+        )
+
     # Circle graphs: ``\\draw[very thick] (cx,cy) circle (Rcm)``
     cm = re.search(
         r"\\draw\[very thick\]\s*\(([-\d.]+),([-\d.]+)\)\s+circle\s*\(([-\d.]+)cm\)",

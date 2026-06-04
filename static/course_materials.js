@@ -20,6 +20,10 @@
   var studyKey = "np-cm-study-" + lessonSlug;
   var syncEnabled = root.getAttribute("data-cm-sync") === "1";
   var progressApi = root.getAttribute("data-cm-progress-api") || "";
+  var classroomActiveApi = root.getAttribute("data-cm-classroom-active-api") || "";
+  var classroomResponseApi = root.getAttribute("data-cm-classroom-response-api") || "";
+  var classroomSummaryApi = root.getAttribute("data-cm-classroom-summary-api") || "";
+  var classroomStartApi = root.getAttribute("data-cm-classroom-start-api") || "";
   var syncTimer = null;
   var globalVisitKey = "np-cm-last-visit";
   var resumeDismissKey = "np-cm-resume-dismiss-" + lessonSlug;
@@ -56,6 +60,7 @@
   var focusKey = "np-cm-focus-" + lessonSlug;
   var pathOpenBeforeFocus = false;
   var coachEl = root.querySelector("[data-cm-coach]");
+  var liveResultsEl = root.querySelector("[data-cm-live-results]");
   var slideHeadEl = root.querySelector(".np-cm-slide-head");
   var deckEl = root.querySelector(".np-cm-deck");
   var reflectEl = root.querySelector("[data-cm-reflect]");
@@ -103,6 +108,9 @@
 
   var progress = loadProgress();
   var studyMode = loadStudyMode();
+  var classroomSession = null;
+  var classroomSummary = null;
+  var classroomSummaryTimer = null;
 
   function loadProgress() {
     try {
@@ -265,6 +273,163 @@
           updateMastery();
           updateKnowledgeMap();
         }
+      })
+      .catch(function () {});
+  }
+
+  function setClassroomSession(session) {
+    classroomSession = session || null;
+    root.classList.toggle("is-classroom-live", !!classroomSession);
+  }
+
+  function loadClassroomSession() {
+    if (!classroomActiveApi) return;
+    fetch(classroomActiveApi, { credentials: "same-origin" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.ok || !data.active) {
+          setClassroomSession(null);
+          return;
+        }
+        setClassroomSession(data.session || null);
+      })
+      .catch(function () {});
+  }
+
+  function submitClassroomResponse(payload) {
+    if (!classroomSession || !classroomResponseApi) return;
+    fetch(classroomResponseApi, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(payload),
+    }).catch(function () {});
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderLiveResults(slide) {
+    if (!liveResultsEl || !classroomSummaryApi || !slide) return;
+    var isQuestion = slide.kind === "question" || slide.kind === "practice" || slide.kind === "example";
+    if (!isQuestion) {
+      liveResultsEl.hidden = true;
+      return;
+    }
+    var summary = classroomSummary || {};
+    var session = summary.session || null;
+    if (!session) {
+      liveResultsEl.hidden = false;
+      liveResultsEl.innerHTML =
+        '<button type="button" class="np-cm-live-chip" data-cm-live-open><span>Live</span><strong>Start</strong></button>' +
+        '<div class="np-cm-live-popover" data-cm-live-popover hidden>' +
+        '<div class="np-cm-live-popover-head"><strong>Live Results</strong><button type="button" data-cm-live-close>×</button></div>' +
+        "<p>Start a live class to see this slide's accuracy here while students answer.</p>" +
+        (classroomStartApi ? '<button type="button" class="np-cm-live-btn" data-cm-start-live>Start live class</button>' : "") +
+        '</div>';
+      bindLivePopover();
+      var startBtn = liveResultsEl.querySelector("[data-cm-start-live]");
+      if (startBtn) {
+        startBtn.onclick = function () {
+          fetch(classroomStartApi, { method: "POST", credentials: "same-origin" })
+            .then(function () { return loadClassroomSummary(); })
+            .catch(function () {});
+        };
+      }
+      return;
+    }
+    var q = null;
+    (summary.questions || []).some(function (item) {
+      if (parseInt(item.slide_index, 10) === parseInt(slide.index, 10)) {
+        q = item;
+        return true;
+      }
+      return false;
+    });
+    if (!q) {
+      liveResultsEl.hidden = true;
+      return;
+    }
+    var submitted = q.submitted || 0;
+    var accuracy = q.accuracy == null ? "—" : q.accuracy + "%";
+    var rosterCount = summary.roster_count || 0;
+    var completion = q.completion == null ? "—" : q.completion + "%";
+    var missingCount = (q.missing_students || []).length;
+    var readyText = q.teach_ready ? "Ready to teach" : (q.almost_ready ? "Almost ready" : "Keep working");
+    var readyClass = q.teach_ready ? "is-ready" : (q.almost_ready ? "is-almost" : "is-waiting");
+    var choiceCounts = q.choice_counts || {};
+    var choiceBars = Object.keys(choiceCounts).sort().map(function (choice) {
+      var count = choiceCounts[choice] || 0;
+      var pct = submitted ? Math.round(100 * count / submitted) : 0;
+      return '<li><span>' + escapeHtml(choice) + '</span><b style="width:' + pct + '%"></b><em>' + escapeHtml(count) + '</em></li>';
+    }).join("");
+    if (!choiceBars) choiceBars = '<li class="is-empty"><span>No choices yet</span></li>';
+    var rows = (q.responses || []).map(function (r) {
+      return '<li class="' + (r.is_correct ? "is-correct" : "is-wrong") + '">' +
+        '<span>' + escapeHtml(r.username) + '</span>' +
+        '<strong>' + escapeHtml(r.selected_answer || "—") + '</strong>' +
+        '</li>';
+    }).join("");
+    if (!rows) rows = '<li class="is-empty"><span>Waiting for students...</span></li>';
+    var missingList = q.missing_students || [];
+    var missing = missingList.slice(0, 12).map(function (r) {
+      return '<span>' + escapeHtml(r.username) + '</span>';
+    }).join("");
+    if (missingList.length > 12) {
+      missing += '<span>+' + escapeHtml(missingList.length - 12) + ' more</span>';
+    }
+    if (!missing) missing = '<span>None</span>';
+    liveResultsEl.hidden = false;
+    liveResultsEl.innerHTML =
+      '<button type="button" class="np-cm-live-chip" data-cm-live-open>' +
+      '<span>Live</span><strong>' + escapeHtml(accuracy) + '</strong><em>' + escapeHtml(submitted) + '/' + escapeHtml(rosterCount || submitted) + '</em>' +
+      '</button>' +
+      '<div class="np-cm-live-popover" data-cm-live-popover hidden>' +
+      '<div class="np-cm-live-popover-head"><strong>Slide ' + escapeHtml(slide.index) + ' Results</strong><button type="button" data-cm-live-close>×</button></div>' +
+      '<div class="np-cm-live-readiness ' + readyClass + '"><strong>' + escapeHtml(readyText) + '</strong><span>' + escapeHtml(missingCount) + ' not submitted</span></div>' +
+      '<div class="np-cm-live-mini-head">' +
+      '<span class="np-cm-live-kicker">Live Results</span>' +
+      '<span class="np-cm-live-pill">' + escapeHtml(completion) + ' complete</span>' +
+      '</div>' +
+      '<div class="np-cm-live-stats">' +
+      '<div><b>' + escapeHtml(accuracy) + '</b><span>accuracy</span></div>' +
+      '<div><b>' + escapeHtml(q.correct || 0) + '/' + escapeHtml(submitted) + '</b><span>correct</span></div>' +
+      '</div>' +
+      '<div class="np-cm-live-distribution"><strong>Choice distribution</strong><ul>' + choiceBars + '</ul></div>' +
+      '<div class="np-cm-live-details"><strong>Students</strong><ul class="np-cm-live-list">' + rows + '</ul></div>' +
+      '<div class="np-cm-live-missing"><strong>Not submitted</strong><div>' + missing + '</div></div>' +
+      '</div>';
+    bindLivePopover();
+  }
+
+  function bindLivePopover() {
+    if (!liveResultsEl) return;
+    var openBtn = liveResultsEl.querySelector("[data-cm-live-open]");
+    var popover = liveResultsEl.querySelector("[data-cm-live-popover]");
+    var closeBtn = liveResultsEl.querySelector("[data-cm-live-close]");
+    if (!openBtn || !popover) return;
+    openBtn.onclick = function () {
+      popover.hidden = !popover.hidden;
+    };
+    if (closeBtn) {
+      closeBtn.onclick = function () {
+        popover.hidden = true;
+      };
+    }
+  }
+
+  function loadClassroomSummary() {
+    if (!classroomSummaryApi) return Promise.resolve();
+    return fetch(classroomSummaryApi, { credentials: "same-origin" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        classroomSummary = data && data.ok ? data : null;
+        renderLiveResults(slides[idx]);
       })
       .catch(function () {});
   }
@@ -1063,6 +1228,13 @@
           }
         }
         markDone(slides[idx].index);
+        submitClassroomResponse({
+          slide_index: slides[idx].index,
+          question_title: slides[idx].title || "",
+          selected_answer: input.value || "",
+          correct_answer: (accept && accept.length ? accept[0] : ""),
+          is_correct: !!isCorrect,
+        });
       };
     }
     refreshBtn();
@@ -1111,6 +1283,13 @@
             prompt.textContent = "Answer recorded — now compare with the worked solution.";
           }
         }
+        submitClassroomResponse({
+          slide_index: slides[idx].index,
+          question_title: slides[idx].title || "",
+          selected_answer: selected,
+          correct_answer: correct || "",
+          is_correct: !!isCorrect,
+        });
       };
     }
 
@@ -1225,6 +1404,7 @@
     });
 
     bindInteractivity(slide);
+    renderLiveResults(slide);
     updateCoach(slide);
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
@@ -1383,6 +1563,17 @@
   updateStudyStat();
   updateMastery();
   updateKnowledgeMap();
+  loadClassroomSession();
+  if (classroomActiveApi) {
+    window.setInterval(loadClassroomSession, 15000);
+  }
+  if (classroomSummaryApi) {
+    loadClassroomSummary();
+    classroomSummaryTimer = window.setInterval(loadClassroomSummary, 4000);
+    window.addEventListener("beforeunload", function () {
+      if (classroomSummaryTimer) window.clearInterval(classroomSummaryTimer);
+    });
+  }
   if (window.matchMedia && window.matchMedia("(min-width: 1101px)").matches) {
     if (!loadFocusMode()) {
       setOutlineOpen(true);

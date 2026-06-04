@@ -84,6 +84,7 @@ PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
 DESMOS_API_KEY = os.environ.get("DESMOS_API_KEY", "").strip()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 COMPILED_BANK_CACHE = None
+COMPILED_BANK_CACHE_MTIME: float | None = None
 COURSE_MATERIALS_CACHE = None
 COURSE_MATERIALS_CACHE_MTIME: float | None = None
 
@@ -668,6 +669,39 @@ def init_db():
         """
     )
     db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS sat_mistake_tests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            learner_key TEXT NOT NULL,
+            items_json TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            completed_at DATETIME,
+            time_limit_seconds INTEGER NOT NULL DEFAULT 2100,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS sat_mistake_test_responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            test_id INTEGER NOT NULL,
+            item_order INTEGER NOT NULL,
+            domain TEXT NOT NULL,
+            topic TEXT NOT NULL,
+            question_index INTEGER NOT NULL,
+            selected_answer TEXT NOT NULL,
+            correct_answer TEXT,
+            is_correct INTEGER,
+            submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(test_id, item_order),
+            FOREIGN KEY (test_id) REFERENCES sat_mistake_tests (id)
+        )
+        """
+    )
+    db.execute(
         "CREATE INDEX IF NOT EXISTS idx_mistake_progress_learner "
         "ON mistake_learning_progress(learner_key)"
     )
@@ -687,6 +721,66 @@ def init_db():
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_cm_progress_user "
         "ON course_material_progress(user_id)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS course_class_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lesson_slug TEXT NOT NULL,
+            title TEXT,
+            created_by INTEGER,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            ended_at DATETIME,
+            FOREIGN KEY (created_by) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_course_class_sessions_lesson "
+        "ON course_class_sessions(lesson_slug, is_active)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS course_class_roster (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            username TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(session_id, user_id),
+            FOREIGN KEY (session_id) REFERENCES course_class_sessions (id),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_course_class_roster_session "
+        "ON course_class_roster(session_id)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS course_class_responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id INTEGER NOT NULL,
+            lesson_slug TEXT NOT NULL,
+            slide_index INTEGER NOT NULL,
+            question_title TEXT,
+            user_id INTEGER NOT NULL,
+            username TEXT,
+            selected_answer TEXT NOT NULL,
+            correct_answer TEXT,
+            is_correct INTEGER,
+            submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(session_id, slide_index, user_id),
+            FOREIGN KEY (session_id) REFERENCES course_class_sessions (id),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_course_class_responses_session "
+        "ON course_class_responses(session_id, slide_index)"
     )
     _seed_users_if_empty(db)
     _sync_render_users_seed_snapshot(db)
@@ -731,8 +825,7 @@ def inject_template_config():
 
     # MathJax is heavy (~hundreds of KB); skip on mostly-static pages to reduce jank.
     load_mathjax = not (
-        p.startswith("/practice/analytics")
-        or p.startswith("/admin")
+        p.startswith("/admin")
         or p in ("/", "")
         or p.startswith("/login")
         or p.startswith("/register")
@@ -1266,21 +1359,27 @@ def apply_placement_calculator_flags(questions: List[dict]) -> List[dict]:
 
 
 def load_compiled_bank() -> Dict[str, Dict[str, List[dict]]]:
-    global COMPILED_BANK_CACHE
-    if COMPILED_BANK_CACHE is not None:
-        return COMPILED_BANK_CACHE
-    if not os.path.isfile(COMPILED_BANK_PATH):
+    global COMPILED_BANK_CACHE, COMPILED_BANK_CACHE_MTIME
+    try:
+        mtime = os.path.getmtime(COMPILED_BANK_PATH)
+    except OSError:
         COMPILED_BANK_CACHE = {}
+        COMPILED_BANK_CACHE_MTIME = None
+        return COMPILED_BANK_CACHE
+    if COMPILED_BANK_CACHE is not None and COMPILED_BANK_CACHE_MTIME == mtime:
         return COMPILED_BANK_CACHE
     try:
         with open(COMPILED_BANK_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, dict):
             COMPILED_BANK_CACHE = data
+            COMPILED_BANK_CACHE_MTIME = mtime
         else:
             COMPILED_BANK_CACHE = {}
+            COMPILED_BANK_CACHE_MTIME = mtime
     except (OSError, json.JSONDecodeError):
         COMPILED_BANK_CACHE = {}
+        COMPILED_BANK_CACHE_MTIME = None
     return COMPILED_BANK_CACHE
 
 
@@ -1567,6 +1666,224 @@ def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress:
     db.commit()
 
 
+def _cm_classroom_question_slides(material: dict[str, Any]) -> list[dict[str, Any]]:
+    slides = material.get("slides") or []
+    questions: list[dict[str, Any]] = []
+    for slide in slides:
+        if slide.get("kind") not in {"question", "practice", "example"}:
+            continue
+        html = str(slide.get("html") or "")
+        if "data-cm-mcq" not in html and "data-cm-grid-in" not in html:
+            continue
+        questions.append(
+            {
+                "slide_index": int(slide.get("index") or 0),
+                "title": str(slide.get("title") or f"Slide {slide.get('index')}"),
+                "kind": str(slide.get("kind") or "question"),
+            }
+        )
+    return questions
+
+
+def _cm_active_class_session(db: sqlite3.Connection, slug: str) -> sqlite3.Row | None:
+    return db.execute(
+        """
+        SELECT id, lesson_slug, title, created_by, is_active, created_at, ended_at
+        FROM course_class_sessions
+        WHERE lesson_slug = ? AND is_active = 1
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (slug,),
+    ).fetchone()
+
+
+def _cm_available_classroom_students(db: sqlite3.Connection) -> list[dict[str, Any]]:
+    rows = db.execute(
+        """
+        SELECT id, username, access_grants, access_scope
+        FROM users
+        WHERE role = 'student' AND is_active = 1
+        ORDER BY lower(username)
+        """
+    ).fetchall()
+    students = []
+    for row in rows:
+        students.append(
+            {
+                "id": int(row["id"]),
+                "username": str(row["username"] or f"Student {row['id']}"),
+                "access_label": _access_grants_label(row["access_grants"] or row["access_scope"]),
+            }
+        )
+    return students
+
+
+def _cm_session_roster(db: sqlite3.Connection, session_id: int) -> dict[int, str]:
+    rows = db.execute(
+        """
+        SELECT user_id, username
+        FROM course_class_roster
+        WHERE session_id = ?
+        ORDER BY lower(username)
+        """,
+        (session_id,),
+    ).fetchall()
+    if rows:
+        return {
+            int(row["user_id"]): str(row["username"] or f"Student {row['user_id']}")
+            for row in rows
+        }
+    # Backward compatibility for sessions created before roster selection existed.
+    return {
+        item["id"]: item["username"]
+        for item in _cm_available_classroom_students(db)
+    }
+
+
+def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], session_id: int) -> dict[str, Any]:
+    slug = str(material.get("slug") or "")
+    session_row = db.execute(
+        """
+        SELECT ccs.*, u.username AS teacher_username
+        FROM course_class_sessions ccs
+        LEFT JOIN users u ON u.id = ccs.created_by
+        WHERE ccs.id = ? AND ccs.lesson_slug = ?
+        """,
+        (session_id, slug),
+    ).fetchone()
+    if not session_row:
+        return {"ok": False, "error": "session not found"}
+    rows = db.execute(
+        """
+        SELECT slide_index, question_title, user_id, username, selected_answer,
+               correct_answer, is_correct, submitted_at
+        FROM course_class_responses
+        WHERE session_id = ?
+        ORDER BY slide_index, lower(username)
+        """,
+        (session_id,),
+    ).fetchall()
+    by_slide: dict[int, list[sqlite3.Row]] = {}
+    students: dict[int, str] = {}
+    for row in rows:
+        slide_index = int(row["slide_index"])
+        by_slide.setdefault(slide_index, []).append(row)
+        students[int(row["user_id"])] = str(row["username"] or f"Student {row['user_id']}")
+    roster = _cm_session_roster(db, int(session_id))
+    questions = []
+    student_stats = {
+        uid: {"user_id": uid, "username": name, "submitted": 0, "correct": 0, "accuracy": None}
+        for uid, name in roster.items()
+    }
+    for q in _cm_classroom_question_slides(material):
+        slide_index = int(q["slide_index"])
+        q_rows = by_slide.get(slide_index, [])
+        submitted = len(q_rows)
+        correct = sum(1 for r in q_rows if int(r["is_correct"] or 0) == 1)
+        choice_counts: dict[str, int] = {}
+        submitted_ids = set()
+        for r in q_rows:
+            user_id = int(r["user_id"])
+            submitted_ids.add(user_id)
+            if user_id not in student_stats:
+                student_stats[user_id] = {
+                    "user_id": user_id,
+                    "username": str(r["username"] or f"Student {user_id}"),
+                    "submitted": 0,
+                    "correct": 0,
+                    "accuracy": None,
+                }
+            student_stats[user_id]["submitted"] += 1
+            if int(r["is_correct"] or 0) == 1:
+                student_stats[user_id]["correct"] += 1
+            choice = str(r["selected_answer"] or "—").strip() or "—"
+            choice_counts[choice] = choice_counts.get(choice, 0) + 1
+        missing_students = [
+            {"user_id": uid, "username": name}
+            for uid, name in roster.items()
+            if uid not in submitted_ids
+        ]
+        completion = round(100 * submitted / len(roster)) if roster else None
+        teach_ready = bool(roster and submitted >= len(roster))
+        almost_ready = bool(roster and submitted >= max(1, round(len(roster) * 0.8)))
+        questions.append(
+            {
+                **q,
+                "submitted": submitted,
+                "correct": correct,
+                "accuracy": round(100 * correct / submitted) if submitted else None,
+                "completion": completion,
+                "teach_ready": teach_ready,
+                "almost_ready": almost_ready,
+                "choice_counts": choice_counts,
+                "missing_students": missing_students,
+                "responses": [
+                    {
+                        "user_id": int(r["user_id"]),
+                        "username": str(r["username"] or f"Student {r['user_id']}"),
+                        "selected_answer": str(r["selected_answer"] or ""),
+                        "correct_answer": str(r["correct_answer"] or ""),
+                        "is_correct": bool(r["is_correct"]),
+                        "submitted_at": r["submitted_at"],
+                    }
+                    for r in q_rows
+                ],
+            }
+        )
+    for stat in student_stats.values():
+        stat["accuracy"] = round(100 * stat["correct"] / stat["submitted"]) if stat["submitted"] else None
+        stat["completion"] = round(100 * stat["submitted"] / len(questions)) if questions else None
+    question_count = len(questions)
+    total_submitted = sum(int(q["submitted"]) for q in questions)
+    total_correct = sum(int(q["correct"]) for q in questions)
+    total_expected = question_count * len(roster)
+    weakest_questions = sorted(
+        [q for q in questions if int(q["submitted"]) > 0],
+        key=lambda item: (101 if item["accuracy"] is None else int(item["accuracy"]), -int(item["submitted"])),
+    )[:5]
+    report = {
+        "question_count": question_count,
+        "total_expected": total_expected,
+        "total_submitted": total_submitted,
+        "total_correct": total_correct,
+        "overall_accuracy": round(100 * total_correct / total_submitted) if total_submitted else None,
+        "completion_rate": round(100 * total_submitted / total_expected) if total_expected else None,
+        "completed_questions": sum(1 for q in questions if q["teach_ready"]),
+        "ready_questions": sum(1 for q in questions if q["teach_ready"] or q["almost_ready"]),
+        "weakest_questions": weakest_questions,
+        "student_breakdown": sorted(
+            student_stats.values(),
+            key=lambda item: (-(item["submitted"] or 0), -(item["correct"] or 0), item["username"].lower()),
+        ),
+    }
+    return {
+        "ok": True,
+        "session": {
+            "id": int(session_row["id"]),
+            "lesson_slug": slug,
+            "title": session_row["title"],
+            "is_active": bool(session_row["is_active"]),
+            "created_at": session_row["created_at"],
+            "ended_at": session_row["ended_at"],
+            "teacher_username": session_row["teacher_username"],
+        },
+        "lesson": {
+            "slug": slug,
+            "section": material.get("section"),
+            "title": material.get("title"),
+        },
+        "student_count": len(students),
+        "roster_count": len(roster),
+        "roster_students": [
+            {"user_id": uid, "username": name}
+            for uid, name in roster.items()
+        ],
+        "report": report,
+        "questions": questions,
+    }
+
+
 @app.route("/practice/materials/api/progress/<slug>", methods=["GET", "POST"])
 def practice_course_material_progress_api(slug: str):
     if not require_login():
@@ -1585,6 +1902,218 @@ def practice_course_material_progress_api(slug: str):
         return jsonify({"ok": False, "error": "invalid progress payload"}), 400
     _cm_progress_save(db, uid, slug, progress)
     return jsonify({"ok": True})
+
+
+@app.route("/practice/materials/<slug>/classroom")
+def practice_course_material_classroom(slug: str):
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return staff_redirect
+    material = _course_material_by_slug(slug)
+    if not material:
+        abort(404)
+    db = get_db()
+    active = _cm_active_class_session(db, slug)
+    latest = active or db.execute(
+        """
+        SELECT id, lesson_slug, title, created_by, is_active, created_at, ended_at
+        FROM course_class_sessions
+        WHERE lesson_slug = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (slug,),
+    ).fetchone()
+    return render_template(
+        "course_material_classroom.html",
+        material=material,
+        active_session=dict(latest) if latest else None,
+        start_api=url_for("practice_course_material_classroom_start_api", slug=slug),
+        end_api=url_for("practice_course_material_classroom_end_api", slug=slug),
+        summary_api=url_for("practice_course_material_classroom_summary_api", slug=slug),
+        lesson_href=url_for("practice_course_material_view", slug=slug),
+        student_roster=_cm_available_classroom_students(db),
+    )
+
+
+@app.route("/practice/materials/api/classroom/<slug>/active")
+def practice_course_material_classroom_active_api(slug: str):
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    row = _cm_active_class_session(db, slug)
+    if not row:
+        return jsonify({"ok": True, "active": False})
+    return jsonify(
+        {
+            "ok": True,
+            "active": True,
+            "session": {
+                "id": int(row["id"]),
+                "lesson_slug": slug,
+                "title": row["title"],
+                "created_at": row["created_at"],
+            },
+        }
+    )
+
+
+@app.route("/practice/materials/api/classroom/<slug>/response", methods=["POST"])
+def practice_course_material_classroom_response_api(slug: str):
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    active = _cm_active_class_session(db, slug)
+    if not active:
+        return jsonify({"ok": False, "error": "no active classroom session"}), 409
+    data = request.get_json(silent=True) or {}
+    try:
+        slide_index = int(data.get("slide_index"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "slide_index required"}), 400
+    selected = str(data.get("selected_answer") or "").strip()[:120]
+    correct = str(data.get("correct_answer") or "").strip()[:120]
+    if not selected:
+        return jsonify({"ok": False, "error": "selected_answer required"}), 400
+    question_title = str(data.get("question_title") or "")[:240]
+    if isinstance(data.get("is_correct"), bool):
+        is_correct = 1 if data.get("is_correct") else 0
+    else:
+        is_correct = 1 if correct and selected.upper() == correct.upper() else 0
+    uid = int(session["user_id"])
+    roster = _cm_session_roster(db, int(active["id"]))
+    if uid not in roster:
+        return jsonify({"ok": False, "error": "student is not in this classroom roster"}), 403
+    username = str(session.get("username") or f"student-{uid}")[:120]
+    db.execute(
+        """
+        INSERT INTO course_class_responses (
+            session_id, lesson_slug, slide_index, question_title, user_id, username,
+            selected_answer, correct_answer, is_correct, submitted_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(session_id, slide_index, user_id) DO UPDATE SET
+            question_title = excluded.question_title,
+            username = excluded.username,
+            selected_answer = excluded.selected_answer,
+            correct_answer = excluded.correct_answer,
+            is_correct = excluded.is_correct,
+            submitted_at = datetime('now')
+        """,
+        (
+            int(active["id"]),
+            slug,
+            slide_index,
+            question_title,
+            uid,
+            username,
+            selected,
+            correct,
+            is_correct,
+        ),
+    )
+    db.commit()
+    return jsonify({"ok": True, "session_id": int(active["id"]), "is_correct": bool(is_correct)})
+
+
+@app.route("/practice/materials/api/classroom/<slug>/start", methods=["POST"])
+def practice_course_material_classroom_start_api(slug: str):
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return jsonify({"ok": False, "error": "staff required"}), 403
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    data = request.get_json(silent=True) or {}
+    requested_ids = data.get("student_ids")
+    available_students = _cm_available_classroom_students(db)
+    available_by_id = {int(item["id"]): item for item in available_students}
+    selected_ids: list[int] = []
+    if isinstance(requested_ids, list):
+        for raw_id in requested_ids:
+            try:
+                student_id = int(raw_id)
+            except (TypeError, ValueError):
+                continue
+            if student_id in available_by_id and student_id not in selected_ids:
+                selected_ids.append(student_id)
+        if not selected_ids:
+            return jsonify({"ok": False, "error": "choose at least one student"}), 400
+    if not selected_ids:
+        selected_ids = [int(item["id"]) for item in available_students]
+    db.execute(
+        "UPDATE course_class_sessions SET is_active = 0, ended_at = datetime('now') WHERE lesson_slug = ? AND is_active = 1",
+        (slug,),
+    )
+    title = f"{material.get('section')} {material.get('title')} live class"
+    cur = db.execute(
+        """
+        INSERT INTO course_class_sessions (lesson_slug, title, created_by, is_active, created_at)
+        VALUES (?, ?, ?, 1, datetime('now'))
+        """,
+        (slug, title, int(session["user_id"])),
+    )
+    session_id = int(cur.lastrowid)
+    db.executemany(
+        """
+        INSERT OR IGNORE INTO course_class_roster (session_id, user_id, username, created_at)
+        VALUES (?, ?, ?, datetime('now'))
+        """,
+        [
+            (session_id, student_id, available_by_id[student_id]["username"])
+            for student_id in selected_ids
+        ],
+    )
+    db.commit()
+    return jsonify({"ok": True, "session_id": session_id, "roster_count": len(selected_ids)})
+
+
+@app.route("/practice/materials/api/classroom/<slug>/end", methods=["POST"])
+def practice_course_material_classroom_end_api(slug: str):
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return jsonify({"ok": False, "error": "staff required"}), 403
+    db = get_db()
+    db.execute(
+        "UPDATE course_class_sessions SET is_active = 0, ended_at = datetime('now') WHERE lesson_slug = ? AND is_active = 1",
+        (slug,),
+    )
+    db.commit()
+    return jsonify({"ok": True})
+
+
+@app.route("/practice/materials/api/classroom/<slug>/summary")
+def practice_course_material_classroom_summary_api(slug: str):
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return jsonify({"ok": False, "error": "staff required"}), 403
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    session_id = request.args.get("session_id", type=int)
+    if not session_id:
+        active = _cm_active_class_session(db, slug)
+        if active:
+            session_id = int(active["id"])
+        else:
+            row = db.execute(
+                "SELECT id FROM course_class_sessions WHERE lesson_slug = ? ORDER BY id DESC LIMIT 1",
+                (slug,),
+            ).fetchone()
+            session_id = int(row["id"]) if row else 0
+    if not session_id:
+        return jsonify({"ok": True, "session": None, "student_count": 0, "questions": []})
+    summary = _cm_classroom_summary(db, material, session_id)
+    status = 200 if summary.get("ok") else 404
+    return jsonify(summary), status
 
 
 @app.route("/practice/materials/api/coach", methods=["POST"])
@@ -4039,6 +4568,14 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
                     tag_ids = [x for x in arr if isinstance(x, str)]
             except (json.JSONDecodeError, TypeError):
                 pass
+        domain_name = str(r["domain"])
+        if domain_name in DOMAIN_SAT_UNIT:
+            unit_label, unit_title = DOMAIN_SAT_UNIT[domain_name]
+        elif domain_name == "hard_problem":
+            unit_label = str(meta.get("knowledge_section") or "Hard")
+            unit_title = str(meta.get("knowledge_section_title_en") or "Hard Problem Drill")
+        else:
+            unit_label, unit_title = "SAT", TOPIC_TITLES.get(r["topic"], r["topic"])
         out.append(
             {
                 "pr_id": r["pr_id"],
@@ -4052,6 +4589,10 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
                     meta.get("knowledge_section_title_en")
                     or TOPIC_TITLES.get(r["topic"], r["topic"])
                 ),
+                "analytics_unit_label": unit_label,
+                "analytics_unit_title": unit_title,
+                "stem_html": meta.get("stem") or "",
+                "choices": meta.get("choices") or [],
                 "question_kind": meta.get("question_kind") or "mcq",
                 "yours": r["selected_answer"] or "—",
                 "key": r["correct_answer"] or "—",
@@ -4359,6 +4900,16 @@ MISS_PART_BY_DOMAIN: Dict[str, str] = {
     "hard_problem": "hard",
 }
 
+SAT_MISTAKE_UNIT_ORDER = ("U1", "U2", "U3", "U4")
+SAT_MISTAKE_UNIT_META: Dict[str, Dict[str, Any]] = {
+    "U1": {"label": "Unit 1", "title": "Algebra", "domain": "algebra", "quota": 8, "pct": 35},
+    "U2": {"label": "Unit 2", "title": "Advanced Math", "domain": "advanced_math", "quota": 8, "pct": 35},
+    "U3": {"label": "Unit 3", "title": "Problem Solving & Data", "domain": "problem_solving", "quota": 3, "pct": 15},
+    "U4": {"label": "Unit 4", "title": "Geometry", "domain": "geometry", "quota": 3, "pct": 15},
+}
+SAT_MISTAKE_TEST_SIZE = 22
+SAT_MISTAKE_TEST_SECONDS = 35 * 60
+
 
 def _miss_module_spec(part_id: str) -> Dict[str, Any] | None:
     for s in SAT_MISS_MODULE_SPECS:
@@ -4440,6 +4991,400 @@ def _wrong_miss_items_for_module(
     return out
 
 
+def _sat_mistake_unit_key(domain: str, qobj: dict) -> str | None:
+    if domain == "algebra":
+        return "U1"
+    if domain == "advanced_math":
+        return "U2"
+    if domain == "problem_solving":
+        return "U3"
+    if domain == "geometry":
+        return "U4"
+    if domain == "hard_problem":
+        raw = str(qobj.get("knowledge_section") or qobj.get("sat_unit_label") or "").strip()
+        m = re.search(r"Unit\s*([1-4])", raw, re.I)
+        if m:
+            return f"U{m.group(1)}"
+    return None
+
+
+def _sat_mistake_topic_candidates() -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for spec in SAT_MISS_MODULE_SPECS:
+        domain = str(spec["domain"])
+        for topic in spec["topics"]:
+            if topic in (BANKS.get(domain) or {}):
+                out.append((domain, str(topic)))
+    for topic in sorted((BANKS.get("hard_problem") or {}).keys(), key=_topic_bank_sort_key):
+        out.append(("hard_problem", str(topic)))
+    return out
+
+
+def _sat_active_mistake_pool(db: sqlite3.Connection, user_id: Any) -> list[dict[str, Any]]:
+    learner = _learner_key()
+    tracked_sql = _tracked_attempt_sql("pa")
+    pool: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, int]] = set()
+    for domain, topic in _sat_mistake_topic_candidates():
+        if topic not in (BANKS.get(domain) or {}):
+            continue
+        if user_id is not None:
+            rows = db.execute(
+                f"""
+                SELECT pr.question_index AS qi,
+                       COUNT(*) AS wrong_count,
+                       MAX(pr.submitted_at) AS last_wrong_at
+                FROM practice_responses pr
+                JOIN practice_attempts pa ON pa.id = pr.attempt_id
+                LEFT JOIN mistake_learning_progress mlp
+                  ON mlp.learner_key = ?
+                 AND mlp.domain = pa.domain
+                 AND mlp.topic = pa.topic
+                 AND mlp.question_index = pr.question_index
+                WHERE pr.is_correct = 0
+                  AND pr.question_index IS NOT NULL
+                  AND pa.domain = ?
+                  AND pa.topic = ?
+                  AND pa.user_id IS ?
+                  AND {tracked_sql}
+                  AND COALESCE(mlp.status, 'unreviewed') != 'mastered'
+                GROUP BY pr.question_index
+                ORDER BY wrong_count DESC, last_wrong_at DESC
+                """,
+                (learner, domain, topic, user_id),
+            ).fetchall()
+        else:
+            rows = db.execute(
+                f"""
+                SELECT pr.question_index AS qi,
+                       COUNT(*) AS wrong_count,
+                       MAX(pr.submitted_at) AS last_wrong_at
+                FROM practice_responses pr
+                JOIN practice_attempts pa ON pa.id = pr.attempt_id
+                LEFT JOIN mistake_learning_progress mlp
+                  ON mlp.learner_key = ?
+                 AND mlp.domain = pa.domain
+                 AND mlp.topic = pa.topic
+                 AND mlp.question_index = pr.question_index
+                WHERE pr.is_correct = 0
+                  AND pr.question_index IS NOT NULL
+                  AND pa.domain = ?
+                  AND pa.topic = ?
+                  AND pa.user_id IS NULL
+                  AND {tracked_sql}
+                  AND COALESCE(mlp.status, 'unreviewed') != 'mastered'
+                GROUP BY pr.question_index
+                ORDER BY wrong_count DESC, last_wrong_at DESC
+                """,
+                (learner, domain, topic),
+            ).fetchall()
+        if not rows:
+            continue
+        questions = get_questions_for_topic(domain, topic, BANKS[domain][topic])
+        for row in rows:
+            qi = int(row["qi"])
+            key = (domain, topic, qi)
+            if key in seen or qi < 0 or qi >= len(questions):
+                continue
+            qobj = questions[qi]
+            unit_key = _sat_mistake_unit_key(domain, qobj)
+            if unit_key not in SAT_MISTAKE_UNIT_META:
+                continue
+            sec, title_en, detail = _summary_topic_fields(domain, qobj)
+            pool.append(
+                {
+                    "domain": domain,
+                    "topic": topic,
+                    "q_index": qi,
+                    "unit_key": unit_key,
+                    "unit_label": SAT_MISTAKE_UNIT_META[unit_key]["label"],
+                    "unit_title": SAT_MISTAKE_UNIT_META[unit_key]["title"],
+                    "topic_title": TOPIC_TITLES.get(topic, topic),
+                    "knowledge_section": sec,
+                    "knowledge_title": title_en or detail or TOPIC_TITLES.get(topic, topic),
+                    "display_number": qobj.get("display_number", qi + 1),
+                    "wrong_count": int(row["wrong_count"] or 0),
+                    "last_wrong_at": row["last_wrong_at"],
+                    "source": "Hard Question" if domain == "hard_problem" else "SAT Unit Practice",
+                }
+            )
+            seen.add(key)
+    pool.sort(key=lambda x: (-int(x["wrong_count"]), str(x.get("last_wrong_at") or ""), x["unit_key"]))
+    return pool
+
+
+def _sat_mistake_dashboard(db: sqlite3.Connection, user_id: Any) -> dict[str, Any]:
+    pool = _sat_active_mistake_pool(db, user_id)
+    by_unit: dict[str, list[dict[str, Any]]] = {k: [] for k in SAT_MISTAKE_UNIT_ORDER}
+    for item in pool:
+        by_unit[item["unit_key"]].append(item)
+    units = []
+    for key in SAT_MISTAKE_UNIT_ORDER:
+        meta = SAT_MISTAKE_UNIT_META[key]
+        items = by_unit[key]
+        top_skills: dict[str, int] = defaultdict(int)
+        for item in items:
+            top_skills[str(item.get("knowledge_title") or item["topic_title"])] += 1
+        units.append(
+            {
+                "key": key,
+                **meta,
+                "count": len(items),
+                "items": items,
+                "top_skills": [
+                    {"title": title, "count": count}
+                    for title, count in sorted(top_skills.items(), key=lambda pair: -pair[1])[:5]
+                ],
+            }
+        )
+    return {
+        "pool": pool,
+        "units": units,
+        "active_count": len(pool),
+        "unlock_count": SAT_MISTAKE_TEST_SIZE,
+        "can_generate": len(pool) >= SAT_MISTAKE_TEST_SIZE,
+        "needed": max(0, SAT_MISTAKE_TEST_SIZE - len(pool)),
+    }
+
+
+def _select_sat_mistake_test_items(pool: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_unit: dict[str, list[dict[str, Any]]] = {k: [] for k in SAT_MISTAKE_UNIT_ORDER}
+    for item in pool:
+        by_unit[item["unit_key"]].append(item)
+    selected: list[dict[str, Any]] = []
+    chosen: set[tuple[str, str, int]] = set()
+
+    def take(item: dict[str, Any]) -> None:
+        key = (item["domain"], item["topic"], int(item["q_index"]))
+        if key in chosen:
+            return
+        chosen.add(key)
+        selected.append(dict(item))
+
+    for unit_key in SAT_MISTAKE_UNIT_ORDER:
+        quota = int(SAT_MISTAKE_UNIT_META[unit_key]["quota"])
+        for item in by_unit[unit_key][:quota]:
+            take(item)
+    if len(selected) < SAT_MISTAKE_TEST_SIZE:
+        leftovers = [
+            item
+            for item in pool
+            if (item["domain"], item["topic"], int(item["q_index"])) not in chosen
+        ]
+        leftovers.sort(key=lambda x: (-int(x["wrong_count"]), str(x.get("last_wrong_at") or "")))
+        for item in leftovers:
+            if len(selected) >= SAT_MISTAKE_TEST_SIZE:
+                break
+            take(item)
+    selected = selected[:SAT_MISTAKE_TEST_SIZE]
+    random.shuffle(selected)
+    for i, item in enumerate(selected):
+        item["order"] = i
+    return selected
+
+
+def _sat_mistake_test_row_or_404(db: sqlite3.Connection, test_id: int, user_id: Any) -> sqlite3.Row:
+    row = db.execute(
+        "SELECT * FROM sat_mistake_tests WHERE id = ? AND user_id IS ?",
+        (test_id, user_id),
+    ).fetchone()
+    if row is None:
+        abort(404)
+    return row
+
+
+def _sat_mistake_test_items(row: sqlite3.Row) -> list[dict[str, Any]]:
+    try:
+        raw = json.loads(row["items_json"] or "[]")
+    except (TypeError, json.JSONDecodeError):
+        raw = []
+    return [dict(item) for item in raw if isinstance(item, dict)]
+
+
+@app.route("/practice/mistakes/sat")
+def practice_sat_mistakes():
+    db = get_db()
+    user_id = session.get("user_id")
+    dashboard = _sat_mistake_dashboard(db, user_id)
+    return render_template(
+        "sat_mistakes.html",
+        dashboard=dashboard,
+        test_size=SAT_MISTAKE_TEST_SIZE,
+        time_limit_minutes=SAT_MISTAKE_TEST_SECONDS // 60,
+    )
+
+
+@app.route("/practice/mistakes/sat/generate", methods=["POST"])
+def practice_sat_mistake_test_generate():
+    db = get_db()
+    user_id = session.get("user_id")
+    dashboard = _sat_mistake_dashboard(db, user_id)
+    if not dashboard["can_generate"]:
+        flash(f"You need {dashboard['needed']} more active SAT mistake(s) before a 22-question test unlocks.")
+        return redirect(url_for("practice_sat_mistakes"))
+    items = _select_sat_mistake_test_items(dashboard["pool"])
+    cur = db.execute(
+        """
+        INSERT INTO sat_mistake_tests (user_id, learner_key, items_json, status, started_at, time_limit_seconds)
+        VALUES (?, ?, ?, 'active', datetime('now'), ?)
+        """,
+        (user_id, _learner_key(), json.dumps(items), SAT_MISTAKE_TEST_SECONDS),
+    )
+    db.commit()
+    return redirect(url_for("practice_sat_mistake_test_question", test_id=int(cur.lastrowid), step=0))
+
+
+@app.route("/practice/mistakes/sat/test/<int:test_id>/<int:step>")
+def practice_sat_mistake_test_question(test_id: int, step: int):
+    db = get_db()
+    user_id = session.get("user_id")
+    row = _sat_mistake_test_row_or_404(db, test_id, user_id)
+    items = _sat_mistake_test_items(row)
+    if not items:
+        flash("That mistake test has no questions.")
+        return redirect(url_for("practice_sat_mistakes"))
+    if str(row["status"]) == "completed":
+        return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+    step = max(0, min(step, len(items) - 1))
+    item = items[step]
+    questions = get_questions_for_topic(item["domain"], item["topic"], BANKS[item["domain"]][item["topic"]])
+    q_index = int(item["q_index"])
+    if q_index < 0 or q_index >= len(questions):
+        abort(404)
+    q = questions[q_index]
+    answered_rows = db.execute(
+        "SELECT item_order FROM sat_mistake_test_responses WHERE test_id = ?",
+        (test_id,),
+    ).fetchall()
+    answered = {int(r["item_order"]) for r in answered_rows}
+    started_row = db.execute(
+        "SELECT CAST(strftime('%s', started_at) AS INTEGER) AS started_unix FROM sat_mistake_tests WHERE id = ?",
+        (test_id,),
+    ).fetchone()
+    return render_template(
+        "sat_mistake_test.html",
+        test_id=test_id,
+        item=item,
+        q=q,
+        step=step,
+        total=len(items),
+        answered_qset=answered,
+        answered_count=len(answered),
+        answered_pct=min(100, round(100 * len(answered) / len(items))) if items else 0,
+        choice_letters=[chr(ord("A") + i) for i in range(len(q.get("choices") or []))],
+        time_limit_seconds=int(row["time_limit_seconds"] or SAT_MISTAKE_TEST_SECONDS),
+        started_unix=int(started_row["started_unix"] or 0) if started_row else 0,
+    )
+
+
+@app.route("/practice/mistakes/sat/test/<int:test_id>/submit", methods=["POST"])
+def practice_sat_mistake_test_submit(test_id: int):
+    db = get_db()
+    user_id = session.get("user_id")
+    row = _sat_mistake_test_row_or_404(db, test_id, user_id)
+    if str(row["status"]) == "completed":
+        return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+    items = _sat_mistake_test_items(row)
+    try:
+        step = int(request.form.get("step") or 0)
+    except ValueError:
+        step = 0
+    if step < 0 or step >= len(items):
+        return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+    raw_answer = (request.form.get("selected_answer") or "").strip()
+    if not raw_answer:
+        flash("Please enter or select an answer before submitting.")
+        return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=step))
+    item = items[step]
+    questions = get_questions_for_topic(item["domain"], item["topic"], BANKS[item["domain"]][item["topic"]])
+    q_index = int(item["q_index"])
+    q = questions[q_index]
+    q_kind = q.get("question_kind", "mcq")
+    selected = raw_answer.upper()[:1] if q_kind in ("mcq", "mcq5") else raw_answer
+    is_correct, correct_answer = grade_for_db(q, selected)
+    db.execute(
+        """
+        INSERT INTO sat_mistake_test_responses (
+            test_id, item_order, domain, topic, question_index,
+            selected_answer, correct_answer, is_correct, submitted_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(test_id, item_order) DO UPDATE SET
+            selected_answer = excluded.selected_answer,
+            correct_answer = excluded.correct_answer,
+            is_correct = excluded.is_correct,
+            submitted_at = datetime('now')
+        """,
+        (test_id, step, item["domain"], item["topic"], q_index, selected, correct_answer, is_correct),
+    )
+    if is_correct == 1:
+        _mistake_progress_on_correct(db, _learner_key(), item["domain"], item["topic"], q_index)
+    elif is_correct == 0:
+        _mistake_progress_on_wrong(db, _learner_key(), item["domain"], item["topic"], q_index)
+    db.commit()
+    if step >= len(items) - 1:
+        return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+    return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=step + 1))
+
+
+@app.route("/practice/mistakes/sat/test/<int:test_id>/done")
+def practice_sat_mistake_test_done(test_id: int):
+    db = get_db()
+    user_id = session.get("user_id")
+    row = _sat_mistake_test_row_or_404(db, test_id, user_id)
+    items = _sat_mistake_test_items(row)
+    responses = db.execute(
+        """
+        SELECT item_order, selected_answer, correct_answer, is_correct
+        FROM sat_mistake_test_responses
+        WHERE test_id = ?
+        ORDER BY item_order
+        """,
+        (test_id,),
+    ).fetchall()
+    by_order = {int(r["item_order"]): r for r in responses}
+    correct = sum(1 for r in responses if int(r["is_correct"] or 0) == 1)
+    total = len(items)
+    if len(responses) >= total and str(row["status"]) != "completed":
+        db.execute(
+            "UPDATE sat_mistake_tests SET status = 'completed', completed_at = datetime('now') WHERE id = ?",
+            (test_id,),
+        )
+        db.commit()
+    unit_summary: dict[str, dict[str, Any]] = {
+        k: {"key": k, **SAT_MISTAKE_UNIT_META[k], "total": 0, "correct": 0}
+        for k in SAT_MISTAKE_UNIT_ORDER
+    }
+    rows = []
+    for i, item in enumerate(items):
+        resp = by_order.get(i)
+        unit = unit_summary[item["unit_key"]]
+        unit["total"] += 1
+        if resp and int(resp["is_correct"] or 0) == 1:
+            unit["correct"] += 1
+        rows.append(
+            {
+                **item,
+                "selected_answer": resp["selected_answer"] if resp else "—",
+                "correct_answer": resp["correct_answer"] if resp else "—",
+                "is_correct": bool(resp and int(resp["is_correct"] or 0) == 1),
+                "practice_href": url_for("practice_question", domain=item["domain"], topic=item["topic"], qnum=int(item["q_index"])),
+            }
+        )
+    for unit in unit_summary.values():
+        unit["accuracy"] = round(100 * unit["correct"] / unit["total"]) if unit["total"] else None
+    return render_template(
+        "sat_mistake_test_done.html",
+        test_id=test_id,
+        total=total,
+        answered=len(responses),
+        correct=correct,
+        pct=round(100 * correct / total) if total else 0,
+        units=list(unit_summary.values()),
+        rows=rows,
+    )
+
+
 def _placement_analytics_unit(q_index: int) -> dict:
     if q_index < 15:
         return {
@@ -4492,7 +5437,7 @@ def _analytics_unit_for_row(row: dict) -> dict:
 
 
 def _analytics_partitions(rows: List[dict]) -> List[dict]:
-    """Mistake analytics: SAT (parent) → Units 1–4, then Placement and Other."""
+    """Mistake analytics: SAT (parent) → Units 1–4 + hard question mistakes only."""
     partitions: List[dict] = []
     used_domains: set[str] = set()
     sat_unit_parts: List[dict] = []
@@ -4606,69 +5551,6 @@ def _analytics_partitions(rows: List[dict]) -> List[dict]:
             }
         )
 
-    placement_rows = [r for r in rows if r.get("domain") == "placement"]
-    used_domains.add("placement")
-    if placement_rows:
-        unit_buckets: Dict[str, dict] = {}
-        for row in placement_rows:
-            unit_meta = _placement_analytics_unit(int(row.get("q_index") or 0))
-            row["analytics_unit_label"] = unit_meta["label"]
-            row["analytics_unit_subtitle"] = unit_meta["subtitle"]
-            bucket = unit_buckets.setdefault(
-                unit_meta["id"],
-                {
-                    **unit_meta,
-                    "rows": [],
-                },
-            )
-            bucket["rows"].append(row)
-        units = []
-        for unit in sorted(unit_buckets.values(), key=lambda x: x["order"]):
-            unit_rows = unit["rows"]
-            units.append(
-                {
-                    **unit,
-                    "count": len(unit_rows),
-                    "classifier": _build_mistake_classifier(unit_rows),
-                }
-            )
-        partitions.append(
-            {
-                "id": "placement",
-                "label": "Placement Test",
-                "subtitle": "Course placement diagnostic mistakes only",
-                "count": len(placement_rows),
-                "classifier": _build_mistake_classifier(placement_rows),
-                "domains": {"placement"},
-                "unit_module_id": "placement",
-                "units": units,
-            }
-        )
-
-    other_rows = [r for r in rows if r.get("domain") not in used_domains]
-    if other_rows:
-        partitions.append(
-            {
-                "id": "other",
-                "label": "Other Practice",
-                "subtitle": "Mistakes outside tracked SAT units and placement",
-                "count": len(other_rows),
-                "classifier": _build_mistake_classifier(other_rows),
-                "domains": set(),
-                "unit_module_id": "other",
-                "units": [
-                    {
-                        "id": "other-all",
-                        "label": "Other",
-                        "subtitle": "Other practice",
-                        "order": 99,
-                        "rows": other_rows,
-                        "count": len(other_rows),
-                        "classifier": _build_mistake_classifier(other_rows),
-                    }
-                ],
-            }
-        )
     return partitions
 
 
@@ -4961,6 +5843,17 @@ def practice_course_material_view(slug: str):
         prev_material=prev_material,
         next_material=next_material,
         cm_progress_api=url_for("practice_course_material_progress_api", slug=slug),
+        cm_classroom_active_api=url_for("practice_course_material_classroom_active_api", slug=slug),
+        cm_classroom_response_api=url_for("practice_course_material_classroom_response_api", slug=slug),
+        cm_classroom_summary_api=url_for("practice_course_material_classroom_summary_api", slug=slug)
+        if current_user_can_access_admin()
+        else None,
+        cm_classroom_start_api=url_for("practice_course_material_classroom_start_api", slug=slug)
+        if current_user_can_access_admin()
+        else None,
+        cm_classroom_href=url_for("practice_course_material_classroom", slug=slug)
+        if current_user_can_access_admin()
+        else None,
     )
 
 
@@ -5157,13 +6050,43 @@ def practice_analytics():
     session["active_track_label"] = "SAT Math"
     db = get_db()
     uid = session.get("user_id")
-    rows = _analytics_wrong_rows(db, uid)
+    all_rows = _analytics_wrong_rows(db, uid)
+    rows = [
+        row for row in all_rows
+        if row.get("domain") in {"algebra", "advanced_math", "problem_solving", "geometry", "hard_problem"}
+    ]
     tag_totals: Dict[str, int] = defaultdict(int)
     for row in rows:
         for lab in row["tag_labels"]:
             tag_totals[lab] += 1
     top_tags = sorted(tag_totals.items(), key=lambda x: -x[1])[:8]
     classifier = _build_mistake_classifier(rows)
+    unit_targets = [
+        ("unit1", "Unit 1", "Algebra"),
+        ("unit2", "Unit 2", "Advanced Math"),
+        ("unit3", "Unit 3", "Problem Solving & Data"),
+        ("unit4", "Unit 4", "Geometry"),
+    ]
+    unit_counts: Dict[str, int] = {key: 0 for key, _, _ in unit_targets}
+    for row in rows:
+        unit_label = str(row.get("analytics_unit_label") or "")
+        for key, label, _subtitle in unit_targets:
+            if unit_label.startswith(label):
+                unit_counts[key] += 1
+                break
+    unit_total = sum(unit_counts.values())
+    sat_unit_distribution = [
+        {
+            "id": key,
+            "label": label,
+            "subtitle": subtitle,
+            "count": unit_counts.get(key, 0),
+            "pct": round(100 * unit_counts.get(key, 0) / unit_total) if unit_total else 0,
+            "href": url_for("practice_analytics", part=key),
+            "is_active": False,
+        }
+        for key, label, subtitle in unit_targets
+    ]
     analytics_partitions = _analytics_partitions(rows)
     for part in analytics_partitions:
         part["pct"] = round(100 * int(part.get("count") or 0) / len(rows)) if rows else 0
@@ -5183,8 +6106,10 @@ def practice_analytics():
         part["viz_color"] = _viz_analytics_partition_color(str(part.get("id") or ""), i)
     viz_hero_conic = _viz_analytics_hero_conic_gradient(analytics_partitions)
     top_tags_viz = _viz_top_tags_bars(top_tags)
-    selected_part_id = (request.args.get("part") or "").strip().lower()
+    selected_part_id = (request.args.get("part") or "sat").strip().lower()
     selected_partition = _analytics_partition_by_id(analytics_partitions, selected_part_id)
+    if selected_partition is None and analytics_partitions:
+        selected_partition = analytics_partitions[0]
     if (
         selected_partition
         and selected_partition.get("units")
@@ -5206,10 +6131,20 @@ def practice_analytics():
     learning_loop_snapshot = _analytics_learning_loop_snapshot(
         loop_rows, active_classifier
     )
+    visible_wrong_rows = rows
+    if selected_partition and not selected_partition.get("sat_children"):
+        visible_ids = {r.get("pr_id") for r in loop_rows}
+        visible_wrong_rows = [r for r in rows if r.get("pr_id") in visible_ids]
+    active_part_id = str(selected_partition.get("id") or "") if selected_partition else ""
+    for item in sat_unit_distribution:
+        item["is_active"] = item["id"] == active_part_id
     return render_template(
         "practice_analytics.html",
         wrong_rows=rows,
+        visible_wrong_rows=visible_wrong_rows,
         wrong_total=len(rows),
+        visible_wrong_total=len(visible_wrong_rows),
+        sat_unit_distribution=sat_unit_distribution,
         top_mistake_tags=top_tags,
         top_tags_viz=top_tags_viz,
         mistake_tag_options=MISTAKE_TAG_OPTIONS,

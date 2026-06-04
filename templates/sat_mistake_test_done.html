@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+  <section class="np-sat-mistakes">
+    <nav class="np-atelier-rail" aria-label="SAT mistake result navigation">
+      <a href="{{ url_for('practice_sat_mistakes') }}">SAT mistake center</a>
+      <span class="np-atelier-rail-sep">·</span>
+      <span class="np-atelier-rail-current">Mistake test report</span>
+    </nav>
+
+    <header class="np-sat-mistake-hero glass-panel np-glass">
+      <div>
+        <p class="np-sat-mistake-kicker">Mistake Test Report</p>
+        <h1>{{ correct }}/{{ total }} correct · {{ pct }}%</h1>
+        <p>This report updates your active SAT mistake pool. Repeated misses stay high priority; corrected items move toward mastery.</p>
+      </div>
+      <div class="np-sat-mistake-unlock">
+        <strong>{{ answered }}</strong>
+        <span>answered</span>
+        <a href="{{ url_for('practice_sat_mistakes') }}" class="np-sat-mistake-primary">Back to mistake center</a>
+      </div>
+    </header>
+
+    <section class="np-sat-mistake-ratio glass-panel np-glass">
+      {% for unit in units %}
+      <article>
+        <span>{{ unit.label }}</span>
+        <strong>{{ unit.correct }}/{{ unit.total }}</strong>
+        <p>{{ unit.title }} · {{ unit.accuracy if unit.accuracy is not none else '—' }}%</p>
+        <b style="width: {{ unit.accuracy if unit.accuracy is not none else 0 }}%;"></b>
+      </article>
+      {% endfor %}
+    </section>
+
+    <section class="np-sat-mistake-review glass-panel np-glass">
+      <header>
+        <p class="np-sat-mistake-kicker">Question Review</p>
+        <h2>What to review next</h2>
+      </header>
+      <ul>
+        {% for row in rows %}
+        <li class="{{ 'is-correct' if row.is_correct else 'is-wrong' }}">
+          <span>{{ row.unit_label }} · {{ row.topic_title }}</span>
+          <strong>{{ 'Correct' if row.is_correct else 'Still missed' }}</strong>
+          <em>Your answer: {{ row.selected_answer }} · Key: {{ row.correct_answer }}</em>
+          <a href="{{ row.practice_href }}">Open original question</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </section>
+</div>
+{% endblock %}

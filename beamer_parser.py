@@ -1130,6 +1130,38 @@ def _wrap_standalone_mcq_list(html: str) -> str:
     return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
 
 
+def _wrap_display_array_mcq_list(html: str) -> str:
+    """Turn display-math array answer choices into clickable MCQs."""
+    if "cm-mcq-interactive" in html:
+        return html
+
+    def repl(m: re.Match[str]) -> str:
+        body = m.group(1)
+        rows = [row.strip() for row in re.split(r"\\\\", body) if row.strip()]
+        choices: list[tuple[str, str]] = []
+        for row in rows:
+            row = re.sub(r"\\textbf\{([^{}]*)\}", r"\1", row).strip()
+            item = re.match(r"^\{?\s*([A-D])\.?\s*\}?\s*&\s*(.*?)\s*$", row, flags=re.S)
+            if not item:
+                return m.group(0)
+            letter = item.group(1)
+            choice = _clean_mcq_body(item.group(2))
+            if _needs_math_delimiters(choice) and not re.search(r"\\\(|\\\[", choice):
+                choice = f"\\({choice}\\)"
+            choices.append((letter, choice))
+        if len(choices) != 4 or [letter for letter, _ in choices] != list("ABCD"):
+            return m.group(0)
+        return _build_mcq_interactive(choices)
+
+    return re.sub(
+        r'<div class="stem-math-block cm-math-block">\s*\\\[\s*'
+        r"\\begin\{array\}\{[^{}]*\}(.*?)\\end\{array\}\s*\\\]\s*</div>",
+        repl,
+        html,
+        flags=re.S,
+    )
+
+
 def _wrap_question_challenge(html: str, title: str) -> str:
     """Question slides use cm-question-workspace (stem + interact) — no legacy banner."""
     if "cm-mcq-interactive" in html or "cm-grid-in-interactive" in html or "cm-question-workspace" in html:
@@ -1587,6 +1619,8 @@ def _slide_role_banner(kind: str) -> str:
 
 def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     html = html.replace("%%HFILL%%", " ")
+    if kind in {"question", "practice", "example"}:
+        html = _wrap_display_array_mcq_list(html)
     html = _wrap_answer_choices(html)
     if kind in {"question", "practice", "example"}:
         html = _wrap_standalone_mcq_list(html)

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+  <section class="np-sat-mistakes">
+    <nav class="np-atelier-rail" aria-label="SAT mistake navigation">
+      <a href="{{ url_for('practice') }}">SAT modules</a>
+      <span class="np-atelier-rail-sep">·</span>
+      <span class="np-atelier-rail-current">SAT mistake test</span>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="np-flash-list" role="status">
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <header class="np-sat-mistake-hero glass-panel np-glass">
+      <div>
+        <p class="np-sat-mistake-kicker">SAT Mistake System</p>
+        <h1>Turn missed questions into a 22-question recovery test.</h1>
+        <p>Only SAT Unit 1-4 and SAT hard-question mistakes count here. Placement and other work stay separate.</p>
+      </div>
+      <div class="np-sat-mistake-unlock">
+        <strong>{{ dashboard.active_count }}</strong>
+        <span>active SAT mistakes</span>
+        {% if dashboard.can_generate %}
+        <form method="post" action="{{ url_for('practice_sat_mistake_test_generate') }}">
+          <button type="submit" class="np-sat-mistake-primary">Generate {{ test_size }}Q · {{ time_limit_minutes }} min test</button>
+        </form>
+        {% else %}
+        <em>{{ dashboard.needed }} more needed to unlock</em>
+        {% endif %}
+      </div>
+    </header>
+
+    <section class="np-sat-mistake-ratio glass-panel np-glass" aria-label="Test ratio">
+      {% for unit in dashboard.units %}
+      <article>
+        <span>{{ unit.label }}</span>
+        <strong>{{ unit.quota }} Q</strong>
+        <p>{{ unit.pct }}% · {{ unit.title }}</p>
+        <b style="width: {{ 100 if unit.count >= dashboard.unlock_count else ((100 * unit.count / dashboard.unlock_count)|round|int) }}%;"></b>
+        <em>{{ unit.count }} active</em>
+      </article>
+      {% endfor %}
+    </section>
+
+    <section class="np-sat-mistake-units" aria-label="Mistakes by SAT unit">
+      {% for unit in dashboard.units %}
+      <article class="np-sat-mistake-unit glass-panel np-glass" id="sat-mistake-{{ unit.key|lower }}">
+        <header>
+          <div>
+            <p>{{ unit.label }}</p>
+            <h2>{{ unit.title }}</h2>
+          </div>
+          <strong>{{ unit.count }}</strong>
+        </header>
+        {% if unit.top_skills %}
+        <div class="np-sat-mistake-skills">
+          {% for skill in unit.top_skills %}
+          <span>{{ skill.title }} <b>{{ skill.count }}</b></span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if unit["items"] %}
+        <ul class="np-sat-mistake-list">
+          {% for item in unit["items"][:10] %}
+          <li>
+            <span>{{ item.source }}</span>
+            <strong>{{ item.topic_title }}</strong>
+            <em>{{ item.knowledge_title }}</em>
+            <b>{{ item.wrong_count }} miss{{ 'es' if item.wrong_count != 1 else '' }}</b>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="np-sat-mistake-empty">No active mistakes in this unit.</p>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+  </section>
+</div>
+{% endblock %}

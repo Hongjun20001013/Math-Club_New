@@ -105,7 +105,7 @@
       </footer>
     </a>
 
-    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode">
+    <article class="np-atelier-card np-atelier-card--hub np-atelier-card--mode">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
       <span class="np-atelier-card-watermark">03</span>
       <div class="np-atelier-card-head">
@@ -115,10 +115,11 @@
       <h3 class="np-atelier-title">Mistake analytics</h3>
       <span class="np-atelier-count">Tags · patterns</span>
       <p class="np-atelier-desc">Tags, notes, redo links, and weak-topic patterns after each session.</p>
-      <footer class="np-atelier-foot">
-        <span class="np-atelier-btn np-atelier-btn--primary">Review mistakes →</span>
+      <footer class="np-atelier-foot np-atelier-foot--split">
+        <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-btn np-atelier-btn--primary">Review mistakes →</a>
+        <a href="{{ url_for('practice_sat_mistakes') }}" class="np-atelier-btn np-atelier-btn--ghost">SAT mistake test</a>
       </footer>
-    </a>
+    </article>
 
     <a href="{{ url_for('practice_exams') }}" class="np-atelier-card np-atelier-card--hub np-atelier-card--mode np-atelier-card--soon">
       <span class="np-atelier-card-glow" aria-hidden="true"></span>
