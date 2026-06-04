@@ -6131,11 +6131,20 @@ def practice_analytics():
     learning_loop_snapshot = _analytics_learning_loop_snapshot(
         loop_rows, active_classifier
     )
+    unit_label_by_part = {key: label for key, label, _subtitle in unit_targets}
+    active_part_id = selected_part_id if selected_part_id in unit_label_by_part else (
+        str(selected_partition.get("id") or "") if selected_partition else "sat"
+    )
     visible_wrong_rows = rows
-    if selected_partition and not selected_partition.get("sat_children"):
+    if active_part_id in unit_label_by_part:
+        unit_label = unit_label_by_part[active_part_id]
+        visible_wrong_rows = [
+            r for r in rows
+            if str(r.get("analytics_unit_label") or "").startswith(unit_label)
+        ]
+    elif selected_partition and not selected_partition.get("sat_children"):
         visible_ids = {r.get("pr_id") for r in loop_rows}
         visible_wrong_rows = [r for r in rows if r.get("pr_id") in visible_ids]
-    active_part_id = str(selected_partition.get("id") or "") if selected_partition else ""
     for item in sat_unit_distribution:
         item["is_active"] = item["id"] == active_part_id
     return render_template(
@@ -6151,6 +6160,7 @@ def practice_analytics():
         classifier=active_classifier,
         analytics_partitions=analytics_partitions,
         selected_partition=selected_partition,
+        active_analytics_part=active_part_id,
         viz_hero_conic=viz_hero_conic,
         risk_viz_max=risk_viz_max,
         learning_loop_snapshot=learning_loop_snapshot,

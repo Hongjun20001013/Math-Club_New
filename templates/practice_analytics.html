@@ -100,7 +100,7 @@
         </div>
 
         <div class="np-mistake-unit-tabs" aria-label="Mistake units">
-            <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-mistake-unit-tab np-mistake-unit-tab--all{% if selected_partition and selected_partition.id == 'sat' %} is-active{% endif %}">
+            <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-mistake-unit-tab np-mistake-unit-tab--all{% if active_analytics_part == 'sat' %} is-active{% endif %}">
                 <span>All SAT</span>
                 <strong>{{ wrong_total }}</strong>
                 <em>all active SAT mistakes</em>
