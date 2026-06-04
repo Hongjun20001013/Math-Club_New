@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T01:08:20.950477Z",
+  "generated_at": "2026-06-04T04:34:59.230169Z",
   "total": 21,
   "available": 21,
   "materials": [
@@ -810,10 +810,11 @@
         {
           "index": 10,
           "title": "Question : Temperature Conversion",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{ll}\n    {A.} & 3.78 \\\\\n    {B.} & 35.78 \\\\\n    {C.} & 487.89 \\\\\n    {D.} & 519.89\n    \\end{array}\n    \\]</div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">3.78</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">35.78</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">487.89</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">519.89</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 12,
           "interactive": true,
+          "answer_index": 12,
+          "correct_choice": "D",
           "group": "practice",
           "section": "Slope",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -897,10 +898,11 @@
         {
           "index": 18,
           "title": "Question : Window Repair Cost",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{ll}\n    {A.} & f(x) = 60x + 100 \\\\\n    {B.} & f(x) = 60x + 220 \\\\\n    {C.} & f(x) = 80x \\\\\n    {D.} & f(x) = 80x + 220\n    \\end{array}\n    \\]</div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 100\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 220\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 80x\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 220\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 19,
           "interactive": true,
+          "answer_index": 19,
+          "correct_choice": "A",
           "group": "practice",
           "section": "Graphs of Linear Function",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -1000,10 +1002,11 @@
         {
           "index": 27,
           "title": "Question: Alternating Context – Lawn Care Service",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{ll}\n    {A.} & f(x) = 80x + 150 \\\\\n    {B.} & f(x) = 80x + 30 \\\\\n    {C.} & f(x) = 60x + 30 \\\\\n    {D.} & f(x) = 60x + 150\n    \\end{array}\n    \\]</div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 150\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 30\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 30\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 150\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 28,
           "interactive": true,
+          "answer_index": 28,
+          "correct_choice": "C",
           "group": "practice",
           "section": "Practice",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -1022,10 +1025,11 @@
         {
           "index": 29,
           "title": "Question: Alternating Context – Aquarium Fish Population",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{ll}\n    {A.} & p(w) = 1200 - 200w \\\\\n    {B.} & p(w) = -150 + 200w \\\\\n    {C.} & p(w) = 1350 - 200w \\\\\n    {D.} & p(w) = 2100 - 200w\n    \\end{array}\n    \\]</div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(p(w) = 1200 - 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(p(w) = -150 + 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(p(w) = 1350 - 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(p(w) = 2100 - 200w\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 30,
           "interactive": true,
+          "answer_index": 30,
+          "correct_choice": "C",
           "group": "practice",
           "section": "Practice",
           "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
@@ -1089,6 +1093,33 @@
       ],
       "checkpoint": [
         {
+          "slide_index": 10,
+          "title": "Question : Temperature Conversion",
+          "section": "Slope",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 12,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "3.78"
+            },
+            {
+              "letter": "B",
+              "text": "35.78"
+            },
+            {
+              "letter": "C",
+              "text": "487.89"
+            },
+            {
+              "letter": "D",
+              "text": "519.89"
+            }
+          ]
+        },
+        {
           "slide_index": 11,
           "title": "Meaning of the Constant in the Equation",
           "section": "Slope",
@@ -1139,6 +1170,33 @@
             {
               "letter": "D",
               "text": "The rate of rainfall was 0 centimeters per hour between \\(x = 2\\) and \\(x = 4\\)."
+            }
+          ]
+        },
+        {
+          "slide_index": 18,
+          "title": "Question : Window Repair Cost",
+          "section": "Graphs of Linear Function",
+          "kind": "question",
+          "correct": "A",
+          "answer_index": 19,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(f(x) = 60x + 100\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(f(x) = 60x + 220\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(f(x) = 80x\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(f(x) = 80x + 220\\)"
             }
           ]
         },
@@ -1222,9 +1280,63 @@
               "text": "5"
             }
           ]
+        },
+        {
+          "slide_index": 27,
+          "title": "Alternating Context – Lawn Care Service",
+          "section": "Practice",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 28,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(f(x) = 80x + 150\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(f(x) = 80x + 30\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(f(x) = 60x + 30\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(f(x) = 60x + 150\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 29,
+          "title": "Alternating Context – Aquarium Fish Population",
+          "section": "Practice",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 30,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(p(w) = 1200 - 200w\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(p(w) = -150 + 200w\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(p(w) = 1350 - 200w\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(p(w) = 2100 - 200w\\)"
+            }
+          ]
         }
       ],
-      "checkpoint_count": 5,
+      "checkpoint_count": 9,
       "knowledge_map": [
         {
           "title": "Linear Function",
@@ -1276,7 +1388,7 @@
               "kind": "question",
               "title": "Question : Temperature Conversion",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 11,
@@ -1331,7 +1443,7 @@
               "kind": "question",
               "title": "Question : Window Repair Cost",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 19,
@@ -1393,7 +1505,7 @@
               "kind": "question",
               "title": "Question: Alternating Context – Lawn Care Service",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 28,
@@ -1407,7 +1519,7 @@
               "kind": "question",
               "title": "Question: Alternating Context – Aquarium Fish Population",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 30,
