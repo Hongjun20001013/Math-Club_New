@@ -35,6 +35,38 @@
     </aside>
   </header>
 
+  <section class="np-launch-path glass-panel np-glass mp-animate-up" aria-label="Today class path">
+    <div class="np-launch-path-head">
+      <div>
+        <p class="np-atelier-kicker">Today’s class path</p>
+        <h2>Start here when class begins.</h2>
+      </div>
+      <span>Slides → Practice → Exam → Review</span>
+    </div>
+    <div class="np-launch-path-grid">
+      <a href="{{ url_for('practice_course_materials') }}">
+        <strong>1</strong>
+        <span>Open today’s lesson deck</span>
+        <em>Slides, PDF, projector, Desmos</em>
+      </a>
+      <a href="{{ url_for('practice_specialized') }}">
+        <strong>2</strong>
+        <span>Drill the unit bank</span>
+        <em>Unit 1–4 full banks and chapter slices</em>
+      </a>
+      <a href="{{ url_for('practice_exams') }}">
+        <strong>3</strong>
+        <span>Run exam mode</span>
+        <em>Random Test, Word Problem, full bank</em>
+      </a>
+      <a href="{{ url_for('practice_analytics', part='sat') }}">
+        <strong>4</strong>
+        <span>Review mistakes</span>
+        <em>Weak units, redo links, mistake test</em>
+      </a>
+    </div>
+  </section>
+
   <section class="np-hub-spotlight mp-animate-up" aria-label="Course materials">
     <a href="{{ url_for('practice_course_materials') }}" class="np-hub-spotlight-card">
       <span class="np-hub-spotlight-glow" aria-hidden="true"></span>

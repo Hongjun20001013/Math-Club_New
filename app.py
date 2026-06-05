@@ -18,6 +18,7 @@ import re
 import secrets
 import shutil
 import sqlite3
+import tempfile
 import time
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -2718,6 +2719,12 @@ def _attempt_user_matches(db: sqlite3.Connection, attempt_id: int, user_id: Any)
     return int(au) == int(user_id)
 
 
+def _current_user_can_view_attempt(db: sqlite3.Connection, attempt_id: int) -> bool:
+    if current_user_can_access_admin():
+        return True
+    return _attempt_user_matches(db, attempt_id, session.get("user_id"))
+
+
 def _distinct_wrong_indices_for_topic(
     db: sqlite3.Connection, user_id: Any, domain: str, topic: str
 ) -> List[int]:
@@ -3932,6 +3939,11 @@ def admin_download_live_database():
     if not os.path.isfile(DB_PATH):
         abort(404, description="Database file not found.")
     path = _backup_database_now(force=True)
+    if not path:
+        tmp = tempfile.NamedTemporaryFile(prefix="sat-live-", suffix=".db", delete=False)
+        tmp.close()
+        path = tmp.name
+        _sqlite_backup_file(DB_PATH, path)
     if not path or not os.path.isfile(path):
         abort(503, description="Could not create a database snapshot.")
     return send_file(
@@ -6740,7 +6752,7 @@ def practice_random_test_done():
             q = item["q"]
             selected = str(module_answers.get(str(idx)) or "")
             key = str(q.get("correct_answer") or "")
-            is_correct = bool(selected and selected == key)
+            is_correct = response_is_correct(q, selected) is True if selected else False
             unit_key = str(item.get("unit_key") or _word_problem_unit_key(item))
             if unit_key in unit_stats:
                 unit_stats[unit_key]["total"] += 1
@@ -6839,7 +6851,7 @@ def practice_exam_question(category_slug: str, set_id: int, step: int):
 
 @app.route("/practice/exams/word-problems/set/<int:set_id>/<int:step>")
 def practice_word_problem_question(set_id: int, step: int):
-    return redirect(url_for("practice_exam_question", category_slug="word-problems", set_id=set_id, step=step))
+    return practice_exam_question("word-problems", set_id, step)
 
 
 @app.route("/practice/exams/<category_slug>/set/<int:set_id>/submit", methods=["POST"])
@@ -6879,7 +6891,7 @@ def practice_exam_done(category_slug: str, set_id: int):
         q = item["q"]
         selected = str(answers.get(str(idx)) or "")
         key = str(q.get("correct_answer") or "")
-        is_correct = bool(selected and selected == key)
+        is_correct = response_is_correct(q, selected) is True if selected else False
         if is_correct:
             correct += 1
         review.append(
@@ -6910,7 +6922,7 @@ def practice_exam_done(category_slug: str, set_id: int):
 
 @app.route("/practice/exams/word-problems/set/<int:set_id>/done")
 def practice_word_problem_done(set_id: int):
-    return redirect(url_for("practice_exam_done", category_slug="word-problems", set_id=set_id))
+    return practice_exam_done("word-problems", set_id)
 
 
 @app.route("/practice/analytics")
@@ -7189,8 +7201,16 @@ def practice_mistake_reflect(domain: str, topic: str, q_index: int):
             WHERE pr.attempt_id = ? AND pr.question_index = ?
               AND pa.domain = ? AND pa.topic = ?
               AND pr.is_correct = 0
+              AND (? = 1 OR pa.user_id = ?)
             """,
-            (attempt_id, q_index, domain, topic),
+            (
+                attempt_id,
+                q_index,
+                domain,
+                topic,
+                1 if current_user_can_access_admin() else 0,
+                session.get("user_id"),
+            ),
         ).fetchone()
         if pr_row is None:
             flash("Could not save reflection for this attempt.")
@@ -7234,8 +7254,16 @@ def practice_mistake_reflect(domain: str, topic: str, q_index: int):
         WHERE pr.attempt_id = ? AND pr.question_index = ?
           AND pa.domain = ? AND pa.topic = ?
           AND pr.is_correct = 0
+          AND (? = 1 OR pa.user_id = ?)
         """,
-        (attempt_id, q_index, domain, topic),
+        (
+            attempt_id,
+            q_index,
+            domain,
+            topic,
+            1 if current_user_can_access_admin() else 0,
+            session.get("user_id"),
+        ),
     ).fetchone()
     if pr_row is None:
         return redirect(
@@ -8388,6 +8416,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
     ).fetchone()
     if att is None:
         return ("Session not found", 404)
+    if not _current_user_can_view_attempt(db, attempt_id):
+        return ("Session not found", 404)
 
     domain = att["domain"]
     topic = att["topic"]
@@ -8672,8 +8702,7 @@ def practice_session_summary(attempt_id: int):
 def practice_session_item(attempt_id: int, q_index: int):
     """Review a single item from a completed session (stem, choices, key, your answer)."""
     db = get_db()
-    user_id = session.get("user_id")
-    if not _attempt_user_matches(db, attempt_id, user_id):
+    if not _current_user_can_view_attempt(db, attempt_id):
         flash("Session not found.")
         return redirect(url_for("practice"))
     att = db.execute(

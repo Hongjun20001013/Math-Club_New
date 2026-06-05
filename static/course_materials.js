@@ -303,7 +303,35 @@
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
       body: JSON.stringify(payload),
-    }).catch(function () {});
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return null; }).then(function (data) {
+          if (!r.ok || !data || !data.ok) {
+            throw new Error((data && data.error) || "Live response was not saved.");
+          }
+          showClassroomResponseNotice("Saved to live classroom.", false);
+        });
+      })
+      .catch(function (err) {
+        showClassroomResponseNotice((err && err.message) || "Live response was not saved. Ask the teacher to refresh the class.", true);
+      });
+  }
+
+  function showClassroomResponseNotice(message, isError) {
+    var notice = root.querySelector("[data-cm-classroom-notice]");
+    if (!notice) {
+      notice = document.createElement("div");
+      notice.setAttribute("data-cm-classroom-notice", "true");
+      notice.className = "cm-classroom-notice";
+      root.appendChild(notice);
+    }
+    notice.textContent = message;
+    notice.classList.toggle("is-error", !!isError);
+    notice.classList.add("is-visible");
+    window.clearTimeout(notice._hideTimer);
+    notice._hideTimer = window.setTimeout(function () {
+      notice.classList.remove("is-visible");
+    }, isError ? 7000 : 2200);
   }
 
   function escapeHtml(value) {
