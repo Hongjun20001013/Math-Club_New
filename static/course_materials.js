@@ -24,6 +24,7 @@
   var classroomResponseApi = root.getAttribute("data-cm-classroom-response-api") || "";
   var classroomSummaryApi = root.getAttribute("data-cm-classroom-summary-api") || "";
   var classroomStartApi = root.getAttribute("data-cm-classroom-start-api") || "";
+  var classroomSlideApi = root.getAttribute("data-cm-classroom-slide-api") || "";
   var syncTimer = null;
   var globalVisitKey = "np-cm-last-visit";
   var resumeDismissKey = "np-cm-resume-dismiss-" + lessonSlug;
@@ -111,6 +112,9 @@
   var classroomSession = null;
   var classroomSummary = null;
   var classroomSummaryTimer = null;
+  var classroomSlidePublishTimer = null;
+  var lastPublishedClassroomSlide = null;
+  var lastFollowedClassroomSlide = null;
 
   function loadProgress() {
     try {
@@ -280,6 +284,46 @@
   function setClassroomSession(session) {
     classroomSession = session || null;
     root.classList.toggle("is-classroom-live", !!classroomSession);
+    root.classList.toggle("is-classroom-controller", !!(classroomSession && classroomSlideApi));
+    updateClassroomPaceBadge();
+    if (!classroomSession) {
+      lastFollowedClassroomSlide = null;
+      return;
+    }
+    if (classroomSlideApi) {
+      publishCurrentClassroomSlide();
+      return;
+    }
+    var remoteSlide = parseInt(classroomSession.current_slide_index, 10) || 0;
+    if (remoteSlide > 0 && !classroomSlideApi) {
+      var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
+      if (currentSlide !== remoteSlide) {
+        goToSlideNumber(remoteSlide, { fromClassroomSync: true });
+        if (lastFollowedClassroomSlide !== remoteSlide) {
+          showClassroomResponseNotice("Synced to teacher slide " + remoteSlide + ".", false);
+        }
+      }
+      lastFollowedClassroomSlide = remoteSlide;
+    }
+  }
+
+  function updateClassroomPaceBadge() {
+    var badge = root.querySelector("[data-cm-classroom-pace]");
+    if (!classroomSession) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.setAttribute("data-cm-classroom-pace", "true");
+      badge.className = "cm-classroom-pace";
+      root.appendChild(badge);
+    }
+    var slide = parseInt((slides[idx] && slides[idx].index) || classroomSession.current_slide_index || 1, 10) || 1;
+    badge.classList.toggle("is-controller", !!classroomSlideApi);
+    badge.innerHTML = classroomSlideApi
+      ? "<strong>Teacher pace on</strong><span>Students follow slide " + slide + "</span>"
+      : "<strong>Following teacher</strong><span>Locked to live class slide " + slide + "</span>";
   }
 
   function loadClassroomSession() {
@@ -294,6 +338,32 @@
         setClassroomSession(data.session || null);
       })
       .catch(function () {});
+  }
+
+  function publishCurrentClassroomSlide() {
+    if (!classroomSession || !classroomSlideApi || !slides[idx]) return;
+    var slideIndex = parseInt(slides[idx].index, 10) || 1;
+    if (lastPublishedClassroomSlide === slideIndex) return;
+    window.clearTimeout(classroomSlidePublishTimer);
+    classroomSlidePublishTimer = window.setTimeout(function () {
+      fetch(classroomSlideApi, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ slide_index: slideIndex }),
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return null; }).then(function (data) {
+            if (!r.ok || !data || !data.ok) {
+              throw new Error((data && data.error) || "Could not sync the class slide.");
+            }
+            lastPublishedClassroomSlide = slideIndex;
+          });
+        })
+        .catch(function (err) {
+          showClassroomResponseNotice((err && err.message) || "Could not sync the class slide.", true);
+        });
+    }, 220);
   }
 
   function submitClassroomResponse(payload) {
@@ -365,7 +435,10 @@
       if (startBtn) {
         startBtn.onclick = function () {
           fetch(classroomStartApi, { method: "POST", credentials: "same-origin" })
-            .then(function () { return loadClassroomSummary(); })
+            .then(function () {
+              loadClassroomSession();
+              return loadClassroomSummary();
+            })
             .catch(function () {});
         };
       }
@@ -895,17 +968,17 @@
     return null;
   }
 
-  function goToIndex(targetIdx) {
+  function goToIndex(targetIdx, options) {
     if (targetIdx >= 0 && targetIdx < slides.length) {
       idx = targetIdx;
       render();
     }
   }
 
-  function goToSlideNumber(num) {
+  function goToSlideNumber(num, options) {
     for (var i = 0; i < slides.length; i++) {
       if (slides[i].index === num) {
-        goToIndex(i);
+        goToIndex(i, options);
         return;
       }
     }
@@ -1434,6 +1507,8 @@
     bindInteractivity(slide);
     renderLiveResults(slide);
     updateCoach(slide);
+    updateClassroomPaceBadge();
+    publishCurrentClassroomSlide();
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
 
@@ -1593,7 +1668,7 @@
   updateKnowledgeMap();
   loadClassroomSession();
   if (classroomActiveApi) {
-    window.setInterval(loadClassroomSession, 15000);
+    window.setInterval(loadClassroomSession, 3000);
   }
   if (classroomSummaryApi) {
     loadClassroomSummary();

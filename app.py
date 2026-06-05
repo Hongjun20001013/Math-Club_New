@@ -731,6 +731,8 @@ def init_db():
             title TEXT,
             created_by INTEGER,
             is_active INTEGER NOT NULL DEFAULT 1,
+            current_slide_index INTEGER NOT NULL DEFAULT 1,
+            slide_updated_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             ended_at DATETIME,
             FOREIGN KEY (created_by) REFERENCES users (id)
@@ -741,6 +743,13 @@ def init_db():
         "CREATE INDEX IF NOT EXISTS idx_course_class_sessions_lesson "
         "ON course_class_sessions(lesson_slug, is_active)"
     )
+    session_cols = _table_columns(db, "course_class_sessions")
+    if "current_slide_index" not in session_cols:
+        db.execute(
+            "ALTER TABLE course_class_sessions ADD COLUMN current_slide_index INTEGER NOT NULL DEFAULT 1"
+        )
+    if "slide_updated_at" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN slide_updated_at DATETIME")
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS course_class_roster (
@@ -1694,7 +1703,8 @@ def _cm_classroom_question_slides(material: dict[str, Any]) -> list[dict[str, An
 def _cm_active_class_session(db: sqlite3.Connection, slug: str) -> sqlite3.Row | None:
     return db.execute(
         """
-        SELECT id, lesson_slug, title, created_by, is_active, created_at, ended_at
+        SELECT id, lesson_slug, title, created_by, is_active, current_slide_index,
+               slide_updated_at, created_at, ended_at
         FROM course_class_sessions
         WHERE lesson_slug = ? AND is_active = 1
         ORDER BY id DESC
@@ -1922,7 +1932,8 @@ def practice_course_material_classroom(slug: str):
     active = _cm_active_class_session(db, slug)
     latest = active or db.execute(
         """
-        SELECT id, lesson_slug, title, created_by, is_active, created_at, ended_at
+        SELECT id, lesson_slug, title, created_by, is_active, current_slide_index,
+               slide_updated_at, created_at, ended_at
         FROM course_class_sessions
         WHERE lesson_slug = ?
         ORDER BY id DESC
@@ -1953,6 +1964,14 @@ def practice_course_material_classroom_active_api(slug: str):
     row = _cm_active_class_session(db, slug)
     if not row:
         return jsonify({"ok": True, "active": False})
+    if not current_user_can_access_admin():
+        roster = _cm_session_roster(db, int(row["id"]))
+        try:
+            uid = int(session["user_id"])
+        except (KeyError, TypeError, ValueError):
+            uid = 0
+        if uid not in roster:
+            return jsonify({"ok": True, "active": False})
     return jsonify(
         {
             "ok": True,
@@ -1962,6 +1981,8 @@ def practice_course_material_classroom_active_api(slug: str):
                 "lesson_slug": slug,
                 "title": row["title"],
                 "created_at": row["created_at"],
+                "current_slide_index": int(row["current_slide_index"] or 1),
+                "slide_updated_at": row["slide_updated_at"],
             },
         }
     )
@@ -2061,8 +2082,10 @@ def practice_course_material_classroom_start_api(slug: str):
     title = f"{material.get('section')} {material.get('title')} live class"
     cur = db.execute(
         """
-        INSERT INTO course_class_sessions (lesson_slug, title, created_by, is_active, created_at)
-        VALUES (?, ?, ?, 1, datetime('now'))
+        INSERT INTO course_class_sessions (
+            lesson_slug, title, created_by, is_active, current_slide_index, slide_updated_at, created_at
+        )
+        VALUES (?, ?, ?, 1, 1, datetime('now'), datetime('now'))
         """,
         (slug, title, int(session["user_id"])),
     )
@@ -2079,6 +2102,38 @@ def practice_course_material_classroom_start_api(slug: str):
     )
     db.commit()
     return jsonify({"ok": True, "session_id": session_id, "roster_count": len(selected_ids)})
+
+
+@app.route("/practice/materials/api/classroom/<slug>/slide", methods=["POST"])
+def practice_course_material_classroom_slide_api(slug: str):
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return jsonify({"ok": False, "error": "staff required"}), 403
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    data = request.get_json(silent=True) or {}
+    try:
+        slide_index = int(data.get("slide_index"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "slide_index required"}), 400
+    slide_count = int(material.get("slide_count") or 0)
+    if slide_index < 1 or (slide_count and slide_index > slide_count):
+        return jsonify({"ok": False, "error": "invalid slide_index"}), 400
+    db = get_db()
+    active = _cm_active_class_session(db, slug)
+    if not active:
+        return jsonify({"ok": False, "error": "no active classroom session"}), 409
+    db.execute(
+        """
+        UPDATE course_class_sessions
+        SET current_slide_index = ?, slide_updated_at = datetime('now')
+        WHERE id = ? AND lesson_slug = ? AND is_active = 1
+        """,
+        (slide_index, int(active["id"]), slug),
+    )
+    db.commit()
+    return jsonify({"ok": True, "session_id": int(active["id"]), "current_slide_index": slide_index})
 
 
 @app.route("/practice/materials/api/classroom/<slug>/end", methods=["POST"])
@@ -5866,6 +5921,9 @@ def practice_course_material_view(slug: str):
         if current_user_can_access_admin()
         else None,
         cm_classroom_start_api=url_for("practice_course_material_classroom_start_api", slug=slug)
+        if current_user_can_access_admin()
+        else None,
+        cm_classroom_slide_api=url_for("practice_course_material_classroom_slide_api", slug=slug)
         if current_user_can_access_admin()
         else None,
         cm_classroom_href=url_for("practice_course_material_classroom", slug=slug)
