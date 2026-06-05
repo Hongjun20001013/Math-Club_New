@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260531-course-materials-v39")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260605-classroom-sync-v2")
 
 
 def _site_brand_name() -> str:
@@ -857,11 +857,7 @@ def inject_template_config():
     nav_show_analytics = grants is None or "sat" in grants
     student_home_href = url_for("index") if grants is None else _student_home_url(grants)
 
-    show_np_desmos = bool(
-        DESMOS_API_KEY
-        and p.startswith("/practice")
-        and not p.startswith("/practice/analytics")
-    )
+    show_np_desmos = bool(p.startswith("/practice") and not p.startswith("/practice/analytics"))
 
     return {
         "desmos_api_key": DESMOS_API_KEY,
@@ -1971,7 +1967,18 @@ def practice_course_material_classroom_active_api(slug: str):
         except (KeyError, TypeError, ValueError):
             uid = 0
         if uid not in roster:
-            return jsonify({"ok": True, "active": False})
+            grants = current_user_access_grants()
+            if grants is not None and "sat" not in grants:
+                return jsonify({"ok": True, "active": False})
+            username = str(session.get("username") or f"student-{uid}")[:120]
+            db.execute(
+                """
+                INSERT OR IGNORE INTO course_class_roster (session_id, user_id, username, created_at)
+                VALUES (?, ?, ?, datetime('now'))
+                """,
+                (int(row["id"]), uid, username),
+            )
+            db.commit()
     return jsonify(
         {
             "ok": True,
@@ -2016,7 +2023,17 @@ def practice_course_material_classroom_response_api(slug: str):
     uid = int(session["user_id"])
     roster = _cm_session_roster(db, int(active["id"]))
     if uid not in roster:
-        return jsonify({"ok": False, "error": "student is not in this classroom roster"}), 403
+        grants = current_user_access_grants()
+        if grants is not None and "sat" not in grants:
+            return jsonify({"ok": False, "error": "student is not in this classroom roster"}), 403
+        username = str(session.get("username") or f"student-{uid}")[:120]
+        db.execute(
+            """
+            INSERT OR IGNORE INTO course_class_roster (session_id, user_id, username, created_at)
+            VALUES (?, ?, ?, datetime('now'))
+            """,
+            (int(active["id"]), uid, username),
+        )
     username = str(session.get("username") or f"student-{uid}")[:120]
     db.execute(
         """

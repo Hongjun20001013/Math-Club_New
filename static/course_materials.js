@@ -299,9 +299,6 @@
       var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
       if (currentSlide !== remoteSlide) {
         goToSlideNumber(remoteSlide, { fromClassroomSync: true });
-        if (lastFollowedClassroomSlide !== remoteSlide) {
-          showClassroomResponseNotice("Synced to teacher slide " + remoteSlide + ".", false);
-        }
       }
       lastFollowedClassroomSlide = remoteSlide;
     }
@@ -322,8 +319,8 @@
     var slide = parseInt((slides[idx] && slides[idx].index) || classroomSession.current_slide_index || 1, 10) || 1;
     badge.classList.toggle("is-controller", !!classroomSlideApi);
     badge.innerHTML = classroomSlideApi
-      ? "<strong>Teacher pace on</strong><span>Students follow slide " + slide + "</span>"
-      : "<strong>Following teacher</strong><span>Locked to live class slide " + slide + "</span>";
+      ? "<strong>Live Sync</strong><span>Slide " + slide + "</span>"
+      : "<strong>Following</strong><span>Slide " + slide + "</span>";
   }
 
   function loadClassroomSession() {
