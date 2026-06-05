@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock sat-practice-page-wrap--miss-quiz" data-calculator-allowed="{{ 'true' if q.calculator_allowed|default(true) else 'false' }}">
+<div class="exam-container practice-run sat-practice sat-practice--split-lock sat-practice--miss-quiz">
+  <div class="sat-exam-chrome">
+    <div class="exam-header sat-exam-top">
+      <div class="left-header sat-miss-quiz-brand">
+        <span class="sat-miss-quiz-dot"></span>
+        <span class="sat-miss-quiz-label">Word Problem Set {{ set_id }}</span>
+      </div>
+      <div class="exam-header-center">
+        <div class="progress-label">Applied problem item</div>
+        <div class="progress-text">
+          <span class="progress-current">{{ step + 1 }}</span>
+          <span class="progress-sep">/</span>
+          <span class="progress-total">{{ total }}</span>
+        </div>
+      </div>
+      <div class="exam-header-actions">
+        <button type="button" id="sat-theme-toggle" class="sat-theme-toggle" title="Toggle exam appearance" aria-label="Toggle dark exam mode" aria-pressed="false">
+          <span class="sat-theme-toggle-track" aria-hidden="true"><span class="sat-theme-toggle-thumb"></span></span>
+          <span class="sat-theme-toggle-label">Light</span>
+        </button>
+        <span class="sat-session-chip sat-session-chip--topic" id="sat-word-timer">{{ (time_limit_seconds // 60)|int }}:00</span>
+      </div>
+    </div>
+    <div class="progress-bar-wrap sat-progress-inner">
+      <div class="progress-bar"><div class="progress-fill" style="width: {{ ((step + 1) / total) * 100 }}%;"></div></div>
+    </div>
+    <div class="sat-session-strip">
+      <span class="sat-session-chip sat-session-chip--topic">{{ item.unit_label }} · {{ item.unit_title }}</span>
+      <span class="sat-session-chip">{{ item.topic_title }}</span>
+      <span class="sat-session-chip">{{ answered_count }} / {{ total }} answered</span>
+      {% if item.is_repeat|default(false) %}<span class="sat-session-chip">Review repeat</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="nav-bar practice-nav-row sat-subnav">
+    <div class="sat-subnav-group sat-subnav-group--primary">
+      <a href="{{ url_for('practice_word_problem_exams') }}" class="nav-btn nav-btn-secondary">← Word sets</a>
+      {% if step > 0 %}
+      <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=step - 1) }}" class="nav-btn nav-btn-secondary">← Previous</a>
+      {% endif %}
+      {% if step < total - 1 %}
+      <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=step + 1) }}" class="nav-btn nav-btn-secondary">Next →</a>
+      {% endif %}
+    </div>
+    <div class="sat-subnav-group sat-subnav-group--tools" aria-label="Question tools">
+      <button type="button" id="sat-review-flag" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--review" aria-pressed="false"><span aria-hidden="true">☆</span> Mark</button>
+      <button type="button" id="q-picker-trigger" class="nav-btn nav-btn-secondary sat-nav-tool-btn" onclick="openQuestionPicker()" aria-expanded="false" aria-controls="q-picker-panel" aria-haspopup="dialog">Jump</button>
+      {% if q.calculator_allowed|default(true) %}
+      <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" data-np-desmos-toggle>Desmos</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('practice_word_problem_submit', set_id=set_id) }}" class="practice-form sat-practice-form">
+    <input type="hidden" name="step" value="{{ step }}">
+    <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
+    <div id="question-area" class="sat-split-card">
+      <div class="sat-split">
+        <section class="sat-pane sat-pane-stem">
+          <header class="sat-pane-head">
+            <span class="sat-pane-kicker">Question</span>
+            <span class="sat-pane-badge">{{ step + 1 }} / {{ total }}</span>
+          </header>
+          <div class="sat-stem-scroll">
+            <div class="question-panel sat-stem-body">{{ q.stem|safe }}</div>
+          </div>
+        </section>
+        <div class="sat-split-gutter" aria-hidden="true"></div>
+        <aside class="sat-pane sat-pane-choices">
+          <header class="sat-pane-head sat-pane-head-choices">
+            <span class="sat-pane-kicker">Answer choices</span>
+            <span class="sat-pane-hint">Select one</span>
+          </header>
+          <div class="choices-panel choices-stack sat-choices-list">
+            {% for choice in q.choices %}
+            <div class="choice-card" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+              <span class="choice-bubble" aria-hidden="true"></span>
+              <span class="choice-letter">{{ choice_letters[loop.index0] }}</span>
+              <div class="choice-content">{{ choice|safe }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <details class="sat-scratchpad">
+            <summary>Scratch notes for this question</summary>
+            <textarea id="sat-scratch-note" class="sat-scratch-note" rows="4" placeholder="Write quick steps, formulas, or why you chose this answer."></textarea>
+          </details>
+          <div class="sat-submit-wrap">
+            <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">
+              {% if step >= total - 1 %}Submit set{% else %}Save &amp; next{% endif %}
+            </button>
+            <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">Choose an answer before continuing.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+
+<div id="q-picker-backdrop" class="q-picker-backdrop" onclick="closeQuestionPicker()" aria-hidden="true" role="presentation"></div>
+<div id="q-picker-panel" class="q-picker-panel" role="dialog" aria-modal="true" aria-labelledby="q-picker-title" aria-hidden="true">
+  <div class="q-picker-panel-inner glass-panel">
+    <div class="q-picker-head">
+      <div>
+        <h2 id="q-picker-title" class="q-picker-title">Jump to question</h2>
+        <p class="q-picker-sub"><span class="q-picker-sub-line">Tap a number to move inside this word-problem set.</span><span class="q-picker-progress"><strong>{{ answered_count }}</strong> of <strong>{{ total }}</strong> answered</span></p>
+        <div class="q-picker-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ answered_count }}"><span class="q-picker-bar-fill" style="width: {{ answered_pct }}%;"></span></div>
+      </div>
+      <button type="button" class="q-picker-close" onclick="closeQuestionPicker()" aria-label="Close">×</button>
+    </div>
+    <div class="q-picker-scroll">
+      <div class="question-nav q-picker-grid">
+        {% for i in range(total) %}
+        {% set done = i in answered_qset %}
+        <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=i) }}" class="q-nav-btn{% if i == step %} is-current{% endif %}{% if done %} is-done{% endif %}" data-q-index="{{ i }}">{{ i + 1 }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const limitSeconds = {{ time_limit_seconds|int }};
+const timerKey = "sat_word_problem_set_{{ set_id }}_deadline";
+const timerEl = document.getElementById("sat-word-timer");
+function deadlineMs() {
+  let raw = sessionStorage.getItem(timerKey);
+  if (!raw) {
+    raw = String(Date.now() + limitSeconds * 1000);
+    sessionStorage.setItem(timerKey, raw);
+  }
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? n : Date.now() + limitSeconds * 1000;
+}
+function renderTimer() {
+  const left = Math.max(0, Math.floor((deadlineMs() - Date.now()) / 1000));
+  const m = String(Math.floor(left / 60)).padStart(2, "0");
+  const s = String(left % 60).padStart(2, "0");
+  if (timerEl) timerEl.textContent = m + ":" + s;
+}
+renderTimer();
+window.setInterval(renderTimer, 1000);
+
+function openQuestionPicker() {
+  const back = document.getElementById("q-picker-backdrop");
+  const panel = document.getElementById("q-picker-panel");
+  const trig = document.getElementById("q-picker-trigger");
+  if (!back || !panel) return;
+  syncQuestionPickerMarks();
+  back.classList.add("is-open");
+  panel.classList.add("is-open");
+  back.setAttribute("aria-hidden", "false");
+  panel.setAttribute("aria-hidden", "false");
+  document.body.classList.add("q-picker-open");
+  if (trig) trig.setAttribute("aria-expanded", "true");
+}
+function closeQuestionPicker() {
+  const back = document.getElementById("q-picker-backdrop");
+  const panel = document.getElementById("q-picker-panel");
+  const trig = document.getElementById("q-picker-trigger");
+  if (!back || !panel) return;
+  back.classList.remove("is-open");
+  panel.classList.remove("is-open");
+  back.setAttribute("aria-hidden", "true");
+  panel.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("q-picker-open");
+  if (trig) trig.setAttribute("aria-expanded", "false");
+}
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeQuestionPicker(); });
+
+const storageKey = "sat_word_problem_set_{{ set_id }}_{{ step }}";
+const selectedInput = document.getElementById("selected-answer-input");
+const practiceForm = document.querySelector(".sat-practice-form");
+const answerStatus = document.getElementById("sat-answer-status");
+const submitButtons = document.querySelectorAll(".sat-submit-btn");
+function setAnswerState(hasAnswer, label) {
+  practiceForm?.classList.toggle("is-answered", hasAnswer);
+  submitButtons.forEach((btn) => {
+    btn.toggleAttribute("disabled", !hasAnswer);
+    btn.classList.toggle("is-disabled", !hasAnswer);
+  });
+  if (answerStatus) answerStatus.textContent = hasAnswer ? (label || "Answer selected.") : "Choose an answer before continuing.";
+}
+setAnswerState(false);
+document.querySelectorAll(".sat-choices-list .choice-card").forEach((card) => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".sat-choices-list .choice-card").forEach((c) => c.classList.remove("selected"));
+    card.classList.add("selected");
+    if (selectedInput) selectedInput.value = card.dataset.letter || "";
+    try { sessionStorage.setItem(storageKey + "_answer", card.dataset.letter || ""); } catch (e) {}
+    setAnswerState(true, "Selected " + (card.dataset.letter || "") + ".");
+  });
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+try {
+  const saved = sessionStorage.getItem(storageKey + "_answer");
+  if (saved) {
+    const card = document.querySelector('.sat-choices-list .choice-card[data-letter="' + saved + '"]');
+    if (card) card.click();
+  }
+} catch (e) {}
+
+const scratch = document.getElementById("sat-scratch-note");
+if (scratch) {
+  const scratchKey = storageKey + "_scratch";
+  try { scratch.value = localStorage.getItem(scratchKey) || ""; } catch (e) {}
+  scratch.addEventListener("input", () => {
+    try { localStorage.setItem(scratchKey, scratch.value); } catch (e) {}
+  });
+}
+const reviewBtn = document.getElementById("sat-review-flag");
+function reviewKeyForStep(idx) { return "sat_word_problem_set_{{ set_id }}_" + String(idx) + "_review_flag"; }
+function syncQuestionPickerMarks() {
+  document.querySelectorAll(".q-picker-grid .q-nav-btn[data-q-index]").forEach((btn) => {
+    const idx = btn.getAttribute("data-q-index");
+    let flagged = false;
+    try { flagged = localStorage.getItem(reviewKeyForStep(idx)) === "1"; } catch (e) {}
+    btn.classList.toggle("is-marked", flagged);
+  });
+}
+function setReviewFlag(flagged) {
+  if (!reviewBtn) return;
+  reviewBtn.classList.toggle("is-active", flagged);
+  reviewBtn.setAttribute("aria-pressed", flagged ? "true" : "false");
+  reviewBtn.innerHTML = flagged ? '<span aria-hidden="true">★</span> Marked' : '<span aria-hidden="true">☆</span> Mark';
+  try {
+    if (flagged) localStorage.setItem(reviewKeyForStep({{ step }}), "1");
+    else localStorage.removeItem(reviewKeyForStep({{ step }}));
+  } catch (e) {}
+  syncQuestionPickerMarks();
+}
+if (reviewBtn) {
+  let flagged = false;
+  try { flagged = localStorage.getItem(reviewKeyForStep({{ step }})) === "1"; } catch (e) {}
+  setReviewFlag(flagged);
+  reviewBtn.addEventListener("click", () => setReviewFlag(reviewBtn.getAttribute("aria-pressed") !== "true"));
+}
+window.addEventListener("pageshow", () => {
+  if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise().catch(() => {});
+});
+</script>
+{% endblock %}

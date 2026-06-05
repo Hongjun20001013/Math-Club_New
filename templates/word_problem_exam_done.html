@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-mistakes np-word-exam-review">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice_word_problem_exams') }}">Word problem sets</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Set {{ set_id }} report</span>
+  </nav>
+
+  <header class="np-sat-mistake-hero glass-panel np-glass">
+    <div>
+      <p class="np-sat-mistake-kicker">Word Problem Set {{ set_id }}</p>
+      <h1>{{ correct }} / {{ total }}</h1>
+      <p>Accuracy: {{ accuracy }}%. Review each applied problem, then move to the next set when ready.</p>
+    </div>
+    <div class="np-sat-mistake-unlock">
+      <strong>{{ accuracy }}%</strong>
+      <span>score</span>
+      {% if next_set_href %}
+      <a class="np-pw-btn np-pw-btn--primary" href="{{ next_set_href }}">Next set →</a>
+      {% else %}
+      <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_word_problem_exams') }}">All sets complete</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <section class="np-sat-mistake-review glass-panel np-glass">
+    <p class="np-sat-mistake-kicker">Question Review</p>
+    {% for row in review %}
+    <article class="np-sat-mistake-review-row{% if row.is_correct %} is-correct{% else %} is-wrong{% endif %}">
+      <div>
+        <strong>Q{{ row.index + 1 }} · {{ row.item.unit_label }} · {{ row.item.unit_title }}</strong>
+        <span>Your answer: {{ row.selected }} · Key: {{ row.key }}</span>
+      </div>
+      <a href="{{ row.href }}">Open question</a>
+    </article>
+    {% endfor %}
+  </section>
+</div>
+</div>
+{% endblock %}

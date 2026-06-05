@@ -6037,11 +6037,294 @@ def practice_hard_material(topic: str, kind: str):
 @app.route("/practice/exams")
 def practice_exams():
     session["active_track_label"] = "SAT Math"
+    ctx = _word_problem_exam_context()
+    return render_template("word_problem_exams.html", **ctx)
+
+
+WORD_PROBLEM_SET_SIZE = 22
+WORD_PROBLEM_SECONDS = 35 * 60
+WORD_PROBLEM_SESSION_KEY = "sat_word_problem_answers"
+
+
+WORD_PROBLEM_CONTEXT_WORDS = frozenset(
+    """
+    account accounts aquarium average bank biologist bus business car class club company
+    cost costs customer data day days distance dollar dollars drives earnings employees
+    experiment fee fish flowers food garden gallons group hours interest jars kelvins
+    lawn machine membership miles minutes month months population price product profit
+    rate recipe rent repair restaurant revenue sale sales school scientist service shop
+    store student students survey teacher temperature tickets time train trip week weeks
+    window workers years
+    """.split()
+)
+
+
+def _word_problem_sources() -> list[tuple[str, str]]:
+    sources = [
+        ("algebra", "unit_1_all"),
+        ("advanced_math", "unit_2_all"),
+        ("problem_solving", "unit_3_all"),
+        ("geometry", "unit_4_all"),
+    ]
+    for topic in sorted(BANKS.get("hard_problem") or {}, key=_topic_bank_sort_key):
+        sources.append(("hard_problem", topic))
+    return sources
+
+
+def _word_problem_plain_text(q: dict) -> str:
+    text = strip_html(str(q.get("stem") or ""))
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _is_word_problem_question(q: dict) -> bool:
+    if q.get("question_kind") not in ("mcq", "mcq5"):
+        return False
+    if len(q.get("choices") or []) < 4:
+        return False
+    text = _word_problem_plain_text(q).lower()
+    words = re.findall(r"[a-z]+", text)
+    if len(words) < 28:
+        return False
+    context_hits = sum(1 for w in words if w in WORD_PROBLEM_CONTEXT_WORDS)
+    if context_hits >= 2:
+        return True
+    # Long applied prompts sometimes use uncommon nouns not in the list above.
+    return len(words) >= 45 and any(w in words for w in ("which", "what", "how"))
+
+
+def _word_problem_unit_key(item: dict) -> str:
+    label = str(item.get("unit_label") or "")
+    m = re.search(r"Unit\s+([1-4])", label)
+    return f"unit{m.group(1)}" if m else "hard"
+
+
+def _word_problem_bank() -> list[dict]:
+    seen: set[str] = set()
+    items: list[dict] = []
+    for domain, topic in _word_problem_sources():
+        tex_file = BANKS.get(domain, {}).get(topic)
+        if not tex_file:
+            continue
+        questions = get_questions_for_topic(domain, topic, tex_file)
+        for q_index, q in enumerate(questions):
+            if not _is_word_problem_question(q):
+                continue
+            plain = _word_problem_plain_text(q)
+            fingerprint = re.sub(r"\s+", " ", plain).lower()[:650]
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
+            unit_label = str(q.get("sat_unit_label") or q.get("knowledge_section") or domain)
+            unit_title = str(q.get("sat_unit_title") or q.get("knowledge_section_title_en") or TOPIC_TITLES.get(topic, topic))
+            items.append(
+                {
+                    "id": f"{domain}:{topic}:{q_index}",
+                    "domain": domain,
+                    "topic": topic,
+                    "q_index": q_index,
+                    "q": q,
+                    "unit_label": unit_label,
+                    "unit_title": unit_title,
+                    "topic_title": TOPIC_TITLES.get(topic, topic),
+                    "excerpt": plain[:150],
+                }
+            )
+
+    buckets: dict[str, list[dict]] = defaultdict(list)
+    for item in items:
+        buckets[_word_problem_unit_key(item)].append(item)
+    ordered: list[dict] = []
+    bucket_order = ("unit1", "unit2", "unit3", "unit4", "hard")
+    while any(buckets.values()):
+        for key in bucket_order:
+            if buckets.get(key):
+                ordered.append(buckets[key].pop(0))
+    return ordered
+
+
+def _word_problem_sets() -> list[dict]:
+    items = _word_problem_bank()
+    sets: list[dict] = []
+    for start in range(0, len(items), WORD_PROBLEM_SET_SIZE):
+        chunk = items[start:start + WORD_PROBLEM_SET_SIZE]
+        unique_count = len(chunk)
+        repeat_count = 0
+        if chunk and len(chunk) < WORD_PROBLEM_SET_SIZE and len(items) > len(chunk):
+            needed = WORD_PROBLEM_SET_SIZE - len(chunk)
+            repeats = []
+            for base in items:
+                if base["id"] in {x["id"] for x in chunk}:
+                    continue
+                repeated = dict(base)
+                repeated["is_repeat"] = True
+                repeats.append(repeated)
+                if len(repeats) >= needed:
+                    break
+            chunk = chunk + repeats
+            repeat_count = len(repeats)
+        unit_counts: dict[str, int] = defaultdict(int)
+        for item in chunk:
+            unit_counts[item["unit_label"]] += 1
+        sets.append(
+            {
+                "id": len(sets) + 1,
+                "items": chunk,
+                "count": len(chunk),
+                "unique_count": unique_count,
+                "repeat_count": repeat_count,
+                "is_full": len(chunk) == WORD_PROBLEM_SET_SIZE,
+                "unit_counts": sorted(unit_counts.items(), key=lambda kv: kv[0]),
+            }
+        )
+    return sets
+
+
+def _word_problem_set_or_404(set_id: int) -> dict:
+    sets = _word_problem_sets()
+    if set_id < 1 or set_id > len(sets):
+        abort(404)
+    return sets[set_id - 1]
+
+
+def _word_problem_answers() -> dict[str, dict[str, str]]:
+    raw = session.get(WORD_PROBLEM_SESSION_KEY)
+    return raw if isinstance(raw, dict) else {}
+
+
+def _save_word_problem_answer(set_id: int, step: int, selected: str) -> None:
+    answers = _word_problem_answers()
+    key = str(set_id)
+    set_answers = answers.get(key)
+    if not isinstance(set_answers, dict):
+        set_answers = {}
+    set_answers[str(step)] = selected
+    answers[key] = set_answers
+    session[WORD_PROBLEM_SESSION_KEY] = answers
+    session.modified = True
+
+
+def _word_problem_answered_set(set_id: int) -> set[int]:
+    set_answers = _word_problem_answers().get(str(set_id), {})
+    if not isinstance(set_answers, dict):
+        return set()
+    out: set[int] = set()
+    for key, value in set_answers.items():
+        if value:
+            try:
+                out.add(int(key))
+            except (TypeError, ValueError):
+                pass
+    return out
+
+
+def _word_problem_exam_context() -> dict[str, Any]:
+    sets = _word_problem_sets()
+    total_questions = len(_word_problem_bank())
+    domain_counts: dict[str, int] = defaultdict(int)
+    unit_counts: dict[str, int] = defaultdict(int)
+    for s in sets:
+        for item in s["items"]:
+            domain_counts[item["domain"]] += 1
+            unit_counts[item["unit_label"]] += 1
+    return {
+        "sets": sets,
+        "total_questions": total_questions,
+        "set_size": WORD_PROBLEM_SET_SIZE,
+        "time_limit_minutes": WORD_PROBLEM_SECONDS // 60,
+        "domain_counts": sorted(domain_counts.items()),
+        "unit_counts": sorted(unit_counts.items()),
+    }
+
+
+@app.route("/practice/exams/word-problems")
+def practice_word_problem_exams():
+    session["active_track_label"] = "SAT Math"
+    return render_template("word_problem_exams.html", **_word_problem_exam_context())
+
+
+@app.route("/practice/exams/word-problems/set/<int:set_id>/<int:step>")
+def practice_word_problem_question(set_id: int, step: int):
+    session["active_track_label"] = "SAT Math"
+    word_set = _word_problem_set_or_404(set_id)
+    items = word_set["items"]
+    if not items:
+        abort(404)
+    step = max(0, min(step, len(items) - 1))
+    item = items[step]
+    q = item["q"]
+    answered_qset = _word_problem_answered_set(set_id)
+    answered_count = len(answered_qset)
     return render_template(
-        "practice_module_placeholder.html",
-        title="Real exam mode",
-        lead="Timed sections and full mock papers that mirror official pacing and layout.",
-        pill="Coming soon",
+        "word_problem_exam_question.html",
+        set_id=set_id,
+        set_count=len(_word_problem_sets()),
+        item=item,
+        q=q,
+        step=step,
+        total=len(items),
+        answered_qset=answered_qset,
+        answered_count=answered_count,
+        answered_pct=min(100, round(100 * answered_count / len(items))) if items else 0,
+        choice_letters=[chr(ord("A") + i) for i in range(len(q.get("choices") or []))],
+        time_limit_seconds=WORD_PROBLEM_SECONDS,
+    )
+
+
+@app.route("/practice/exams/word-problems/set/<int:set_id>/submit", methods=["POST"])
+def practice_word_problem_submit(set_id: int):
+    word_set = _word_problem_set_or_404(set_id)
+    total = len(word_set["items"])
+    try:
+        step = int(request.form.get("step") or 0)
+    except ValueError:
+        step = 0
+    step = max(0, min(step, max(0, total - 1)))
+    raw_answer = (request.form.get("selected_answer") or "").strip().upper()[:1]
+    if not raw_answer:
+        flash("Please select an answer before continuing.")
+        return redirect(url_for("practice_word_problem_question", set_id=set_id, step=step))
+    _save_word_problem_answer(set_id, step, raw_answer)
+    if step >= total - 1:
+        return redirect(url_for("practice_word_problem_done", set_id=set_id))
+    return redirect(url_for("practice_word_problem_question", set_id=set_id, step=step + 1))
+
+
+@app.route("/practice/exams/word-problems/set/<int:set_id>/done")
+def practice_word_problem_done(set_id: int):
+    word_set = _word_problem_set_or_404(set_id)
+    answers = _word_problem_answers().get(str(set_id), {})
+    if not isinstance(answers, dict):
+        answers = {}
+    review: list[dict] = []
+    correct = 0
+    for idx, item in enumerate(word_set["items"]):
+        q = item["q"]
+        selected = str(answers.get(str(idx)) or "")
+        key = str(q.get("correct_answer") or "")
+        is_correct = bool(selected and selected == key)
+        if is_correct:
+            correct += 1
+        review.append(
+            {
+                "index": idx,
+                "item": item,
+                "selected": selected or "—",
+                "key": key or "—",
+                "is_correct": is_correct,
+                "href": url_for("practice_word_problem_question", set_id=set_id, step=idx),
+            }
+        )
+    total = len(word_set["items"])
+    return render_template(
+        "word_problem_exam_done.html",
+        set_id=set_id,
+        word_set=word_set,
+        total=total,
+        correct=correct,
+        accuracy=round(100 * correct / total) if total else 0,
+        review=review,
+        next_set_href=url_for("practice_word_problem_question", set_id=set_id + 1, step=0)
+        if set_id < len(_word_problem_sets()) else None,
     )
 
 

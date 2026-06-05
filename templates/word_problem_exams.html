@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-word-exams">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Word problem exams</span>
+  </nav>
+
+  <header class="np-atelier-hero glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <div>
+      <p class="np-atelier-kicker">Exam Mode · Word Problems</p>
+      <h1>Word Problem Training</h1>
+      <p class="np-atelier-hero-lead">All applied, longer-context SAT Math questions are extracted from Specialized Training and Hard Problem Drill, then split into exam-style sets.</p>
+      <div class="np-atelier-hero-stats" role="list">
+        <div class="np-atelier-stat" role="listitem"><strong>{{ total_questions }}</strong><span>word problems</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ sets|length }}</strong><span>sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ set_size }}</strong><span>per full set</span></div>
+      </div>
+    </div>
+    <aside class="np-atelier-aside" aria-label="Exam pacing">
+      <span class="np-atelier-aside-label">Pacing</span>
+      <strong>{{ time_limit_minutes }} min</strong>
+      <div class="np-atelier-aside-track" aria-hidden="true"><i style="width: 100%;"></i></div>
+      <em>22-question SAT-style sections</em>
+    </aside>
+  </header>
+
+  <section class="np-word-exam-grid" aria-label="Word problem sets">
+    {% for set in sets %}
+    <article class="np-word-exam-card glass-panel np-glass">
+      <div class="np-word-exam-card-head">
+        <span class="np-atelier-kicker">Set {{ set.id }}</span>
+        <strong>{{ set.count }}</strong>
+      </div>
+      <h2>{% if set.is_full %}Full 22-question set{% else %}Final completion set{% endif %}</h2>
+      <p>
+        {% if set.repeat_count %}
+        {{ set.unique_count }} new word problems + {{ set.repeat_count }} review repeats to keep the section at 22 questions.
+        {% else %}
+        Mixed Unit 1–4 and hard applied questions in exam pacing.
+        {% endif %}
+      </p>
+      <div class="np-word-exam-tags">
+        {% for label, count in set.unit_counts %}
+        <span>{{ label }} · {{ count }}</span>
+        {% endfor %}
+      </div>
+      <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('practice_word_problem_question', set_id=set.id, step=0) }}">Start set →</a>
+    </article>
+    {% endfor %}
+  </section>
+</div>
+</div>
+{% endblock %}

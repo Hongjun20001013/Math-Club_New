@@ -31091,3 +31091,87 @@ html[data-exam-theme="dark"] .np-mistake-question-head span {
     color: rgba(226, 232, 240, 0.72);
 }
 
+.np-word-exam-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.np-word-exam-card {
+    padding: 1.2rem;
+    border-radius: 28px;
+}
+
+.np-word-exam-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.np-word-exam-card-head strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 42px;
+    border-radius: 999px;
+    background: rgba(108, 78, 255, 0.13);
+    color: #5b3df4;
+    font-weight: 950;
+}
+
+.np-word-exam-card h2 {
+    margin: 0.75rem 0 0.35rem;
+    color: #17113f;
+    letter-spacing: -0.04em;
+}
+
+.np-word-exam-card p {
+    color: rgba(39, 31, 91, 0.7);
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.np-word-exam-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.9rem 0 1rem;
+}
+
+.np-word-exam-tags span {
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(235, 229, 255, 0.8);
+    color: #3a2d7c;
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.np-word-exam-review .np-sat-mistake-review-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.np-word-exam-review .np-sat-mistake-review-row span,
+.np-word-exam-review .np-sat-mistake-review-row a {
+    display: block;
+    margin-top: 0.25rem;
+    color: rgba(39, 31, 91, 0.72);
+    font-weight: 800;
+}
+
+.np-word-exam-review .np-sat-mistake-review-row.is-correct strong {
+    color: #047857;
+}
+
+.np-word-exam-review .np-sat-mistake-review-row.is-wrong strong {
+    color: #b45309;
+}
+
