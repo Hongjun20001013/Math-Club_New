@@ -4,16 +4,16 @@
 <div class="np-page-shell">
 <div class="np-sat-mistakes np-word-exam-review">
   <nav class="np-atelier-rail" aria-label="SAT navigation">
-    <a href="{{ url_for('practice_word_problem_exams') }}">Word problem sets</a>
+    <a href="{{ url_for('practice_exam_category', category_slug=category_slug) }}">{{ category.title }} sets</a>
     <span class="np-atelier-rail-sep">·</span>
     <span class="np-atelier-rail-current">Set {{ set_id }} report</span>
   </nav>
 
   <header class="np-sat-mistake-hero glass-panel np-glass">
     <div>
-      <p class="np-sat-mistake-kicker">Word Problem Set {{ set_id }}</p>
+      <p class="np-sat-mistake-kicker">{{ category.title }} · Set {{ set_id }}</p>
       <h1>{{ correct }} / {{ total }}</h1>
-      <p>Accuracy: {{ accuracy }}%. Review each applied problem, then move to the next set when ready.</p>
+      <p>Accuracy: {{ accuracy }}%. Review each question, then move to the next set when ready.</p>
     </div>
     <div class="np-sat-mistake-unlock">
       <strong>{{ accuracy }}%</strong>
@@ -21,7 +21,7 @@
       {% if next_set_href %}
       <a class="np-pw-btn np-pw-btn--primary" href="{{ next_set_href }}">Next set →</a>
       {% else %}
-      <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_word_problem_exams') }}">All sets complete</a>
+      <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_exam_category', category_slug=category_slug) }}">All sets complete</a>
       {% endif %}
     </div>
   </header>

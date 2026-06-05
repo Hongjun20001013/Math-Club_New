@@ -6037,13 +6037,16 @@ def practice_hard_material(topic: str, kind: str):
 @app.route("/practice/exams")
 def practice_exams():
     session["active_track_label"] = "SAT Math"
-    ctx = _word_problem_exam_context()
+    ctx = _practice_exam_center_context()
     return render_template("word_problem_exams.html", **ctx)
 
 
 WORD_PROBLEM_SET_SIZE = 22
 WORD_PROBLEM_SECONDS = 35 * 60
 WORD_PROBLEM_SESSION_KEY = "sat_word_problem_answers"
+UNIT_BANK_EXAM_SESSION_KEY = "sat_unit_bank_exam_answers"
+RANDOM_TEST_SESSION_KEY = "sat_random_test_attempt"
+RANDOM_TEST_UNIT_TARGETS = (("unit1", 8), ("unit2", 8), ("unit3", 3), ("unit4", 3))
 
 
 WORD_PROBLEM_CONTEXT_WORDS = frozenset(
@@ -6098,6 +6101,40 @@ def _word_problem_unit_key(item: dict) -> str:
     return f"unit{m.group(1)}" if m else "hard"
 
 
+def _unit_bank_sources() -> list[tuple[str, str]]:
+    sources = [
+        ("algebra", "unit_1_all"),
+        ("advanced_math", "unit_2_all"),
+        ("problem_solving", "unit_3_all"),
+        ("geometry", "unit_4_all"),
+    ]
+    for topic in sorted(BANKS.get("hard_problem") or {}, key=_topic_bank_sort_key):
+        sources.append(("hard_problem", topic))
+    return sources
+
+
+def _exam_question_fingerprint(q: dict) -> str:
+    plain = _word_problem_plain_text(q)
+    return re.sub(r"\s+", " ", plain).lower()[:650]
+
+
+def _exam_question_item(domain: str, topic: str, q_index: int, q: dict) -> dict:
+    plain = _word_problem_plain_text(q)
+    unit_label = str(q.get("sat_unit_label") or q.get("knowledge_section") or domain)
+    unit_title = str(q.get("sat_unit_title") or q.get("knowledge_section_title_en") or TOPIC_TITLES.get(topic, topic))
+    return {
+        "id": f"{domain}:{topic}:{q_index}",
+        "domain": domain,
+        "topic": topic,
+        "q_index": q_index,
+        "q": q,
+        "unit_label": unit_label,
+        "unit_title": unit_title,
+        "topic_title": TOPIC_TITLES.get(topic, topic),
+        "excerpt": plain[:150],
+    }
+
+
 def _word_problem_bank() -> list[dict]:
     seen: set[str] = set()
     items: list[dict] = []
@@ -6110,25 +6147,11 @@ def _word_problem_bank() -> list[dict]:
             if not _is_word_problem_question(q):
                 continue
             plain = _word_problem_plain_text(q)
-            fingerprint = re.sub(r"\s+", " ", plain).lower()[:650]
+            fingerprint = _exam_question_fingerprint(q)
             if fingerprint in seen:
                 continue
             seen.add(fingerprint)
-            unit_label = str(q.get("sat_unit_label") or q.get("knowledge_section") or domain)
-            unit_title = str(q.get("sat_unit_title") or q.get("knowledge_section_title_en") or TOPIC_TITLES.get(topic, topic))
-            items.append(
-                {
-                    "id": f"{domain}:{topic}:{q_index}",
-                    "domain": domain,
-                    "topic": topic,
-                    "q_index": q_index,
-                    "q": q,
-                    "unit_label": unit_label,
-                    "unit_title": unit_title,
-                    "topic_title": TOPIC_TITLES.get(topic, topic),
-                    "excerpt": plain[:150],
-                }
-            )
+            items.append(_exam_question_item(domain, topic, q_index, q))
 
     buckets: dict[str, list[dict]] = defaultdict(list)
     for item in items:
@@ -6142,8 +6165,33 @@ def _word_problem_bank() -> list[dict]:
     return ordered
 
 
-def _word_problem_sets() -> list[dict]:
-    items = _word_problem_bank()
+def _unit_bank_exam_bank() -> list[dict]:
+    seen: set[str] = set()
+    items: list[dict] = []
+    for domain, topic in _unit_bank_sources():
+        tex_file = BANKS.get(domain, {}).get(topic)
+        if not tex_file:
+            continue
+        questions = get_questions_for_topic(domain, topic, tex_file)
+        for q_index, q in enumerate(questions):
+            if q.get("question_kind") not in ("mcq", "mcq5"):
+                continue
+            if len(q.get("choices") or []) < 4:
+                continue
+            fingerprint = _exam_question_fingerprint(q)
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
+            items.append(_exam_question_item(domain, topic, q_index, q))
+    return items
+
+
+def _exam_unit_sort_key(label: str) -> tuple[int, str]:
+    m = re.search(r"Unit\s+([1-4])", str(label))
+    return (int(m.group(1)) if m else 99, str(label))
+
+
+def _build_exam_sets(items: list[dict]) -> list[dict]:
     sets: list[dict] = []
     for start in range(0, len(items), WORD_PROBLEM_SET_SIZE):
         chunk = items[start:start + WORD_PROBLEM_SET_SIZE]
@@ -6173,38 +6221,308 @@ def _word_problem_sets() -> list[dict]:
                 "unique_count": unique_count,
                 "repeat_count": repeat_count,
                 "is_full": len(chunk) == WORD_PROBLEM_SET_SIZE,
-                "unit_counts": sorted(unit_counts.items(), key=lambda kv: kv[0]),
+                "unit_counts": sorted(unit_counts.items(), key=lambda kv: _exam_unit_sort_key(kv[0])),
             }
         )
     return sets
 
 
-def _word_problem_set_or_404(set_id: int) -> dict:
-    sets = _word_problem_sets()
+def _word_problem_sets() -> list[dict]:
+    return _build_exam_sets(_word_problem_bank())
+
+
+def _unit_bank_exam_sets() -> list[dict]:
+    return _build_exam_sets(_unit_bank_exam_bank())
+
+
+def _specialized_exam_bank() -> list[dict]:
+    seen: set[str] = set()
+    items: list[dict] = []
+    for domain, topic in [
+        ("algebra", "unit_1_all"),
+        ("advanced_math", "unit_2_all"),
+        ("problem_solving", "unit_3_all"),
+        ("geometry", "unit_4_all"),
+    ]:
+        tex_file = BANKS.get(domain, {}).get(topic)
+        if not tex_file:
+            continue
+        for q_index, q in enumerate(get_questions_for_topic(domain, topic, tex_file)):
+            if q.get("question_kind") not in ("mcq", "mcq5") or len(q.get("choices") or []) < 4:
+                continue
+            fingerprint = _exam_question_fingerprint(q)
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
+            items.append(_exam_question_item(domain, topic, q_index, q))
+    return items
+
+
+def _hard_problem_exam_bank() -> list[dict]:
+    seen: set[str] = set()
+    items: list[dict] = []
+    for topic in sorted(BANKS.get("hard_problem") or {}, key=_topic_bank_sort_key):
+        tex_file = BANKS.get("hard_problem", {}).get(topic)
+        if not tex_file:
+            continue
+        for q_index, q in enumerate(get_questions_for_topic("hard_problem", topic, tex_file)):
+            if q.get("question_kind") not in ("mcq", "mcq5") or len(q.get("choices") or []) < 4:
+                continue
+            fingerprint = _exam_question_fingerprint(q)
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
+            items.append(_exam_question_item("hard_problem", topic, q_index, q))
+    return items
+
+
+def _balanced_random_module_items(source_items: list[dict], seed: str, module_id: int) -> list[dict]:
+    buckets: dict[str, list[dict]] = defaultdict(list)
+    for item in source_items:
+        buckets[_word_problem_unit_key(item)].append(item)
+
+    selected: list[dict] = []
+    selected_ids: set[str] = set()
+    for unit_key, target in RANDOM_TEST_UNIT_TARGETS:
+        bucket = list(buckets.get(unit_key) or [])
+        rng = random.Random(f"{seed}:module{module_id}:{unit_key}")
+        rng.shuffle(bucket)
+        for item in bucket[:target]:
+            copy_item = dict(item)
+            copy_item["module_id"] = module_id
+            copy_item["unit_key"] = unit_key
+            selected.append(copy_item)
+            selected_ids.add(item["id"])
+
+    if len(selected) < WORD_PROBLEM_SET_SIZE:
+        leftovers = [item for item in source_items if item["id"] not in selected_ids]
+        rng = random.Random(f"{seed}:module{module_id}:fill")
+        rng.shuffle(leftovers)
+        for item in leftovers[: WORD_PROBLEM_SET_SIZE - len(selected)]:
+            copy_item = dict(item)
+            copy_item["module_id"] = module_id
+            copy_item["unit_key"] = _word_problem_unit_key(item)
+            selected.append(copy_item)
+
+    rng = random.Random(f"{seed}:module{module_id}:order")
+    rng.shuffle(selected)
+    return selected[:WORD_PROBLEM_SET_SIZE]
+
+
+def _random_test_seed() -> str:
+    attempt = session.get(RANDOM_TEST_SESSION_KEY)
+    if isinstance(attempt, dict) and attempt.get("seed"):
+        return str(attempt["seed"])
+    seed = str(random.randrange(10**9, 10**10))
+    session[RANDOM_TEST_SESSION_KEY] = {"seed": seed, "answers": {}, "deadlines": {}}
+    session.modified = True
+    return seed
+
+
+def _random_test_attempt() -> dict[str, Any]:
+    attempt = session.get(RANDOM_TEST_SESSION_KEY)
+    if not isinstance(attempt, dict) or not attempt.get("seed"):
+        seed = _random_test_seed()
+        attempt = {"seed": seed, "answers": {}, "deadlines": {}}
+    if not isinstance(attempt.get("answers"), dict):
+        attempt["answers"] = {}
+    if not isinstance(attempt.get("deadlines"), dict):
+        attempt["deadlines"] = {}
+    return attempt
+
+
+def _random_test_modules(seed: str) -> dict[int, list[dict]]:
+    return {
+        1: _balanced_random_module_items(_specialized_exam_bank(), seed, 1),
+        2: _balanced_random_module_items(_hard_problem_exam_bank(), seed, 2),
+    }
+
+
+def _random_test_score(raw_correct: int) -> int:
+    raw_correct = max(0, min(44, raw_correct))
+    return int(round((200 + (raw_correct / 44) * 600) / 10) * 10)
+
+
+def _random_test_answered_set(module_id: int) -> set[int]:
+    answers = _random_test_attempt().get("answers", {}).get(str(module_id), {})
+    if not isinstance(answers, dict):
+        return set()
+    out: set[int] = set()
+    for key, value in answers.items():
+        if value:
+            try:
+                out.add(int(key))
+            except (TypeError, ValueError):
+                pass
+    return out
+
+
+def _save_random_test_answer(module_id: int, step: int, selected: str) -> None:
+    attempt = _random_test_attempt()
+    answers = attempt.setdefault("answers", {})
+    module_answers = answers.get(str(module_id))
+    if not isinstance(module_answers, dict):
+        module_answers = {}
+    module_answers[str(step)] = selected
+    answers[str(module_id)] = module_answers
+    session[RANDOM_TEST_SESSION_KEY] = attempt
+    session.modified = True
+
+
+def _random_test_deadline_ms(module_id: int) -> int:
+    attempt = _random_test_attempt()
+    deadlines = attempt.setdefault("deadlines", {})
+    key = str(module_id)
+    raw = deadlines.get(key)
+    try:
+        deadline_ms = int(raw)
+    except (TypeError, ValueError):
+        deadline_ms = 0
+    if deadline_ms <= 0:
+        deadline_ms = int(time.time() * 1000) + WORD_PROBLEM_SECONDS * 1000
+        deadlines[key] = deadline_ms
+        session[RANDOM_TEST_SESSION_KEY] = attempt
+        session.modified = True
+    return deadline_ms
+
+
+def _random_test_continue_href() -> str:
+    attempt = _random_test_attempt()
+    seed = str(attempt["seed"])
+    modules = _random_test_modules(seed)
+    answers = attempt.get("answers", {})
+    for module_id in (1, 2):
+        module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+        if not isinstance(module_answers, dict):
+            module_answers = {}
+        for idx in range(len(modules[module_id])):
+            if not module_answers.get(str(idx)):
+                return url_for("practice_random_test_question", module_id=module_id, step=idx)
+    return url_for("practice_random_test_done")
+
+
+def _empty_exam_bank() -> list[dict]:
+    return []
+
+
+def _empty_exam_sets() -> list[dict]:
+    return []
+
+
+def _practice_exam_categories() -> list[dict[str, Any]]:
+    return [
+        {
+            "slug": "word-problems",
+            "number": "01",
+            "label": "Word Problem",
+            "title": "Word Problem",
+            "kicker": "Category · Word Problem",
+            "short_label": "Word",
+            "item_label": "Applied problem item",
+            "question_kind_label": "Mixed applied questions in exam pacing.",
+            "description": "Long-context and real-world SAT Math questions extracted from Specialized Training and Hard Problem Drill. Students complete the sets in order until every extracted applied problem has been covered.",
+            "sets_fn": _word_problem_sets,
+            "bank_fn": _word_problem_bank,
+            "session_key": WORD_PROBLEM_SESSION_KEY,
+            "is_live": True,
+        },
+        {
+            "slug": "unit-bank",
+            "number": "02",
+            "label": "Unit 1-4 Full Bank",
+            "title": "Unit 1-4 Full Bank",
+            "kicker": "Category · Full Question Bank",
+            "short_label": "Unit Bank",
+            "item_label": "SAT bank item",
+            "question_kind_label": "Mixed Unit 1-4 and hard-drill questions in exam pacing.",
+            "description": "Every multiple-choice question from Unit 1 through Unit 4 plus all Hard Problem Drill questions is grouped into 22-question SAT-style practice sections. New uploaded questions will flow into this category after the question bank is rebuilt.",
+            "sets_fn": _unit_bank_exam_sets,
+            "bank_fn": _unit_bank_exam_bank,
+            "session_key": UNIT_BANK_EXAM_SESSION_KEY,
+            "is_live": True,
+        },
+        {
+            "slug": "random-test",
+            "number": "03",
+            "label": "Random Test",
+            "title": "Random Test",
+            "kicker": "Category · Full SAT Simulation",
+            "short_label": "Random",
+            "item_label": "SAT Math module item",
+            "question_kind_label": "Two-module SAT Math simulation.",
+            "description": "A full SAT Math mock test: Module 1 pulls from Specialized Training and Module 2 pulls from Hard Problem Drill, each balanced Unit 1 35%, Unit 2 35%, Unit 3 15%, Unit 4 15%.",
+            "sets_fn": _empty_exam_sets,
+            "bank_fn": _empty_exam_bank,
+            "session_key": RANDOM_TEST_SESSION_KEY,
+            "is_live": True,
+            "status_label": "Live",
+            "is_random_test": True,
+        },
+        {
+            "slug": "practice-test",
+            "number": "04",
+            "label": "Practice Test",
+            "title": "Practice Test",
+            "kicker": "Category · Practice Test",
+            "short_label": "Practice Test",
+            "item_label": "Practice test item",
+            "question_kind_label": "Practice-test questions in exam pacing.",
+            "description": "A reserved window for official-style practice test sections. This gives us a clean slot for future uploaded practice tests.",
+            "sets_fn": _empty_exam_sets,
+            "bank_fn": _empty_exam_bank,
+            "session_key": "sat_practice_test_answers",
+            "is_live": False,
+            "status_label": "Coming soon",
+        },
+    ]
+
+
+def _practice_exam_category_or_404(category_slug: str) -> dict[str, Any]:
+    for category in _practice_exam_categories():
+        if category["slug"] == category_slug:
+            return category
+    abort(404)
+
+
+def _practice_exam_sets(category: dict[str, Any]) -> list[dict]:
+    return category["sets_fn"]()
+
+
+def _practice_exam_bank(category: dict[str, Any]) -> list[dict]:
+    return category["bank_fn"]()
+
+
+def _practice_exam_set_or_404(category_slug: str, set_id: int) -> tuple[dict[str, Any], dict]:
+    category = _practice_exam_category_or_404(category_slug)
+    sets = _practice_exam_sets(category)
     if set_id < 1 or set_id > len(sets):
         abort(404)
-    return sets[set_id - 1]
+    return category, sets[set_id - 1]
 
 
-def _word_problem_answers() -> dict[str, dict[str, str]]:
-    raw = session.get(WORD_PROBLEM_SESSION_KEY)
+def _word_problem_set_or_404(set_id: int) -> dict:
+    return _practice_exam_set_or_404("word-problems", set_id)[1]
+
+
+def _practice_exam_answers(category: dict[str, Any]) -> dict[str, dict[str, str]]:
+    raw = session.get(category["session_key"])
     return raw if isinstance(raw, dict) else {}
 
 
-def _save_word_problem_answer(set_id: int, step: int, selected: str) -> None:
-    answers = _word_problem_answers()
+def _save_practice_exam_answer(category: dict[str, Any], set_id: int, step: int, selected: str) -> None:
+    answers = _practice_exam_answers(category)
     key = str(set_id)
     set_answers = answers.get(key)
     if not isinstance(set_answers, dict):
         set_answers = {}
     set_answers[str(step)] = selected
     answers[key] = set_answers
-    session[WORD_PROBLEM_SESSION_KEY] = answers
+    session[category["session_key"]] = answers
     session.modified = True
 
 
-def _word_problem_answered_set(set_id: int) -> set[int]:
-    set_answers = _word_problem_answers().get(str(set_id), {})
+def _practice_exam_answered_set(category: dict[str, Any], set_id: int) -> set[int]:
+    set_answers = _practice_exam_answers(category).get(str(set_id), {})
     if not isinstance(set_answers, dict):
         return set()
     out: set[int] = set()
@@ -6217,23 +6535,87 @@ def _word_problem_answered_set(set_id: int) -> set[int]:
     return out
 
 
-def _word_problem_exam_context() -> dict[str, Any]:
-    sets = _word_problem_sets()
-    total_questions = len(_word_problem_bank())
+def _word_problem_answers() -> dict[str, dict[str, str]]:
+    return _practice_exam_answers(_practice_exam_category_or_404("word-problems"))
+
+
+def _save_word_problem_answer(set_id: int, step: int, selected: str) -> None:
+    _save_practice_exam_answer(_practice_exam_category_or_404("word-problems"), set_id, step, selected)
+
+
+def _word_problem_answered_set(set_id: int) -> set[int]:
+    return _practice_exam_answered_set(_practice_exam_category_or_404("word-problems"), set_id)
+
+
+def _practice_exam_category_context(category: dict[str, Any]) -> dict[str, Any]:
+    sets = _practice_exam_sets(category)
+    total_questions = 44 if category.get("is_random_test") else len(_practice_exam_bank(category))
     domain_counts: dict[str, int] = defaultdict(int)
     unit_counts: dict[str, int] = defaultdict(int)
     for s in sets:
         for item in s["items"]:
             domain_counts[item["domain"]] += 1
             unit_counts[item["unit_label"]] += 1
+    category = dict(category)
+    category.update(
+        {
+            "sets": sets,
+            "total_questions": total_questions,
+            "set_count": 2 if category.get("is_random_test") else len(sets),
+            "set_size": WORD_PROBLEM_SET_SIZE,
+            "time_limit_minutes": WORD_PROBLEM_SECONDS // 60,
+            "domain_counts": sorted(domain_counts.items()),
+            "unit_counts": sorted(unit_counts.items(), key=lambda kv: _exam_unit_sort_key(kv[0])),
+            "start_href": url_for("practice_exam_question", category_slug=category["slug"], set_id=1, step=0) if sets else "#",
+            "category_href": url_for("practice_random_test_intro") if category.get("is_random_test") else (url_for("practice_exam_category", category_slug=category["slug"]) if category.get("is_live") else "#"),
+            "status_label": category.get("status_label") or ("Live" if sets else "Empty"),
+        }
+    )
+    return category
+
+
+def _practice_exam_center_context() -> dict[str, Any]:
+    categories = [_practice_exam_category_context(category) for category in _practice_exam_categories()]
     return {
-        "sets": sets,
-        "total_questions": total_questions,
+        "categories": categories,
+        "total_sets": sum(category["set_count"] for category in categories),
+        "total_questions": sum(category["total_questions"] for category in categories),
         "set_size": WORD_PROBLEM_SET_SIZE,
         "time_limit_minutes": WORD_PROBLEM_SECONDS // 60,
-        "domain_counts": sorted(domain_counts.items()),
-        "unit_counts": sorted(unit_counts.items()),
+        "is_category_index": True,
     }
+
+
+def _word_problem_exam_context() -> dict[str, Any]:
+    category = _practice_exam_category_context(_practice_exam_category_or_404("word-problems"))
+    return {
+        "categories": [category],
+        "sets": category["sets"],
+        "total_sets": category["set_count"],
+        "total_questions": category["total_questions"],
+        "set_size": WORD_PROBLEM_SET_SIZE,
+        "time_limit_minutes": WORD_PROBLEM_SECONDS // 60,
+        "domain_counts": category["domain_counts"],
+        "unit_counts": category["unit_counts"],
+        "is_category_index": False,
+    }
+
+
+@app.route("/practice/exams/<category_slug>")
+def practice_exam_category(category_slug: str):
+    session["active_track_label"] = "SAT Math"
+    if category_slug == "random-test":
+        return redirect(url_for("practice_random_test_intro"))
+    category = _practice_exam_category_context(_practice_exam_category_or_404(category_slug))
+    return render_template(
+        "word_problem_exams.html",
+        categories=[category],
+        total_sets=category["set_count"],
+        total_questions=category["total_questions"],
+        set_size=WORD_PROBLEM_SET_SIZE,
+        time_limit_minutes=WORD_PROBLEM_SECONDS // 60,
+        is_category_index=False,
+    )
 
 
 @app.route("/practice/exams/word-problems")
@@ -6242,22 +6624,207 @@ def practice_word_problem_exams():
     return render_template("word_problem_exams.html", **_word_problem_exam_context())
 
 
-@app.route("/practice/exams/word-problems/set/<int:set_id>/<int:step>")
-def practice_word_problem_question(set_id: int, step: int):
+@app.route("/practice/exams/random-test")
+def practice_random_test_intro():
     session["active_track_label"] = "SAT Math"
-    word_set = _word_problem_set_or_404(set_id)
-    items = word_set["items"]
+    category = _practice_exam_category_context(_practice_exam_category_or_404("random-test"))
+    raw_attempt = session.get(RANDOM_TEST_SESSION_KEY)
+    has_active_attempt = isinstance(raw_attempt, dict) and bool(raw_attempt.get("seed"))
+    return render_template(
+        "random_test_intro.html",
+        category=category,
+        module_targets=RANDOM_TEST_UNIT_TARGETS,
+        module_minutes=WORD_PROBLEM_SECONDS // 60,
+        has_active_attempt=has_active_attempt,
+        continue_href=_random_test_continue_href() if has_active_attempt else None,
+    )
+
+
+@app.route("/practice/exams/random-test/start", methods=["POST"])
+def practice_random_test_start():
+    seed = str(random.randrange(10**9, 10**10))
+    session[RANDOM_TEST_SESSION_KEY] = {"seed": seed, "answers": {}, "deadlines": {}}
+    session.modified = True
+    return redirect(url_for("practice_random_test_question", module_id=1, step=0))
+
+
+@app.route("/practice/exams/random-test/module/<int:module_id>/<int:step>")
+def practice_random_test_question(module_id: int, step: int):
+    session["active_track_label"] = "SAT Math"
+    if module_id not in (1, 2):
+        abort(404)
+    attempt = _random_test_attempt()
+    modules = _random_test_modules(str(attempt["seed"]))
+    items = modules[module_id]
     if not items:
         abort(404)
     step = max(0, min(step, len(items) - 1))
     item = items[step]
     q = item["q"]
-    answered_qset = _word_problem_answered_set(set_id)
+    category = _practice_exam_category_context(_practice_exam_category_or_404("random-test"))
+    answered_qset = _random_test_answered_set(module_id)
     answered_count = len(answered_qset)
     return render_template(
         "word_problem_exam_question.html",
+        category=category,
+        category_slug="random-test",
+        set_id=module_id,
+        set_count=2,
+        item=item,
+        q=q,
+        step=step,
+        total=len(items),
+        answered_qset=answered_qset,
+        answered_count=answered_count,
+        answered_pct=min(100, round(100 * answered_count / len(items))) if items else 0,
+        choice_letters=[chr(ord("A") + i) for i in range(len(q.get("choices") or []))],
+        time_limit_seconds=WORD_PROBLEM_SECONDS,
+        deadline_ms=_random_test_deadline_ms(module_id),
+        is_random_test=True,
+        random_test_module=module_id,
+        back_href=url_for("practice_random_test_intro"),
+        back_label="SAT Math Test",
+        prev_href=url_for("practice_random_test_question", module_id=module_id, step=step - 1) if step > 0 else None,
+        next_href=url_for("practice_random_test_question", module_id=module_id, step=step + 1) if step < len(items) - 1 else None,
+        form_action=url_for("practice_random_test_submit", module_id=module_id),
+        submit_final_label="Finish Module 1" if module_id == 1 else "Submit test",
+        submit_next_label="Save & next",
+    )
+
+
+@app.route("/practice/exams/random-test/module/<int:module_id>/submit", methods=["POST"])
+def practice_random_test_submit(module_id: int):
+    if module_id not in (1, 2):
+        abort(404)
+    attempt = _random_test_attempt()
+    modules = _random_test_modules(str(attempt["seed"]))
+    total = len(modules[module_id])
+    try:
+        step = int(request.form.get("step") or 0)
+    except ValueError:
+        step = 0
+    step = max(0, min(step, max(0, total - 1)))
+    raw_answer = (request.form.get("selected_answer") or "").strip().upper()[:1]
+    if not raw_answer:
+        flash("Please select an answer before continuing.")
+        return redirect(url_for("practice_random_test_question", module_id=module_id, step=step))
+    _save_random_test_answer(module_id, step, raw_answer)
+    if step >= total - 1:
+        if module_id == 1:
+            return redirect(url_for("practice_random_test_question", module_id=2, step=0))
+        return redirect(url_for("practice_random_test_done"))
+    return redirect(url_for("practice_random_test_question", module_id=module_id, step=step + 1))
+
+
+@app.route("/practice/exams/random-test/done")
+def practice_random_test_done():
+    attempt = _random_test_attempt()
+    modules = _random_test_modules(str(attempt["seed"]))
+    answers = attempt.get("answers", {})
+    review: list[dict[str, Any]] = []
+    module_results: list[dict[str, Any]] = []
+    unit_stats: dict[str, dict[str, Any]] = {
+        "unit1": {"key": "unit1", "label": "Unit 1", "title": "Algebra", "correct": 0, "total": 0},
+        "unit2": {"key": "unit2", "label": "Unit 2", "title": "Advanced Math", "correct": 0, "total": 0},
+        "unit3": {"key": "unit3", "label": "Unit 3", "title": "Problem Solving & Data", "correct": 0, "total": 0},
+        "unit4": {"key": "unit4", "label": "Unit 4", "title": "Geometry", "correct": 0, "total": 0},
+    }
+    total_correct = 0
+    total_questions = 0
+    for module_id in (1, 2):
+        module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+        if not isinstance(module_answers, dict):
+            module_answers = {}
+        module_correct = 0
+        for idx, item in enumerate(modules[module_id]):
+            q = item["q"]
+            selected = str(module_answers.get(str(idx)) or "")
+            key = str(q.get("correct_answer") or "")
+            is_correct = bool(selected and selected == key)
+            unit_key = str(item.get("unit_key") or _word_problem_unit_key(item))
+            if unit_key in unit_stats:
+                unit_stats[unit_key]["total"] += 1
+                if is_correct:
+                    unit_stats[unit_key]["correct"] += 1
+            if is_correct:
+                module_correct += 1
+                total_correct += 1
+            total_questions += 1
+            review.append(
+                {
+                    "module_id": module_id,
+                    "index": idx,
+                    "item": item,
+                    "selected": selected or "—",
+                    "key": key or "—",
+                    "is_correct": is_correct,
+                    "href": url_for("practice_random_test_question", module_id=module_id, step=idx),
+                }
+            )
+        module_results.append(
+            {
+                "module_id": module_id,
+                "source": "Specialized Training" if module_id == 1 else "Hard Problem Drill",
+                "correct": module_correct,
+                "total": len(modules[module_id]),
+                "accuracy": round(100 * module_correct / len(modules[module_id])) if modules[module_id] else 0,
+                "wrong": len(modules[module_id]) - module_correct,
+            }
+        )
+    unit_results: list[dict[str, Any]] = []
+    for stat in unit_stats.values():
+        total = int(stat["total"] or 0)
+        correct = int(stat["correct"] or 0)
+        stat["wrong"] = total - correct
+        stat["accuracy"] = round(100 * correct / total) if total else 0
+        unit_results.append(stat)
+    weakest_unit = min(
+        (unit for unit in unit_results if unit["total"]),
+        key=lambda unit: (unit["accuracy"], -unit["wrong"]),
+        default=None,
+    )
+    score = _random_test_score(total_correct)
+    raw_accuracy = round(100 * total_correct / total_questions) if total_questions else 0
+    score_pct = round(100 * (score - 200) / 600) if score >= 200 else 0
+    module_gap = abs(int(module_results[0]["correct"]) - int(module_results[1]["correct"])) if len(module_results) == 2 else 0
+    score_band = "Advanced" if score >= 700 else ("On Track" if score >= 600 else ("Building" if score >= 500 else "Needs Focus"))
+    return render_template(
+        "random_test_done.html",
+        score=score,
+        score_pct=max(0, min(100, score_pct)),
+        score_band=score_band,
+        total_correct=total_correct,
+        total_questions=total_questions,
+        raw_accuracy=raw_accuracy,
+        module_results=module_results,
+        module_gap=module_gap,
+        unit_results=unit_results,
+        weakest_unit=weakest_unit,
+        target_600=max(0, 600 - score),
+        target_700=max(0, 700 - score),
+        review=review,
+    )
+
+
+@app.route("/practice/exams/<category_slug>/set/<int:set_id>/<int:step>")
+def practice_exam_question(category_slug: str, set_id: int, step: int):
+    session["active_track_label"] = "SAT Math"
+    category, exam_set = _practice_exam_set_or_404(category_slug, set_id)
+    category = _practice_exam_category_context(category)
+    items = exam_set["items"]
+    if not items:
+        abort(404)
+    step = max(0, min(step, len(items) - 1))
+    item = items[step]
+    q = item["q"]
+    answered_qset = _practice_exam_answered_set(category, set_id)
+    answered_count = len(answered_qset)
+    return render_template(
+        "word_problem_exam_question.html",
+        category=category,
+        category_slug=category_slug,
         set_id=set_id,
-        set_count=len(_word_problem_sets()),
+        set_count=category["set_count"],
         item=item,
         q=q,
         step=step,
@@ -6270,10 +6837,15 @@ def practice_word_problem_question(set_id: int, step: int):
     )
 
 
-@app.route("/practice/exams/word-problems/set/<int:set_id>/submit", methods=["POST"])
-def practice_word_problem_submit(set_id: int):
-    word_set = _word_problem_set_or_404(set_id)
-    total = len(word_set["items"])
+@app.route("/practice/exams/word-problems/set/<int:set_id>/<int:step>")
+def practice_word_problem_question(set_id: int, step: int):
+    return redirect(url_for("practice_exam_question", category_slug="word-problems", set_id=set_id, step=step))
+
+
+@app.route("/practice/exams/<category_slug>/set/<int:set_id>/submit", methods=["POST"])
+def practice_exam_submit(category_slug: str, set_id: int):
+    category, exam_set = _practice_exam_set_or_404(category_slug, set_id)
+    total = len(exam_set["items"])
     try:
         step = int(request.form.get("step") or 0)
     except ValueError:
@@ -6282,22 +6854,28 @@ def practice_word_problem_submit(set_id: int):
     raw_answer = (request.form.get("selected_answer") or "").strip().upper()[:1]
     if not raw_answer:
         flash("Please select an answer before continuing.")
-        return redirect(url_for("practice_word_problem_question", set_id=set_id, step=step))
-    _save_word_problem_answer(set_id, step, raw_answer)
+        return redirect(url_for("practice_exam_question", category_slug=category_slug, set_id=set_id, step=step))
+    _save_practice_exam_answer(category, set_id, step, raw_answer)
     if step >= total - 1:
-        return redirect(url_for("practice_word_problem_done", set_id=set_id))
-    return redirect(url_for("practice_word_problem_question", set_id=set_id, step=step + 1))
+        return redirect(url_for("practice_exam_done", category_slug=category_slug, set_id=set_id))
+    return redirect(url_for("practice_exam_question", category_slug=category_slug, set_id=set_id, step=step + 1))
 
 
-@app.route("/practice/exams/word-problems/set/<int:set_id>/done")
-def practice_word_problem_done(set_id: int):
-    word_set = _word_problem_set_or_404(set_id)
-    answers = _word_problem_answers().get(str(set_id), {})
+@app.route("/practice/exams/word-problems/set/<int:set_id>/submit", methods=["POST"])
+def practice_word_problem_submit(set_id: int):
+    return practice_exam_submit("word-problems", set_id)
+
+
+@app.route("/practice/exams/<category_slug>/set/<int:set_id>/done")
+def practice_exam_done(category_slug: str, set_id: int):
+    category, exam_set = _practice_exam_set_or_404(category_slug, set_id)
+    category = _practice_exam_category_context(category)
+    answers = _practice_exam_answers(category).get(str(set_id), {})
     if not isinstance(answers, dict):
         answers = {}
     review: list[dict] = []
     correct = 0
-    for idx, item in enumerate(word_set["items"]):
+    for idx, item in enumerate(exam_set["items"]):
         q = item["q"]
         selected = str(answers.get(str(idx)) or "")
         key = str(q.get("correct_answer") or "")
@@ -6311,21 +6889,28 @@ def practice_word_problem_done(set_id: int):
                 "selected": selected or "—",
                 "key": key or "—",
                 "is_correct": is_correct,
-                "href": url_for("practice_word_problem_question", set_id=set_id, step=idx),
+                "href": url_for("practice_exam_question", category_slug=category_slug, set_id=set_id, step=idx),
             }
         )
-    total = len(word_set["items"])
+    total = len(exam_set["items"])
     return render_template(
         "word_problem_exam_done.html",
+        category=category,
+        category_slug=category_slug,
         set_id=set_id,
-        word_set=word_set,
+        word_set=exam_set,
         total=total,
         correct=correct,
         accuracy=round(100 * correct / total) if total else 0,
         review=review,
-        next_set_href=url_for("practice_word_problem_question", set_id=set_id + 1, step=0)
-        if set_id < len(_word_problem_sets()) else None,
+        next_set_href=url_for("practice_exam_question", category_slug=category_slug, set_id=set_id + 1, step=0)
+        if set_id < category["set_count"] else None,
     )
+
+
+@app.route("/practice/exams/word-problems/set/<int:set_id>/done")
+def practice_word_problem_done(set_id: int):
+    return redirect(url_for("practice_exam_done", category_slug="word-problems", set_id=set_id))
 
 
 @app.route("/practice/analytics")

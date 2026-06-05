@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-random-report-shell">
+  <nav class="np-random-report-nav" aria-label="SAT navigation">
+    <a href="{{ url_for('practice_random_test_intro') }}">Random Test</a>
+    <span>Score report</span>
+  </nav>
+
+  <header class="np-random-report-hero">
+    <div class="np-random-report-copy">
+      <p class="np-report-kicker">SAT Math Random Test</p>
+      <h1>{{ score }}</h1>
+      <p>{{ total_correct }} / {{ total_questions }} correct · {{ raw_accuracy }}% raw accuracy · {{ score_band }}</p>
+      {% if weakest_unit %}
+      <span class="np-report-insight">Primary focus: {{ weakest_unit.label }} · {{ weakest_unit.title }} at {{ weakest_unit.accuracy }}%</span>
+      {% endif %}
+    </div>
+    <aside class="np-score-orb" style="--score-pct: {{ score_pct }}%;">
+      <div class="np-score-orb-ring">
+        <strong>{{ score }}</strong>
+        <span>out of 800</span>
+      </div>
+      <form method="post" action="{{ url_for('practice_random_test_start') }}">
+        <button type="submit" class="np-report-primary-btn">New random test →</button>
+      </form>
+    </aside>
+  </header>
+
+  <section class="np-report-metric-grid" aria-label="Score metrics">
+    <article>
+      <span>Raw Score</span>
+      <strong>{{ total_correct }}/{{ total_questions }}</strong>
+      <em>{{ raw_accuracy }}% correct</em>
+    </article>
+    <article>
+      <span>Module Gap</span>
+      <strong>{{ module_gap }}</strong>
+      <em>question difference</em>
+    </article>
+    <article>
+      <span>To 600</span>
+      <strong>{% if target_600 %}+{{ target_600 }}{% else %}Met{% endif %}</strong>
+      <em>score points</em>
+    </article>
+    <article>
+      <span>To 700</span>
+      <strong>{% if target_700 %}+{{ target_700 }}{% else %}Met{% endif %}</strong>
+      <em>score points</em>
+    </article>
+  </section>
+
+  <section class="np-report-grid">
+    <div class="np-report-panel">
+      <div class="np-report-panel-head">
+        <p class="np-report-kicker">Module Data</p>
+        <h2>Performance by module</h2>
+      </div>
+      <div class="np-module-bars">
+        {% for module in module_results %}
+        <article>
+          <div>
+            <strong>Module {{ module.module_id }}</strong>
+            <span>{{ module.source }}</span>
+          </div>
+          <em>{{ module.correct }}/{{ module.total }}</em>
+          <div class="np-report-bar"><i style="width: {{ module.accuracy }}%;"></i></div>
+          <small>{{ module.accuracy }}% accuracy · {{ module.wrong }} wrong</small>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="np-report-panel">
+      <div class="np-report-panel-head">
+        <p class="np-report-kicker">Unit Breakdown</p>
+        <h2>Where points were lost</h2>
+      </div>
+      <div class="np-unit-data-list">
+        {% for unit in unit_results %}
+        <article class="{% if weakest_unit and unit.key == weakest_unit.key %}is-weakest{% endif %}">
+          <div>
+            <strong>{{ unit.label }}</strong>
+            <span>{{ unit.title }}</span>
+          </div>
+          <em>{{ unit.correct }}/{{ unit.total }}</em>
+          <div class="np-report-bar"><i style="width: {{ unit.accuracy }}%;"></i></div>
+          <small>{{ unit.accuracy }}% · {{ unit.wrong }} missed</small>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="np-report-panel np-report-review">
+    <div class="np-report-panel-head">
+      <p class="np-report-kicker">Question Review</p>
+      <h2>Every question, sorted by module order</h2>
+    </div>
+    <div class="np-report-review-list">
+      {% for row in review %}
+      <article class="{% if row.is_correct %}is-correct{% else %}is-wrong{% endif %}">
+        <div>
+          <strong>M{{ row.module_id }} Q{{ row.index + 1 }} · {{ row.item.unit_label }} · {{ row.item.unit_title }}</strong>
+          <span>Your answer: {{ row.selected }} · Key: {{ row.key }}</span>
+        </div>
+        <a href="{{ row.href }}">Open question</a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

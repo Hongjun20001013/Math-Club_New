@@ -16,8 +16,8 @@
       <h1>Practice Exam</h1>
       <p class="np-atelier-hero-lead">A focused exam center for SAT-style section practice. Each category collects related 22-question sets so students can finish one training path systematically.</p>
       <div class="np-atelier-hero-stats" role="list">
-        <div class="np-atelier-stat" role="listitem"><strong>1</strong><span>live category</span></div>
-        <div class="np-atelier-stat" role="listitem"><strong>{{ sets|length }}</strong><span>exam sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ categories|length }}</strong><span>live categories</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ total_sets }}</strong><span>exam sets</span></div>
         <div class="np-atelier-stat" role="listitem"><strong>{{ set_size }}</strong><span>questions each</span></div>
       </div>
     </div>
@@ -29,18 +29,44 @@
     </aside>
   </header>
 
-  <section class="np-exam-category-shell glass-panel np-glass mp-animate-up" aria-label="Practice exam categories">
+  {% if is_category_index %}
+  <section class="np-exam-window-grid mp-animate-up" aria-label="Practice exam windows">
+    {% for category in categories %}
+    <article class="np-exam-window-card glass-panel np-glass{% if not category.is_live %} is-coming-soon{% endif %}">
+      <div class="np-exam-window-topline">
+        <span class="np-exam-category-badge">{{ category.number }}</span>
+        <span class="np-atelier-pill {% if category.is_live %}np-atelier-pill--live{% else %}np-atelier-pill--core{% endif %}">{{ category.status_label }}</span>
+      </div>
+      <p class="np-atelier-kicker">{{ category.kicker }}</p>
+      <h2>{{ category.title }}</h2>
+      <p>{{ category.description }}</p>
+      <div class="np-exam-window-stats" role="list">
+        <span role="listitem"><strong>{{ category.total_questions }}</strong> questions</span>
+        <span role="listitem"><strong>{{ category.set_count }}</strong> sets</span>
+        <span role="listitem"><strong>{{ category.time_limit_minutes }}</strong> min</span>
+      </div>
+      {% if category.is_live and (category.sets or category.is_random_test|default(false)) %}
+      <a class="np-atelier-btn np-atelier-btn--primary" href="{{ category.category_href }}">Open window →</a>
+      {% else %}
+      <span class="np-atelier-btn np-atelier-btn--ghost np-exam-window-disabled">Reserved window</span>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+  {% else %}
+  {% for category in categories %}
+  <section class="np-exam-category-shell glass-panel np-glass mp-animate-up" aria-label="{{ category.title }} exam category">
     <div class="np-exam-category-main">
-      <div class="np-exam-category-badge">01</div>
+      <div class="np-exam-category-badge">{{ category.number }}</div>
       <div>
-        <p class="np-atelier-kicker">Category · Word Problem</p>
-        <h2>Word Problem</h2>
-        <p>Long-context and real-world SAT Math questions extracted from Specialized Training and Hard Problem Drill. Students complete the sets in order until every extracted applied problem has been covered.</p>
+        <p class="np-atelier-kicker">{{ category.kicker }}</p>
+        <h2>{{ category.title }}</h2>
+        <p>{{ category.description }}</p>
       </div>
       <div class="np-exam-category-stats" role="list">
-        <span role="listitem"><strong>{{ total_questions }}</strong> unique questions</span>
-        <span role="listitem"><strong>{{ sets|length }}</strong> practice sets</span>
-        <span role="listitem"><strong>{{ time_limit_minutes }}</strong> minutes per set</span>
+        <span role="listitem"><strong>{{ category.total_questions }}</strong> unique questions</span>
+        <span role="listitem"><strong>{{ category.set_count }}</strong> practice sets</span>
+        <span role="listitem"><strong>{{ category.time_limit_minutes }}</strong> minutes per set</span>
       </div>
     </div>
 
@@ -50,11 +76,13 @@
           <p class="np-atelier-kicker">Set Plan</p>
           <h3>Finish these in order</h3>
         </div>
-        <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('practice_word_problem_question', set_id=1, step=0) }}">Start Set 1 →</a>
+        {% if category.sets %}
+        <a class="np-atelier-btn np-atelier-btn--primary" href="{{ category.start_href }}">Start Set 1 →</a>
+        {% endif %}
       </div>
 
-      <div class="np-word-exam-grid" aria-label="Word problem sets">
-        {% for set in sets %}
+      <div class="np-word-exam-grid" aria-label="{{ category.title }} sets">
+        {% for set in category.sets %}
         <article class="np-word-exam-card">
           <div class="np-word-exam-card-head">
             <span class="np-atelier-kicker">Set {{ set.id }}</span>
@@ -65,7 +93,7 @@
             {% if set.repeat_count %}
             {{ set.unique_count }} new + {{ set.repeat_count }} review repeats.
             {% else %}
-            Mixed applied questions in exam pacing.
+            {{ category.question_kind_label }}
             {% endif %}
           </p>
           <div class="np-word-exam-tags">
@@ -73,12 +101,19 @@
             <span>{{ label }} · {{ count }}</span>
             {% endfor %}
           </div>
-          <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('practice_word_problem_question', set_id=set.id, step=0) }}">Start set →</a>
+          <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('practice_exam_question', category_slug=category.slug, set_id=set.id, step=0) }}">Start set →</a>
+        </article>
+        {% else %}
+        <article class="np-word-exam-card">
+          <h4>No questions yet</h4>
+          <p>Rebuild the question bank after uploading new source files, then this category will populate automatically.</p>
         </article>
         {% endfor %}
       </div>
     </div>
   </section>
+  {% endfor %}
+  {% endif %}
 </div>
 </div>
 {% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="np-bluebook-shell">
+  <main class="np-bluebook-intro">
+    <h1>Practice Test</h1>
+    <section class="np-bluebook-instruction-card" aria-label="Practice test instructions">
+      <article>
+        <span class="np-bluebook-icon">T</span>
+        <div>
+          <h2>Timing</h2>
+          <p>Each Math module has {{ module_minutes }} minutes. If you leave and return, the timer continues from the original module start time.</p>
+        </div>
+      </article>
+      <article>
+        <span class="np-bluebook-icon">S</span>
+        <div>
+          <h2>Scores</h2>
+          <p>When you finish Module 2, you will receive an estimated SAT Math score out of 800 plus a full question review.</p>
+        </div>
+      </article>
+      <article>
+        <span class="np-bluebook-icon">M</span>
+        <div>
+          <h2>Module Balance</h2>
+          <p>Module 1 uses Specialized Training. Module 2 uses Hard Problem Drill. Each module follows Unit 1 8, Unit 2 8, Unit 3 3, Unit 4 3.</p>
+        </div>
+      </article>
+      <article>
+        <span class="np-bluebook-icon">L</span>
+        <div>
+          <h2>No Timer Reset</h2>
+          <p>The module deadline is saved for this session, so refreshing or leaving the page will not restore the clock to 35 minutes.</p>
+        </div>
+      </article>
+      {% if has_active_attempt %}
+      <article class="np-bluebook-active-attempt">
+        <span class="np-bluebook-icon">!</span>
+        <div>
+          <h2>Test in Progress</h2>
+          <p>Next will continue your current test and keep the original module timer.</p>
+        </div>
+      </article>
+      {% endif %}
+    </section>
+  </main>
+  <footer class="np-bluebook-bottom-bar">
+    <a href="{{ url_for('practice_exams') }}" class="np-bluebook-btn np-bluebook-btn--ghost">Back</a>
+    {% if has_active_attempt and continue_href %}
+    <a href="{{ continue_href }}" class="np-bluebook-btn np-bluebook-btn--primary">Next</a>
+    {% else %}
+    <form method="post" action="{{ url_for('practice_random_test_start') }}">
+      <button type="submit" class="np-bluebook-btn np-bluebook-btn--primary">Next</button>
+    </form>
+    {% endif %}
+  </footer>
+</div>
+{% endblock %}

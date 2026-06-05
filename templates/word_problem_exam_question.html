@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock sat-practice-page-wrap--miss-quiz" data-calculator-allowed="{{ 'true' if q.calculator_allowed|default(true) else 'false' }}">
-<div class="exam-container practice-run sat-practice sat-practice--split-lock sat-practice--miss-quiz">
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock sat-practice-page-wrap--miss-quiz{% if is_random_test|default(false) %} sat-practice-page-wrap--bluebook{% endif %}" data-calculator-allowed="{{ 'true' if q.calculator_allowed|default(true) else 'false' }}">
+<div class="exam-container practice-run sat-practice sat-practice--split-lock sat-practice--miss-quiz{% if is_random_test|default(false) %} sat-practice--bluebook{% endif %}">
   <div class="sat-exam-chrome">
     <div class="exam-header sat-exam-top">
       <div class="left-header sat-miss-quiz-brand">
         <span class="sat-miss-quiz-dot"></span>
-        <span class="sat-miss-quiz-label">Word Problem Set {{ set_id }}</span>
+        <span class="sat-miss-quiz-label">{% if is_random_test|default(false) %}SAT Math Module {{ random_test_module }}{% else %}{{ category.short_label }} Set {{ set_id }}{% endif %}</span>
       </div>
       <div class="exam-header-center">
-        <div class="progress-label">Applied problem item</div>
+        <div class="progress-label">{{ category.item_label }}</div>
         <div class="progress-text">
           <span class="progress-current">{{ step + 1 }}</span>
           <span class="progress-sep">/</span>
@@ -38,12 +38,12 @@
 
   <div class="nav-bar practice-nav-row sat-subnav">
     <div class="sat-subnav-group sat-subnav-group--primary">
-      <a href="{{ url_for('practice_word_problem_exams') }}" class="nav-btn nav-btn-secondary">← Word sets</a>
+      <a href="{{ back_href if back_href is defined else url_for('practice_exam_category', category_slug=category_slug) }}" class="nav-btn nav-btn-secondary">← {{ back_label if back_label is defined else category.short_label ~ ' sets' }}</a>
       {% if step > 0 %}
-      <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=step - 1) }}" class="nav-btn nav-btn-secondary">← Previous</a>
+      <a href="{{ prev_href if prev_href is defined and prev_href else url_for('practice_exam_question', category_slug=category_slug, set_id=set_id, step=step - 1) }}" class="nav-btn nav-btn-secondary">← Previous</a>
       {% endif %}
       {% if step < total - 1 %}
-      <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=step + 1) }}" class="nav-btn nav-btn-secondary">Next →</a>
+      <a href="{{ next_href if next_href is defined and next_href else url_for('practice_exam_question', category_slug=category_slug, set_id=set_id, step=step + 1) }}" class="nav-btn nav-btn-secondary">Next →</a>
       {% endif %}
     </div>
     <div class="sat-subnav-group sat-subnav-group--tools" aria-label="Question tools">
@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <form method="post" action="{{ url_for('practice_word_problem_submit', set_id=set_id) }}" class="practice-form sat-practice-form">
+  <form method="post" action="{{ form_action if form_action is defined else url_for('practice_exam_submit', category_slug=category_slug, set_id=set_id) }}" class="practice-form sat-practice-form">
     <input type="hidden" name="step" value="{{ step }}">
     <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
     <div id="question-area" class="sat-split-card">
@@ -90,7 +90,7 @@
           </details>
           <div class="sat-submit-wrap">
             <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">
-              {% if step >= total - 1 %}Submit set{% else %}Save &amp; next{% endif %}
+              {% if step >= total - 1 %}{{ submit_final_label if submit_final_label is defined else 'Submit set' }}{% else %}{{ submit_next_label if submit_next_label is defined else 'Save & next' }}{% endif %}
             </button>
             <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">Choose an answer before continuing.</p>
           </div>
@@ -107,7 +107,7 @@
     <div class="q-picker-head">
       <div>
         <h2 id="q-picker-title" class="q-picker-title">Jump to question</h2>
-        <p class="q-picker-sub"><span class="q-picker-sub-line">Tap a number to move inside this word-problem set.</span><span class="q-picker-progress"><strong>{{ answered_count }}</strong> of <strong>{{ total }}</strong> answered</span></p>
+        <p class="q-picker-sub"><span class="q-picker-sub-line">Tap a number to move inside this {% if is_random_test|default(false) %}module{% else %}{{ category.short_label }} set{% endif %}.</span><span class="q-picker-progress"><strong>{{ answered_count }}</strong> of <strong>{{ total }}</strong> answered</span></p>
         <div class="q-picker-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ answered_count }}"><span class="q-picker-bar-fill" style="width: {{ answered_pct }}%;"></span></div>
       </div>
       <button type="button" class="q-picker-close" onclick="closeQuestionPicker()" aria-label="Close">×</button>
@@ -116,7 +116,7 @@
       <div class="question-nav q-picker-grid">
         {% for i in range(total) %}
         {% set done = i in answered_qset %}
-        <a href="{{ url_for('practice_word_problem_question', set_id=set_id, step=i) }}" class="q-nav-btn{% if i == step %} is-current{% endif %}{% if done %} is-done{% endif %}" data-q-index="{{ i }}">{{ i + 1 }}</a>
+        <a href="{% if is_random_test|default(false) %}{{ url_for('practice_random_test_question', module_id=random_test_module, step=i) }}{% else %}{{ url_for('practice_exam_question', category_slug=category_slug, set_id=set_id, step=i) }}{% endif %}" class="q-nav-btn{% if i == step %} is-current{% endif %}{% if done %} is-done{% endif %}" data-q-index="{{ i }}">{{ i + 1 }}</a>
         {% endfor %}
       </div>
     </div>
@@ -125,9 +125,12 @@
 
 <script>
 const limitSeconds = {{ time_limit_seconds|int }};
-const timerKey = "sat_word_problem_set_{{ set_id }}_deadline";
+const examStoragePrefix = "sat_exam_{{ category_slug }}_set_{{ set_id }}";
+const timerKey = examStoragePrefix + "_deadline";
 const timerEl = document.getElementById("sat-word-timer");
+const serverDeadlineMs = {{ deadline_ms|default(0)|int }};
 function deadlineMs() {
+  if (serverDeadlineMs > 0) return serverDeadlineMs;
   let raw = sessionStorage.getItem(timerKey);
   if (!raw) {
     raw = String(Date.now() + limitSeconds * 1000);
@@ -172,7 +175,7 @@ function closeQuestionPicker() {
 }
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeQuestionPicker(); });
 
-const storageKey = "sat_word_problem_set_{{ set_id }}_{{ step }}";
+const storageKey = examStoragePrefix + "_{{ step }}";
 const selectedInput = document.getElementById("selected-answer-input");
 const practiceForm = document.querySelector(".sat-practice-form");
 const answerStatus = document.getElementById("sat-answer-status");
@@ -218,7 +221,7 @@ if (scratch) {
   });
 }
 const reviewBtn = document.getElementById("sat-review-flag");
-function reviewKeyForStep(idx) { return "sat_word_problem_set_{{ set_id }}_" + String(idx) + "_review_flag"; }
+function reviewKeyForStep(idx) { return examStoragePrefix + "_" + String(idx) + "_review_flag"; }
 function syncQuestionPickerMarks() {
   document.querySelectorAll(".q-picker-grid .q-nav-btn[data-q-index]").forEach((btn) => {
     const idx = btn.getAttribute("data-q-index");
