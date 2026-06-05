@@ -1024,11 +1024,12 @@ def _practice_domain_from_path(path: str) -> str | None:
         "challenge",
         "analytics",
         "exams",
+        "materials",
+        "mistakes",
         "submit",
         "miss-quiz",
         "mistake-redo",
         "session",
-        "challenge",
     ):
         return None
     return dom
@@ -1070,6 +1071,10 @@ def _path_allowed_for_grants(path: str, grants: set[str] | None, db: sqlite3.Con
         if dom:
             return _domain_allowed_by_grants(dom, grants)
         if p.startswith("/practice/analytics") or p.startswith("/practice/miss-quiz"):
+            return "sat" in grants
+        if p.startswith("/practice/materials"):
+            return "sat" in grants
+        if p.startswith("/practice/mistakes"):
             return "sat" in grants
         if p.startswith("/practice/challenge/materials"):
             return "sat" in grants
