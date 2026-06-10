@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260609-track-v1")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-track-v1")
 
 _DB_SCHEMA_READY = False
 
@@ -3685,90 +3685,92 @@ def _attempt_graded_count(db: sqlite3.Connection, attempt_id: int) -> int:
     return int(row["c"] or 0) if row else 0
 
 
-def _attempt_meets_tracking_threshold(db: sqlite3.Connection, attempt_id: int) -> bool:
+def _attempt_is_tracked(db: sqlite3.Connection, attempt_id: int, domain: str | None = None) -> bool:
+    if domain == "placement":
+        return True
     return _attempt_graded_count(db, attempt_id) >= MIN_TRACKED_SAT_RESPONSES
 
 
-def _find_resumable_practice_attempt(
+def _sync_attempt_mistake_progress(
+    db: sqlite3.Connection, learner_key: str, attempt_id: int
+) -> None:
+    """Backfill mistake ladder for all graded responses once a session unlocks."""
+    rows = db.execute(
+        """
+        SELECT pa.domain, pa.topic, pr.question_index, pr.is_correct
+        FROM practice_responses pr
+        JOIN practice_attempts pa ON pa.id = pr.attempt_id
+        WHERE pr.attempt_id = ? AND pr.is_correct IN (0, 1) AND pr.question_index IS NOT NULL
+        ORDER BY pr.id
+        """,
+        (attempt_id,),
+    ).fetchall()
+    for row in rows:
+        domain = str(row["domain"] or "")
+        topic = str(row["topic"] or "")
+        q_index = int(row["question_index"])
+        if int(row["is_correct"] or 0) == 1:
+            _mistake_progress_on_correct(db, learner_key, domain, topic, q_index)
+        else:
+            _mistake_progress_on_wrong(db, learner_key, domain, topic, q_index)
+
+
+def _apply_practice_mistake_progress(
     db: sqlite3.Connection,
-    user_id: int | None,
+    learner_key: str,
+    attempt_id: int,
+    domain: str,
+    topic: str,
+    q_index: int,
+    is_correct: int | None,
+    *,
+    mistake_redo: bool,
+    graded_before: int | None = None,
+) -> None:
+    if domain == "placement" or mistake_redo:
+        if is_correct == 1:
+            _mistake_progress_on_correct(db, learner_key, domain, topic, q_index)
+        elif is_correct == 0:
+            _mistake_progress_on_wrong(db, learner_key, domain, topic, q_index)
+        return
+    before = int(graded_before if graded_before is not None else _attempt_graded_count(db, attempt_id))
+    after = _attempt_graded_count(db, attempt_id)
+    was_tracked = before >= MIN_TRACKED_SAT_RESPONSES
+    is_tracked = after >= MIN_TRACKED_SAT_RESPONSES
+    if not was_tracked and is_tracked:
+        _sync_attempt_mistake_progress(db, learner_key, attempt_id)
+    elif is_tracked:
+        if is_correct == 1:
+            _mistake_progress_on_correct(db, learner_key, domain, topic, q_index)
+        elif is_correct == 0:
+            _mistake_progress_on_wrong(db, learner_key, domain, topic, q_index)
+
+
+def _resume_incomplete_attempt_id(
+    db: sqlite3.Connection,
+    user_id: Any,
     domain: str,
     topic: str,
     bank_total: int,
 ) -> int | None:
-    """Reuse the latest in-progress set instead of opening another partial session."""
-    if user_id is None or bank_total <= 0:
-        return None
-    if domain == "placement" or str(domain).startswith("exam_"):
+    """Reuse a recent in-progress bank attempt instead of spawning another row."""
+    if user_id is None or bank_total <= 0 or domain in ("placement",) or domain.startswith("exam_"):
         return None
     row = db.execute(
         """
         SELECT pa.id
         FROM practice_attempts pa
-        LEFT JOIN practice_responses pr
-          ON pr.attempt_id = pa.id AND pr.question_index IS NOT NULL
-        WHERE pa.user_id = ?
-          AND pa.domain = ?
-          AND pa.topic = ?
-          AND pa.created_at >= datetime('now', '-14 days')
+        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE pa.user_id = ? AND pa.domain = ? AND pa.topic = ?
+          AND pa.created_at >= datetime('now', '-24 hours')
         GROUP BY pa.id
-        HAVING COUNT(DISTINCT pr.question_index) > 0
-           AND COUNT(DISTINCT pr.question_index) < ?
+        HAVING COUNT(DISTINCT pr.question_index) < ?
         ORDER BY pa.id DESC
         LIMIT 1
         """,
         (user_id, domain, topic, bank_total),
     ).fetchone()
     return int(row["id"]) if row else None
-
-
-def _discard_untracked_attempts_for_topic(
-    db: sqlite3.Connection, user_id: int, domain: str, topic: str
-) -> None:
-    """Remove short, non-analytics attempts when a student explicitly starts fresh."""
-    if domain == "placement" or str(domain).startswith("exam_"):
-        return
-    rows = db.execute(
-        f"""
-        SELECT pa.id
-        FROM practice_attempts pa
-        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
-        WHERE pa.user_id = ? AND pa.domain = ? AND pa.topic = ?
-        GROUP BY pa.id
-        HAVING COUNT(CASE WHEN pr.is_correct IN (0, 1) THEN 1 END) < ?
-        """,
-        (user_id, domain, topic, MIN_TRACKED_SAT_RESPONSES),
-    ).fetchall()
-    for row in rows:
-        aid = int(row["id"])
-        db.execute("DELETE FROM practice_responses WHERE attempt_id = ?", (aid,))
-        db.execute("DELETE FROM practice_attempts WHERE id = ?", (aid,))
-
-
-def _cleanup_untracked_practice_attempts(db: sqlite3.Connection) -> None:
-    """Drop abandoned partial sets (<3 graded answers) after a short grace window."""
-    try:
-        rows = db.execute(
-            f"""
-            SELECT pa.id
-            FROM practice_attempts pa
-            JOIN practice_responses pr ON pr.attempt_id = pa.id
-            WHERE pa.domain != 'placement'
-              AND pa.domain NOT LIKE 'exam_%'
-              AND pa.created_at < datetime('now', '-1 hour')
-            GROUP BY pa.id
-            HAVING COUNT(CASE WHEN pr.is_correct IN (0, 1) THEN 1 END) < ?
-            """,
-            (MIN_TRACKED_SAT_RESPONSES,),
-        ).fetchall()
-        for row in rows:
-            aid = int(row["id"])
-            db.execute("DELETE FROM practice_responses WHERE attempt_id = ?", (aid,))
-            db.execute("DELETE FROM practice_attempts WHERE id = ?", (aid,))
-        if rows:
-            db.commit()
-    except sqlite3.Error:
-        pass
 
 
 def _tracked_attempt_sql(alias: str = "pa") -> str:
@@ -5208,9 +5210,7 @@ def _student_report_context(
     chapter_touched = sum(min(int(r["engaged"] or 0), int(r["cap"] or 0)) for r in chapter_only)
     weak_chapters = _student_weak_chapters(db, user_id)
     period_activity = _student_period_activity(db, user_id, days=period_days)
-    recent_sessions = [
-        a for a in _admin_attempt_rows(db, user_id) if a.get("is_tracked")
-    ][:6]
+    recent_sessions = _admin_attempt_rows(db, user_id)[:6]
 
     if student is None:
         row = db.execute(
@@ -5295,22 +5295,8 @@ def _full_bank_topic_for_domain(domain: str) -> str | None:
 
 
 def _mistake_progress_on_wrong(
-    db: sqlite3.Connection,
-    learner_key: str,
-    domain: str,
-    topic: str,
-    q_index: int,
-    *,
-    attempt_id: int | None = None,
-    force: bool = False,
+    db: sqlite3.Connection, learner_key: str, domain: str, topic: str, q_index: int
 ) -> None:
-    if (
-        not force
-        and domain != "placement"
-        and not str(domain).startswith("exam_")
-        and (attempt_id is None or not _attempt_meets_tracking_threshold(db, attempt_id))
-    ):
-        return
     db.execute(
         """
         INSERT INTO mistake_learning_progress
@@ -5326,30 +5312,8 @@ def _mistake_progress_on_wrong(
 
 
 def _mistake_progress_on_correct(
-    db: sqlite3.Connection,
-    learner_key: str,
-    domain: str,
-    topic: str,
-    q_index: int,
-    *,
-    attempt_id: int | None = None,
-    force: bool = False,
+    db: sqlite3.Connection, learner_key: str, domain: str, topic: str, q_index: int
 ) -> None:
-    if (
-        not force
-        and domain != "placement"
-        and not str(domain).startswith("exam_")
-        and (attempt_id is None or not _attempt_meets_tracking_threshold(db, attempt_id))
-    ):
-        row = db.execute(
-            """
-            SELECT 1 FROM mistake_learning_progress
-            WHERE learner_key = ? AND domain = ? AND topic = ? AND question_index = ?
-            """,
-            (learner_key, domain, topic, q_index),
-        ).fetchone()
-        if row is None:
-            return
     row = db.execute(
         """
         SELECT correct_after_last_wrong, status
@@ -6403,13 +6367,9 @@ def practice_sat_mistake_test_submit(test_id: int):
         (test_id, step, item["domain"], item["topic"], q_index, selected, correct_answer, is_correct),
     )
     if is_correct == 1:
-        _mistake_progress_on_correct(
-            db, _learner_key(), item["domain"], item["topic"], q_index, force=True
-        )
+        _mistake_progress_on_correct(db, _learner_key(), item["domain"], item["topic"], q_index)
     elif is_correct == 0:
-        _mistake_progress_on_wrong(
-            db, _learner_key(), item["domain"], item["topic"], q_index, force=True
-        )
+        _mistake_progress_on_wrong(db, _learner_key(), item["domain"], item["topic"], q_index)
     db.commit()
     if step >= len(items) - 1:
         return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
@@ -9320,9 +9280,9 @@ def practice_miss_quiz_submit():
     )
     lk = _learner_key()
     if is_correct == 1:
-        _mistake_progress_on_correct(db, lk, domain, topic, bank_q, force=True)
+        _mistake_progress_on_correct(db, lk, domain, topic, bank_q)
     elif is_correct == 0:
-        _mistake_progress_on_wrong(db, lk, domain, topic, bank_q, force=True)
+        _mistake_progress_on_wrong(db, lk, domain, topic, bank_q)
     db.commit()
 
     session[MQ_FEEDBACK_KEY] = {
@@ -9650,31 +9610,29 @@ def practice_question(domain, topic, qnum):
     else:
         attempt_id = session.get(sk)
         row = None
-        resumed_in_progress = False
         if attempt_id is not None:
             row = db.execute(
                 "SELECT id FROM practice_attempts WHERE id = ? AND domain = ? AND topic = ?",
                 (attempt_id, domain, topic),
             ).fetchone()
         if row is None:
-            resume_id = _find_resumable_practice_attempt(
-                db, user_id, domain, topic, len(questions)
-            )
-            if resume_id is not None:
-                attempt_id = resume_id
-                row = {"id": resume_id}
-                resumed_in_progress = True
-        if row is None:
             if domain == "placement" and not _placement_profile_from_session()[0]:
                 flash("Please complete the student information before starting the diagnostic.")
                 return redirect(url_for("placement_start"))
-            attempt_id = _insert_practice_attempt(
-                db, user_id, domain, topic, question_index
+            resumed_id = _resume_incomplete_attempt_id(
+                db, user_id, domain, topic, len(questions)
             )
-            session[sk] = attempt_id
+            if resumed_id is not None:
+                attempt_id = resumed_id
+                session[sk] = attempt_id
+                session.modified = True
+            else:
+                attempt_id = _insert_practice_attempt(
+                    db, user_id, domain, topic, question_index
+                )
+                session[sk] = attempt_id
         else:
             attempt_id = int(row["id"])
-            session[sk] = attempt_id
             _backfill_placement_student_profile(db, attempt_id, domain)
 
     answered_rows = db.execute(
@@ -9691,11 +9649,6 @@ def practice_question(domain, topic, qnum):
     )
     answered_count = len(answered_qset)
     bank_total = len(questions)
-    if resumed_in_progress and answered_count and bank_total:
-        flash(
-            f"Continuing your in-progress set — {answered_count}/{bank_total} questions answered. "
-            f"Finish at least {MIN_TRACKED_SAT_RESPONSES} for mistake tracking."
-        )
     if (
         not mistake_redo_mode
         and bank_total > 0
@@ -9754,7 +9707,7 @@ def practice_question(domain, topic, qnum):
             remaining = MIN_TRACKED_SAT_RESPONSES - graded_count
             tracked_responses_hint = (
                 f"Answer {remaining} more question{'s' if remaining != 1 else ''} "
-                f"in this set to unlock session tracking and mistake analytics for this bank."
+                f"in this set before mistakes count toward your error log."
             )
 
     return render_template(
@@ -9886,6 +9839,7 @@ def submit_practice_answer():
             user_id = session.get("user_id")
             attempt_id = _insert_practice_attempt(db, user_id, domain, topic, q_index)
 
+        graded_before = _attempt_graded_count(db, attempt_id)
         db.execute(
             "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
             (attempt_id, q_index),
@@ -9899,14 +9853,17 @@ def submit_practice_answer():
             (attempt_id, q_index, selected_answer, correct_answer, is_correct),
         )
         lk = _learner_key()
-        if is_correct == 1:
-            _mistake_progress_on_correct(
-                db, lk, domain, topic, q_index, attempt_id=attempt_id
-            )
-        elif is_correct == 0:
-            _mistake_progress_on_wrong(
-                db, lk, domain, topic, q_index, attempt_id=attempt_id
-            )
+        _apply_practice_mistake_progress(
+            db,
+            lk,
+            attempt_id,
+            domain,
+            topic,
+            q_index,
+            is_correct,
+            mistake_redo=mistake_redo,
+            graded_before=graded_before,
+        )
         if not _safe_db_commit(db):
             flash("The server was busy and could not save your answer. Please submit again.")
             return _practice_redirect(
@@ -9958,7 +9915,7 @@ def submit_practice_answer():
         )
 
     sk = _practice_session_key(domain, topic)
-    session.pop(sk, None)
+    session[sk] = attempt_id
     session.modified = True
     return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
 
@@ -10533,15 +10490,32 @@ def placement_blank_test_pdf():
 
 @app.route("/practice/<domain>/<topic>/new-session")
 def practice_new_session(domain: str, topic: str):
-    session.pop(_practice_session_key(domain, topic), None)
     db = get_db()
     user_id = session.get("user_id")
-    if user_id is not None:
-        try:
-            _discard_untracked_attempts_for_topic(db, int(user_id), domain, topic)
-            _safe_db_commit(db)
-        except sqlite3.Error:
-            pass
+    if user_id is not None and domain != "placement" and not domain.startswith("exam_"):
+        latest = db.execute(
+            """
+            SELECT
+                pa.id,
+                SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded
+            FROM practice_attempts pa
+            LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+            WHERE pa.user_id = ? AND pa.domain = ? AND pa.topic = ?
+            GROUP BY pa.id
+            ORDER BY pa.id DESC
+            LIMIT 1
+            """,
+            (user_id, domain, topic),
+        ).fetchone()
+        if latest:
+            graded = int(latest["graded"] or 0)
+            if 0 < graded < MIN_TRACKED_SAT_RESPONSES:
+                flash(
+                    f"Finish at least {MIN_TRACKED_SAT_RESPONSES} questions in your current set "
+                    f"before starting a new one — short tries don't count toward mistake tracking."
+                )
+                return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=0))
+    session.pop(_practice_session_key(domain, topic), None)
     if domain == "placement" and topic == "placement_full":
         _clear_placement_profile_session()
         return redirect(url_for("placement_start"))
@@ -10766,10 +10740,7 @@ def _recent_record_rows(db: sqlite3.Connection) -> List[dict]:
 
 
 def _cleanup_empty_practice_attempts(db: sqlite3.Connection) -> None:
-    """Drop stale attempts with zero responses (page opens, abandoned starts).
-
-    A 24h grace window keeps genuinely in-progress sessions safe.
-    """
+    """Drop abandoned starts and short untracked spam sessions."""
     try:
         db.execute(
             """
@@ -10778,10 +10749,25 @@ def _cleanup_empty_practice_attempts(db: sqlite3.Connection) -> None:
               AND created_at < datetime('now', '-24 hours')
             """
         )
+        db.execute(
+            f"""
+            DELETE FROM practice_attempts
+            WHERE id IN (
+                SELECT pa.id
+                FROM practice_attempts pa
+                LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+                WHERE pa.domain NOT IN ('placement')
+                  AND pa.domain NOT LIKE 'exam_%'
+                GROUP BY pa.id
+                HAVING COUNT(pr.id) > 0
+                  AND SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) < {MIN_TRACKED_SAT_RESPONSES}
+                  AND COALESCE(MAX(pr.submitted_at), pa.created_at) < datetime('now', '-2 hours')
+            )
+            """
+        )
         db.commit()
     except sqlite3.Error:
         pass
-    _cleanup_untracked_practice_attempts(db)
 
 
 def _int_to_roman(value: int) -> str:
@@ -11872,13 +11858,15 @@ def _admin_weekly_digest(
     return digest
 
 
-def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> List[dict]:
+def _admin_attempt_rows(
+    db: sqlite3.Connection, user_id: int | None = None, *, tracked_only: bool = False
+) -> List[dict]:
     _cleanup_empty_practice_attempts(db)
     where = ""
-    params: tuple[Any, ...] = ()
+    params: list[Any] = []
     if user_id is not None:
         where = "WHERE pa.user_id = ?"
-        params = (user_id,)
+        params = [user_id]
 
     rows = [
         dict(row)
@@ -11895,6 +11883,7 @@ def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> L
                 pa.exam_meta_json,
                 COUNT(pr.id) AS responses_total,
                 SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_total,
+                SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded_total,
                 MAX(pr.submitted_at) AS last_submitted_at
             FROM practice_attempts pa
             LEFT JOIN users u ON u.id = pa.user_id
@@ -11905,30 +11894,69 @@ def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> L
             ORDER BY COALESCE(last_submitted_at, pa.created_at) DESC
             LIMIT 300
             """,
-            params,
+            tuple(params),
         ).fetchall()
     ]
+    out: list[dict] = []
     for row in rows:
+        domain = str(row.get("domain") or "")
+        graded = int(row.get("graded_total") or 0)
+        is_tracked = domain == "placement" or graded >= MIN_TRACKED_SAT_RESPONSES
+        if tracked_only and not is_tracked and not domain.startswith("exam_"):
+            continue
         responses = int(row.get("responses_total") or 0)
         correct = int(row.get("correct_total") or 0)
-        domain = str(row.get("domain") or "")
         row["accuracy_pct"] = round(100 * correct / responses) if responses else None
-        row["is_tracked"] = (
-            domain == "placement"
-            or domain.startswith("exam_")
-            or responses >= MIN_TRACKED_SAT_RESPONSES
-        )
+        row["is_tracked"] = is_tracked
+        row["topic_title"] = TOPIC_TITLES.get(str(row.get("topic") or ""), str(row.get("topic") or ""))
         row["tracking_label"] = (
-            "Tracked"
-            if row["is_tracked"]
-            else f"Partial · need {MIN_TRACKED_SAT_RESPONSES}+ answers"
+            "Counts"
+            if is_tracked or domain.startswith("exam_")
+            else f"Preview · need {max(0, MIN_TRACKED_SAT_RESPONSES - graded)} more"
         )
         row["label"] = _exam_attempt_label(
-            str(row.get("domain") or ""),
+            domain,
             str(row.get("topic") or ""),
             row.get("exam_meta_json"),
         )
-    return rows
+        out.append(row)
+    return out
+
+
+def _admin_attempt_topic_summary(rows: list[dict]) -> list[dict[str, Any]]:
+    """Roll tracked bank sessions up by topic for a cleaner teacher view."""
+    buckets: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in rows:
+        if not row.get("is_tracked") or str(row.get("domain") or "").startswith("exam_"):
+            continue
+        key = (str(row.get("domain") or ""), str(row.get("topic") or ""))
+        bucket = buckets.get(key)
+        if bucket is None:
+            buckets[key] = {
+                "domain": key[0],
+                "topic": key[1],
+                "topic_title": row.get("topic_title") or key[1],
+                "sessions": 1,
+                "best_accuracy_pct": row.get("accuracy_pct"),
+                "latest_accuracy_pct": row.get("accuracy_pct"),
+                "latest_at": row.get("last_submitted_at") or row.get("created_at"),
+                "total_responses": int(row.get("responses_total") or 0),
+            }
+            continue
+        bucket["sessions"] += 1
+        bucket["total_responses"] += int(row.get("responses_total") or 0)
+        acc = row.get("accuracy_pct")
+        if acc is not None and (
+            bucket["best_accuracy_pct"] is None or acc > bucket["best_accuracy_pct"]
+        ):
+            bucket["best_accuracy_pct"] = acc
+        latest_at = row.get("last_submitted_at") or row.get("created_at")
+        if latest_at and str(latest_at) >= str(bucket["latest_at"] or ""):
+            bucket["latest_at"] = latest_at
+            bucket["latest_accuracy_pct"] = acc
+    summary = list(buckets.values())
+    summary.sort(key=lambda x: (x["topic_title"], x["domain"]))
+    return summary
 
 
 def _admin_attempt_detail(db: sqlite3.Connection, attempt_id: int) -> dict | None:
@@ -12116,15 +12144,14 @@ def admin_student_detail(user_id: int):
     student_dict["access_grants_set"] = _normalize_access_grants(
         student["access_grants"] or student["access_scope"]
     )
-    attempts = _admin_attempt_rows(db, user_id)
-    tracked_attempts = [a for a in attempts if a.get("is_tracked")]
-    show_all_attempts = request.args.get("show_all") == "1"
-    visible_attempts = attempts if show_all_attempts else tracked_attempts
-    partial_attempt_count = len(attempts) - len(tracked_attempts)
+    attempts_all = _admin_attempt_rows(db, user_id)
+    attempts = _admin_attempt_rows(db, user_id, tracked_only=True)
+    attempt_topic_summary = _admin_attempt_topic_summary(attempts_all)
+    preview_count = sum(1 for a in attempts_all if not a.get("is_tracked"))
     totals = {
-        "sessions": len(tracked_attempts),
-        "responses": sum(int(a["responses_total"] or 0) for a in tracked_attempts),
-        "correct": sum(int(a["correct_total"] or 0) for a in tracked_attempts),
+        "sessions": len(attempts),
+        "responses": sum(int(a["responses_total"] or 0) for a in attempts),
+        "correct": sum(int(a["correct_total"] or 0) for a in attempts),
     }
     totals["accuracy_pct"] = (
         round(100 * totals["correct"] / totals["responses"]) if totals["responses"] else None
@@ -12132,11 +12159,10 @@ def admin_student_detail(user_id: int):
     return render_template(
         "admin_student.html",
         student=student_dict,
-        attempts=visible_attempts,
-        all_attempt_count=len(attempts),
-        tracked_attempt_count=len(tracked_attempts),
-        partial_attempt_count=partial_attempt_count,
-        show_all_attempts=show_all_attempts,
+        attempts=attempts,
+        attempts_all=attempts_all,
+        attempt_topic_summary=attempt_topic_summary,
+        preview_session_count=preview_count,
         min_tracked_responses=MIN_TRACKED_SAT_RESPONSES,
         totals=totals,
         report_href=url_for("admin_student_report", user_id=user_id),
