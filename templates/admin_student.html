@@ -59,13 +59,19 @@
     </section>
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-student-sessions">
-      <header class="np-admin-section-head">
+      <header class="np-admin-section-head np-admin-section-head--split">
         <div>
           <p class="np-admin-kicker">Practice History</p>
-          <h2 id="np-admin-student-sessions">All Sessions</h2>
-          <p>Open a session to see the submitted questions, answers, and correctness.</p>
+          <h2 id="np-admin-student-sessions">Meaningful sessions</h2>
+          <p>Only sets with <strong>{{ min_tracked_responses }}+ answers</strong> count toward mistake tracking and reports. Partial tries are hidden by default.</p>
         </div>
+        {% if partial_attempt_count %}
+        <a href="{{ url_for('admin_student_detail', user_id=student.id, show_all='1' if not show_all_attempts else '0') }}" class="np-admin-btn np-admin-btn--ghost">
+          {% if show_all_attempts %}Hide partial tries{% else %}Show {{ partial_attempt_count }} partial try{{ 'ies' if partial_attempt_count != 1 else '' }}{% endif %}
+        </a>
+        {% endif %}
       </header>
+      <p class="np-admin-session-note">Showing {{ attempts | length }} of {{ all_attempt_count }} saved attempt{{ 's' if all_attempt_count != 1 else '' }} · {{ tracked_attempt_count }} tracked</p>
       <div class="np-admin-record-table" role="table" aria-label="Student practice sessions">
         <div class="np-admin-record-row np-admin-record-row--head" role="row">
           <span>Domain</span>
@@ -77,9 +83,9 @@
           <span>Detail</span>
         </div>
         {% for attempt in attempts %}
-        <div class="np-admin-record-row" role="row">
+        <div class="np-admin-record-row{% if not attempt.is_tracked %} np-admin-record-row--partial{% endif %}" role="row">
           <span>{{ attempt.label|default(attempt.domain) }}</span>
-          <span>{{ attempt.topic if not attempt.label else '' }}</span>
+          <span>{% if attempt.is_tracked %}Tracked{% else %}{{ attempt.tracking_label }}{% endif %}</span>
           <span>{{ attempt.responses_total or 0 }}</span>
           <span>{{ attempt.correct_total or 0 }}{% if attempt.accuracy_pct is not none %} · {{ attempt.accuracy_pct }}%{% endif %}</span>
           <span>{{ attempt.created_at }}</span>
@@ -87,7 +93,7 @@
           <span><a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-admin-detail-link">Report</a></span>
         </div>
         {% else %}
-        <p class="np-admin-empty">This student has no practice sessions yet.</p>
+        <p class="np-admin-empty">No tracked practice sessions yet — student needs {{ min_tracked_responses }}+ answers in one set.</p>
         {% endfor %}
       </div>
     </section>

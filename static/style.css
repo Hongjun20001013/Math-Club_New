@@ -21858,6 +21858,23 @@ html[data-exam-theme="dark"] .np-login-preview-grid span {
     background: rgba(91, 77, 255, 0.1);
 }
 
+.np-admin-session-note {
+    margin: 0 0 12px;
+    color: #5b6478;
+    font-size: 0.82rem;
+}
+
+.np-admin-record-row--partial {
+    opacity: 0.72;
+    background: rgba(248, 250, 252, 0.92);
+}
+
+.np-admin-record-row--partial span:nth-child(2) {
+    color: #b45309;
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
 .np-admin-record-danger {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr);
