@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning Pulse · {{ weekly_digest.period_label }} · {{ site_brand_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ style_css_revision }}" type="text/css">
+  <style>
+    body { background: #fff; color: #171326; }
+    .np-digest-print { max-width: 880px; margin: 0 auto; padding: 32px 24px 48px; font-family: system-ui, sans-serif; }
+    .np-digest-print-head { border-bottom: 2px solid #e5e7f5; padding-bottom: 16px; margin-bottom: 24px; }
+    .np-digest-print-head h1 { margin: 0 0 6px; font-size: 1.5rem; }
+    .np-digest-print-head p { margin: 0; color: #5b6478; line-height: 1.45; }
+    .np-digest-print-section { margin-bottom: 22px; }
+    .np-digest-print-section h2 { font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin: 0 0 10px; }
+    .np-digest-print-steps li { margin-bottom: 8px; line-height: 1.45; }
+    .np-digest-print-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .np-digest-print-stat { border: 1px solid #e5e7f5; border-radius: 12px; padding: 12px 14px; }
+    .np-digest-print-stat strong { display: block; font-size: 1.25rem; }
+    .np-digest-print-stat span { color: #5b6478; font-size: 0.78rem; }
+    .np-digest-print-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .np-digest-print-table th, .np-digest-print-table td { border: 1px solid #e5e7f5; padding: 8px 10px; text-align: left; vertical-align: top; }
+    .np-digest-print-table th { background: #f8f7ff; font-size: 0.72rem; text-transform: uppercase; }
+    .np-digest-print-foot { margin-top: 28px; color: #5b6478; font-size: 0.82rem; }
+    @media print { .np-digest-print-no-print { display: none !important; } .np-digest-print { padding: 0; max-width: none; } }
+  </style>
+</head>
+<body>
+  {% set brief = weekly_digest.pulse_brief %}
+  <div class="np-digest-print">
+    <p class="np-digest-print-no-print"><button type="button" onclick="window.print()">Print this report</button></p>
+
+    <header class="np-digest-print-head">
+      <h1>Learning Pulse · {{ weekly_digest.period_label }}</h1>
+      <p><strong>{{ brief.headline }}</strong></p>
+      <p>{{ site_brand_name }} · {{ weekly_digest.generated_at }}{% if hide_demo %} · Demo accounts hidden{% endif %}</p>
+    </header>
+
+    <div class="np-digest-print-grid">
+      {% for tile in brief.glance %}
+      <div class="np-digest-print-stat"><strong>{{ tile.value }}</strong><span>{{ tile.label }}</span></div>
+      {% endfor %}
+    </div>
+
+    {% if brief.priority_steps %}
+    <section class="np-digest-print-section">
+      <h2>Start here</h2>
+      <ol class="np-digest-print-steps">
+        {% for step in brief.priority_steps %}
+        <li><strong>{{ step.short_title }}</strong> — {{ step.detail }}</li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if brief.attention %}
+    <section class="np-digest-print-section">
+      <h2>Who needs you</h2>
+      <table class="np-digest-print-table">
+        <thead><tr><th>Student</th><th>Status</th><th>Reason</th><th>Last active</th></tr></thead>
+        <tbody>
+          {% for person in brief.attention %}
+          <tr>
+            <td>{{ person.username }}</td>
+            <td>{{ person.status }}</td>
+            <td>{{ person.reason }}</td>
+            <td>{{ person.last_active }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+    <section class="np-digest-print-section">
+      <h2>Student snapshot</h2>
+      <table class="np-digest-print-table">
+        <thead><tr><th>Student</th><th>Status</th><th>Note</th><th>Last active</th></tr></thead>
+        <tbody>
+          {% for row in brief.roster_primary %}
+          <tr>
+            <td>{{ row.username }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.pulse_note }}</td>
+            <td>{{ row.last_activity_label }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <p class="np-digest-print-foot">Confidential instructor summary.</p>
+  </div>
+  <script>window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 300); });</script>
+</body>
+</html>

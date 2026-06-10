@@ -20,6 +20,7 @@
         <h1>{{ student.username }}</h1>
         <p>Created: {{ student.created_at or "Unknown" }} · {{ "Active" if student.is_active else "Inactive" }}</p>
         <p class="np-admin-grants-summary">Access: <strong>{{ student.access_grants_label }}</strong></p>
+        <p class="np-admin-report-link"><a href="{{ report_href }}" class="np-admin-btn np-admin-btn--cta">Open progress report →</a></p>
       </div>
       <div class="np-admin-stats" aria-label="Student summary">
         <div><strong>{{ totals.sessions }}</strong><span>Sessions</span></div>
@@ -77,10 +78,10 @@
         </div>
         {% for attempt in attempts %}
         <div class="np-admin-record-row" role="row">
-          <span>{{ attempt.domain }}</span>
-          <span>{{ attempt.topic }}</span>
+          <span>{{ attempt.label|default(attempt.domain) }}</span>
+          <span>{{ attempt.topic if not attempt.label else '' }}</span>
           <span>{{ attempt.responses_total or 0 }}</span>
-          <span>{{ attempt.correct_total or 0 }}</span>
+          <span>{{ attempt.correct_total or 0 }}{% if attempt.accuracy_pct is not none %} · {{ attempt.accuracy_pct }}%{% endif %}</span>
           <span>{{ attempt.created_at }}</span>
           <span>{{ attempt.last_submitted_at or attempt.created_at }}</span>
           <span><a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-admin-detail-link">Report</a></span>

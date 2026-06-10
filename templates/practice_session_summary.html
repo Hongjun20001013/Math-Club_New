@@ -45,7 +45,7 @@
         </p>
         <p class="np-summary-time-spent">{% if domain == 'placement' %}Diagnostic time{% else %}Time spent{% endif %}: <strong>{{ session_duration_label }}</strong></p>
         {% if domain != 'placement' and skipped_count %}
-        <p class="np-summary-skip-note">You did not submit an answer on <strong>{{ skipped_count }}</strong> item(s); they appear as skipped in the sheet below.</p>
+        <p class="np-summary-skip-note">You did not submit an answer on <strong>{{ skipped_count }}</strong> item(s); they appear as skipped in the sheet below.{% if answered_pct is not none %} On the <strong>{{ answered_count }}</strong> answered question{{ '' if answered_count == 1 else 's' }}, accuracy was <strong>{{ answered_pct }}%</strong>.{% endif %}</p>
         {% endif %}
       </div>
       <div class="np-summary-hero-visual">

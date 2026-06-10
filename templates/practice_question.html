@@ -173,7 +173,10 @@
         {% endif %}
     </div>
 
-    <form method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
+      <form method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
+        {% if tracked_responses_hint %}
+        <p class="np-tracked-hint" role="note">{{ tracked_responses_hint }}</p>
+        {% endif %}
         <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
         <input type="hidden" name="domain" value="{{ domain }}">
         <input type="hidden" name="topic" value="{{ topic }}">

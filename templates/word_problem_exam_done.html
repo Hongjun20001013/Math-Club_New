@@ -23,6 +23,9 @@
       {% else %}
       <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('practice_exam_category', category_slug=category_slug) }}">All sets complete</a>
       {% endif %}
+      {% if session_summary_href %}
+      <a class="np-pw-btn np-pw-btn--ghost" href="{{ session_summary_href }}">Saved report →</a>
+      {% endif %}
     </div>
   </header>
 

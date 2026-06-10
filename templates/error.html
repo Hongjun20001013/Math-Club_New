@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ site_brand_name }}{% endblock %}
+{% block content %}
+<div class="np-error-page glass-panel np-glass">
+  <p class="np-error-kicker">Error {{ code }}</p>
+  <h1>{{ title }}</h1>
+  <p class="np-error-message">{{ message }}</p>
+  <div class="np-error-actions">
+    <a href="{{ url_for('index') }}" class="np-pw-btn np-pw-btn--primary">Back to home</a>
+    <button type="button" class="np-pw-btn np-pw-btn--ghost" onclick="window.location.reload()">Refresh page</button>
+  </div>
+</div>
+{% endblock %}

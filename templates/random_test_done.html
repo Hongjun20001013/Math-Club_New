@@ -24,6 +24,9 @@
       <form method="post" action="{{ url_for('practice_random_test_start') }}">
         <button type="submit" class="np-report-primary-btn">New random test →</button>
       </form>
+      {% if session_summary_href %}
+      <a href="{{ session_summary_href }}" class="np-report-primary-btn np-report-primary-btn--ghost">Saved report →</a>
+      {% endif %}
     </aside>
   </header>
 

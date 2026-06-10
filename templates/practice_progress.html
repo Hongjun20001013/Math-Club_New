@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}My progress · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-progress-page">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice') }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">My progress</span>
+  </nav>
+
+  <header class="np-progress-hero glass-panel np-glass mp-animate-in">
+    <div>
+      <p class="np-atelier-kicker">Learning dashboard</p>
+      <h1>Your SAT progress</h1>
+      <p class="np-progress-lead">Mock scores, chapter coverage, mistake digestion, and where to focus next.</p>
+    </div>
+    <div class="np-progress-hero-stats">
+      <div class="np-progress-hero-stat">
+        <strong>{% if mock_history.latest %}{{ mock_history.latest.score }}{% else %}—{% endif %}</strong>
+        <span>Latest mock</span>
+      </div>
+      <div class="np-progress-hero-stat">
+        <strong>{{ chapter_overall_pct }}%</strong>
+        <span>Chapters touched</span>
+      </div>
+      <div class="np-progress-hero-stat">
+        <strong>{% if mistake_mastery.digest_pct is not none %}{{ mistake_mastery.digest_pct }}%{% else %}—{% endif %}</strong>
+        <span>Misses mastered</span>
+      </div>
+      <div class="np-progress-hero-stat">
+        <strong>{% if miss_quiz.pass_rate is not none %}{{ miss_quiz.pass_rate }}%{% else %}—{% endif %}</strong>
+        <span>Miss quiz pass</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="np-progress-grid mp-animate-up">
+    <article class="np-progress-card glass-panel np-glass">
+      <header class="np-progress-card-head">
+        <div>
+          <p class="np-atelier-kicker">Mock exams</p>
+          <h2>Random Test history</h2>
+        </div>
+        <a href="{{ random_test_href }}" class="np-atelier-btn np-atelier-btn--ghost">New mock →</a>
+      </header>
+      {% if mock_history.scores %}
+      <p class="np-progress-note">{{ mock_history.trend_label }}</p>
+      <div class="np-progress-mock-chart" role="img" aria-label="Random Test score history">
+        {% for pt in mock_history.scores %}
+        <a href="{{ pt.summary_href }}" class="np-progress-mock-col" title="{{ pt.score }}/800 · {{ pt.when_label }}">
+          <span class="np-progress-mock-bar" style="height: {{ pt.bar_pct }}%;"></span>
+          <strong>{{ pt.score }}</strong>
+          <em>{{ pt.when_label }}</em>
+        </a>
+        {% endfor %}
+      </div>
+      {% if mock_history.best %}
+      <p class="np-progress-foot">Best: <strong>{{ mock_history.best.score }}/800</strong> · Latest report <a href="{{ mock_history.latest.summary_href }}">open →</a></p>
+      {% endif %}
+      {% else %}
+      <p class="np-progress-empty">No saved Random Test yet. Complete one mock to start your score curve.</p>
+      <a href="{{ random_test_href }}" class="np-atelier-btn np-atelier-btn--primary">Take Random Test →</a>
+      {% endif %}
+    </article>
+
+    <article class="np-progress-card glass-panel np-glass">
+      <header class="np-progress-card-head">
+        <div>
+          <p class="np-atelier-kicker">Focus areas</p>
+          <h2>Weakest units</h2>
+        </div>
+        <a href="{{ analytics_href }}" class="np-atelier-btn np-atelier-btn--ghost">Mistake log →</a>
+      </header>
+      {% if weak_units %}
+      <ul class="np-progress-weak-list">
+        {% for unit in weak_units %}
+        <li>
+          <span>{{ unit.label }}</span>
+          <strong>{{ unit.pct }}%</strong>
+          <a href="{{ unit.href }}">Review →</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="np-progress-empty">Answer a few questions in each unit (3+ per bank) to unlock weak-area tracking.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="np-progress-card glass-panel np-glass mp-animate-up">
+    <header class="np-progress-card-head">
+      <div>
+        <p class="np-atelier-kicker">Coverage</p>
+        <h2>Chapter slices · 1.1–4.4</h2>
+        <p class="np-progress-note">Distinct questions answered in each bank slice (not full-bank merged sets).</p>
+      </div>
+    </header>
+    <div class="np-progress-unit-strip" role="list">
+      {% for unit in unit_summaries %}
+      <div class="np-progress-unit-pill" role="listitem">
+        <span>{{ unit.label }}</span>
+        <strong>{{ unit.pct }}%</strong>
+        <em>{{ unit.touched }}/{{ unit.cap }}</em>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="np-progress-chapter-grid">
+      {% for row in chapter_rows %}
+      <a href="{{ row.href or '#' }}" class="np-progress-chapter{% if row.is_pt %} np-progress-chapter--pt{% endif %}{% if row.pct >= 100 %} is-complete{% elif row.engaged %} is-started{% endif %}"{% if not row.href %} aria-disabled="true"{% endif %}>
+        <span class="np-progress-chapter-unit">{{ row.unit_label }}</span>
+        <strong>{{ row.section }}</strong>
+        <em>{{ row.engaged }}/{{ row.cap }}</em>
+        <i style="width: {{ row.pct }}%;"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="np-progress-grid mp-animate-up">
+    <article class="np-progress-card glass-panel np-glass">
+      <header class="np-progress-card-head">
+        <div>
+          <p class="np-atelier-kicker">Mistake ladder</p>
+          <h2>Are misses sticking?</h2>
+        </div>
+      </header>
+      <div class="np-progress-mastery-grid">
+        <div><strong>{{ mistake_mastery.mastered }}</strong><span>Mastered</span></div>
+        <div><strong>{{ mistake_mastery.in_progress }}</strong><span>In review</span></div>
+        <div><strong>{{ mistake_mastery.open_misses }}</strong><span>Open misses</span></div>
+      </div>
+      <p class="np-progress-note">Mastered = answered correctly twice after a miss. Keep running miss quizzes on open slots.</p>
+      <a href="{{ mistake_mastery.analytics_href }}" class="np-atelier-btn np-atelier-btn--primary">Open mistake analytics →</a>
+    </article>
+
+    <article class="np-progress-card glass-panel np-glass">
+      <header class="np-progress-card-head">
+        <div>
+          <p class="np-atelier-kicker">Miss quiz</p>
+          <h2>Pass rate · {{ miss_quiz.pass_threshold }}%+ bar</h2>
+        </div>
+      </header>
+      {% if miss_quiz.total_runs %}
+      <p class="np-progress-note">{{ miss_quiz.passed_runs }}/{{ miss_quiz.total_runs }} runs passed · {{ miss_quiz.pass_rate }}% overall</p>
+      <ul class="np-progress-mq-list">
+        {% for run in miss_quiz.recent %}
+        <li class="{% if run.passed %}is-pass{% else %}is-fail{% endif %}">
+          <span>{{ run.label }}</span>
+          <strong>{{ run.pct }}%</strong>
+          <em>{{ run.when_label }}</em>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="np-progress-empty">No miss quizzes recorded yet. Finish one from Mistake analytics — runs are tracked from now on.</p>
+      <a href="{{ analytics_href }}" class="np-atelier-btn np-atelier-btn--primary">Start miss quiz →</a>
+      {% endif %}
+    </article>
+  </section>
+</div>
+</div>
+{% endblock %}

@@ -18,8 +18,11 @@
       <div class="np-atelier-hero-stats" role="list">
         <div class="np-atelier-stat" role="listitem"><strong>{% if cm_total is defined %}{{ cm_total }}{% else %}21{% endif %}</strong><span>lessons</span></div>
         <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
-        <div class="np-atelier-stat" role="listitem"><strong>15</strong><span>hard sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ hard_drill_meta.count or 15 }}</strong><span>hard sets</span></div>
       </div>
+      {% if user_logged_in %}
+      <a href="{{ url_for('practice_progress') }}" class="np-atelier-btn np-atelier-btn--primary np-hub-progress-cta">My progress →</a>
+      {% endif %}
     </div>
     <aside class="np-atelier-aside" aria-label="Quick unit starts">
       <span class="np-atelier-aside-label">Fast lane</span>
@@ -43,10 +46,63 @@
       </div>
       <span>Slides → Practice → Exam → Review</span>
     </div>
+
+    {% if live_classroom %}
+    <div class="np-launch-live-banner" role="status">
+      <strong>Live class now</strong>
+      <span>{{ live_classroom.title }} · slide {{ live_classroom.slide }}</span>
+      <a href="{{ live_classroom.lesson_href }}" class="np-atelier-btn np-atelier-btn--primary">Join lesson →</a>
+      {% if live_classroom.classroom_href %}
+      <a href="{{ live_classroom.classroom_href }}" class="np-atelier-btn np-atelier-btn--ghost">Teacher dashboard</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if continue_material %}
+    <div class="np-launch-continue-card">
+      <div>
+        <p class="np-atelier-kicker">Continue lesson</p>
+        <strong>{{ continue_material.section }} — {{ continue_material.title }}</strong>
+        <span>Slide {{ continue_material.continue_slide }} · {{ continue_material.continue_mastery_pct }}% mastery</span>
+      </div>
+      <a href="{{ url_for('practice_course_material_view', slug=continue_material.slug, slide=continue_material.continue_slide) }}" class="np-atelier-btn np-atelier-btn--primary">Resume slides →</a>
+    </div>
+    {% endif %}
+
+    {% if resume_session %}
+    <div class="np-launch-continue-card np-launch-continue-card--practice">
+      <div>
+        <p class="np-atelier-kicker">Continue practice</p>
+        <strong>{{ resume_session.track_short }} · {{ resume_session.topic_title }}</strong>
+        <span>{{ resume_session.answered }}/{{ resume_session.total }} answered</span>
+      </div>
+      <a href="{{ resume_session.href }}" class="np-atelier-btn np-atelier-btn--primary">Resume bank →</a>
+    </div>
+    {% endif %}
+
+    {% if random_test_continue %}
+    <div class="np-launch-continue-card np-launch-continue-card--exam">
+      <div>
+        <p class="np-atelier-kicker">Random Test in progress</p>
+        <strong>{{ random_test_continue.answered }}/{{ random_test_continue.total }} answered</strong>
+        {% if latest_random_test_score %}<span>Last score: {{ latest_random_test_score }}/800</span>{% endif %}
+      </div>
+      <a href="{{ random_test_continue.href }}" class="np-atelier-btn np-atelier-btn--primary">Continue test →</a>
+    </div>
+    {% elif latest_random_test_score %}
+    <div class="np-launch-continue-card np-launch-continue-card--exam">
+      <div>
+        <p class="np-atelier-kicker">Latest Random Test</p>
+        <strong>{{ latest_random_test_score }}/800</strong>
+      </div>
+      <a href="{{ url_for('practice_random_test_intro') }}" class="np-atelier-btn np-atelier-btn--ghost">New test →</a>
+    </div>
+    {% endif %}
+
     <div class="np-launch-path-grid">
-      <a href="{{ url_for('practice_course_materials') }}">
+      <a href="{% if continue_material %}{{ url_for('practice_course_material_view', slug=continue_material.slug, slide=continue_material.continue_slide) }}{% else %}{{ url_for('practice_course_materials') }}{% endif %}">
         <strong>1</strong>
-        <span>Open today’s lesson deck</span>
+        <span>{% if continue_material %}Resume today’s lesson deck{% else %}Open today’s lesson deck{% endif %}</span>
         <em>Slides, PDF, projector, Desmos</em>
       </a>
       <a href="{{ url_for('practice_specialized') }}">
@@ -130,7 +186,7 @@
         <span class="np-atelier-pill np-atelier-pill--live">Live</span>
       </div>
       <h3 class="np-atelier-title">Hard problem drill</h3>
-      <span class="np-atelier-count">15 sets · I–XVI</span>
+      <span class="np-atelier-count">{{ hard_drill_meta.count or 15 }} sets · {{ hard_drill_meta.range_label or 'I–XIV + XVI' }}</span>
       <p class="np-atelier-desc">Roman numeral picker, worksheet PDFs, teaching slides, and session reports.</p>
       <footer class="np-atelier-foot">
         <span class="np-atelier-btn np-atelier-btn--primary">Open hard drill →</span>

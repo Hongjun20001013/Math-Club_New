@@ -110,6 +110,7 @@
   var progress = loadProgress();
   var studyMode = loadStudyMode();
   var classroomSession = null;
+  var lastKnownSlideUpdatedAt = null;
   var classroomSummary = null;
   var classroomSummaryTimer = null;
   var classroomSlidePublishTimer = null;
@@ -281,26 +282,46 @@
       .catch(function () {});
   }
 
+  function isClassroomFollower() {
+    return !!(classroomSession && !classroomSlideApi);
+  }
+
   function setClassroomSession(session) {
+    var previousId = classroomSession ? classroomSession.id : null;
     classroomSession = session || null;
+    var currentId = classroomSession ? classroomSession.id : null;
+    if (currentId !== previousId) {
+      // New live class (or class ended): forget cached sync state so the
+      // teacher republishes and students re-follow from scratch.
+      lastPublishedClassroomSlide = null;
+      lastFollowedClassroomSlide = null;
+      lastKnownSlideUpdatedAt = null;
+    }
     root.classList.toggle("is-classroom-live", !!classroomSession);
     root.classList.toggle("is-classroom-controller", !!(classroomSession && classroomSlideApi));
     updateClassroomPaceBadge();
-    if (!classroomSession) {
-      lastFollowedClassroomSlide = null;
-      return;
-    }
+    updateClassroomLiveBanner();
+    if (!classroomSession) return;
+    var remoteSlide = parseInt(classroomSession.current_slide_index, 10) || 0;
+    var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
     if (classroomSlideApi) {
+      // Teacher: if the server state drifted (failed publish, server
+      // restart, another tab), force a republish of the current slide.
+      if (remoteSlide !== currentSlide) {
+        lastPublishedClassroomSlide = null;
+      }
       publishCurrentClassroomSlide();
       return;
     }
-    var remoteSlide = parseInt(classroomSession.current_slide_index, 10) || 0;
-    if (remoteSlide > 0 && !classroomSlideApi) {
-      var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
-      if (currentSlide !== remoteSlide) {
+    if (remoteSlide > 0) {
+      var remoteUpdated = classroomSession.slide_updated_at || "";
+      var slideChanged = currentSlide !== remoteSlide;
+      var stampChanged = remoteUpdated && remoteUpdated !== lastKnownSlideUpdatedAt;
+      if (slideChanged || stampChanged) {
         goToSlideNumber(remoteSlide, { fromClassroomSync: true });
       }
-      lastFollowedClassroomSlide = remoteSlide;
+      if (remoteUpdated) lastKnownSlideUpdatedAt = remoteUpdated;
+      if (remoteSlide > 0) lastFollowedClassroomSlide = remoteSlide;
     }
   }
 
@@ -323,24 +344,63 @@
       : "<strong>Following</strong><span>Slide " + slide + "</span>";
   }
 
+  function updateClassroomLiveBanner() {
+    var banner = root.querySelector("[data-cm-classroom-live-banner]");
+    if (!classroomSession) {
+      if (banner) banner.remove();
+      return;
+    }
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.setAttribute("data-cm-classroom-live-banner", "true");
+      banner.className = "cm-classroom-live-banner";
+      var hero = root.querySelector(".np-cm-hero");
+      if (hero && hero.parentNode) {
+        hero.parentNode.insertBefore(banner, hero.nextSibling);
+      } else {
+        root.insertBefore(banner, root.firstChild);
+      }
+    }
+    var isFollower = !classroomSlideApi;
+    var title = classroomSession.title || "Live class";
+    var slide = parseInt(classroomSession.current_slide_index, 10) || 1;
+    banner.classList.toggle("is-controller", !isFollower);
+    banner.innerHTML = isFollower
+      ? "<strong>Live class active</strong><span>" + title + " · slide " + slide + " · your answers are recorded</span>"
+      : "<strong>Live class running</strong><span>" + title + " · slide " + slide + "</span>";
+  }
+
+  var classroomPollFailures = 0;
+  var classroomPollInFlight = false;
+
   function loadClassroomSession() {
-    if (!classroomActiveApi) return;
+    if (!classroomActiveApi || classroomPollInFlight) return;
+    classroomPollInFlight = true;
     fetch(classroomActiveApi, { credentials: "same-origin" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
-        if (!data || !data.ok || !data.active) {
-          setClassroomSession(null);
+        if (!data || !data.ok) {
+          classroomPollFailures += 1;
+          if (classroomPollFailures >= 10) setClassroomSession(null);
           return;
         }
-        setClassroomSession(data.session || null);
+        classroomPollFailures = 0;
+        setClassroomSession(data.active ? (data.session || null) : null);
       })
-      .catch(function () {});
+      .catch(function () {
+        classroomPollFailures += 1;
+        if (classroomPollFailures >= 10) setClassroomSession(null);
+      })
+      .finally(function () {
+        classroomPollInFlight = false;
+      });
   }
 
-  function publishCurrentClassroomSlide() {
+  function publishCurrentClassroomSlide(attempt) {
+    attempt = attempt || 0;
     if (!classroomSession || !classroomSlideApi || !slides[idx]) return;
     var slideIndex = parseInt(slides[idx].index, 10) || 1;
-    if (lastPublishedClassroomSlide === slideIndex) return;
+    if (lastPublishedClassroomSlide === slideIndex && attempt === 0) return;
     window.clearTimeout(classroomSlidePublishTimer);
     classroomSlidePublishTimer = window.setTimeout(function () {
       fetch(classroomSlideApi, {
@@ -355,15 +415,24 @@
               throw new Error((data && data.error) || "Could not sync the class slide.");
             }
             lastPublishedClassroomSlide = slideIndex;
+            if (data.slide_updated_at) {
+              classroomSession.slide_updated_at = data.slide_updated_at;
+              lastKnownSlideUpdatedAt = data.slide_updated_at;
+            }
           });
         })
         .catch(function (err) {
+          if (attempt < 2) {
+            window.setTimeout(function () { publishCurrentClassroomSlide(attempt + 1); }, 400 * (attempt + 1));
+            return;
+          }
           showClassroomResponseNotice((err && err.message) || "Could not sync the class slide.", true);
         });
-    }, 220);
+    }, attempt > 0 ? 0 : 220);
   }
 
-  function submitClassroomResponse(payload) {
+  function submitClassroomResponse(payload, attempt) {
+    attempt = attempt || 0;
     if (!classroomSession || !classroomResponseApi) return;
     fetch(classroomResponseApi, {
       method: "POST",
@@ -380,6 +449,10 @@
         });
       })
       .catch(function (err) {
+        if (attempt < 1) {
+          window.setTimeout(function () { submitClassroomResponse(payload, attempt + 1); }, 500);
+          return;
+        }
         showClassroomResponseNotice((err && err.message) || "Live response was not saved. Ask the teacher to refresh the class.", true);
       });
   }
@@ -409,6 +482,23 @@
       .replace(/"/g, "&quot;");
   }
 
+  var livePopoverOpen = false;
+  var liveSections = { dist: true, students: true, overview: false, missing: true };
+
+  function liveSection(key, title, badge, inner) {
+    var open = !!liveSections[key];
+    return (
+      '<section class="np-cm-live-sec' + (open ? " is-open" : "") + '">' +
+      '<button type="button" class="np-cm-live-sec-head" data-cm-live-sec="' + key + '">' +
+      '<span class="np-cm-live-sec-title">' + title + '</span>' +
+      (badge ? '<span class="np-cm-live-sec-badge">' + badge + '</span>' : "") +
+      '<span class="np-cm-live-sec-chev" aria-hidden="true"></span>' +
+      '</button>' +
+      '<div class="np-cm-live-sec-body"' + (open ? "" : " hidden") + '>' + inner + '</div>' +
+      '</section>'
+    );
+  }
+
   function renderLiveResults(slide) {
     if (!liveResultsEl || !classroomSummaryApi || !slide) return;
     var isQuestion = slide.kind === "question" || slide.kind === "practice" || slide.kind === "example";
@@ -422,7 +512,7 @@
       liveResultsEl.hidden = false;
       liveResultsEl.innerHTML =
         '<button type="button" class="np-cm-live-chip" data-cm-live-open><span>Live</span><strong>Start</strong></button>' +
-        '<div class="np-cm-live-popover" data-cm-live-popover hidden>' +
+        '<div class="np-cm-live-popover" data-cm-live-popover' + (livePopoverOpen ? "" : " hidden") + '>' +
         '<div class="np-cm-live-popover-head"><strong>Live Results</strong><button type="button" data-cm-live-close>×</button></div>' +
         "<p>Start a live class to see this slide's accuracy here while students answer.</p>" +
         (classroomStartApi ? '<button type="button" class="np-cm-live-btn" data-cm-start-live>Start live class</button>' : "") +
@@ -456,51 +546,91 @@
     var submitted = q.submitted || 0;
     var accuracy = q.accuracy == null ? "—" : q.accuracy + "%";
     var rosterCount = summary.roster_count || 0;
+    var completionPct = q.completion == null ? 0 : q.completion;
     var completion = q.completion == null ? "—" : q.completion + "%";
-    var missingCount = (q.missing_students || []).length;
+    var missingList = q.missing_students || [];
+    var missingCount = missingList.length;
     var readyText = q.teach_ready ? "Ready to teach" : (q.almost_ready ? "Almost ready" : "Keep working");
     var readyClass = q.teach_ready ? "is-ready" : (q.almost_ready ? "is-almost" : "is-waiting");
+
+    var correctAnswer = "";
+    (q.responses || []).some(function (r) {
+      if (r.correct_answer) { correctAnswer = String(r.correct_answer).trim(); return true; }
+      return false;
+    });
+
     var choiceCounts = q.choice_counts || {};
     var choiceBars = Object.keys(choiceCounts).sort().map(function (choice) {
       var count = choiceCounts[choice] || 0;
       var pct = submitted ? Math.round(100 * count / submitted) : 0;
-      return '<li><span>' + escapeHtml(choice) + '</span><b style="width:' + pct + '%"></b><em>' + escapeHtml(count) + '</em></li>';
+      var isAns = correctAnswer && choice.trim() === correctAnswer;
+      return '<li class="' + (isAns ? "is-correct-bar" : "") + '">' +
+        '<span>' + escapeHtml(choice) + (isAns ? ' <i>✓</i>' : '') + '</span>' +
+        '<b style="width:' + pct + '%"></b><em>' + escapeHtml(count) + '</em></li>';
     }).join("");
     if (!choiceBars) choiceBars = '<li class="is-empty"><span>No choices yet</span></li>';
-    var rows = (q.responses || []).map(function (r) {
+
+    var rows = (q.responses || []).slice().sort(function (a, b) {
+      if (!!a.is_correct !== !!b.is_correct) return a.is_correct ? 1 : -1;
+      return String(a.username).toLowerCase() < String(b.username).toLowerCase() ? -1 : 1;
+    }).map(function (r) {
       return '<li class="' + (r.is_correct ? "is-correct" : "is-wrong") + '">' +
-        '<span>' + escapeHtml(r.username) + '</span>' +
+        '<span class="np-cm-live-row-name">' + escapeHtml(r.username) + '</span>' +
         '<strong>' + escapeHtml(r.selected_answer || "—") + '</strong>' +
+        '<i>' + (r.is_correct ? "✓" : "✗") + '</i>' +
         '</li>';
     }).join("");
     if (!rows) rows = '<li class="is-empty"><span>Waiting for students...</span></li>';
-    var missingList = q.missing_students || [];
-    var missing = missingList.slice(0, 12).map(function (r) {
+
+    var breakdown = (summary.report && summary.report.student_breakdown) || [];
+    var overviewRows = breakdown.map(function (st) {
+      var acc = st.accuracy == null ? null : st.accuracy;
+      var tone = !st.submitted ? "is-idle" : acc >= 80 ? "is-good" : acc >= 50 ? "is-warn" : "is-risk";
+      var accText = acc == null ? "—" : acc + "%";
+      var wrongCount = (st.wrong_questions || []).length;
+      return '<li class="' + tone + '">' +
+        '<span class="np-cm-live-row-name">' + escapeHtml(st.username) + '</span>' +
+        '<span class="np-cm-live-ov-meta">' + escapeHtml(st.submitted || 0) + ' done' +
+        (wrongCount ? ' · ' + escapeHtml(wrongCount) + ' wrong' : '') + '</span>' +
+        '<strong>' + escapeHtml(accText) + '</strong>' +
+        '</li>';
+    }).join("");
+    if (!overviewRows) overviewRows = '<li class="is-empty"><span>No students yet</span></li>';
+
+    var missing = missingList.slice(0, 16).map(function (r) {
       return '<span>' + escapeHtml(r.username) + '</span>';
     }).join("");
-    if (missingList.length > 12) {
-      missing += '<span>+' + escapeHtml(missingList.length - 12) + ' more</span>';
+    if (missingList.length > 16) {
+      missing += '<span>+' + escapeHtml(missingList.length - 16) + ' more</span>';
     }
-    if (!missing) missing = '<span>None</span>';
+    if (!missing) missing = '<span class="is-none">Everyone submitted 🎉</span>';
+
     liveResultsEl.hidden = false;
     liveResultsEl.innerHTML =
       '<button type="button" class="np-cm-live-chip" data-cm-live-open>' +
+      '<i class="np-cm-live-dot" aria-hidden="true"></i>' +
       '<span>Live</span><strong>' + escapeHtml(accuracy) + '</strong><em>' + escapeHtml(submitted) + '/' + escapeHtml(rosterCount || submitted) + '</em>' +
       '</button>' +
-      '<div class="np-cm-live-popover" data-cm-live-popover hidden>' +
-      '<div class="np-cm-live-popover-head"><strong>Slide ' + escapeHtml(slide.index) + ' Results</strong><button type="button" data-cm-live-close>×</button></div>' +
-      '<div class="np-cm-live-readiness ' + readyClass + '"><strong>' + escapeHtml(readyText) + '</strong><span>' + escapeHtml(missingCount) + ' not submitted</span></div>' +
-      '<div class="np-cm-live-mini-head">' +
-      '<span class="np-cm-live-kicker">Live Results</span>' +
-      '<span class="np-cm-live-pill">' + escapeHtml(completion) + ' complete</span>' +
+      '<div class="np-cm-live-popover" data-cm-live-popover' + (livePopoverOpen ? "" : " hidden") + '>' +
+      '<div class="np-cm-live-popover-head">' +
+      '<div class="np-cm-live-head-copy"><i class="np-cm-live-dot" aria-hidden="true"></i>' +
+      '<strong>Slide ' + escapeHtml(slide.index) + '</strong><span>Live Results</span></div>' +
+      '<button type="button" data-cm-live-close>×</button></div>' +
+      '<div class="np-cm-live-readiness ' + readyClass + '">' +
+      '<div class="np-cm-live-readiness-copy"><strong>' + escapeHtml(readyText) + '</strong>' +
+      '<span>' + escapeHtml(missingCount) + ' not submitted · ' + escapeHtml(completion) + ' complete</span></div>' +
+      '<div class="np-cm-live-progress"><b style="width:' + completionPct + '%"></b></div>' +
       '</div>' +
       '<div class="np-cm-live-stats">' +
       '<div><b>' + escapeHtml(accuracy) + '</b><span>accuracy</span></div>' +
       '<div><b>' + escapeHtml(q.correct || 0) + '/' + escapeHtml(submitted) + '</b><span>correct</span></div>' +
+      '<div><b>' + escapeHtml(submitted) + '/' + escapeHtml(rosterCount || submitted) + '</b><span>submitted</span></div>' +
+      '<div><b>' + escapeHtml(missingCount) + '</b><span>missing</span></div>' +
       '</div>' +
-      '<div class="np-cm-live-distribution"><strong>Choice distribution</strong><ul>' + choiceBars + '</ul></div>' +
-      '<div class="np-cm-live-details"><strong>Students</strong><ul class="np-cm-live-list">' + rows + '</ul></div>' +
-      '<div class="np-cm-live-missing"><strong>Not submitted</strong><div>' + missing + '</div></div>' +
+      liveSection("dist", "Choice distribution", correctAnswer ? "Answer " + escapeHtml(correctAnswer) : "", '<ul class="np-cm-live-bars">' + choiceBars + '</ul>') +
+      liveSection("students", "This question", escapeHtml(submitted) + " response" + (submitted === 1 ? "" : "s"), '<ul class="np-cm-live-list">' + rows + '</ul>') +
+      liveSection("overview", "Class overview", escapeHtml(breakdown.length) + " student" + (breakdown.length === 1 ? "" : "s"), '<ul class="np-cm-live-list np-cm-live-overview">' + overviewRows + '</ul>') +
+      liveSection("missing", "Not submitted", escapeHtml(missingCount) || "", '<div class="np-cm-live-missing-chips">' + missing + '</div>') +
       '</div>';
     bindLivePopover();
   }
@@ -512,13 +642,25 @@
     var closeBtn = liveResultsEl.querySelector("[data-cm-live-close]");
     if (!openBtn || !popover) return;
     openBtn.onclick = function () {
+      livePopoverOpen = popover.hidden;
       popover.hidden = !popover.hidden;
     };
     if (closeBtn) {
       closeBtn.onclick = function () {
+        livePopoverOpen = false;
         popover.hidden = true;
       };
     }
+    liveResultsEl.querySelectorAll("[data-cm-live-sec]").forEach(function (btn) {
+      btn.onclick = function () {
+        var key = btn.getAttribute("data-cm-live-sec");
+        liveSections[key] = !liveSections[key];
+        var sec = btn.closest(".np-cm-live-sec");
+        var body = sec ? sec.querySelector(".np-cm-live-sec-body") : null;
+        if (sec) sec.classList.toggle("is-open", liveSections[key]);
+        if (body) body.hidden = !liveSections[key];
+      };
+    });
   }
 
   function loadClassroomSummary() {
@@ -1515,6 +1657,22 @@
     }
   }
 
+  function guardedNavigate(delta) {
+    if (isClassroomFollower()) {
+      loadClassroomSession();
+      return;
+    }
+    go(delta);
+  }
+
+  function guardedGoToSlideNumber(num) {
+    if (isClassroomFollower()) {
+      loadClassroomSession();
+      return;
+    }
+    goToSlideNumber(num);
+  }
+
   function go(delta) {
     idx = (idx + delta + slides.length) % slides.length;
     render();
@@ -1605,8 +1763,8 @@
     });
   }
 
-  root.querySelector("[data-cm-prev]").addEventListener("click", function () { go(-1); });
-  root.querySelector("[data-cm-next]").addEventListener("click", function () { go(1); });
+  root.querySelector("[data-cm-prev]").addEventListener("click", function () { guardedNavigate(-1); });
+  root.querySelector("[data-cm-next]").addEventListener("click", function () { guardedNavigate(1); });
 
   document.querySelectorAll("[data-cm-open-checkpoint]").forEach(function (btn) {
     btn.addEventListener("click", openCheckpoint);
@@ -1632,7 +1790,7 @@
     btn.addEventListener("click", function () {
       var target = parseInt(btn.getAttribute("data-cm-index"), 10);
       if (target > 0) {
-        goToSlideNumber(target);
+        guardedGoToSlideNumber(target);
         if (window.matchMedia && window.matchMedia("(max-width: 1100px)").matches) {
           setOutlineOpen(false);
         }
@@ -1648,8 +1806,8 @@
       closeCheckpoint();
       return;
     }
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(1); }
-    if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(-1); }
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); guardedNavigate(1); }
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); guardedNavigate(-1); }
     if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFocusMode(); }
     if (e.key === "Escape" && root.classList.contains("is-focus-mode")) {
       e.preventDefault();
@@ -1665,7 +1823,27 @@
   updateKnowledgeMap();
   loadClassroomSession();
   if (classroomActiveApi) {
-    window.setInterval(loadClassroomSession, 3000);
+    var pollJitter = 0;
+    try {
+      pollJitter = parseInt(sessionStorage.getItem("cmPollJitter") || "0", 10);
+      if (!pollJitter) {
+        pollJitter = Math.floor(Math.random() * 800);
+        sessionStorage.setItem("cmPollJitter", String(pollJitter));
+      }
+    } catch (e) {
+      pollJitter = Math.floor(Math.random() * 800);
+    }
+    window.setTimeout(function () {
+      loadClassroomSession();
+      window.setInterval(loadClassroomSession, 2500);
+    }, pollJitter);
+    // Background tabs throttle timers; resync immediately when the student
+    // comes back so they land on the teacher's current slide right away.
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) loadClassroomSession();
+    });
+    window.addEventListener("focus", loadClassroomSession);
+    window.addEventListener("pageshow", function () { loadClassroomSession(); });
   }
   if (classroomSummaryApi) {
     loadClassroomSummary();

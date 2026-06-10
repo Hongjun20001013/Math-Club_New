@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}{% if viewer == 'admin' %}{{ student.username }} · Progress report{% else %}My progress{% endif %} · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+{% set brief = report_brief %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-report-page np-report-page--{{ brief.status }}">
+  <nav class="np-atelier-rail" aria-label="Navigation">
+    {% if viewer == 'admin' %}
+    <a href="{{ url_for('admin') }}">Admin</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <a href="{{ admin_href }}">{{ student.username }}</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Progress report</span>
+    {% else %}
+    <a href="{{ back_href }}">SAT modules</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">My progress</span>
+    {% endif %}
+  </nav>
+
+  <header class="np-report-hero glass-panel np-glass mp-animate-in">
+    <div class="np-report-hero-copy">
+      <p class="np-atelier-kicker">{% if viewer == 'admin' %}Student progress report{% else %}Your learning report{% endif %}</p>
+      <h1>{% if viewer == 'admin' %}{{ student.username }}{% else %}Your SAT progress{% endif %}</h1>
+      <p class="np-report-headline">{{ brief.headline }}</p>
+      {% if viewer == 'admin' %}
+      <p class="np-report-meta">Last {{ period_days }} days · {{ period_activity.last_activity_label }} · Updated {{ generated_at }}</p>
+      {% else %}
+      <p class="np-report-meta">Updated {{ generated_at }}</p>
+      {% endif %}
+    </div>
+    <div class="np-report-hero-actions">
+      {% if viewer == 'admin' %}
+      <a href="{{ print_href }}" class="np-atelier-btn np-atelier-btn--ghost" target="_blank" rel="noopener">Print report</a>
+      <a href="{{ admin_href }}" class="np-atelier-btn np-atelier-btn--ghost">Account settings →</a>
+      {% else %}
+      <a href="{{ random_test_href }}" class="np-atelier-btn np-atelier-btn--primary">New mock →</a>
+      {% endif %}
+    </div>
+    <div class="np-report-glance" aria-label="At a glance">
+      {% for tile in brief.glance %}
+      <div class="np-report-glance-tile">
+        <strong>{{ tile.value }}</strong>
+        <span>{{ tile.label }}</span>
+        {% if tile.hint %}<em>{{ tile.hint }}</em>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </header>
+
+  <section class="np-report-zone glass-panel np-glass mp-animate-up" aria-labelledby="np-report-focus-title">
+    <header class="np-report-zone-head">
+      <h2 id="np-report-focus-title">{% if viewer == 'admin' %}Recommended focus{% else %}Your focus this week{% endif %}</h2>
+      <p>{% if viewer == 'admin' %}What this student should do next, in order.{% else %}Do these in order — everything else is optional detail below.{% endif %}</p>
+    </header>
+    <ol class="np-report-steps">
+      {% for step in brief.focus_steps %}
+      <li class="np-report-step np-report-step--{{ step.kind }}">
+        <span class="np-report-step-num">{{ step.step }}</span>
+        <div class="np-report-step-body">
+          <strong>{{ step.title }}</strong>
+          <p>{{ step.detail }}</p>
+          {% if step.href %}
+          <a href="{{ step.href }}"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>{% if viewer == 'admin' %}Open as student →{% else %}Go →{% endif %}</a>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+    {% if brief.focus_line %}
+    <p class="np-report-focus-line">Weakest area: <strong>{{ brief.focus_line }}</strong></p>
+    {% endif %}
+  </section>
+
+  {% if viewer == 'admin' %}
+  <section class="np-report-zone glass-panel np-glass mp-animate-up" aria-label="Recent activity summary">
+    <header class="np-report-zone-head">
+      <h2>Last {{ period_days }} days</h2>
+      <p>Quick activity read before opening session details.</p>
+    </header>
+    <div class="np-report-activity-grid">
+      <div class="np-report-activity-tile">
+        <strong>{{ period_activity.practice_sessions }}</strong><span>Practice sessions</span>
+      </div>
+      <div class="np-report-activity-tile">
+        <strong>{{ period_activity.exam_sessions }}</strong><span>Mock exams</span>
+      </div>
+      <div class="np-report-activity-tile">
+        <strong>{% if period_activity.accuracy_pct is not none %}{{ period_activity.accuracy_pct }}%{% else %}—{% endif %}</strong>
+        <span>Accuracy</span>
+        {% if period_activity.graded_responses %}<em>n={{ period_activity.graded_responses }}</em>{% endif %}
+      </div>
+      <div class="np-report-activity-tile">
+        <strong>{{ period_activity.wrong_count }}</strong><span>Misses logged</span>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="np-report-grid mp-animate-up">
+    <article class="np-report-card glass-panel np-glass">
+      <header class="np-report-card-head">
+        <div>
+          <p class="np-atelier-kicker">Score story</p>
+          <h2>Random Test history</h2>
+        </div>
+        <a href="{{ random_test_href }}" class="np-atelier-btn np-atelier-btn--ghost"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>New mock →</a>
+      </header>
+      {% if mock_history.scores %}
+      <p class="np-report-note">{{ mock_history.trend_label }}</p>
+      <div class="np-progress-mock-chart" role="img" aria-label="Random Test score history">
+        {% for pt in mock_history.scores %}
+        <a href="{{ pt.summary_href }}" class="np-progress-mock-col" title="{{ pt.score }}/800 · {{ pt.when_label }}"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>
+          <span class="np-progress-mock-bar" style="height: {{ pt.bar_pct }}%;"></span>
+          <strong>{{ pt.score }}</strong>
+          <em>{{ pt.when_label }}</em>
+        </a>
+        {% endfor %}
+      </div>
+      {% if mock_history.best %}
+      <p class="np-report-foot">Best <strong>{{ mock_history.best.score }}/800</strong>{% if mock_history.latest %} · Latest {{ mock_history.latest.score }}/800{% endif %}</p>
+      {% endif %}
+      {% else %}
+      <p class="np-report-empty">No saved Random Test yet. The score curve starts after the first completed mock.</p>
+      {% endif %}
+    </article>
+
+    <article class="np-report-card glass-panel np-glass">
+      <header class="np-report-card-head">
+        <div>
+          <p class="np-atelier-kicker">Weak spots</p>
+          <h2>Where to drill</h2>
+        </div>
+        <a href="{{ analytics_href }}" class="np-atelier-btn np-atelier-btn--ghost"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>Mistake log →</a>
+      </header>
+      {% if weak_chapters %}
+      <ul class="np-report-weak-list">
+        {% for ch in weak_chapters %}
+        <li>
+          <span>{{ ch.label }}</span>
+          <strong>{{ ch.pct }}%</strong>
+          {% if ch.href and viewer != 'admin' %}<a href="{{ ch.href }}">Drill →</a>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% elif weak_units %}
+      <ul class="np-report-weak-list">
+        {% for unit in weak_units %}
+        <li>
+          <span>{{ unit.label }}</span>
+          <strong>{{ unit.pct }}%</strong>
+          {% if viewer != 'admin' %}<a href="{{ unit.href }}">Review →</a>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="np-report-empty">Answer 3+ questions per chapter slice to unlock weak-area tracking.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="np-report-zone glass-panel np-glass mp-animate-up">
+    <header class="np-report-zone-head">
+      <h2>Unit coverage</h2>
+      <p>Overall chapter touch rate across Units 1–4.</p>
+    </header>
+    <div class="np-progress-unit-strip" role="list">
+      {% for unit in unit_summaries %}
+      <div class="np-progress-unit-pill" role="listitem">
+        <span>{{ unit.label }}</span>
+        <strong>{{ unit.pct }}%</strong>
+        <em>{{ unit.touched }}/{{ unit.cap }}</em>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <details class="np-report-drawer glass-panel np-glass">
+    <summary>Chapter map · 1.1–4.4</summary>
+    <p class="np-report-note">Distinct questions answered in each bank slice.</p>
+    <div class="np-progress-chapter-grid">
+      {% for row in chapter_rows %}
+      <a href="{{ row.href or '#' }}" class="np-progress-chapter{% if row.is_pt %} np-progress-chapter--pt{% endif %}{% if row.pct >= 100 %} is-complete{% elif row.engaged %} is-started{% endif %}"{% if not row.href %} aria-disabled="true"{% endif %}{% if viewer == 'admin' and row.href %} target="_blank" rel="noopener"{% endif %}>
+        <span class="np-progress-chapter-unit">{{ row.unit_label }}</span>
+        <strong>{{ row.section }}</strong>
+        <em>{{ row.engaged }}/{{ row.cap }}</em>
+        <i style="width: {{ row.pct }}%;"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </details>
+
+  <details class="np-report-drawer glass-panel np-glass">
+    <summary>Mistake digestion · ladder &amp; miss quiz</summary>
+    <div class="np-report-grid np-report-grid--inner">
+      <article class="np-report-card np-report-card--flat">
+        <h3>Mistake ladder</h3>
+        <div class="np-progress-mastery-grid">
+          <div><strong>{{ mistake_mastery.mastered }}</strong><span>Mastered</span></div>
+          <div><strong>{{ mistake_mastery.in_progress }}</strong><span>In review</span></div>
+          <div><strong>{{ mistake_mastery.open_misses }}</strong><span>Open misses</span></div>
+        </div>
+        <p class="np-report-note">Mastered = answered correctly twice after a miss.</p>
+      </article>
+      <article class="np-report-card np-report-card--flat">
+        <h3>Miss quiz · {{ miss_quiz.pass_threshold }}%+ bar</h3>
+        {% if miss_quiz.total_runs %}
+        <p class="np-report-note">{{ miss_quiz.passed_runs }}/{{ miss_quiz.total_runs }} passed · {{ miss_quiz.pass_rate }}% overall</p>
+        <ul class="np-progress-mq-list">
+          {% for run in miss_quiz.recent %}
+          <li class="{% if run.passed %}is-pass{% else %}is-fail{% endif %}">
+            <span>{{ run.label }}</span>
+            <strong>{{ run.pct }}%</strong>
+            <em>{{ run.when_label }}</em>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="np-report-empty">No miss quizzes recorded yet.</p>
+        {% endif %}
+      </article>
+    </div>
+  </details>
+
+  {% if viewer == 'admin' and recent_sessions %}
+  <details class="np-report-drawer glass-panel np-glass">
+    <summary>Recent sessions · last 6</summary>
+    <div class="np-report-session-list">
+      {% for attempt in recent_sessions %}
+      <a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-report-session-row" target="_blank" rel="noopener">
+        <strong>{{ attempt.label|default(attempt.domain) }}</strong>
+        <span>{{ attempt.responses_total or 0 }} responses{% if attempt.accuracy_pct is not none %} · {{ attempt.accuracy_pct }}%{% endif %}</span>
+        <em>{{ attempt.last_submitted_at or attempt.created_at }}</em>
+        <i>Open →</i>
+      </a>
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
+
+  <p class="np-report-foot">{% if viewer == 'admin' %}Confidential instructor report{% else %}Keep the loop: lesson → drill → mock → mistake redo{% endif %}</p>
+</div>
+</div>
+{% endblock %}

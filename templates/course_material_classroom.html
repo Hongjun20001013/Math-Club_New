@@ -169,13 +169,28 @@
     var students = studentRows.map(function (s) {
       var submitted = s.submitted || 0;
       var correct = s.correct || 0;
-      var accuracy = s.accuracy == null ? "Not started" : pct(s.accuracy);
+      var accuracy = s.accuracy;
+      var accuracyLabel = accuracy == null ? "—" : pct(accuracy);
       var studentCompletion = s.completion == null ? 0 : s.completion;
-      var status = submitted === 0 ? "Not started" : (studentCompletion >= 100 ? "Complete" : "In progress");
-      return '<li>' +
-        '<div><span>' + escapeHtml(s.username) + '</span><em>' + escapeHtml(status) + '</em></div>' +
+      var status, statusClass;
+      if (submitted === 0) { status = "Not started"; statusClass = "is-idle"; }
+      else if (accuracy >= 80) { status = "On track"; statusClass = "is-good"; }
+      else if (accuracy >= 50) { status = "Needs review"; statusClass = "is-warn"; }
+      else { status = "Needs help"; statusClass = "is-risk"; }
+      var wrongList = s.wrong_questions || [];
+      var wrongChips = wrongList.map(function (w) {
+        var detail = w.selected ? (w.selected + (w.correct_answer ? " → " + w.correct_answer : "")) : "";
+        return '<span class="np-classroom-wrong-chip" title="' + escapeHtml(w.title || "") + (detail ? " · " + escapeHtml(detail) : "") + '">S' + escapeHtml(w.slide_index) + (w.selected ? " · " + escapeHtml(w.selected) : "") + '</span>';
+      }).join("");
+      var missingSlides = s.missing_slides || [];
+      var detailBits = [];
+      if (wrongChips) detailBits.push('<div class="np-classroom-student-wrong"><em>Wrong (' + wrongList.length + ')</em>' + wrongChips + '</div>');
+      if (missingSlides.length) detailBits.push('<div class="np-classroom-student-missing"><em>Not answered (' + missingSlides.length + ')</em><span>' + missingSlides.map(function (n) { return "S" + escapeHtml(n); }).join(", ") + '</span></div>');
+      return '<li class="np-classroom-student-row ' + statusClass + '">' +
+        '<div><span>' + escapeHtml(s.username) + '</span><em class="np-classroom-student-status">' + escapeHtml(status) + '</em></div>' +
         '<strong>' + escapeHtml(correct) + '/' + escapeHtml(submitted) + '</strong>' +
-        '<div class="np-classroom-student-progress"><b style="width:' + studentCompletion + '%"></b><small>' + escapeHtml(studentCompletion) + '% done · ' + escapeHtml(accuracy) + '</small></div>' +
+        '<div class="np-classroom-student-progress"><b style="width:' + studentCompletion + '%"></b><small>' + escapeHtml(studentCompletion) + '% done · accuracy ' + escapeHtml(accuracyLabel) + '</small></div>' +
+        (detailBits.length ? '<div class="np-classroom-student-detail">' + detailBits.join("") + '</div>' : "") +
       '</li>';
     }).join("");
     if (!students) students = '<li class="is-empty">No student data yet</li>';

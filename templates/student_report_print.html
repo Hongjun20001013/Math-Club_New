@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ student.username }} · Progress report · {{ site_brand_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ style_css_revision }}">
+  <style>
+    body { background: #fff; color: #171326; font-family: system-ui, sans-serif; }
+    .np-report-print { max-width: 820px; margin: 0 auto; padding: 28px 24px 40px; }
+    .np-report-print-head { border-bottom: 2px solid #e5e7f5; padding-bottom: 14px; margin-bottom: 20px; }
+    .np-report-print-head h1 { margin: 0 0 6px; font-size: 1.45rem; }
+    .np-report-print-head p { margin: 0; color: #5b6478; line-height: 1.45; }
+    .np-report-print-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 22px; }
+    .np-report-print-stat { border: 1px solid #e5e7f5; border-radius: 10px; padding: 10px 12px; }
+    .np-report-print-stat strong { display: block; font-size: 1.2rem; }
+    .np-report-print-stat span { color: #5b6478; font-size: 0.75rem; }
+    .np-report-print-section { margin-bottom: 20px; }
+    .np-report-print-section h2 { margin: 0 0 8px; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6366f1; }
+    .np-report-print-section li, .np-report-print-section p { margin: 0 0 6px; font-size: 0.88rem; line-height: 1.45; }
+    .np-report-print-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .np-report-print-table th, .np-report-print-table td { border: 1px solid #e5e7f5; padding: 7px 9px; text-align: left; }
+    .np-report-print-table th { background: #f8f7ff; font-size: 0.7rem; text-transform: uppercase; }
+    @media print { .np-report-print-no-print { display: none !important; } .np-report-print { padding: 0; } }
+  </style>
+</head>
+<body>
+  {% set brief = report_brief %}
+  <div class="np-report-print">
+    <p class="np-report-print-no-print"><button type="button" onclick="window.print()">Print</button></p>
+
+    <header class="np-report-print-head">
+      <h1>{{ student.username }} · Progress report</h1>
+      <p><strong>{{ brief.headline }}</strong></p>
+      <p>{{ site_brand_name }} · {{ generated_at }} · Last {{ period_days }} days · {{ period_activity.last_activity_label }}</p>
+    </header>
+
+    <div class="np-report-print-grid">
+      {% for tile in brief.glance %}
+      <div class="np-report-print-stat"><strong>{{ tile.value }}</strong><span>{{ tile.label }}</span></div>
+      {% endfor %}
+    </div>
+
+    <section class="np-report-print-section">
+      <h2>Recommended focus</h2>
+      <ol>
+        {% for step in brief.focus_steps %}
+        <li><strong>{{ step.title }}</strong> — {{ step.detail }}</li>
+        {% endfor %}
+      </ol>
+      {% if brief.focus_line %}<p>Weakest area: {{ brief.focus_line }}</p>{% endif %}
+    </section>
+
+    <section class="np-report-print-section">
+      <h2>Last {{ period_days }} days</h2>
+      <p>{{ period_activity.practice_sessions }} practice sessions · {{ period_activity.exam_sessions }} mocks · {% if period_activity.accuracy_pct is not none %}{{ period_activity.accuracy_pct }}% accuracy (n={{ period_activity.graded_responses }}){% else %}no graded answers{% endif %} · {{ period_activity.wrong_count }} misses</p>
+    </section>
+
+    {% if mock_history.scores %}
+    <section class="np-report-print-section">
+      <h2>Mock scores</h2>
+      <p>{% for pt in mock_history.scores %}{{ pt.score }}/800 ({{ pt.when_label }}){% if not loop.last %} · {% endif %}{% endfor %}</p>
+      <p>{{ mock_history.trend_label }}</p>
+    </section>
+    {% endif %}
+
+    {% if weak_chapters %}
+    <section class="np-report-print-section">
+      <h2>Weakest chapters</h2>
+      <p>{% for ch in weak_chapters %}{{ ch.label }} ({{ ch.pct }}%){% if not loop.last %} · {% endif %}{% endfor %}</p>
+    </section>
+    {% endif %}
+
+    <section class="np-report-print-section">
+      <h2>Unit coverage</h2>
+      <p>{% for unit in unit_summaries %}{{ unit.label }} {{ unit.pct }}% ({{ unit.touched }}/{{ unit.cap }}){% if not loop.last %} · {% endif %}{% endfor %}</p>
+    </section>
+
+    <section class="np-report-print-section">
+      <h2>Mistake digestion</h2>
+      <p>Mastered {{ mistake_mastery.mastered }} · In review {{ mistake_mastery.in_progress }} · Open {{ mistake_mastery.open_misses }}{% if miss_quiz.total_runs %} · Miss quiz pass {{ miss_quiz.pass_rate }}% ({{ miss_quiz.passed_runs }}/{{ miss_quiz.total_runs }}){% endif %}</p>
+    </section>
+
+    <p style="color:#5b6478;font-size:0.8rem;margin-top:24px;">Confidential instructor report.</p>
+  </div>
+  <script>window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 300); });</script>
+</body>
+</html>

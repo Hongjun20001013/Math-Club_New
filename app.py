@@ -108,7 +108,74 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260605-classroom-sync-v2")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260609-report-v1")
+
+_DB_SCHEMA_READY = False
+
+_MOJIBAKE_REPAIRS = (
+    ("â€™", "'"),
+    ("â€˜", "'"),
+    ("â€œ", '"'),
+    ("â€\x9d", '"'),
+    ("â€”", "—"),
+    ("â€“", "–"),
+    ("Ã—", "×"),
+    ("Â°", "°"),
+    ("\ufffd", ""),
+)
+
+
+def _sanitize_display_text(value: Any) -> str:
+    text = "" if value is None else str(value)
+    for bad, good in _MOJIBAKE_REPAIRS:
+        text = text.replace(bad, good)
+    return text
+
+
+def _sanitize_question_for_render(q: dict) -> dict:
+    out = dict(q)
+    out["stem"] = _sanitize_display_text(out.get("stem"))
+    choices = out.get("choices")
+    if isinstance(choices, list):
+        out["choices"] = [_sanitize_display_text(c) for c in choices]
+    return out
+
+
+def _safe_db_commit(db: sqlite3.Connection) -> bool:
+    try:
+        db.commit()
+        return True
+    except sqlite3.OperationalError as exc:
+        app.logger.warning("DB commit failed: %s", exc)
+        try:
+            db.rollback()
+        except sqlite3.Error:
+            pass
+        return False
+
+
+def _wants_json_error() -> bool:
+    p = request.path or ""
+    if p.startswith("/practice/") and "/api/" in p:
+        return True
+    accept = request.headers.get("Accept", "")
+    return "application/json" in accept and "text/html" not in accept
+
+
+def _practice_redirect(domain: str, topic: str, qnum: int, *, mistake_redo: bool = False, analytics_part: str = "", miss_anchor: str = ""):
+    if mistake_redo:
+        return redirect(
+            url_for(
+                "practice_question",
+                domain=domain,
+                topic=topic,
+                qnum=qnum,
+                mistake_redo=1,
+                analytics_part=analytics_part or None,
+                miss_anchor=miss_anchor or None,
+            )
+        )
+    return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=qnum))
 
 
 def _site_brand_name() -> str:
@@ -570,6 +637,9 @@ def _table_columns(db: sqlite3.Connection, table: str) -> List[str]:
 
 
 def init_db():
+    global _DB_SCHEMA_READY
+    if _DB_SCHEMA_READY:
+        return
     db = get_db()
     db.executescript(
         """
@@ -654,6 +724,28 @@ def init_db():
         db.execute(
             "ALTER TABLE practice_attempts ADD COLUMN placement_student_math_course TEXT"
         )
+    att_cols = _table_columns(db, "practice_attempts")
+    if "exam_meta_json" not in att_cols:
+        db.execute("ALTER TABLE practice_attempts ADD COLUMN exam_meta_json TEXT")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS miss_quiz_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            label TEXT,
+            scope_part_id TEXT,
+            item_count INTEGER NOT NULL DEFAULT 0,
+            correct_count INTEGER NOT NULL DEFAULT 0,
+            pct INTEGER NOT NULL DEFAULT 0,
+            passed INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_miss_quiz_runs_user ON miss_quiz_runs(user_id, created_at DESC)"
+    )
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS mistake_learning_progress (
@@ -796,6 +888,48 @@ def init_db():
     _sync_render_users_seed_snapshot(db)
     _maybe_auto_backup_database()
     db.commit()
+    _DB_SCHEMA_READY = True
+
+
+@app.after_request
+def apply_reliability_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    if response.content_type and response.content_type.startswith("application/json"):
+        response.headers["Content-Type"] = "application/json; charset=utf-8"
+    if response.content_type and "text/html" in response.content_type:
+        response.headers.setdefault("Cache-Control", "no-store")
+    return response
+
+
+@app.errorhandler(404)
+def handle_not_found(_err):
+    if _wants_json_error():
+        return jsonify({"ok": False, "error": "not found"}), 404
+    return (
+        render_template(
+            "error.html",
+            code=404,
+            title="Page not found",
+            message="This page does not exist or may have moved.",
+        ),
+        404,
+    )
+
+
+@app.errorhandler(500)
+def handle_internal_error(err):
+    app.logger.exception("Unhandled server error: %s", err)
+    if _wants_json_error():
+        return jsonify({"ok": False, "error": "Server error. Please try again."}), 500
+    return (
+        render_template(
+            "error.html",
+            code=500,
+            title="Something went wrong",
+            message="Please refresh and try again. If you were submitting an answer, your progress is usually saved.",
+        ),
+        500,
+    )
 
 
 @app.before_request
@@ -842,16 +976,7 @@ def inject_template_config():
     )
 
     grants = current_user_access_grants()
-    visible_tracks = []
-    for t in LEARNING_TRACKS:
-        key = t.get("key")
-        if grants is None:
-            visible_tracks.append(t)
-            continue
-        if key == "sat" and "sat" in grants:
-            visible_tracks.append(t)
-        elif key == "placement" and "placement" in grants:
-            visible_tracks.append(t)
+    visible_tracks = _visible_learning_tracks(grants)
     nav_show_dashboard = grants is None or "dashboard" in grants
     nav_show_workspace = grants is None or "sat" in grants
     nav_show_analytics = grants is None or "sat" in grants
@@ -881,6 +1006,7 @@ def inject_template_config():
         "current_user_role": current_user_role(),
         "load_mathjax": load_mathjax,
         "style_css_revision": STYLE_CSS_REVISION,
+        "hard_drill_meta": _hard_drill_display_meta(),
         **_site_branding_context(),
     }
 
@@ -1663,7 +1789,7 @@ def _cm_progress_row(db: sqlite3.Connection, user_id: int, slug: str) -> dict[st
     return {"progress": data, "updated_at": row["updated_at"]}
 
 
-def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress: dict[str, Any]) -> None:
+def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress: dict[str, Any]) -> bool:
     db.execute(
         """
         INSERT INTO course_material_progress (user_id, lesson_slug, progress_json, updated_at)
@@ -1674,7 +1800,7 @@ def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress:
         """,
         (user_id, slug, json.dumps(progress, ensure_ascii=False)),
     )
-    db.commit()
+    return _safe_db_commit(db)
 
 
 def _cm_classroom_question_slides(material: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1785,9 +1911,17 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
     roster = _cm_session_roster(db, int(session_id))
     questions = []
     student_stats = {
-        uid: {"user_id": uid, "username": name, "submitted": 0, "correct": 0, "accuracy": None}
+        uid: {
+            "user_id": uid,
+            "username": name,
+            "submitted": 0,
+            "correct": 0,
+            "accuracy": None,
+            "wrong_questions": [],
+        }
         for uid, name in roster.items()
     }
+    answered_by_student: dict[int, set[int]] = {}
     for q in _cm_classroom_question_slides(material):
         slide_index = int(q["slide_index"])
         q_rows = by_slide.get(slide_index, [])
@@ -1805,10 +1939,21 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
                     "submitted": 0,
                     "correct": 0,
                     "accuracy": None,
+                    "wrong_questions": [],
                 }
+            answered_by_student.setdefault(user_id, set()).add(slide_index)
             student_stats[user_id]["submitted"] += 1
             if int(r["is_correct"] or 0) == 1:
                 student_stats[user_id]["correct"] += 1
+            else:
+                student_stats[user_id]["wrong_questions"].append(
+                    {
+                        "slide_index": slide_index,
+                        "title": str(q.get("title") or f"Slide {slide_index}"),
+                        "selected": str(r["selected_answer"] or ""),
+                        "correct_answer": str(r["correct_answer"] or ""),
+                    }
+                )
             choice = str(r["selected_answer"] or "—").strip() or "—"
             choice_counts[choice] = choice_counts.get(choice, 0) + 1
         missing_students = [
@@ -1843,9 +1988,14 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
                 ],
             }
         )
-    for stat in student_stats.values():
+    all_question_slides = [int(q["slide_index"]) for q in questions]
+    for uid, stat in student_stats.items():
         stat["accuracy"] = round(100 * stat["correct"] / stat["submitted"]) if stat["submitted"] else None
         stat["completion"] = round(100 * stat["submitted"] / len(questions)) if questions else None
+        answered = answered_by_student.get(uid, set())
+        missing = [si for si in all_question_slides if si not in answered]
+        stat["missing_slides"] = missing
+        stat["missing_count"] = len(missing)
     question_count = len(questions)
     total_submitted = sum(int(q["submitted"]) for q in questions)
     total_correct = sum(int(q["correct"]) for q in questions)
@@ -1864,9 +2014,16 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
         "completed_questions": sum(1 for q in questions if q["teach_ready"]),
         "ready_questions": sum(1 for q in questions if q["teach_ready"] or q["almost_ready"]),
         "weakest_questions": weakest_questions,
+        # Struggling students first so the teacher can intervene quickly;
+        # students who have not started yet go to the end.
         "student_breakdown": sorted(
             student_stats.values(),
-            key=lambda item: (-(item["submitted"] or 0), -(item["correct"] or 0), item["username"].lower()),
+            key=lambda item: (
+                1 if not item["submitted"] else 0,
+                item["accuracy"] if item["accuracy"] is not None else 999,
+                -(item["submitted"] or 0),
+                item["username"].lower(),
+            ),
         ),
     }
     return {
@@ -1912,7 +2069,12 @@ def practice_course_material_progress_api(slug: str):
     progress = data.get("progress")
     if not isinstance(progress, dict):
         return jsonify({"ok": False, "error": "invalid progress payload"}), 400
-    _cm_progress_save(db, uid, slug, progress)
+    try:
+        if not _cm_progress_save(db, uid, slug, progress):
+            return jsonify({"ok": False, "error": "server busy, please try again"}), 503
+    except Exception:
+        app.logger.exception("course material progress save failed slug=%s", slug)
+        return jsonify({"ok": False, "error": "could not save progress"}), 500
     return jsonify({"ok": True})
 
 
@@ -1978,7 +2140,7 @@ def practice_course_material_classroom_active_api(slug: str):
                 """,
                 (int(row["id"]), uid, username),
             )
-            db.commit()
+            _safe_db_commit(db)
     return jsonify(
         {
             "ok": True,
@@ -2035,34 +2197,39 @@ def practice_course_material_classroom_response_api(slug: str):
             (int(active["id"]), uid, username),
         )
     username = str(session.get("username") or f"student-{uid}")[:120]
-    db.execute(
-        """
-        INSERT INTO course_class_responses (
-            session_id, lesson_slug, slide_index, question_title, user_id, username,
-            selected_answer, correct_answer, is_correct, submitted_at
+    try:
+        db.execute(
+            """
+            INSERT INTO course_class_responses (
+                session_id, lesson_slug, slide_index, question_title, user_id, username,
+                selected_answer, correct_answer, is_correct, submitted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(session_id, slide_index, user_id) DO UPDATE SET
+                question_title = excluded.question_title,
+                username = excluded.username,
+                selected_answer = excluded.selected_answer,
+                correct_answer = excluded.correct_answer,
+                is_correct = excluded.is_correct,
+                submitted_at = datetime('now')
+            """,
+            (
+                int(active["id"]),
+                slug,
+                slide_index,
+                question_title,
+                uid,
+                username,
+                selected,
+                correct,
+                is_correct,
+            ),
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-        ON CONFLICT(session_id, slide_index, user_id) DO UPDATE SET
-            question_title = excluded.question_title,
-            username = excluded.username,
-            selected_answer = excluded.selected_answer,
-            correct_answer = excluded.correct_answer,
-            is_correct = excluded.is_correct,
-            submitted_at = datetime('now')
-        """,
-        (
-            int(active["id"]),
-            slug,
-            slide_index,
-            question_title,
-            uid,
-            username,
-            selected,
-            correct,
-            is_correct,
-        ),
-    )
-    db.commit()
+        if not _safe_db_commit(db):
+            return jsonify({"ok": False, "error": "server busy, please try again"}), 503
+    except Exception:
+        app.logger.exception("classroom response save failed slug=%s slide=%s", slug, slide_index)
+        return jsonify({"ok": False, "error": "could not save response"}), 500
     return jsonify({"ok": True, "session_id": int(active["id"]), "is_correct": bool(is_correct)})
 
 
@@ -2149,8 +2316,19 @@ def practice_course_material_classroom_slide_api(slug: str):
         """,
         (slide_index, int(active["id"]), slug),
     )
-    db.commit()
-    return jsonify({"ok": True, "session_id": int(active["id"]), "current_slide_index": slide_index})
+    if not _safe_db_commit(db):
+        return jsonify({"ok": False, "error": "server busy, please try again"}), 503
+    updated = db.execute(
+        "SELECT slide_updated_at FROM course_class_sessions WHERE id = ?",
+        (int(active["id"]),),
+    ).fetchone()
+    slide_updated_at = updated["slide_updated_at"] if updated else None
+    return jsonify({
+        "ok": True,
+        "session_id": int(active["id"]),
+        "current_slide_index": slide_index,
+        "slide_updated_at": slide_updated_at,
+    })
 
 
 @app.route("/practice/materials/api/classroom/<slug>/end", methods=["POST"])
@@ -2253,26 +2431,27 @@ def _course_material_pdf_path(slug: str) -> str | None:
 
 
 def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dict]:
-    compiled = load_compiled_bank()
-    topic_questions = compiled.get(domain, {}).get(topic)
-    if isinstance(topic_questions, list) and topic_questions:
-        if domain == "placement":
-            return apply_placement_calculator_flags([dict(q) for q in topic_questions])
-        return _finalize_questions(domain, topic, topic_questions)
-
-    full_path = os.path.join(APP_DIR, file_path)
-    if not os.path.isfile(full_path):
-        return []
     try:
+        compiled = load_compiled_bank()
+        topic_questions = compiled.get(domain, {}).get(topic)
+        if isinstance(topic_questions, list) and topic_questions:
+            if domain == "placement":
+                return apply_placement_calculator_flags([dict(q) for q in topic_questions])
+            return _finalize_questions(domain, topic, topic_questions)
+
+        full_path = os.path.join(APP_DIR, file_path)
+        if not os.path.isfile(full_path):
+            return []
         if domain == "placement":
             qs = parse_placement_tex_file(full_path)
         else:
             qs = parse_tex_file(full_path)
-    except OSError:
+        if domain == "placement":
+            return apply_placement_calculator_flags(qs)
+        return _finalize_questions(domain, topic, qs)
+    except Exception as exc:
+        app.logger.warning("Question load failed for %s/%s: %s", domain, topic, exc)
         return []
-    if domain == "placement":
-        return apply_placement_calculator_flags(qs)
-    return _finalize_questions(domain, topic, qs)
 
 
 # =====================================================
@@ -2696,7 +2875,17 @@ DASHBOARD_TRACK_SHORT: Dict[str, str] = {
     "geometry": "SAT · Geometry",
     "hard_problem": "SAT · Hard",
     "placement": "Placement",
+    "exam_word_problems": "Exam · Word",
+    "exam_unit_bank": "Exam · Unit bank",
+    "exam_random_test": "Exam · Random Test",
 }
+
+EXAM_DOMAIN_BY_SLUG: Dict[str, str] = {
+    "word-problems": "exam_word_problems",
+    "unit-bank": "exam_unit_bank",
+    "random-test": "exam_random_test",
+}
+EXAM_DB_ATTEMPT_IDS_KEY = "exam_db_attempt_ids"
 
 def _practice_session_key(domain: str, topic: str) -> str:
     return f"pa_{domain}_{topic}"
@@ -3489,9 +3678,10 @@ def _tracked_attempt_sql(alias: str = "pa") -> str:
     """Only count deliberate SAT sessions; placement diagnostics are always tracked."""
     return (
         f"({alias}.domain = 'placement' OR "
+        f"({alias}.domain NOT LIKE 'exam_%' AND "
         f"(SELECT COUNT(*) FROM practice_responses pr_track "
         f"WHERE pr_track.attempt_id = {alias}.id "
-        f"AND pr_track.is_correct IN (0, 1)) >= {MIN_TRACKED_SAT_RESPONSES})"
+        f"AND pr_track.is_correct IN (0, 1)) >= {MIN_TRACKED_SAT_RESPONSES}))"
     )
 
 
@@ -4048,7 +4238,7 @@ def index():
         return redirect(_student_home_url(grants))
     return render_template(
         "dashboard.html",
-        tracks=LEARNING_TRACKS,
+        tracks=_visible_learning_tracks(grants),
         **_dashboard_context(),
     )
 
@@ -4138,11 +4328,118 @@ def admin_export_students_csv():
     )
 
 
+@app.route("/admin/export/weekly-digest.csv")
+def admin_export_weekly_digest_csv():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    import csv
+    import io
+
+    db = get_db()
+    try:
+        digest_days = int(request.args.get("days") or 7)
+    except ValueError:
+        digest_days = 7
+    if digest_days not in (7, 14, 30):
+        digest_days = 7
+    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
+    digest = _admin_weekly_digest(db, digest_days, hide_demo=hide_demo)
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "username",
+            "status",
+            "last_activity",
+            "practice_sessions",
+            "exam_sessions",
+            "graded_responses",
+            "latest_exam",
+            "wrong_count",
+            "accuracy_pct",
+            "accuracy_basis",
+            "weak_chapter",
+            "weak_chapter_pct",
+            "weak_unit",
+            "weak_unit_pct",
+            "mock_first_score",
+            "mock_latest_score",
+            "mock_trend",
+            "mastery_pct",
+            "quality_hint",
+            "last_login_at",
+        ]
+    )
+    for row in digest["students"]:
+        writer.writerow(
+            [
+                row["username"],
+                row["status"],
+                row["last_activity"] or "",
+                row["practice_sessions"],
+                row["exam_sessions"],
+                row.get("graded_count") or 0,
+                row.get("latest_exam_label") or "",
+                row["wrong_count"],
+                row.get("accuracy_pct") if row.get("accuracy_pct") is not None else "",
+                row.get("accuracy_basis") if row.get("accuracy_basis") is not None else "",
+                row.get("weak_chapter") or "",
+                row.get("weak_chapter_pct") if row.get("weak_chapter_pct") is not None else "",
+                row.get("weak_unit") or "",
+                row.get("weak_unit_pct") if row.get("weak_unit_pct") is not None else "",
+                row.get("mock_first_score") if row.get("mock_first_score") is not None else "",
+                row.get("mock_latest_score") if row.get("mock_latest_score") is not None else "",
+                row.get("mock_trend_label") or "",
+                row.get("mastery_pct") if row.get("mastery_pct") is not None else "",
+                row.get("quality_hint") or "",
+                row.get("last_login_at") or "",
+            ]
+        )
+    filename = f"novel-prep-learning-pulse-{digest_days}d-{date.today().isoformat()}.csv"
+    return Response(
+        buf.getvalue(),
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.route("/admin/learning-pulse/print")
+def admin_learning_pulse_print():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    try:
+        digest_days = int(request.args.get("days") or 7)
+    except ValueError:
+        digest_days = 7
+    if digest_days not in (7, 14, 30):
+        digest_days = 7
+    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
+    return render_template(
+        "admin_digest_print.html",
+        weekly_digest=_admin_weekly_digest(db, digest_days, hide_demo=hide_demo),
+        digest_days=digest_days,
+        hide_demo=hide_demo,
+    )
+
+
 @app.route("/learn/<track_key>")
 def learning_track(track_key: str):
     track = next((t for t in LEARNING_TRACKS if t["key"] == track_key), None)
     if track is None:
         return "Unknown learning track", 404
+    grants = current_user_access_grants()
+    if grants is not None:
+        if track_key == "sat" and "sat" not in grants:
+            abort(404)
+        if track_key == "placement" and "placement" not in grants:
+            abort(404)
+        if track_key not in ("sat", "placement"):
+            return redirect(_student_home_url(grants))
     session["active_track_label"] = track["title"]
     return render_template("learning_track.html", track=track)
 
@@ -4337,6 +4634,544 @@ def _mistake_tags_json_from_form(form) -> str:
     allowed = {o["id"] for o in MISTAKE_TAG_OPTIONS}
     picked = sorted({x for x in form.getlist("mistake_tag") if x in allowed})
     return json.dumps(picked, ensure_ascii=False)
+
+
+def _learner_key_for_user(user_id: int | None) -> str:
+    if user_id is not None:
+        return f"u:{int(user_id)}"
+    return _learner_key()
+
+
+def _persist_miss_quiz_run(
+    db: sqlite3.Connection,
+    user_id: Any,
+    *,
+    label: str,
+    scope_part_id: str | None,
+    total: int,
+    correct_n: int,
+    pct: int,
+    passed: bool,
+) -> None:
+    if not user_id:
+        return
+    db.execute(
+        """
+        INSERT INTO miss_quiz_runs
+        (user_id, label, scope_part_id, item_count, correct_count, pct, passed)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            int(user_id),
+            str(label or "Miss quiz")[:220],
+            str(scope_part_id)[:40] if scope_part_id else None,
+            int(total),
+            int(correct_n),
+            int(pct),
+            1 if passed else 0,
+        ),
+    )
+    _safe_db_commit(db)
+
+
+def _student_chapter_progress_rows(db: sqlite3.Connection, user_id: int | None) -> list[dict[str, Any]]:
+    compiled = load_compiled_bank()
+    rows: list[dict[str, Any]] = []
+    unit_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for domain, topic, section, unit_label in STUDENT_CHAPTER_SLICES:
+        cap = len(compiled.get(domain, {}).get(topic) or [])
+        if cap <= 0:
+            tex = BANKS.get(domain, {}).get(topic)
+            if tex:
+                cap = len(get_questions_for_topic(domain, topic, tex))
+        engaged = _practice_distinct_answered(db, user_id, domain, topic) if cap else 0
+        pct = min(100, round(100 * engaged / cap)) if cap else 0
+        row = {
+            "domain": domain,
+            "topic": topic,
+            "section": section,
+            "unit_label": unit_label,
+            "title": TOPIC_TITLES.get(topic, topic),
+            "cap": cap,
+            "engaged": engaged,
+            "pct": pct,
+            "href": url_for("practice_question", domain=domain, topic=topic, qnum=0) if cap else None,
+            "is_pt": section == "PT",
+        }
+        rows.append(row)
+        unit_groups[unit_label].append(row)
+    unit_summaries: list[dict[str, Any]] = []
+    for unit_label in ("Unit 1", "Unit 2", "Unit 3", "Unit 4"):
+        group = unit_groups.get(unit_label) or []
+        chapter_rows = [r for r in group if not r["is_pt"]]
+        caps = sum(int(r["cap"] or 0) for r in chapter_rows)
+        touched = sum(int(r["engaged"] or 0) for r in chapter_rows)
+        unit_summaries.append(
+            {
+                "label": unit_label,
+                "pct": min(100, round(100 * touched / caps)) if caps else 0,
+                "touched": touched,
+                "cap": caps,
+            }
+        )
+    return rows, unit_summaries
+
+
+def _student_mock_score_history(db: sqlite3.Connection, user_id: int) -> list[dict[str, Any]]:
+    rows = db.execute(
+        """
+        SELECT id, exam_meta_json, created_at
+        FROM practice_attempts
+        WHERE user_id = ? AND domain = 'exam_random_test' AND exam_meta_json IS NOT NULL
+        ORDER BY id ASC
+        """,
+        (user_id,),
+    ).fetchall()
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        try:
+            meta = json.loads(row["exam_meta_json"] or "{}")
+            score = int(meta.get("score") or 0)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            continue
+        if score <= 0:
+            continue
+        out.append(
+            {
+                "attempt_id": int(row["id"]),
+                "score": score,
+                "when_label": _session_when_label(row["created_at"]),
+                "created_at": row["created_at"],
+                "summary_href": url_for("practice_session_summary", attempt_id=int(row["id"])),
+                "bar_pct": max(8, round(100 * score / 800)),
+            }
+        )
+    if out:
+        first = out[0]["score"]
+        last = out[-1]["score"]
+        delta = last - first
+        trend_label = f"{delta:+d} since first mock" if len(out) >= 2 else "First mock on record"
+    else:
+        trend_label = "No Random Test saved yet"
+        delta = 0
+    return {
+        "scores": out,
+        "latest": out[-1] if out else None,
+        "best": max(out, key=lambda x: x["score"]) if out else None,
+        "trend_label": trend_label,
+        "trend_delta": delta if out else None,
+        "chart_max": 800,
+    }
+
+
+def _student_weak_units(db: sqlite3.Connection, user_id: int) -> list[dict[str, Any]]:
+    rows = db.execute(
+        """
+        SELECT
+            pa.domain,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded
+        FROM practice_attempts pa
+        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE pa.user_id = ?
+          AND pa.domain IN ('algebra', 'advanced_math', 'problem_solving', 'geometry', 'hard_problem')
+        GROUP BY pa.domain
+        HAVING graded >= 3
+        """,
+        (user_id,),
+    ).fetchall()
+    units: list[dict[str, Any]] = []
+    for row in rows:
+        graded = int(row["graded"] or 0)
+        if graded <= 0:
+            continue
+        pct = round(100 * int(row["correct"] or 0) / graded)
+        domain = str(row["domain"] or "")
+        units.append(
+            {
+                "label": _dashboard_track_short(domain),
+                "pct": pct,
+                "href": url_for("practice_analytics", part=MISS_PART_BY_DOMAIN.get(domain, "sat")),
+            }
+        )
+    units.sort(key=lambda x: (x["pct"], x["label"]))
+    return units[:4]
+
+
+def _student_mistake_mastery(db: sqlite3.Connection, user_id: int) -> dict[str, Any]:
+    lk = _learner_key_for_user(user_id)
+    status_rows = db.execute(
+        """
+        SELECT status, COUNT(*) AS c
+        FROM mistake_learning_progress
+        WHERE learner_key = ?
+        GROUP BY status
+        """,
+        (lk,),
+    ).fetchall()
+    counts = {str(r["status"] or ""): int(r["c"] or 0) for r in status_rows}
+    total = sum(counts.values())
+    mastered = counts.get("mastered", 0)
+    in_progress = counts.get("reviewed", 0) + counts.get("redo_correct", 0)
+    open_misses = counts.get("unreviewed", 0)
+    digest_pct = round(100 * mastered / total) if total else None
+    return {
+        "total": total,
+        "mastered": mastered,
+        "in_progress": in_progress,
+        "open_misses": open_misses,
+        "digest_pct": digest_pct,
+        "analytics_href": url_for("practice_analytics", part="sat"),
+    }
+
+
+def _student_miss_quiz_stats(db: sqlite3.Connection, user_id: int) -> dict[str, Any]:
+    rows = db.execute(
+        """
+        SELECT id, label, scope_part_id, item_count, correct_count, pct, passed, created_at
+        FROM miss_quiz_runs
+        WHERE user_id = ?
+        ORDER BY id DESC
+        LIMIT 20
+        """,
+        (user_id,),
+    ).fetchall()
+    recent: list[dict[str, Any]] = []
+    passed_n = 0
+    for row in rows:
+        passed = int(row["passed"] or 0) == 1
+        if passed:
+            passed_n += 1
+        recent.append(
+            {
+                "label": str(row["label"] or "Miss quiz"),
+                "pct": int(row["pct"] or 0),
+                "passed": passed,
+                "item_count": int(row["item_count"] or 0),
+                "when_label": _session_when_label(row["created_at"]),
+            }
+        )
+    total_runs = len(rows)
+    pass_rate = round(100 * passed_n / total_runs) if total_runs else None
+    return {
+        "total_runs": total_runs,
+        "passed_runs": passed_n,
+        "pass_rate": pass_rate,
+        "pass_threshold": MISS_QUIZ_PASS_PERCENT,
+        "recent": recent[:8],
+    }
+
+
+def _student_weak_chapters(
+    db: sqlite3.Connection, user_id: int, *, limit: int = 4
+) -> list[dict[str, Any]]:
+    chapter_topics = [(d, t, sec) for d, t, sec, _ in STUDENT_CHAPTER_SLICES]
+    if not chapter_topics:
+        return []
+    chapter_ph = " OR ".join("(pa.domain = ? AND pa.topic = ?)" for _ in chapter_topics)
+    params: list[Any] = [user_id]
+    for domain, topic, _sec in chapter_topics:
+        params.extend([domain, topic])
+    rows = db.execute(
+        f"""
+        SELECT
+            pa.domain,
+            pa.topic,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded
+        FROM practice_attempts pa
+        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE pa.user_id = ?
+          AND ({chapter_ph})
+        GROUP BY pa.domain, pa.topic
+        HAVING graded >= 3
+        """,
+        params,
+    ).fetchall()
+    chapters: list[dict[str, Any]] = []
+    for row in rows:
+        graded = int(row["graded"] or 0)
+        if graded <= 0:
+            continue
+        domain = str(row["domain"] or "")
+        topic = str(row["topic"] or "")
+        pct = round(100 * int(row["correct"] or 0) / graded)
+        section = next(
+            (sec for dom, top, sec, _ in STUDENT_CHAPTER_SLICES if dom == domain and top == topic),
+            topic,
+        )
+        chapters.append(
+            {
+                "section": section,
+                "label": _digest_chapter_slice_label(domain, topic),
+                "pct": pct,
+                "graded": graded,
+                "href": url_for("practice_question", domain=domain, topic=topic, qnum=0),
+            }
+        )
+    chapters.sort(key=lambda x: (x["pct"], x["section"]))
+    return chapters[:limit]
+
+
+def _student_period_activity(
+    db: sqlite3.Connection, user_id: int, *, days: int = 30
+) -> dict[str, Any]:
+    window_sql = f"-{int(days)} days"
+    row = db.execute(
+        f"""
+        SELECT
+            MAX(COALESCE(pr.submitted_at, pa.created_at)) AS last_activity,
+            COUNT(DISTINCT CASE
+                WHEN pa.domain NOT LIKE 'exam_%' AND pa.domain != 'placement' THEN pa.id
+            END) AS practice_sessions,
+            COUNT(DISTINCT CASE WHEN pa.domain LIKE 'exam_%' THEN pa.id END) AS exam_sessions,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct,
+            SUM(CASE WHEN pr.is_correct = 0 THEN 1 ELSE 0 END) AS wrong_count
+        FROM practice_attempts pa
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE pa.user_id = ?
+          AND pa.created_at >= datetime('now', ?)
+        """,
+        (user_id, window_sql),
+    ).fetchone()
+    graded = int(row["graded"] or 0) if row else 0
+    correct = int(row["correct"] or 0) if row else 0
+    last_activity = row["last_activity"] if row else None
+    return {
+        "days": days,
+        "last_activity": last_activity,
+        "last_activity_label": _session_when_label(last_activity) or "No activity",
+        "status": _activity_status_label(last_activity),
+        "practice_sessions": int(row["practice_sessions"] or 0) if row else 0,
+        "exam_sessions": int(row["exam_sessions"] or 0) if row else 0,
+        "graded_responses": graded,
+        "wrong_count": int(row["wrong_count"] or 0) if row else 0,
+        "accuracy_pct": round(100 * correct / graded) if graded else None,
+    }
+
+
+def _student_report_brief(ctx: dict[str, Any]) -> dict[str, Any]:
+    mock = ctx["mock_history"]
+    mastery = ctx["mistake_mastery"]
+    miss_quiz = ctx["miss_quiz"]
+    weak_chapters = ctx.get("weak_chapters") or []
+    weak_units = ctx.get("weak_units") or []
+    chapter_pct = int(ctx.get("chapter_overall_pct") or 0)
+    activity = ctx.get("period_activity") or {}
+    username = ctx.get("username") or "Student"
+
+    has_mock = bool(mock.get("scores"))
+    has_practice = chapter_pct > 0 or int(activity.get("graded_responses") or 0) > 0
+    open_misses = int(mastery.get("open_misses") or 0)
+
+    if has_mock and (mock.get("trend_delta") or 0) > 0:
+        status = "improving"
+    elif has_mock or (has_practice and chapter_pct >= 25):
+        status = "on_track"
+    elif has_practice:
+        status = "building"
+    else:
+        status = "starting"
+
+    if has_mock and mock.get("latest"):
+        latest_score = int(mock["latest"]["score"])
+        headline = f"Latest mock {latest_score}/800"
+        if mock.get("best") and int(mock["best"]["score"]) > latest_score:
+            headline += f" · best {mock['best']['score']}"
+        if mock.get("trend_delta") is not None and len(mock.get("scores") or []) >= 2:
+            headline += f" · {mock['trend_label']}"
+    elif has_practice:
+        headline = f"{chapter_pct}% chapter coverage — take a mock to set your score baseline"
+    else:
+        headline = "Ready to begin — one lesson, one drill, one mock starts your report"
+
+    if ctx.get("viewer") == "admin":
+        act_label = activity.get("last_activity_label") or "No activity"
+        headline = f"{username}: {headline} · last active {act_label}"
+
+    glance = [
+        {
+            "key": "mock",
+            "label": "Latest mock",
+            "value": str(mock["latest"]["score"]) if mock.get("latest") else "—",
+            "hint": mock.get("trend_label") if has_mock else "No mock yet",
+        },
+        {
+            "key": "coverage",
+            "label": "Chapter coverage",
+            "value": f"{chapter_pct}%",
+            "hint": "Distinct questions across 1.1–4.4",
+        },
+        {
+            "key": "mastery",
+            "label": "Misses mastered",
+            "value": f"{mastery['digest_pct']}%" if mastery.get("digest_pct") is not None else "—",
+            "hint": f"{mastery.get('open_misses', 0)} open misses" if open_misses else "Mistake ladder",
+        },
+        {
+            "key": "miss_quiz",
+            "label": "Miss quiz pass",
+            "value": f"{miss_quiz['pass_rate']}%" if miss_quiz.get("pass_rate") is not None else "—",
+            "hint": f"{miss_quiz.get('passed_runs', 0)}/{miss_quiz.get('total_runs', 0)} runs"
+            if miss_quiz.get("total_runs")
+            else "Not started",
+        },
+    ]
+
+    focus_steps: list[dict[str, Any]] = []
+    if not has_mock:
+        focus_steps.append(
+            {
+                "kind": "mock",
+                "title": "Take a Random Test",
+                "detail": "Save your first mock score — this becomes the anchor for all future progress.",
+                "href": ctx.get("random_test_href"),
+            }
+        )
+    if weak_chapters:
+        focus = weak_chapters[0]
+        focus_steps.append(
+            {
+                "kind": "review",
+                "title": f"Review {focus['section']}",
+                "detail": f"Lowest chapter slice at {focus['pct']}% ({focus['label'].split(' · ', 1)[-1]}).",
+                "href": focus.get("href"),
+            }
+        )
+    elif weak_units:
+        focus = weak_units[0]
+        focus_steps.append(
+            {
+                "kind": "review",
+                "title": f"Strengthen {focus['label']}",
+                "detail": f"Domain accuracy {focus['pct']}% — drill this unit next.",
+                "href": focus.get("href"),
+            }
+        )
+    if open_misses >= 3:
+        focus_steps.append(
+            {
+                "kind": "miss_quiz",
+                "title": "Run a miss quiz",
+                "detail": f"{open_misses} misses still open — clear them with a focused redo set.",
+                "href": ctx.get("analytics_href"),
+            }
+        )
+    elif not has_practice:
+        focus_steps.append(
+            {
+                "kind": "start",
+                "title": "Start Unit 1.1",
+                "detail": "Open the course deck or bank drill and answer at least 3 questions to unlock tracking.",
+                "href": ctx.get("practice_href"),
+            }
+        )
+    if not focus_steps:
+        focus_steps.append(
+            {
+                "kind": "maintain",
+                "title": "Keep the weekly loop",
+                "detail": "One lesson deck, one bank drill, one mock, then mistake redo.",
+                "href": ctx.get("practice_href"),
+            }
+        )
+
+    for idx, step in enumerate(focus_steps[:3], start=1):
+        step["step"] = idx
+
+    focus_line = None
+    if weak_chapters:
+        w = weak_chapters[0]
+        focus_line = f"{w['label']} — {w['pct']}% accuracy"
+    elif weak_units:
+        w = weak_units[0]
+        focus_line = f"{w['label']} — {w['pct']}% accuracy"
+
+    return {
+        "headline": headline,
+        "status": status,
+        "glance": glance,
+        "focus_steps": focus_steps[:3],
+        "focus_line": focus_line,
+    }
+
+
+def _student_report_context(
+    db: sqlite3.Connection,
+    user_id: int,
+    *,
+    viewer: str = "student",
+    student: dict[str, Any] | None = None,
+    period_days: int = 30,
+) -> dict[str, Any]:
+    chapter_rows, unit_summaries = _student_chapter_progress_rows(db, user_id)
+    chapter_only = [r for r in chapter_rows if not r["is_pt"]]
+    chapter_caps = sum(int(r["cap"] or 0) for r in chapter_only)
+    chapter_touched = sum(min(int(r["engaged"] or 0), int(r["cap"] or 0)) for r in chapter_only)
+    weak_chapters = _student_weak_chapters(db, user_id)
+    period_activity = _student_period_activity(db, user_id, days=period_days)
+    recent_sessions = _admin_attempt_rows(db, user_id)[:6]
+
+    if student is None:
+        row = db.execute(
+            "SELECT id, username, is_active, created_at FROM users WHERE id = ? AND role = 'student'",
+            (user_id,),
+        ).fetchone()
+        student = dict(row) if row else {"id": user_id, "username": f"User {user_id}"}
+
+    ctx: dict[str, Any] = {
+        "viewer": viewer,
+        "student": student,
+        "username": str(student.get("username") or ""),
+        "user_id": user_id,
+        "period_days": period_days,
+        "period_activity": period_activity,
+        "mock_history": _student_mock_score_history(db, user_id),
+        "weak_units": _student_weak_units(db, user_id),
+        "weak_chapters": weak_chapters,
+        "chapter_rows": chapter_rows,
+        "unit_summaries": unit_summaries,
+        "chapter_overall_pct": min(100, round(100 * chapter_touched / chapter_caps))
+        if chapter_caps
+        else 0,
+        "mistake_mastery": _student_mistake_mastery(db, user_id),
+        "miss_quiz": _student_miss_quiz_stats(db, user_id),
+        "recent_sessions": recent_sessions,
+        "random_test_href": url_for("practice_random_test_intro"),
+        "analytics_href": url_for("practice_analytics", part="sat"),
+        "practice_href": url_for("practice"),
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+    }
+    if viewer == "admin":
+        ctx["admin_href"] = url_for("admin_student_detail", user_id=user_id)
+        ctx["print_href"] = url_for("admin_student_report_print", user_id=user_id)
+        ctx["back_href"] = url_for("admin")
+    else:
+        ctx["back_href"] = url_for("practice")
+    ctx["report_brief"] = _student_report_brief(ctx)
+    return ctx
+
+
+def _student_progress_context(db: sqlite3.Connection, user_id: int) -> dict[str, Any]:
+    ctx = _student_report_context(db, user_id, viewer="student")
+    return {
+        "mock_history": ctx["mock_history"],
+        "weak_units": ctx["weak_units"],
+        "chapter_rows": ctx["chapter_rows"],
+        "unit_summaries": ctx["unit_summaries"],
+        "chapter_overall_pct": ctx["chapter_overall_pct"],
+        "mistake_mastery": ctx["mistake_mastery"],
+        "miss_quiz": ctx["miss_quiz"],
+        "random_test_href": ctx["random_test_href"],
+        "analytics_href": ctx["analytics_href"],
+        "report_brief": ctx["report_brief"],
+        "weak_chapters": ctx["weak_chapters"],
+        "period_activity": ctx["period_activity"],
+        "viewer": "student",
+        "back_href": ctx["back_href"],
+        "generated_at": ctx["generated_at"],
+    }
 
 
 def _learner_key() -> str:
@@ -4999,6 +5834,32 @@ SAT_MISTAKE_UNIT_META: Dict[str, Dict[str, Any]] = {
 SAT_MISTAKE_TEST_SIZE = 22
 SAT_MISTAKE_TEST_SECONDS = 35 * 60
 
+STUDENT_CHAPTER_SLICES: List[tuple[str, str, str, str]] = [
+    ("algebra", "1_1", "1.1", "Unit 1"),
+    ("algebra", "1_2", "1.2", "Unit 1"),
+    ("algebra", "1_3", "1.3", "Unit 1"),
+    ("algebra", "1_4", "1.4", "Unit 1"),
+    ("algebra", "1_5", "1.5", "Unit 1"),
+    ("algebra", "1_pt", "PT", "Unit 1"),
+    ("advanced_math", "2_1", "2.1", "Unit 2"),
+    ("advanced_math", "2_2", "2.2", "Unit 2"),
+    ("advanced_math", "2_3", "2.3", "Unit 2"),
+    ("advanced_math", "2_pt", "PT", "Unit 2"),
+    ("problem_solving", "3_1", "3.1", "Unit 3"),
+    ("problem_solving", "3_2", "3.2", "Unit 3"),
+    ("problem_solving", "3_3", "3.3", "Unit 3"),
+    ("problem_solving", "3_4", "3.4", "Unit 3"),
+    ("problem_solving", "3_5", "3.5", "Unit 3"),
+    ("problem_solving", "3_6", "3.6", "Unit 3"),
+    ("problem_solving", "3_7", "3.7", "Unit 3"),
+    ("problem_solving", "3_pt", "PT", "Unit 3"),
+    ("geometry", "4_1", "4.1", "Unit 4"),
+    ("geometry", "4_2", "4.2", "Unit 4"),
+    ("geometry", "4_3", "4.3", "Unit 4"),
+    ("geometry", "4_4", "4.4", "Unit 4"),
+    ("geometry", "4_pt", "PT", "Unit 4"),
+]
+
 
 def _miss_module_spec(part_id: str) -> Dict[str, Any] | None:
     for s in SAT_MISS_MODULE_SPECS:
@@ -5354,7 +6215,7 @@ def practice_sat_mistake_test_question(test_id: int, step: int):
         "sat_mistake_test.html",
         test_id=test_id,
         item=item,
-        q=q,
+        q=_sanitize_question_for_render(q),
         step=step,
         total=len(items),
         answered_qset=answered,
@@ -5611,7 +6472,7 @@ def _analytics_partitions(rows: List[dict]) -> List[dict]:
                 {
                     "id": "hard",
                     "label": "Hard Problem Drill",
-                    "subtitle": "Hard sets I–XVI · classified by SAT unit",
+                    "subtitle": f"Hard sets {_hard_drill_display_meta()['range_label']} · classified by SAT unit",
                     "count": len(hard_rows),
                     "classifier": _build_mistake_classifier(hard_rows),
                     "domains": {"hard_problem"},
@@ -5840,11 +6701,19 @@ def placement_begin():
 def practice():
     """SAT Math home: four modules (specialized, challenge, exams, analytics)."""
     session["active_track_label"] = "SAT Math"
-    cm = load_course_materials()
+    return render_template("practice_hub.html", **_practice_hub_context())
+
+
+@app.route("/practice/progress")
+def practice_progress():
+    """Student learning dashboard: mock trends, chapter coverage, miss-quiz digest."""
+    session["active_track_label"] = "SAT Math"
+    if not require_login():
+        return redirect(url_for("login", next=url_for("practice_progress")))
+    db = get_db()
+    uid = int(session["user_id"])
     return render_template(
-        "practice_hub.html",
-        cm_total=int(cm.get("total") or 0),
-        cm_ready=int(cm.get("available") or 0),
+        "student_report.html", **_student_report_context(db, uid, viewer="student")
     )
 
 
@@ -5971,30 +6840,6 @@ def practice_challenge():
     db = get_db()
     uid = session.get("user_id")
 
-    def _int_to_roman(value: int) -> str:
-        pairs = (
-            (1000, "M"),
-            (900, "CM"),
-            (500, "D"),
-            (400, "CD"),
-            (100, "C"),
-            (90, "XC"),
-            (50, "L"),
-            (40, "XL"),
-            (10, "X"),
-            (9, "IX"),
-            (5, "V"),
-            (4, "IV"),
-            (1, "I"),
-        )
-        out = ""
-        n = max(1, int(value))
-        for amount, numeral in pairs:
-            while n >= amount:
-                out += numeral
-                n -= amount
-        return out
-
     def _hard_set_number(topic: str, fallback_idx: int) -> int:
         match = re.match(r"^hard_(\d+)$", topic)
         return int(match.group(1)) if match else fallback_idx
@@ -6099,6 +6944,7 @@ def practice_challenge():
         "practice_challenge.html",
         hard_sets=hard_sets,
         hard_stats=hard_stats,
+        hard_drill_meta=_hard_drill_display_meta(),
         continue_set=continue_set,
         next_set=next_set,
         default_index=default_index,
@@ -6459,6 +7305,19 @@ def _save_random_test_answer(module_id: int, step: int, selected: str) -> None:
     answers[str(module_id)] = module_answers
     session[RANDOM_TEST_SESSION_KEY] = attempt
     session.modified = True
+    uid = session.get("user_id")
+    if not uid:
+        return
+    seed = str(attempt.get("seed") or "")
+    if not seed:
+        return
+    db = get_db()
+    db_attempt_id = _ensure_exam_db_attempt(db, uid, "random-test", seed=seed)
+    if not db_attempt_id:
+        return
+    q, qi = _random_test_question_at(module_id, step, seed)
+    if q is not None and qi is not None:
+        _persist_exam_response(db, db_attempt_id, qi, q, selected)
 
 
 def _random_test_deadline_ms(module_id: int) -> int:
@@ -6611,6 +7470,19 @@ def _save_practice_exam_answer(category: dict[str, Any], set_id: int, step: int,
     answers[key] = set_answers
     session[category["session_key"]] = answers
     session.modified = True
+    uid = session.get("user_id")
+    category_slug = str(category.get("slug") or "")
+    if not uid or category_slug not in EXAM_DOMAIN_BY_SLUG:
+        return
+    db = get_db()
+    db_attempt_id = _ensure_exam_db_attempt(db, uid, category_slug, set_id=set_id)
+    if not db_attempt_id:
+        return
+    _, exam_set = _practice_exam_set_or_404(category_slug, set_id)
+    items = exam_set["items"]
+    if step < 0 or step >= len(items):
+        return
+    _persist_exam_response(db, db_attempt_id, step, items[step]["q"], selected)
 
 
 def _practice_exam_answered_set(category: dict[str, Any], set_id: int) -> set[int]:
@@ -6763,7 +7635,7 @@ def practice_random_test_question(module_id: int, step: int):
         set_id=module_id,
         set_count=2,
         item=item,
-        q=q,
+        q=_sanitize_question_for_render(q),
         step=step,
         total=len(items),
         answered_qset=answered_qset,
@@ -6880,6 +7752,29 @@ def practice_random_test_done():
     score_pct = round(100 * (score - 200) / 600) if score >= 200 else 0
     module_gap = abs(int(module_results[0]["correct"]) - int(module_results[1]["correct"])) if len(module_results) == 2 else 0
     score_band = "Advanced" if score >= 700 else ("On Track" if score >= 600 else ("Building" if score >= 500 else "Needs Focus"))
+    exam_meta = {
+        "category_slug": "random-test",
+        "seed": str(attempt.get("seed") or ""),
+        "score": score,
+        "total_correct": total_correct,
+        "total_questions": total_questions,
+        "raw_accuracy": raw_accuracy,
+        "score_band": score_band,
+    }
+    session_summary_href = None
+    uid = session.get("user_id")
+    if uid:
+        db = get_db()
+        db_attempt_id = _persist_random_test_exam_to_db(
+            db,
+            uid,
+            str(attempt.get("seed") or ""),
+            modules,
+            answers,
+            exam_meta,
+        )
+        if db_attempt_id:
+            session_summary_href = url_for("practice_session_summary", attempt_id=db_attempt_id)
     return render_template(
         "random_test_done.html",
         score=score,
@@ -6895,6 +7790,7 @@ def practice_random_test_done():
         target_600=max(0, 600 - score),
         target_700=max(0, 700 - score),
         review=review,
+        session_summary_href=session_summary_href,
     )
 
 
@@ -6918,7 +7814,7 @@ def practice_exam_question(category_slug: str, set_id: int, step: int):
         set_id=set_id,
         set_count=category["set_count"],
         item=item,
-        q=q,
+        q=_sanitize_question_for_render(q),
         step=step,
         total=len(items),
         answered_qset=answered_qset,
@@ -6985,6 +7881,28 @@ def practice_exam_done(category_slug: str, set_id: int):
             }
         )
     total = len(exam_set["items"])
+    exam_meta = {
+        "category_slug": category_slug,
+        "set_id": set_id,
+        "correct": correct,
+        "total": total,
+        "accuracy": round(100 * correct / total) if total else 0,
+    }
+    session_summary_href = None
+    uid = session.get("user_id")
+    if uid:
+        db = get_db()
+        db_attempt_id = _persist_category_exam_to_db(
+            db,
+            uid,
+            category_slug,
+            set_id,
+            exam_set["items"],
+            answers,
+            exam_meta,
+        )
+        if db_attempt_id:
+            session_summary_href = url_for("practice_session_summary", attempt_id=db_attempt_id)
     return render_template(
         "word_problem_exam_done.html",
         category=category,
@@ -6997,6 +7915,7 @@ def practice_exam_done(category_slug: str, set_id: int):
         review=review,
         next_set_href=url_for("practice_exam_question", category_slug=category_slug, set_id=set_id + 1, step=0)
         if set_id < category["set_count"] else None,
+        session_summary_href=session_summary_href,
     )
 
 
@@ -7369,7 +8288,7 @@ def practice_mistake_reflect(domain: str, topic: str, q_index: int):
         attempt_id=attempt_id,
         continue_to=continue_to,
         total=len(questions),
-        q=q,
+        q=_sanitize_question_for_render(q),
         yours=(pr_row["selected_answer"] or "").strip(),
         key_disp=(pr_row["correct_answer"] or "").strip(),
         mistake_tag_options=MISTAKE_TAG_OPTIONS,
@@ -7647,6 +8566,342 @@ def _insert_practice_attempt(
     return int(cur.lastrowid)
 
 
+def _visible_learning_tracks(grants: set[str] | None) -> list[dict[str, Any]]:
+    if grants is None:
+        return list(LEARNING_TRACKS)
+    visible: list[dict[str, Any]] = []
+    for track in LEARNING_TRACKS:
+        key = track.get("key")
+        if key == "sat" and "sat" in grants:
+            visible.append(track)
+        elif key == "placement" and "placement" in grants:
+            visible.append(track)
+    return visible
+
+
+def _exam_topic(category_slug: str, *, set_id: int | None = None, seed: str | None = None) -> str:
+    if category_slug == "random-test":
+        return f"seed_{seed or 'unknown'}"
+    return f"set_{int(set_id or 0)}"
+
+
+def _exam_db_attempt_cache_key(category_slug: str, topic: str) -> str:
+    return f"{category_slug}:{topic}"
+
+
+def _get_exam_db_attempt_id(
+    category_slug: str, *, set_id: int | None = None, seed: str | None = None
+) -> int | None:
+    topic = _exam_topic(category_slug, set_id=set_id, seed=seed)
+    cache = session.get(EXAM_DB_ATTEMPT_IDS_KEY)
+    if isinstance(cache, dict):
+        raw = cache.get(_exam_db_attempt_cache_key(category_slug, topic))
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            pass
+    if category_slug == "random-test":
+        attempt = session.get(RANDOM_TEST_SESSION_KEY)
+        if isinstance(attempt, dict) and attempt.get("db_attempt_id"):
+            try:
+                return int(attempt["db_attempt_id"])
+            except (TypeError, ValueError):
+                pass
+    return None
+
+
+def _set_exam_db_attempt_id(category_slug: str, topic: str, attempt_id: int) -> None:
+    cache = session.get(EXAM_DB_ATTEMPT_IDS_KEY)
+    if not isinstance(cache, dict):
+        cache = {}
+    cache[_exam_db_attempt_cache_key(category_slug, topic)] = attempt_id
+    session[EXAM_DB_ATTEMPT_IDS_KEY] = cache
+    if category_slug == "random-test":
+        attempt = session.get(RANDOM_TEST_SESSION_KEY)
+        if not isinstance(attempt, dict):
+            attempt = {}
+        attempt["db_attempt_id"] = attempt_id
+        session[RANDOM_TEST_SESSION_KEY] = attempt
+    session.modified = True
+
+
+def _ensure_exam_db_attempt(
+    db: sqlite3.Connection,
+    user_id: Any,
+    category_slug: str,
+    *,
+    set_id: int | None = None,
+    seed: str | None = None,
+) -> int | None:
+    if not user_id:
+        return None
+    domain = EXAM_DOMAIN_BY_SLUG.get(category_slug)
+    if not domain:
+        return None
+    topic = _exam_topic(category_slug, set_id=set_id, seed=seed)
+    existing = _get_exam_db_attempt_id(category_slug, set_id=set_id, seed=seed)
+    if existing:
+        row = db.execute(
+            """
+            SELECT id FROM practice_attempts
+            WHERE id = ? AND user_id = ? AND domain = ? AND topic = ?
+            """,
+            (existing, user_id, domain, topic),
+        ).fetchone()
+        if row:
+            return int(row["id"])
+    attempt_id = _insert_practice_attempt(db, user_id, domain, topic, 0)
+    _set_exam_db_attempt_id(category_slug, topic, attempt_id)
+    return attempt_id
+
+
+def _persist_exam_response(
+    db: sqlite3.Connection, attempt_id: int, question_index: int, question: dict, selected: str
+) -> None:
+    is_correct, correct_answer = grade_for_db(question, selected)
+    db.execute(
+        "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+        (attempt_id, question_index),
+    )
+    db.execute(
+        """
+        INSERT INTO practice_responses
+        (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (attempt_id, question_index, selected, correct_answer, is_correct),
+    )
+    _safe_db_commit(db)
+
+
+def _finalize_exam_db_attempt(db: sqlite3.Connection, attempt_id: int, meta: dict[str, Any]) -> None:
+    db.execute(
+        "UPDATE practice_attempts SET exam_meta_json = ? WHERE id = ?",
+        (json.dumps(meta, separators=(",", ":")), attempt_id),
+    )
+    _safe_db_commit(db)
+
+
+def _random_test_question_index(module_id: int, step: int) -> int:
+    return (module_id - 1) * WORD_PROBLEM_SET_SIZE + step
+
+
+def _random_test_question_at(
+    module_id: int, step: int, seed: str
+) -> tuple[dict[str, Any] | None, int | None]:
+    modules = _random_test_modules(seed)
+    items = modules.get(module_id) or []
+    if step < 0 or step >= len(items):
+        return None, None
+    return items[step]["q"], _random_test_question_index(module_id, step)
+
+
+def _exam_attempt_label(domain: str, topic: str, exam_meta_json: str | None = None) -> str:
+    meta: dict[str, Any] = {}
+    if exam_meta_json:
+        try:
+            parsed = json.loads(exam_meta_json)
+            if isinstance(parsed, dict):
+                meta = parsed
+        except json.JSONDecodeError:
+            pass
+    if domain == "exam_random_test":
+        score = meta.get("score")
+        return f"Random Test · {score}/800" if score else "Random Test"
+    if domain == "exam_word_problems":
+        set_id = topic.replace("set_", "") if topic.startswith("set_") else topic
+        acc = meta.get("accuracy")
+        return f"Word Problem exam · Set {set_id}" + (f" · {acc}%" if acc is not None else "")
+    if domain == "exam_unit_bank":
+        set_id = topic.replace("set_", "") if topic.startswith("set_") else topic
+        acc = meta.get("accuracy")
+        return f"Unit bank exam · Set {set_id}" + (f" · {acc}%" if acc is not None else "")
+    return TOPIC_TITLES.get(topic, topic)
+
+
+def _persist_random_test_exam_to_db(
+    db: sqlite3.Connection,
+    user_id: Any,
+    seed: str,
+    modules: dict[int, list[dict]],
+    answers: dict[str, Any],
+    meta: dict[str, Any],
+) -> int | None:
+    attempt_id = _ensure_exam_db_attempt(db, user_id, "random-test", seed=seed)
+    if not attempt_id:
+        return None
+    for module_id in (1, 2):
+        module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+        if not isinstance(module_answers, dict):
+            module_answers = {}
+        for idx, item in enumerate(modules.get(module_id) or []):
+            selected = str(module_answers.get(str(idx)) or "")
+            if not selected:
+                continue
+            qi = _random_test_question_index(module_id, idx)
+            _persist_exam_response(db, attempt_id, qi, item["q"], selected)
+    _finalize_exam_db_attempt(db, attempt_id, meta)
+    return attempt_id
+
+
+def _persist_category_exam_to_db(
+    db: sqlite3.Connection,
+    user_id: Any,
+    category_slug: str,
+    set_id: int,
+    items: list[dict],
+    answers: dict[str, str],
+    meta: dict[str, Any],
+) -> int | None:
+    attempt_id = _ensure_exam_db_attempt(db, user_id, category_slug, set_id=set_id)
+    if not attempt_id:
+        return None
+    for idx, item in enumerate(items):
+        selected = str(answers.get(str(idx)) or "")
+        if not selected:
+            continue
+        _persist_exam_response(db, attempt_id, idx, item["q"], selected)
+    _finalize_exam_db_attempt(db, attempt_id, meta)
+    return attempt_id
+
+
+def _hub_active_classroom(db: sqlite3.Connection) -> dict[str, Any] | None:
+    row = db.execute(
+        """
+        SELECT lesson_slug, title, current_slide_index
+        FROM course_class_sessions
+        WHERE is_active = 1
+        ORDER BY id DESC
+        LIMIT 1
+        """
+    ).fetchone()
+    if not row:
+        return None
+    slug = str(row["lesson_slug"] or "")
+    return {
+        "slug": slug,
+        "title": str(row["title"] or "Live class"),
+        "slide": int(row["current_slide_index"] or 1),
+        "lesson_href": url_for("practice_course_material_view", slug=slug),
+        "classroom_href": url_for("practice_course_material_classroom", slug=slug)
+        if current_user_can_access_admin()
+        else None,
+    }
+
+
+def _hub_resume_practice_session(db: sqlite3.Connection, uid: int) -> dict[str, Any] | None:
+    rows = db.execute(
+        """
+        SELECT pa.id, pa.domain, pa.topic,
+               COUNT(pr.id) AS answered
+        FROM practice_attempts pa
+        LEFT JOIN practice_responses pr
+          ON pr.attempt_id = pa.id AND pr.question_index IS NOT NULL
+        WHERE pa.user_id = ?
+          AND pa.domain NOT LIKE 'exam_%'
+          AND pa.domain != 'placement'
+        GROUP BY pa.id
+        HAVING COUNT(pr.id) > 0
+        ORDER BY pa.id DESC
+        LIMIT 12
+        """,
+        (uid,),
+    ).fetchall()
+    for row in rows:
+        domain = str(row["domain"] or "")
+        topic = str(row["topic"] or "")
+        tex_file = BANKS.get(domain, {}).get(topic)
+        if not tex_file:
+            continue
+        questions = get_questions_for_topic(domain, topic, tex_file)
+        total = len(questions)
+        answered = int(row["answered"] or 0)
+        if total > 0 and answered < total:
+            return {
+                "attempt_id": int(row["id"]),
+                "domain": domain,
+                "topic": topic,
+                "topic_title": TOPIC_TITLES.get(topic, topic),
+                "answered": answered,
+                "total": total,
+                "href": url_for("practice_question", domain=domain, topic=topic, qnum=0),
+                "track_short": _dashboard_track_short(domain),
+            }
+    return None
+
+
+def _practice_hub_context() -> dict[str, Any]:
+    cm = load_course_materials()
+    ctx: dict[str, Any] = {
+        "cm_total": int(cm.get("total") or 0),
+        "cm_ready": int(cm.get("available") or 0),
+    }
+    materials = list(cm.get("materials") or [])
+    ready_materials = sorted(
+        [m for m in materials if m.get("tex_available")],
+        key=lambda m: tuple(
+            int(p) if p.isdigit() else 0 for p in str(m.get("section") or "0").split(".")
+        ),
+    )
+    user_progress: dict[str, dict[str, Any]] = {}
+    uid = session.get("user_id")
+    db = get_db()
+    if uid:
+        prog_rows = db.execute(
+            "SELECT lesson_slug, progress_json FROM course_material_progress WHERE user_id = ?",
+            (int(uid),),
+        ).fetchall()
+        for row in prog_rows:
+            try:
+                user_progress[str(row["lesson_slug"])] = json.loads(row["progress_json"] or "{}")
+            except json.JSONDecodeError:
+                continue
+        for m in ready_materials:
+            slug = str(m.get("slug") or "")
+            prog = user_progress.get(slug) or {}
+            m["user_mastery_pct"] = mastery_pct_from_progress(
+                prog,
+                int(m.get("slide_count") or 0),
+                int(m.get("checkpoint_count") or 0),
+            )
+        ctx["resume_session"] = _hub_resume_practice_session(db, int(uid))
+        rt_row = db.execute(
+            """
+            SELECT exam_meta_json FROM practice_attempts
+            WHERE user_id = ? AND domain = 'exam_random_test' AND exam_meta_json IS NOT NULL
+            ORDER BY id DESC LIMIT 1
+            """,
+            (int(uid),),
+        ).fetchone()
+        if rt_row and rt_row["exam_meta_json"]:
+            try:
+                rt_meta = json.loads(rt_row["exam_meta_json"])
+                if isinstance(rt_meta, dict) and rt_meta.get("score"):
+                    ctx["latest_random_test_score"] = int(rt_meta["score"])
+            except (json.JSONDecodeError, TypeError, ValueError):
+                pass
+    ctx["continue_material"] = _pick_continue_material(ready_materials, user_progress)
+    ctx["live_classroom"] = _hub_active_classroom(db)
+    rt_attempt = session.get(RANDOM_TEST_SESSION_KEY)
+    if isinstance(rt_attempt, dict) and rt_attempt.get("seed"):
+        seed = str(rt_attempt["seed"])
+        modules = _random_test_modules(seed)
+        answers = rt_attempt.get("answers", {})
+        answered = 0
+        total = sum(len(modules.get(mid) or []) for mid in (1, 2))
+        for module_id in (1, 2):
+            module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+            if isinstance(module_answers, dict):
+                answered += sum(1 for v in module_answers.values() if v)
+        if answered > 0 and answered < total:
+            ctx["random_test_continue"] = {
+                "answered": answered,
+                "total": total,
+                "href": _random_test_continue_href(),
+            }
+    return ctx
+
+
 # -----------------------------------------------------
 # Miss quiz (wrong-only redo with instant feedback)
 # -----------------------------------------------------
@@ -7803,7 +9058,7 @@ def _miss_quiz_render_question_step(step: int):
     miss_quiz_v2 = bool(pack.get("v") == MQ_PACK_VERSION)
     return render_template(
         "practice_question.html",
-        q=q,
+        q=_sanitize_question_for_render(q),
         domain=domain,
         topic=topic,
         qnum=bank_q,
@@ -8033,6 +9288,16 @@ def practice_miss_quiz_run_done():
             f"Below {MISS_QUIZ_PASS_PERCENT}% on this miss quiz—ladder progress for these "
             f"{mastery_reset} question slot(s) was reset. Run the quiz again until you clear the bar."
         )
+    _persist_miss_quiz_run(
+        db,
+        session.get("user_id"),
+        label=str(pack.get("label") or "Miss quiz"),
+        scope_part_id=str(module_part_id) if module_part_id else None,
+        total=total,
+        correct_n=correct_n,
+        pct=pct,
+        passed=quiz_passed,
+    )
     first = items[0]
     done_domain = str(first["domain"])
     done_topic = str(first["topic"])
@@ -8101,6 +9366,16 @@ def practice_miss_quiz_done(domain: str, topic: str):
             f"Below {MISS_QUIZ_PASS_PERCENT}% on this miss quiz—ladder progress for these "
             f"{mastery_reset} question slot(s) was reset. Run the quiz again until you clear the bar."
         )
+    _persist_miss_quiz_run(
+        db,
+        session.get("user_id"),
+        label=str(pack.get("label") or TOPIC_TITLES.get(topic, topic)),
+        scope_part_id=MISS_PART_BY_DOMAIN.get(domain),
+        total=total,
+        correct_n=correct_n,
+        pct=pct,
+        passed=quiz_passed,
+    )
     return render_template(
         "miss_quiz_done.html",
         domain=domain,
@@ -8311,9 +9586,26 @@ def practice_question(domain, topic, qnum):
         else 0
     )
 
+    tracked_responses_hint = None
+    if domain != "placement" and not mistake_redo_mode:
+        graded_row = db.execute(
+            """
+            SELECT COUNT(*) AS c FROM practice_responses
+            WHERE attempt_id = ? AND is_correct IN (0, 1)
+            """,
+            (attempt_id,),
+        ).fetchone()
+        graded_count = int(graded_row["c"] or 0) if graded_row else 0
+        if graded_count < MIN_TRACKED_SAT_RESPONSES:
+            remaining = MIN_TRACKED_SAT_RESPONSES - graded_count
+            tracked_responses_hint = (
+                f"Answer {remaining} more question{'s' if remaining != 1 else ''} "
+                f"in this set to unlock session tracking and mistake analytics for this bank."
+            )
+
     return render_template(
         "practice_question.html",
-        q=q,
+        q=_sanitize_question_for_render(q),
         domain=domain,
         topic=topic,
         qnum=question_index,
@@ -8338,6 +9630,7 @@ def practice_question(domain, topic, qnum):
         mistake_return_href=mistake_return_href,
         mistake_analytics_part=analytics_part_q,
         mistake_miss_anchor=miss_anchor_q,
+        tracked_responses_hint=tracked_responses_hint,
     )
 
 
@@ -8426,36 +9719,65 @@ def submit_practice_answer():
     except ValueError:
         attempt_id = None
 
-    # If attempt_id is missing/invalid/nonexistent, create a fallback attempt row.
-    attempt_exists = None
-    if attempt_id is not None:
-        attempt_exists = db.execute(
-            "SELECT id FROM practice_attempts WHERE id = ?",
-            (attempt_id,),
-        ).fetchone()
+    try:
+        # If attempt_id is missing/invalid/nonexistent, create a fallback attempt row.
+        attempt_exists = None
+        if attempt_id is not None:
+            attempt_exists = db.execute(
+                "SELECT id FROM practice_attempts WHERE id = ?",
+                (attempt_id,),
+            ).fetchone()
 
-    if attempt_id is None or attempt_exists is None:
-        user_id = session.get("user_id")
-        attempt_id = _insert_practice_attempt(db, user_id, domain, topic, q_index)
+        if attempt_id is None or attempt_exists is None:
+            user_id = session.get("user_id")
+            attempt_id = _insert_practice_attempt(db, user_id, domain, topic, q_index)
 
-    db.execute(
-        "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
-        (attempt_id, q_index),
-    )
-    db.execute(
-        """
-        INSERT INTO practice_responses
-        (attempt_id, question_index, selected_answer, correct_answer, is_correct)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (attempt_id, q_index, selected_answer, correct_answer, is_correct),
-    )
-    lk = _learner_key()
-    if is_correct == 1:
-        _mistake_progress_on_correct(db, lk, domain, topic, q_index)
-    elif is_correct == 0:
-        _mistake_progress_on_wrong(db, lk, domain, topic, q_index)
-    db.commit()
+        db.execute(
+            "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+            (attempt_id, q_index),
+        )
+        db.execute(
+            """
+            INSERT INTO practice_responses
+            (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (attempt_id, q_index, selected_answer, correct_answer, is_correct),
+        )
+        lk = _learner_key()
+        if is_correct == 1:
+            _mistake_progress_on_correct(db, lk, domain, topic, q_index)
+        elif is_correct == 0:
+            _mistake_progress_on_wrong(db, lk, domain, topic, q_index)
+        if not _safe_db_commit(db):
+            flash("The server was busy and could not save your answer. Please submit again.")
+            return _practice_redirect(
+                domain,
+                topic,
+                qnum_for_redirect,
+                mistake_redo=mistake_redo,
+                analytics_part=analytics_part_f,
+                miss_anchor=miss_anchor_f,
+            )
+        if domain != "placement" and not mistake_redo:
+            _maybe_flash_tracking_hint(db, attempt_id)
+    except Exception:
+        app.logger.exception(
+            "submit_practice_answer failed domain=%s topic=%s qnum=%s attempt=%s",
+            domain,
+            topic,
+            q_index,
+            attempt_id_raw,
+        )
+        flash("Could not save your answer due to a temporary error. Please try again.")
+        return _practice_redirect(
+            domain,
+            topic,
+            qnum_for_redirect,
+            mistake_redo=mistake_redo,
+            analytics_part=analytics_part_f,
+            miss_anchor=miss_anchor_f,
+        )
 
     if mistake_redo:
         sk_mr = _practice_mistake_redo_session_key(domain, topic, q_index)
@@ -8483,13 +9805,137 @@ def submit_practice_answer():
     return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
 
 
+def _exam_session_summary_payload(
+    attempt_id: int, att: sqlite3.Row, db: sqlite3.Connection
+) -> dict[str, Any]:
+    domain = str(att["domain"] or "")
+    topic = str(att["topic"] or "")
+    exam_meta: dict[str, Any] = {}
+    try:
+        raw_meta = att["exam_meta_json"]
+    except (KeyError, IndexError, TypeError):
+        raw_meta = None
+    if raw_meta:
+        try:
+            parsed = json.loads(raw_meta)
+            if isinstance(parsed, dict):
+                exam_meta = parsed
+        except json.JSONDecodeError:
+            pass
+
+    resp_rows = db.execute(
+        """
+        SELECT question_index, selected_answer, correct_answer, is_correct
+        FROM practice_responses
+        WHERE attempt_id = ? AND question_index IS NOT NULL
+        ORDER BY question_index
+        """,
+        (attempt_id,),
+    ).fetchall()
+    duration_row = db.execute(
+        """
+        SELECT
+          CAST(strftime('%s', pa.created_at) AS INTEGER) AS start_s,
+          CAST(strftime('%s', MAX(pr.submitted_at)) AS INTEGER) AS end_s
+        FROM practice_attempts pa
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE pa.id = ?
+        GROUP BY pa.id
+        """,
+        (attempt_id,),
+    ).fetchone()
+    duration_seconds: int | None = None
+    if duration_row is not None and duration_row["start_s"] is not None:
+        start_s = int(duration_row["start_s"])
+        end_raw = duration_row["end_s"]
+        if end_raw is not None:
+            duration_seconds = max(0, int(end_raw) - start_s)
+
+    rows_out: List[dict] = []
+    correct_count = 0
+    for r in resp_rows:
+        qi = int(r["question_index"])
+        yours_raw = (r["selected_answer"] or "").strip()
+        key_display = (r["correct_answer"] or "").strip() or "—"
+        is_correct = r["is_correct"]
+        if is_correct == 1:
+            status = "correct"
+            correct_count += 1
+        elif is_correct == 0:
+            status = "incorrect"
+        else:
+            status = "nocheck"
+        rows_out.append(
+            {
+                "q_index": qi,
+                "q_display": str(qi + 1),
+                "session_q": str(len(rows_out) + 1),
+                "row_id": f"summary-q-{qi}",
+                "knowledge_section": "—",
+                "knowledge_title_en": "",
+                "topic_detail": "",
+                "hard_skill": "",
+                "yours_display": yours_raw or "—",
+                "key_display": key_display,
+                "status": status,
+                "explanation_en": "",
+                "review_href": None,
+            }
+        )
+
+    total_q = len(rows_out)
+    if exam_meta.get("total"):
+        total_q = max(total_q, int(exam_meta["total"]))
+    if exam_meta.get("total_correct") is not None:
+        correct_count = int(exam_meta["total_correct"])
+    elif exam_meta.get("correct") is not None:
+        correct_count = int(exam_meta["correct"])
+    score_pct = round(100.0 * correct_count / total_q) if total_q else 0
+    topic_title = _exam_attempt_label(domain, topic, att["exam_meta_json"] if "exam_meta_json" in att.keys() else None)
+    skipped_count = sum(1 for row in rows_out if row["status"] == "skipped")
+    mistake_focus = [row for row in rows_out if row["status"] == "incorrect"]
+
+    render = {
+        "domain": domain,
+        "topic": topic,
+        "topic_title": topic_title,
+        "attempt_id": attempt_id,
+        "rows": rows_out,
+        "correct_count": correct_count,
+        "total_q": total_q,
+        "score_pct": score_pct,
+        "answered_count": total_q - skipped_count,
+        "answered_pct": (
+            round(100 * correct_count / (total_q - skipped_count))
+            if total_q - skipped_count > 0
+            else None
+        ),
+        "session_duration_seconds": duration_seconds,
+        "session_duration_label": _format_duration(duration_seconds),
+        "section_stats": [],
+        "placement_rec": None,
+        "placement_brand": None,
+        "placement_student": None,
+        "celebrate_confetti": bool(score_pct >= 55),
+        "mistake_focus": mistake_focus,
+        "skipped_count": skipped_count,
+        "miss_quiz_session_href": None,
+        "miss_quiz_all_href": None,
+        "miss_quiz_all_count": 0,
+        "miss_quiz_all_is_module": False,
+        "is_exam_summary": True,
+        "exam_meta": exam_meta,
+    }
+    return {"render": render, "pdf_ctx": render}
+
+
 def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple[str, int]:
     """Shared data for HTML summary and placement PDF export."""
     db = get_db()
     att = db.execute(
         """
         SELECT id, domain, topic, user_id, created_at, placement_student_name, placement_student_grade,
-               placement_student_math_course
+               placement_student_math_course, exam_meta_json
         FROM practice_attempts WHERE id = ?
         """,
         (attempt_id,),
@@ -8500,6 +9946,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         return ("Session not found", 404)
 
     domain = att["domain"]
+    if str(domain or "").startswith("exam_"):
+        return _exam_session_summary_payload(attempt_id, att, db)
     topic = att["topic"]
 
     def _att_str(col: str) -> str:
@@ -8739,6 +10187,12 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "correct_count": correct_count,
         "total_q": total_q,
         "score_pct": score_pct,
+        "answered_count": total_q - skipped_count,
+        "answered_pct": (
+            round(100 * correct_count / (total_q - skipped_count))
+            if total_q - skipped_count > 0
+            else None
+        ),
         "session_duration_seconds": duration_seconds,
         "session_duration_label": session_duration_label,
         "section_stats": section_stats,
@@ -9145,14 +10599,1121 @@ def _recent_record_rows(db: sqlite3.Connection) -> List[dict]:
     ]
 
 
+def _cleanup_empty_practice_attempts(db: sqlite3.Connection) -> None:
+    """Drop stale attempts with zero responses (page opens, abandoned starts).
+
+    A 24h grace window keeps genuinely in-progress sessions safe.
+    """
+    try:
+        db.execute(
+            """
+            DELETE FROM practice_attempts
+            WHERE id NOT IN (SELECT DISTINCT attempt_id FROM practice_responses)
+              AND created_at < datetime('now', '-24 hours')
+            """
+        )
+        db.commit()
+    except sqlite3.Error:
+        pass
+
+
+def _int_to_roman(value: int) -> str:
+    pairs = (
+        (1000, "M"),
+        (900, "CM"),
+        (500, "D"),
+        (400, "CD"),
+        (100, "C"),
+        (90, "XC"),
+        (50, "L"),
+        (40, "XL"),
+        (10, "X"),
+        (9, "IX"),
+        (5, "V"),
+        (4, "IV"),
+        (1, "I"),
+    )
+    out = ""
+    n = max(1, int(value))
+    for amount, numeral in pairs:
+        while n >= amount:
+            out += numeral
+            n -= amount
+    return out
+
+
+def _hard_drill_display_meta() -> dict[str, Any]:
+    topics = sorted(BANKS.get("hard_problem", {}).keys(), key=_topic_bank_sort_key)
+    numbers: list[int] = []
+    for topic in topics:
+        match = re.match(r"^hard_(\d+)$", topic)
+        if match:
+            numbers.append(int(match.group(1)))
+    count = len(topics)
+    if not numbers:
+        return {"count": 0, "range_label": ""}
+    if count == 15 and 15 not in numbers and 16 in numbers:
+        range_label = "I–XIV + XVI"
+    elif len(numbers) == 1:
+        range_label = _int_to_roman(numbers[0])
+    else:
+        range_label = f"{_int_to_roman(min(numbers))}–{_int_to_roman(max(numbers))}"
+    return {"count": count, "range_label": range_label}
+
+
+def _activity_status_label(last_activity: str | None, *, quiet_days: int = 3) -> str:
+    if not last_activity:
+        return "inactive"
+    try:
+        dt = datetime.strptime(str(last_activity).strip()[:19], "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return "quiet"
+    age = (datetime.now() - dt).days
+    if age <= quiet_days:
+        return "active"
+    return "quiet"
+
+
+def _maybe_flash_tracking_hint(db: sqlite3.Connection, attempt_id: int) -> None:
+    row = db.execute(
+        """
+        SELECT COUNT(*) AS c FROM practice_responses
+        WHERE attempt_id = ? AND is_correct IN (0, 1)
+        """,
+        (attempt_id,),
+    ).fetchone()
+    graded = int(row["c"] or 0) if row else 0
+    if graded >= MIN_TRACKED_SAT_RESPONSES:
+        flash("Session unlocked — this set now counts toward mistake analytics and session reports.")
+        return
+    remaining = MIN_TRACKED_SAT_RESPONSES - graded
+    flash(
+        f"Saved · {remaining} more answer{'s' if remaining != 1 else ''} needed "
+        f"for this set to count in analytics."
+    )
+
+
+DIGEST_DEMO_USERNAME_RE = re.compile(r"^live\d+_s\d+$", re.I)
+
+
+def _is_digest_demo_username(username: str) -> bool:
+    u = (username or "").strip().lower()
+    if DIGEST_DEMO_USERNAME_RE.match(u):
+        return True
+    if u.startswith("demo_") or u.endswith("_demo") or u.startswith("test_"):
+        return True
+    return False
+
+
+def _digest_demo_user_ids(db: sqlite3.Connection) -> set[int]:
+    rows = db.execute("SELECT id, username FROM users WHERE role = 'student'").fetchall()
+    return {
+        int(row["id"])
+        for row in rows
+        if _is_digest_demo_username(str(row["username"] or ""))
+    }
+
+
+def _digest_chapter_slice_label(domain: str, topic: str) -> str:
+    section = next(
+        (sec for dom, top, sec, _ in STUDENT_CHAPTER_SLICES if dom == domain and top == topic),
+        topic,
+    )
+    title = TOPIC_TITLES.get(topic, topic)
+    short_title = title.split(" – ", 1)[-1] if " – " in title else title
+    if len(short_title) > 34:
+        short_title = short_title[:32] + "…"
+    return f"{section} · {short_title}"
+
+
+def _digest_weekly_trend_series(
+    db: sqlite3.Connection,
+    *,
+    weeks: int = 8,
+    exclude_user_ids: set[int] | None = None,
+) -> dict[str, Any]:
+    exclude_user_ids = exclude_user_ids or set()
+    exclude_clause = ""
+    exclude_params: list[Any] = []
+    if exclude_user_ids:
+        ph = ",".join("?" * len(exclude_user_ids))
+        exclude_clause = f"AND u.id NOT IN ({ph})"
+        exclude_params = sorted(exclude_user_ids)
+
+    series: list[dict[str, Any]] = []
+    for w in range(weeks - 1, -1, -1):
+        start_days = (w + 1) * 7
+        end_days = w * 7
+        start_sql = f"-{start_days} days"
+        end_clause = "datetime('now')" if end_days == 0 else f"datetime('now', '-{end_days} days')"
+        row = db.execute(
+            f"""
+            SELECT
+                COUNT(DISTINCT CASE WHEN pa.id IS NOT NULL THEN u.id END) AS active_students,
+                COUNT(DISTINCT CASE
+                    WHEN pa.domain NOT LIKE 'exam_%' AND pa.domain != 'placement' THEN pa.id
+                END) AS practice_sessions,
+                SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded,
+                SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct
+            FROM users u
+            LEFT JOIN practice_attempts pa ON pa.user_id = u.id
+              AND pa.created_at >= datetime('now', ?)
+              AND pa.created_at < {end_clause}
+            LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+            WHERE u.role = 'student' AND u.is_active = 1
+              {exclude_clause}
+            """,
+            (start_sql, *exclude_params),
+        ).fetchone()
+        mock_rows = db.execute(
+            f"""
+            SELECT pa.exam_meta_json
+            FROM practice_attempts pa
+            JOIN users u ON u.id = pa.user_id
+            WHERE u.role = 'student' AND u.is_active = 1
+              {exclude_clause}
+              AND pa.domain = 'exam_random_test'
+              AND pa.exam_meta_json IS NOT NULL
+              AND pa.created_at >= datetime('now', ?)
+              AND pa.created_at < {end_clause}
+            """,
+            (*exclude_params, start_sql),
+        ).fetchall()
+        scores: list[int] = []
+        for mock_row in mock_rows:
+            try:
+                score = int(json.loads(mock_row["exam_meta_json"] or "{}").get("score") or 0)
+            except (json.JSONDecodeError, TypeError, ValueError):
+                continue
+            if score > 0:
+                scores.append(score)
+        graded = int(row["graded"] or 0) if row else 0
+        correct = int(row["correct"] or 0) if row else 0
+        week_end = datetime.now() - timedelta(days=end_days)
+        series.append(
+            {
+                "label": week_end.strftime("%b %d"),
+                "active_students": int(row["active_students"] or 0) if row else 0,
+                "practice_sessions": int(row["practice_sessions"] or 0) if row else 0,
+                "accuracy_pct": round(100 * correct / graded) if graded else None,
+                "mock_median": sorted(scores)[len(scores) // 2] if scores else None,
+                "mock_count": len(scores),
+            }
+        )
+
+    max_active = max((s["active_students"] for s in series), default=0) or 1
+    max_practice = max((s["practice_sessions"] for s in series), default=0) or 1
+    acc_values = [s["accuracy_pct"] for s in series if s["accuracy_pct"] is not None]
+    max_acc = max(acc_values, default=100) or 100
+    mock_values = [s["mock_median"] for s in series if s["mock_median"] is not None]
+    max_mock = max(mock_values, default=800) or 800
+    for point in series:
+        point["active_bar_pct"] = max(8, round(100 * point["active_students"] / max_active))
+        point["practice_bar_pct"] = max(8, round(100 * point["practice_sessions"] / max_practice))
+        point["accuracy_bar_pct"] = (
+            max(8, round(100 * point["accuracy_pct"] / max_acc)) if point["accuracy_pct"] is not None else 0
+        )
+        point["mock_bar_pct"] = (
+            max(8, round(100 * point["mock_median"] / max_mock)) if point["mock_median"] is not None else 0
+        )
+    return {"weeks": series, "weeks_count": weeks}
+
+
+def _digest_class_mastery(
+    db: sqlite3.Connection, exclude_user_ids: set[int] | None = None
+) -> dict[str, Any]:
+    exclude_user_ids = exclude_user_ids or set()
+    rows = db.execute(
+        "SELECT id FROM users WHERE role = 'student' AND is_active = 1"
+    ).fetchall()
+    learner_keys = [
+        _learner_key_for_user(int(row["id"]))
+        for row in rows
+        if int(row["id"]) not in exclude_user_ids
+    ]
+    if not learner_keys:
+        return {"mastered": 0, "total": 0, "digest_pct": None}
+    ph = ",".join("?" * len(learner_keys))
+    stat = db.execute(
+        f"""
+        SELECT
+            SUM(CASE WHEN status = 'mastered' THEN 1 ELSE 0 END) AS mastered,
+            COUNT(*) AS total
+        FROM mistake_learning_progress
+        WHERE learner_key IN ({ph})
+        """,
+        learner_keys,
+    ).fetchone()
+    mastered = int(stat["mastered"] or 0) if stat else 0
+    total = int(stat["total"] or 0) if stat else 0
+    return {
+        "mastered": mastered,
+        "total": total,
+        "digest_pct": round(100 * mastered / total) if total else None,
+    }
+
+
+def _digest_student_mastery_pct(db: sqlite3.Connection, user_id: int) -> int | None:
+    lk = _learner_key_for_user(user_id)
+    row = db.execute(
+        """
+        SELECT
+            SUM(CASE WHEN status = 'mastered' THEN 1 ELSE 0 END) AS mastered,
+            COUNT(*) AS total
+        FROM mistake_learning_progress
+        WHERE learner_key = ?
+        """,
+        (lk,),
+    ).fetchone()
+    total = int(row["total"] or 0) if row else 0
+    if not total:
+        return None
+    mastered = int(row["mastered"] or 0) if row else 0
+    return round(100 * mastered / total)
+
+
+def _digest_student_attention_reason(
+    student: dict[str, Any], nudge_groups: dict[str, list[dict[str, Any]]]
+) -> str | None:
+    uid = int(student["id"])
+    for kind, label in (
+        ("inactive", "No activity this period"),
+        ("no_practice", "Logged in but no practice"),
+        ("no_mock", "Practicing but no mock yet"),
+    ):
+        if any(int(s["id"]) == uid for s in nudge_groups.get(kind) or []):
+            return label
+    if student.get("quality_hint"):
+        return str(student["quality_hint"])
+    if student.get("weak_chapter"):
+        return f"Weak: {student['weak_chapter']} ({student['weak_chapter_pct']}%)"
+    return None
+
+
+def _digest_pulse_brief(digest: dict[str, Any]) -> dict[str, Any]:
+    students = digest.get("students") or []
+    summary = digest.get("summary") or {}
+    nudge_groups = digest.get("nudge_groups") or {}
+    nudge = digest.get("needs_attention") or []
+    total = len(students)
+    active = int(summary.get("active_students") or 0)
+    acc = summary.get("accuracy_pct")
+
+    if total == 0:
+        headline = "No students in this view."
+        status = "empty"
+    elif not nudge and active >= max(1, (total + 1) // 2):
+        headline = f"Class is engaged — {active} of {total} students active this period."
+        status = "on_track"
+    elif nudge and len(nudge) >= total:
+        headline = f"Everyone needs a check-in — all {total} students need follow-up."
+        status = "needs_attention"
+    else:
+        parts: list[str] = [f"{active} of {total} active"]
+        if digest.get("class_weak_chapters"):
+            chapter = str(digest["class_weak_chapters"][0]["label"]).split(" · ", 1)[0]
+            parts.append(f"review {chapter} next")
+        elif digest.get("class_weak_units"):
+            parts.append(f"weak in {digest['class_weak_units'][0]['label']}")
+        if nudge:
+            parts.append(f"{len(nudge)} need follow-up")
+        headline = ", ".join(parts).capitalize() + "."
+        status = "mixed"
+
+    glance = [
+        {
+            "key": "active",
+            "label": "Active students",
+            "value": f"{active}/{total}",
+            "hint": digest.get("trends", {}).get("practice_sessions_delta"),
+        },
+        {
+            "key": "mock",
+            "label": "Took a mock",
+            "value": str(int(summary.get("exam_takers") or 0)),
+            "hint": digest.get("trends", {}).get("exam_sessions_delta"),
+        },
+        {
+            "key": "accuracy",
+            "label": "Class accuracy",
+            "value": f"{acc}%" if acc is not None else "—",
+            "hint": (
+                f"Based on {summary.get('accuracy_basis')} answers"
+                if summary.get("accuracy_basis")
+                else None
+            ),
+        },
+        {
+            "key": "nudge",
+            "label": "Need follow-up",
+            "value": str(len(nudge)),
+            "hint": "Inactive or missing mocks" if nudge else "Nobody flagged",
+            "emphasis": bool(nudge),
+        },
+    ]
+
+    step_titles = {
+        "review": "Review in class",
+        "assign": "Assign a mock",
+        "nudge": "Send reminders",
+        "quality": "Run miss quiz",
+        "loop": "Keep the weekly loop",
+    }
+    priority_steps: list[dict[str, Any]] = []
+    for action in digest.get("teaching_actions") or []:
+        if len(priority_steps) >= 3:
+            break
+        step = dict(action)
+        step["step"] = len(priority_steps) + 1
+        step["short_title"] = step_titles.get(str(action.get("kind") or ""), action.get("title"))
+        priority_steps.append(step)
+
+    attention: list[dict[str, Any]] = []
+    seen: set[int] = set()
+    for student in nudge[:8]:
+        uid = int(student["id"])
+        attention.append(
+            {
+                "username": student["username"],
+                "admin_href": student["admin_href"],
+                "report_href": student.get("report_href") or student["admin_href"],
+                "status": student["status"],
+                "reason": _digest_student_attention_reason(student, nudge_groups) or "Needs follow-up",
+                "last_active": student["last_activity_label"],
+            }
+        )
+        seen.add(uid)
+    for student in students:
+        uid = int(student["id"])
+        if uid in seen or not student.get("quality_hint"):
+            continue
+        attention.append(
+            {
+                "username": student["username"],
+                "admin_href": student["admin_href"],
+                "report_href": student.get("report_href") or student["admin_href"],
+                "status": student["status"],
+                "reason": str(student["quality_hint"]),
+                "last_active": student["last_activity_label"],
+            }
+        )
+        seen.add(uid)
+        if len(attention) >= 8:
+            break
+
+    primary_ids = {int(s["id"]) for s in nudge}
+    for student in students:
+        if student.get("practice_sessions") or student.get("exam_sessions"):
+            primary_ids.add(int(student["id"]))
+
+    def _roster_note(student: dict[str, Any]) -> str:
+        reason = _digest_student_attention_reason(student, nudge_groups)
+        if reason:
+            return reason
+        if student.get("mock_trend_label"):
+            return f"Mock: {student['mock_trend_label']}"
+        if student.get("weak_chapter"):
+            return f"{student['weak_chapter']} · {student['weak_chapter_pct']}%"
+        if student.get("accuracy_pct") is not None:
+            return f"{student['accuracy_pct']}% accuracy"
+        return "On track"
+
+    roster_primary = []
+    roster_rest = []
+    for student in students:
+        row = dict(student)
+        row["pulse_note"] = _roster_note(student)
+        if int(student["id"]) in primary_ids:
+            roster_primary.append(row)
+        else:
+            roster_rest.append(row)
+
+    focus_line = None
+    if digest.get("class_weak_chapters"):
+        focus = digest["class_weak_chapters"][0]
+        focus_line = f"{focus['label']} — class avg {focus['avg_pct']}%"
+    elif digest.get("class_weak_units"):
+        focus = digest["class_weak_units"][0]
+        focus_line = f"{focus['label']} — class avg {focus['avg_pct']}%"
+
+    return {
+        "headline": headline,
+        "status": status,
+        "glance": glance,
+        "priority_steps": priority_steps,
+        "attention": attention,
+        "roster_primary": roster_primary,
+        "roster_rest": roster_rest,
+        "focus_line": focus_line,
+        "nudge_count": len(nudge),
+        "student_count": total,
+    }
+
+
+def _digest_teaching_actions(
+    digest: dict[str, Any],
+    *,
+    days: int,
+    exam_hub_href: str,
+) -> list[dict[str, Any]]:
+    actions: list[dict[str, Any]] = []
+    weak_chapters = digest.get("class_weak_chapters") or []
+    if weak_chapters:
+        focus = weak_chapters[0]
+        actions.append(
+            {
+                "kind": "review",
+                "title": f"Review: {focus['label']}",
+                "detail": (
+                    f"Class avg {focus['avg_pct']}% across {focus['students']} student(s) "
+                    f"in the last {days} days."
+                ),
+            }
+        )
+    elif digest.get("class_weak_units"):
+        focus = digest["class_weak_units"][0]
+        actions.append(
+            {
+                "kind": "review",
+                "title": f"Review: {focus['label']}",
+                "detail": (
+                    f"Domain avg {focus['avg_pct']}% across {focus['students']} student(s) "
+                    f"this period."
+                ),
+            }
+        )
+
+    students = digest.get("students") or []
+    no_mock = [s for s in students if not s.get("exam_sessions")]
+    if no_mock:
+        actions.append(
+            {
+                "kind": "assign",
+                "title": "Assign: Random Test mock",
+                "detail": f"{len(no_mock)}/{len(students)} student(s) have not taken a mock in this period.",
+                "href": exam_hub_href,
+            }
+        )
+
+    nudge = digest.get("nudge_groups") or {}
+    inactive = nudge.get("inactive") or []
+    if inactive:
+        names = ", ".join(s["username"] for s in inactive[:6])
+        if len(inactive) > 6:
+            names += "…"
+        actions.append(
+            {
+                "kind": "nudge",
+                "title": "Nudge inactive students",
+                "detail": f"{len(inactive)} student(s) with no activity: {names}",
+                "copy_names": [s["username"] for s in inactive],
+            }
+        )
+
+    low_quality = [
+        s
+        for s in students
+        if s.get("accuracy_pct") is not None
+        and s["accuracy_pct"] < 50
+        and int(s.get("wrong_count") or 0) >= 5
+    ]
+    if low_quality:
+        names = ", ".join(s["username"] for s in low_quality[:4])
+        actions.append(
+            {
+                "kind": "quality",
+                "title": "Suggest miss quiz / redo",
+                "detail": f"Low accuracy with logged misses: {names}",
+            }
+        )
+
+    tags = digest.get("top_mistake_tags") or []
+    if tags and not any(a["kind"] == "review" for a in actions):
+        actions.append(
+            {
+                "kind": "review",
+                "title": f"Review: {tags[0][0]}",
+                "detail": f"{tags[0][1]} tagged wrongs this period — good for a short recap.",
+            }
+        )
+
+    if not actions:
+        actions.append(
+            {
+                "kind": "loop",
+                "title": "Keep the weekly loop",
+                "detail": "One lesson deck, one bank drill, one mock, then mistake redo.",
+            }
+        )
+    return actions[:4]
+
+
+def _digest_period_stats(
+    db: sqlite3.Connection, days: int, *, offset_days: int = 0
+) -> dict[str, int]:
+    """Aggregate practice/exam activity for a window ending `offset_days` ago."""
+    start_sql = f"-{int(days) + int(offset_days)} days"
+    end_clause = "datetime('now')" if not offset_days else f"datetime('now', '-{int(offset_days)} days')"
+    row = db.execute(
+        f"""
+        SELECT
+            COUNT(DISTINCT CASE WHEN pa.id IS NOT NULL THEN u.id END) AS active_students,
+            COUNT(DISTINCT CASE
+                WHEN pa.domain NOT LIKE 'exam_%' AND pa.domain != 'placement' THEN pa.id
+            END) AS practice_sessions,
+            COUNT(DISTINCT CASE WHEN pa.domain LIKE 'exam_%' THEN pa.id END) AS exam_sessions,
+            SUM(CASE WHEN pr.is_correct = 0 THEN 1 ELSE 0 END) AS wrong_count,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded_count,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_count
+        FROM users u
+        LEFT JOIN practice_attempts pa ON pa.user_id = u.id
+          AND pa.created_at >= datetime('now', ?)
+          AND pa.created_at < {end_clause}
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE u.role = 'student' AND u.is_active = 1
+        """,
+        (start_sql,),
+    ).fetchone()
+    graded = int(row["graded_count"] or 0) if row else 0
+    correct = int(row["correct_count"] or 0) if row else 0
+    return {
+        "active_students": int(row["active_students"] or 0) if row else 0,
+        "practice_sessions": int(row["practice_sessions"] or 0) if row else 0,
+        "exam_sessions": int(row["exam_sessions"] or 0) if row else 0,
+        "wrong_count": int(row["wrong_count"] or 0) if row else 0,
+        "accuracy_pct": round(100 * correct / graded) if graded else None,
+    }
+
+
+def _digest_delta_label(current: int, previous: int) -> str:
+    diff = current - previous
+    if diff > 0:
+        return f"+{diff} vs prior period"
+    if diff < 0:
+        return f"{diff} vs prior period"
+    return "flat vs prior period"
+
+
+def _admin_weekly_digest(
+    db: sqlite3.Connection, days: int = 7, *, hide_demo: bool = True
+) -> dict[str, Any]:
+    window_sql = f"-{int(days)} days"
+    id_to_label = {o["id"]: o["label"] for o in MISTAKE_TAG_OPTIONS}
+    demo_user_ids = _digest_demo_user_ids(db) if hide_demo else set()
+    exam_hub_href = url_for("practice_exams")
+
+    student_rows = db.execute(
+        f"""
+        SELECT
+            u.id,
+            u.username,
+            u.last_login_at,
+            MAX(COALESCE(pr.submitted_at, pa.created_at)) AS last_activity,
+            COUNT(DISTINCT CASE
+                WHEN pa.domain NOT LIKE 'exam_%' AND pa.domain != 'placement' THEN pa.id
+            END) AS practice_sessions,
+            COUNT(DISTINCT CASE WHEN pa.domain LIKE 'exam_%' THEN pa.id END) AS exam_sessions,
+            SUM(CASE WHEN pr.is_correct = 0 THEN 1 ELSE 0 END) AS wrong_count,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded_count,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_count
+        FROM users u
+        LEFT JOIN practice_attempts pa
+          ON pa.user_id = u.id AND pa.created_at >= datetime('now', ?)
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE u.role = 'student' AND u.is_active = 1
+        GROUP BY u.id, u.username, u.last_login_at
+        ORDER BY last_activity DESC, lower(u.username)
+        """,
+        (window_sql,),
+    ).fetchall()
+
+    exam_rows = db.execute(
+        f"""
+        SELECT pa.user_id, pa.domain, pa.topic, pa.exam_meta_json, pa.created_at
+        FROM practice_attempts pa
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.domain LIKE 'exam_%'
+          AND pa.created_at >= datetime('now', ?)
+        ORDER BY pa.id DESC
+        """,
+        (window_sql,),
+    ).fetchall()
+    latest_exam_by_user: dict[int, str] = {}
+    for row in exam_rows:
+        uid = int(row["user_id"])
+        if uid in latest_exam_by_user:
+            continue
+        latest_exam_by_user[uid] = _exam_attempt_label(
+            str(row["domain"] or ""),
+            str(row["topic"] or ""),
+            row["exam_meta_json"],
+        )
+
+    tag_counts: dict[str, int] = defaultdict(int)
+    tag_rows = db.execute(
+        f"""
+        SELECT pr.mistake_tags
+        FROM practice_responses pr
+        JOIN practice_attempts pa ON pa.id = pr.attempt_id
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pr.is_correct = 0
+          AND pr.mistake_tags IS NOT NULL
+          AND pr.mistake_tags != ''
+          AND COALESCE(pr.submitted_at, pa.created_at) >= datetime('now', ?)
+        """,
+        (window_sql,),
+    ).fetchall()
+    for row in tag_rows:
+        try:
+            arr = json.loads(row["mistake_tags"] or "[]")
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(arr, list):
+            continue
+        for tag_id in arr:
+            if isinstance(tag_id, str):
+                tag_counts[id_to_label.get(tag_id, tag_id)] += 1
+
+    all_mock_rows = db.execute(
+        """
+        SELECT pa.user_id, pa.exam_meta_json, pa.created_at
+        FROM practice_attempts pa
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.domain = 'exam_random_test'
+          AND pa.exam_meta_json IS NOT NULL
+        ORDER BY pa.user_id, pa.id
+        """
+    ).fetchall()
+    all_scores_by_user: dict[int, list[int]] = defaultdict(list)
+    for row in all_mock_rows:
+        if hide_demo and int(row["user_id"]) in demo_user_ids:
+            continue
+        try:
+            meta = json.loads(row["exam_meta_json"] or "{}")
+            score = int(meta.get("score") or 0)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            continue
+        if score > 0:
+            all_scores_by_user[int(row["user_id"])].append(score)
+
+    period_mock_rows = db.execute(
+        f"""
+        SELECT pa.user_id, pa.exam_meta_json, pa.created_at
+        FROM practice_attempts pa
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.domain = 'exam_random_test'
+          AND pa.exam_meta_json IS NOT NULL
+          AND pa.created_at >= datetime('now', ?)
+        ORDER BY pa.user_id, pa.id
+        """,
+        (window_sql,),
+    ).fetchall()
+    period_scores_by_user: dict[int, list[int]] = defaultdict(list)
+    for row in period_mock_rows:
+        if hide_demo and int(row["user_id"]) in demo_user_ids:
+            continue
+        try:
+            meta = json.loads(row["exam_meta_json"] or "{}")
+            score = int(meta.get("score") or 0)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            continue
+        if score > 0:
+            period_scores_by_user[int(row["user_id"])].append(score)
+
+    students: list[dict[str, Any]] = []
+    active_count = 0
+    quiet_count = 0
+    inactive_count = 0
+    exam_takers = 0
+    hidden_demo_count = 0
+    for row in student_rows:
+        uid = int(row["id"])
+        username = str(row["username"] or "")
+        is_demo = _is_digest_demo_username(username)
+        if hide_demo and is_demo:
+            hidden_demo_count += 1
+            continue
+        last_activity = row["last_activity"]
+        status = _activity_status_label(last_activity)
+        if status == "active":
+            active_count += 1
+        elif status == "quiet":
+            quiet_count += 1
+        else:
+            inactive_count += 1
+        exam_sessions = int(row["exam_sessions"] or 0)
+        if exam_sessions:
+            exam_takers += 1
+        graded = int(row["graded_count"] or 0)
+        correct = int(row["correct_count"] or 0)
+        wrong_count = int(row["wrong_count"] or 0)
+        accuracy_pct = round(100 * correct / graded) if graded else None
+        all_scores = all_scores_by_user.get(uid) or []
+        period_scores = period_scores_by_user.get(uid) or []
+        mock_first = all_scores[0] if all_scores else None
+        mock_latest = all_scores[-1] if all_scores else None
+        if len(all_scores) >= 2:
+            delta = all_scores[-1] - all_scores[0]
+            mock_trend_label = f"{mock_first}→{mock_latest} ({delta:+d})"
+        elif mock_latest is not None:
+            mock_trend_label = f"{mock_latest}/800"
+        else:
+            mock_trend_label = None
+        quality_hint = None
+        if accuracy_pct is not None and accuracy_pct < 50 and wrong_count >= 5:
+            quality_hint = "Suggest miss quiz"
+        elif graded and graded < MIN_TRACKED_SAT_RESPONSES and (wrong_count or graded):
+            quality_hint = f"Only {graded} graded — needs {MIN_TRACKED_SAT_RESPONSES}+ for analytics"
+        students.append(
+            {
+                "id": uid,
+                "username": username,
+                "is_demo": is_demo,
+                "last_activity": last_activity,
+                "last_activity_label": _session_when_label(last_activity) or "No activity",
+                "last_login_at": row["last_login_at"],
+                "practice_sessions": int(row["practice_sessions"] or 0),
+                "exam_sessions": exam_sessions,
+                "latest_exam_label": latest_exam_by_user.get(uid),
+                "wrong_count": wrong_count,
+                "graded_count": graded,
+                "accuracy_pct": accuracy_pct,
+                "accuracy_basis": graded,
+                "status": status,
+                "admin_href": url_for("admin_student_detail", user_id=uid),
+                "report_href": url_for("admin_student_report", user_id=uid),
+                "mock_first_score": mock_first,
+                "mock_latest_score": mock_latest,
+                "mock_period_count": len(period_scores),
+                "mock_trend_label": mock_trend_label,
+                "mock_assign_href": exam_hub_href if not all_scores else None,
+                "quality_hint": quality_hint,
+                "mastery_pct": _digest_student_mastery_pct(db, uid),
+            }
+        )
+
+    top_mistake_tags = sorted(tag_counts.items(), key=lambda x: (-x[1], x[0]))[:8]
+
+    nudge_groups: dict[str, list[dict[str, Any]]] = {
+        "inactive": [],
+        "no_practice": [],
+        "no_mock": [],
+    }
+    for student in students:
+        if student["status"] == "inactive":
+            nudge_groups["inactive"].append(student)
+        elif student["practice_sessions"] == 0 and student["exam_sessions"] == 0:
+            nudge_groups["no_practice"].append(student)
+        elif student["status"] == "active" and student["exam_sessions"] == 0:
+            nudge_groups["no_mock"].append(student)
+    needs_attention = (
+        nudge_groups["inactive"]
+        + nudge_groups["no_practice"]
+        + nudge_groups["no_mock"]
+    )
+
+    chapter_topics = [(d, t) for d, t, _, _ in STUDENT_CHAPTER_SLICES]
+    chapter_ph = " OR ".join("(pa.domain = ? AND pa.topic = ?)" for _ in chapter_topics)
+    chapter_params: list[Any] = [window_sql]
+    for domain, topic in chapter_topics:
+        chapter_params.extend([domain, topic])
+    chapter_unit_rows = db.execute(
+        f"""
+        SELECT
+            pa.user_id,
+            pa.domain,
+            pa.topic,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded
+        FROM practice_attempts pa
+        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.created_at >= datetime('now', ?)
+          AND ({chapter_ph})
+        GROUP BY pa.user_id, pa.domain, pa.topic
+        HAVING graded >= 3
+        """,
+        chapter_params,
+    ).fetchall()
+
+    weak_chapter_by_user: dict[int, tuple[str, int, str]] = {}
+    chapter_class: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for row in chapter_unit_rows:
+        uid = int(row["user_id"])
+        if hide_demo and uid in demo_user_ids:
+            continue
+        graded_u = int(row["graded"] or 0)
+        if graded_u <= 0:
+            continue
+        pct = round(100 * int(row["correct"] or 0) / graded_u)
+        domain = str(row["domain"] or "")
+        topic = str(row["topic"] or "")
+        label = _digest_chapter_slice_label(domain, topic)
+        chapter_class[(domain, topic)].append(pct)
+        prev = weak_chapter_by_user.get(uid)
+        if prev is None or pct < prev[1]:
+            weak_chapter_by_user[uid] = (label, pct, topic)
+    class_weak_chapters: list[dict[str, Any]] = []
+    for (domain, topic), pcts in chapter_class.items():
+        if not pcts:
+            continue
+        class_weak_chapters.append(
+            {
+                "label": _digest_chapter_slice_label(domain, topic),
+                "domain": domain,
+                "topic": topic,
+                "avg_pct": round(sum(pcts) / len(pcts)),
+                "students": len(pcts),
+            }
+        )
+    class_weak_chapters.sort(key=lambda x: (x["avg_pct"], -x["students"]))
+
+    unit_rows = db.execute(
+        f"""
+        SELECT
+            pa.user_id,
+            pa.domain,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded
+        FROM practice_attempts pa
+        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        JOIN users u ON u.id = pa.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.domain IN ('algebra', 'advanced_math', 'problem_solving', 'geometry', 'hard_problem')
+          AND pa.created_at >= datetime('now', ?)
+        GROUP BY pa.user_id, pa.domain
+        HAVING graded >= 3
+        """,
+        (window_sql,),
+    ).fetchall()
+    weak_unit_by_user: dict[int, tuple[str, int]] = {}
+    for row in unit_rows:
+        uid = int(row["user_id"])
+        if hide_demo and uid in demo_user_ids:
+            continue
+        graded_u = int(row["graded"] or 0)
+        if graded_u <= 0:
+            continue
+        pct = round(100 * int(row["correct"] or 0) / graded_u)
+        domain = str(row["domain"] or "")
+        label = _dashboard_track_short(domain)
+        prev = weak_unit_by_user.get(uid)
+        if prev is None or pct < prev[1]:
+            weak_unit_by_user[uid] = (label, pct)
+    for student in students:
+        uid = int(student["id"])
+        weak_ch = weak_chapter_by_user.get(uid)
+        student["weak_chapter"] = weak_ch[0] if weak_ch else None
+        student["weak_chapter_pct"] = weak_ch[1] if weak_ch else None
+        weak = weak_unit_by_user.get(uid)
+        student["weak_unit"] = weak[0] if weak else None
+        student["weak_unit_pct"] = weak[1] if weak else None
+
+    prior = _digest_period_stats(db, days, offset_days=days)
+    current_agg = {
+        "practice_sessions": sum(s["practice_sessions"] for s in students),
+        "exam_sessions": sum(s["exam_sessions"] for s in students),
+        "wrong_count": sum(s["wrong_count"] for s in students),
+        "active_students": active_count,
+        "graded_responses": sum(s["graded_count"] for s in students),
+    }
+    graded_all = current_agg["graded_responses"]
+    correct_all = sum(
+        round(s["graded_count"] * s["accuracy_pct"] / 100)
+        for s in students
+        if s.get("accuracy_pct") is not None and s["graded_count"]
+    )
+    current_accuracy = round(100 * correct_all / graded_all) if graded_all else None
+
+    unit_class: dict[str, list[int]] = defaultdict(list)
+    for row in unit_rows:
+        uid = int(row["user_id"])
+        if hide_demo and uid in demo_user_ids:
+            continue
+        graded_u = int(row["graded"] or 0)
+        if graded_u <= 0:
+            continue
+        unit_class[str(row["domain"] or "")].append(
+            round(100 * int(row["correct"] or 0) / graded_u)
+        )
+    class_weak_units = []
+    for domain, pcts in unit_class.items():
+        if not pcts:
+            continue
+        class_weak_units.append(
+            {
+                "label": _dashboard_track_short(domain),
+                "avg_pct": round(sum(pcts) / len(pcts)),
+                "students": len(pcts),
+            }
+        )
+    class_weak_units.sort(key=lambda x: (x["avg_pct"], -x["students"]))
+
+    class_mastery = _digest_class_mastery(db, demo_user_ids if hide_demo else set())
+    weekly_trends = _digest_weekly_trend_series(
+        db, weeks=8, exclude_user_ids=demo_user_ids if hide_demo else set()
+    )
+
+    learning_insights: list[str] = []
+    if class_weak_chapters:
+        focus = class_weak_chapters[0]
+        learning_insights.append(
+            f"Chapter focus: {focus['label']} averages {focus['avg_pct']}% across {focus['students']} student(s) this period."
+        )
+    elif class_weak_units:
+        focus = class_weak_units[0]
+        learning_insights.append(
+            f"Class focus: {focus['label']} averages {focus['avg_pct']}% across {focus['students']} student(s) this period."
+        )
+    if top_mistake_tags:
+        learning_insights.append(
+            f"Recurring misses: {top_mistake_tags[0][0]} ({top_mistake_tags[0][1]} tagged wrongs) — good candidate for a short review."
+        )
+    no_mock = [s["username"] for s in students if not s.get("exam_sessions")]
+    if no_mock:
+        learning_insights.append(
+            f"{len(no_mock)} student(s) have not taken a mock exam in the last {days} days."
+        )
+    improvers = [
+        s
+        for s in students
+        if s.get("mock_first_score") is not None
+        and s.get("mock_latest_score") is not None
+        and s["mock_latest_score"] > s["mock_first_score"]
+    ]
+    if improvers:
+        learning_insights.append(
+            f"Mock score gains: {', '.join(s['username'] for s in improvers[:4])}"
+            + ("…" if len(improvers) > 4 else "")
+            + " improved on Random Test."
+        )
+    if class_mastery.get("digest_pct") is not None:
+        learning_insights.append(
+            f"Mistake mastery: {class_mastery['digest_pct']}% of logged misses marked mastered ({class_mastery['mastered']}/{class_mastery['total']})."
+        )
+    if not learning_insights:
+        learning_insights.append(
+            "Keep the weekly loop: one lesson deck, one bank drill, one mock, then mistake redo."
+        )
+
+    miss_quiz_row = db.execute(
+        f"""
+        SELECT
+            COUNT(*) AS runs,
+            SUM(CASE WHEN passed = 1 THEN 1 ELSE 0 END) AS passed_runs
+        FROM miss_quiz_runs mqr
+        JOIN users u ON u.id = mqr.user_id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND mqr.created_at >= datetime('now', ?)
+        """,
+        (window_sql,),
+    ).fetchone()
+    miss_quiz_runs = int(miss_quiz_row["runs"] or 0) if miss_quiz_row else 0
+    miss_quiz_passed = int(miss_quiz_row["passed_runs"] or 0) if miss_quiz_row else 0
+    miss_quiz_pass_rate = round(100 * miss_quiz_passed / miss_quiz_runs) if miss_quiz_runs else None
+    if miss_quiz_runs:
+        learning_insights.append(
+            f"Miss quiz pass rate: {miss_quiz_passed}/{miss_quiz_runs} runs cleared the {MISS_QUIZ_PASS_PERCENT}% bar this period."
+        )
+
+    period_name = {7: "This week", 14: "Last 2 weeks", 30: "Last 30 days"}.get(days, f"Last {days} days")
+    q_param = request.args.get("q") or ""
+    hide_demo_param = "1" if hide_demo else "0"
+
+    digest: dict[str, Any] = {
+        "days": days,
+        "period_label": period_name,
+        "hide_demo": hide_demo,
+        "hidden_demo_count": hidden_demo_count,
+        "period_options": [
+            {
+                "days": 7,
+                "label": "7 days",
+                "href": url_for("admin", digest_days=7, hide_demo=hide_demo_param, q=q_param),
+            },
+            {
+                "days": 14,
+                "label": "14 days",
+                "href": url_for("admin", digest_days=14, hide_demo=hide_demo_param, q=q_param),
+            },
+            {
+                "days": 30,
+                "label": "30 days",
+                "href": url_for("admin", digest_days=30, hide_demo=hide_demo_param, q=q_param),
+            },
+        ],
+        "demo_toggle_href": url_for(
+            "admin",
+            digest_days=days,
+            hide_demo="0" if hide_demo else "1",
+            q=q_param,
+        ),
+        "print_href": url_for(
+            "admin_learning_pulse_print",
+            days=days,
+            hide_demo=hide_demo_param,
+        ),
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "summary": {
+            "students_total": len(students),
+            "active_students": active_count,
+            "quiet_students": quiet_count,
+            "inactive_students": inactive_count,
+            "exam_takers": exam_takers,
+            "practice_sessions": current_agg["practice_sessions"],
+            "exam_sessions": current_agg["exam_sessions"],
+            "total_wrongs": current_agg["wrong_count"],
+            "graded_responses": current_agg["graded_responses"],
+            "accuracy_pct": current_accuracy,
+            "accuracy_basis": graded_all,
+            "mastery_pct": class_mastery.get("digest_pct"),
+            "mastery_mastered": class_mastery.get("mastered"),
+            "mastery_total": class_mastery.get("total"),
+        },
+        "trends": {
+            "practice_sessions_delta": _digest_delta_label(
+                current_agg["practice_sessions"], prior["practice_sessions"]
+            ),
+            "exam_sessions_delta": _digest_delta_label(
+                current_agg["exam_sessions"], prior["exam_sessions"]
+            ),
+            "wrongs_delta": _digest_delta_label(current_agg["wrong_count"], prior["wrong_count"]),
+            "prior_accuracy_pct": prior["accuracy_pct"],
+        },
+        "weekly_trends": weekly_trends,
+        "students": students,
+        "top_mistake_tags": top_mistake_tags,
+        "needs_attention": needs_attention[:12],
+        "nudge_groups": nudge_groups,
+        "class_weak_units": class_weak_units[:4],
+        "class_weak_chapters": class_weak_chapters[:6],
+        "learning_insights": learning_insights[:6],
+        "miss_quiz_pass_rate": miss_quiz_pass_rate,
+        "miss_quiz_runs": miss_quiz_runs,
+        "exam_hub_href": exam_hub_href,
+    }
+    digest["teaching_actions"] = _digest_teaching_actions(
+        digest, days=days, exam_hub_href=exam_hub_href
+    )
+    digest["nudge_copy_text"] = ", ".join(s["username"] for s in needs_attention)
+    digest["pulse_brief"] = _digest_pulse_brief(digest)
+    return digest
+
+
 def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> List[dict]:
+    _cleanup_empty_practice_attempts(db)
     where = ""
     params: tuple[Any, ...] = ()
     if user_id is not None:
         where = "WHERE pa.user_id = ?"
         params = (user_id,)
 
-    return [
+    rows = [
         dict(row)
         for row in db.execute(
             f"""
@@ -9164,6 +11725,7 @@ def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> L
                 pa.topic,
                 pa.qnum,
                 pa.created_at,
+                pa.exam_meta_json,
                 COUNT(pr.id) AS responses_total,
                 SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_total,
                 MAX(pr.submitted_at) AS last_submitted_at
@@ -9172,12 +11734,23 @@ def _admin_attempt_rows(db: sqlite3.Connection, user_id: int | None = None) -> L
             LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
             {where}
             GROUP BY pa.id
+            HAVING COUNT(pr.id) > 0
             ORDER BY COALESCE(last_submitted_at, pa.created_at) DESC
             LIMIT 300
             """,
             params,
         ).fetchall()
     ]
+    for row in rows:
+        responses = int(row.get("responses_total") or 0)
+        correct = int(row.get("correct_total") or 0)
+        row["accuracy_pct"] = round(100 * correct / responses) if responses else None
+        row["label"] = _exam_attempt_label(
+            str(row.get("domain") or ""),
+            str(row.get("topic") or ""),
+            row.get("exam_meta_json"),
+        )
+    return rows
 
 
 def _admin_attempt_detail(db: sqlite3.Connection, attempt_id: int) -> dict | None:
@@ -9310,6 +11883,13 @@ def admin():
 
     db = get_db()
     q = (request.args.get("q") or "").strip()
+    try:
+        digest_days = int(request.args.get("digest_days") or 7)
+    except ValueError:
+        digest_days = 7
+    if digest_days not in (7, 14, 30):
+        digest_days = 7
+    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
     students = _student_rows(db, q)
     recent_records = _recent_record_rows(db)
     data_snapshot = _admin_data_snapshot(db)
@@ -9325,6 +11905,9 @@ def admin():
         recent_records=recent_records,
         data_snapshot=data_snapshot,
         totals=totals,
+        weekly_digest=_admin_weekly_digest(db, digest_days, hide_demo=hide_demo),
+        digest_days=digest_days,
+        hide_demo=hide_demo,
         q=q,
         user_is_supervisor=current_user_is_supervisor(),
         db_persistence=_db_persistence_status(),
@@ -9369,7 +11952,50 @@ def admin_student_detail(user_id: int):
         student=student_dict,
         attempts=attempts,
         totals=totals,
+        report_href=url_for("admin_student_report", user_id=user_id),
         student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
+    )
+
+
+@app.route("/admin/students/<int:user_id>/report")
+def admin_student_report(user_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    student = db.execute(
+        """
+        SELECT id, username, is_active, created_at, access_grants, access_scope
+        FROM users WHERE id = ? AND role = 'student'
+        """,
+        (user_id,),
+    ).fetchone()
+    if student is None:
+        abort(404)
+    student_dict = dict(student)
+    return render_template(
+        "student_report.html",
+        **_student_report_context(db, user_id, viewer="admin", student=student_dict),
+    )
+
+
+@app.route("/admin/students/<int:user_id>/report/print")
+def admin_student_report_print(user_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    student = db.execute(
+        "SELECT id, username, is_active, created_at FROM users WHERE id = ? AND role = 'student'",
+        (user_id,),
+    ).fetchone()
+    if student is None:
+        abort(404)
+    return render_template(
+        "student_report_print.html",
+        **_student_report_context(db, user_id, viewer="admin", student=dict(student)),
     )
 
 
