@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Class group · {{ cohort.name }} · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-admin-page np-admin-studio">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="np-flash-list np-login-flash" role="status">
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <section class="np-admin-hero np-admin-hero--studio glass-panel np-glass mp-animate-in">
+      <div class="np-admin-hero-copy">
+        <p class="np-admin-kicker">Class group</p>
+        <h1>{{ cohort.name }}</h1>
+        <p class="np-admin-hero-lead">
+          {% if cohort.description %}{{ cohort.description }} · {% endif %}
+          {{ cohort.member_count }} student{{ 's' if cohort.member_count != 1 else '' }} in this group.
+          Use it for live classroom roster and Learning Pulse.
+        </p>
+        <div class="np-admin-hero-actions">
+          <a href="{{ url_for('admin', cohort_id=cohort.id) }}" class="np-admin-hero-btn">Learning Pulse</a>
+          <a href="{{ url_for('admin') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Back to admin</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-cohort-edit">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Members</p>
+          <h2 id="np-cohort-edit">Edit class group</h2>
+          <p>Selected students appear as one-click roster in live classroom. Set as default to auto-select them when you start class.</p>
+        </div>
+      </header>
+
+      <form method="post" class="np-cohort-form">
+        <div class="np-cohort-form-meta">
+          <label>
+            <span>Group name</span>
+            <input type="text" name="name" value="{{ cohort.name }}" required>
+          </label>
+          <label>
+            <span>Notes (optional)</span>
+            <input type="text" name="description" value="{{ cohort.description or '' }}" placeholder="Summer Camp Session A">
+          </label>
+          <label class="np-cohort-default">
+            <input type="checkbox" name="is_default" value="1"{% if cohort.is_default %} checked{% endif %}>
+            <span>Default group for live classroom</span>
+          </label>
+        </div>
+
+        <div class="np-cohort-roster-head">
+          <strong>Students in this group</strong>
+          <div class="np-cohort-roster-actions">
+            <button type="button" class="np-admin-btn np-admin-btn--ghost" data-cohort-select-all>Select all</button>
+            <button type="button" class="np-admin-btn np-admin-btn--ghost" data-cohort-clear>Clear</button>
+          </div>
+        </div>
+
+        <div class="np-cohort-roster-grid">
+          {% for student in roster %}
+          <label class="np-cohort-roster-card">
+            <input type="checkbox" name="student_ids" value="{{ student.id }}"{% if student.in_cohort %} checked{% endif %}>
+            <span>
+              <strong>{{ student.username }}</strong>
+              <em>{{ student.access_grants_label or 'Student' }}</em>
+            </span>
+          </label>
+          {% else %}
+          <p class="np-cohort-empty">No active students found.</p>
+          {% endfor %}
+        </div>
+
+        <footer class="np-cohort-form-foot">
+          <button type="submit" class="np-admin-btn np-admin-btn--cta">Save class group</button>
+        </footer>
+      </form>
+    </section>
+
+    {% if weekly_digest %}
+    <section class="np-admin-card np-cohort-pulse glass-panel np-glass mp-animate-up">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">This week</p>
+          <h2>Class homework snapshot</h2>
+          <p>Quick view for {{ cohort.name }} — open Learning Pulse for full trends and exports.</p>
+        </div>
+      </header>
+      <div class="np-cohort-pulse-grid">
+        <div class="np-cohort-pulse-tile">
+          <strong>{{ weekly_digest.summary.students_total }}</strong>
+          <span>Students tracked</span>
+        </div>
+        <div class="np-cohort-pulse-tile">
+          <strong>{{ weekly_digest.summary.active_students }}</strong>
+          <span>Active this week</span>
+        </div>
+        <div class="np-cohort-pulse-tile">
+          <strong>{% if weekly_digest.summary.accuracy_pct is not none %}{{ weekly_digest.summary.accuracy_pct }}%{% else %}—{% endif %}</strong>
+          <span>Class accuracy</span>
+        </div>
+        <div class="np-cohort-pulse-tile">
+          <strong>{{ weekly_digest.summary.practice_sessions }}</strong>
+          <span>Practice sessions</span>
+        </div>
+      </div>
+      {% if weekly_digest.students %}
+      <div class="np-cohort-student-table-wrap">
+        <table class="np-cohort-student-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Status</th>
+              <th>Sessions</th>
+              <th>Accuracy</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in weekly_digest.students %}
+            <tr>
+              <td>{{ row.username }}</td>
+              <td>{{ row.status }}</td>
+              <td>{{ row.practice_sessions }}</td>
+              <td>{% if row.accuracy_pct is not none %}{{ row.accuracy_pct }}%{% else %}—{% endif %}</td>
+              <td><a href="{{ row.report_href }}">Report</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="np-admin-card np-admin-card--danger glass-panel np-glass mp-animate-up">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Danger zone</p>
+          <h2>Delete class group</h2>
+          <p>Removes the group only — student accounts and practice data stay.</p>
+        </div>
+      </header>
+      <form method="post" action="{{ url_for('admin_cohort_delete', cohort_id=cohort.id) }}" class="np-cohort-delete-form">
+        <input name="confirm" type="text" placeholder="Type DELETE GROUP" aria-label="Confirm delete class group">
+        <button type="submit" class="np-admin-btn">Delete group</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var selectAll = document.querySelector("[data-cohort-select-all]");
+  var clearAll = document.querySelector("[data-cohort-clear]");
+  if (!selectAll || !clearAll) return;
+  selectAll.addEventListener("click", function () {
+    document.querySelectorAll(".np-cohort-roster-card input[type=checkbox]").forEach(function (input) {
+      input.checked = true;
+    });
+  });
+  clearAll.addEventListener("click", function () {
+    document.querySelectorAll(".np-cohort-roster-card input[type=checkbox]").forEach(function (input) {
+      input.checked = false;
+    });
+  });
+})();
+</script>
+{% endblock %}

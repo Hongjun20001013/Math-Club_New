@@ -291,333 +291,202 @@
       </form>
     </section>
 
-    {% if weekly_digest %}
-    {% set brief = weekly_digest.pulse_brief %}
-    <section class="np-admin-card np-pulse glass-panel np-glass mp-animate-up np-pulse--{{ brief.status }}" aria-labelledby="np-admin-weekly">
-      <header class="np-pulse-top">
-        <div class="np-pulse-top-copy">
-          <p class="np-admin-kicker">Learning pulse</p>
-          <h2 id="np-admin-weekly">{{ weekly_digest.period_label }}</h2>
-          <p class="np-pulse-headline">{{ brief.headline }}</p>
-          {% if weekly_digest.hidden_demo_count %}
-          <p class="np-pulse-meta">{{ weekly_digest.hidden_demo_count }} demo account{{ 's' if weekly_digest.hidden_demo_count != 1 else '' }} hidden · <a href="{{ weekly_digest.demo_toggle_href }}">Show</a></p>
-          {% elif hide_demo %}
-          <p class="np-pulse-meta">Demo accounts hidden · <a href="{{ weekly_digest.demo_toggle_href }}">Show</a></p>
-          {% endif %}
-        </div>
-        <div class="np-pulse-top-actions">
-          <div class="np-admin-weekly-periods" role="tablist" aria-label="Report period">
-            {% for opt in weekly_digest.period_options %}
-            <a href="{{ opt.href }}" class="np-admin-weekly-period{% if opt.days == digest_days %} is-active{% endif %}">{{ opt.label }}</a>
-            {% endfor %}
-          </div>
-          <div class="np-pulse-export">
-            <a href="{{ url_for('admin_export_weekly_digest_csv', days=digest_days, hide_demo='1' if hide_demo else '0') }}" class="np-admin-btn np-admin-btn--ghost">CSV</a>
-            <a href="{{ weekly_digest.print_href }}" class="np-admin-btn np-admin-btn--ghost" target="_blank" rel="noopener">Print</a>
-          </div>
+    <section class="np-admin-card np-cohort-hub glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-cohorts">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Class groups</p>
+          <h2 id="np-admin-cohorts">Summer camp &amp; live class roster</h2>
+          <p>Create a group once (e.g. Summer Camp 2026), then one click selects those students in live classroom and filters Learning Pulse below.</p>
         </div>
       </header>
 
-      <div class="np-pulse-glance" aria-label="At a glance">
-        {% for tile in brief.glance %}
-        <div class="np-pulse-glance-tile{% if tile.emphasis %} is-alert{% endif %}">
-          <strong>{{ tile.value }}</strong>
-          <span>{{ tile.label }}</span>
-          {% if tile.hint %}<em>{{ tile.hint }}</em>{% endif %}
-        </div>
+      <div class="np-cohort-hub-grid">
+        {% for cohort in student_cohorts %}
+        <article class="np-cohort-hub-card{% if cohort.is_default %} is-default{% endif %}">
+          <div class="np-cohort-hub-card-head">
+            <strong>{{ cohort.name }}</strong>
+            {% if cohort.is_default %}<span class="np-cohort-badge">Default</span>{% endif %}
+          </div>
+          <p>{{ cohort.member_count }} student{{ 's' if cohort.member_count != 1 else '' }}{% if cohort.description %} · {{ cohort.description }}{% endif %}</p>
+          <div class="np-cohort-hub-card-actions">
+            <a href="{{ url_for('admin_cohort_edit', cohort_id=cohort.id) }}" class="np-admin-btn np-admin-btn--ghost">Edit members</a>
+            <button type="button" class="np-admin-btn np-admin-btn--ghost" data-pulse-open-cohort="{{ cohort.id }}">Class pulse</button>
+          </div>
+        </article>
+        {% else %}
+        <p class="np-cohort-hub-empty">No class groups yet. Create one for your summer camp roster.</p>
         {% endfor %}
       </div>
 
-      {% if brief.priority_steps %}
-      <section class="np-pulse-zone" aria-labelledby="np-pulse-steps-title">
-        <header class="np-pulse-zone-head">
-          <h3 id="np-pulse-steps-title">Start here · 3 things for this period</h3>
-          <p>Do these in order — everything else is optional detail below.</p>
-        </header>
-        <ol class="np-pulse-steps">
-          {% for step in brief.priority_steps %}
-          <li class="np-pulse-step np-pulse-step--{{ step.kind }}">
-            <span class="np-pulse-step-num">{{ step.step }}</span>
-            <div class="np-pulse-step-body">
-              <strong>{{ step.short_title }}</strong>
-              <p>{{ step.detail }}</p>
-              {% if step.href %}
-              <a href="{{ step.href }}" target="_blank" rel="noopener">Open exam hub →</a>
-              {% elif step.copy_names %}
-              <button type="button" class="np-admin-weekly-copy" data-copy="{{ step.copy_names | join(', ') }}">Copy names</button>
-              {% endif %}
-            </div>
-          </li>
-          {% endfor %}
-        </ol>
-        {% if brief.focus_line %}
-        <p class="np-pulse-focus">Class weak spot: <strong>{{ brief.focus_line }}</strong></p>
-        {% endif %}
-      </section>
-      {% endif %}
-
-      <section class="np-pulse-zone" aria-labelledby="np-pulse-attention-title">
-        <header class="np-pulse-zone-head np-pulse-zone-head--split">
-          <div>
-            <h3 id="np-pulse-attention-title">Who needs you</h3>
-            <p>{% if brief.attention %}{{ brief.attention | length }} student{{ 's' if brief.attention | length != 1 else '' }} flagged{% else %}Nobody flagged — class looks on track{% endif %}</p>
-          </div>
-          {% if weekly_digest.nudge_copy_text %}
-          <button type="button" class="np-admin-weekly-copy np-pulse-copy-btn" data-copy="{{ weekly_digest.nudge_copy_text }}">Copy all names</button>
-          {% endif %}
-        </header>
-        {% if brief.attention %}
-        <div class="np-pulse-attention-grid">
-          {% for person in brief.attention %}
-          <a href="{{ person.report_href }}" class="np-pulse-attention-card">
-            <span class="np-admin-weekly-status np-admin-weekly-status--{{ person.status }}">{{ person.status }}</span>
-            <strong>{{ person.username }}</strong>
-            <em>{{ person.reason }}</em>
-            <span>{{ person.last_active }}</span>
-          </a>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="np-pulse-empty-good">No one needs a nudge right now. Check trends below if you want the long view.</div>
-        {% endif %}
-      </section>
-
-      <section class="np-pulse-zone" aria-labelledby="np-pulse-roster-title">
-        <header class="np-pulse-zone-head np-pulse-zone-head--split">
-          <div>
-            <h3 id="np-pulse-roster-title">Student snapshot</h3>
-            <p>Active or flagged students first — open a row for the full record.</p>
-          </div>
-          {% if brief.roster_rest %}
-          <button type="button" class="np-pulse-toggle-roster" aria-expanded="false" aria-controls="np-pulse-roster-rest">Show {{ brief.roster_rest | length }} quiet student{{ 's' if brief.roster_rest | length != 1 else '' }}</button>
-          {% endif %}
-        </header>
-        <div class="np-pulse-roster">
-          {% for row in brief.roster_primary %}
-          <a href="{{ row.report_href if row.report_href is defined else row.admin_href }}" class="np-pulse-roster-row">
-            <span class="np-pulse-roster-name">{{ row.username }}</span>
-            <span class="np-admin-weekly-status np-admin-weekly-status--{{ row.status }}">{{ row.status }}</span>
-            <span class="np-pulse-roster-note">{{ row.pulse_note }}</span>
-            <span class="np-pulse-roster-when">{{ row.last_activity_label }}</span>
-            <span class="np-pulse-roster-go">Open →</span>
-          </a>
-          {% endfor %}
-          {% if brief.roster_rest %}
-          <div id="np-pulse-roster-rest" class="np-pulse-roster-rest" hidden>
-            {% for row in brief.roster_rest %}
-            <a href="{{ row.report_href if row.report_href is defined else row.admin_href }}" class="np-pulse-roster-row is-quiet">
-              <span class="np-pulse-roster-name">{{ row.username }}</span>
-              <span class="np-admin-weekly-status np-admin-weekly-status--{{ row.status }}">{{ row.status }}</span>
-              <span class="np-pulse-roster-note">{{ row.pulse_note }}</span>
-              <span class="np-pulse-roster-when">{{ row.last_activity_label }}</span>
-              <span class="np-pulse-roster-go">Open →</span>
-            </a>
-            {% endfor %}
-          </div>
-          {% endif %}
-        </div>
-      </section>
-
-      <details class="np-pulse-drawer">
-        <summary>Trends · last 8 weeks</summary>
-        {% if weekly_digest.weekly_trends and weekly_digest.weekly_trends.weeks %}
-        <div class="np-admin-weekly-trends np-pulse-trends">
-          <div class="np-admin-weekly-trend-panel">
-            <p class="np-admin-weekly-tags-label">Active students</p>
-            <div class="np-admin-weekly-trend-chart" role="img" aria-label="Weekly active students">
-              {% for pt in weekly_digest.weekly_trends.weeks %}
-              <div class="np-admin-weekly-trend-col" title="{{ pt.label }} · {{ pt.active_students }} active">
-                <span class="np-admin-weekly-trend-bar np-admin-weekly-trend-bar--active" style="height: {{ pt.active_bar_pct }}%;"></span>
-                <em>{{ pt.label }}</em>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="np-admin-weekly-trend-panel">
-            <p class="np-admin-weekly-tags-label">Practice sessions</p>
-            <div class="np-admin-weekly-trend-chart" role="img" aria-label="Weekly practice sessions">
-              {% for pt in weekly_digest.weekly_trends.weeks %}
-              <div class="np-admin-weekly-trend-col" title="{{ pt.label }} · {{ pt.practice_sessions }} sessions">
-                <span class="np-admin-weekly-trend-bar np-admin-weekly-trend-bar--practice" style="height: {{ pt.practice_bar_pct }}%;"></span>
-                <em>{{ pt.label }}</em>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="np-admin-weekly-trend-panel">
-            <p class="np-admin-weekly-tags-label">Class accuracy</p>
-            <div class="np-admin-weekly-trend-chart" role="img" aria-label="Weekly class accuracy">
-              {% for pt in weekly_digest.weekly_trends.weeks %}
-              <div class="np-admin-weekly-trend-col" title="{{ pt.label }} · {% if pt.accuracy_pct is not none %}{{ pt.accuracy_pct }}%{% else %}no data{% endif %}">
-                <span class="np-admin-weekly-trend-bar np-admin-weekly-trend-bar--accuracy" style="height: {{ pt.accuracy_bar_pct }}%;"></span>
-                <strong>{% if pt.accuracy_pct is not none %}{{ pt.accuracy_pct }}%{% else %}—{% endif %}</strong>
-                <em>{{ pt.label }}</em>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="np-admin-weekly-trend-panel">
-            <p class="np-admin-weekly-tags-label">Mock median</p>
-            <div class="np-admin-weekly-trend-chart" role="img" aria-label="Weekly mock median score">
-              {% for pt in weekly_digest.weekly_trends.weeks %}
-              <div class="np-admin-weekly-trend-col" title="{{ pt.label }} · {% if pt.mock_median is not none %}{{ pt.mock_median }}/800{% else %}no mocks{% endif %}">
-                <span class="np-admin-weekly-trend-bar np-admin-weekly-trend-bar--mock" style="height: {{ pt.mock_bar_pct }}%;"></span>
-                <strong>{% if pt.mock_median is not none %}{{ pt.mock_median }}{% else %}—{% endif %}</strong>
-                <em>{{ pt.label }}</em>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        {% else %}
-        <p class="np-pulse-drawer-empty">Not enough history yet for trend charts.</p>
-        {% endif %}
-      </details>
-
-      <details class="np-pulse-drawer">
-        <summary>Quality metrics · accuracy, misses, miss quiz</summary>
-        <div class="np-admin-weekly-summary np-pulse-metrics">
-          <div class="np-admin-weekly-stat">
-            <strong>{% if weekly_digest.summary.accuracy_pct is not none %}{{ weekly_digest.summary.accuracy_pct }}%{% else %}—{% endif %}</strong>
-            <span>Class accuracy</span>
-            <em>{% if weekly_digest.summary.accuracy_basis %}n={{ weekly_digest.summary.accuracy_basis }}{% else %}No graded answers{% endif %}</em>
-          </div>
-          <div class="np-admin-weekly-stat">
-            <strong>{{ weekly_digest.summary.graded_responses }}</strong>
-            <span>Graded responses</span>
-            <em>{{ weekly_digest.summary.total_wrongs }} misses</em>
-          </div>
-          <div class="np-admin-weekly-stat">
-            <strong>{% if weekly_digest.summary.mastery_pct is not none %}{{ weekly_digest.summary.mastery_pct }}%{% else %}—{% endif %}</strong>
-            <span>Misses mastered</span>
-            <em>{% if weekly_digest.summary.mastery_total %}{{ weekly_digest.summary.mastery_mastered }}/{{ weekly_digest.summary.mastery_total }}{% else %}No tracked misses{% endif %}</em>
-          </div>
-          <div class="np-admin-weekly-stat">
-            <strong>{% if weekly_digest.miss_quiz_pass_rate is not none %}{{ weekly_digest.miss_quiz_pass_rate }}%{% else %}—{% endif %}</strong>
-            <span>Miss quiz pass</span>
-            <em>{% if weekly_digest.miss_quiz_runs %}{{ weekly_digest.miss_quiz_runs }} runs{% else %}No runs yet{% endif %}</em>
-          </div>
-        </div>
-        {% if weekly_digest.learning_insights %}
-        <div class="np-admin-weekly-insights np-pulse-insights">
-          {% for line in weekly_digest.learning_insights %}
-          <p>{{ line }}</p>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </details>
-
-      <details class="np-pulse-drawer">
-        <summary>Focus areas · chapters, domains, mistake tags</summary>
-        {% if weekly_digest.class_weak_chapters %}
-        <div class="np-admin-weekly-units">
-          <span class="np-admin-weekly-tags-label">Weakest chapters</span>
-          {% for unit in weekly_digest.class_weak_chapters %}
-          <span class="np-admin-weekly-tag np-admin-weekly-tag--chapter">{{ unit.label }} · {{ unit.avg_pct }}% · {{ unit.students }} students</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% if weekly_digest.class_weak_units %}
-        <div class="np-admin-weekly-units">
-          <span class="np-admin-weekly-tags-label">Weakest domains</span>
-          {% for unit in weekly_digest.class_weak_units %}
-          <span class="np-admin-weekly-tag">{{ unit.label }} · {{ unit.avg_pct }}% · {{ unit.students }} students</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% if weekly_digest.top_mistake_tags %}
-        <div class="np-admin-weekly-tags">
-          <span class="np-admin-weekly-tags-label">Top mistake tags</span>
-          {% for label, count in weekly_digest.top_mistake_tags %}
-          <span class="np-admin-weekly-tag">{{ label }} · {{ count }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% if not weekly_digest.class_weak_chapters and not weekly_digest.class_weak_units and not weekly_digest.top_mistake_tags %}
-        <p class="np-pulse-drawer-empty">Students need more practice (3+ answers per slice) before focus areas appear.</p>
-        {% endif %}
-      </details>
-
-      <details class="np-pulse-drawer">
-        <summary>Full data table · all columns</summary>
-        <div class="np-admin-weekly-table-wrap">
-          <table class="np-admin-weekly-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Status</th>
-                <th>Last active</th>
-                <th>Practice</th>
-                <th>Graded</th>
-                <th>Exams</th>
-                <th>Mock trend</th>
-                <th>Weak chapter</th>
-                <th>Misses</th>
-                <th>Acc.</th>
-                <th>Mastery</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in weekly_digest.students %}
-              <tr>
-                <td><a href="{{ row.admin_href }}">{{ row.username }}</a>{% if row.quality_hint %}<span class="np-admin-weekly-hint">{{ row.quality_hint }}</span>{% endif %}</td>
-                <td><span class="np-admin-weekly-status np-admin-weekly-status--{{ row.status }}">{{ row.status }}</span></td>
-                <td>{{ row.last_activity_label }}</td>
-                <td>{{ row.practice_sessions }}</td>
-                <td>{{ row.graded_count }}</td>
-                <td>{{ row.exam_sessions }}</td>
-                <td>
-                  {% if row.mock_trend_label %}
-                  {{ row.mock_trend_label }}
-                  {% elif row.mock_assign_href %}
-                  <a href="{{ row.mock_assign_href }}" target="_blank" rel="noopener">Assign mock →</a>
-                  {% else %}—{% endif %}
-                </td>
-                <td>{% if row.weak_chapter %}{{ row.weak_chapter }} · {{ row.weak_chapter_pct }}%{% elif row.weak_unit %}{{ row.weak_unit }} · {{ row.weak_unit_pct }}%{% else %}—{% endif %}</td>
-                <td>{{ row.wrong_count }}</td>
-                <td>{% if row.accuracy_pct is not none %}{{ row.accuracy_pct }}%{% if row.accuracy_basis %}<span class="np-admin-weekly-hint">n={{ row.accuracy_basis }}</span>{% endif %}{% else %}—{% endif %}</td>
-                <td>{% if row.mastery_pct is not none %}{{ row.mastery_pct }}%{% else %}—{% endif %}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </details>
-
-      <p class="np-admin-weekly-foot">Updated {{ weekly_digest.generated_at }} · Use <strong>30 days</strong> after a month for term patterns · Details live in the drawers above</p>
+      <form method="post" action="{{ url_for('admin_cohort_create') }}" class="np-cohort-create-form">
+        <label>
+          <span>New group name</span>
+          <input type="text" name="name" placeholder="Summer Camp 2026" required>
+        </label>
+        <label>
+          <span>Notes (optional)</span>
+          <input type="text" name="description" placeholder="Session A · Mon–Fri 10am">
+        </label>
+        <button type="submit" class="np-admin-btn np-admin-btn--cta">Create class group</button>
+      </form>
     </section>
+
+    <div id="np-learning-pulse-mount" class="np-learning-pulse-mount">
+      {% include "admin_learning_pulse_panel.html" %}
+    </div>
+
     <script>
     (function () {
-      document.querySelectorAll('.np-admin-weekly-copy').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var text = btn.getAttribute('data-copy') || '';
-          if (!text) return;
-          navigator.clipboard.writeText(text).then(function () {
-            var prev = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(function () { btn.textContent = prev; }, 1200);
-          });
+      var mount = document.getElementById("np-learning-pulse-mount");
+      if (!mount) return;
+
+      var panelUrl = {{ url_for('admin_learning_pulse_panel') | tojson }};
+      var loading = false;
+
+      function readOpts(root) {
+        root = root || mount;
+        var panel = root.querySelector("[data-pulse-panel]") || root;
+        var activeCohort = panel.querySelector("[data-pulse-cohort].is-active");
+        var activeDays = panel.querySelector("[data-pulse-days].is-active");
+        var demoBtn = panel.querySelector("[data-pulse-demo-toggle]");
+        var activeStudent = panel.querySelector("[data-pulse-student].is-active");
+        return {
+          cohort_id: activeCohort ? (activeCohort.getAttribute("data-pulse-cohort") || "") : "",
+          days: activeDays ? activeDays.getAttribute("data-pulse-days") || "7" : "7",
+          hide_demo: demoBtn ? demoBtn.getAttribute("data-hide-demo") || "1" : "1",
+          student_id: activeStudent ? activeStudent.getAttribute("data-pulse-student") || "" : ""
+        };
+      }
+
+      function adminQueryParams(opts) {
+        var params = new URLSearchParams(window.location.search);
+        params.set("digest_days", opts.days || "7");
+        params.set("hide_demo", opts.hide_demo !== undefined ? opts.hide_demo : "1");
+        if (opts.cohort_id) params.set("cohort_id", opts.cohort_id);
+        else params.delete("cohort_id");
+        if (opts.student_id) params.set("student_id", opts.student_id);
+        else params.delete("student_id");
+        return params;
+      }
+
+      function selectStudent(root, studentId) {
+        if (!studentId) return;
+        root.querySelectorAll("[data-pulse-student]").forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-pulse-student") === String(studentId));
         });
-      });
-      var rosterToggle = document.querySelector('.np-pulse-toggle-roster');
-      var rosterRest = document.getElementById('np-pulse-roster-rest');
-      if (rosterToggle && rosterRest) {
-        rosterToggle.addEventListener('click', function () {
-          var open = rosterRest.hasAttribute('hidden');
-          if (open) {
-            rosterRest.removeAttribute('hidden');
-            rosterToggle.setAttribute('aria-expanded', 'true');
-            rosterToggle.textContent = 'Hide quiet students';
-          } else {
-            rosterRest.setAttribute('hidden', '');
-            rosterToggle.setAttribute('aria-expanded', 'false');
-            rosterToggle.textContent = 'Show {{ brief.roster_rest | length }} quiet student{{ 's' if brief.roster_rest | length != 1 else '' }}';
-          }
+        root.querySelectorAll("[data-pulse-student-panel]").forEach(function (panel) {
+          var match = panel.getAttribute("data-pulse-student-panel") === String(studentId);
+          panel.hidden = !match;
+          panel.classList.toggle("is-visible", match);
         });
       }
+
+      function bindStudentRoster(root) {
+        root.querySelectorAll("[data-pulse-student]").forEach(function (btn) {
+          if (btn.__npStudentBound) return;
+          btn.__npStudentBound = true;
+          btn.addEventListener("click", function () {
+            var sid = btn.getAttribute("data-pulse-student") || "";
+            selectStudent(root, sid);
+            var opts = readOpts(root);
+            opts.student_id = sid;
+            history.replaceState(null, "", window.location.pathname + "?" + adminQueryParams(opts).toString() + window.location.hash);
+          });
+        });
+      }
+
+      function bindCopyButtons(root) {
+        root.querySelectorAll(".np-admin-weekly-copy, .np-pulse-v2-copy").forEach(function (btn) {
+          if (btn.__npCopyBound) return;
+          btn.__npCopyBound = true;
+          btn.addEventListener("click", function () {
+            var text = btn.getAttribute("data-copy") || "";
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(function () {
+              var prev = btn.textContent;
+              btn.textContent = "Copied!";
+              setTimeout(function () { btn.textContent = prev; }, 1200);
+            });
+          });
+        });
+      }
+
+      function bindPulsePanel(root) {
+        root.querySelectorAll("[data-pulse-cohort]").forEach(function (btn) {
+          if (btn.__npPulseBound) return;
+          btn.__npPulseBound = true;
+          btn.addEventListener("click", function () {
+            var opts = readOpts(root);
+            opts.cohort_id = btn.getAttribute("data-pulse-cohort") || "";
+            opts.student_id = "";
+            loadPulse(opts);
+          });
+        });
+        root.querySelectorAll("[data-pulse-days]").forEach(function (btn) {
+          if (btn.__npPulseBound) return;
+          btn.__npPulseBound = true;
+          btn.addEventListener("click", function () {
+            var opts = readOpts(root);
+            opts.days = btn.getAttribute("data-pulse-days") || "7";
+            loadPulse(opts);
+          });
+        });
+        var demoBtn = root.querySelector("[data-pulse-demo-toggle]");
+        if (demoBtn && !demoBtn.__npPulseBound) {
+          demoBtn.__npPulseBound = true;
+          demoBtn.addEventListener("click", function () {
+            var opts = readOpts(root);
+            opts.hide_demo = opts.hide_demo === "1" ? "0" : "1";
+            loadPulse(opts);
+          });
+        }
+        bindCopyButtons(root);
+        bindStudentRoster(root);
+        var urlStudent = new URLSearchParams(window.location.search).get("student_id");
+        if (urlStudent) selectStudent(root, urlStudent);
+      }
+
+      function loadPulse(opts) {
+        if (loading) return;
+        loading = true;
+        mount.classList.add("is-loading");
+        var params = new URLSearchParams();
+        params.set("days", opts.days || "7");
+        params.set("hide_demo", opts.hide_demo !== undefined ? opts.hide_demo : "1");
+        if (opts.cohort_id) params.set("cohort_id", opts.cohort_id);
+        if (opts.student_id) params.set("student_id", opts.student_id);
+
+        var pageParams = adminQueryParams(opts);
+        history.replaceState(null, "", window.location.pathname + "?" + pageParams.toString() + window.location.hash);
+
+        fetch(panelUrl + "?" + params.toString(), { credentials: "same-origin", headers: { "X-Requested-With": "XMLHttpRequest" } })
+          .then(function (r) { return r.text(); })
+          .then(function (html) {
+            mount.innerHTML = html;
+            bindPulsePanel(mount);
+          })
+          .finally(function () {
+            loading = false;
+            mount.classList.remove("is-loading");
+          });
+      }
+
+      bindPulsePanel(mount);
+
+      document.querySelectorAll("[data-pulse-open-cohort]").forEach(function (btn) {
+        btn.addEventListener("click", function (event) {
+          event.preventDefault();
+          var cohortId = btn.getAttribute("data-pulse-open-cohort") || "";
+          var opts = readOpts(mount);
+          opts.cohort_id = cohortId;
+          if (mount.scrollIntoView) {
+            mount.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          loadPulse(opts);
+        });
+      });
     })();
     </script>
-    {% endif %}
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-students">
       <header class="np-admin-section-head np-admin-section-head--split">

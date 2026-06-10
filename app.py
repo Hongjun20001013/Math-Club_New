@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-track-v1")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-studio-v1")
 
 _DB_SCHEMA_READY = False
 
@@ -883,6 +883,33 @@ def init_db():
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_course_class_responses_session "
         "ON course_class_responses(session_id, slide_index)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS student_cohorts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            is_default INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS student_cohort_members (
+            cohort_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (cohort_id, user_id),
+            FOREIGN KEY (cohort_id) REFERENCES student_cohorts (id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_student_cohort_members_user "
+        "ON student_cohort_members(user_id)"
     )
     _seed_users_if_empty(db)
     _sync_render_users_seed_snapshot(db)
@@ -1836,6 +1863,70 @@ def _cm_active_class_session(db: sqlite3.Connection, slug: str) -> sqlite3.Row |
     ).fetchone()
 
 
+def _student_cohort_rows(db: sqlite3.Connection) -> list[dict[str, Any]]:
+    rows = db.execute(
+        """
+        SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.is_default,
+            c.created_at,
+            COUNT(m.user_id) AS member_count
+        FROM student_cohorts c
+        LEFT JOIN student_cohort_members m ON m.cohort_id = c.id
+        GROUP BY c.id, c.name, c.description, c.is_default, c.created_at
+        ORDER BY c.is_default DESC, lower(c.name)
+        """
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def _student_cohort_member_ids(db: sqlite3.Connection, cohort_id: int) -> set[int]:
+    rows = db.execute(
+        "SELECT user_id FROM student_cohort_members WHERE cohort_id = ?",
+        (cohort_id,),
+    ).fetchall()
+    return {int(row["user_id"]) for row in rows}
+
+
+def _student_cohorts_for_classroom(db: sqlite3.Connection) -> list[dict[str, Any]]:
+    cohorts = []
+    for row in _student_cohort_rows(db):
+        cid = int(row["id"])
+        member_ids = sorted(_student_cohort_member_ids(db, cid))
+        cohorts.append(
+            {
+                "id": cid,
+                "name": str(row["name"] or ""),
+                "description": str(row["description"] or ""),
+                "is_default": int(row["is_default"] or 0) == 1,
+                "member_count": len(member_ids),
+                "member_ids": member_ids,
+            }
+        )
+    return cohorts
+
+
+def _student_cohort_by_id(db: sqlite3.Connection, cohort_id: int) -> dict[str, Any] | None:
+    row = db.execute(
+        "SELECT id, name, description, is_default, created_at FROM student_cohorts WHERE id = ?",
+        (cohort_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    data = dict(row)
+    data["member_ids"] = sorted(_student_cohort_member_ids(db, cohort_id))
+    data["member_count"] = len(data["member_ids"])
+    data["is_default"] = int(data.get("is_default") or 0) == 1
+    return data
+
+
+def _set_default_student_cohort(db: sqlite3.Connection, cohort_id: int) -> None:
+    db.execute("UPDATE student_cohorts SET is_default = 0")
+    db.execute("UPDATE student_cohorts SET is_default = 1 WHERE id = ?", (cohort_id,))
+
+
 def _cm_available_classroom_students(db: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = db.execute(
         """
@@ -2108,6 +2199,7 @@ def practice_course_material_classroom(slug: str):
         summary_api=url_for("practice_course_material_classroom_summary_api", slug=slug),
         lesson_href=url_for("practice_course_material_view", slug=slug),
         student_roster=_cm_available_classroom_students(db),
+        student_cohorts=_student_cohorts_for_classroom(db),
     )
 
 
@@ -4444,7 +4536,14 @@ def admin_export_weekly_digest_csv():
     if digest_days not in (7, 14, 30):
         digest_days = 7
     hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
-    digest = _admin_weekly_digest(db, digest_days, hide_demo=hide_demo)
+    cohort_id: int | None = None
+    raw_cohort = (request.args.get("cohort_id") or "").strip()
+    if raw_cohort:
+        try:
+            cohort_id = int(raw_cohort)
+        except ValueError:
+            cohort_id = None
+    digest = _admin_weekly_digest(db, digest_days, hide_demo=hide_demo, cohort_id=cohort_id)
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(
@@ -4504,6 +4603,25 @@ def admin_export_weekly_digest_csv():
     )
 
 
+@app.route("/admin/learning-pulse/panel")
+def admin_learning_pulse_panel():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    digest_days, hide_demo, cohort_id, _student_id = _parse_learning_pulse_args()
+    return render_template(
+        "admin_learning_pulse_panel.html",
+        **_learning_pulse_panel_context(
+            db,
+            digest_days=digest_days,
+            hide_demo=hide_demo,
+            cohort_id=cohort_id,
+        ),
+    )
+
+
 @app.route("/admin/learning-pulse/print")
 def admin_learning_pulse_print():
     gate = _require_admin_response()
@@ -4511,16 +4629,12 @@ def admin_learning_pulse_print():
         return gate
 
     db = get_db()
-    try:
-        digest_days = int(request.args.get("days") or 7)
-    except ValueError:
-        digest_days = 7
-    if digest_days not in (7, 14, 30):
-        digest_days = 7
-    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
+    digest_days, hide_demo, cohort_id, _student_id = _parse_learning_pulse_args()
     return render_template(
         "admin_digest_print.html",
-        weekly_digest=_admin_weekly_digest(db, digest_days, hide_demo=hide_demo),
+        weekly_digest=_admin_weekly_digest(
+            db, digest_days, hide_demo=hide_demo, cohort_id=cohort_id
+        ),
         digest_days=digest_days,
         hide_demo=hide_demo,
     )
@@ -10879,6 +10993,246 @@ def _digest_chapter_slice_label(domain: str, topic: str) -> str:
     return f"{section} · {short_title}"
 
 
+def _digest_topic_short_label(topic: str) -> str:
+    title = TOPIC_TITLES.get(topic, topic)
+    if " – " in title:
+        title = title.split(" – ", 1)[-1]
+    if len(title) > 36:
+        title = title[:34] + "…"
+    return title
+
+
+def _digest_student_recent_wrongs(
+    db: sqlite3.Connection, user_id: int, days: int, *, limit: int = 10
+) -> list[dict[str, Any]]:
+    window_sql = f"-{int(days)} days"
+    tracked_sql = _tracked_attempt_sql("pa")
+    rows = db.execute(
+        f"""
+        SELECT
+            pa.domain,
+            pa.topic,
+            pr.question_index,
+            pr.selected_answer,
+            pr.correct_answer,
+            COALESCE(pr.submitted_at, pa.created_at) AS answered_at
+        FROM practice_responses pr
+        JOIN practice_attempts pa ON pa.id = pr.attempt_id
+        WHERE pa.user_id = ?
+          AND pr.is_correct = 0
+          AND pr.question_index IS NOT NULL
+          AND pa.domain NOT LIKE 'exam_%'
+          AND pa.domain != 'placement'
+          AND COALESCE(pr.submitted_at, pa.created_at) >= datetime('now', ?)
+          AND {tracked_sql}
+        ORDER BY answered_at DESC
+        LIMIT ?
+        """,
+        (user_id, window_sql, max(limit * 3, limit)),
+    ).fetchall()
+    out: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, int]] = set()
+    for row in rows:
+        domain = str(row["domain"] or "")
+        topic = str(row["topic"] or "")
+        qi = int(row["question_index"])
+        key = (domain, topic, qi)
+        if key in seen:
+            continue
+        seen.add(key)
+        selected = str(row["selected_answer"] or "").strip()
+        correct = str(row["correct_answer"] or "").strip()
+        out.append(
+            {
+                "label": f"{_digest_topic_short_label(topic)} · Q{qi + 1}",
+                "selected": selected,
+                "correct": correct,
+                "detail": f"{selected} → {correct}" if selected and correct else selected or correct or "",
+                "when_label": _session_when_label(row["answered_at"]) or "",
+            }
+        )
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _learning_pulse_session_rows(
+    db: sqlite3.Connection,
+    *,
+    days: int,
+    user_ids: set[int] | None = None,
+    hide_demo: bool = True,
+    tracked_only: bool = True,
+    limit: int = 80,
+) -> list[dict[str, Any]]:
+    _cleanup_empty_practice_attempts(db)
+    window_sql = f"-{int(days)} days"
+    demo_ids = _digest_demo_user_ids(db) if hide_demo else set()
+
+    user_filter = ""
+    params: list[Any] = []
+    if user_ids is not None:
+        if not user_ids:
+            return []
+        ph = ",".join("?" * len(user_ids))
+        user_filter = f"AND u.id IN ({ph})"
+        params.extend(sorted(user_ids))
+
+    params.extend([window_sql, limit])
+    rows = db.execute(
+        f"""
+        SELECT
+            pa.id,
+            u.username,
+            u.id AS user_id,
+            pa.domain,
+            pa.topic,
+            pa.created_at,
+            COUNT(pr.id) AS responses_total,
+            SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_total,
+            SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded_total,
+            MAX(pr.submitted_at) AS last_submitted_at
+        FROM practice_attempts pa
+        JOIN users u ON u.id = pa.user_id
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+        WHERE u.role = 'student' AND u.is_active = 1
+          AND pa.domain NOT LIKE 'exam_%'
+          AND pa.domain != 'placement'
+          {user_filter}
+        GROUP BY pa.id
+        HAVING COUNT(pr.id) > 0
+          AND COALESCE(MAX(pr.submitted_at), pa.created_at) >= datetime('now', ?)
+        ORDER BY COALESCE(MAX(pr.submitted_at), pa.created_at) DESC
+        LIMIT ?
+        """,
+        tuple(params),
+    ).fetchall()
+
+    out: list[dict[str, Any]] = []
+    for raw in rows:
+        row = dict(raw)
+        uid = int(row["user_id"])
+        if hide_demo and uid in demo_ids:
+            continue
+        if _is_digest_demo_username(str(row["username"] or "")):
+            continue
+        graded = int(row.get("graded_total") or 0)
+        is_tracked = graded >= MIN_TRACKED_SAT_RESPONSES
+        if tracked_only and not is_tracked:
+            continue
+        responses = int(row.get("responses_total") or 0)
+        correct = int(row.get("correct_total") or 0)
+        topic = str(row.get("topic") or "")
+        out.append(
+            {
+                "id": int(row["id"]),
+                "username": str(row["username"] or ""),
+                "user_id": uid,
+                "topic_title": TOPIC_TITLES.get(topic, topic),
+                "responses_total": responses,
+                "accuracy_pct": round(100 * correct / responses) if responses else None,
+                "created_at": row["created_at"],
+                "last_submitted_at": row["last_submitted_at"],
+                "tracking_label": "Counts" if is_tracked else f"Preview · need {max(0, MIN_TRACKED_SAT_RESPONSES - graded)} more",
+                "is_tracked": is_tracked,
+                "session_href": url_for("practice_session_summary", attempt_id=int(row["id"])),
+                "student_href": url_for("admin_student_detail", user_id=uid),
+            }
+        )
+    return out
+
+
+def _learning_pulse_panel_context(
+    db: sqlite3.Connection,
+    *,
+    digest_days: int = 7,
+    hide_demo: bool = True,
+    cohort_id: int | None = None,
+) -> dict[str, Any]:
+    digest = _admin_weekly_digest(
+        db, digest_days, hide_demo=hide_demo, cohort_id=cohort_id
+    )
+    scope_ids = {int(s["id"]) for s in digest.get("students") or []}
+    session_rows = _learning_pulse_session_rows(
+        db,
+        days=digest_days,
+        user_ids=scope_ids,
+        hide_demo=hide_demo,
+        tracked_only=True,
+    )
+    sessions_by_user: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for row in session_rows:
+        sessions_by_user[int(row["user_id"])].append(row)
+
+    roster_students: list[dict[str, Any]] = []
+    for student in digest.get("students") or []:
+        uid = int(student["id"])
+        user_sessions = sessions_by_user.get(uid, [])
+        roster_students.append(
+            {
+                **student,
+                "sessions": user_sessions,
+                "period_sessions": len(user_sessions),
+            }
+        )
+    roster_students.sort(
+        key=lambda s: (
+            0 if s.get("period_sessions") else 1,
+            0 if s.get("status") == "active" else 1,
+            str(s.get("username") or "").lower(),
+        )
+    )
+
+    selected_student_id: int | None = None
+    raw_student = (request.args.get("student_id") or "").strip()
+    if raw_student:
+        try:
+            candidate = int(raw_student)
+            if any(int(s["id"]) == candidate for s in roster_students):
+                selected_student_id = candidate
+        except ValueError:
+            pass
+    if selected_student_id is None and roster_students:
+        selected_student_id = int(roster_students[0]["id"])
+
+    return {
+        "weekly_digest": digest,
+        "digest_days": digest_days,
+        "hide_demo": hide_demo,
+        "cohort_id": cohort_id,
+        "student_cohorts": _student_cohort_rows(db),
+        "session_rows": session_rows,
+        "roster_students": roster_students,
+        "selected_student_id": selected_student_id,
+        "min_tracked_responses": MIN_TRACKED_SAT_RESPONSES,
+    }
+
+
+def _parse_learning_pulse_args() -> tuple[int, bool, int | None, int | None]:
+    try:
+        digest_days = int(request.args.get("digest_days") or request.args.get("days") or 7)
+    except ValueError:
+        digest_days = 7
+    if digest_days not in (7, 14, 30):
+        digest_days = 7
+    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
+    cohort_id: int | None = None
+    raw_cohort = (request.args.get("cohort_id") or "").strip()
+    if raw_cohort:
+        try:
+            cohort_id = int(raw_cohort)
+        except ValueError:
+            cohort_id = None
+    student_id: int | None = None
+    raw_student = (request.args.get("student_id") or "").strip()
+    if raw_student:
+        try:
+            student_id = int(raw_student)
+        except ValueError:
+            student_id = None
+    return digest_days, hide_demo, cohort_id, student_id
+
+
 def _digest_weekly_trend_series(
     db: sqlite3.Connection,
     *,
@@ -11302,9 +11656,20 @@ def _digest_teaching_actions(
 
 
 def _digest_period_stats(
-    db: sqlite3.Connection, days: int, *, offset_days: int = 0
+    db: sqlite3.Connection,
+    days: int,
+    *,
+    offset_days: int = 0,
+    exclude_user_ids: set[int] | None = None,
 ) -> dict[str, int]:
     """Aggregate practice/exam activity for a window ending `offset_days` ago."""
+    exclude_user_ids = exclude_user_ids or set()
+    exclude_clause = ""
+    exclude_params: list[Any] = []
+    if exclude_user_ids:
+        ph = ",".join("?" * len(exclude_user_ids))
+        exclude_clause = f"AND u.id NOT IN ({ph})"
+        exclude_params = sorted(exclude_user_ids)
     start_sql = f"-{int(days) + int(offset_days)} days"
     end_clause = "datetime('now')" if not offset_days else f"datetime('now', '-{int(offset_days)} days')"
     row = db.execute(
@@ -11324,8 +11689,9 @@ def _digest_period_stats(
           AND pa.created_at < {end_clause}
         LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
         WHERE u.role = 'student' AND u.is_active = 1
+          {exclude_clause}
         """,
-        (start_sql,),
+        (start_sql, *exclude_params),
     ).fetchone()
     graded = int(row["graded_count"] or 0) if row else 0
     correct = int(row["correct_count"] or 0) if row else 0
@@ -11348,12 +11714,42 @@ def _digest_delta_label(current: int, previous: int) -> str:
 
 
 def _admin_weekly_digest(
-    db: sqlite3.Connection, days: int = 7, *, hide_demo: bool = True
+    db: sqlite3.Connection,
+    days: int = 7,
+    *,
+    hide_demo: bool = True,
+    cohort_id: int | None = None,
 ) -> dict[str, Any]:
     window_sql = f"-{int(days)} days"
     id_to_label = {o["id"]: o["label"] for o in MISTAKE_TAG_OPTIONS}
     demo_user_ids = _digest_demo_user_ids(db) if hide_demo else set()
     exam_hub_href = url_for("practice_exams")
+
+    cohort_info: dict[str, Any] | None = None
+    cohort_member_ids: set[int] | None = None
+    if cohort_id is not None:
+        cohort_info = _student_cohort_by_id(db, cohort_id)
+        if cohort_info is None:
+            cohort_id = None
+        else:
+            cohort_member_ids = set(cohort_info["member_ids"])
+
+    all_active_student_ids = {
+        int(row["id"])
+        for row in db.execute(
+            "SELECT id FROM users WHERE role = 'student' AND is_active = 1"
+        ).fetchall()
+    }
+    digest_exclude_user_ids = set(demo_user_ids if hide_demo else set())
+    if cohort_member_ids is not None:
+        digest_exclude_user_ids |= all_active_student_ids - cohort_member_ids
+
+    def _digest_user_in_scope(uid: int) -> bool:
+        if hide_demo and uid in demo_user_ids:
+            return False
+        if cohort_member_ids is not None and uid not in cohort_member_ids:
+            return False
+        return True
 
     student_rows = db.execute(
         f"""
@@ -11395,6 +11791,8 @@ def _admin_weekly_digest(
     latest_exam_by_user: dict[int, str] = {}
     for row in exam_rows:
         uid = int(row["user_id"])
+        if not _digest_user_in_scope(uid):
+            continue
         if uid in latest_exam_by_user:
             continue
         latest_exam_by_user[uid] = _exam_attempt_label(
@@ -11406,7 +11804,7 @@ def _admin_weekly_digest(
     tag_counts: dict[str, int] = defaultdict(int)
     tag_rows = db.execute(
         f"""
-        SELECT pr.mistake_tags
+        SELECT pa.user_id, pr.mistake_tags
         FROM practice_responses pr
         JOIN practice_attempts pa ON pa.id = pr.attempt_id
         JOIN users u ON u.id = pa.user_id
@@ -11419,6 +11817,9 @@ def _admin_weekly_digest(
         (window_sql,),
     ).fetchall()
     for row in tag_rows:
+        uid = int(row["user_id"])
+        if not _digest_user_in_scope(uid):
+            continue
         try:
             arr = json.loads(row["mistake_tags"] or "[]")
         except json.JSONDecodeError:
@@ -11442,7 +11843,7 @@ def _admin_weekly_digest(
     ).fetchall()
     all_scores_by_user: dict[int, list[int]] = defaultdict(list)
     for row in all_mock_rows:
-        if hide_demo and int(row["user_id"]) in demo_user_ids:
+        if not _digest_user_in_scope(int(row["user_id"])):
             continue
         try:
             meta = json.loads(row["exam_meta_json"] or "{}")
@@ -11467,7 +11868,7 @@ def _admin_weekly_digest(
     ).fetchall()
     period_scores_by_user: dict[int, list[int]] = defaultdict(list)
     for row in period_mock_rows:
-        if hide_demo and int(row["user_id"]) in demo_user_ids:
+        if not _digest_user_in_scope(int(row["user_id"])):
             continue
         try:
             meta = json.loads(row["exam_meta_json"] or "{}")
@@ -11487,8 +11888,9 @@ def _admin_weekly_digest(
         uid = int(row["id"])
         username = str(row["username"] or "")
         is_demo = _is_digest_demo_username(username)
-        if hide_demo and is_demo:
-            hidden_demo_count += 1
+        if not _digest_user_in_scope(uid):
+            if hide_demo and is_demo:
+                hidden_demo_count += 1
             continue
         last_activity = row["last_activity"]
         status = _activity_status_label(last_activity)
@@ -11598,7 +12000,7 @@ def _admin_weekly_digest(
     chapter_class: dict[tuple[str, str], list[int]] = defaultdict(list)
     for row in chapter_unit_rows:
         uid = int(row["user_id"])
-        if hide_demo and uid in demo_user_ids:
+        if not _digest_user_in_scope(uid):
             continue
         graded_u = int(row["graded"] or 0)
         if graded_u <= 0:
@@ -11647,7 +12049,7 @@ def _admin_weekly_digest(
     weak_unit_by_user: dict[int, tuple[str, int]] = {}
     for row in unit_rows:
         uid = int(row["user_id"])
-        if hide_demo and uid in demo_user_ids:
+        if not _digest_user_in_scope(uid):
             continue
         graded_u = int(row["graded"] or 0)
         if graded_u <= 0:
@@ -11667,7 +12069,9 @@ def _admin_weekly_digest(
         student["weak_unit"] = weak[0] if weak else None
         student["weak_unit_pct"] = weak[1] if weak else None
 
-    prior = _digest_period_stats(db, days, offset_days=days)
+    prior = _digest_period_stats(
+        db, days, offset_days=days, exclude_user_ids=digest_exclude_user_ids
+    )
     current_agg = {
         "practice_sessions": sum(s["practice_sessions"] for s in students),
         "exam_sessions": sum(s["exam_sessions"] for s in students),
@@ -11686,7 +12090,7 @@ def _admin_weekly_digest(
     unit_class: dict[str, list[int]] = defaultdict(list)
     for row in unit_rows:
         uid = int(row["user_id"])
-        if hide_demo and uid in demo_user_ids:
+        if not _digest_user_in_scope(uid):
             continue
         graded_u = int(row["graded"] or 0)
         if graded_u <= 0:
@@ -11707,9 +12111,9 @@ def _admin_weekly_digest(
         )
     class_weak_units.sort(key=lambda x: (x["avg_pct"], -x["students"]))
 
-    class_mastery = _digest_class_mastery(db, demo_user_ids if hide_demo else set())
+    class_mastery = _digest_class_mastery(db, digest_exclude_user_ids)
     weekly_trends = _digest_weekly_trend_series(
-        db, weeks=8, exclude_user_ids=demo_user_ids if hide_demo else set()
+        db, weeks=8, exclude_user_ids=digest_exclude_user_ids
     )
 
     learning_insights: list[str] = []
@@ -11763,8 +12167,9 @@ def _admin_weekly_digest(
         JOIN users u ON u.id = mqr.user_id
         WHERE u.role = 'student' AND u.is_active = 1
           AND mqr.created_at >= datetime('now', ?)
+          {"AND u.id NOT IN (" + ",".join("?" * len(digest_exclude_user_ids)) + ")" if digest_exclude_user_ids else ""}
         """,
-        (window_sql,),
+        (window_sql, *sorted(digest_exclude_user_ids)),
     ).fetchone()
     miss_quiz_runs = int(miss_quiz_row["runs"] or 0) if miss_quiz_row else 0
     miss_quiz_passed = int(miss_quiz_row["passed_runs"] or 0) if miss_quiz_row else 0
@@ -11775,41 +12180,55 @@ def _admin_weekly_digest(
         )
 
     period_name = {7: "This week", 14: "Last 2 weeks", 30: "Last 30 days"}.get(days, f"Last {days} days")
+    if cohort_info:
+        period_name = f"{cohort_info['name']} · {period_name}"
     q_param = request.args.get("q") or ""
     hide_demo_param = "1" if hide_demo else "0"
+
+    def _digest_admin_href(**extra: Any) -> str:
+        params: dict[str, Any] = {
+            "digest_days": days,
+            "hide_demo": hide_demo_param,
+            "q": q_param,
+        }
+        if cohort_id is not None:
+            params["cohort_id"] = cohort_id
+        params.update(extra)
+        return url_for("admin", **params)
 
     digest: dict[str, Any] = {
         "days": days,
         "period_label": period_name,
+        "cohort_id": cohort_id,
+        "cohort_name": cohort_info["name"] if cohort_info else None,
+        "cohort_member_count": len(cohort_member_ids) if cohort_member_ids is not None else None,
         "hide_demo": hide_demo,
         "hidden_demo_count": hidden_demo_count,
         "period_options": [
             {
                 "days": 7,
                 "label": "7 days",
-                "href": url_for("admin", digest_days=7, hide_demo=hide_demo_param, q=q_param),
+                "href": _digest_admin_href(digest_days=7),
             },
             {
                 "days": 14,
                 "label": "14 days",
-                "href": url_for("admin", digest_days=14, hide_demo=hide_demo_param, q=q_param),
+                "href": _digest_admin_href(digest_days=14),
             },
             {
                 "days": 30,
                 "label": "30 days",
-                "href": url_for("admin", digest_days=30, hide_demo=hide_demo_param, q=q_param),
+                "href": _digest_admin_href(digest_days=30),
             },
         ],
-        "demo_toggle_href": url_for(
-            "admin",
-            digest_days=days,
+        "demo_toggle_href": _digest_admin_href(
             hide_demo="0" if hide_demo else "1",
-            q=q_param,
         ),
         "print_href": url_for(
             "admin_learning_pulse_print",
             days=days,
             hide_demo=hide_demo_param,
+            cohort_id=cohort_id or None,
         ),
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "summary": {
@@ -12081,6 +12500,118 @@ def _admin_confirm_value(raw: str) -> str:
     return " ".join((raw or "").strip().upper().split())
 
 
+@app.route("/admin/cohorts", methods=["POST"])
+def admin_cohort_create():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    name = (request.form.get("name") or "").strip()
+    if not name:
+        flash("Class group name is required.")
+        return redirect(url_for("admin"))
+    description = (request.form.get("description") or "").strip() or None
+    db = get_db()
+    cur = db.execute(
+        "INSERT INTO student_cohorts (name, description) VALUES (?, ?)",
+        (name, description),
+    )
+    db.commit()
+    cohort_id = int(cur.lastrowid)
+    flash(f'Class group "{name}" created. Add students on the edit page.')
+    return redirect(url_for("admin_cohort_edit", cohort_id=cohort_id))
+
+
+@app.route("/admin/cohorts/<int:cohort_id>", methods=["GET", "POST"])
+def admin_cohort_edit(cohort_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    db = get_db()
+    cohort = _student_cohort_by_id(db, cohort_id)
+    if cohort is None:
+        abort(404)
+
+    if request.method == "POST":
+        name = (request.form.get("name") or "").strip()
+        if not name:
+            flash("Class group name is required.")
+            return redirect(url_for("admin_cohort_edit", cohort_id=cohort_id))
+        description = (request.form.get("description") or "").strip() or None
+        make_default = request.form.get("is_default") == "1"
+        raw_ids = request.form.getlist("student_ids")
+        member_ids: set[int] = set()
+        for raw in raw_ids:
+            try:
+                member_ids.add(int(raw))
+            except ValueError:
+                continue
+        db.execute(
+            "UPDATE student_cohorts SET name = ?, description = ? WHERE id = ?",
+            (name, description, cohort_id),
+        )
+        if make_default:
+            _set_default_student_cohort(db, cohort_id)
+        elif cohort["is_default"]:
+            db.execute(
+                "UPDATE student_cohorts SET is_default = 0 WHERE id = ?",
+                (cohort_id,),
+            )
+        db.execute("DELETE FROM student_cohort_members WHERE cohort_id = ?", (cohort_id,))
+        for uid in sorted(member_ids):
+            active = db.execute(
+                "SELECT id FROM users WHERE id = ? AND role = 'student' AND is_active = 1",
+                (uid,),
+            ).fetchone()
+            if active:
+                db.execute(
+                    "INSERT INTO student_cohort_members (cohort_id, user_id) VALUES (?, ?)",
+                    (cohort_id, uid),
+                )
+        db.commit()
+        flash(f'Class group "{name}" saved ({len(member_ids)} students).')
+        return redirect(url_for("admin_cohort_edit", cohort_id=cohort_id))
+
+    students = _student_rows(db, "")
+    member_set = set(cohort["member_ids"])
+    roster = [
+        {
+            **s,
+            "in_cohort": int(s["id"]) in member_set,
+        }
+        for s in students
+        if s["is_active"]
+    ]
+    return render_template(
+        "admin_cohort.html",
+        cohort=cohort,
+        roster=roster,
+        weekly_digest=_admin_weekly_digest(db, 7, hide_demo=True, cohort_id=cohort_id),
+    )
+
+
+@app.route("/admin/cohorts/<int:cohort_id>/delete", methods=["POST"])
+def admin_cohort_delete(cohort_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+
+    confirm = _admin_confirm_value(request.form.get("confirm") or "")
+    if confirm != "DELETE GROUP":
+        flash('Type DELETE GROUP to remove this class group.')
+        return redirect(url_for("admin_cohort_edit", cohort_id=cohort_id))
+
+    db = get_db()
+    cohort = _student_cohort_by_id(db, cohort_id)
+    if cohort is None:
+        abort(404)
+    db.execute("DELETE FROM student_cohorts WHERE id = ?", (cohort_id,))
+    db.commit()
+    flash(f'Class group "{cohort["name"]}" deleted.')
+    return redirect(url_for("admin"))
+
+
 @app.route("/admin")
 def admin():
     gate = _require_admin_response()
@@ -12089,16 +12620,17 @@ def admin():
 
     db = get_db()
     q = (request.args.get("q") or "").strip()
-    try:
-        digest_days = int(request.args.get("digest_days") or 7)
-    except ValueError:
-        digest_days = 7
-    if digest_days not in (7, 14, 30):
-        digest_days = 7
-    hide_demo = request.args.get("hide_demo", "1") not in ("0", "false", "no")
+    digest_days, hide_demo, cohort_id, _student_id = _parse_learning_pulse_args()
+    pulse_ctx = _learning_pulse_panel_context(
+        db,
+        digest_days=digest_days,
+        hide_demo=hide_demo,
+        cohort_id=cohort_id,
+    )
     students = _student_rows(db, q)
     recent_records = _recent_record_rows(db)
     data_snapshot = _admin_data_snapshot(db)
+    student_cohorts = pulse_ctx["student_cohorts"]
     totals = {
         "students": len(students),
         "active_students": sum(1 for s in students if s["is_active"]),
@@ -12111,9 +12643,15 @@ def admin():
         recent_records=recent_records,
         data_snapshot=data_snapshot,
         totals=totals,
-        weekly_digest=_admin_weekly_digest(db, digest_days, hide_demo=hide_demo),
+        weekly_digest=pulse_ctx["weekly_digest"],
+        session_rows=pulse_ctx["session_rows"],
+        roster_students=pulse_ctx["roster_students"],
+        selected_student_id=pulse_ctx["selected_student_id"],
+        min_tracked_responses=pulse_ctx["min_tracked_responses"],
         digest_days=digest_days,
         hide_demo=hide_demo,
+        cohort_id=cohort_id,
+        student_cohorts=student_cohorts,
         q=q,
         user_is_supervisor=current_user_is_supervisor(),
         db_persistence=_db_persistence_status(),

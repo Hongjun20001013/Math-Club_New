@@ -1,0 +1,114 @@
+{% if weekly_digest %}
+{% set brief = weekly_digest.pulse_brief %}
+{% set summary = weekly_digest.summary %}
+<section class="np-pulse-studio glass-panel np-glass" aria-labelledby="np-admin-weekly" data-pulse-panel>
+  <header class="np-pulse-studio-head">
+    <div class="np-pulse-studio-title">
+      <p class="np-admin-kicker">Class dashboard</p>
+      <h2 id="np-admin-weekly">{{ weekly_digest.period_label }}</h2>
+      <p class="np-pulse-studio-lead">{{ roster_students|length }} student{{ 's' if roster_students|length != 1 else '' }} · {{ summary.active_students }} active · {% if summary.accuracy_pct is not none %}{{ summary.accuracy_pct }}% accuracy{% else %}no graded work{% endif %}</p>
+    </div>
+    <div class="np-pulse-studio-actions">
+      <a href="{{ url_for('admin_export_weekly_digest_csv', days=digest_days, hide_demo='1' if hide_demo else '0', cohort_id=cohort_id or none) }}" class="np-pulse-studio-action">Export CSV</a>
+      <a href="{{ weekly_digest.print_href }}" class="np-pulse-studio-action" target="_blank" rel="noopener">Print</a>
+    </div>
+  </header>
+
+  <div class="np-pulse-studio-toolbar">
+    {% if student_cohorts %}
+    <div class="np-pulse-studio-filters">
+      <button type="button" class="np-pulse-studio-chip{% if not cohort_id %} is-active{% endif %}" data-pulse-cohort="">All students</button>
+      {% for cohort in student_cohorts %}
+      <button type="button" class="np-pulse-studio-chip{% if cohort_id == cohort.id %} is-active{% endif %}" data-pulse-cohort="{{ cohort.id }}">{{ cohort.name }} · {{ cohort.member_count }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="np-pulse-studio-filters">
+      {% for opt in weekly_digest.period_options %}
+      <button type="button" class="np-pulse-studio-chip np-pulse-studio-chip--muted{% if opt.days == digest_days %} is-active{% endif %}" data-pulse-days="{{ opt.days }}">{{ opt.label }}</button>
+      {% endfor %}
+      <button type="button" class="np-pulse-studio-chip np-pulse-studio-chip--ghost" data-pulse-demo-toggle data-hide-demo="{{ '1' if hide_demo else '0' }}">{% if hide_demo %}Hide demo{% else %}Show demo{% endif %}</button>
+    </div>
+  </div>
+
+  {% if roster_students %}
+  <div class="np-pulse-studio-layout">
+    <aside class="np-pulse-studio-roster" aria-label="Students in this class">
+      <p class="np-pulse-studio-roster-label">Students</p>
+      <ul class="np-pulse-studio-roster-list">
+        {% for student in roster_students %}
+        <li>
+          <button type="button" class="np-pulse-studio-student{% if selected_student_id == student.id %} is-active{% endif %}" data-pulse-student="{{ student.id }}">
+            <span class="np-pulse-studio-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</span>
+            <span class="np-pulse-studio-student-copy">
+              <strong>{{ student.username }}</strong>
+              <em>
+                {% if student.period_sessions %}{{ student.period_sessions }} set{{ 's' if student.period_sessions != 1 else '' }}{% else %}No homework{% endif %}
+                {% if student.accuracy_pct is not none %} · {{ student.accuracy_pct }}%{% endif %}
+              </em>
+            </span>
+            <span class="np-admin-weekly-status np-admin-weekly-status--{{ student.status }}">{{ student.status }}</span>
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <div class="np-pulse-studio-detail" data-pulse-detail>
+      {% for student in roster_students %}
+      <section class="np-pulse-studio-panel{% if selected_student_id == student.id %} is-visible{% endif %}" data-pulse-student-panel="{{ student.id }}"{% if selected_student_id != student.id %} hidden{% endif %} aria-label="{{ student.username }} homework">
+        <header class="np-pulse-studio-panel-head">
+          <div>
+            <h3>{{ student.username }}</h3>
+            <p>Last active {{ student.last_activity_label }} · {{ student.practice_sessions }} practice session{{ 's' if student.practice_sessions != 1 else '' }} this period</p>
+          </div>
+          <div class="np-pulse-studio-panel-links">
+            <a href="{{ student.admin_href }}" class="np-pulse-studio-link">Full record</a>
+            <a href="{{ student.report_href }}" class="np-pulse-studio-link np-pulse-studio-link--primary">Progress report</a>
+          </div>
+        </header>
+
+        {% if student.sessions %}
+        <div class="np-admin-record-table np-admin-record-table--studio-detail" role="table">
+          <div class="np-admin-record-row np-admin-record-row--head" role="row">
+            <span>Unit / set</span>
+            <span>Responses</span>
+            <span>Accuracy</span>
+            <span>Started</span>
+            <span>Last activity</span>
+            <span>Status</span>
+            <span>Report</span>
+          </div>
+          {% for row in student.sessions %}
+          <div class="np-admin-record-row" role="row">
+            <span>{{ row.topic_title }}</span>
+            <span>{{ row.responses_total }}</span>
+            <span>{% if row.accuracy_pct is not none %}{{ row.accuracy_pct }}%{% else %}—{% endif %}</span>
+            <span>{{ row.created_at }}</span>
+            <span>{{ row.last_submitted_at or row.created_at }}</span>
+            <span class="np-admin-session-badge np-admin-session-badge--tracked">{{ row.tracking_label }}</span>
+            <span><a href="{{ row.session_href }}" class="np-admin-detail-link">Open</a></span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="np-pulse-studio-empty">
+          <p>No tracked homework in the last {{ digest_days }} days.</p>
+          <a href="{{ student.report_href }}" class="np-pulse-studio-link">View full progress report →</a>
+        </div>
+        {% endif %}
+
+        {% if student.weak_chapter %}
+        <p class="np-pulse-studio-note">Weak spot this period: <strong>{{ student.weak_chapter }}</strong>{% if student.weak_chapter_pct is not none %} · {{ student.weak_chapter_pct }}%{% endif %}</p>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <p class="np-admin-empty">No students in this view. Create a class group and add members, or change filters above.</p>
+  {% endif %}
+
+  <footer class="np-pulse-studio-foot">Updated {{ weekly_digest.generated_at }}</footer>
+</section>
+{% endif %}

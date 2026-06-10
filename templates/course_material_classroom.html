@@ -2,7 +2,7 @@
 {% block title %}Classroom · {{ material.section }} · {{ site_brand_name }}{% endblock %}
 
 {% block content %}
-<section class="np-classroom-shell" data-classroom-dashboard data-summary-api="{{ summary_api }}" data-start-api="{{ start_api }}" data-end-api="{{ end_api }}" data-students='{{ student_roster|tojson }}'>
+<section class="np-classroom-shell" data-classroom-dashboard data-summary-api="{{ summary_api }}" data-start-api="{{ start_api }}" data-end-api="{{ end_api }}" data-students='{{ student_roster|tojson }}' data-cohorts='{{ student_cohorts|tojson }}'>
   <header class="np-classroom-hero glass-panel np-glass">
     <nav class="np-cm-cinema-rail" aria-label="Classroom navigation">
       <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
@@ -36,6 +36,7 @@
         <button type="button" class="np-classroom-btn np-classroom-btn--small" data-roster-clear>Clear</button>
       </div>
     </div>
+    <div class="np-classroom-cohort-bar" data-cohort-bar hidden></div>
     <div class="np-classroom-roster-grid" data-roster-grid></div>
     <p class="np-classroom-roster-note" data-roster-note></p>
   </div>
@@ -63,11 +64,18 @@
   var startApi = root.getAttribute("data-start-api");
   var endApi = root.getAttribute("data-end-api");
   var students = [];
+  var cohorts = [];
   try {
     students = JSON.parse(root.getAttribute("data-students") || "[]") || [];
   } catch (err) {
     students = [];
   }
+  try {
+    cohorts = JSON.parse(root.getAttribute("data-cohorts") || "[]") || [];
+  } catch (err2) {
+    cohorts = [];
+  }
+  var COHORT_STORAGE_KEY = "np-classroom-cohort-id";
   var statusEl = root.querySelector("[data-classroom-status]");
   var metaEl = root.querySelector("[data-classroom-meta]");
   var dotEl = root.querySelector("[data-classroom-live-dot]");
@@ -75,6 +83,7 @@
   var reportEl = root.querySelector("[data-classroom-report]");
   var rosterGrid = root.querySelector("[data-roster-grid]");
   var rosterNote = root.querySelector("[data-roster-note]");
+  var cohortBar = root.querySelector("[data-cohort-bar]");
   var refreshTimer = null;
   var renderedSessionId = null;
 
@@ -102,6 +111,64 @@
     rosterNote.textContent = selected + " selected for this SAT class. Only selected students count toward completion, not-submitted, and class statistics.";
   }
 
+  function applyCohortSelection(memberIds, cohortId) {
+    var selected = {};
+    (memberIds || []).forEach(function (id) {
+      selected[parseInt(id, 10)] = true;
+    });
+    Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
+      input.checked = !!selected[parseInt(input.value, 10)];
+    });
+    if (cohortBar) {
+      Array.prototype.slice.call(cohortBar.querySelectorAll("[data-cohort-pick]")).forEach(function (btn) {
+        btn.classList.toggle("is-active", String(btn.getAttribute("data-cohort-pick")) === String(cohortId || ""));
+      });
+    }
+    if (cohortId) {
+      try { window.localStorage.setItem(COHORT_STORAGE_KEY, String(cohortId)); } catch (storageErr) {}
+    }
+    updateRosterNote();
+  }
+
+  function initialRosterSelection() {
+    var defaultCohort = null;
+    var storedId = null;
+    try { storedId = window.localStorage.getItem(COHORT_STORAGE_KEY); } catch (storageErr) {}
+    if (storedId) {
+      defaultCohort = cohorts.find(function (c) { return String(c.id) === String(storedId); }) || null;
+    }
+    if (!defaultCohort) {
+      defaultCohort = cohorts.find(function (c) { return c.is_default; }) || null;
+    }
+    if (defaultCohort && defaultCohort.member_ids && defaultCohort.member_ids.length) {
+      applyCohortSelection(defaultCohort.member_ids, defaultCohort.id);
+      return;
+    }
+    updateRosterNote();
+  }
+
+  function renderCohortBar() {
+    if (!cohortBar || !cohorts.length) return;
+    cohortBar.hidden = false;
+    cohortBar.innerHTML =
+      '<p class="np-classroom-cohort-label">Quick select class group</p>' +
+      '<div class="np-classroom-cohort-pills">' +
+      cohorts.map(function (cohort) {
+        var label = escapeHtml(cohort.name) + ' (' + escapeHtml(cohort.member_count) + ')';
+        if (cohort.is_default) label += ' · default';
+        return '<button type="button" class="np-classroom-cohort-pill" data-cohort-pick="' + escapeHtml(cohort.id) + '">' + label + '</button>';
+      }).join("") +
+      '</div>';
+    Array.prototype.slice.call(cohortBar.querySelectorAll("[data-cohort-pick]")).forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var cohortId = parseInt(btn.getAttribute("data-cohort-pick"), 10);
+        var cohort = cohorts.find(function (c) { return c.id === cohortId; });
+        if (!cohort) return;
+        applyCohortSelection(cohort.member_ids || [], cohort.id);
+      });
+    });
+  }
+
   function renderRosterSelector() {
     if (!rosterGrid) return;
     if (!students.length) {
@@ -111,14 +178,15 @@
     }
     rosterGrid.innerHTML = students.map(function (student) {
       return '<label class="np-classroom-roster-card">' +
-        '<input type="checkbox" data-roster-student value="' + escapeHtml(student.id) + '" checked>' +
+        '<input type="checkbox" data-roster-student value="' + escapeHtml(student.id) + '">' +
         '<span><strong>' + escapeHtml(student.username) + '</strong><em>' + escapeHtml(student.access_label || "Student") + '</em></span>' +
       '</label>';
     }).join("");
     Array.prototype.slice.call(root.querySelectorAll("[data-roster-student]")).forEach(function (input) {
       input.addEventListener("change", updateRosterNote);
     });
-    updateRosterNote();
+    renderCohortBar();
+    initialRosterSelection();
   }
 
   function syncRosterSelection(data) {
