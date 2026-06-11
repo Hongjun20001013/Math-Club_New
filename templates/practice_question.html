@@ -3,6 +3,7 @@
 {% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
 
 <div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
+<p class="sat-mobile-practice-hint" role="note">Best on tablet or laptop — rotate to landscape on phone for easier reading.</p>
 <div class="exam-container practice-run sat-practice sat-practice--split-lock{% if placement_mode %} sat-practice--placement{% endif %}{% if chrome_focus %} sat-practice--miss-quiz{% endif %}">
 
     <div class="sat-exam-chrome{% if placement_mode %} sat-exam-chrome--placement{% endif %}" aria-label="Session controls">
@@ -177,7 +178,7 @@
         {% if tracked_responses_hint %}
         <p class="np-tracked-hint" role="note">{{ tracked_responses_hint }}</p>
         {% endif %}
-        <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
+        <input type="hidden" name="attempt_id" value="{{ attempt_id if attempt_id is not none else '' }}">
         <input type="hidden" name="domain" value="{{ domain }}">
         <input type="hidden" name="topic" value="{{ topic }}">
         {% if miss_quiz_mode %}

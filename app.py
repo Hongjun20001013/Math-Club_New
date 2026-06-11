@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-studio-v1")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-class-v1")
 
 _DB_SCHEMA_READY = False
 
@@ -883,6 +883,18 @@ def init_db():
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_course_class_responses_session "
         "ON course_class_responses(session_id, slide_index)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS course_class_slide_ink (
+            session_id INTEGER NOT NULL,
+            slide_index INTEGER NOT NULL,
+            strokes_json TEXT NOT NULL DEFAULT '[]',
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (session_id, slide_index),
+            FOREIGN KEY (session_id) REFERENCES course_class_sessions (id) ON DELETE CASCADE
+        )
+        """
     )
     db.execute(
         """
@@ -1927,6 +1939,90 @@ def _set_default_student_cohort(db: sqlite3.Connection, cohort_id: int) -> None:
     db.execute("UPDATE student_cohorts SET is_default = 1 WHERE id = ?", (cohort_id,))
 
 
+def _cm_slide_ink_payload(
+    db: sqlite3.Connection, session_id: int, slide_index: int
+) -> dict[str, Any]:
+    row = db.execute(
+        """
+        SELECT strokes_json, updated_at
+        FROM course_class_slide_ink
+        WHERE session_id = ? AND slide_index = ?
+        """,
+        (session_id, slide_index),
+    ).fetchone()
+    if row is None:
+        return {"strokes": [], "updated_at": None}
+    try:
+        strokes = json.loads(row["strokes_json"] or "[]")
+    except json.JSONDecodeError:
+        strokes = []
+    if not isinstance(strokes, list):
+        strokes = []
+    return {
+        "strokes": strokes,
+        "updated_at": row["updated_at"],
+    }
+
+
+def _cm_save_slide_ink(
+    db: sqlite3.Connection, session_id: int, slide_index: int, strokes: list[Any]
+) -> str | None:
+    safe_strokes: list[Any] = []
+    for stroke in strokes[:120]:
+        if not isinstance(stroke, dict):
+            continue
+        points = stroke.get("points")
+        if not isinstance(points, list) or len(points) < 2:
+            continue
+        norm_points: list[list[float]] = []
+        for pt in points[:800]:
+            if (
+                isinstance(pt, (list, tuple))
+                and len(pt) >= 2
+                and isinstance(pt[0], (int, float))
+                and isinstance(pt[1], (int, float))
+            ):
+                norm_points.append(
+                    [
+                        max(0.0, min(1.0, float(pt[0]))),
+                        max(0.0, min(1.0, float(pt[1]))),
+                    ]
+                )
+        if len(norm_points) < 2:
+            continue
+        color = str(stroke.get("color") or "#ef4444")[:16]
+        try:
+            width = float(stroke.get("width") or 3)
+        except (TypeError, ValueError):
+            width = 3.0
+        safe_strokes.append(
+            {
+                "points": norm_points,
+                "color": color,
+                "width": max(1.0, min(12.0, width)),
+            }
+        )
+    payload = json.dumps(safe_strokes, separators=(",", ":"))
+    db.execute(
+        """
+        INSERT INTO course_class_slide_ink (session_id, slide_index, strokes_json, updated_at)
+        VALUES (?, ?, ?, datetime('now'))
+        ON CONFLICT(session_id, slide_index) DO UPDATE SET
+            strokes_json = excluded.strokes_json,
+            updated_at = datetime('now')
+        """,
+        (session_id, slide_index, payload),
+    )
+    row = db.execute(
+        """
+        SELECT updated_at FROM course_class_slide_ink
+        WHERE session_id = ? AND slide_index = ?
+        """,
+        (session_id, slide_index),
+    ).fetchone()
+    return str(row["updated_at"]) if row else None
+
+
 def _cm_available_classroom_students(db: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = db.execute(
         """
@@ -2233,6 +2329,8 @@ def practice_course_material_classroom_active_api(slug: str):
                 (int(row["id"]), uid, username),
             )
             _safe_db_commit(db)
+    slide_index = int(row["current_slide_index"] or 1)
+    ink = _cm_slide_ink_payload(db, int(row["id"]), slide_index)
     return jsonify(
         {
             "ok": True,
@@ -2242,9 +2340,62 @@ def practice_course_material_classroom_active_api(slug: str):
                 "lesson_slug": slug,
                 "title": row["title"],
                 "created_at": row["created_at"],
-                "current_slide_index": int(row["current_slide_index"] or 1),
+                "current_slide_index": slide_index,
                 "slide_updated_at": row["slide_updated_at"],
+                "ink_updated_at": ink.get("updated_at"),
             },
+        }
+    )
+
+
+@app.route("/practice/materials/api/classroom/<slug>/ink", methods=["GET", "POST"])
+def practice_course_material_classroom_ink_api(slug: str):
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    active = _cm_active_class_session(db, slug)
+    if not active:
+        return jsonify({"ok": False, "error": "no active classroom session"}), 409
+    session_id = int(active["id"])
+    if request.method == "GET":
+        try:
+            slide_index = int(request.args.get("slide_index") or active["current_slide_index"] or 1)
+        except (TypeError, ValueError):
+            slide_index = int(active["current_slide_index"] or 1)
+        ink = _cm_slide_ink_payload(db, session_id, slide_index)
+        return jsonify(
+            {
+                "ok": True,
+                "session_id": session_id,
+                "slide_index": slide_index,
+                "strokes": ink["strokes"],
+                "updated_at": ink["updated_at"],
+            }
+        )
+
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return jsonify({"ok": False, "error": "staff required"}), 403
+    data = request.get_json(silent=True) or {}
+    try:
+        slide_index = int(data.get("slide_index"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "slide_index required"}), 400
+    strokes = data.get("strokes")
+    if not isinstance(strokes, list):
+        return jsonify({"ok": False, "error": "strokes must be a list"}), 400
+    updated_at = _cm_save_slide_ink(db, session_id, slide_index, strokes)
+    if not _safe_db_commit(db):
+        return jsonify({"ok": False, "error": "server busy, please try again"}), 503
+    return jsonify(
+        {
+            "ok": True,
+            "session_id": session_id,
+            "slide_index": slide_index,
+            "updated_at": updated_at,
         }
     )
 
@@ -7025,6 +7176,7 @@ def practice_course_material_view(slug: str):
         cm_classroom_slide_api=url_for("practice_course_material_classroom_slide_api", slug=slug)
         if current_user_can_access_admin()
         else None,
+        cm_classroom_ink_api=url_for("practice_course_material_classroom_ink_api", slug=slug),
         cm_classroom_href=url_for("practice_course_material_classroom", slug=slug)
         if current_user_can_access_admin()
         else None,
@@ -9741,21 +9893,23 @@ def practice_question(domain, topic, qnum):
                 session[sk] = attempt_id
                 session.modified = True
             else:
-                attempt_id = _insert_practice_attempt(
-                    db, user_id, domain, topic, question_index
-                )
-                session[sk] = attempt_id
+                attempt_id = None
+                session.pop(sk, None)
+                session.modified = True
         else:
             attempt_id = int(row["id"])
             _backfill_placement_student_profile(db, attempt_id, domain)
 
-    answered_rows = db.execute(
-        """
-        SELECT DISTINCT question_index FROM practice_responses
-        WHERE attempt_id = ? AND question_index IS NOT NULL
-        """,
-        (attempt_id,),
-    ).fetchall()
+    if attempt_id is not None:
+        answered_rows = db.execute(
+            """
+            SELECT DISTINCT question_index FROM practice_responses
+            WHERE attempt_id = ? AND question_index IS NOT NULL
+            """,
+            (attempt_id,),
+        ).fetchall()
+    else:
+        answered_rows = []
     answered_qset = frozenset(
         int(r["question_index"])
         for r in answered_rows
@@ -9989,6 +10143,9 @@ def submit_practice_answer():
                 miss_anchor=miss_anchor_f,
             )
         if domain != "placement" and not mistake_redo:
+            sk = _practice_session_key(domain, topic)
+            session[sk] = attempt_id
+            session.modified = True
             _maybe_flash_tracking_hint(db, attempt_id)
     except Exception:
         app.logger.exception(

@@ -23,6 +23,51 @@
 
 {% block content %}
 <div class="mp-page-shell np-page-shell">
+{% if dashboard_username %}
+<section class="np-cmd-center glass-panel np-glass mp-animate-in" aria-label="Your next steps">
+  <header class="np-cmd-center-head">
+    <div>
+      <p class="mp-eyebrow mp-eyebrow--lux">Command center</p>
+      <h2 class="np-cmd-center-title">Hi {{ dashboard_username }} — here’s what to do next</h2>
+    </div>
+    <div class="np-cmd-center-stats">
+      <span>{{ stats.wrong_total }} misses</span>
+      <span>{{ stats.accuracy_pct }}% accuracy</span>
+      <span>{{ stats.sat_remaining }} questions left</span>
+    </div>
+  </header>
+  <div class="np-cmd-center-grid">
+    {% if resume_practice %}
+    <a href="{{ resume_practice.href }}" class="np-cmd-card np-cmd-card--primary">
+      <strong>Continue</strong>
+      <span>{{ resume_practice.line }}</span>
+      <em>{{ resume_practice.when_label }}</em>
+    </a>
+    {% elif next_unit %}
+    <a href="{{ next_unit.href }}" class="np-cmd-card np-cmd-card--primary">
+      <strong>Next unit</strong>
+      <span>{{ next_unit.label }}</span>
+      <em>{{ next_unit.remaining }} questions left</em>
+    </a>
+    {% endif %}
+    <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-cmd-card">
+      <strong>Fix mistakes</strong>
+      <span>{{ stats.wrong_total }} logged misses</span>
+    </a>
+    <a href="{{ url_for('practice_random_test_intro') }}" class="np-cmd-card">
+      <strong>Mock exam</strong>
+      <span>Random test · track score</span>
+    </a>
+    {% if recent_sessions and recent_sessions[0].summary_href %}
+    <a href="{{ recent_sessions[0].summary_href }}" class="np-cmd-card">
+      <strong>Latest session</strong>
+      <span>{{ recent_sessions[0].topic }}</span>
+      <em>{{ recent_sessions[0].when_label }}</em>
+    </a>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
 <section class="mp-hero mp-hero--pro glass-panel np-glass mp-animate-in">
   <div class="mp-hero-shine" aria-hidden="true"></div>
   <div class="np-sh-hero-noise" aria-hidden="true"></div>
@@ -33,10 +78,14 @@
       <p class="mp-hero-welcome">Welcome back, <strong>{{ dashboard_username }}</strong></p>
       {% endif %}
       <h1 class="mp-title">
+        {% if dashboard_username %}
+        <span>Your SAT workspace</span>
+        {% else %}
         <span>Your SAT plan,</span>
         <span>ready to run.</span>
+        {% endif %}
       </h1>
-      <p class="mp-subtitle">Start with the next unit, review recent misses, and keep every answer connected to your {{ site_brand_short }} account.</p>
+      <p class="mp-subtitle">{% if dashboard_username %}Jump back into practice, review misses, or open today’s lesson deck.{% else %}Start with the next unit, review recent misses, and keep every answer connected to your {{ site_brand_short }} account.{% endif %}</p>
       <div class="mp-hero-actions">
         {% if resume_practice %}
         <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">{{ resume_practice.label }}</a>

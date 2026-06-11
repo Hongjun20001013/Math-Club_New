@@ -25,6 +25,7 @@
   var classroomSummaryApi = root.getAttribute("data-cm-classroom-summary-api") || "";
   var classroomStartApi = root.getAttribute("data-cm-classroom-start-api") || "";
   var classroomSlideApi = root.getAttribute("data-cm-classroom-slide-api") || "";
+  var classroomInkApi = root.getAttribute("data-cm-classroom-ink-api") || "";
   var syncTimer = null;
   var globalVisitKey = "np-cm-last-visit";
   var resumeDismissKey = "np-cm-resume-dismiss-" + lessonSlug;
@@ -296,11 +297,14 @@
       lastPublishedClassroomSlide = null;
       lastFollowedClassroomSlide = null;
       lastKnownSlideUpdatedAt = null;
+      inkUpdatedAt = null;
+      inkStrokes = [];
     }
     root.classList.toggle("is-classroom-live", !!classroomSession);
     root.classList.toggle("is-classroom-controller", !!(classroomSession && classroomSlideApi));
     updateClassroomPaceBadge();
     updateClassroomLiveBanner();
+    syncInkFromSession(false);
     if (!classroomSession) return;
     var remoteSlide = parseInt(classroomSession.current_slide_index, 10) || 0;
     var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
@@ -372,6 +376,236 @@
 
   var classroomPollFailures = 0;
   var classroomPollInFlight = false;
+
+  var inkLayerEl = null;
+  var inkCanvasEl = null;
+  var inkToolbarEl = null;
+  var inkCtx = null;
+  var inkStrokes = [];
+  var inkCurrentStroke = null;
+  var inkDrawing = false;
+  var inkColor = "#ef4444";
+  var inkWidth = 3;
+  var inkUpdatedAt = null;
+  var inkSaveTimer = null;
+  var inkPollTimer = null;
+  var inkCanDraw = false;
+  var inkResizeObserver = null;
+
+  function ensureInkLayer() {
+    if (!stageEl) return;
+    if (!inkLayerEl) {
+      inkLayerEl = document.createElement("div");
+      inkLayerEl.className = "np-cm-ink-layer";
+      inkLayerEl.setAttribute("data-cm-ink-layer", "true");
+      inkCanvasEl = document.createElement("canvas");
+      inkCanvasEl.className = "np-cm-ink-canvas";
+      inkCanvasEl.setAttribute("data-cm-ink-canvas", "true");
+      inkLayerEl.appendChild(inkCanvasEl);
+      stageEl.appendChild(inkLayerEl);
+      inkCtx = inkCanvasEl.getContext("2d");
+      window.addEventListener("resize", resizeInkCanvas);
+      if (window.ResizeObserver && slideEl) {
+        inkResizeObserver = new ResizeObserver(resizeInkCanvas);
+        inkResizeObserver.observe(slideEl);
+      }
+      bindInkPointerEvents();
+    }
+    updateInkToolbar();
+    resizeInkCanvas();
+  }
+
+  function updateInkToolbar() {
+    if (!classroomSession || !classroomSlideApi) {
+      if (inkToolbarEl) inkToolbarEl.hidden = true;
+      inkCanDraw = false;
+      return;
+    }
+    inkCanDraw = true;
+    if (!inkToolbarEl) {
+      inkToolbarEl = document.createElement("div");
+      inkToolbarEl.className = "np-cm-ink-toolbar";
+      inkToolbarEl.setAttribute("data-cm-ink-toolbar", "true");
+      inkToolbarEl.innerHTML =
+        '<span class="np-cm-ink-label">Live pen</span>' +
+        '<button type="button" data-ink-color="#ef4444" class="is-active" aria-label="Red pen"></button>' +
+        '<button type="button" data-ink-color="#2563eb" aria-label="Blue pen"></button>' +
+        '<button type="button" data-ink-color="#111827" aria-label="Black pen"></button>' +
+        '<button type="button" data-ink-clear>Clear slide</button>';
+      inkToolbarEl.querySelectorAll("[data-ink-color]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          inkColor = btn.getAttribute("data-ink-color") || "#ef4444";
+          inkToolbarEl.querySelectorAll("[data-ink-color]").forEach(function (b) {
+            b.classList.toggle("is-active", b === btn);
+          });
+        });
+      });
+      var clearBtn = inkToolbarEl.querySelector("[data-ink-clear]");
+      if (clearBtn) {
+        clearBtn.addEventListener("click", function () {
+          inkStrokes = [];
+          inkCurrentStroke = null;
+          redrawInkCanvas();
+          scheduleInkSave();
+        });
+      }
+      var heroActions = root.querySelector(".np-cm-hero-actions");
+      if (heroActions) heroActions.insertBefore(inkToolbarEl, heroActions.firstChild);
+    }
+    inkToolbarEl.hidden = false;
+    if (inkCanvasEl) {
+      inkCanvasEl.classList.toggle("is-drawable", !!classroomSlideApi);
+    }
+  }
+
+  function resizeInkCanvas() {
+    if (!inkCanvasEl || !slideEl || !inkCtx) return;
+    var rect = slideEl.getBoundingClientRect();
+    var w = Math.max(1, Math.round(rect.width));
+    var h = Math.max(1, Math.round(rect.height));
+    if (inkCanvasEl.width !== w || inkCanvasEl.height !== h) {
+      inkCanvasEl.width = w;
+      inkCanvasEl.height = h;
+      redrawInkCanvas();
+    }
+  }
+
+  function redrawInkCanvas() {
+    if (!inkCtx || !inkCanvasEl) return;
+    inkCtx.clearRect(0, 0, inkCanvasEl.width, inkCanvasEl.height);
+    inkStrokes.forEach(function (stroke) { drawInkStroke(stroke); });
+    if (inkCurrentStroke) drawInkStroke(inkCurrentStroke);
+  }
+
+  function drawInkStroke(stroke) {
+    if (!inkCtx || !stroke || !stroke.points || stroke.points.length < 2) return;
+    var w = inkCanvasEl.width;
+    var h = inkCanvasEl.height;
+    inkCtx.save();
+    inkCtx.strokeStyle = stroke.color || "#ef4444";
+    inkCtx.lineWidth = stroke.width || 3;
+    inkCtx.lineCap = "round";
+    inkCtx.lineJoin = "round";
+    inkCtx.beginPath();
+    stroke.points.forEach(function (pt, i) {
+      var x = pt[0] * w;
+      var y = pt[1] * h;
+      if (i === 0) inkCtx.moveTo(x, y);
+      else inkCtx.lineTo(x, y);
+    });
+    inkCtx.stroke();
+    inkCtx.restore();
+  }
+
+  function inkPointFromEvent(e) {
+    var rect = slideEl.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    return [
+      Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)),
+      Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height)),
+    ];
+  }
+
+  function bindInkPointerEvents() {
+    if (!inkCanvasEl) return;
+    inkCanvasEl.addEventListener("pointerdown", function (e) {
+      if (!inkCanDraw || !classroomSlideApi) return;
+      e.preventDefault();
+      var pt = inkPointFromEvent(e);
+      if (!pt) return;
+      inkDrawing = true;
+      inkCurrentStroke = { points: [pt], color: inkColor, width: inkWidth };
+      inkCanvasEl.setPointerCapture(e.pointerId);
+      redrawInkCanvas();
+    });
+    inkCanvasEl.addEventListener("pointermove", function (e) {
+      if (!inkDrawing || !inkCurrentStroke) return;
+      e.preventDefault();
+      var pt = inkPointFromEvent(e);
+      if (!pt) return;
+      var pts = inkCurrentStroke.points;
+      var last = pts[pts.length - 1];
+      if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) < 0.002) return;
+      pts.push(pt);
+      redrawInkCanvas();
+    });
+    function finishStroke(e) {
+      if (!inkDrawing) return;
+      inkDrawing = false;
+      if (inkCurrentStroke && inkCurrentStroke.points.length >= 2) {
+        inkStrokes.push(inkCurrentStroke);
+        scheduleInkSave();
+      }
+      inkCurrentStroke = null;
+      try { inkCanvasEl.releasePointerCapture(e.pointerId); } catch (err) {}
+      redrawInkCanvas();
+    }
+    inkCanvasEl.addEventListener("pointerup", finishStroke);
+    inkCanvasEl.addEventListener("pointercancel", finishStroke);
+  }
+
+  function scheduleInkSave() {
+    if (!classroomInkApi || !classroomSlideApi || !classroomSession) return;
+    if (inkSaveTimer) window.clearTimeout(inkSaveTimer);
+    inkSaveTimer = window.setTimeout(publishInkStrokes, 280);
+  }
+
+  function publishInkStrokes() {
+    if (!classroomInkApi || !classroomSession) return;
+    var slide = slides[idx];
+    if (!slide) return;
+    fetch(classroomInkApi, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slide_index: parseInt(slide.index, 10),
+        strokes: inkStrokes,
+      }),
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data.ok && data.updated_at) inkUpdatedAt = data.updated_at;
+      })
+      .catch(function () {});
+  }
+
+  function loadInkForCurrentSlide(force) {
+    if (!classroomInkApi || !classroomSession) return;
+    var slide = slides[idx];
+    if (!slide) return;
+    var slideIndex = parseInt(slide.index, 10);
+    fetch(
+      classroomInkApi + "?slide_index=" + encodeURIComponent(slideIndex),
+      { credentials: "same-origin" }
+    )
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.ok) return;
+        if (!force && data.updated_at && data.updated_at === inkUpdatedAt) return;
+        inkUpdatedAt = data.updated_at || null;
+        inkStrokes = Array.isArray(data.strokes) ? data.strokes : [];
+        inkCurrentStroke = null;
+        ensureInkLayer();
+        redrawInkCanvas();
+      })
+      .catch(function () {});
+  }
+
+  function syncInkFromSession(force) {
+    if (!classroomSession) {
+      inkStrokes = [];
+      inkUpdatedAt = null;
+      if (inkLayerEl) inkLayerEl.hidden = true;
+      return;
+    }
+    ensureInkLayer();
+    if (inkLayerEl) inkLayerEl.hidden = false;
+    var remoteInkAt = classroomSession.ink_updated_at || null;
+    if (force || remoteInkAt !== inkUpdatedAt) {
+      loadInkForCurrentSlide(force);
+    }
+  }
 
   function loadClassroomSession() {
     if (!classroomActiveApi || classroomPollInFlight) return;
@@ -1648,6 +1882,8 @@
     updateCoach(slide);
     updateClassroomPaceBadge();
     publishCurrentClassroomSlide();
+    ensureInkLayer();
+    loadInkForCurrentSlide(true);
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
 

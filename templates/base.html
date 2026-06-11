@@ -90,7 +90,7 @@
     </div>
     <nav class="nav-links" aria-label="Primary">
         {% if nav_show_dashboard %}
-        <a href="/" class="{% if nav_path == '/' %}is-active{% endif %}">Dashboard</a>
+        <a href="{{ student_home_href }}" class="{% if nav_path == '/' %}is-active{% endif %}">Dashboard</a>
         {% endif %}
         {% if nav_show_workspace %}
         <a href="/practice" class="{% if nav_path.startswith('/practice') and not nav_path.startswith('/practice/analytics') %}is-active{% endif %}">Workspace</a>
@@ -121,7 +121,7 @@
         <span class="np-site-footer-brand">{{ site_brand_name }}</span>
         <span class="np-site-footer-sep" aria-hidden="true">·</span>
         <span class="np-site-footer-meta">{{ site_footer_tagline }}</span>
-        <a class="np-site-footer-link" href="/">Home</a>
+        <a class="np-site-footer-link" href="{{ student_home_href }}">Home</a>
         {% if nav_show_workspace %}
         <a class="np-site-footer-link" href="/practice">Workspace</a>
         {% endif %}

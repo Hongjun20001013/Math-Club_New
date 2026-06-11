@@ -31324,6 +31324,122 @@ body.is-cm-projector .np-cm-slide-body mjx-container {
     padding: 4px 8px;
 }
 
+.np-cmd-center {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding: clamp(18px, 2.5vw, 24px);
+}
+
+.np-cmd-center-head {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.np-cmd-center-title {
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    margin: 0;
+}
+
+.np-cmd-center-stats {
+    color: #64748b;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.84rem;
+    font-weight: 650;
+    gap: 12px;
+}
+
+.np-cmd-center-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.np-cmd-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    color: inherit;
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.np-cmd-card:hover {
+    border-color: rgba(67, 56, 202, 0.22);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.np-cmd-card--primary {
+    background: linear-gradient(135deg, rgba(67, 56, 202, 0.08), rgba(99, 102, 241, 0.04));
+    border-color: rgba(67, 56, 202, 0.18);
+}
+
+.np-cmd-card strong {
+    font-size: 0.95rem;
+}
+
+.np-cmd-card span {
+    color: #334155;
+    font-size: 0.86rem;
+}
+
+.np-cmd-card em {
+    color: #64748b;
+    font-size: 0.78rem;
+    font-style: normal;
+}
+
+.sat-mobile-practice-hint {
+    background: rgba(67, 56, 202, 0.08);
+    border: 1px solid rgba(67, 56, 202, 0.14);
+    border-radius: 12px;
+    color: #4338ca;
+    display: none;
+    font-size: 0.84rem;
+    font-weight: 650;
+    margin: 0 0 12px;
+    padding: 10px 14px;
+}
+
+.np-login-staff-note {
+    margin-top: 12px;
+}
+
+.np-login-staff-note summary {
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.np-login-role-grid--staff {
+    margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+    .sat-mobile-practice-hint {
+        display: block;
+    }
+
+    .sat-practice-page-wrap--split-lock .sat-split {
+        grid-template-columns: 1fr !important;
+        min-height: 0 !important;
+    }
+
+    .sat-practice-page-wrap--split-lock .sat-pane-choices {
+        border-left: 0 !important;
+        border-top: 1px solid rgba(108, 78, 255, 0.12) !important;
+        grid-column: 1 !important;
+    }
+}
+
 /* Class dashboard — roster + detail */
 .np-pulse-studio {
     display: grid;
