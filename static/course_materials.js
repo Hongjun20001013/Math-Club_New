@@ -42,6 +42,9 @@
   var kindPill = root.querySelector("[data-cm-kind-pill]");
   var progressEl = root.querySelector("[data-cm-progress]");
   var stageEl = root.querySelector(".np-cm-slide-stage");
+  var inkRailHost = root.querySelector("[data-cm-ink-rail]");
+  var inkCompactSlot = root.querySelector("[data-cm-ink-compact-slot]");
+  var inkChromeHost = root.querySelector(".np-cm-deck-chrome");
   var studyToggle = root.querySelector("[data-cm-study-toggle]");
   var studyStatEl = root.querySelector("[data-cm-study-stat]");
   var masteryPctEl = root.querySelector("[data-cm-mastery-pct]");
@@ -299,12 +302,16 @@
       lastKnownSlideUpdatedAt = null;
       inkUpdatedAt = null;
       inkStrokes = [];
+      clearLaserTrail(true);
+      hideLaserPreview();
+      publishLaserState(false);
     }
     root.classList.toggle("is-classroom-live", !!classroomSession);
     root.classList.toggle("is-classroom-controller", !!(classroomSession && classroomSlideApi));
     updateClassroomPaceBadge();
     updateClassroomLiveBanner();
     syncInkFromSession(false);
+    updateInkDock();
     if (!classroomSession) return;
     var remoteSlide = parseInt(classroomSession.current_slide_index, 10) || 0;
     var currentSlide = slides[idx] ? parseInt(slides[idx].index, 10) : 0;
@@ -379,21 +386,88 @@
 
   var inkLayerEl = null;
   var inkCanvasEl = null;
-  var inkToolbarEl = null;
+  var inkDockEl = null;
+  var inkReaderEl = null;
   var inkCtx = null;
   var inkStrokes = [];
   var inkCurrentStroke = null;
   var inkDrawing = false;
   var inkColor = "#ef4444";
-  var inkWidth = 3;
+  var inkTool = "pen";
+  var inkSizeKey = "m";
+  var inkEnabled = false;
+  var inkExpanded = false;
   var inkUpdatedAt = null;
   var inkSaveTimer = null;
-  var inkPollTimer = null;
   var inkCanDraw = false;
   var inkResizeObserver = null;
+  var inkSavePending = false;
+  var inkDpr = 1;
+  var inkLaserCanvasEl = null;
+  var inkLaserCtx = null;
+  var inkEraserRingEl = null;
+  var inkLaserPreviewEl = null;
+  var inkLaserTrail = [];
+  var inkLaserRaf = null;
+  var inkLaserTrailMs = 360;
+  var inkLaserMaxPts = 120;
+  var inkLaserPos = null;
+  var inkLaserSaveTimer = null;
+  var inkRemoteLaserAt = null;
+  var inkLaserDragging = false;
+  var inkLaserPollTimer = null;
+  var INK_DOCK_VERSION = "v5";
+
+  var INK_SIZES = { s: 1.8, m: 4, l: 8.5 };
+  var INK_ERASER_RADIUS = { s: 0.007, m: 0.016, l: 0.034 };
+  var INK_LASER_SCALE = { s: 0.5, m: 0.85, l: 1.25 };
+  var INK_ICON_PEN =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16l1.2-4.2L14.5 2.7a1.2 1.2 0 011.7 0l1.1 1.1a1.2 1.2 0 010 1.7L7 14.8 4 16z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  var INK_ICON_HIGHLIGHTER =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15l2-6 8-2-2 8-6 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  var INK_ICON_LASER =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 15.5L8 4l2.2 7.2L14 6l3.5 9.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="15.5" r="1.75" fill="currentColor" opacity="0.9"/></svg>';
+  var INK_ICON_ERASER =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 12l6-6 7 7-6 6H4v-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  var INK_ICON_UNDO =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 7H14a4 4 0 010 8H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 4L5 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function inkWidthPx() {
+    return INK_SIZES[inkSizeKey] || INK_SIZES.m;
+  }
+
+  function inkEraserRadius() {
+    return INK_ERASER_RADIUS[inkSizeKey] || INK_ERASER_RADIUS.m;
+  }
+
+  function inkLaserScale() {
+    return INK_LASER_SCALE[inkSizeKey] || INK_LASER_SCALE.m;
+  }
+
+  function inkLaserMinStep() {
+    return 0.00035;
+  }
+
+  function inkStrokeStyle(color, tool) {
+    if (tool === "highlighter") {
+      return { color: color, width: inkWidthPx() * 2.4, alpha: 0.38, tool: "highlighter" };
+    }
+    return { color: color, width: inkWidthPx(), alpha: 1, tool: "pen" };
+  }
+
+  function updateInkToolHint() {
+    if (!inkDockEl) return;
+    var rail = inkDockEl.querySelector(".np-cm-ink-rail");
+    if (rail) {
+      rail.setAttribute(
+        "data-ink-mode",
+        inkTool === "laser" ? "laser" : inkTool === "eraser" ? "eraser" : "draw"
+      );
+    }
+  }
 
   function ensureInkLayer() {
-    if (!stageEl) return;
+    if (!slideEl) return;
     if (!inkLayerEl) {
       inkLayerEl = document.createElement("div");
       inkLayerEl.className = "np-cm-ink-layer";
@@ -402,76 +476,621 @@
       inkCanvasEl.className = "np-cm-ink-canvas";
       inkCanvasEl.setAttribute("data-cm-ink-canvas", "true");
       inkLayerEl.appendChild(inkCanvasEl);
-      stageEl.appendChild(inkLayerEl);
+      slideEl.appendChild(inkLayerEl);
       inkCtx = inkCanvasEl.getContext("2d");
       window.addEventListener("resize", resizeInkCanvas);
+      if (stageEl) stageEl.addEventListener("scroll", resizeInkCanvas, { passive: true });
       if (window.ResizeObserver && slideEl) {
         inkResizeObserver = new ResizeObserver(resizeInkCanvas);
         inkResizeObserver.observe(slideEl);
       }
       bindInkPointerEvents();
     }
-    updateInkToolbar();
+    ensureLaserCanvas();
+    ensureEraserRing();
+    ensureLaserPreview();
+    updateInkDock();
     resizeInkCanvas();
   }
 
-  function updateInkToolbar() {
+  function ensureLaserCanvas() {
+    if (!inkLayerEl) return;
+    if (!inkLaserCanvasEl) {
+      inkLaserCanvasEl = document.createElement("canvas");
+      inkLaserCanvasEl.className = "np-cm-laser-canvas";
+      inkLaserCanvasEl.setAttribute("data-cm-laser-canvas", "true");
+      inkLayerEl.appendChild(inkLaserCanvasEl);
+      inkLaserCtx = inkLaserCanvasEl.getContext("2d");
+    }
+  }
+
+  function ensureLaserPreview() {
+    if (!inkLayerEl) return;
+    if (!inkLaserPreviewEl) {
+      inkLaserPreviewEl = document.createElement("div");
+      inkLaserPreviewEl.className = "np-cm-laser-preview";
+      inkLaserPreviewEl.setAttribute("data-cm-laser-preview", "true");
+      inkLaserPreviewEl.innerHTML =
+        '<span class="np-cm-laser-preview-ring" aria-hidden="true"></span>' +
+        '<span class="np-cm-laser-preview-core" aria-hidden="true"></span>';
+      inkLaserPreviewEl.hidden = true;
+      inkLayerEl.appendChild(inkLaserPreviewEl);
+    }
+  }
+
+  function moveLaserPreview(pt) {
+    ensureLaserPreview();
+    if (!inkLaserPreviewEl || !pt) return;
+    inkLaserPreviewEl.hidden = false;
+    inkLaserPreviewEl.style.setProperty("--laser-x", String(pt[0] * 100) + "%");
+    inkLaserPreviewEl.style.setProperty("--laser-y", String(pt[1] * 100) + "%");
+    inkLaserPreviewEl.style.setProperty("--laser-sc", String(inkLaserScale()));
+    inkLaserPreviewEl.classList.toggle("is-drawing", !!inkLaserDragging);
+  }
+
+  function hideLaserPreview() {
+    if (inkLaserPreviewEl) inkLaserPreviewEl.hidden = true;
+  }
+
+  function ensureEraserRing() {
+    if (!inkLayerEl) return;
+    if (!inkEraserRingEl) {
+      inkEraserRingEl = document.createElement("div");
+      inkEraserRingEl.className = "np-cm-eraser-ring";
+      inkEraserRingEl.setAttribute("data-cm-eraser-ring", "true");
+      inkEraserRingEl.hidden = true;
+      inkLayerEl.appendChild(inkEraserRingEl);
+    }
+  }
+
+  function resizeLaserCanvas() {
+    if (!inkLaserCanvasEl || !slideEl || !inkLaserCtx) return;
+    var cssW = slideEl.offsetWidth;
+    var cssH = slideEl.offsetHeight;
+    if (!cssW || !cssH) return;
+    var bufW = Math.max(1, Math.round(cssW * inkDpr));
+    var bufH = Math.max(1, Math.round(cssH * inkDpr));
+    inkLaserCanvasEl.style.width = cssW + "px";
+    inkLaserCanvasEl.style.height = cssH + "px";
+    if (inkLaserCanvasEl.width !== bufW || inkLaserCanvasEl.height !== bufH) {
+      inkLaserCanvasEl.width = bufW;
+      inkLaserCanvasEl.height = bufH;
+    }
+  }
+
+  function pruneLaserTrail(now) {
+    inkLaserTrail = inkLaserTrail.filter(function (p) {
+      return now - p.t < inkLaserTrailMs;
+    });
+    if (inkLaserTrail.length > inkLaserMaxPts) {
+      inkLaserTrail = inkLaserTrail.slice(-inkLaserMaxPts);
+    }
+  }
+
+  function pushLaserTrailPoint(pt) {
+    if (!pt) return;
+    var now = performance.now();
+    inkLaserPos = [pt[0], pt[1]];
+    var last = inkLaserTrail.length ? inkLaserTrail[inkLaserTrail.length - 1] : null;
+    if (last && Math.hypot(pt[0] - last.x, pt[1] - last.y) < inkLaserMinStep()) return;
+    inkLaserTrail.push({ x: pt[0], y: pt[1], t: now });
+    pruneLaserTrail(now);
+    ensureLaserLoop();
+  }
+
+  function laserTrailForPublish() {
+    return inkLaserTrail.slice(-14).map(function (p) {
+      return [Math.round(p.x * 1000) / 1000, Math.round(p.y * 1000) / 1000];
+    });
+  }
+
+  function drawLaserHead(ctx, p, life, w, h) {
+    if (!p || life <= 0) return;
+    var sc = inkLaserScale();
+    var x = p.x * w;
+    var y = p.y * h;
+    var r = (2 + life * 1.5) * inkDpr * sc;
+    var glow = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
+    glow.addColorStop(0, "rgba(255, 255, 255, " + (0.9 * life) + ")");
+    glow.addColorStop(0.35, "rgba(255, 90, 70, " + (0.45 * life) + ")");
+    glow.addColorStop(1, "rgba(255, 40, 40, 0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255," + (0.88 * life) + ")";
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawLaserTrailSegment(ctx, p0, p1, life, w, h) {
+    if (life <= 0) return;
+    var sc = inkLaserScale();
+    var x0 = p0.x * w;
+    var y0 = p0.y * h;
+    var x1 = p1.x * w;
+    var y1 = p1.y * h;
+    var alpha = life * life;
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(255, 45, 45, " + (alpha * 0.18) + ")";
+    ctx.lineWidth = (6 + life * 4) * inkDpr * sc;
+    ctx.shadowColor = "rgba(255, 60, 60, " + (alpha * 0.4) + ")";
+    ctx.shadowBlur = 8 * inkDpr * life * sc;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255, 180, 120, " + (alpha * 0.5) + ")";
+    ctx.lineWidth = (2.5 + life * 2) * inkDpr * sc;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(255, 255, 255, " + (alpha * 0.82) + ")";
+    ctx.lineWidth = (1 + life * 1.2) * inkDpr * sc;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawLaserTrailFrame() {
+    if (!inkLaserCtx || !inkLaserCanvasEl) return;
+    var now = performance.now();
+    pruneLaserTrail(now);
+    var w = inkLaserCanvasEl.width;
+    var h = inkLaserCanvasEl.height;
+    inkLaserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    inkLaserCtx.clearRect(0, 0, w, h);
+    var pts = inkLaserTrail;
+    if (!pts.length) return;
+    if (pts.length === 1) {
+      var loneLife = 1 - (now - pts[0].t) / inkLaserTrailMs;
+      drawLaserHead(inkLaserCtx, pts[0], Math.max(0, loneLife), w, h);
+      return;
+    }
+    for (var i = 1; i < pts.length; i++) {
+      var life = 1 - (now - pts[i].t) / inkLaserTrailMs;
+      drawLaserTrailSegment(inkLaserCtx, pts[i - 1], pts[i], Math.max(0, life), w, h);
+    }
+    var head = pts[pts.length - 1];
+    var headLife = 1 - (now - head.t) / inkLaserTrailMs;
+    drawLaserHead(inkLaserCtx, head, Math.max(0, headLife), w, h);
+  }
+
+  function tickLaserTrail() {
+    inkLaserRaf = null;
+    drawLaserTrailFrame();
+    var now = performance.now();
+    pruneLaserTrail(now);
+    if (inkLaserTrail.length) {
+      inkLaserRaf = window.requestAnimationFrame(tickLaserTrail);
+    }
+  }
+
+  function ensureLaserLoop() {
+    if (!inkLaserRaf) inkLaserRaf = window.requestAnimationFrame(tickLaserTrail);
+  }
+
+  function clearLaserTrail(immediate) {
+    if (inkLaserRaf) {
+      window.cancelAnimationFrame(inkLaserRaf);
+      inkLaserRaf = null;
+    }
+    if (immediate) {
+      inkLaserTrail = [];
+      inkLaserPos = null;
+      if (inkLaserCtx && inkLaserCanvasEl) {
+        inkLaserCtx.clearRect(0, 0, inkLaserCanvasEl.width, inkLaserCanvasEl.height);
+      }
+      return;
+    }
+    ensureLaserLoop();
+  }
+
+  function scheduleLaserPublish(active) {
+    if (!classroomInkApi || !classroomSlideApi || !classroomSession) return;
+    if (inkLaserSaveTimer) window.clearTimeout(inkLaserSaveTimer);
+    inkLaserSaveTimer = window.setTimeout(function () {
+      publishLaserState(active);
+    }, 28);
+  }
+
+  function publishLaserState(active) {
+    if (!classroomInkApi || !classroomSession) return;
+    var slide = slides[idx];
+    if (!slide) return;
+    fetch(classroomInkApi, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slide_index: parseInt(slide.index, 10),
+        laser: {
+          active: !!active,
+          x: active && inkLaserPos ? inkLaserPos[0] : null,
+          y: active && inkLaserPos ? inkLaserPos[1] : null,
+          trail: active ? laserTrailForPublish() : [],
+        },
+      }),
+    }).catch(function () {});
+  }
+
+  function ingestRemoteLaser(laser) {
+    if (!laser) {
+      clearLaserTrail(true);
+      return;
+    }
+    var slide = slides[idx];
+    if (!slide) return;
+    var slideIndex = parseInt(slide.index, 10);
+    if (!laser.active || parseInt(laser.slide_index, 10) !== slideIndex) {
+      clearLaserTrail(true);
+      return;
+    }
+    ensureInkLayer();
+    var now = performance.now();
+    var trail = Array.isArray(laser.trail) ? laser.trail : [];
+    if (trail.length >= 2) {
+      inkLaserTrail = trail.map(function (p, i) {
+        return {
+          x: Number(p[0]),
+          y: Number(p[1]),
+          t: now - (trail.length - 1 - i) * 24,
+        };
+      });
+      inkLaserPos = [inkLaserTrail[inkLaserTrail.length - 1].x, inkLaserTrail[inkLaserTrail.length - 1].y];
+      ensureLaserLoop();
+      return;
+    }
+    if (laser.x != null && laser.y != null) {
+      pushLaserTrailPoint([Number(laser.x), Number(laser.y)]);
+    }
+  }
+
+  function syncRemoteLaser(force) {
+    if (!classroomSession || classroomSlideApi) return;
+    var laser = classroomSession.laser || null;
+    if (!force && laser && laser.updated_at && laser.updated_at === inkRemoteLaserAt && !laser.active) {
+      clearLaserTrail(true);
+      return;
+    }
+    inkRemoteLaserAt = laser ? laser.updated_at || null : null;
+    ingestRemoteLaser(laser);
+  }
+
+  function startLaserPoll() {
+    if (inkLaserPollTimer || classroomSlideApi || !classroomInkApi) return;
+    inkLaserPollTimer = window.setInterval(pollRemoteLaser, 100);
+  }
+
+  function stopLaserPoll() {
+    if (inkLaserPollTimer) window.clearInterval(inkLaserPollTimer);
+    inkLaserPollTimer = null;
+  }
+
+  function pollRemoteLaser() {
+    if (!classroomInkApi || !classroomSession || classroomSlideApi) return;
+    var slide = slides[idx];
+    if (!slide) return;
+    fetch(
+      classroomInkApi + "?slide_index=" + encodeURIComponent(slide.index) + "&fields=laser",
+      { credentials: "same-origin" }
+    )
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.ok || !data.laser) return;
+        classroomSession.laser = data.laser;
+        syncRemoteLaser(false);
+      })
+      .catch(function () {});
+  }
+
+  function moveEraserRing(pt) {
+    ensureEraserRing();
+    if (!inkEraserRingEl || !pt) return;
+    var radiusPx = Math.max(8, inkEraserRadius() * (slideEl ? slideEl.offsetWidth : 400));
+    inkEraserRingEl.hidden = false;
+    inkEraserRingEl.style.setProperty("--eraser-x", String(pt[0] * 100) + "%");
+    inkEraserRingEl.style.setProperty("--eraser-y", String(pt[1] * 100) + "%");
+    inkEraserRingEl.style.setProperty("--eraser-r", String(radiusPx) + "px");
+  }
+
+  function hideEraserRing() {
+    if (inkEraserRingEl) inkEraserRingEl.hidden = true;
+  }
+
+  function buildInkDockHtml() {
+    return (
+      '<div class="np-cm-ink-rail">' +
+      '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--tools">' +
+      '<button type="button" class="np-cm-ink-chip is-active" data-ink-tool="pen" title="Pen">' + INK_ICON_PEN + "</button>" +
+      '<button type="button" class="np-cm-ink-chip" data-ink-tool="highlighter" title="Highlighter">' + INK_ICON_HIGHLIGHTER + "</button>" +
+      '<button type="button" class="np-cm-ink-chip np-cm-ink-chip--laser" data-ink-tool="laser" title="Laser (L) — hover to aim, drag for beam">' + INK_ICON_LASER + "</button>" +
+      '<button type="button" class="np-cm-ink-chip" data-ink-tool="eraser" title="Eraser (E)">' + INK_ICON_ERASER + "</button>" +
+      "</div>" +
+      '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
+      '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--colors">' +
+      '<button type="button" class="np-cm-ink-swatch is-active" data-ink-color="#ef4444" aria-label="Red"></button>' +
+      '<button type="button" class="np-cm-ink-swatch" data-ink-color="#2563eb" aria-label="Blue"></button>' +
+      '<button type="button" class="np-cm-ink-swatch" data-ink-color="#059669" aria-label="Green"></button>' +
+      '<button type="button" class="np-cm-ink-swatch" data-ink-color="#1e293b" aria-label="Black"></button>' +
+      "</div>" +
+      '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
+      '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--sizes">' +
+      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="s" title="Small"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn is-active" data-ink-size="m" title="Medium"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="l" title="Large"><i></i></button>' +
+      "</div>" +
+      '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
+      '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--edit">' +
+      '<button type="button" class="np-cm-ink-chip" data-ink-undo title="Undo (U)" disabled>' + INK_ICON_UNDO + "</button>" +
+      '<button type="button" class="np-cm-ink-chip np-cm-ink-chip--clear" data-ink-clear title="Clear slide">Clear</button>' +
+      "</div>" +
+      '<span class="np-cm-ink-sync is-synced" data-ink-status title="Ready">' +
+      '<span class="np-cm-ink-sync-dot"></span></span>' +
+      '<button type="button" class="np-cm-ink-rail-close" data-ink-collapse title="Close (P)" aria-label="Close pen toolbar">×</button>' +
+      "</div>"
+    );
+  }
+  function ensureInkCompactButton() {
+    if (!inkCompactSlot) return null;
+    var btn = inkCompactSlot.querySelector("[data-ink-compact-toggle]");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "np-cm-ink-compact";
+      btn.setAttribute("data-ink-compact-toggle", "true");
+      btn.setAttribute("aria-pressed", "false");
+      btn.title = "Open live pen (P)";
+      btn.innerHTML = INK_ICON_PEN;
+      btn.addEventListener("click", function () {
+        inkExpanded = !inkExpanded;
+        if (inkExpanded) inkEnabled = true;
+        syncInkDockState();
+      });
+      inkCompactSlot.appendChild(btn);
+    }
+    return btn;
+  }
+
+  function bindInkDockEvents() {
+    if (!inkDockEl || inkDockEl.getAttribute("data-cm-ink-bound") === "1") return;
+    inkDockEl.setAttribute("data-cm-ink-bound", "1");
+
+    var collapseBtn = inkDockEl.querySelector("[data-ink-collapse]");
+    if (collapseBtn) {
+      collapseBtn.addEventListener("click", function () {
+        inkExpanded = false;
+        inkEnabled = false;
+        publishLaserState(false);
+        clearLaserTrail(true);
+        hideLaserPreview();
+        hideEraserRing();
+        syncInkDockState();
+      });
+    }
+
+    inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        inkTool = btn.getAttribute("data-ink-tool") || "pen";
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        if (inkTool === "laser") {
+          inkEnabled = true;
+          hideEraserRing();
+          clearLaserTrail(true);
+        } else {
+          hideLaserPreview();
+        }
+        if (!inkEnabled && inkTool !== "eraser") {
+          inkEnabled = true;
+        }
+        if (inkTool !== "laser") {
+          publishLaserState(false);
+          clearLaserTrail(true);
+        }
+        updateInkToolHint();
+        syncInkDockState();
+      });
+    });
+
+    inkDockEl.querySelectorAll("[data-ink-color]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        inkColor = btn.getAttribute("data-ink-color") || "#ef4444";
+        inkDockEl.querySelectorAll("[data-ink-color]").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        if (inkTool === "eraser" || inkTool === "laser") {
+          inkTool = "pen";
+          inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+            b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "pen");
+          });
+          updateInkToolHint();
+        }
+        syncInkDockState();
+      });
+    });
+
+    inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        inkSizeKey = btn.getAttribute("data-ink-size") || "m";
+        inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        syncInkDockState();
+        if (inkTool === "eraser" && inkEraserRingEl && !inkEraserRingEl.hidden) {
+          var ex = parseFloat(inkEraserRingEl.style.getPropertyValue("--eraser-x")) / 100;
+          var ey = parseFloat(inkEraserRingEl.style.getPropertyValue("--eraser-y")) / 100;
+          if (!isNaN(ex) && !isNaN(ey)) moveEraserRing([ex, ey]);
+        }
+      });
+    });
+
+    var undoBtn = inkDockEl.querySelector("[data-ink-undo]");
+    if (undoBtn) {
+      undoBtn.addEventListener("click", function () {
+        if (!inkStrokes.length) return;
+        inkStrokes.pop();
+        inkCurrentStroke = null;
+        redrawInkCanvas();
+        scheduleInkSave();
+        updateInkActionButtons();
+      });
+    }
+
+    var clearBtn = inkDockEl.querySelector("[data-ink-clear]");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        if (!inkStrokes.length) return;
+        if (!window.confirm("Clear all annotations on this slide for every student?")) return;
+        inkStrokes = [];
+        inkCurrentStroke = null;
+        redrawInkCanvas();
+        scheduleInkSave();
+        updateInkActionButtons();
+      });
+    }
+  }
+
+  function updateInkActionButtons() {
+    if (!inkDockEl) return;
+    var undoBtn = inkDockEl.querySelector("[data-ink-undo]");
+    var clearBtn = inkDockEl.querySelector("[data-ink-clear]");
+    var hasStrokes = inkStrokes.length > 0;
+    if (undoBtn) undoBtn.disabled = !hasStrokes;
+    if (clearBtn) clearBtn.disabled = !hasStrokes;
+  }
+
+  function setInkStatus(kind, text) {
+    if (!inkDockEl) return;
+    var statusEl = inkDockEl.querySelector("[data-ink-status]");
+    if (!statusEl) return;
+    statusEl.classList.remove("is-synced", "is-pending", "is-drawing");
+    if (kind) statusEl.classList.add(kind);
+    if (text) statusEl.setAttribute("title", text);
+  }
+
+  function syncInkDockState() {
+    if (inkCompactSlot) {
+      var compactBtn = ensureInkCompactButton();
+      if (compactBtn) {
+        compactBtn.classList.toggle("is-active", !!inkExpanded);
+        compactBtn.setAttribute("aria-pressed", inkExpanded ? "true" : "false");
+      }
+    }
+    var chromeTools = root.querySelector("[data-cm-chrome-tools]");
+    if (chromeTools) {
+      chromeTools.hidden = !inkExpanded;
+      chromeTools.classList.toggle("is-ink-open", !!inkExpanded);
+    }
+    if (!inkExpanded) hideLaserPreview();
+    if (!inkDockEl) return;
+    if (inkTool === "laser" && inkExpanded) inkEnabled = true;
+    var railEl = inkDockEl.querySelector(".np-cm-ink-rail");
+    if (railEl) {
+      railEl.classList.toggle("is-laser-tool", inkTool === "laser");
+    }
+    if (inkTool !== "laser") hideLaserPreview();
+    root.classList.toggle("is-pen-active", !!(inkEnabled && classroomSlideApi && classroomSession && inkTool !== "laser"));
+    root.classList.toggle("is-laser-active", !!(inkEnabled && classroomSlideApi && classroomSession && inkTool === "laser"));
+    if (inkCanvasEl) {
+      var laserMode = inkTool === "laser" && inkEnabled && inkExpanded;
+      var drawable = !!(inkCanDraw && inkEnabled && classroomSlideApi && inkTool !== "eraser" && inkTool !== "laser");
+      inkCanvasEl.classList.toggle(
+        "is-drawable",
+        (inkCanDraw && inkExpanded && classroomSlideApi && inkEnabled) &&
+          (drawable || inkTool === "eraser" || inkTool === "laser")
+      );
+      inkCanvasEl.classList.toggle("is-eraser", inkTool === "eraser" && inkEnabled);
+      inkCanvasEl.classList.toggle("is-highlighter", inkTool === "highlighter" && inkEnabled);
+      inkCanvasEl.classList.toggle("is-laser", laserMode);
+    }
+    updateInkActionButtons();
+    updateInkToolHint();
+  }
+
+  function updateInkReaderBadge() {
+    var showReader = !!(classroomSession && !classroomSlideApi);
+    if (!showReader) {
+      if (inkReaderEl) inkReaderEl.hidden = true;
+      return;
+    }
+    if (!inkReaderEl) {
+      inkReaderEl = document.createElement("span");
+      inkReaderEl.className = "np-cm-ink-reader";
+      inkReaderEl.setAttribute("data-cm-ink-reader", "true");
+      inkReaderEl.innerHTML = '<span class="np-cm-ink-reader-dot"></span><span>Teacher notes</span>';
+      if (inkChromeHost) inkChromeHost.appendChild(inkReaderEl);
+    }
+    inkReaderEl.hidden = !(inkStrokes.length > 0 || (classroomSession && classroomSession.ink_updated_at));
+  }
+
+  function updateInkDock() {
+    updateInkReaderBadge();
     if (!classroomSession || !classroomSlideApi) {
-      if (inkToolbarEl) inkToolbarEl.hidden = true;
+      if (inkDockEl) {
+        inkDockEl.innerHTML = "";
+        inkDockEl.removeAttribute("data-cm-ink-bound");
+        inkDockEl.removeAttribute("data-cm-ink-version");
+      }
+      if (inkRailHost) inkRailHost.hidden = true;
+      if (inkCompactSlot) inkCompactSlot.hidden = true;
+      inkExpanded = false;
       inkCanDraw = false;
+      stopLaserPoll();
+      syncInkDockState();
       return;
     }
     inkCanDraw = true;
-    if (!inkToolbarEl) {
-      inkToolbarEl = document.createElement("div");
-      inkToolbarEl.className = "np-cm-ink-toolbar";
-      inkToolbarEl.setAttribute("data-cm-ink-toolbar", "true");
-      inkToolbarEl.innerHTML =
-        '<span class="np-cm-ink-label">Live pen</span>' +
-        '<button type="button" data-ink-color="#ef4444" class="is-active" aria-label="Red pen"></button>' +
-        '<button type="button" data-ink-color="#2563eb" aria-label="Blue pen"></button>' +
-        '<button type="button" data-ink-color="#111827" aria-label="Black pen"></button>' +
-        '<button type="button" data-ink-clear>Clear slide</button>';
-      inkToolbarEl.querySelectorAll("[data-ink-color]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          inkColor = btn.getAttribute("data-ink-color") || "#ef4444";
-          inkToolbarEl.querySelectorAll("[data-ink-color]").forEach(function (b) {
-            b.classList.toggle("is-active", b === btn);
-          });
-        });
-      });
-      var clearBtn = inkToolbarEl.querySelector("[data-ink-clear]");
-      if (clearBtn) {
-        clearBtn.addEventListener("click", function () {
-          inkStrokes = [];
-          inkCurrentStroke = null;
-          redrawInkCanvas();
-          scheduleInkSave();
-        });
-      }
-      var heroActions = root.querySelector(".np-cm-hero-actions");
-      if (heroActions) heroActions.insertBefore(inkToolbarEl, heroActions.firstChild);
+    if (inkCompactSlot) {
+      inkCompactSlot.hidden = false;
+      ensureInkCompactButton();
     }
-    inkToolbarEl.hidden = false;
-    if (inkCanvasEl) {
-      inkCanvasEl.classList.toggle("is-drawable", !!classroomSlideApi);
+    if (!inkRailHost) return;
+    inkRailHost.hidden = false;
+    if (!inkDockEl) {
+      inkDockEl = document.createElement("div");
+      inkDockEl.setAttribute("data-cm-ink-toolbar", "true");
+      inkRailHost.appendChild(inkDockEl);
     }
+    if (!inkDockEl.innerHTML || inkDockEl.getAttribute("data-cm-ink-version") !== INK_DOCK_VERSION) {
+      inkDockEl.innerHTML = buildInkDockHtml();
+      inkDockEl.setAttribute("data-cm-ink-version", INK_DOCK_VERSION);
+      inkDockEl.removeAttribute("data-cm-ink-bound");
+      bindInkDockEvents();
+    }
+    syncInkDockState();
+    updateInkActionButtons();
   }
 
   function resizeInkCanvas() {
     if (!inkCanvasEl || !slideEl || !inkCtx) return;
-    var rect = slideEl.getBoundingClientRect();
-    var w = Math.max(1, Math.round(rect.width));
-    var h = Math.max(1, Math.round(rect.height));
-    if (inkCanvasEl.width !== w || inkCanvasEl.height !== h) {
-      inkCanvasEl.width = w;
-      inkCanvasEl.height = h;
+    inkDpr = window.devicePixelRatio || 1;
+    var cssW = slideEl.offsetWidth;
+    var cssH = slideEl.offsetHeight;
+    if (!cssW || !cssH) return;
+    var bufW = Math.max(1, Math.round(cssW * inkDpr));
+    var bufH = Math.max(1, Math.round(cssH * inkDpr));
+    inkCanvasEl.style.width = cssW + "px";
+    inkCanvasEl.style.height = cssH + "px";
+    if (inkCanvasEl.width !== bufW || inkCanvasEl.height !== bufH) {
+      inkCanvasEl.width = bufW;
+      inkCanvasEl.height = bufH;
       redrawInkCanvas();
     }
+    resizeLaserCanvas();
   }
 
   function redrawInkCanvas() {
     if (!inkCtx || !inkCanvasEl) return;
+    inkCtx.setTransform(1, 0, 0, 1, 0, 0);
     inkCtx.clearRect(0, 0, inkCanvasEl.width, inkCanvasEl.height);
     inkStrokes.forEach(function (stroke) { drawInkStroke(stroke); });
     if (inkCurrentStroke) drawInkStroke(inkCurrentStroke);
@@ -479,26 +1098,44 @@
 
   function drawInkStroke(stroke) {
     if (!inkCtx || !stroke || !stroke.points || stroke.points.length < 2) return;
-    var w = inkCanvasEl.width;
-    var h = inkCanvasEl.height;
+    var bw = inkCanvasEl.width;
+    var bh = inkCanvasEl.height;
+    var lw = (stroke.width || 4) * (inkDpr || 1);
     inkCtx.save();
     inkCtx.strokeStyle = stroke.color || "#ef4444";
-    inkCtx.lineWidth = stroke.width || 3;
+    inkCtx.lineWidth = lw;
+    inkCtx.globalAlpha = stroke.alpha == null ? 1 : stroke.alpha;
     inkCtx.lineCap = "round";
     inkCtx.lineJoin = "round";
+    var points = stroke.points;
     inkCtx.beginPath();
-    stroke.points.forEach(function (pt, i) {
-      var x = pt[0] * w;
-      var y = pt[1] * h;
-      if (i === 0) inkCtx.moveTo(x, y);
-      else inkCtx.lineTo(x, y);
-    });
+    inkCtx.moveTo(points[0][0] * bw, points[0][1] * bh);
+    for (var i = 1; i < points.length - 1; i++) {
+      var mx = (points[i][0] + points[i + 1][0]) * 0.5 * bw;
+      var my = (points[i][1] + points[i + 1][1]) * 0.5 * bh;
+      inkCtx.quadraticCurveTo(points[i][0] * bw, points[i][1] * bh, mx, my);
+    }
+    var last = points[points.length - 1];
+    inkCtx.lineTo(last[0] * bw, last[1] * bh);
     inkCtx.stroke();
     inkCtx.restore();
   }
 
+  function eraseStrokesNearPoint(pt, radius) {
+    if (!pt) return false;
+    radius = radius == null ? inkEraserRadius() : radius;
+    var before = inkStrokes.length;
+    inkStrokes = inkStrokes.filter(function (stroke) {
+      if (!stroke || !stroke.points) return false;
+      return !stroke.points.some(function (p) {
+        return Math.hypot(p[0] - pt[0], p[1] - pt[1]) <= radius;
+      });
+    });
+    return inkStrokes.length !== before;
+  }
+
   function inkPointFromEvent(e) {
-    var rect = slideEl.getBoundingClientRect();
+    var rect = inkCanvasEl.getBoundingClientRect();
     if (!rect.width || !rect.height) return null;
     return [
       Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)),
@@ -508,37 +1145,111 @@
 
   function bindInkPointerEvents() {
     if (!inkCanvasEl) return;
+    inkCanvasEl.addEventListener("pointerenter", function () {
+      if (inkTool === "laser" && inkEnabled && inkExpanded) {
+        inkCanvasEl.classList.add("is-laser-hover");
+      }
+    });
+    inkCanvasEl.addEventListener("pointerleave", function () {
+      inkCanvasEl.classList.remove("is-laser-hover");
+      if (!inkLaserDragging) hideLaserPreview();
+    });
     inkCanvasEl.addEventListener("pointerdown", function (e) {
-      if (!inkCanDraw || !classroomSlideApi) return;
+      if (!inkCanDraw || !classroomSlideApi || !inkEnabled) return;
       e.preventDefault();
       var pt = inkPointFromEvent(e);
       if (!pt) return;
+      if (inkTool === "laser") {
+        inkLaserDragging = true;
+        pushLaserTrailPoint(pt);
+        moveLaserPreview(pt);
+        scheduleLaserPublish(true);
+        inkCanvasEl.setPointerCapture(e.pointerId);
+        return;
+      }
+      if (inkTool === "eraser") {
+        inkDrawing = true;
+        moveEraserRing(pt);
+        if (eraseStrokesNearPoint(pt)) {
+          redrawInkCanvas();
+          scheduleInkSave();
+          updateInkActionButtons();
+        }
+        inkCanvasEl.setPointerCapture(e.pointerId);
+        return;
+      }
       inkDrawing = true;
-      inkCurrentStroke = { points: [pt], color: inkColor, width: inkWidth };
+      hideEraserRing();
+      var style = inkStrokeStyle(inkColor, inkTool);
+      inkCurrentStroke = {
+        points: [pt],
+        color: style.color,
+        width: style.width,
+        alpha: style.alpha,
+        tool: style.tool,
+      };
+      setInkStatus("is-drawing", "Drawing…");
       inkCanvasEl.setPointerCapture(e.pointerId);
       redrawInkCanvas();
     });
     inkCanvasEl.addEventListener("pointermove", function (e) {
-      if (!inkDrawing || !inkCurrentStroke) return;
-      e.preventDefault();
+      if (!inkEnabled || !inkExpanded) return;
       var pt = inkPointFromEvent(e);
+      if (inkTool === "laser") {
+        if (!pt) return;
+        moveLaserPreview(pt);
+        if (inkLaserDragging) {
+          e.preventDefault();
+          pushLaserTrailPoint(pt);
+          scheduleLaserPublish(true);
+        }
+        return;
+      }
+      hideLaserPreview();
+      if (inkTool === "eraser" && pt) {
+        moveEraserRing(pt);
+      }
+      if (!inkDrawing) return;
+      e.preventDefault();
       if (!pt) return;
+      if (inkTool === "eraser") {
+        if (eraseStrokesNearPoint(pt)) {
+          redrawInkCanvas();
+          scheduleInkSave();
+          updateInkActionButtons();
+        }
+        return;
+      }
+      if (!inkCurrentStroke) return;
       var pts = inkCurrentStroke.points;
       var last = pts[pts.length - 1];
-      if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) < 0.002) return;
+      if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) < 0.0008) return;
       pts.push(pt);
       redrawInkCanvas();
     });
     function finishStroke(e) {
+      if (inkTool === "laser") {
+        inkLaserDragging = false;
+        if (inkLaserPreviewEl) inkLaserPreviewEl.classList.remove("is-drawing");
+        try { inkCanvasEl.releasePointerCapture(e.pointerId); } catch (err) {}
+        scheduleLaserPublish(false);
+        return;
+      }
+      if (inkTool === "eraser") {
+        hideEraserRing();
+      }
       if (!inkDrawing) return;
       inkDrawing = false;
-      if (inkCurrentStroke && inkCurrentStroke.points.length >= 2) {
+      if (inkTool !== "eraser" && inkCurrentStroke && inkCurrentStroke.points.length >= 2) {
         inkStrokes.push(inkCurrentStroke);
         scheduleInkSave();
+        updateInkActionButtons();
       }
       inkCurrentStroke = null;
       try { inkCanvasEl.releasePointerCapture(e.pointerId); } catch (err) {}
       redrawInkCanvas();
+      updateInkReaderBadge();
+      if (!inkSavePending) setInkStatus("is-synced", inkStrokes.length ? "Synced" : "Ready");
     }
     inkCanvasEl.addEventListener("pointerup", finishStroke);
     inkCanvasEl.addEventListener("pointercancel", finishStroke);
@@ -546,6 +1257,8 @@
 
   function scheduleInkSave() {
     if (!classroomInkApi || !classroomSlideApi || !classroomSession) return;
+    inkSavePending = true;
+    setInkStatus("is-pending", "Saving…");
     if (inkSaveTimer) window.clearTimeout(inkSaveTimer);
     inkSaveTimer = window.setTimeout(publishInkStrokes, 280);
   }
@@ -565,9 +1278,14 @@
     })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
+        inkSavePending = false;
         if (data && data.ok && data.updated_at) inkUpdatedAt = data.updated_at;
+        setInkStatus("is-synced", inkStrokes.length ? "Synced · " + inkStrokes.length : "Ready");
       })
-      .catch(function () {});
+      .catch(function () {
+        inkSavePending = false;
+        setInkStatus("is-pending", "Sync retry…");
+      });
   }
 
   function loadInkForCurrentSlide(force) {
@@ -582,12 +1300,21 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data || !data.ok) return;
-        if (!force && data.updated_at && data.updated_at === inkUpdatedAt) return;
+        if (!force && data.updated_at && data.updated_at === inkUpdatedAt) {
+          if (data.laser && classroomSession) classroomSession.laser = data.laser;
+          syncRemoteLaser(false);
+          return;
+        }
         inkUpdatedAt = data.updated_at || null;
         inkStrokes = Array.isArray(data.strokes) ? data.strokes : [];
         inkCurrentStroke = null;
+        if (data.laser && classroomSession) classroomSession.laser = data.laser;
         ensureInkLayer();
         redrawInkCanvas();
+        updateInkActionButtons();
+        updateInkReaderBadge();
+        syncRemoteLaser(false);
+        clearLaserTrail(true);
       })
       .catch(function () {});
   }
@@ -597,6 +1324,9 @@
       inkStrokes = [];
       inkUpdatedAt = null;
       if (inkLayerEl) inkLayerEl.hidden = true;
+      clearLaserTrail(true);
+      hideEraserRing();
+      stopLaserPoll();
       return;
     }
     ensureInkLayer();
@@ -604,9 +1334,16 @@
     var remoteInkAt = classroomSession.ink_updated_at || null;
     if (force || remoteInkAt !== inkUpdatedAt) {
       loadInkForCurrentSlide(force);
+    } else {
+      syncRemoteLaser(force);
+    }
+    if (classroomSlideApi) {
+      stopLaserPoll();
+    } else {
+      startLaserPoll();
+      syncRemoteLaser(force);
     }
   }
-
   function loadClassroomSession() {
     if (!classroomActiveApi || classroomPollInFlight) return;
     classroomPollInFlight = true;
@@ -1511,6 +2248,7 @@
       else exitProjectionFullscreen();
     }
     saveFocusMode(on);
+    if (on) window.requestAnimationFrame(resizeInkCanvas);
   }
 
   function exitFocusMode() {
@@ -1942,6 +2680,9 @@
   });
   ["fullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"].forEach(function (eventName) {
     document.addEventListener(eventName, function () {
+      if (getFullscreenElement() && root.classList.contains("is-focus-mode")) {
+        window.requestAnimationFrame(resizeInkCanvas);
+      }
       if (!getFullscreenElement() && root.classList.contains("is-focus-mode")) {
         setFocusMode(false, { fullscreen: false });
       }
@@ -2044,6 +2785,48 @@
     }
     if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); guardedNavigate(1); }
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); guardedNavigate(-1); }
+    if ((e.key === "p" || e.key === "P") && classroomSlideApi && classroomSession) {
+      e.preventDefault();
+      inkExpanded = !inkExpanded;
+      if (inkExpanded) inkEnabled = true;
+      syncInkDockState();
+      return;
+    }
+    if ((e.key === "u" || e.key === "U") && classroomSlideApi && classroomSession && inkStrokes.length) {
+      e.preventDefault();
+      inkStrokes.pop();
+      inkCurrentStroke = null;
+      redrawInkCanvas();
+      scheduleInkSave();
+      updateInkActionButtons();
+      return;
+    }
+    if ((e.key === "l" || e.key === "L") && classroomSlideApi && classroomSession && inkExpanded) {
+      e.preventDefault();
+      inkTool = "laser";
+      inkEnabled = true;
+      if (inkDockEl) {
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "laser");
+        });
+      }
+      updateInkToolHint();
+      syncInkDockState();
+      return;
+    }
+    if ((e.key === "e" || e.key === "E") && classroomSlideApi && classroomSession && inkExpanded) {
+      e.preventDefault();
+      inkTool = "eraser";
+      inkEnabled = true;
+      if (inkDockEl) {
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "eraser");
+        });
+      }
+      updateInkToolHint();
+      syncInkDockState();
+      return;
+    }
     if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFocusMode(); }
     if (e.key === "Escape" && root.classList.contains("is-focus-mode")) {
       e.preventDefault();

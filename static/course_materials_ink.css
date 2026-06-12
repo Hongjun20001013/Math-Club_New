@@ -1,4 +1,5 @@
-.np-cm-slide-stage {
+/* ── Ink overlay ── */
+.np-cm-slide {
     position: relative;
 }
 
@@ -6,77 +7,392 @@
     inset: 0;
     pointer-events: none;
     position: absolute;
-    z-index: 12;
+    z-index: 8;
 }
 
-.np-cm-ink-canvas {
+.np-cm-ink-canvas,
+.np-cm-laser-canvas {
     display: block;
-    height: 100%;
+    left: 0;
     pointer-events: none;
+    position: absolute;
+    top: 0;
     touch-action: none;
-    width: 100%;
+}
+
+.np-cm-laser-canvas {
+    z-index: 10;
 }
 
 .np-cm-ink-canvas.is-drawable {
-    cursor: crosshair;
     pointer-events: auto;
 }
 
-.np-cm-ink-toolbar {
+.np-cm-ink-canvas.is-eraser,
+.np-cm-ink-canvas.is-laser {
+    cursor: none;
+}
+
+.np-cm-ink-canvas.is-highlighter,
+.np-cm-ink-canvas.is-drawable:not(.is-eraser):not(.is-laser) {
+    cursor: crosshair;
+}
+
+/* ── Laser hover aim (visible before click) ── */
+.np-cm-laser-preview {
+    left: var(--laser-x, 50%);
+    pointer-events: none;
+    position: absolute;
+    top: var(--laser-y, 50%);
+    transform: translate(-50%, -50%);
+    z-index: 11;
+}
+
+.np-cm-laser-preview-ring {
+    animation: np-cm-laser-aim 1.8s ease-in-out infinite;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35);
+    display: block;
+    height: calc(11px * var(--laser-sc, 0.85));
+    opacity: 0.85;
+    width: calc(11px * var(--laser-sc, 0.85));
+}
+
+.np-cm-laser-preview-core {
+    background: #ef4444;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.65);
+    display: block;
+    height: calc(4px * var(--laser-sc, 0.85));
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(4px * var(--laser-sc, 0.85));
+}
+
+@keyframes np-cm-laser-aim {
+    0%, 100% { opacity: 0.65; transform: scale(1); }
+    50% { opacity: 0.95; transform: scale(1.04); }
+}
+
+.np-cm-laser-preview.is-drawing .np-cm-laser-preview-ring {
+    display: none;
+}
+
+.np-cm-laser-preview.is-drawing .np-cm-laser-preview-core {
+    height: calc(3px * var(--laser-sc, 0.85));
+    width: calc(3px * var(--laser-sc, 0.85));
+}
+
+/* ── Eraser ring ── */
+.np-cm-eraser-ring {
+    border: 2px dashed rgba(100, 116, 139, 0.55);
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px rgba(148, 163, 184, 0.12);
+    height: var(--eraser-r, 28px);
+    left: var(--eraser-x, 50%);
+    pointer-events: none;
+    position: absolute;
+    top: var(--eraser-y, 50%);
+    transform: translate(-50%, -50%);
+    width: var(--eraser-r, 28px);
+    z-index: 9;
+}
+
+/* ── Compact ink rail (single row) ── */
+.np-cm-deck-chrome-tools[hidden] {
+    display: none !important;
+}
+
+.np-cm-deck-chrome-tools.is-ink-open {
+    padding: 4px 8px 5px;
+}
+
+.np-cm-ink-rail-host:not([hidden]) {
+    display: block;
+    width: 100%;
+}
+
+.np-cm-ink-rail {
     align-items: center;
-    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(14px) saturate(1.12);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 23, 42, 0.07);
     border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+    box-shadow:
+        0 4px 18px rgba(15, 23, 42, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 4px 6px 4px 8px;
+}
+
+.np-cm-ink-rail-group {
+    align-items: center;
     display: inline-flex;
-    gap: 8px;
-    padding: 6px 10px;
+    flex-shrink: 0;
+    gap: 2px;
 }
 
-.np-cm-ink-label {
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    margin-right: 4px;
-    text-transform: uppercase;
+.np-cm-ink-rail-vsep {
+    align-self: center;
+    background: rgba(15, 23, 42, 0.08);
+    flex-shrink: 0;
+    height: 18px;
+    width: 1px;
 }
 
-.np-cm-ink-toolbar button {
-    background: rgba(255, 255, 255, 0.12);
-    border: 2px solid transparent;
-    border-radius: 999px;
-    color: #fff;
+.np-cm-ink-rail.is-laser-tool .np-cm-ink-rail-group--colors,
+.np-cm-ink-rail.is-laser-tool .np-cm-ink-rail-group--edit {
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+.np-cm-ink-compact-slot:not([hidden]) {
+    display: inline-flex;
+}
+
+.np-cm-ink-compact {
+    align-items: center;
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 9px;
+    color: #64748b;
     cursor: pointer;
-    font: inherit;
-    font-size: 0.72rem;
-    font-weight: 700;
-    min-height: 28px;
-    min-width: 28px;
-    padding: 0 10px;
+    display: inline-flex;
+    height: 30px;
+    justify-content: center;
+    transition: all 0.14s ease;
+    width: 30px;
 }
 
-.np-cm-ink-toolbar button[data-ink-color] {
-    min-width: 24px;
+.np-cm-ink-compact svg {
+    height: 15px;
+    width: 15px;
+}
+
+.np-cm-ink-compact.is-active,
+.np-cm-ink-compact:hover {
+    background: rgba(91, 77, 255, 0.1);
+    border-color: rgba(91, 77, 255, 0.22);
+    color: #5b3df5;
+}
+
+.np-cm-ink-chip {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    height: 28px;
+    justify-content: center;
+    min-width: 28px;
+    padding: 0 6px;
+    transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.np-cm-ink-chip:hover {
+    background: rgba(15, 23, 42, 0.05);
+    color: #334155;
+}
+
+.np-cm-ink-chip.is-active {
+    background: rgba(91, 77, 255, 0.11);
+    box-shadow: inset 0 0 0 1px rgba(91, 77, 255, 0.14);
+    color: #4338ca;
+}
+
+.np-cm-ink-chip--laser.is-active {
+    background: rgba(254, 226, 226, 0.85);
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.22);
+    color: #dc2626;
+}
+
+.np-cm-ink-chip--clear {
+    color: #94a3b8;
+    font-size: 0.64rem;
+    font-weight: 700;
+    min-width: auto;
+    padding: 0 8px;
+}
+
+.np-cm-ink-chip--clear:hover {
+    background: rgba(254, 242, 242, 0.9);
+    color: #dc2626;
+}
+
+.np-cm-ink-chip svg {
+    height: 14px;
+    width: 14px;
+}
+
+.np-cm-ink-chip:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.np-cm-ink-swatch {
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+    cursor: pointer;
+    height: 16px;
+    padding: 0;
+    transition: transform 0.1s ease;
+    width: 16px;
+}
+
+.np-cm-ink-swatch.is-active {
+    box-shadow: 0 0 0 2px #6d4dff;
+    transform: scale(1.12);
+}
+
+.np-cm-ink-swatch[data-ink-color="#ef4444"] { background: #ef4444; }
+.np-cm-ink-swatch[data-ink-color="#2563eb"] { background: #2563eb; }
+.np-cm-ink-swatch[data-ink-color="#059669"] { background: #059669; }
+.np-cm-ink-swatch[data-ink-color="#1e293b"] { background: #1e293b; }
+
+.np-cm-ink-size-btn {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: inline-flex;
+    height: 24px;
+    justify-content: center;
+    min-width: 22px;
     padding: 0;
 }
 
-.np-cm-ink-toolbar button[data-ink-color="#ef4444"] {
-    background: #ef4444;
+.np-cm-ink-size-btn.is-active {
+    background: rgba(91, 77, 255, 0.1);
+    color: #4338ca;
 }
 
-.np-cm-ink-toolbar button[data-ink-color="#2563eb"] {
-    background: #2563eb;
+.np-cm-ink-size-btn i {
+    background: currentColor;
+    border-radius: 50%;
+    display: block;
 }
 
-.np-cm-ink-toolbar button[data-ink-color="#111827"] {
-    background: #111827;
+.np-cm-ink-size-btn[data-ink-size="s"] i { height: 3px; width: 3px; }
+.np-cm-ink-size-btn[data-ink-size="m"] i { height: 5px; width: 5px; }
+.np-cm-ink-size-btn[data-ink-size="l"] i { height: 8px; width: 8px; }
+
+.np-cm-ink-sync {
+    align-items: center;
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-left: 2px;
+    padding: 0 2px;
 }
 
-.np-cm-ink-toolbar button.is-active {
-    border-color: #fff;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+.np-cm-ink-sync-dot {
+    background: #cbd5e1;
+    border-radius: 50%;
+    height: 6px;
+    width: 6px;
 }
 
-.is-classroom-live .np-cm-slide-stage {
-    outline: 1px solid rgba(67, 56, 202, 0.12);
+.np-cm-ink-sync.is-synced .np-cm-ink-sync-dot {
+    background: #22c55e;
+}
+
+.np-cm-ink-sync.is-pending .np-cm-ink-sync-dot,
+.np-cm-ink-sync.is-drawing .np-cm-ink-sync-dot {
+    animation: np-cm-ink-pulse 0.8s ease infinite;
+    background: #818cf8;
+}
+
+@keyframes np-cm-ink-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+.np-cm-ink-rail-close {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    height: 24px;
+    justify-content: center;
+    line-height: 1;
+    margin-left: 2px;
+    padding: 0;
+    width: 24px;
+}
+
+.np-cm-ink-rail-close:hover {
+    background: rgba(15, 23, 42, 0.06);
+    color: #475569;
+}
+
+/* ── Student badge ── */
+.np-cm-deck-chrome .np-cm-ink-reader {
+    margin-left: auto;
+}
+
+.np-cm-ink-reader {
+    align-items: center;
+    background: rgba(91, 77, 255, 0.07);
+    border: 1px solid rgba(91, 77, 255, 0.12);
+    border-radius: 999px;
+    color: #4338ca;
+    display: inline-flex;
+    font-size: 0.68rem;
+    font-weight: 700;
+    gap: 5px;
+    padding: 3px 8px;
+}
+
+.np-cm-ink-reader-dot {
+    animation: np-cm-ink-pulse 1.4s ease infinite;
+    background: #6d4dff;
+    border-radius: 50%;
+    height: 5px;
+    width: 5px;
+}
+
+.is-classroom-live.is-pen-active .np-cm-slide-stage {
+    box-shadow: inset 0 0 0 1px rgba(109, 77, 255, 0.12);
+}
+
+.is-classroom-live.is-laser-active .np-cm-slide-stage {
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 640px) {
+    .np-cm-ink-rail {
+        border-radius: 14px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        padding: 5px 6px;
+    }
+
+    .np-cm-ink-rail-vsep:nth-of-type(n+3) {
+        display: none;
+    }
+
+    .np-cm-ink-rail-group--colors,
+    .np-cm-ink-rail-group--sizes {
+        display: none;
+    }
 }

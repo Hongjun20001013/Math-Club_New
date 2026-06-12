@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260610-class-v1")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260611-ink-v5")
 
 _DB_SCHEMA_READY = False
 
@@ -842,6 +842,22 @@ def init_db():
         )
     if "slide_updated_at" not in session_cols:
         db.execute("ALTER TABLE course_class_sessions ADD COLUMN slide_updated_at DATETIME")
+    session_cols = _table_columns(db, "course_class_sessions")
+    if "laser_slide_index" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN laser_slide_index INTEGER")
+    if "laser_x" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN laser_x REAL")
+    if "laser_y" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN laser_y REAL")
+    if "laser_active" not in session_cols:
+        db.execute(
+            "ALTER TABLE course_class_sessions ADD COLUMN laser_active INTEGER NOT NULL DEFAULT 0"
+        )
+    if "laser_updated_at" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN laser_updated_at DATETIME")
+    session_cols = _table_columns(db, "course_class_sessions")
+    if "laser_trail_json" not in session_cols:
+        db.execute("ALTER TABLE course_class_sessions ADD COLUMN laser_trail_json TEXT")
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS course_class_roster (
@@ -1395,6 +1411,7 @@ def require_authenticated_user():
     if endpoint in {
         "static",
         "health",
+        "health_db",
         "health_stylesheet_bundle",
         "login",
         "logout",
@@ -2023,6 +2040,121 @@ def _cm_save_slide_ink(
     return str(row["updated_at"]) if row else None
 
 
+def _cm_laser_payload(
+    db: sqlite3.Connection, session_id: int, slide_index: int
+) -> dict[str, Any]:
+    row = db.execute(
+        """
+        SELECT laser_slide_index, laser_x, laser_y, laser_active, laser_updated_at,
+               laser_trail_json
+        FROM course_class_sessions
+        WHERE id = ?
+        """,
+        (session_id,),
+    ).fetchone()
+    if row is None:
+        return {
+            "active": False,
+            "x": None,
+            "y": None,
+            "slide_index": None,
+            "updated_at": None,
+            "trail": [],
+        }
+    active = bool(row["laser_active"]) and int(row["laser_slide_index"] or 0) == slide_index
+    trail: list[list[float]] = []
+    if active and row["laser_trail_json"]:
+        try:
+            parsed = json.loads(row["laser_trail_json"] or "[]")
+            if isinstance(parsed, list):
+                for pt in parsed[:20]:
+                    if (
+                        isinstance(pt, (list, tuple))
+                        and len(pt) >= 2
+                        and isinstance(pt[0], (int, float))
+                        and isinstance(pt[1], (int, float))
+                    ):
+                        trail.append(
+                            [
+                                max(0.0, min(1.0, float(pt[0]))),
+                                max(0.0, min(1.0, float(pt[1]))),
+                            ]
+                        )
+        except json.JSONDecodeError:
+            trail = []
+    return {
+        "active": active,
+        "x": float(row["laser_x"]) if active and row["laser_x"] is not None else None,
+        "y": float(row["laser_y"]) if active and row["laser_y"] is not None else None,
+        "slide_index": int(row["laser_slide_index"]) if row["laser_slide_index"] is not None else None,
+        "updated_at": row["laser_updated_at"],
+        "trail": trail,
+    }
+
+
+def _cm_save_laser(
+    db: sqlite3.Connection,
+    session_id: int,
+    slide_index: int,
+    active: bool,
+    x: float | None,
+    y: float | None,
+    trail: list[Any] | None = None,
+) -> str | None:
+    safe_trail: list[list[float]] = []
+    if isinstance(trail, list):
+        for pt in trail[:20]:
+            if (
+                isinstance(pt, (list, tuple))
+                and len(pt) >= 2
+                and isinstance(pt[0], (int, float))
+                and isinstance(pt[1], (int, float))
+            ):
+                safe_trail.append(
+                    [
+                        max(0.0, min(1.0, float(pt[0]))),
+                        max(0.0, min(1.0, float(pt[1]))),
+                    ]
+                )
+    trail_json = json.dumps(safe_trail, separators=(",", ":")) if safe_trail else "[]"
+    if active and x is not None and y is not None:
+        db.execute(
+            """
+            UPDATE course_class_sessions
+            SET laser_slide_index = ?,
+                laser_x = ?,
+                laser_y = ?,
+                laser_active = 1,
+                laser_trail_json = ?,
+                laser_updated_at = datetime('now')
+            WHERE id = ?
+            """,
+            (
+                slide_index,
+                max(0.0, min(1.0, float(x))),
+                max(0.0, min(1.0, float(y))),
+                trail_json,
+                session_id,
+            ),
+        )
+    else:
+        db.execute(
+            """
+            UPDATE course_class_sessions
+            SET laser_active = 0,
+                laser_trail_json = '[]',
+                laser_updated_at = datetime('now')
+            WHERE id = ?
+            """,
+            (session_id,),
+        )
+    row = db.execute(
+        "SELECT laser_updated_at FROM course_class_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+    return str(row["laser_updated_at"]) if row and row["laser_updated_at"] else None
+
+
 def _cm_available_classroom_students(db: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = db.execute(
         """
@@ -2331,6 +2463,7 @@ def practice_course_material_classroom_active_api(slug: str):
             _safe_db_commit(db)
     slide_index = int(row["current_slide_index"] or 1)
     ink = _cm_slide_ink_payload(db, int(row["id"]), slide_index)
+    laser = _cm_laser_payload(db, int(row["id"]), slide_index)
     return jsonify(
         {
             "ok": True,
@@ -2343,6 +2476,7 @@ def practice_course_material_classroom_active_api(slug: str):
                 "current_slide_index": slide_index,
                 "slide_updated_at": row["slide_updated_at"],
                 "ink_updated_at": ink.get("updated_at"),
+                "laser": laser,
             },
         }
     )
@@ -2366,6 +2500,9 @@ def practice_course_material_classroom_ink_api(slug: str):
         except (TypeError, ValueError):
             slide_index = int(active["current_slide_index"] or 1)
         ink = _cm_slide_ink_payload(db, session_id, slide_index)
+        laser = _cm_laser_payload(db, session_id, slide_index)
+        if request.args.get("fields") == "laser":
+            return jsonify({"ok": True, "session_id": session_id, "slide_index": slide_index, "laser": laser})
         return jsonify(
             {
                 "ok": True,
@@ -2373,6 +2510,7 @@ def practice_course_material_classroom_ink_api(slug: str):
                 "slide_index": slide_index,
                 "strokes": ink["strokes"],
                 "updated_at": ink["updated_at"],
+                "laser": laser,
             }
         )
 
@@ -2385,9 +2523,34 @@ def practice_course_material_classroom_ink_api(slug: str):
     except (TypeError, ValueError):
         return jsonify({"ok": False, "error": "slide_index required"}), 400
     strokes = data.get("strokes")
-    if not isinstance(strokes, list):
-        return jsonify({"ok": False, "error": "strokes must be a list"}), 400
-    updated_at = _cm_save_slide_ink(db, session_id, slide_index, strokes)
+    laser = data.get("laser")
+    if strokes is None and laser is None:
+        return jsonify({"ok": False, "error": "strokes or laser required"}), 400
+    updated_at = None
+    laser_updated_at = None
+    if strokes is not None:
+        if not isinstance(strokes, list):
+            return jsonify({"ok": False, "error": "strokes must be a list"}), 400
+        updated_at = _cm_save_slide_ink(db, session_id, slide_index, strokes)
+    if laser is not None:
+        if not isinstance(laser, dict):
+            return jsonify({"ok": False, "error": "laser must be an object"}), 400
+        active = bool(laser.get("active"))
+        x = laser.get("x")
+        y = laser.get("y")
+        if active and x is not None and y is not None:
+            try:
+                x = float(x)
+                y = float(y)
+            except (TypeError, ValueError):
+                return jsonify({"ok": False, "error": "invalid laser coordinates"}), 400
+        else:
+            x = y = None
+            active = False
+        trail = laser.get("trail")
+        if trail is not None and not isinstance(trail, list):
+            return jsonify({"ok": False, "error": "laser.trail must be a list"}), 400
+        laser_updated_at = _cm_save_laser(db, session_id, slide_index, active, x, y, trail)
     if not _safe_db_commit(db):
         return jsonify({"ok": False, "error": "server busy, please try again"}), 503
     return jsonify(
@@ -2396,6 +2559,7 @@ def practice_course_material_classroom_ink_api(slug: str):
             "session_id": session_id,
             "slide_index": slide_index,
             "updated_at": updated_at,
+            "laser_updated_at": laser_updated_at,
         }
     )
 
