@@ -217,6 +217,50 @@
     color: #dc2626;
 }
 
+.np-cm-ink-chip--clear.is-armed {
+    animation: np-cm-clear-arm 0.9s ease-in-out infinite;
+    background: rgba(254, 226, 226, 0.95);
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.35);
+    color: #b91c1c;
+    font-weight: 800;
+}
+
+@keyframes np-cm-clear-arm {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.72; }
+}
+
+body.is-cm-projector .np-cm-ink-rail {
+    padding: 6px 10px;
+}
+
+body.is-cm-projector .np-cm-ink-chip {
+    height: 30px;
+    min-width: 30px;
+}
+
+body.is-cm-projector .np-cm-ink-chip svg {
+    height: 16px;
+    width: 16px;
+}
+
+body.is-cm-projector .np-cm-ink-chip--clear {
+    font-size: 0.72rem;
+    min-width: 52px;
+}
+
+body.is-cm-projector .np-cm-deck-chrome-tools.is-ink-open {
+    padding: 6px 10px 7px;
+}
+
+body.is-cm-projector .np-cm-ink-canvas.is-drawable {
+    cursor: crosshair;
+}
+
+body.is-cm-projector.is-pen-active .np-cm-slide-body {
+    user-select: none;
+}
+
 .np-cm-ink-chip--clear {
     color: #94a3b8;
     font-size: 0.64rem;

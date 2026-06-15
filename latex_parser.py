@@ -596,6 +596,7 @@ def parse_tex_file(path: str):
         stem_part = clean_latex_junk(stem_part)
         stem_part = _convert_latex_lists(stem_part)
         stem_part = clean_math(stem_part)
+        stem_part = _mathjax_safe_lt_in_tex_math(stem_part)
         stem_part = _format_stem_html(stem_part)
 
         # ------------------ Choices ------------------
@@ -615,6 +616,7 @@ def parse_tex_file(path: str):
                 content = table_html
             else:
                 content = clean_math(content)
+            content = _mathjax_safe_lt_in_tex_math(content)
             choices[idx] = content
 
         letters_present = {L for L in "ABCD" if raw_choices.get(L)}
@@ -779,6 +781,7 @@ def _mathjax_safe_lt_in_tex_math(s: str) -> str:
             return inner
         inner = inner.replace("<=", "§LE§").replace(">=", "§GE§")
         inner = inner.replace("<", r"\lt ")
+        inner = re.sub(r"(?<!\\)%", r"\\%", inner)
         return inner.replace("§LE§", "<=").replace("§GE§", ">=")
 
     while i < n:

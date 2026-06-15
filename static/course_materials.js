@@ -416,9 +416,13 @@
   var inkRemoteLaserAt = null;
   var inkLaserDragging = false;
   var inkLaserPollTimer = null;
-  var INK_DOCK_VERSION = "v5";
+  var inkClearArmed = false;
+  var inkClearArmTimer = null;
+  var inkLocalSlideCache = {};
+  var inkActiveSlideIndex = null;
+  var INK_DOCK_VERSION = "v7";
 
-  var INK_SIZES = { s: 1.8, m: 4, l: 8.5 };
+  var INK_SIZES = { s: 2.4, m: 5.5, l: 11 };
   var INK_ERASER_RADIUS = { s: 0.007, m: 0.016, l: 0.034 };
   var INK_LASER_SCALE = { s: 0.5, m: 0.85, l: 1.25 };
   var INK_ICON_PEN =
@@ -444,8 +448,81 @@
     return INK_LASER_SCALE[inkSizeKey] || INK_LASER_SCALE.m;
   }
 
-  function inkLaserMinStep() {
-    return 0.00035;
+  function disarmInkClear(btn) {
+    inkClearArmed = false;
+    if (inkClearArmTimer) {
+      window.clearTimeout(inkClearArmTimer);
+      inkClearArmTimer = null;
+    }
+    if (!btn) return;
+    btn.classList.remove("is-armed");
+    btn.textContent = "Clear";
+    btn.setAttribute("title", "Clear slide");
+  }
+
+  function armInkClear(btn) {
+    if (!btn) return;
+    inkClearArmed = true;
+    btn.classList.add("is-armed");
+    btn.textContent = "Confirm?";
+    btn.setAttribute("title", "Click again to clear this slide for everyone");
+    if (inkClearArmTimer) window.clearTimeout(inkClearArmTimer);
+    inkClearArmTimer = window.setTimeout(function () {
+      disarmInkClear(btn);
+    }, 3500);
+  }
+
+  function isInkTeacher() {
+    return !!classroomSlideApi;
+  }
+
+  function cacheLocalInkForSlide(slideIndex) {
+    if (!isInkTeacher() || classroomSession || slideIndex == null) return;
+    inkLocalSlideCache[String(slideIndex)] = JSON.parse(JSON.stringify(inkStrokes));
+  }
+
+  function restoreLocalInkForSlide(slideIndex) {
+    if (!isInkTeacher() || classroomSession || slideIndex == null) return;
+    inkStrokes = JSON.parse(JSON.stringify(inkLocalSlideCache[String(slideIndex)] || []));
+    inkCurrentStroke = null;
+    inkUpdatedAt = null;
+    inkActiveSlideIndex = slideIndex;
+    redrawInkCanvas();
+    updateInkActionButtons();
+    updateInkReaderBadge();
+  }
+
+  function toggleInkToolbar() {
+    if (!isInkTeacher()) return;
+    updateInkDock();
+    inkExpanded = !inkExpanded;
+    if (inkExpanded) {
+      inkEnabled = true;
+      ensureInkLayer();
+    }
+    syncInkDockState();
+  }
+
+  function openInkForTeaching(options) {
+    options = options || {};
+    if (!isInkTeacher()) return;
+    updateInkDock();
+    inkExpanded = true;
+    inkEnabled = true;
+    if (options.tool) inkTool = options.tool;
+    if (options.sizeKey) inkSizeKey = options.sizeKey;
+    if (inkDockEl) {
+      inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === inkTool);
+      });
+      inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-ink-size") === inkSizeKey);
+      });
+    }
+    ensureInkLayer();
+    updateInkToolHint();
+    syncInkDockState();
+    window.requestAnimationFrame(resizeInkCanvas);
   }
 
   function inkStrokeStyle(color, tool) {
@@ -847,12 +924,10 @@
       btn.className = "np-cm-ink-compact";
       btn.setAttribute("data-ink-compact-toggle", "true");
       btn.setAttribute("aria-pressed", "false");
-      btn.title = "Open live pen (P)";
+      btn.title = "Open live pen (P) — works before Live Class starts";
       btn.innerHTML = INK_ICON_PEN;
       btn.addEventListener("click", function () {
-        inkExpanded = !inkExpanded;
-        if (inkExpanded) inkEnabled = true;
-        syncInkDockState();
+        toggleInkToolbar();
       });
       inkCompactSlot.appendChild(btn);
     }
@@ -866,6 +941,7 @@
     var collapseBtn = inkDockEl.querySelector("[data-ink-collapse]");
     if (collapseBtn) {
       collapseBtn.addEventListener("click", function () {
+        disarmInkClear(inkDockEl.querySelector("[data-ink-clear]"));
         inkExpanded = false;
         inkEnabled = false;
         publishLaserState(false);
@@ -949,11 +1025,18 @@
     if (clearBtn) {
       clearBtn.addEventListener("click", function () {
         if (!inkStrokes.length) return;
-        if (!window.confirm("Clear all annotations on this slide for every student?")) return;
+        if (!inkClearArmed) {
+          armInkClear(clearBtn);
+          return;
+        }
+        disarmInkClear(clearBtn);
         inkStrokes = [];
         inkCurrentStroke = null;
         redrawInkCanvas();
         scheduleInkSave();
+        if (isInkTeacher() && !classroomSession && slides[idx]) {
+          cacheLocalInkForSlide(slides[idx].index);
+        }
         updateInkActionButtons();
       });
     }
@@ -998,14 +1081,14 @@
       railEl.classList.toggle("is-laser-tool", inkTool === "laser");
     }
     if (inkTool !== "laser") hideLaserPreview();
-    root.classList.toggle("is-pen-active", !!(inkEnabled && classroomSlideApi && classroomSession && inkTool !== "laser"));
-    root.classList.toggle("is-laser-active", !!(inkEnabled && classroomSlideApi && classroomSession && inkTool === "laser"));
+    root.classList.toggle("is-pen-active", !!(inkEnabled && isInkTeacher() && inkTool !== "laser"));
+    root.classList.toggle("is-laser-active", !!(inkEnabled && isInkTeacher() && inkTool === "laser"));
     if (inkCanvasEl) {
       var laserMode = inkTool === "laser" && inkEnabled && inkExpanded;
-      var drawable = !!(inkCanDraw && inkEnabled && classroomSlideApi && inkTool !== "eraser" && inkTool !== "laser");
+      var drawable = !!(inkCanDraw && inkEnabled && isInkTeacher() && inkTool !== "eraser" && inkTool !== "laser");
       inkCanvasEl.classList.toggle(
         "is-drawable",
-        (inkCanDraw && inkExpanded && classroomSlideApi && inkEnabled) &&
+        (inkCanDraw && inkExpanded && isInkTeacher() && inkEnabled) &&
           (drawable || inkTool === "eraser" || inkTool === "laser")
       );
       inkCanvasEl.classList.toggle("is-eraser", inkTool === "eraser" && inkEnabled);
@@ -1034,7 +1117,7 @@
 
   function updateInkDock() {
     updateInkReaderBadge();
-    if (!classroomSession || !classroomSlideApi) {
+    if (!isInkTeacher()) {
       if (inkDockEl) {
         inkDockEl.innerHTML = "";
         inkDockEl.removeAttribute("data-cm-ink-bound");
@@ -1155,7 +1238,7 @@
       if (!inkLaserDragging) hideLaserPreview();
     });
     inkCanvasEl.addEventListener("pointerdown", function (e) {
-      if (!inkCanDraw || !classroomSlideApi || !inkEnabled) return;
+      if (!inkCanDraw || !isInkTeacher() || !inkEnabled) return;
       e.preventDefault();
       var pt = inkPointFromEvent(e);
       if (!pt) return;
@@ -1321,12 +1404,18 @@
 
   function syncInkFromSession(force) {
     if (!classroomSession) {
-      inkStrokes = [];
-      inkUpdatedAt = null;
-      if (inkLayerEl) inkLayerEl.hidden = true;
-      clearLaserTrail(true);
-      hideEraserRing();
-      stopLaserPoll();
+      if (!isInkTeacher()) {
+        inkStrokes = [];
+        inkUpdatedAt = null;
+        if (inkLayerEl) inkLayerEl.hidden = true;
+        clearLaserTrail(true);
+        hideEraserRing();
+        stopLaserPoll();
+        return;
+      }
+      ensureInkLayer();
+      if (inkLayerEl) inkLayerEl.hidden = false;
+      updateInkDock();
       return;
     }
     ensureInkLayer();
@@ -2248,6 +2337,9 @@
       else exitProjectionFullscreen();
     }
     saveFocusMode(on);
+    if (on && isInkTeacher()) {
+      openInkForTeaching({ tool: "pen", sizeKey: "l" });
+    }
     if (on) window.requestAnimationFrame(resizeInkCanvas);
   }
 
@@ -2620,8 +2712,15 @@
     updateCoach(slide);
     updateClassroomPaceBadge();
     publishCurrentClassroomSlide();
+    if (isInkTeacher() && !classroomSession && inkActiveSlideIndex !== null && slide.index !== inkActiveSlideIndex) {
+      cacheLocalInkForSlide(inkActiveSlideIndex);
+    }
     ensureInkLayer();
-    loadInkForCurrentSlide(true);
+    if (isInkTeacher() && !classroomSession) {
+      restoreLocalInkForSlide(slide.index);
+    } else {
+      loadInkForCurrentSlide(true);
+    }
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
 
@@ -2785,14 +2884,12 @@
     }
     if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); guardedNavigate(1); }
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); guardedNavigate(-1); }
-    if ((e.key === "p" || e.key === "P") && classroomSlideApi && classroomSession) {
+    if ((e.key === "p" || e.key === "P") && isInkTeacher()) {
       e.preventDefault();
-      inkExpanded = !inkExpanded;
-      if (inkExpanded) inkEnabled = true;
-      syncInkDockState();
+      toggleInkToolbar();
       return;
     }
-    if ((e.key === "u" || e.key === "U") && classroomSlideApi && classroomSession && inkStrokes.length) {
+    if ((e.key === "u" || e.key === "U") && isInkTeacher() && inkStrokes.length) {
       e.preventDefault();
       inkStrokes.pop();
       inkCurrentStroke = null;
@@ -2801,7 +2898,7 @@
       updateInkActionButtons();
       return;
     }
-    if ((e.key === "l" || e.key === "L") && classroomSlideApi && classroomSession && inkExpanded) {
+    if ((e.key === "l" || e.key === "L") && isInkTeacher() && inkExpanded) {
       e.preventDefault();
       inkTool = "laser";
       inkEnabled = true;
@@ -2814,7 +2911,7 @@
       syncInkDockState();
       return;
     }
-    if ((e.key === "e" || e.key === "E") && classroomSlideApi && classroomSession && inkExpanded) {
+    if ((e.key === "e" || e.key === "E") && isInkTeacher() && inkExpanded) {
       e.preventDefault();
       inkTool = "eraser";
       inkEnabled = true;
@@ -2875,6 +2972,9 @@
     if (!loadFocusMode()) {
       setOutlineOpen(true);
     }
+  }
+  if (isInkTeacher()) {
+    updateInkDock();
   }
   setFocusMode(loadFocusMode(), { fullscreen: false });
   var initialSlide = parseInitialSlide();
