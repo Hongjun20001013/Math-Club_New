@@ -108,7 +108,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260612-ink-v7")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260615-desmos-v13")
 
 _DB_SCHEMA_READY = False
 

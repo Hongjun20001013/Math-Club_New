@@ -14,6 +14,7 @@
   var resetBtn = panel.querySelector("[data-np-desmos-reset]");
   var handle = document.getElementById("np-desmos-drag-handle");
   var desmosApiKey = config.apiKey || "";
+  var desmosApiVersion = config.apiVersion || "v1.13";
   var calculator = null;
   var desmosLoadPromise = null;
   var LAYOUT_KEY = config.layoutKey || "np-desmos-panel-layout";
@@ -183,7 +184,9 @@
     desmosLoadPromise = new Promise(function (resolve) {
       var script = document.createElement("script");
       script.src =
-        "https://www.desmos.com/api/v1.6/calculator.js?apiKey=" +
+        "https://www.desmos.com/api/" +
+        desmosApiVersion +
+        "/calculator.js?apiKey=" +
         encodeURIComponent(desmosApiKey);
       script.async = true;
       script.onload = function () { resolve(true); };
@@ -215,7 +218,11 @@
       zoomButtons: true,
       expressionsCollapsed: false,
       border: false,
-      lockViewport: false
+      lockViewport: false,
+      // Table regression UI requires API v1.10+ (customRegressions) and v1.11+ (regressionTemplates menu).
+      customRegressions: true,
+      regressionTemplates: true,
+      links: true
     });
     resizeCalculator();
     return true;
