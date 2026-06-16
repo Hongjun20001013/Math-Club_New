@@ -25,7 +25,7 @@
 \setbeamercolor{title}{fg=white, bg=purpleblue}
 
 % 封面信息
-\title[SAT Unit 2.3.1 ]{\textbf{SAT Unit 2.3.1\\ Polynomial and Rational Function}}
+\title[SAT Unit 2.3.1]{\textbf{SAT Unit 2.3.1\\ Polynomial and Rational Functions}}
 \author{\textbf{Jack Zeng}}
 \institute{\textcolor{white}{\textbf{Novel Prep}}}
 \date{\today} 
@@ -58,7 +58,6 @@
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
-        ;
     \end{tikzpicture}
 \end{frame}
 
@@ -88,7 +87,6 @@
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
-        ;
     \end{tikzpicture}
 \end{frame}
 
@@ -312,25 +310,41 @@ Polynomial long division is used to divide a polynomial by another polynomial of
 \end{frame}
 
 \begin{frame}{Polynomial Long Division}
-
-\vspace{0.3cm}
-\textbf{Example:}
+\small
+\begin{center}
+\begin{minipage}{0.62\textwidth}
+\centering
+\setlength{\arraycolsep}{0pt}
+\renewcommand{\arraystretch}{1.35}
 \[
-\frac{2x^3 + 3x^2 - 5x + 6}{x - 2}
+\begin{array}{rl}
+  & 2x^2 + 7x + 9 \\
+x - 2 \; ) & \overline{2x^3 + 3x^2 - 5x + 6} \\
+  & \underline{-2x^3 + 4x^2} \\
+  & \phantom{2x^3 + }7x^2 - 5x \\
+  & \underline{\phantom{2x^3 + }-7x^2 + 14x} \\
+  & \phantom{2x^3 + 3x^2 - }9x + 6 \\
+  & \underline{\phantom{2x^3 + 3x^2 - }-9x + 18} \\
+  & \phantom{2x^3 + 3x^2 - 5x + }24
+\end{array}
 \]
-\begin{itemize}
-    \item Divide $2x^3 \div x = 2x^2$
-    \item Multiply: $2x^2(x - 2) = 2x^3 - 4x^2$
-    \item Subtract: $(2x^3 + 3x^2) - (2x^3 - 4x^2) = 7x^2$
-    \item Continue until remainder
-\end{itemize}
+\end{minipage}%
+\begin{minipage}{0.3\textwidth}
+\vspace{1.2em}
+\textbf{Steps:}
+\begin{enumerate}
+    \item Divide
+    \item Multiply
+    \item Subtract
+\end{enumerate}
+\end{minipage}
+\end{center}
 
-\vspace{0.2cm}
-\textbf{Result:} 
+\vspace{0.35cm}
+\textbf{Result:}
 \[
 \frac{2x^3 + 3x^2 - 5x + 6}{x - 2} = 2x^2 + 7x + 9 + \frac{24}{x - 2}
 \]
-    
 \end{frame}
 
 \begin{frame}{Remainder Theorem}
@@ -439,7 +453,6 @@ We are told that \( p(3) = -2 \). According to the Remainder Theorem, the remain
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
-        ;
     \end{tikzpicture}
 \end{frame}
 
@@ -551,12 +564,11 @@ f(x) = \frac{4}{x - 5}
         \foreach \x in {1,2,3,4,5} {
             \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
         }
-        ;
     \end{tikzpicture}
 \end{frame}
 
 
-\begin{frame}{\textbf{Question: Intercepts of a Quadratic Function}}
+\begin{frame}{\textbf{Question: Intercepts of a Polynomial Function}}
 The graph of $y = f(x)$ has a $y$-intercept at $(0, 12)$ and $x$-intercepts at $(-3, 0)$ and $(2, 0)$.  
 Which of the following equations could define $f$?
 \vspace{1em}
@@ -569,7 +581,7 @@ Which of the following equations could define $f$?
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{\textbf{Answer: Intercepts of a Quadratic Function}}
+\begin{frame}{\textbf{Answer: Intercepts of a Polynomial Function}}
 We are given:
 \begin{itemize}
   \item $x$-intercepts at $x = -3$ and $x = 2$, so the factored form must contain $(x + 3)$ and $(x - 2)$.
@@ -650,7 +662,15 @@ We are given:
 p(x) = \frac{3x + 2}{(x - 1)^2 - 4(x - 1) + 4}
 \]
 
-
+The graph cannot cross the $x$-axis where the denominator is zero. Simplify the denominator:
+\[
+(x - 1)^2 - 4(x - 1) + 4
+\]
+Let $u = x - 1$, then:
+\[
+u^2 - 4u + 4 = (u - 2)^2 = (x - 3)^2
+\]
+So the denominator is zero when $x = 3$.
 
 Thus, $p(x)$ \textbf{cannot} cross the $x$-axis at:
 \[
