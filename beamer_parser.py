@@ -992,12 +992,12 @@ def _clean_mcq_body(body: str) -> str:
     return body
 
 
-def _extract_mcq_choices_from_ul(ul_html: str) -> list[tuple[str, str]]:
+def _extract_mcq_choices_from_list(list_html: str) -> list[tuple[str, str]]:
     choices: list[tuple[str, str]] = []
     for item in re.finditer(
         r'<li class="stem-li-labeled">\s*<span class="stem-li-marker">(.*?)</span>\s*'
         r'<span class="stem-li-body">(.*?)</span>\s*</li>',
-        ul_html,
+        list_html,
         flags=re.S,
     ):
         letter = _normalize_mcq_marker(item.group(1))
@@ -1006,11 +1006,15 @@ def _extract_mcq_choices_from_ul(ul_html: str) -> list[tuple[str, str]]:
     if not choices:
         for item in re.finditer(
             r"<li><strong>([A-D]):\s*</strong>\s*(.*?)</li>",
-            ul_html,
+            list_html,
             flags=re.S,
         ):
             choices.append((item.group(1), _clean_mcq_body(item.group(2))))
     return choices
+
+
+def _extract_mcq_choices_from_ul(ul_html: str) -> list[tuple[str, str]]:
+    return _extract_mcq_choices_from_list(ul_html)
 
 
 def _build_mcq_interactive(
@@ -1045,7 +1049,7 @@ def _wrap_answer_choices(html: str) -> str:
         return html
 
     m = re.search(
-        r"(<p><strong>(?:Answer Choices|Options):\s*</strong></p>\s*)"
+        r"(<p><strong>(?:Answer Choices|Options|Choices):\s*</strong></p>\s*)"
         r'(<div class="cm-mcq-grid">((?:\s*<div class="cm-mcq-choice">.*?</div>)+)\s*</div>)',
         html,
         flags=re.I | re.S,
@@ -1063,32 +1067,13 @@ def _wrap_answer_choices(html: str) -> str:
             return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
 
     m = re.search(
-        r"(<p><strong>(?:Answer Choices|Options):\s*</strong></p>\s*)"
-        r'(<ul class="stem-itemize">(.*?)</ul>)',
+        r"(<p><strong>(?:Answer Choices|Options|Choices):\s*</strong></p>\s*)"
+        r'(<(?:ul|ol) class="(?:stem-itemize|stem-enumerate cm-beamer-list)">(.*?)</(?:ul|ol)>)',
         html,
         flags=re.I | re.S,
     )
     if m:
-        choices = _extract_mcq_choices_from_ul(m.group(3))
-        if len(choices) >= 2:
-            return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
-
-    m = re.search(
-        r"(<p><strong>Answer Choices:\s*</strong></p>\s*)"
-        r'(<ul class="stem-itemize">(.*?)</ul>)',
-        html,
-        flags=re.I | re.S,
-    )
-    if m:
-        choices = _extract_mcq_choices_from_ul(m.group(3))
-        if not choices:
-            for item in re.finditer(
-                r'<li class="stem-li-labeled"><span class="stem-li-marker">([A-D])\.?</span>\s*'
-                r'<span class="stem-li-body">(.*?)</span></li>',
-                m.group(3),
-                flags=re.S,
-            ):
-                choices.append((item.group(1), _clean_mcq_body(item.group(2))))
+        choices = _extract_mcq_choices_from_list(m.group(2))
         if len(choices) >= 2:
             return html[: m.start()] + m.group(1) + _build_mcq_interactive(choices) + html[m.end() :]
 
@@ -1119,12 +1104,16 @@ def _wrap_standalone_mcq_list(html: str) -> str:
         if len(choices) == 4:
             return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
     matches = list(
-        re.finditer(r'(<ul class="stem-itemize">(.*?)</ul>)', html, flags=re.S)
+        re.finditer(
+            r'(<(?:ul|ol) class="(?:stem-itemize|stem-enumerate cm-beamer-list)">(.*?)</(?:ul|ol)>)',
+            html,
+            flags=re.S,
+        )
     )
     if not matches:
         return html
     m = matches[-1]
-    choices = _extract_mcq_choices_from_ul(m.group(2))
+    choices = _extract_mcq_choices_from_list(m.group(2))
     if len(choices) != 4 or not all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
         return html
     return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
@@ -1642,8 +1631,12 @@ def _enrich_slide_html(html: str, kind: str, title: str) -> str:
 
 
 def _body_has_mcq_choices(html: str) -> bool:
-    for ul in re.finditer(r'<ul class="stem-itemize">(.*?)</ul>', html, flags=re.S):
-        choices = _extract_mcq_choices_from_ul(ul.group(1))
+    for lst in re.finditer(
+        r'<(?:ul|ol) class="(?:stem-itemize|stem-enumerate cm-beamer-list)">(.*?)</(?:ul|ol)>',
+        html,
+        flags=re.S,
+    ):
+        choices = _extract_mcq_choices_from_list(lst.group(1))
         if len(choices) == 4 and all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
             return True
     return False
@@ -2650,6 +2643,18 @@ def _clean_frame_body(body: str) -> str:
     body = _remove_environment(body, "flushright")
     body = _remove_environment(body, "flushleft")
     body = _strip_beamer_layout_commands(body)
+
+    def _convert_array_in_display_math(text: str) -> str:
+        def repl_block(m: re.Match[str]) -> str:
+            inner = m.group(1)
+            if r"\begin{array}" not in inner and r"\begin{tabular}" not in inner:
+                return m.group(0)
+            converted = latex_array_and_tabular_to_html(inner)
+            return converted if converted != inner else m.group(0)
+
+        return re.sub(r"\\\[(.*?)\\\]", repl_block, text, flags=re.S)
+
+    body = _convert_array_in_display_math(body)
     math_vault: list[str] = []
     body = _shield_vaulted_blocks(body, r"\\\[.*?\\\]", math_vault)
     body = _shield_vaulted_blocks(body, r"\\\(.*?\\\)", math_vault)

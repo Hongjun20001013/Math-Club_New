@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-17T06:59:18.540469Z",
+  "generated_at": "2026-06-17T18:50:57.785198Z",
   "total": 21,
   "available": 21,
   "materials": [
@@ -810,11 +810,10 @@
         {
           "index": 10,
           "title": "Question : Temperature Conversion",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">3.78</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">35.78</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">487.89</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">519.89</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>A.</th><th>3.78</th></tr></thead><tbody><tr><td>B.</td><td>35.78</td></tr><tr><td>C.</td><td>487.89</td></tr><tr><td>D.</td><td>519.89</td></tr></tbody></table></div>",
           "kind": "question",
-          "interactive": true,
           "answer_index": 12,
-          "correct_choice": "D",
+          "interactive": true,
           "group": "practice",
           "section": "Slope",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -898,11 +897,10 @@
         {
           "index": 18,
           "title": "Question : Window Repair Cost",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 100\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 220\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 80x\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 220\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>A.</th><th>f(x) = 60x + 100</th></tr></thead><tbody><tr><td>B.</td><td>f(x) = 60x + 220</td></tr><tr><td>C.</td><td>f(x) = 80x</td></tr><tr><td>D.</td><td>f(x) = 80x + 220</td></tr></tbody></table></div>",
           "kind": "question",
-          "interactive": true,
           "answer_index": 19,
-          "correct_choice": "A",
+          "interactive": true,
           "group": "practice",
           "section": "Graphs of Linear Function",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -1002,11 +1000,10 @@
         {
           "index": 27,
           "title": "Question: Alternating Context – Lawn Care Service",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 150\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 80x + 30\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 30\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 150\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>A.</th><th>f(x) = 80x + 150</th></tr></thead><tbody><tr><td>B.</td><td>f(x) = 80x + 30</td></tr><tr><td>C.</td><td>f(x) = 60x + 30</td></tr><tr><td>D.</td><td>f(x) = 60x + 150</td></tr></tbody></table></div>",
           "kind": "question",
-          "interactive": true,
           "answer_index": 28,
-          "correct_choice": "C",
+          "interactive": true,
           "group": "practice",
           "section": "Practice",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -1025,11 +1022,10 @@
         {
           "index": 29,
           "title": "Question: Alternating Context – Aquarium Fish Population",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(p(w) = 1200 - 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(p(w) = -150 + 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(p(w) = 1350 - 200w\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(p(w) = 2100 - 200w\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>A.</th><th>p(w) = 1200 - 200w</th></tr></thead><tbody><tr><td>B.</td><td>p(w) = -150 + 200w</td></tr><tr><td>C.</td><td>p(w) = 1350 - 200w</td></tr><tr><td>D.</td><td>p(w) = 2100 - 200w</td></tr></tbody></table></div>",
           "kind": "question",
-          "interactive": true,
           "answer_index": 30,
-          "correct_choice": "C",
+          "interactive": true,
           "group": "practice",
           "section": "Practice",
           "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
@@ -1093,33 +1089,6 @@
       ],
       "checkpoint": [
         {
-          "slide_index": 10,
-          "title": "Question : Temperature Conversion",
-          "section": "Slope",
-          "kind": "question",
-          "correct": "D",
-          "answer_index": 12,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\( F \\) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \\( x \\) kelvins:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    F(x) = \\frac{9}{5} (x - 273.15) + 32.\n    \\]</div>\n<p>If a temperature increased by <strong>2.1</strong> kelvins, by how much did the temperature increase, in degrees Fahrenheit?</p></div><div class=\"cm-question-interact\">",
-          "choices": [
-            {
-              "letter": "A",
-              "text": "3.78"
-            },
-            {
-              "letter": "B",
-              "text": "35.78"
-            },
-            {
-              "letter": "C",
-              "text": "487.89"
-            },
-            {
-              "letter": "D",
-              "text": "519.89"
-            }
-          ]
-        },
-        {
           "slide_index": 11,
           "title": "Meaning of the Constant in the Equation",
           "section": "Slope",
@@ -1170,33 +1139,6 @@
             {
               "letter": "D",
               "text": "The rate of rainfall was 0 centimeters per hour between \\(x = 2\\) and \\(x = 4\\)."
-            }
-          ]
-        },
-        {
-          "slide_index": 18,
-          "title": "Question : Window Repair Cost",
-          "section": "Graphs of Linear Function",
-          "kind": "question",
-          "correct": "A",
-          "answer_index": 19,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A window repair specialist charges <strong>&#36;220</strong> for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is <strong>&#36;400</strong>. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\">",
-          "choices": [
-            {
-              "letter": "A",
-              "text": "\\(f(x) = 60x + 100\\)"
-            },
-            {
-              "letter": "B",
-              "text": "\\(f(x) = 60x + 220\\)"
-            },
-            {
-              "letter": "C",
-              "text": "\\(f(x) = 80x\\)"
-            },
-            {
-              "letter": "D",
-              "text": "\\(f(x) = 80x + 220\\)"
             }
           ]
         },
@@ -1280,63 +1222,9 @@
               "text": "5"
             }
           ]
-        },
-        {
-          "slide_index": 27,
-          "title": "Alternating Context – Lawn Care Service",
-          "section": "Practice",
-          "kind": "question",
-          "correct": "C",
-          "answer_index": 28,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A lawn care company charges <strong>&#36;150</strong> for the first two hours of work and an additional hourly rate for each hour after that. The total charge for 6 hours of work is <strong>&#36;390</strong>.</p>\n<p>Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of work, where \\( x \\geq 2 \\)?</p></div><div class=\"cm-question-interact\">",
-          "choices": [
-            {
-              "letter": "A",
-              "text": "\\(f(x) = 80x + 150\\)"
-            },
-            {
-              "letter": "B",
-              "text": "\\(f(x) = 80x + 30\\)"
-            },
-            {
-              "letter": "C",
-              "text": "\\(f(x) = 60x + 30\\)"
-            },
-            {
-              "letter": "D",
-              "text": "\\(f(x) = 60x + 150\\)"
-            }
-          ]
-        },
-        {
-          "slide_index": 29,
-          "title": "Alternating Context – Aquarium Fish Population",
-          "section": "Practice",
-          "kind": "question",
-          "correct": "C",
-          "answer_index": 30,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A marine biologist observes an initial population of <strong>900 fish</strong> in a large aquarium.</p>\n<p>The biologist’s goal is to increase the population to <strong>2,100 fish</strong>.</p>\n<p>The population model assumes:</p>\n<ul class=\"stem-itemize\"><li>the population begins at 900</li><li>it increases by 150 fish per week for the first 3 weeks</li><li>after that, it increases by 200 fish per week until the goal is reached</li></ul>\n<p>According to this model, at the end of week \\(w\\) after the initial observation, where \\(w > 3\\),</p>\n<p>which of the following functions gives the predicted number of fish still needed to reach the biologist’s goal?</p></div><div class=\"cm-question-interact\">",
-          "choices": [
-            {
-              "letter": "A",
-              "text": "\\(p(w) = 1200 - 200w\\)"
-            },
-            {
-              "letter": "B",
-              "text": "\\(p(w) = -150 + 200w\\)"
-            },
-            {
-              "letter": "C",
-              "text": "\\(p(w) = 1350 - 200w\\)"
-            },
-            {
-              "letter": "D",
-              "text": "\\(p(w) = 2100 - 200w\\)"
-            }
-          ]
         }
       ],
-      "checkpoint_count": 9,
+      "checkpoint_count": 5,
       "knowledge_map": [
         {
           "title": "Linear Function",
@@ -1388,7 +1276,7 @@
               "kind": "question",
               "title": "Question : Temperature Conversion",
               "interactive": true,
-              "has_mcq": true
+              "has_mcq": false
             },
             {
               "index": 11,
@@ -1443,7 +1331,7 @@
               "kind": "question",
               "title": "Question : Window Repair Cost",
               "interactive": true,
-              "has_mcq": true
+              "has_mcq": false
             },
             {
               "index": 19,
@@ -1505,7 +1393,7 @@
               "kind": "question",
               "title": "Question: Alternating Context – Lawn Care Service",
               "interactive": true,
-              "has_mcq": true
+              "has_mcq": false
             },
             {
               "index": 28,
@@ -1519,7 +1407,7 @@
               "kind": "question",
               "title": "Question: Alternating Context – Aquarium Fish Population",
               "interactive": true,
-              "has_mcq": true
+              "has_mcq": false
             },
             {
               "index": 30,
@@ -1938,7 +1826,7 @@
         {
           "index": 36,
           "title": "Question",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The table below shows the coordinates of three points on a line in the \\(\\displaystyle xy\\)-plane, where \\(\\displaystyle k\\) and \\(\\displaystyle n\\) are constants. If the slope of the line is \\(\\displaystyle 2\\), what is the value of \\(\\displaystyle k + n\\)?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\begin{array}{c|c}\nx & y \\\\\n\\hline\n3 & 7 \\\\\nk & 11 \\\\\n12 & n \\\\\n\\end{array}\n\\]</div></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;30&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The table below shows the coordinates of three points on a line in the \\(\\displaystyle xy\\)-plane, where \\(\\displaystyle k\\) and \\(\\displaystyle n\\) are constants. If the slope of the line is \\(\\displaystyle 2\\), what is the value of \\(\\displaystyle k + n\\)?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>7</td></tr><tr><td>k</td><td>11</td></tr><tr><td>12</td><td>n</td></tr></tbody></table></div></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;30&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
           "kind": "question",
           "answer_index": 37,
           "interactive": true,
@@ -3364,7 +3252,7 @@
         {
           "index": 14,
           "title": "Question: Inequality Table Matching",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Compute the boundary 6x + 2 at each x, then confirm every y is strictly below it.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Given the inequality:</p>\n<div class=\"stem-math-block cm-math-block\">\\[y \\lt  6x + 2\\]</div>\n<p>For which of the following tables are <strong>all</strong> \\((x, y)\\) values solutions to the inequality?</p>\n<p><strong>A.</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{c|c}\n    x & y \\\\\n    \\hline\n    3 & 20 \\\\\n    5 & 32 \\\\\n    7 & 44 \\\\\n    \\end{array}\n    \\]</div>\n<p><strong>B.</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{c|c}\n    x & y \\\\\n    \\hline\n    3 & 16 \\\\\n    5 & 36 \\\\\n    7 & 40 \\\\\n    \\end{array}\n    \\]</div>\n<p><strong>C.</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{c|c}\n    x & y \\\\\n    \\hline\n    3 & 16 \\\\\n    5 & 28 \\\\\n    7 & 40 \\\\\n    \\end{array}\n    \\]</div>\n<p><strong>D.</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    \\begin{array}{c|c}\n    x & y \\\\\n    \\hline\n    3 & 24 \\\\\n    5 & 36 \\\\\n    7 & 48 \\\\\n    \\end{array}\n    \\]</div></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;C&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Compute the boundary 6x + 2 at each x, then confirm every y is strictly below it.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Given the inequality:</p>\n<div class=\"stem-math-block cm-math-block\">\\[y \\lt  6x + 2\\]</div>\n<p>For which of the following tables are <strong>all</strong> \\((x, y)\\) values solutions to the inequality?</p>\n<p><strong>A.</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>20</td></tr><tr><td>5</td><td>32</td></tr><tr><td>7</td><td>44</td></tr></tbody></table></div>\n<p><strong>B.</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>16</td></tr><tr><td>5</td><td>36</td></tr><tr><td>7</td><td>40</td></tr></tbody></table></div>\n<p><strong>C.</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>16</td></tr><tr><td>5</td><td>28</td></tr><tr><td>7</td><td>40</td></tr></tbody></table></div>\n<p><strong>D.</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>x</th><th>y</th></tr></thead><tbody><tr><td>3</td><td>24</td></tr><tr><td>5</td><td>36</td></tr><tr><td>7</td><td>48</td></tr></tbody></table></div></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;C&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
           "kind": "question",
           "answer_index": 15,
           "interactive": true,
@@ -5157,10 +5045,11 @@
         {
           "index": 48,
           "title": "Question",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nT = 2P \\sqrt{\\frac{L}{G}}\n\\]</div>\n<p>The given equation relates the positive real numbers \\(\\displaystyle G\\), \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\). Which equation correctly expresses \\(\\displaystyle G\\) in terms of \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\)?</p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>)}</li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">A</span><span class=\"stem-li-body\">\\(\\displaystyle \\dfrac{2PL}{T^2}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">B</span><span class=\"stem-li-body\">\\(\\displaystyle \\dfrac{T^2}{4LP^2}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">C</span><span class=\"stem-li-body\">\\(\\displaystyle \\dfrac{LT^2}{4P^2}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">D</span><span class=\"stem-li-body\">\\(\\displaystyle \\dfrac{4LP^2}{T^2}\\)</span></li></ol>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Isolate the radical, square both sides if needed, then check for extraneous solutions.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nT = 2P \\sqrt{\\frac{L}{G}}\n\\]</div>\n<p>The given equation relates the positive real numbers \\(\\displaystyle G\\), \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\). Which equation correctly expresses \\(\\displaystyle G\\) in terms of \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\displaystyle \\dfrac{2PL}{T^2}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle \\dfrac{T^2}{4LP^2}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\displaystyle \\dfrac{LT^2}{4P^2}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\displaystyle \\dfrac{4LP^2}{T^2}\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 49,
           "interactive": true,
+          "answer_index": 49,
+          "correct_choice": "D",
           "group": "practice",
           "section": "Practices",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -5324,9 +5213,36 @@
               "text": "\\(\\displaystyle t = \\frac{2u}{u - 3}\\)"
             }
           ]
+        },
+        {
+          "slide_index": 48,
+          "title": "Question",
+          "section": "Practices",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 49,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Isolate the radical, square both sides if needed, then check for extraneous solutions.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nT = 2P \\sqrt{\\frac{L}{G}}\n\\]</div>\n<p>The given equation relates the positive real numbers \\(\\displaystyle G\\), \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\). Which equation correctly expresses \\(\\displaystyle G\\) in terms of \\(\\displaystyle L\\), \\(\\displaystyle P\\), and \\(\\displaystyle T\\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(\\displaystyle \\dfrac{2PL}{T^2}\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(\\displaystyle \\dfrac{T^2}{4LP^2}\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(\\displaystyle \\dfrac{LT^2}{4P^2}\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(\\displaystyle \\dfrac{4LP^2}{T^2}\\)"
+            }
+          ]
         }
       ],
-      "checkpoint_count": 3,
+      "checkpoint_count": 4,
       "knowledge_map": [
         {
           "title": "Combine Like Terms and Simplify",
@@ -5640,7 +5556,7 @@
               "kind": "question",
               "title": "Question",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 49,
@@ -7360,10 +7276,11 @@
         {
           "index": 7,
           "title": "Question: Polynomial Matches the Graph",
-          "html": "<div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>The graph of a function \\(\\displaystyle f\\) is shown. Which of the following functions could define \\(\\displaystyle f\\)?</strong></p>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E27.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 280px; max-height: 202px; object-fit: contain;\" /></div></p>\n<p><strong>Choices:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>A.</strong></span><span class=\"stem-li-body\">\\(\\displaystyle f(x) = (x - 3)(x - 1)^2(x + 2)^2\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>B.</strong></span><span class=\"stem-li-body\">\\(\\displaystyle f(x) = (x - 3)^2(x - 1)(x + 2)\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>C.</strong></span><span class=\"stem-li-body\">\\(\\displaystyle f(x) = (x + 3)(x + 1)^2(x - 2)^2\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\"><strong>D.</strong></span><span class=\"stem-li-body\">\\(\\displaystyle f(x) = (x + 3)^2(x + 1)(x - 2)\\)</span></li></ol>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the initial value, growth or decay factor, and how the exponent scales with time.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>The graph of a function \\(\\displaystyle f\\) is shown. Which of the following functions could define \\(\\displaystyle f\\)?</strong></p>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E27.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 280px; max-height: 202px; object-fit: contain;\" /></div></p>\n<p><strong>Choices:</strong></p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\displaystyle f(x) = (x - 3)(x - 1)^2(x + 2)^2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle f(x) = (x - 3)^2(x - 1)(x + 2)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\displaystyle f(x) = (x + 3)(x + 1)^2(x - 2)^2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\displaystyle f(x) = (x + 3)^2(x + 1)(x - 2)\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
-          "answer_index": 8,
           "interactive": true,
+          "answer_index": 8,
+          "correct_choice": "C",
           "group": "practice",
           "section": "Polynomial Functions",
           "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
@@ -7428,7 +7345,7 @@
         {
           "index": 13,
           "title": "Polynomial Long Division",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\begin{array}{rl}\n  & 2x^2 + 7x + 9 \\\\\nx - 2 \\; ) & \\overline{2x^3 + 3x^2 - 5x + 6} \\\\\n  & \\underline{-2x^3 + 4x^2} \\\\\n  & \\phantom{2x^3 + }7x^2 - 5x \\\\\n  & \\underline{\\phantom{2x^3 + }-7x^2 + 14x} \\\\\n  & \\phantom{2x^3 + 3x^2 - }9x + 6 \\\\\n  & \\underline{\\phantom{2x^3 + 3x^2 - }-9x + 18} \\\\\n  & \\phantom{2x^3 + 3x^2 - 5x + }24\n\\end{array}\n\\]</div>\n<p><strong>Steps:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Divide</li><li>Multiply</li><li>Subtract</li></ol>\n<p><strong>Result:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\frac{2x^3 + 3x^2 - 5x + 6}{x - 2} = 2x^2 + 7x + 9 + \\frac{24}{x - 2}\n\\]</div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th></th><th>2x^2 + 7x + 9</th></tr></thead><tbody><tr><td>x - 2  )</td><td>\\(\\overline{2x^3 + 3x^2 - 5x + 6}\\)</td></tr><tr><td></td><td>\\(\\underline{-2x^3 + 4x^2}\\)</td></tr><tr><td></td><td>\\(\\phantom{2x^3 + }7x^2 - 5x\\)</td></tr><tr><td></td><td>\\(\\underline{\\phantom{2x^3 + }-7x^2 + 14x}\\)</td></tr><tr><td></td><td>\\(\\phantom{2x^3 + 3x^2 - }9x + 6\\)</td></tr><tr><td></td><td>\\(\\underline{\\phantom{2x^3 + 3x^2 - }-9x + 18}\\)</td></tr><tr><td></td><td>\\(\\phantom{2x^3 + 3x^2 - 5x + }24\\)</td></tr></tbody></table></div>\n<p><strong>Steps:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Divide</li><li>Multiply</li><li>Subtract</li></ol>\n<p><strong>Result:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\frac{2x^3 + 3x^2 - 5x + 6}{x - 2} = 2x^2 + 7x + 9 + \\frac{24}{x - 2}\n\\]</div>",
           "kind": "lesson",
           "group": "learn",
           "section": "Polynomial Functions",
@@ -7686,6 +7603,33 @@
       ],
       "checkpoint": [
         {
+          "slide_index": 7,
+          "title": "Polynomial Matches the Graph",
+          "section": "Polynomial Functions",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 8,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the initial value, growth or decay factor, and how the exponent scales with time.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>The graph of a function \\(\\displaystyle f\\) is shown. Which of the following functions could define \\(\\displaystyle f\\)?</strong></p>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E27.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 280px; max-height: 202px; object-fit: contain;\" /></div></p>\n<p><strong>Choices:</strong></p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(\\displaystyle f(x) = (x - 3)(x - 1)^2(x + 2)^2\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(\\displaystyle f(x) = (x - 3)^2(x - 1)(x + 2)\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(\\displaystyle f(x) = (x + 3)(x + 1)^2(x - 2)^2\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(\\displaystyle f(x) = (x + 3)^2(x + 1)(x - 2)\\)"
+            }
+          ]
+        },
+        {
           "slide_index": 15,
           "title": "Polynomial Divisibility",
           "section": "Polynomial Functions",
@@ -7821,7 +7765,7 @@
           ]
         }
       ],
-      "checkpoint_count": 5,
+      "checkpoint_count": 6,
       "knowledge_map": [
         {
           "title": "Polynomial Functions",
@@ -7853,7 +7797,7 @@
               "kind": "question",
               "title": "Question: Polynomial Matches the Graph",
               "interactive": true,
-              "has_mcq": false
+              "has_mcq": true
             },
             {
               "index": 8,
@@ -9600,7 +9544,7 @@
         {
           "index": 7,
           "title": "Percent Greater or Less Than",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p>\\begin{table}[h]</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th></th><th><strong>Translates to...</strong></th><th><strong>Example</strong></th></tr></thead><tbody><tr><td>\\(\\displaystyle p&#37;\\) of \\(\\displaystyle x\\)</td><td>\\(\\displaystyle \\dfrac{p}{100} \\times x\\)</td><td>\\(\\displaystyle 15&#37;\\) of \\(\\displaystyle x ⇒ \\dfrac{15}{100} \\times x = 0.15x\\)</td></tr><tr><td>\\(\\displaystyle p&#37;\\) greater than \\(\\displaystyle x\\)</td><td>\\(\\displaystyle \\left(1 + \\dfrac{p}{100} \\right)x\\)</td><td>\\(\\displaystyle 15&#37;\\) greater than \\(\\displaystyle x ⇒ \\left(1 + \\dfrac{15}{100} \\right)x = 1.15x\\)</td></tr><tr><td>\\(\\displaystyle p&#37;\\) less than \\(\\displaystyle x\\)</td><td>\\(\\displaystyle \\left(1 - \\dfrac{p}{100} \\right)x\\)</td><td>\\(\\displaystyle 15&#37;\\) less than \\(\\displaystyle x ⇒ \\left(1 - \\dfrac{15}{100} \\right)x = 0.85x\\)</td></tr></tbody></table></div>\n<p>\\end{table}</p>\n<p><strong>Example:</strong> If 200 is <strong>x</strong>% greater than 50, what is <strong>x</strong>?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n   50\\times(1+x\\%)=200\n    \\]</div>\n<p><strong>Key Takeaway:</strong> If something is <strong>50% greater than</strong> a value, multiply by 1.5.</p>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p>\\begin{table}[h]</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th></th><th><strong>Translates to...</strong></th><th><strong>Example</strong></th></tr></thead><tbody><tr><td>\\(\\displaystyle p&#37;\\) of \\(\\displaystyle x\\)</td><td>\\(\\(\\displaystyle \\dfrac{p}{100} \\times x\\)\\)</td><td>\\(\\(\\displaystyle 15&#37;\\) of \\(\\displaystyle x ⇒ \\dfrac{15}{100} \\times x = 0.15x\\)\\)</td></tr><tr><td>\\(\\displaystyle p&#37;\\) greater than \\(\\displaystyle x\\)</td><td>\\(\\(\\displaystyle \\left(1 + \\dfrac{p}{100} \\right)x\\)\\)</td><td>\\(\\(\\displaystyle 15&#37;\\) greater than \\(\\displaystyle x ⇒ \\left(1 + \\dfrac{15}{100} \\right)x = 1.15x\\)\\)</td></tr><tr><td>\\(\\displaystyle p&#37;\\) less than \\(\\displaystyle x\\)</td><td>\\(\\(\\displaystyle \\left(1 - \\dfrac{p}{100} \\right)x\\)\\)</td><td>\\(\\(\\displaystyle 15&#37;\\) less than \\(\\displaystyle x ⇒ \\left(1 - \\dfrac{15}{100} \\right)x = 0.85x\\)\\)</td></tr></tbody></table></div>\n<p>\\end{table}</p>\n<p><strong>Example:</strong> If 200 is <strong>x</strong>% greater than 50, what is <strong>x</strong>?</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n   50\\times(1+x\\%)=200\n    \\]</div>\n<p><strong>Key Takeaway:</strong> If something is <strong>50% greater than</strong> a value, multiply by 1.5.</p>",
           "kind": "lesson",
           "group": "learn",
           "section": "Percent Greater or Less Than",
@@ -10984,7 +10928,7 @@
         {
           "index": 8,
           "title": "Comparing Linear vs Exponential Models",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Linear:</strong> Constant difference</p>\n<p><strong>Exponential:</strong> Constant ratio</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Feature</strong></th><th><strong>Linear</strong></th><th><strong>Exponential</strong></th></tr></thead><tbody><tr><td><strong>General Form</strong></td><td>\\(\\displaystyle y = mx + b\\)</td><td>\\(\\displaystyle y = a \\cdot b^x\\)</td></tr><tr><td><strong>Rate of Change</strong></td><td>Constant (add/subtract)</td><td>Constant (multiply/divide)</td></tr><tr><td><strong>Graph Shape</strong></td><td>Straight line</td><td>Curve (growth/decay)</td></tr><tr><td><strong>Example</strong></td><td>&#36;10 per day</td><td>Double each day</td></tr><tr><td><strong>Real-World Use</strong></td><td>Salaries, fees</td><td>Populations, investments</td></tr></tbody></table></div>\n<p><strong>Key Insight:</strong></p>\n<p>If the rate of change is constant <strong>difference</strong>, it's linear.</p>\n<p>If the rate of change is constant <strong>ratio</strong>, it's exponential.</p>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Linear:</strong> Constant difference</p>\n<p><strong>Exponential:</strong> Constant ratio</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Feature</strong></th><th><strong>Linear</strong></th><th><strong>Exponential</strong></th></tr></thead><tbody><tr><td><strong>General Form</strong></td><td>\\(\\displaystyle y = mx + b\\)</td><td>\\(\\(\\displaystyle y = a \\cdot b^x\\)\\)</td></tr><tr><td><strong>Rate of Change</strong></td><td>Constant (add/subtract)</td><td>Constant (multiply/divide)</td></tr><tr><td><strong>Graph Shape</strong></td><td>Straight line</td><td>Curve (growth/decay)</td></tr><tr><td><strong>Example</strong></td><td>&#36;10 per day</td><td>Double each day</td></tr><tr><td><strong>Real-World Use</strong></td><td>Salaries, fees</td><td>Populations, investments</td></tr></tbody></table></div>\n<p><strong>Key Insight:</strong></p>\n<p>If the rate of change is constant <strong>difference</strong>, it's linear.</p>\n<p>If the rate of change is constant <strong>ratio</strong>, it's exponential.</p>",
           "kind": "lesson",
           "group": "learn",
           "section": "Linear vs Exponential Model",
@@ -13975,7 +13919,7 @@
         {
           "index": 7,
           "title": "Angle Bisector Theorem",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Statement:</strong> If a point lies on the <strong>bisector of an angle</strong>, then it is equidistant from the two sides of the angle.</p>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E11.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 245px; max-height: 176px; object-fit: contain;\" /></div></p>\n<p><strong>Mathematical Representation:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n        \\left\\{\n        \\begin{array}{l}\n        \\overrightarrow{AD} \\text{ bisects } \\angle BAC \\\\\n        DB \\perp \\overrightarrow{AB} \\\\\n        DC \\perp \\overrightarrow{AC}\n        \\end{array}\n        \\right\\}   ⇒   DB = DC\n        \\]</div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Statement:</strong> If a point lies on the <strong>bisector of an angle</strong>, then it is equidistant from the two sides of the angle.</p>\n<p><div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img\" src=\"/static/course_materials/E11.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 245px; max-height: 176px; object-fit: contain;\" /></div></p>\n<p><strong>Mathematical Representation:</strong></p>\n<p>\\left\\{</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\overrightarrow{AD}  bisects  \\angle BAC</th></tr></thead><tbody><tr><td>DB \\perp \\overrightarrow{AB}</td></tr><tr><td>DC \\perp \\overrightarrow{AC}</td></tr></tbody></table></div>\n<p>\\right\\}   ⇒   DB = DC</p>",
           "kind": "lesson",
           "group": "learn",
           "section": "Angle",
@@ -15203,7 +15147,7 @@
         {
           "index": 16,
           "title": "What If the Angle is Greater Than 90 Degrees?",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Big idea:</strong> for angles outside a right triangle, do not start by drawing a new triangle.</p>\n<p>Start with the angle's position on the coordinate plane.</p>\n<p><strong>Use this 4-step routine:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Draw the angle in <strong>standard position</strong>: start on the positive \\(x\\)-axis and rotate counterclockwise.</li><li>Identify the <strong>quadrant</strong> where the terminal side lands.</li><li>Find the <strong>reference angle</strong>: the acute angle between the terminal side and the \\(x\\)-axis.</li><li>Use the reference-angle value, then attach the correct sign.</li></ol>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n\\begin{array}{c|c}\n\\text{Quadrant} & \\text{Positive trig ratio} \\\\\n\\hline\nI & \\sin,\\ \\cos,\\ \\tan \\\\\nII & \\sin \\\\\nIII & \\tan \\\\\nIV & \\cos\n\\end{array}\n\\]</div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Big idea:</strong> for angles outside a right triangle, do not start by drawing a new triangle.</p>\n<p>Start with the angle's position on the coordinate plane.</p>\n<p><strong>Use this 4-step routine:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Draw the angle in <strong>standard position</strong>: start on the positive \\(x\\)-axis and rotate counterclockwise.</li><li>Identify the <strong>quadrant</strong> where the terminal side lands.</li><li>Find the <strong>reference angle</strong>: the acute angle between the terminal side and the \\(x\\)-axis.</li><li>Use the reference-angle value, then attach the correct sign.</li></ol>\n\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Quadrant</th><th>Positive trig ratio</th></tr></thead><tbody><tr><td>I</td><td>\\sin,\\ \\cos,\\ \\tan</td></tr><tr><td>II</td><td>\\sin</td></tr><tr><td>III</td><td>\\tan</td></tr><tr><td>IV</td><td>\\cos</td></tr></tbody></table></div>",
           "kind": "lesson",
           "group": "learn",
           "section": "Trigonometric In Unit Circle",

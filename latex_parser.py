@@ -230,8 +230,14 @@ def _clean_table_cell(cell: str) -> str:
         cell,
     )
     cell = re.sub(r"\\frac(\d)(\d)", r"\\(\\frac{\1}{\2}\\)", cell)
+    cell = re.sub(r"\\;\s*", " ", cell)
     # Percent signs must survive clean_latex_junk comment stripping in HTML tables.
     cell = cell.replace("%", "&#37;")
+    if re.search(
+        r"\\(?:overline|underline|phantom|frac|sqrt|cdot|times|left|right|text)\b",
+        cell,
+    ) and not re.search(r"\\\(|\\\[", cell):
+        cell = f"\\({cell}\\)"
     return cell.strip()
 
 
