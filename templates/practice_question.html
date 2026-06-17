@@ -11,8 +11,22 @@
     <div class="sat-placement-ribbon" role="status">
       <span class="sat-placement-ribbon-dot" aria-hidden="true"></span>
       <span class="sat-placement-ribbon-title">Course placement</span>
+      {% if q.placement_section %}
+      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+      <span class="sat-placement-ribbon-phase">{{ q.placement_section_title|default('Diagnostic') }}</span>
+      {% if q.placement_global_total %}
+      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+      <span class="sat-placement-ribbon-meta">Question {{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total }}</span>
+      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+      <span class="sat-placement-ribbon-meta">Item {{ q.placement_section_index|default(1) }} / {{ q.placement_section_total|default(20) }} in this part</span>
+      {% else %}
+      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+      <span class="sat-placement-ribbon-meta">{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}</span>
+      {% endif %}
+      {% else %}
       <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
       <span class="sat-placement-ribbon-meta">Item {{ qnum + 1 }} / {{ total }}</span>
+      {% endif %}
     </div>
     {% endif %}
     <!-- Header -->
@@ -21,7 +35,7 @@
         <div class="left-header exam-timer{% if not placement_mode %} exam-timer--unlimited{% endif %}">
             <span class="exam-timer-icon" aria-hidden="true">⏳</span>
             <span class="exam-timer-copy">
-                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}95:00{% else %}00:00{% endif %}</span>
+                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}{{ '%d:%02d'|format((practice_timer_seconds|default(5700)) // 60, (practice_timer_seconds|default(5700)) % 60) }}{% else %}00:00{% endif %}</span>
                 {% if not placement_mode %}<span class="exam-timer-mode">Unlimited</span>{% endif %}
             </span>
         </div>
@@ -192,17 +206,15 @@
         <input type="hidden" name="analytics_part" value="{{ mistake_analytics_part|default('') }}">
         <input type="hidden" name="miss_anchor" value="{{ mistake_miss_anchor|default('') }}">
         {% endif %}
-        {% if q.question_kind|default('mcq') != 'free_response' %}
+        {% if q.question_kind|default('mcq') in ['mcq', 'mcq5'] %}
         <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
         {% endif %}
-
-    <!-- SAT-style split: stem left, choices right -->
     <div id="question-area" class="sat-split-card" aria-label="Question and answer area">
         <div class="sat-split">
             <section class="sat-pane sat-pane-stem" aria-label="Question">
                 <header class="sat-pane-head">
                     <span class="sat-pane-kicker">Question</span>
-                    <span class="sat-pane-badge">{% if miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
+                    <span class="sat-pane-badge">{% if miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% elif placement_mode and q.placement_section %}{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
                 </header>
                 <div class="sat-stem-scroll">
                     <div class="question-panel sat-stem-body">
@@ -213,16 +225,25 @@
 
             <div class="sat-split-gutter" aria-hidden="true"></div>
 
-            <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+            <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'free_response' %}Enter a number or fraction{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
-                {% if q.question_kind|default('mcq') == 'free_response' %}
+                {% if q.question_kind|default('mcq') == 'constructed_response' %}
+                <div class="sat-constructed-panel">
+                    <label class="sat-constructed-label" for="constructed-answer-input">Your response</label>
+                    <textarea class="sat-constructed-input" name="selected_answer" id="constructed-answer-input" rows="12" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."></textarea>
+                    <p class="sat-constructed-hint">{% if q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
+                </div>
+                {% elif q.question_kind|default('mcq') == 'free_response' %}
                 <div class="sat-spr-panel">
                     <label class="sat-spr-label" for="spr-answer-input">Answer</label>
-                    <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. -22, 3/2, 0.75" aria-describedby="spr-hint">
-                    <p id="spr-hint" class="sat-spr-hint">Decimals or fractions are accepted when they match the answer key.</p>
+                    <div class="sat-spr-input-wrap">
+                        <div class="sat-spr-input-math" id="spr-answer-math" aria-hidden="true"></div>
+                        <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. 3/4, x^2, sqrt(2), pi" aria-describedby="spr-hint">
+                    </div>
+                    <p id="spr-hint" class="sat-spr-hint">{% if placement_mode %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>2e-3</strong>, or <strong>pi</strong>.{% else %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>pi</strong>.{% endif %}</p>
                     <div class="sat-spr-assist" aria-label="Accepted response formats">
                         <span class="sat-spr-assist-kicker">Accepted formats</span>
                         <div class="sat-spr-assist-grid">
@@ -262,7 +283,7 @@
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
                     {% endif %}
-                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
+                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
                 </div>
             </aside>
         </div>
@@ -481,25 +502,37 @@ const scratchKey = storageKey + "_scratch";
 const reviewFlagKey = storageKey + "_review_flag";
 const selectedInput = document.getElementById("selected-answer-input");
 const sprInput = document.getElementById("spr-answer-input");
+const constructedInput = document.getElementById("constructed-answer-input");
 const practiceForm = document.querySelector(".sat-practice-form");
 const answerStatus = document.getElementById("sat-answer-status");
 const submitButtons = document.querySelectorAll(".sat-submit-btn");
 
+const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response') | tojson }};
+
 function setAnswerState(hasAnswer, label) {
     practiceForm?.classList.toggle("is-answered", hasAnswer);
-    answerStatus?.classList.toggle("is-visible", hasAnswer);
+    answerStatus?.classList.toggle("is-visible", hasAnswer || isConstructedMode);
     submitButtons.forEach((btn) => {
+        if (isConstructedMode) {
+            btn.removeAttribute("disabled");
+            btn.classList.remove("is-disabled");
+            return;
+        }
         btn.toggleAttribute("disabled", !hasAnswer);
         btn.classList.toggle("is-disabled", !hasAnswer);
     });
     if (answerStatus) {
         answerStatus.textContent = hasAnswer
             ? (label || "Answer selected. You can submit when ready.")
-            : "{% if q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
+            : "{% if q.question_kind|default('mcq') == 'constructed_response' %}Type your work, then click Save &amp; next.{% elif q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
     }
 }
 
-setAnswerState(false);
+if (isConstructedMode) {
+    setAnswerState(true, "Type your work in the box, then save and continue.");
+} else {
+    setAnswerState(false);
+}
 
 if (selectedInput) {
 document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
@@ -603,7 +636,10 @@ window.addEventListener("load", () => {
     }
 
     const saved = localStorage.getItem(storageKey);
-    if (sprInput && saved !== null) {
+    if (constructedInput && saved !== null) {
+        constructedInput.value = saved;
+        setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
+    } else if (sprInput && saved !== null) {
         sprInput.value = saved;
         setAnswerState(!!sprInput.value.trim(), "Answer entered. Ready to submit.");
     } else if (selectedInput && saved !== null) {
@@ -615,6 +651,18 @@ window.addEventListener("load", () => {
             selectedInput.value = cards[saved].dataset.letter;
             setAnswerState(true, `Selected ${cards[saved].dataset.letter}. Ready to submit.`);
         }
+    }
+
+    if (constructedInput) {
+        const syncConstructedStatus = () => {
+            const hasValue = constructedInput.value.trim().length > 0;
+            setAnswerState(true, hasValue ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
+        };
+        syncConstructedStatus();
+        constructedInput.addEventListener("input", () => {
+            localStorage.setItem(storageKey, constructedInput.value);
+            syncConstructedStatus();
+        });
     }
 
     if (sprInput) {
@@ -644,7 +692,11 @@ document.addEventListener("keydown", (event) => {
             cards[index].click();
         }
     } else if (event.key === "Enter") {
-        const canSubmit = sprInput ? sprInput.value.trim() : selectedInput?.value;
+        const canSubmit = constructedInput
+            ? true
+            : sprInput
+            ? sprInput.value.trim()
+            : selectedInput?.value;
         if (canSubmit) {
             event.preventDefault();
             practiceForm?.requestSubmit();
@@ -653,6 +705,14 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.querySelector("form").addEventListener("submit", (event) => {
+    if (constructedInput) {
+        if (!constructedInput.value.trim()) {
+            event.preventDefault();
+            setAnswerState(true, "Please type your work before submitting.");
+            constructedInput.focus();
+        }
+        return;
+    }
     if (sprInput) {
         if (!sprInput.value.trim()) {
             event.preventDefault();
@@ -671,5 +731,8 @@ document.querySelector("form").addEventListener("submit", (event) => {
 
 
 </script>
+{% if q.question_kind|default('mcq') == 'free_response' %}
+<script src="{{ url_for('static', filename='spr_math_input.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
 
 {% endblock %}

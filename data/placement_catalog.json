@@ -1,0 +1,104 @@
+{
+  "title": "Course placement diagnostics",
+  "subtitle": "Choose the track that matches your student's school math pathway.",
+  "tiers": [
+    {
+      "id": "middle",
+      "title": "Middle school",
+      "title_zh": "初中段",
+      "description": "One 100-item placement diagnostic from Math 5 through Algebra 1/2 readiness.",
+      "tests": [
+        {
+          "slug": "middle-level",
+          "topic": "middle_level",
+          "title": "Middle Level Math Placement",
+          "subtitle": "100-item readiness diagnostic · Math 5 through Algebra 1/2",
+          "status": "available",
+          "tex_file": "Placement_Middle_Level.tex",
+          "pdf_file": "Placement_Middle_Level.pdf",
+          "meta_file": "data/placement_middle_level_meta.json",
+          "online_mcq_count": 0,
+          "online_item_count": 100,
+          "paper_sections": "100 constructed-response · five 20-question bands",
+          "parts": [
+            {"code": "I", "range": "1–20", "label": "Math 5/4 readiness"},
+            {"code": "II", "range": "21–40", "label": "Math 6/5 readiness"},
+            {"code": "III", "range": "41–60", "label": "Math 7/6 readiness"},
+            {"code": "IV", "range": "61–80", "label": "Math 8/7 readiness"},
+            {"code": "V", "range": "81–100", "label": "Algebra 1/2 readiness"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integrated",
+      "title": "Integrated / Enhanced track",
+      "title_zh": "Integrated / Enhanced 路径",
+      "description": "Math I and Enhanced Math I readiness for integrated middle-school pathways.",
+      "tests": [
+        {
+          "slug": "enhanced-math-1",
+          "topic": "enhanced_math_1",
+          "title": "Enhanced Math 1 / Math I",
+          "subtitle": "IUSD-aligned Math I & Enhanced Math I diagnostic",
+          "status": "available",
+          "tex_file": "Placement_Enhanced_Math_1.tex",
+          "pdf_file": "Placement_Enhanced_Math_1.pdf",
+          "meta_file": "data/placement_enhanced_math_1_meta.json",
+          "online_mcq_count": 50,
+          "online_item_count": 65,
+          "paper_sections": "50 MCQ · 4 graphing · 11 free response",
+          "parts": [
+            {"code": "A", "range": "1–10", "label": "Core readiness"},
+            {"code": "B", "range": "11–30", "label": "Math I mastery"},
+            {"code": "C", "range": "31–50", "label": "Enhanced Math I readiness"}
+          ]
+        },
+        {
+          "slug": "enhanced-math-2",
+          "topic": "enhanced_math_2",
+          "title": "Enhanced Math 2",
+          "subtitle": "Enhanced Math II placement",
+          "status": "available",
+          "tex_file": "Placement_Enhanced_Math_2.tex",
+          "pdf_file": "Placement_Enhanced_Math_2.pdf",
+          "meta_file": "data/placement_enhanced_math_2_meta.json",
+          "online_mcq_count": 55,
+          "online_item_count": 69,
+          "paper_sections": "55 MCQ · 4 graphing · 10 free response",
+          "parts": [
+            {"code": "A", "range": "1–28", "label": "Math II readiness"},
+            {"code": "B", "range": "29–55", "label": "Enhanced Math II readiness"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "upper",
+      "title": "Upper school",
+      "title_zh": "高中段",
+      "description": "Algebra I through precalculus / calculus-readiness placement.",
+      "tests": [
+        {
+          "slug": "upper-algebra-precalc",
+          "topic": "placement_full",
+          "title": "Algebra 1 · Algebra 2 · Precalculus",
+          "subtitle": "70-item upper-school placement diagnostic",
+          "status": "available",
+          "tex_file": "Placement_Test.tex",
+          "pdf_file": "Placement_Test.pdf",
+          "meta_file": "data/placement_meta.json",
+          "online_mcq_count": 70,
+          "paper_sections": "70 items · five parts",
+          "parts": [
+            {"code": "I", "range": "1–15", "label": "Foundations & algebra"},
+            {"code": "II", "range": "16–30", "label": "Exponents, rationals & functions"},
+            {"code": "III", "range": "31–45", "label": "Graphs, geometry & radicals"},
+            {"code": "IV", "range": "46–60", "label": "Functions, trig & precalc"},
+            {"code": "V", "range": "61–70", "label": "Geometry & advanced readiness"}
+          ]
+        }
+      ]
+    }
+  ]
+}

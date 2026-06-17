@@ -1,0 +1,60 @@
+{
+  "description": "Novel Prep Math 5 placement — 20 constructed-response items from Part I of Placement_Middle_Level.tex.",
+  "brand": {
+    "report_title": "Math 5 placement report",
+    "trust_line": "Responses are saved for teacher review. Score bands follow the printed middle-level placement guide (16/20 to advance).",
+    "trust_line_zh": "作答已保存供教师批阅。分数区间与纸质初中段分班测试说明一致（当前档位建议 16/20 及以上晋级）。"
+  },
+  "calculator_by_index": {},
+  "score_band_rubric": [
+    {
+      "course_key": "below_math_5",
+      "tier": 1,
+      "title": "Below Math 5 readiness",
+      "min_score": 0,
+      "max_score": 11,
+      "headline": "Build foundational arithmetic and number sense.",
+      "headline_zh": "建议先巩固基础算术与数感。",
+      "summary": "Printed guide: fewer than 12 correct in Part I suggests remediation before Math 5 placement.",
+      "summary_zh": "与官方说明一致：Part I 正确题数不足 12 题时建议先补强基础。",
+      "highlights": [
+        "Focus on addition, subtraction, multiplication, and division fluency.",
+        "Review fractions, decimals, and perimeter/area basics.",
+        "Teacher should grade written work using the printable answer key."
+      ]
+    },
+    {
+      "course_key": "borderline_math_5",
+      "tier": 2,
+      "title": "Borderline Math 5",
+      "min_score": 12,
+      "max_score": 15,
+      "headline": "Near Math 5 readiness — short targeted support.",
+      "headline_zh": "接近 Math 5 门槛，建议短期针对性支持。",
+      "summary": "Borderline band on Part I; teacher review of work quality is especially important.",
+      "summary_zh": "Part I 边缘区间；建议教师结合书写过程综合判断。",
+      "highlights": [
+        "Target missed items from this 20-question band.",
+        "Re-take or continue to Part II only after teacher confirms readiness.",
+        "Use the printable test for full five-band progression."
+      ]
+    },
+    {
+      "course_key": "math_5_ready",
+      "tier": 3,
+      "title": "Math 5 ready",
+      "min_score": 16,
+      "max_score": 20,
+      "headline": "Strong Math 5/4 readiness on this band.",
+      "headline_zh": "在本档位表现达到 Math 5 准备度。",
+      "summary": "Printed guide: 16+ correct in Part I supports Math 5 placement; consider Math 6 band when appropriate.",
+      "summary_zh": "与官方说明一致：Part I 达 16 题及以上支持 Math 5 分班；可继续评估 Math 6 档位。",
+      "highlights": [
+        "Celebrate growth and maintain computational fluency.",
+        "Optional: take Math 6 placement when school recommends the next band.",
+        "Teacher grading of constructed responses confirms final placement."
+      ]
+    }
+  ],
+  "rubric": []
+}

@@ -11,6 +11,9 @@ _pdf_img_probe/
 _unit3_img_probe/
 .tmp_sat_source/
 tmp_pdf_*/
+static/placement_middle/_build/
+*.backup*
+sat.db.backup*
 *.aux
 *.log
 *.nav

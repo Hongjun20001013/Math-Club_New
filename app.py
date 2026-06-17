@@ -8,7 +8,12 @@ from course_materials_progress import (
     openai_chat_completion,
     strip_html,
 )
-from latex_parser import parse_placement_tex_file, parse_tex_file
+from latex_parser import (
+    parse_enhanced_math_placement_tex_file,
+    parse_middle_level_placement_tex_file,
+    parse_placement_tex_file,
+    parse_tex_file,
+)
 
 import json
 import glob
@@ -82,6 +87,57 @@ COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 COURSE_MATERIALS_PATH = os.path.join(APP_DIR, "data", "course_materials.json")
 COURSE_MATERIALS_MANIFEST_PATH = os.path.join(APP_DIR, "data", "course_materials_manifest.json")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
+PLACEMENT_CATALOG_PATH = os.path.join(APP_DIR, "data", "placement_catalog.json")
+PLACEMENT_META_BY_TOPIC: Dict[str, str] = {
+    "placement_full": PLACEMENT_META_PATH,
+    "enhanced_math_1": os.path.join(APP_DIR, "data", "placement_enhanced_math_1_meta.json"),
+    "enhanced_math_2": os.path.join(APP_DIR, "data", "placement_enhanced_math_2_meta.json"),
+    "middle_level": os.path.join(APP_DIR, "data", "placement_middle_level_meta.json"),
+}
+
+# Part transitions for the 100-item middle-level placement (0-based q indices).
+MIDDLE_LEVEL_PART_GATES: List[dict[str, Any]] = [
+    {
+        "section": "part_ii",
+        "session_flag": "placement_middle_seen_part_ii",
+        "first_qnum": 20,
+        "after_q_index": 19,
+        "part_num": 2,
+        "band_label": "Math 6 readiness",
+        "part_title": "Part II — Math 6/5 Readiness",
+        "prev_band": "Math 5",
+    },
+    {
+        "section": "part_iii",
+        "session_flag": "placement_middle_seen_part_iii",
+        "first_qnum": 40,
+        "after_q_index": 39,
+        "part_num": 3,
+        "band_label": "Math 7 readiness",
+        "part_title": "Part III — Math 7/6 Readiness",
+        "prev_band": "Math 6",
+    },
+    {
+        "section": "part_iv",
+        "session_flag": "placement_middle_seen_part_iv",
+        "first_qnum": 60,
+        "after_q_index": 59,
+        "part_num": 4,
+        "band_label": "Math 8 readiness",
+        "part_title": "Part IV — Math 8/7 Readiness",
+        "prev_band": "Math 7",
+    },
+    {
+        "section": "part_v",
+        "session_flag": "placement_middle_seen_part_v",
+        "first_qnum": 80,
+        "after_q_index": 79,
+        "part_num": 5,
+        "band_label": "Algebra 1/2 readiness",
+        "part_title": "Part V — Algebra 1/2 Readiness",
+        "prev_band": "Math 8",
+    },
+]
 DESMOS_API_KEY = os.environ.get("DESMOS_API_KEY", "").strip()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 COMPILED_BANK_CACHE = None
@@ -108,7 +164,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260615-mcq-fix")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260617-spr-math-input")
 
 _DB_SCHEMA_READY = False
 
@@ -1091,7 +1147,7 @@ STUDENT_RESOURCE_GRANTS: tuple[dict[str, str], ...] = (
     {
         "key": "placement",
         "label": "Course placement",
-        "description": "70-item placement diagnostic & PDF report",
+        "description": "Middle, Integrated, and upper-school placement diagnostics with PDF reports",
         "home_href": "/placement",
     },
 )
@@ -1460,18 +1516,174 @@ def extract_correct_answer(question: dict) -> str | None:
     return s if s else None
 
 
-def _load_placement_meta_file() -> dict:
-    if not os.path.isfile(PLACEMENT_META_PATH):
+def _placement_flow_config(topic: str) -> dict | None:
+    """Online section layout for multi-part placement tests."""
+    row = _placement_test_by_topic(topic)
+    if not row or str(row.get("status") or "") != "available":
+        return None
+    if topic == "middle_level":
+        return {
+            "mc_count": 0,
+            "graph_count": 0,
+            "fr_count": 100,
+            "total": 100,
+            "has_gates": True,
+            "gate_kind": "middle_parts",
+            "session_prefix": "placement_middle",
+            "mc_scored": False,
+        }
+    mc = int(row.get("online_mcq_count") or 0)
+    total = int(row.get("online_item_count") or 0)
+    graph = 4 if topic in ("enhanced_math_1", "enhanced_math_2") else 0
+    fr = max(0, total - mc - graph)
+    session_prefix = {
+        "enhanced_math_1": "placement_em1",
+        "enhanced_math_2": "placement_em2",
+    }.get(topic)
+    return {
+        "mc_count": mc,
+        "graph_count": graph,
+        "fr_count": fr,
+        "total": total or (mc + graph + fr),
+        "has_gates": bool(session_prefix and mc > 0 and graph > 0),
+        "gate_kind": "enhanced_sections",
+        "session_prefix": session_prefix,
+        "mc_scored": topic in ("enhanced_math_1", "enhanced_math_2"),
+    }
+
+
+def _placement_timer_seconds(topic: str) -> int:
+    return {
+        "enhanced_math_1": 120 * 60,
+        "enhanced_math_2": 130 * 60,
+        "middle_level": 150 * 60,
+    }.get(topic, 95 * 60)
+
+
+def _clear_placement_section_flags(topic: str) -> None:
+    cfg = _placement_flow_config(topic)
+    if not cfg:
+        return
+    if cfg.get("gate_kind") == "middle_parts":
+        for gate in MIDDLE_LEVEL_PART_GATES:
+            session.pop(str(gate["session_flag"]), None)
+        return
+    prefix = cfg.get("session_prefix")
+    if not prefix:
+        return
+    prefix = str(prefix)
+    session.pop(f"{prefix}_seen_graphing", None)
+    session.pop(f"{prefix}_seen_fr", None)
+
+
+def _load_placement_meta_file(topic: str | None = None) -> dict:
+    path = PLACEMENT_META_BY_TOPIC.get(str(topic or "placement_full"), PLACEMENT_META_PATH)
+    if not os.path.isfile(path):
         return {}
     try:
-        with open(PLACEMENT_META_PATH, "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return data if isinstance(data, dict) else {}
     except (OSError, json.JSONDecodeError):
         return {}
 
 
-def _placement_tier_for_course_key(course_key: str) -> int:
+def _load_placement_catalog() -> dict:
+    if not os.path.isfile(PLACEMENT_CATALOG_PATH):
+        return {"tiers": []}
+    try:
+        with open(PLACEMENT_CATALOG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {"tiers": []}
+    except (OSError, json.JSONDecodeError):
+        return {"tiers": []}
+
+
+def _placement_tests_flat() -> list[dict]:
+    out: list[dict] = []
+    for tier in _load_placement_catalog().get("tiers") or []:
+        if not isinstance(tier, dict):
+            continue
+        for test in tier.get("tests") or []:
+            if isinstance(test, dict):
+                row = dict(test)
+                row["tier_id"] = tier.get("id")
+                row["tier_title"] = tier.get("title")
+                row["tier_title_zh"] = tier.get("title_zh")
+                row["tier_description"] = tier.get("description")
+                out.append(row)
+    return out
+
+
+def _placement_test_by_slug(slug: str) -> dict | None:
+    slug = (slug or "").strip().lower()
+    for row in _placement_tests_flat():
+        if str(row.get("slug") or "").lower() == slug:
+            return row
+    return None
+
+
+def _placement_test_by_topic(topic: str) -> dict | None:
+    topic = (topic or "").strip()
+    for row in _placement_tests_flat():
+        if str(row.get("topic") or "") == topic:
+            return row
+    return None
+
+
+def _placement_topic_for_slug(slug: str) -> str | None:
+    row = _placement_test_by_slug(slug)
+    if not row:
+        return None
+    topic = str(row.get("topic") or "").strip()
+    return topic if topic in BANKS.get("placement", {}) else None
+
+
+def _placement_slug_for_topic(topic: str) -> str:
+    row = _placement_test_by_topic(topic)
+    if row and row.get("slug"):
+        return str(row["slug"])
+    if topic == "placement_full":
+        return "upper-algebra-precalc"
+    return topic.replace("_", "-")
+
+
+def _placement_landing_parts_for_topic(topic: str) -> list[dict[str, str]]:
+    row = _placement_test_by_topic(topic)
+    parts = row.get("parts") if isinstance(row, dict) else None
+    if isinstance(parts, list) and parts:
+        return [dict(p) for p in parts if isinstance(p, dict)]
+    return list(PLACEMENT_LANDING_PARTS)
+
+
+def _placement_tier_for_course_key(course_key: str, topic: str | None = None) -> int:
+    if topic == "enhanced_math_1":
+        return {
+            "below_math_i": 1,
+            "borderline_math_i": 2,
+            "math_i_ready": 3,
+            "borderline_enhanced": 4,
+            "enhanced_math_i_ready": 5,
+        }.get(course_key, 2)
+    if topic == "enhanced_math_2":
+        return {
+            "below_math_ii": 1,
+            "borderline_math_ii": 2,
+            "math_ii_ready": 3,
+            "borderline_enhanced_math_ii": 4,
+            "enhanced_math_ii_ready": 5,
+        }.get(course_key, 2)
+    if topic == "middle_level":
+        return {
+            "math_5_focus": 1,
+            "math_6_7_track": 2,
+            "math_8_algebra_track": 3,
+            "algebra_readiness": 4,
+        }.get(course_key, 2)
+    return _placement_tier_for_course_key_legacy(course_key)
+
+
+def _placement_tier_for_course_key_legacy(course_key: str) -> int:
     return {
         "algebra_i": 1,
         "geometry": 2,
@@ -1492,7 +1704,7 @@ def _placement_course_recommendation(score_pct: int, meta: dict) -> dict | None:
     return None
 
 
-def _enrich_placement_rec(row: dict, raw_score: int, total_q: int) -> dict:
+def _enrich_placement_rec(row: dict, raw_score: int, total_q: int, topic: str | None = None) -> dict:
     out = dict(row)
     lo = int(out.get("min_score", 0))
     hi = int(out.get("max_score", total_q or 70))
@@ -1500,21 +1712,23 @@ def _enrich_placement_rec(row: dict, raw_score: int, total_q: int) -> dict:
     out["raw_score"] = raw_score
     out["total_q"] = total_q
     ck = str(out.get("course_key") or "")
-    out["tier"] = int(out.get("tier") or _placement_tier_for_course_key(ck))
+    out["tier"] = int(out.get("tier") or _placement_tier_for_course_key(ck, topic))
     if not isinstance(out.get("highlights"), list):
         out["highlights"] = []
     return out
 
 
-def _placement_recommendation(meta: dict, raw_score: int, total_q: int) -> dict | None:
-    """Prefer total-score bands (out of 70); fall back to percent rubric."""
+def _placement_recommendation(
+    meta: dict, raw_score: int, total_q: int, topic: str | None = None
+) -> dict | None:
+    """Prefer total-score bands; fall back to percent rubric."""
     for row in meta.get("score_band_rubric") or []:
         if not isinstance(row, dict):
             continue
         lo = int(row.get("min_score", -1))
         hi = int(row.get("max_score", 999))
         if lo <= raw_score <= hi:
-            return _enrich_placement_rec(row, raw_score, total_q)
+            return _enrich_placement_rec(row, raw_score, total_q, topic)
     if total_q > 0:
         pct = round(100.0 * raw_score / total_q)
         fb = _placement_course_recommendation(pct, meta)
@@ -1526,7 +1740,8 @@ def _placement_recommendation(meta: dict, raw_score: int, total_q: int) -> dict 
             out["raw_score"] = raw_score
             out["total_q"] = total_q
             out["tier"] = int(
-                out.get("tier") or _placement_tier_for_course_key(str(out.get("course_key") or ""))
+                out.get("tier")
+                or _placement_tier_for_course_key(str(out.get("course_key") or ""), topic)
             )
             if not isinstance(out.get("highlights"), list):
                 out["highlights"] = []
@@ -1534,9 +1749,9 @@ def _placement_recommendation(meta: dict, raw_score: int, total_q: int) -> dict 
     return None
 
 
-def apply_placement_calculator_flags(questions: List[dict]) -> List[dict]:
-    """Attach calculator_allowed from placement_meta (default false if unset)."""
-    meta = _load_placement_meta_file()
+def apply_placement_calculator_flags(questions: List[dict], topic: str | None = None) -> List[dict]:
+    """Attach calculator_allowed from placement meta (default false if unset)."""
+    meta = _load_placement_meta_file(topic)
     m = meta.get("calculator_by_index") or {}
     out: List[dict] = []
     for i, q in enumerate(questions):
@@ -2843,18 +3058,25 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         topic_questions = compiled.get(domain, {}).get(topic)
         if isinstance(topic_questions, list) and topic_questions:
             if domain == "placement":
-                return apply_placement_calculator_flags([dict(q) for q in topic_questions])
+                return apply_placement_calculator_flags([dict(q) for q in topic_questions], topic)
             return _finalize_questions(domain, topic, topic_questions)
 
         full_path = os.path.join(APP_DIR, file_path)
         if not os.path.isfile(full_path):
             return []
         if domain == "placement":
-            qs = parse_placement_tex_file(full_path)
+            if topic == "enhanced_math_1":
+                qs = parse_enhanced_math_placement_tex_file(full_path, profile="math_1")
+            elif topic == "enhanced_math_2":
+                qs = parse_enhanced_math_placement_tex_file(full_path, profile="math_2")
+            elif topic == "middle_level":
+                qs = parse_middle_level_placement_tex_file(full_path, topic=topic)
+            else:
+                qs = parse_placement_tex_file(full_path)
         else:
             qs = parse_tex_file(full_path)
         if domain == "placement":
-            return apply_placement_calculator_flags(qs)
+            return apply_placement_calculator_flags(qs, topic)
         return _finalize_questions(domain, topic, qs)
     except Exception as exc:
         app.logger.warning("Question load failed for %s/%s: %s", domain, topic, exc)
@@ -2926,6 +3148,9 @@ BANKS: Dict[str, Dict[str, str]] = {
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
         "placement_full": "Placement_Test.tex",
+        "enhanced_math_1": "Placement_Enhanced_Math_1.tex",
+        "enhanced_math_2": "Placement_Enhanced_Math_2.tex",
+        "middle_level": "Placement_Middle_Level.tex",
     },
 }
 
@@ -3564,9 +3789,14 @@ def _clear_placement_profile_session() -> None:
     session.pop("placement_student_math_course", None)
 
 
-def _clear_placement_full_session_attempt() -> None:
+def _clear_placement_session_attempt(topic: str) -> None:
     """Drop in-progress placement attempt binding so the next run creates a new row."""
-    session.pop(_practice_session_key("placement", "placement_full"), None)
+    session.pop(_practice_session_key("placement", topic), None)
+    _clear_placement_section_flags(topic)
+
+
+def _clear_placement_full_session_attempt() -> None:
+    _clear_placement_session_attempt("placement_full")
 
 
 def _backfill_placement_student_profile(
@@ -3654,7 +3884,10 @@ TOPIC_TITLES = {
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
     "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
-    "placement_full": "Course placement (full diagnostic)",
+    "placement_full": "Upper school placement (Algebra–Precalculus)",
+    "enhanced_math_1": "Enhanced Math 1 / Math I placement",
+    "enhanced_math_2": "Enhanced Math 2 / Math II placement",
+    "middle_level": "Middle level math placement",
 }
 
 SAT_UNIT_LABELS: Dict[str, tuple[str, str]] = {
@@ -3991,7 +4224,7 @@ LEARNING_TRACKS = [
         "catalog": "school",
         "title": "Course placement",
         "level": "Active",
-        "description": "70-item diagnostic with printable + in-app reports—lock the right level for honors or AP, then walk into advising with a polished PDF.",
+        "description": "Placement catalog: Math 5–7, Enhanced Math, and Algebra–Precalculus tracks—printable + in-app reports.",
         "cta_label": "Start placement",
         "cta_href": "/placement",
         "pill": "Live",
@@ -6863,7 +7096,105 @@ def practice_sat_mistake_test_done(test_id: int):
     )
 
 
-def _placement_analytics_unit(q_index: int) -> dict:
+def _placement_analytics_unit(q_index: int, topic: str | None = None) -> dict:
+    if topic == "enhanced_math_1":
+        if q_index < 10:
+            return {
+                "id": "em1-part-a",
+                "label": "Part A",
+                "subtitle": "Core readiness",
+                "order": 1,
+            }
+        if q_index < 30:
+            return {
+                "id": "em1-part-b",
+                "label": "Part B",
+                "subtitle": "Math I mastery",
+                "order": 2,
+            }
+        if q_index < 50:
+            return {
+                "id": "em1-part-c",
+                "label": "Part C",
+                "subtitle": "Enhanced Math I readiness",
+                "order": 3,
+            }
+        if q_index < 54:
+            return {
+                "id": "em1-graphing",
+                "label": "Graphing",
+                "subtitle": "Constructed response",
+                "order": 4,
+            }
+        return {
+            "id": "em1-fr",
+            "label": "Free response",
+            "subtitle": "Modeling & reasoning",
+            "order": 5,
+        }
+    if topic == "enhanced_math_2":
+        if q_index < 28:
+            return {
+                "id": "em2-part-a",
+                "label": "Part A",
+                "subtitle": "Math II readiness",
+                "order": 1,
+            }
+        if q_index < 55:
+            return {
+                "id": "em2-part-b",
+                "label": "Part B",
+                "subtitle": "Enhanced Math II readiness",
+                "order": 2,
+            }
+        if q_index < 59:
+            return {
+                "id": "em2-graphing",
+                "label": "Graphing",
+                "subtitle": "Constructed response",
+                "order": 3,
+            }
+        return {
+            "id": "em2-fr",
+            "label": "Free response",
+            "subtitle": "Modeling & reasoning",
+            "order": 4,
+        }
+    if topic == "middle_level":
+        if q_index < 20:
+            return {
+                "id": "middle-part-i",
+                "label": "Part I",
+                "subtitle": "Math 5 readiness",
+                "order": 1,
+            }
+        if q_index < 40:
+            return {
+                "id": "middle-part-ii",
+                "label": "Part II",
+                "subtitle": "Math 6 readiness",
+                "order": 2,
+            }
+        if q_index < 60:
+            return {
+                "id": "middle-part-iii",
+                "label": "Part III",
+                "subtitle": "Math 7 readiness",
+                "order": 3,
+            }
+        if q_index < 80:
+            return {
+                "id": "middle-part-iv",
+                "label": "Part IV",
+                "subtitle": "Math 8 readiness",
+                "order": 4,
+            }
+        return {
+            "id": "middle-part-v",
+            "label": "Part V",
+            "subtitle": "Algebra 1/2 readiness",
+            "order": 5,
+        }
     if q_index < 15:
         return {
             "id": "placement-part-i",
@@ -6905,7 +7236,7 @@ def _analytics_unit_for_row(row: dict) -> dict:
     if domain in SAT_ANALYTICS_UNITS:
         return dict(SAT_ANALYTICS_UNITS[str(domain)])
     if domain == "placement":
-        return _placement_analytics_unit(int(row.get("q_index") or 0))
+        return _placement_analytics_unit(int(row.get("q_index") or 0), str(row.get("topic") or ""))
     return {
         "id": f"other-{domain or 'practice'}",
         "label": str(domain or "Other"),
@@ -7183,37 +7514,304 @@ def _viz_risk_chart_max(selected: dict | None) -> int:
     return 1
 
 
+def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | None:
+    cfg = _placement_flow_config(topic)
+    if not cfg or not cfg.get("has_gates"):
+        return None
+    if cfg.get("gate_kind") == "middle_parts":
+        for gate in MIDDLE_LEVEL_PART_GATES:
+            if gate["section"] != section:
+                continue
+            part_num = int(gate["part_num"])
+            return {
+                "section": section,
+                "session_flag": str(gate["session_flag"]),
+                "first_qnum": int(gate["first_qnum"]),
+                "kicker": f"Placement · Part {part_num} of 5",
+                "title": str(gate["band_label"]),
+                "lead": (
+                    f"You completed {gate['prev_band']} readiness (Part {part_num - 1}). "
+                    f"Next: 20 questions at the {gate['band_label']} level — "
+                    f"questions {int(gate['first_qnum']) + 1}–{int(gate['first_qnum']) + 20} of 100."
+                ),
+                "begin_label": f"Begin {gate['band_label']}",
+                "part_num": part_num,
+                "part_total": 5,
+                "q_start": int(gate["first_qnum"]) + 1,
+                "q_end": int(gate["first_qnum"]) + 20,
+                "total_items": 100,
+                "cards": [
+                    {
+                        "icon": str(part_num),
+                        "title": f"Part {part_num}",
+                        "body": str(gate["part_title"]),
+                    },
+                    {
+                        "icon": "20",
+                        "title": "Twenty items",
+                        "body": "Show your work in the response box — same order as the printable placement test.",
+                    },
+                    {
+                        "icon": "⏱",
+                        "title": "Timer",
+                        "body": "Your placement timer keeps running across all 100 questions.",
+                    },
+                ],
+            }
+        return None
+    mc = int(cfg["mc_count"])
+    graph = int(cfg["graph_count"])
+    fr = int(cfg["fr_count"])
+    prefix = str(cfg["session_prefix"])
+    if section == "graphing":
+        mc_label = str(mc)
+        return {
+            "section": "graphing",
+            "session_flag": f"{prefix}_seen_graphing",
+            "first_qnum": mc,
+            "kicker": "Placement · Section 2 of 3",
+            "title": "Graphing — show your work",
+            "lead": (
+                f"You finished the {mc_label} multiple-choice items. "
+                f"Next: {graph} graphing and coordinate-reasoning questions."
+            ),
+            "begin_label": "Begin graphing section",
+            "part_num": 2,
+            "part_total": 3,
+            "q_start": mc + 1,
+            "q_end": mc + graph,
+            "total_items": mc + graph + fr,
+            "cards": [
+                {
+                    "icon": "G",
+                    "title": "What to do",
+                    "body": "Use the grid in each question (or graph paper). Type your graph description, interval notation, and key steps in the response box.",
+                },
+                {
+                    "icon": str(graph),
+                    "title": f"{graph} items",
+                    "body": "Number line, inequalities, systems, and transformations — same order as the printable placement test.",
+                },
+                {
+                    "icon": "✓",
+                    "title": "Scoring",
+                    "body": "These items are saved for your teacher or advisor. They are not auto-scored online.",
+                },
+            ],
+        }
+    if section == "free_response":
+        return {
+            "section": "free_response",
+            "session_flag": f"{prefix}_seen_fr",
+            "first_qnum": mc + graph,
+            "kicker": "Placement · Section 3 of 3",
+            "title": "Free response — modeling & reasoning",
+            "lead": (
+                f"Final section: {fr} written-response items covering modeling, proof, "
+                "and Enhanced readiness challenge."
+            ),
+            "begin_label": "Begin free response section",
+            "part_num": 3,
+            "part_total": 3,
+            "q_start": mc + graph + 1,
+            "q_end": mc + graph + fr,
+            "total_items": mc + graph + fr,
+            "cards": [
+                {
+                    "icon": "FR",
+                    "title": "What to do",
+                    "body": "Show each step and explain your reasoning. Use the response box for your full solution — work on paper is fine too.",
+                },
+                {
+                    "icon": str(fr),
+                    "title": f"{fr} items",
+                    "body": "Equation reasoning through advanced topics — matches the paper test’s free-response block.",
+                },
+                {
+                    "icon": "⏱",
+                    "title": "Timer",
+                    "body": "Your placement timer keeps running. Take your time on proofs and explanations.",
+                },
+            ],
+        }
+    return None
+
+
+def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
+    cfg = _placement_flow_config(topic)
+    if not cfg or not cfg.get("has_gates"):
+        return None
+    slug = _placement_slug_for_topic(topic)
+    if cfg.get("gate_kind") == "middle_parts":
+        for gate in MIDDLE_LEVEL_PART_GATES:
+            if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
+                return url_for(
+                    "placement_section_intro",
+                    slug=slug,
+                    section=str(gate["section"]),
+                )
+        return None
+    mc = int(cfg["mc_count"])
+    graph = int(cfg["graph_count"])
+    fr_start = mc + graph
+    prefix = str(cfg["session_prefix"])
+    if qnum >= fr_start and not session.get(f"{prefix}_seen_fr"):
+        return url_for("placement_section_intro", slug=slug, section="free_response")
+    if mc <= qnum < fr_start and not session.get(f"{prefix}_seen_graphing"):
+        return url_for("placement_section_intro", slug=slug, section="graphing")
+    return None
+
+
+def _placement_section_back_href(topic: str, section: str) -> str:
+    cfg = _placement_flow_config(topic) or {}
+    if cfg.get("gate_kind") == "middle_parts":
+        for gate in MIDDLE_LEVEL_PART_GATES:
+            if gate["section"] == section:
+                return url_for(
+                    "practice_question",
+                    domain="placement",
+                    topic=topic,
+                    qnum=int(gate["after_q_index"]),
+                )
+        return url_for("practice_question", domain="placement", topic=topic, qnum=0)
+    mc = int(cfg.get("mc_count") or 0)
+    graph = int(cfg.get("graph_count") or 0)
+    if section == "graphing":
+        return url_for("practice_question", domain="placement", topic=topic, qnum=mc - 1)
+    return url_for(
+        "practice_question", domain="placement", topic=topic, qnum=mc + graph - 1
+    )
+
+
+@app.route("/placement/<slug>/section/<section>")
+def placement_section_intro(slug: str, section: str):
+    session["active_track_label"] = "Course placement"
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    meta = _placement_section_intro_meta(topic, section)
+    if not meta:
+        abort(404)
+    back_href = _placement_section_back_href(topic, section)
+    return render_template(
+        "placement_section_intro.html",
+        test=_placement_test_by_slug(slug),
+        slug=slug,
+        topic=topic,
+        section_kicker=meta["kicker"],
+        section_title=meta["title"],
+        section_lead=meta["lead"],
+        section_cards=meta["cards"],
+        part_num=meta.get("part_num", 1),
+        part_total=meta.get("part_total", 1),
+        q_start=meta.get("q_start"),
+        q_end=meta.get("q_end"),
+        total_items=meta.get("total_items"),
+        begin_label=meta["begin_label"],
+        back_href=back_href,
+        begin_href=url_for("placement_section_begin", slug=slug, section=section),
+    )
+
+
+@app.route("/placement/<slug>/section/<section>/begin", methods=["POST"])
+def placement_section_begin(slug: str, section: str):
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    meta = _placement_section_intro_meta(topic, section)
+    if not meta:
+        abort(404)
+    session[meta["session_flag"]] = True
+    session.modified = True
+    return redirect(
+        url_for(
+            "practice_question",
+            domain="placement",
+            topic=topic,
+            qnum=meta["first_qnum"],
+        )
+    )
+
+
 @app.route("/placement")
 def placement_landing():
     session["active_track_label"] = "Course placement"
+    catalog = _load_placement_catalog()
     return render_template(
-        "placement_landing.html",
-        placement_parts=PLACEMENT_LANDING_PARTS,
+        "placement_catalog.html",
+        catalog=catalog,
+    )
+
+
+@app.route("/placement/<slug>")
+def placement_test_landing(slug: str):
+    session["active_track_label"] = "Course placement"
+    test = _placement_test_by_slug(slug)
+    if not test:
+        abort(404)
+    if str(test.get("status") or "") != "available":
+        flash(f"{test.get('title', 'That placement test')} is coming soon.")
+        return redirect(url_for("placement_landing"))
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    return render_template(
+        "placement_test_landing.html",
+        test=test,
+        placement_parts=_placement_landing_parts_for_topic(topic),
+        topic=topic,
+        slug=slug,
     )
 
 
 @app.route("/placement/start")
-def placement_start():
+def placement_start_legacy():
+    return redirect(url_for("placement_test_landing", slug="upper-algebra-precalc"))
+
+
+@app.route("/placement/<slug>/start")
+def placement_test_start(slug: str):
     session["active_track_label"] = "Course placement"
-    # New intake = new diagnostic: do not resume an old in-browser attempt (fixes stale answers).
-    _clear_placement_full_session_attempt()
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    test = _placement_test_by_slug(slug)
+    if not test or str(test.get("status") or "") != "available":
+        abort(404)
+    _clear_placement_session_attempt(topic)
     session.modified = True
-    return render_template("placement_start.html")
+    return render_template(
+        "placement_start.html",
+        test=test,
+        topic=topic,
+        slug=slug,
+    )
 
 
 @app.route("/placement/begin", methods=["POST"])
-def placement_begin():
+def placement_begin_legacy():
+    return redirect(url_for("placement_test_landing", slug="upper-algebra-precalc"))
+
+
+@app.route("/placement/<slug>/begin", methods=["POST"])
+def placement_test_begin(slug: str):
     session["active_track_label"] = "Course placement"
-    _clear_placement_full_session_attempt()
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    test = _placement_test_by_slug(slug)
+    if not test or str(test.get("status") or "") != "available":
+        abort(404)
+    _clear_placement_session_attempt(topic)
     name = request.form.get("student_name", "").strip()
     grade = request.form.get("student_grade", "").strip()
     course = request.form.get("student_math_course", "").strip()
     if len(name) < 1:
         flash("Please enter the student name.")
-        return redirect(url_for("placement_start"))
+        return redirect(url_for("placement_test_start", slug=slug))
     if len(name) > 160:
         flash("Name is too long (160 characters max).")
-        return redirect(url_for("placement_start"))
+        return redirect(url_for("placement_test_start", slug=slug))
     grade = grade[:120]
     course = course[:400]
     session["placement_student_name"] = name[:160]
@@ -7221,7 +7819,7 @@ def placement_begin():
     session["placement_student_math_course"] = course
     session.modified = True
     return redirect(
-        url_for("practice_question", domain="placement", topic="placement_full", qnum=0)
+        url_for("practice_question", domain="placement", topic=topic, qnum=0)
     )
 
 
@@ -9025,6 +9623,9 @@ def practice_topics(domain):
     if not domain_data:
         return "Unknown domain", 404
 
+    if domain == "placement":
+        return redirect(url_for("placement_landing"))
+
     db = get_db()
     uid = session.get("user_id")
     studio = _build_unit_topic_studio(db, uid, domain)
@@ -10008,6 +10609,11 @@ def practice_question(domain, topic, qnum):
     q = questions[qnum % len(questions)]
     question_index = qnum % len(questions)
 
+    if domain == "placement" and _placement_flow_config(topic):
+        gate_href = _placement_section_gate_redirect(topic, question_index)
+        if gate_href:
+            return redirect(gate_href)
+
     mistake_redo_mode = domain != "placement" and _mistake_redo_flag(
         request.args.get("mistake_redo")
     )
@@ -10048,7 +10654,8 @@ def practice_question(domain, topic, qnum):
         if row is None:
             if domain == "placement" and not _placement_profile_from_session()[0]:
                 flash("Please complete the student information before starting the diagnostic.")
-                return redirect(url_for("placement_start"))
+                slug = _placement_slug_for_topic(topic)
+                return redirect(url_for("placement_test_start", slug=slug))
             resumed_id = _resume_incomplete_attempt_id(
                 db, user_id, domain, topic, len(questions)
             )
@@ -10063,6 +10670,13 @@ def practice_question(domain, topic, qnum):
         else:
             attempt_id = int(row["id"])
             _backfill_placement_student_profile(db, attempt_id, domain)
+
+    if domain == "placement" and attempt_id is None and _placement_profile_from_session()[0]:
+        attempt_id = _insert_practice_attempt(
+            db, user_id, domain, topic, question_index
+        )
+        session[sk] = attempt_id
+        session.modified = True
 
     if attempt_id is not None:
         answered_rows = db.execute(
@@ -10106,9 +10720,11 @@ def practice_question(domain, topic, qnum):
     placement_mode = domain == "placement"
     choice_letters = [chr(ord("A") + i) for i in range(len(q.get("choices") or []))]
     if placement_mode:
-        practice_timer_seconds = 95 * 60
-        practice_timer_summary_url = url_for(
-            "practice_session_summary", attempt_id=attempt_id
+        practice_timer_seconds = _placement_timer_seconds(topic)
+        practice_timer_summary_url = (
+            url_for("practice_session_summary", attempt_id=attempt_id)
+            if attempt_id is not None
+            else None
         )
         practice_timer_mode = "countdown"
     else:
@@ -10247,6 +10863,13 @@ def submit_practice_answer():
             return redirect(
                 url_for("practice_question", domain=domain, topic=topic, qnum=qnum_for_redirect)
             )
+    elif q_kind in ("constructed_response", "free_response"):
+        selected_answer = raw_answer.strip()
+        if not selected_answer:
+            flash("Please enter your answer before continuing.")
+            return redirect(
+                url_for("practice_question", domain=domain, topic=topic, qnum=qnum_for_redirect)
+            )
     else:
         selected_answer = raw_answer
 
@@ -10345,6 +10968,32 @@ def submit_practice_answer():
 
     is_last = q_index >= len(questions) - 1
     if not is_last:
+        flow = _placement_flow_config(topic) if domain == "placement" else None
+        if flow and flow.get("has_gates"):
+            slug = _placement_slug_for_topic(topic)
+            if flow.get("gate_kind") == "middle_parts":
+                for gate in MIDDLE_LEVEL_PART_GATES:
+                    if q_index == int(gate["after_q_index"]):
+                        return redirect(
+                            url_for(
+                                "placement_section_intro",
+                                slug=slug,
+                                section=str(gate["section"]),
+                            )
+                        )
+            else:
+                mc = int(flow["mc_count"])
+                graph = int(flow["graph_count"])
+                if q_index == mc - 1:
+                    return redirect(
+                        url_for("placement_section_intro", slug=slug, section="graphing")
+                    )
+                if q_index == mc + graph - 1:
+                    return redirect(
+                        url_for(
+                            "placement_section_intro", slug=slug, section="free_response"
+                        )
+                    )
         return redirect(
             url_for("practice_question", domain=domain, topic=topic, qnum=q_index + 1)
         )
@@ -10560,9 +11209,10 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         if end_raw is not None:
             duration_seconds = max(0, int(end_raw) - start_s)
         elif domain == "placement":
+            timer_cap = _placement_timer_seconds(topic)
             now_row = db.execute("SELECT CAST(strftime('%s', 'now') AS INTEGER) AS now_s").fetchone()
             if now_row is not None and now_row["now_s"] is not None:
-                duration_seconds = min(95 * 60, max(0, int(now_row["now_s"]) - start_s))
+                duration_seconds = min(timer_cap, max(0, int(now_row["now_s"]) - start_s))
     session_duration_label = _format_duration(duration_seconds)
     by_q: Dict[int, Any] = {}
     for r in resp_rows:
@@ -10590,7 +11240,10 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
             if yours == "—":
                 status = "skipped"
             elif not key:
-                status = "nocheck"
+                if qobj.get("question_kind") in ("constructed_response", "free_response"):
+                    status = "submitted" if yours != "—" else "skipped"
+                else:
+                    status = "nocheck"
             else:
                 graded = response_is_correct(qobj, yours_raw)
                 if graded is True:
@@ -10622,6 +11275,29 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         )
 
     score_pct = round(100.0 * correct_count / total_q) if total_q else 0
+    placement_mcq_correct = correct_count
+    placement_mcq_total = total_q
+    flow_cfg = _placement_flow_config(topic) if domain == "placement" else None
+    if flow_cfg and flow_cfg.get("mc_scored"):
+        mcq_rows = [
+            (row, qobj)
+            for row, qobj in zip(rows_out, questions)
+            if qobj.get("question_kind") == "mcq"
+        ]
+        placement_mcq_total = len(mcq_rows)
+        placement_mcq_correct = sum(1 for row, _ in mcq_rows if row["status"] == "correct")
+        score_pct = (
+            round(100.0 * placement_mcq_correct / placement_mcq_total)
+            if placement_mcq_total
+            else 0
+        )
+        correct_count = placement_mcq_correct
+    elif domain == "placement" and topic == "middle_level":
+        submitted_count = sum(1 for r in rows_out if r["status"] == "submitted")
+        placement_mcq_correct = submitted_count
+        placement_mcq_total = total_q
+        score_pct = round(100.0 * submitted_count / total_q) if total_q else 0
+        correct_count = submitted_count
     mistake_focus: List[dict] = []
     skipped_count = sum(1 for r in rows_out if r["status"] == "skipped")
     if domain != "placement":
@@ -10644,7 +11320,15 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         acc[sec]["title"] = qobj.get("knowledge_section_title_en", "") or acc[sec]["title"]
         if row["status"] == "correct":
             acc[sec]["correct"] += 1
-    if domain == "placement":
+        elif domain == "placement" and topic == "middle_level" and row["status"] == "submitted":
+            acc[sec]["correct"] += 1
+    if domain == "placement" and topic == "enhanced_math_1":
+        part_order = ("A", "B", "C", "G", "FR")
+    elif domain == "placement" and topic == "enhanced_math_2":
+        part_order = ("A", "B", "G", "FR")
+    elif domain == "placement" and topic == "middle_level":
+        part_order = ("I", "II", "III", "IV", "V")
+    elif domain == "placement":
         part_order = ("I", "II", "III", "IV", "V")
     elif domain == "algebra":
         part_order = ("1.1", "1.2", "1.3", "1.4", "1.5")
@@ -10681,25 +11365,26 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
             }
         )
 
-    placement_meta = _load_placement_meta_file()
+    placement_meta = _load_placement_meta_file(topic if domain == "placement" else None)
     placement_rec = None
     placement_brand: dict | None = None
     if domain == "placement":
+        flow_cfg = _placement_flow_config(topic)
+        rec_total = placement_mcq_total if flow_cfg and flow_cfg.get("mc_scored") else total_q
+        rec_correct = placement_mcq_correct if flow_cfg and flow_cfg.get("mc_scored") else correct_count
         placement_rec = _placement_recommendation(
-            placement_meta, correct_count, total_q
+            placement_meta, rec_correct, rec_total, topic
         )
         b = placement_meta.get("brand")
         placement_brand = dict(b) if isinstance(b, dict) else None
         if placement_brand is not None:
             placement_brand.setdefault("report_title", "Official course placement report")
-            placement_brand["trust_line"] = (
-                f"Score bands follow the printed {SITE_BRAND_NAME} placement guide "
-                f"(same 70-item key as the paper diagnostic)."
-            )
-            placement_brand["trust_line_zh"] = (
-                placement_brand.get("trust_line_zh")
-                or "分数区间与纸质分班测试官方说明一致（70 题标准答案）。"
-            )
+            if not placement_brand.get("trust_line"):
+                placement_brand["trust_line"] = (
+                    f"Score bands follow the printed {SITE_BRAND_NAME} placement guide."
+                )
+            if not placement_brand.get("trust_line_zh"):
+                placement_brand["trust_line_zh"] = "分数区间与纸质分班测试官方说明一致。"
 
     celebrate_confetti = bool(domain == "placement" or score_pct >= 55)
 
@@ -10911,15 +11596,27 @@ def practice_placement_report_pdf(attempt_id: int):
 
 
 @app.route("/placement/blank-test.pdf")
-def placement_blank_test_pdf():
-    path = os.path.join(APP_DIR, "Placement_Test.pdf")
+def placement_blank_test_pdf_legacy():
+    return redirect(url_for("placement_blank_test_pdf", slug="upper-algebra-precalc"))
+
+
+@app.route("/placement/<slug>/blank-test.pdf")
+def placement_blank_test_pdf(slug: str):
+    test = _placement_test_by_slug(slug)
+    if not test or str(test.get("status") or "") != "available":
+        abort(404)
+    pdf_name = str(test.get("pdf_file") or "").strip()
+    if not pdf_name:
+        abort(404)
+    path = os.path.join(APP_DIR, pdf_name)
     if not os.path.isfile(path):
         abort(404)
+    safe_slug = slug.replace("-", "_")
     return send_file(
         path,
         mimetype="application/pdf",
         as_attachment=True,
-        download_name="NovelPrep-Course-Placement-Blank.pdf",
+        download_name=f"NovelPrep-Placement-{safe_slug}-Blank.pdf",
     )
 
 
@@ -10951,9 +11648,10 @@ def practice_new_session(domain: str, topic: str):
                 )
                 return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=0))
     session.pop(_practice_session_key(domain, topic), None)
-    if domain == "placement" and topic == "placement_full":
+    if domain == "placement":
         _clear_placement_profile_session()
-        return redirect(url_for("placement_start"))
+        slug = _placement_slug_for_topic(topic)
+        return redirect(url_for("placement_test_start", slug=slug))
     return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=0))
 
 

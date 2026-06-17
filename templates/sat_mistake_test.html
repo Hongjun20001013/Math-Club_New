@@ -79,13 +79,16 @@
         <aside class="sat-pane sat-pane-choices">
           <header class="sat-pane-head sat-pane-head-choices">
             <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-            <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'free_response' %}Enter a number or fraction{% else %}Select one{% endif %}</span>
+            <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
           </header>
           {% if q.question_kind|default('mcq') == 'free_response' %}
           <div class="sat-spr-panel">
             <label class="sat-spr-label" for="spr-answer-input">Answer</label>
-            <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. -22, 3/2, 0.75" aria-describedby="spr-hint">
-            <p id="spr-hint" class="sat-spr-hint">Decimals or fractions are accepted when they match the answer key.</p>
+            <div class="sat-spr-input-wrap">
+              <div class="sat-spr-input-math" id="spr-answer-math" aria-hidden="true"></div>
+              <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. 3/4, x^2, sqrt(2), pi" aria-describedby="spr-hint">
+            </div>
+            <p id="spr-hint" class="sat-spr-hint">Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, or <strong>pi</strong>.</p>
             <div class="sat-spr-assist" aria-label="Accepted response formats">
               <span class="sat-spr-assist-kicker">Accepted formats</span>
               <div class="sat-spr-assist-grid">
@@ -337,4 +340,7 @@ window.addEventListener("pageshow", () => {
   }
 });
 </script>
+{% if q.question_kind|default('mcq') == 'free_response' %}
+<script src="{{ url_for('static', filename='spr_math_input.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
 {% endblock %}

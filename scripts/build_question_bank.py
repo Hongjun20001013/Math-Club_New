@@ -13,7 +13,14 @@ _SOLUTION_HTML_PREFIX = '<article class="np-solution-pro"'
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import APP_DIR, BANKS, DOMAIN_SAT_UNIT, HARD_ANSWER_KEYS, _apply_hard_question_units, _enrich_domain_sat_unit
-from latex_parser import parse_placement_answer_key, parse_placement_tex_file, parse_tex_file
+from latex_parser import (
+    parse_enhanced_math_placement_answer_key,
+    parse_enhanced_math_placement_tex_file,
+    parse_middle_level_placement_tex_file,
+    parse_placement_answer_key,
+    parse_placement_tex_file,
+    parse_tex_file,
+)
 
 
 OUTPUT_DIR = os.path.join(APP_DIR, "data")
@@ -975,10 +982,30 @@ def build_bank():
 
             try:
                 if domain == "placement":
-                    questions = parse_placement_tex_file(full_path)
-                    with open(full_path, "r", encoding="utf-8") as pf:
-                        tex_full = pf.read()
-                    keys = parse_placement_answer_key(tex_full)
+                    if topic_key == "enhanced_math_1":
+                        questions = parse_enhanced_math_placement_tex_file(
+                            full_path, profile="math_1"
+                        )
+                        with open(full_path, "r", encoding="utf-8") as pf:
+                            tex_full = pf.read()
+                        keys = parse_enhanced_math_placement_answer_key(tex_full)
+                    elif topic_key == "enhanced_math_2":
+                        questions = parse_enhanced_math_placement_tex_file(
+                            full_path, profile="math_2"
+                        )
+                        with open(full_path, "r", encoding="utf-8") as pf:
+                            tex_full = pf.read()
+                        keys = parse_enhanced_math_placement_answer_key(tex_full)
+                    elif topic_key == "middle_level":
+                        questions = parse_middle_level_placement_tex_file(
+                            full_path, topic=topic_key
+                        )
+                        keys = {}
+                    else:
+                        questions = parse_placement_tex_file(full_path)
+                        with open(full_path, "r", encoding="utf-8") as pf:
+                            tex_full = pf.read()
+                        keys = parse_placement_answer_key(tex_full)
                     for i, q in enumerate(questions):
                         ca = keys.get(i + 1)
                         if ca:

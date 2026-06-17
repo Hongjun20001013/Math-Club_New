@@ -1,0 +1,114 @@
+{
+  "description": "Novel Prep Enhanced Math II placement — full online diagnostic: 55 MCQ + 4 graphing + 10 free response from Placement_Enhanced_Math_2.tex.",
+  "brand": {
+    "report_title": "Enhanced Math II placement report",
+    "trust_line": "Score bands follow the printed Novel Prep Enhanced Math II placement guide (55-item MC key; full paper includes graphing and free response).",
+    "trust_line_zh": "分数区间与纸质《Enhanced Math II 分班测试》官方说明一致（在线为 55 道选择题；纸质卷另含作图与解答题）。"
+  },
+  "calculator_by_index": {},
+  "score_band_rubric": [
+    {
+      "course_key": "below_math_ii",
+      "tier": 1,
+      "title": "Below Math II readiness",
+      "min_score": 0,
+      "max_score": 20,
+      "headline": "Build Math I mastery before Math II.",
+      "headline_zh": "建议先巩固 Math I，再进入 Math II。",
+      "summary": "Matches the printed guide for students who need remediation on quadratics, polynomials, radicals, and core algebra before Math II.",
+      "summary_zh": "与官方说明一致：需在二次函数、多项式、根式与核心代数方面系统补强后再进入 Math II。",
+      "highlights": [
+        "Focus on factoring, quadratic equations, and function notation.",
+        "Use Part A misses as a targeted review list.",
+        "Re-take after a focused unit to confirm growth."
+      ]
+    },
+    {
+      "course_key": "borderline_math_ii",
+      "tier": 2,
+      "title": "Borderline Math II",
+      "min_score": 21,
+      "max_score": 27,
+      "headline": "Close to Math II — targeted support recommended.",
+      "headline_zh": "接近 Math II 门槛，建议带支持进入或短期强化。",
+      "summary": "Aligned with the borderline Math II band on the printed two-gate protocol (Gate 1).",
+      "summary_zh": "与官方 Gate 1 边缘区间一致：建议加强二次函数、根式与概率基础后再加速。",
+      "highlights": [
+        "Review MC 1–28 misses, especially quadratics, radicals, and similarity.",
+        "Consider Math II with structured support rather than skipping prerequisites.",
+        "Paper graphing and free-response sections add context for final placement."
+      ]
+    },
+    {
+      "course_key": "math_ii_ready",
+      "tier": 3,
+      "title": "Math II ready",
+      "min_score": 28,
+      "max_score": 39,
+      "headline": "Qualified for Math II; Enhanced Math II not yet secure.",
+      "headline_zh": "可进入 Math II；Enhanced Math II 尚需加强。",
+      "summary": "Gate 1 Math II readiness is likely secure on MC items. Enhanced Math II signals (Part B) still need growth.",
+      "summary_zh": "选择题表现支持 Math II 起点；Enhanced 相关能力（Part B）仍需提升。",
+      "highlights": [
+        "Assign Part B review: conics, statistics, advanced trigonometry.",
+        "Use the full paper test (graphing + FR) before Enhanced placement decisions.",
+        "Gate 2 on the printed key requires strong Part B plus constructed response work."
+      ]
+    },
+    {
+      "course_key": "borderline_enhanced_math_ii",
+      "tier": 4,
+      "title": "Borderline Enhanced Math II",
+      "min_score": 40,
+      "max_score": 46,
+      "headline": "Near Enhanced Math II readiness — polish Part B and reasoning.",
+      "headline_zh": "接近 Enhanced Math II；建议强化 Part B 与说理。",
+      "summary": "Matches the printed borderline Enhanced band. Student shows substantial Math II mastery with emerging Enhanced signals.",
+      "summary_zh": "与官方 Enhanced 边缘区间一致：Math II 较扎实，Enhanced 信号已出现但尚需巩固。",
+      "highlights": [
+        "Target Part B misses: conics, normal distributions, Law of Sines/Cosines.",
+        "Review graphing and free-response items on the paper test for Gate 2.",
+        "Discuss honors pacing with the school using this report plus class performance."
+      ]
+    },
+    {
+      "course_key": "enhanced_math_ii_ready",
+      "tier": 5,
+      "title": "Enhanced Math II ready",
+      "min_score": 47,
+      "max_score": 55,
+      "headline": "Strong Math II and Enhanced Math II readiness on this MC diagnostic.",
+      "headline_zh": "在本套选择题诊断上达到 Enhanced Math II 准备度。",
+      "summary": "Top band on the printed MC key — strong Part A–B performance. Confirm with paper graphing/FR and Gate 2 protocol before final Enhanced Math II placement.",
+      "summary_zh": "与官方 MC 最高档一致：Part A–B 表现突出；最终分班仍建议结合纸质作图/解答题与 Gate 2。",
+      "highlights": [
+        "Maintain depth through mixed review and explanation-quality practice.",
+        "Use any missed items for precision tuning, not re-teaching entire units.",
+        "Coordinate with school counselors for Integrated/Enhanced track scheduling."
+      ]
+    }
+  ],
+  "rubric": [
+    {
+      "course_key": "below_math_ii",
+      "title": "Below Math II readiness",
+      "min_percent": 0,
+      "max_percent": 45,
+      "summary": "Percent fallback: focus on Math I remediation."
+    },
+    {
+      "course_key": "math_ii_ready",
+      "title": "Math II ready",
+      "min_percent": 46,
+      "max_percent": 72,
+      "summary": "Percent fallback: Math II track; build Enhanced signals."
+    },
+    {
+      "course_key": "enhanced_math_ii_ready",
+      "title": "Enhanced Math II ready",
+      "min_percent": 73,
+      "max_percent": 100,
+      "summary": "Percent fallback: strong overall MC performance."
+    }
+  ]
+}

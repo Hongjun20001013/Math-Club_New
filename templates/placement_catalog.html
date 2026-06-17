@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier" aria-labelledby="np-pl-catalog-heading">
+    <div class="np-pl2-mesh" aria-hidden="true">
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
+        <span class="np-pl2-mesh__aurora"></span>
+        <span class="np-pl2-mesh__noise"></span>
+    </div>
+
+    <div class="np-pl-canvas__inner">
+        <nav class="np-pl2-nav np-pl-reveal">
+            <a href="{{ url_for('index') }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Math Studio
+            </a>
+        </nav>
+
+        <header class="np-pl-hero np-pl-reveal">
+            <div class="np-pl-hero__layout">
+                <div class="np-pl-hero__copy">
+                    <p class="np-pl-eyebrow">
+                        <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                        School track · Placement diagnostics
+                    </p>
+                    <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Course placement diagnostics') }}</h1>
+                    <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the track that matches your student\'s school math pathway.') }}</p>
+                    <ul class="np-pl-tags" aria-label="Features">
+                        <li class="np-pl-tag">Instant score report</li>
+                        <li class="np-pl-tag">Parent-ready PDF</li>
+                        <li class="np-pl-tag">Blank test download</li>
+                    </ul>
+                </div>
+                <aside class="np-pl-stat-stack" aria-label="Overview">
+                    <div class="np-pl-stat-stack__item">
+                        <span class="np-pl-stat-stack__num">3</span>
+                        <span class="np-pl-stat-stack__lbl">Pathways</span>
+                    </div>
+                    <div class="np-pl-stat-stack__item">
+                        <span class="np-pl-stat-stack__num">4</span>
+                        <span class="np-pl-stat-stack__lbl">Live tests</span>
+                    </div>
+                    <div class="np-pl-stat-stack__item np-pl-stat-stack__item--accent">
+                        <span class="np-pl-stat-stack__num">100%</span>
+                        <span class="np-pl-stat-stack__lbl">Online + PDF</span>
+                    </div>
+                </aside>
+            </div>
+            <div class="np-pl-hero__rule" aria-hidden="true"></div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="np-pl2-flash np-pl-reveal" role="status">
+            {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <div class="np-pl-tiers" data-pl-stagger>
+            {% for tier in catalog.tiers %}
+            <section class="np-pl-tier np-pl-tier--{{ tier.id }}" aria-labelledby="np-tier-{{ tier.id }}"{% if loop.index > 1 %} data-pl-reveal{% endif %}>
+                <header class="np-pl-tier__head">
+                    <span class="np-pl-tier__index" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
+                    <div class="np-pl-tier__icon" aria-hidden="true">
+                        {% if tier.id == 'middle' %}
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        {% elif tier.id == 'integrated' %}
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                        {% else %}
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 12v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5" stroke="currentColor" stroke-width="1.8"/></svg>
+                        {% endif %}
+                    </div>
+                    <div class="np-pl-tier__copy">
+                        <p class="np-pl-tier__zh">{{ tier.title_zh|default(tier.title) }}</p>
+                        <h2 class="np-pl-tier__title" id="np-tier-{{ tier.id }}">{{ tier.title }}</h2>
+                        {% if tier.description %}
+                        <p class="np-pl-tier__desc">{{ tier.description }}</p>
+                        {% endif %}
+                    </div>
+                </header>
+
+                <div class="np-pl-cards">
+                    {% for test in tier.tests %}
+                    <article class="np-pl-card{% if test.status != 'available' %} np-pl-card--soon{% endif %}">
+                        {% if test.online_item_count or test.online_mcq_count %}
+                        <span class="np-pl-card__ghost" aria-hidden="true">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
+                        {% endif %}
+                        <div class="np-pl-card__body">
+                            <header class="np-pl-card__top">
+                                <h3 class="np-pl-card__name">{{ test.title }}</h3>
+                                {% if test.status == 'available' %}
+                                <span class="np-pl-card__live"><span aria-hidden="true"></span>Live</span>
+                                {% endif %}
+                            </header>
+                            {% if test.subtitle %}
+                            <p class="np-pl-card__sub">{{ test.subtitle }}</p>
+                            {% endif %}
+                            {% if test.online_item_count or test.online_mcq_count %}
+                            <div class="np-pl-card__meta">
+                                <span class="np-pl-card__count">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
+                                <span class="np-pl-card__unit">items</span>
+                                {% if test.paper_sections %}
+                                <span class="np-pl-card__sep" aria-hidden="true">·</span>
+                                <span class="np-pl-card__format">{{ test.paper_sections }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="np-pl-card__foot">
+                            {% if test.status == 'available' %}
+                            <a href="{{ url_for('placement_test_landing', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">
+                                Open diagnostic
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </a>
+                            {% else %}
+                            <span class="np-pl-soon">Coming soon</span>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

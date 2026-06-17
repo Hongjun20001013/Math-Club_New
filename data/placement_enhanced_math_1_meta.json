@@ -1,0 +1,114 @@
+{
+  "description": "Novel Prep Math I / Enhanced Math I Placement — full online diagnostic: 50 MCQ + 4 graphing + 11 free response from Placement_Enhanced_Math_1.tex.",
+  "brand": {
+    "report_title": "Math I / Enhanced Math I placement report",
+    "trust_line": "Score bands follow the printed Novel Prep Math I / Enhanced Math I placement guide (50-item MC key; full paper includes graphing and free response).",
+    "trust_line_zh": "分数区间与纸质《Math I / Enhanced Math I 分班测试》官方说明一致（在线为 50 道选择题；纸质卷另含作图与解答题）。"
+  },
+  "calculator_by_index": {},
+  "score_band_rubric": [
+    {
+      "course_key": "below_math_i",
+      "tier": 1,
+      "title": "Below Math I readiness",
+      "min_score": 0,
+      "max_score": 19,
+      "headline": "Build core algebra fluency before Math I.",
+      "headline_zh": "建议先巩固核心代数，再进入 Math I。",
+      "summary": "Matches the printed guide for students who need remediation on equations, inequalities, slope, and function basics before entering Math I.",
+      "summary_zh": "与官方说明一致：需在方程、不等式、斜率与函数基础方面系统补强后再进入 Math I。",
+      "highlights": [
+        "Focus on integer and rational operations, linear equations, and graphing lines.",
+        "Use Parts A–B misses as a targeted review list.",
+        "Re-take after a focused unit to confirm growth."
+      ]
+    },
+    {
+      "course_key": "borderline_math_i",
+      "tier": 2,
+      "title": "Borderline Math I",
+      "min_score": 20,
+      "max_score": 24,
+      "headline": "Close to Math I — targeted support recommended.",
+      "headline_zh": "接近 Math I 门槛，建议带支持进入或短期强化。",
+      "summary": "Aligned with the borderline Math I band on the printed two-gate protocol (Gate 1). Strengthen linear models, function notation, and systems before accelerating.",
+      "summary_zh": "与官方 Gate 1 边缘区间一致：建议加强一次函数、函数记号与方程组后再加速。",
+      "highlights": [
+        "Review MC 1–30 misses, especially equations, slope, and function vs. non-function.",
+        "Consider Math I with structured support rather than skipping prerequisites.",
+        "Paper graphing and free-response sections add context for final placement."
+      ]
+    },
+    {
+      "course_key": "math_i_ready",
+      "tier": 3,
+      "title": "Math I ready",
+      "min_score": 25,
+      "max_score": 36,
+      "headline": "Qualified for Math I; Enhanced Math I not yet secure.",
+      "headline_zh": "可进入 Math I；Enhanced Math I 尚需加强。",
+      "summary": "Gate 1 Math I readiness is likely secure on MC items. Enhanced Math I signals (Part C) still need growth before honors/accelerated placement.",
+      "summary_zh": "选择题表现支持 Math I 起点；Enhanced 相关能力（Part C）仍需提升。",
+      "highlights": [
+        "Assign Part C review: radicals, systems, transformations, coordinate geometry.",
+        "Use the full paper test (graphing + FR) before Enhanced placement decisions.",
+        "Gate 2 on the printed key requires strong Part C plus constructed response work."
+      ]
+    },
+    {
+      "course_key": "borderline_enhanced",
+      "tier": 4,
+      "title": "Borderline Enhanced Math I",
+      "min_score": 37,
+      "max_score": 42,
+      "headline": "Near Enhanced Math I readiness — polish reasoning and Part C.",
+      "headline_zh": "接近 Enhanced Math I；建议强化 Part C 与说理。",
+      "summary": "Matches the printed borderline Enhanced band. Student shows substantial Math I mastery with emerging Enhanced signals; short targeted prep may close the gap.",
+      "summary_zh": "与官方 Enhanced 边缘区间一致：Math I 较扎实，Enhanced 信号已出现但尚需巩固。",
+      "highlights": [
+        "Target Part C misses: proof reasoning, coordinate geometry, nonlinear systems.",
+        "Review graphing and free-response items on the paper test for Gate 2.",
+        "Discuss honors pacing with the school using this report plus class performance."
+      ]
+    },
+    {
+      "course_key": "enhanced_math_i_ready",
+      "tier": 5,
+      "title": "Enhanced Math I ready",
+      "min_score": 43,
+      "max_score": 50,
+      "headline": "Strong Math I and Enhanced Math I readiness on this MC diagnostic.",
+      "headline_zh": "在本套选择题诊断上达到 Enhanced Math I 准备度。",
+      "summary": "Top band on the printed MC key — strong Part A–C performance. Confirm with paper graphing/FR and Gate 2 protocol before final Enhanced Math I placement.",
+      "summary_zh": "与官方 MC 最高档一致：Part A–C 表现突出；最终分班仍建议结合纸质作图/解答题与 Gate 2。",
+      "highlights": [
+        "Maintain depth through mixed review and explanation-quality practice.",
+        "Use any missed items for precision tuning, not re-teaching entire units.",
+        "Coordinate with school counselors for Integrated/Enhanced track scheduling."
+      ]
+    }
+  ],
+  "rubric": [
+    {
+      "course_key": "below_math_i",
+      "title": "Below Math I readiness",
+      "min_percent": 0,
+      "max_percent": 45,
+      "summary": "Percent fallback: focus on core algebra remediation."
+    },
+    {
+      "course_key": "math_i_ready",
+      "title": "Math I ready",
+      "min_percent": 46,
+      "max_percent": 72,
+      "summary": "Percent fallback: Math I track; build Enhanced signals."
+    },
+    {
+      "course_key": "enhanced_math_i_ready",
+      "title": "Enhanced Math I ready",
+      "min_percent": 73,
+      "max_percent": 100,
+      "summary": "Percent fallback: strong overall MC performance."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--section" aria-labelledby="np-pl-section-heading">
+    <div class="np-pl2-mesh" aria-hidden="true">
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
+        <span class="np-pl2-mesh__aurora"></span>
+        <span class="np-pl2-mesh__noise"></span>
+    </div>
+
+    <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+        <nav class="np-pl2-nav np-pl-reveal">
+            <a href="{{ back_href }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back
+            </a>
+        </nav>
+
+        <div class="np-pl-part np-pl-reveal">
+            <span class="np-pl-part__watermark" aria-hidden="true">{{ part_num }}</span>
+
+            <div class="np-pl-part__progress" role="list" aria-label="Test progress">
+                {% for i in range(1, part_total + 1) %}
+                <span class="np-pl-part__step{% if i < part_num %} is-done{% elif i == part_num %} is-current{% endif %}" role="listitem">
+                    <span class="np-pl-part__dot">
+                        {% if i < part_num %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {% else %}{{ i }}{% endif %}
+                    </span>
+                    {% if i < part_total %}<span class="np-pl-part__line" aria-hidden="true"></span>{% endif %}
+                </span>
+                {% endfor %}
+            </div>
+
+            <header class="np-pl-part__head">
+                <p class="np-pl-eyebrow np-pl-eyebrow--section">{{ section_kicker }}</p>
+                <h1 class="np-pl-display np-pl-display--md" id="np-pl-section-heading">{{ section_title }}</h1>
+                <p class="np-pl-lead">{{ section_lead }}</p>
+                {% if q_start and q_end and total_items %}
+                <div class="np-pl-part__range" aria-label="Question range">
+                    <span class="np-pl-part__pill">Q {{ q_start }}–{{ q_end }}</span>
+                    <span class="np-pl-part__of">of {{ total_items }}</span>
+                    <span class="np-pl-part__bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total_items }}" aria-valuenow="{{ q_end }}">
+                        <span style="width: {{ ((q_end / total_items) * 100)|round }}%;"></span>
+                    </span>
+                </div>
+                {% endif %}
+            </header>
+
+            <section class="np-pl-part__bento" aria-label="Section instructions" data-pl-stagger>
+                {% for card in section_cards %}
+                <article class="np-pl-part__card np-pl-reveal" data-pl-reveal>
+                    <div class="np-pl-part__card-icon" aria-hidden="true">
+                        {% if loop.index0 == 0 %}<span>{{ card.icon }}</span>
+                        {% elif loop.index0 == 1 %}
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>
+                        {% else %}
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        {% endif %}
+                    </div>
+                    <div class="np-pl-part__card-copy"><h2>{{ card.title }}</h2><p>{{ card.body }}</p></div>
+                </article>
+                {% endfor %}
+            </section>
+        </div>
+
+        <footer class="np-pl-part__dock np-pl-reveal" data-pl-reveal>
+            <p class="np-pl-part__dock-hint">Timer keeps running · Answers saved as you go</p>
+            <form method="post" action="{{ begin_href }}" class="np-pl-part__dock-form">
+                <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow np-pl-part__cta">{{ begin_label }}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </form>
+        </footer>
+    </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

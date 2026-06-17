@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Dashboard · {{ site_brand_name }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
 {% macro track_icon(key) -%}
 <span class="mp-track-glyph" aria-hidden="true">
 {% if key == 'sat' %}
@@ -261,6 +265,23 @@
       {% endfor %}
     </div>
   </section>
+
+  <a href="{{ url_for('placement_landing') }}" class="np-pl-dash-spotlight mp-animate-up" style="animation-delay: 0.06s" aria-label="Open course placement diagnostics">
+    <span class="np-pl-dash-spotlight__mesh" aria-hidden="true"></span>
+    <span class="np-pl-dash-spotlight__border" aria-hidden="true"></span>
+    <span class="np-pl-dash-spotlight__symbols" aria-hidden="true">π ∑ √</span>
+    <span class="np-pl-dash-spotlight__content">
+      <span class="np-pl-dash-spotlight__kicker">School track · 校内选课 · Placement</span>
+      <span class="np-pl-dash-spotlight__title">Course placement diagnostics</span>
+      <span class="np-pl-dash-spotlight__lead">Middle school 100-item run, Enhanced Math I/II, upper-school bands — polished online flow with instant report and parent-ready PDF.</span>
+      <span class="np-pl-dash-spotlight__cta">Open placement hub →</span>
+    </span>
+    <span class="np-pl-dash-spotlight__stats" aria-hidden="true">
+      <span class="np-pl-dash-spotlight__stat"><strong>4</strong> live tests</span>
+      <span class="np-pl-dash-spotlight__stat"><strong>100</strong> max items</span>
+      <span class="np-pl-dash-spotlight__stat np-pl-dash-spotlight__stat--gold"><strong>PDF</strong> + report</span>
+    </span>
+  </a>
 
   <section id="catalog-school" class="mp-catalog-block mp-catalog-block--school glass-panel np-glass mp-animate-up" style="animation-delay: 0.08s;">
     <header class="mp-catalog-head mp-catalog-head--school">

@@ -1,0 +1,83 @@
+{
+  "description": "Novel Prep Middle Level Math Placement — full 100-item online diagnostic from Placement_Middle_Level.tex (5 bands × 20 constructed-response items).",
+  "brand": {
+    "report_title": "Middle level math placement report",
+    "trust_line": "Responses are saved for teacher review. Band scoring follows the printed guide: 16/20 in a band supports advancing to the next readiness level.",
+    "trust_line_zh": "作答已保存供教师批阅。各档位评分与纸质《初中段数学分班测试》一致：每档 20 题中答对 16 题及以上可进入下一档评估。"
+  },
+  "calculator_by_index": {},
+  "bands": [
+    {"code": "I", "range": "1–20", "label": "Math 5/4 readiness", "advance_label": "Math 6 readiness"},
+    {"code": "II", "range": "21–40", "label": "Math 6/5 readiness", "advance_label": "Math 7 readiness"},
+    {"code": "III", "range": "41–60", "label": "Math 7/6 readiness", "advance_label": "Math 8 readiness"},
+    {"code": "IV", "range": "61–80", "label": "Math 8/7 readiness", "advance_label": "Algebra 1/2 readiness"},
+    {"code": "V", "range": "81–100", "label": "Algebra 1/2 readiness", "advance_label": "Algebra 1 or higher diagnostic"}
+  ],
+  "score_band_rubric": [
+    {
+      "course_key": "math_5_focus",
+      "tier": 1,
+      "title": "Math 5 foundations",
+      "min_score": 0,
+      "max_score": 39,
+      "headline": "Focus on Math 5 foundations across the early bands.",
+      "headline_zh": "建议重点巩固 Math 5 基础（前几档表现）。",
+      "summary": "Use Parts I–II teacher scoring. Fewer than 16/20 on Questions 1–20 suggests remediation before advancing.",
+      "summary_zh": "请教师按纸质答案批改 Part I–II；1–20 题不足 16 题正确时建议先补强再晋级。",
+      "highlights": [
+        "Review whole-number operations, place value, and measurement.",
+        "Use the printable answer key for each 20-question band.",
+        "Re-assess after targeted instruction."
+      ]
+    },
+    {
+      "course_key": "math_6_7_track",
+      "tier": 2,
+      "title": "Math 6–7 track",
+      "min_score": 40,
+      "max_score": 59,
+      "headline": "Middle-school core readiness — Math 6–7 range likely.",
+      "headline_zh": "初中核心准备度 — 可能在 Math 6–7 区间。",
+      "summary": "Student completed the full diagnostic. Teacher scoring on Parts I–III determines whether Math 7+ placement is appropriate.",
+      "summary_zh": "学生已完成全套诊断；教师批改 Part I–III 后判断是否适合 Math 7 及以上。",
+      "highlights": [
+        "Score each 20-question band separately on the printable key.",
+        "16/20 threshold per band before advancing interpretation.",
+        "Consider pacing and shown work, not just final answers."
+      ]
+    },
+    {
+      "course_key": "math_8_algebra_track",
+      "tier": 3,
+      "title": "Math 8 / pre-algebra track",
+      "min_score": 60,
+      "max_score": 79,
+      "headline": "Strong middle-school performance — Math 8 / pre-algebra signals.",
+      "headline_zh": "初中段表现较好 — 出现 Math 8 / 预代数信号。",
+      "summary": "If Parts I–IV each score ≥16/20 on teacher review, student may be ready for Algebra 1/2 readiness material.",
+      "summary_zh": "若教师批改 Part I–IV 均达 16/20，可评估 Algebra 1/2 准备度。",
+      "highlights": [
+        "Review Part IV–V responses for algebra readiness.",
+        "Coordinate with school for Integrated or Algebra 1 placement.",
+        "Use upper-school or Enhanced Math 1 diagnostics if scores support it."
+      ]
+    },
+    {
+      "course_key": "algebra_readiness",
+      "tier": 4,
+      "title": "Algebra readiness",
+      "min_score": 80,
+      "max_score": 100,
+      "headline": "Full diagnostic submitted — algebra readiness under teacher review.",
+      "headline_zh": "全套 100 题已提交 — 代数准备度待教师批改确认。",
+      "summary": "All 100 constructed responses captured. If Parts IV–V each score ≥16/20, consider Algebra 1 or a higher diagnostic.",
+      "summary_zh": "100 道解答题作答已保存；若 Part IV–V 各达 16/20，可考虑 Algebra 1 或更高级诊断。",
+      "highlights": [
+        "Use the five-band score card on the printable test.",
+        "Discuss honors / Integrated pathways with the school.",
+        "Optional follow-up: Enhanced Math 1 or upper-school placement."
+      ]
+    }
+  ],
+  "rubric": []
+}

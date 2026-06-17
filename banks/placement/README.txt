@@ -1,13 +1,21 @@
-Course placement diagnostic
------------------------------
-Source of truth: **Placement_Test.tex** at the repo root (70 items with `\circnum{n}`, `\mc{...}{...}{...}{...}{...}`, or graph `enumerate` blocks). `BANKS["placement"]["placement_full"]` points to that file only — nothing is merged from SAT Unit 1 or Unit 2.
+Course placement diagnostics (multi-track)
+------------------------------------------
+The placement hub lives at **/placement** (`data/placement_catalog.json`). Each available test has its own slug, LaTeX source, PDF, and meta JSON.
 
-1. Calculator policy: `data/placement_meta.json` → `calculator_by_index` (1-based). Default: Q1–60 off, Q61–70 on (Part 5).
+**Available now**
+- **Middle school** — `Placement_Middle_Level.tex` (100 CR items, topic `middle_level`, slug `middle-level`)
+  - Five 20-question bands: Math 5 → Math 6 → Math 7 → Math 8 → Algebra 1/2
+  - Meta: `data/placement_middle_level_meta.json`
+- **Enhanced Math 1 / Math I** — `Placement_Enhanced_Math_1.tex` (65 online items; slug `enhanced-math-1`)
+- **Enhanced Math 2 / Math II** — `Placement_Enhanced_Math_2.tex` (69 online items; slug `enhanced-math-2`)
+- **Upper school** — `Placement_Test.tex` (70 MCQ; slug `upper-algebra-precalc`)
 
-2. Answers: parsed from the Answer Key table inside the same `Placement_Test.tex` when you run `python3 scripts/build_question_bank.py`. No copying from algebra or advanced_math banks.
+Build steps
+1. Edit the relevant `.tex` at repo root (source of truth).
+2. Run `python3 scripts/build_question_bank.py` to refresh `data/question_bank.json`.
+3. Compile PDF if needed: `pdflatex Placement_Middle_Level.tex`, etc.
 
-3. Course bands: `score_band_rubric` in `placement_meta.json` uses **raw score out of 70** (0–18 Algebra I, …, 61–70 calculus readiness). Optional `rubric` percent rows are only a fallback if bands are removed.
-
-4. Run `python3 scripts/build_question_bank.py` after any placement `.tex` change.
-
-5. App URL: `/placement`
+URLs
+- Catalog: `/placement`
+- Middle level: `/placement/middle-level`
+- Legacy `/placement/start` redirects to upper-school test.

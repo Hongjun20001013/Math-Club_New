@@ -1,32 +1,43 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
 {% block content %}
-<div class="np-page-shell">
-<div class="np-pl-start">
-    <p class="np-pw-breadcrumb np-pl-start-bc"><a href="{{ url_for('placement_landing') }}">← Placement overview</a></p>
-    <div class="np-pl-start-bg" aria-hidden="true">
-        <span class="np-pl-start-orb np-pl-start-orb--a"></span>
-        <span class="np-pl-start-orb np-pl-start-orb--b"></span>
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--start" aria-labelledby="np-pl-start-heading">
+    <div class="np-pl2-mesh" aria-hidden="true">
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
+        <span class="np-pl2-mesh__aurora"></span>
+        <span class="np-pl2-mesh__noise"></span>
     </div>
-    <div class="np-pl-start-layout">
-        <article class="np-pl-start-card glass-panel np-glass mp-animate-in">
-            <div class="np-sh-hero-noise np-pl-start-noise" aria-hidden="true"></div>
-            <header class="np-pl-start-head">
-                <p class="np-pl-start-kicker">You’re one step from the diagnostic</p>
-                <h1 class="np-pl-start-title">Personalize this placement run</h1>
-                <p class="np-pl-start-lead">A <strong>name on the report</strong> signals care. Grade and current class help everyone read the band in context—parents see it on screen and in the <strong>exportable PDF</strong> beside the recommendation.</p>
-                <p class="np-pl-start-hint">Takes about <strong>30 seconds</strong>. Then the full 70-item diagnostic opens—same structure as the printable placement.</p>
+
+    <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+        <nav class="np-pl2-nav np-pl-reveal">
+            <a href="{{ url_for('placement_test_landing', slug=slug) }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {{ test.title|default('Placement overview') }}
+            </a>
+        </nav>
+
+        <article class="np-pl-intake np-pl-reveal">
+            <header class="np-pl-intake__head">
+                <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>One step before question 1</p>
+                <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Personalize this run</h1>
+                <p class="np-pl-lead">A <strong>name on the report</strong> signals care. Grade and class help everyone read the band in context — on screen and in the <strong>exportable PDF</strong>.</p>
+                <p class="np-pl-intake__hint">About <strong>30 seconds</strong>, then the full {{ test.online_item_count|default(test.online_mcq_count|default(70)) }}-item diagnostic opens.</p>
             </header>
 
             {% with messages = get_flashed_messages() %}
             {% if messages %}
-            <ul class="np-pl-start-flash" role="status">
-                {% for m in messages %}<li>{{ m }}</li>{% endfor %}
-            </ul>
+            <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
             {% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('placement_begin') }}" class="np-pl-start-form">
+            <form method="post" action="{{ url_for('placement_test_begin', slug=slug) }}" class="np-pl-intake__form">
                 <div class="np-pl-field">
                     <label class="np-pl-label" for="pl-name">Student name <span class="np-pl-req">*</span></label>
                     <input id="pl-name" name="student_name" type="text" autocomplete="name" required maxlength="160" placeholder="e.g. Alex Chen" class="np-pl-input">
@@ -35,33 +46,27 @@
                     <label class="np-pl-label" for="pl-grade">Grade</label>
                     <select id="pl-grade" name="student_grade" class="np-pl-input np-pl-select">
                         <option value="">Select (optional)</option>
-                        <option>6th</option>
-                        <option>7th</option>
-                        <option>8th</option>
-                        <option>9th</option>
-                        <option>10th</option>
-                        <option>11th</option>
-                        <option>12th</option>
-                        <option>College</option>
-                        <option>Other</option>
+                        <option>6th</option><option>7th</option><option>8th</option><option>9th</option>
+                        <option>10th</option><option>11th</option><option>12th</option><option>College</option><option>Other</option>
                     </select>
                 </div>
                 <div class="np-pl-field np-pl-field--full">
                     <label class="np-pl-label" for="pl-course">Current school math class</label>
                     <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input">
                 </div>
-                <p class="np-pl-start-privacy">Name is required. Grade and class are optional but recommended—they print only on <strong>this attempt’s</strong> report and PDF, not on other SAT practice in the studio.</p>
-                <div class="np-pl-start-trust" role="note">
-                    <span class="np-pl-start-trust-icon" aria-hidden="true">✓</span>
-                    <span>Designed for advising: clear headers, band language, and a file you can forward as-is.</span>
+                <p class="np-pl-intake__privacy">Name is required. Grade and class are optional — they print only on <strong>this attempt's</strong> report.</p>
+                <div class="np-pl-intake__trust" role="note">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Clear headers, band language, and a file you can forward as-is.</span>
                 </div>
-                <div class="np-pl-start-actions">
-                    <button type="submit" class="big-btn mp-btn-pill mp-btn-glow">Begin 70-item diagnostic</button>
-                    <a href="{{ url_for('placement_landing') }}" class="big-btn mp-btn-secondary mp-btn-pill">Back</a>
+                <div class="np-pl-intake__actions">
+                    <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">Begin {{ test.online_item_count|default(test.online_mcq_count|default(70)) }}-item diagnostic</button>
+                    <a href="{{ url_for('placement_test_landing', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost">Back</a>
                 </div>
             </form>
         </article>
     </div>
 </div>
 </div>
+{% include 'partials/placement_atelier_scripts.html' %}
 {% endblock %}

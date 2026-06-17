@@ -505,10 +505,200 @@ def _parse_tikz_thick_polyline_body(body: str) -> List[Tuple[float, float]]:
     return pts
 
 
+def _placement_box_plot_svg(tikz_block: str) -> Optional[str]:
+    """Box-and-whisker plots (e.g. Enhanced Math I placement MC Q22)."""
+    if "rectangle" not in tikz_block:
+        return None
+    if r"\draw[->]" not in tikz_block:
+        return None
+
+    xscale = 1.0
+    yscale = 1.0
+    opt_m = re.search(r"\\begin\{tikzpicture\}\[([^\]]*)\]", tikz_block)
+    if opt_m:
+        opts = opt_m.group(1)
+        xs = re.search(r"xscale=([\d.]+)", opts)
+        ys = re.search(r"yscale=([\d.]+)", opts)
+        if xs:
+            xscale = float(xs.group(1))
+        if ys:
+            yscale = float(ys.group(1))
+
+    axis_m = re.search(r"\\draw\[->\]\s*\(([^)]+)\)--\(([^)]+)\)", tikz_block)
+    if not axis_m:
+        return None
+    ax0 = [float(x.strip()) for x in axis_m.group(1).split(",")]
+    ax1 = [float(x.strip()) for x in axis_m.group(2).split(",")]
+    xmin, xmax = min(ax0[0], ax1[0]), max(ax0[0], ax1[0])
+
+    ticks: List[float] = []
+    tick_m = re.search(r"\\foreach\s*\\x\s+in\s*\{([^}]+)\}", tikz_block)
+    if tick_m:
+        try:
+            ticks = [float(x.strip()) for x in tick_m.group(1).split(",") if x.strip()]
+        except ValueError:
+            ticks = []
+
+    rect_m = re.search(
+        r"\\draw\[thick\]\s*\(([^,]+),([^)]+)\)\s*rectangle\s*\(([^,]+),([^)]+)\)",
+        tikz_block,
+    )
+    box = None
+    if rect_m:
+        box = (
+            float(rect_m.group(1)),
+            float(rect_m.group(2)),
+            float(rect_m.group(3)),
+            float(rect_m.group(4)),
+        )
+
+    segments: List[Tuple[Tuple[float, float], Tuple[float, float]]] = []
+    for seg_m in re.finditer(r"\\draw\[thick\]\s*\(([^)]+)\)--\(([^)]+)\)", tikz_block):
+        a = tuple(float(x.strip()) for x in seg_m.group(1).split(","))
+        b = tuple(float(x.strip()) for x in seg_m.group(2).split(","))
+        segments.append((a, b))
+
+    w, h = 500, 148
+    pad_l, pad_r = 44.0, 28.0
+    axis_y = 92.0
+    label_y = 124.0
+    plot_y = 46.0
+    plot_h = 34.0
+    span = xmax - xmin or 1.0
+    plot_w = w - pad_l - pad_r
+
+    def tx(x: float) -> float:
+        return pad_l + (x * xscale - xmin) / span * plot_w
+
+    parts: List[str] = []
+    parts.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
+        'class="stem-tikz-svg stem-tikz-svg--boxplot" role="img" aria-label="Box plot">'
+    )
+    parts.append("<defs>")
+    parts.append(
+        '<marker id="npBoxArrow" viewBox="0 0 10 10" refX="9" refY="5" '
+        'markerWidth="6" markerHeight="6" orient="auto">'
+        '<path d="M 0 0 L 10 5 L 0 10 z" fill="#4f2fd4"/></marker>'
+    )
+    parts.append("</defs>")
+    parts.append(
+        f'<rect x="0" y="0" width="{w}" height="{h}" rx="12" fill="#faf9ff"/>'
+    )
+    parts.append(
+        f'<line x1="{tx(xmin):.2f}" y1="{axis_y:.2f}" x2="{tx(xmax):.2f}" y2="{axis_y:.2f}" '
+        f'stroke="#4f2fd4" stroke-width="2.2" marker-end="url(#npBoxArrow)"/>'
+    )
+    for tv in ticks:
+        x_ = tx(tv)
+        parts.append(
+            f'<line x1="{x_:.2f}" y1="{axis_y - 7:.2f}" x2="{x_:.2f}" y2="{axis_y + 7:.2f}" '
+            f'stroke="#6b5cad" stroke-width="1.5"/>'
+        )
+        parts.append(
+            f'<text x="{x_:.2f}" y="{label_y:.2f}" text-anchor="middle" '
+            f'font-size="12" font-weight="500" fill="#3d3568">{_fmt_tick_num(tv)}</text>'
+        )
+    if box:
+        x1, _, x2, _ = box
+        bx1, bx2 = tx(min(x1, x2)), tx(max(x1, x2))
+        parts.append(
+            f'<rect x="{bx1:.2f}" y="{plot_y:.2f}" width="{max(2.0, bx2 - bx1):.2f}" height="{plot_h:.2f}" '
+            f'fill="rgba(98,54,255,0.16)" stroke="#4f2fd4" stroke-width="2.4" rx="2"/>'
+        )
+    for (a, b) in segments:
+        y_a, y_b = a[1] * yscale, b[1] * yscale
+        if abs(y_a - y_b) < 0.05:
+            cy = plot_y + plot_h / 2
+            parts.append(
+                f'<line x1="{tx(a[0]):.2f}" y1="{cy:.2f}" x2="{tx(b[0]):.2f}" y2="{cy:.2f}" '
+                f'stroke="#4f2fd4" stroke-width="2.4" stroke-linecap="round"/>'
+            )
+        else:
+            parts.append(
+                f'<line x1="{tx(a[0]):.2f}" y1="{plot_y + 4:.2f}" x2="{tx(b[0]):.2f}" y2="{plot_y + plot_h - 4:.2f}" '
+                f'stroke="#4f2fd4" stroke-width="2.6" stroke-linecap="round"/>'
+            )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _number_line_tikz_svg(tikz_block: str) -> Optional[str]:
+    """Horizontal number lines with ``\\draw[<->]`` (no full coordinate grid)."""
+    if r"\draw[<->]" not in tikz_block:
+        return None
+    if "grid" in tikz_block or "rectangle" in tikz_block or r"\begin{axis}" in tikz_block:
+        return None
+    axis_m = re.search(r"\\draw\[<->\]\s*\(([^)]+)\)--\(([^)]+)\)", tikz_block)
+    if not axis_m:
+        return None
+    a0 = [float(x.strip()) for x in axis_m.group(1).split(",")]
+    a1 = [float(x.strip()) for x in axis_m.group(2).split(",")]
+    xmin, xmax = min(a0[0], a1[0]), max(a0[0], a1[0])
+
+    ticks: List[float] = []
+    tick_m = re.search(r"\\foreach\s*\\x\s+in\s*\{([^}]+)\}", tikz_block)
+    if tick_m:
+        try:
+            ticks = [float(x.strip()) for x in tick_m.group(1).split(",") if x.strip()]
+        except ValueError:
+            ticks = []
+    if not ticks:
+        ticks = _auto_ticks(xmin, xmax, 9)
+
+    scale = 1.0
+    sc_m = re.search(r"\\begin\{tikzpicture\}\[scale=([\d.]+)\]", tikz_block)
+    if sc_m:
+        scale = float(sc_m.group(1))
+
+    w, h = 480, 72
+    pad = 28.0
+    span = (xmax - xmin) * scale or 1.0
+
+    def tx(x: float) -> float:
+        return pad + (x * scale - xmin * scale) / span * (w - 2 * pad)
+
+    cy = h / 2
+    parts: List[str] = []
+    parts.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
+        'class="stem-tikz-svg stem-tikz-svg--numberline" role="img" aria-label="Number line">'
+    )
+    parts.append("<defs>")
+    parts.append(
+        '<marker id="npNumArrowL" viewBox="0 0 10 10" refX="1" refY="5" '
+        'markerWidth="7" markerHeight="7" orient="auto">'
+        '<path d="M 10 0 L 0 5 L 10 10 z" fill="#352875"/></marker>'
+    )
+    parts.append(
+        '<marker id="npNumArrowR" viewBox="0 0 10 10" refX="9" refY="5" '
+        'markerWidth="7" markerHeight="7" orient="auto">'
+        '<path d="M 0 0 L 10 5 L 0 10 z" fill="#352875"/></marker>'
+    )
+    parts.append("</defs>")
+    parts.append(
+        f'<line x1="{tx(xmin):.2f}" y1="{cy:.2f}" x2="{tx(xmax):.2f}" y2="{cy:.2f}" '
+        f'stroke="{_AXIS}" stroke-width="2.2" marker-start="url(#npNumArrowL)" marker-end="url(#npNumArrowR)"/>'
+    )
+    for tv in ticks:
+        x_ = tx(tv)
+        parts.append(
+            f'<line x1="{x_:.2f}" y1="{cy - 7:.2f}" x2="{x_:.2f}" y2="{cy + 7:.2f}" '
+            f'stroke="{_AXIS}" stroke-width="1.5"/>'
+        )
+        parts.append(
+            f'<text x="{x_:.2f}" y="{cy + 22:.2f}" text-anchor="middle" font-size="11" fill="{_TICK}">{_fmt_tick_num(tv)}</text>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 def _placement_prism_wireframe_svg(tikz_block: str) -> Optional[str]:
     """
     Wireframe diagrams without a coordinate grid (e.g. Q63 rectangular prism in ``Placement_Test.tex``).
     """
+    if "rectangle" in tikz_block:
+        return None
     if r"\draw[step=" in tikz_block or r"\draw[thick,->]" in tikz_block:
         return None
     if r"\begin{axis}" in tikz_block:
@@ -1021,6 +1211,12 @@ def _tikz_block_to_figure_html(block: str) -> Optional[str]:
         svg = _pgfplots_to_svg(block)
         if svg:
             return f'<div class="stem-figure-wrap">{svg}</div>'
+    boxplot = _placement_box_plot_svg(block)
+    if boxplot:
+        return f'<div class="stem-figure-wrap stem-figure-wrap--boxplot">{boxplot}</div>'
+    numline = _number_line_tikz_svg(block)
+    if numline:
+        return f'<div class="stem-figure-wrap stem-figure-wrap--numberline">{numline}</div>'
     prism = _placement_prism_wireframe_svg(block)
     if prism:
         return f'<div class="stem-figure-wrap stem-figure-wrap--prism">{prism}</div>'

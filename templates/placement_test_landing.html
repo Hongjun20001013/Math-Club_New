@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--landing" aria-labelledby="np-pl-heading">
+    <div class="np-pl2-mesh" aria-hidden="true">
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
+        <span class="np-pl2-mesh__aurora"></span>
+        <span class="np-pl2-mesh__noise"></span>
+    </div>
+
+    <div class="np-pl-canvas__inner">
+        <nav class="np-pl2-nav np-pl-reveal">
+            <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                All placement tests
+            </a>
+        </nav>
+
+        <div class="np-pl-landing">
+            <div class="np-pl-landing__main">
+                <header class="np-pl-landing-hero np-pl-reveal">
+                    <div class="np-pl-landing-hero__copy">
+                        <p class="np-pl-eyebrow">
+                            <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                            School track · Course placement
+                        </p>
+                        <h1 class="np-pl-display np-pl-display--md" id="np-pl-heading">{{ test.title }}</h1>
+                        {% if test.subtitle %}
+                        <p class="np-pl-lead">{{ test.subtitle }}</p>
+                        {% endif %}
+                        <div class="np-pl-metrics" role="list" aria-label="Test overview">
+                            <div class="np-pl-metric" role="listitem">
+                                <span class="np-pl-metric__val">{{ test.online_item_count|default(test.online_mcq_count|default(70)) }}</span>
+                                <span class="np-pl-metric__lbl">Questions</span>
+                            </div>
+                            <div class="np-pl-metric" role="listitem">
+                                <span class="np-pl-metric__val">{{ placement_parts|length }}</span>
+                                <span class="np-pl-metric__lbl">Parts</span>
+                            </div>
+                            <div class="np-pl-metric np-pl-metric--time" role="listitem">
+                                <span class="np-pl-metric__val">
+                                    {% if topic == 'middle_level' %}150{% elif topic == 'enhanced_math_1' %}120{% elif topic == 'enhanced_math_2' %}130{% else %}95{% endif %}
+                                </span>
+                                <span class="np-pl-metric__lbl">Minutes</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="np-pl-device np-pl-device--tilt" aria-hidden="true">
+                        <div class="np-pl-device__shell">
+                            <div class="np-pl-device__bar"><span></span><span></span><span></span></div>
+                            <div class="np-pl-device__ribbon">
+                                <span>{% if topic == 'middle_level' %}Math 6 readiness{% else %}Part II{% endif %}</span>
+                                <span>{% if topic == 'middle_level' %}Q 24 / 100{% else %}Q 12 / {{ test.online_item_count|default(65) }}{% endif %}</span>
+                            </div>
+                            <div class="np-pl-device__screen">
+                                <p class="np-pl-device__label">Fill in the answer</p>
+                                <p class="np-pl-device__math">\( 3x + 7 = 28 \)</p>
+                                <div class="np-pl-device__input"></div>
+                            </div>
+                        </div>
+                        <span class="np-pl-device__glow" aria-hidden="true"></span>
+                    </div>
+                </header>
+
+                <section class="np-pl-flow np-pl-reveal" data-pl-reveal aria-label="Test flow">
+                    <h2 class="np-pl-section-title">Your path to results</h2>
+                    <ol class="np-pl-flow__steps">
+                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">1</span><div><strong>Student profile</strong><span>Quick intake before question 1</span></div></li>
+                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">2</span><div><strong>Timed diagnostic</strong><span>{% if topic == 'middle_level' %}100 fill-in items · 5 readiness bands{% elif topic == 'enhanced_math_1' %}50 MCQ → graphing → free response{% elif topic == 'enhanced_math_2' %}55 MCQ → graphing → free response{% else %}Work straight through or jump ahead{% endif %}</span></div></li>
+                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">3</span><div><strong>Instant report</strong><span>Score bands, part breakdown, highlights</span></div></li>
+                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">4</span><div><strong>Export PDF</strong><span>Share with parents &amp; counselors</span></div></li>
+                    </ol>
+                </section>
+
+                {% if placement_parts %}
+                <section class="np-pl-structure np-pl-reveal" data-pl-reveal aria-labelledby="np-pl-parts-heading">
+                    <div class="np-pl-structure__head">
+                        <h2 class="np-pl-section-title" id="np-pl-parts-heading">Test structure</h2>
+                        <p class="np-pl-section-lead">{% if topic == 'middle_level' %}Five 20-question bands — readiness level shown as you progress.{% else %}Same part arc as the printable placement guide.{% endif %}</p>
+                    </div>
+                    <div class="np-pl-structure__track">
+                        {% for p in placement_parts %}
+                        <article class="np-pl-structure__part">
+                            <span class="np-pl-structure__code">Part {{ p.code }}</span>
+                            <span class="np-pl-structure__range">Q {{ p.range }}</span>
+                            <span class="np-pl-structure__label">{{ p.label }}</span>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% if topic == 'middle_level' %}
+                    <p class="np-pl-structure__note">Each band shows on screen (e.g. <strong>Math 6 readiness</strong>) throughout the 100-question run.</p>
+                    {% elif topic == 'enhanced_math_1' %}
+                    <p class="np-pl-structure__note">Online: <strong>50 MCQ</strong> auto-scored, then <strong>4 graphing</strong> + <strong>11 free response</strong> for advisor review.</p>
+                    {% elif topic == 'enhanced_math_2' %}
+                    <p class="np-pl-structure__note">Online: <strong>55 MCQ</strong> auto-scored, then <strong>4 graphing</strong> + <strong>10 free response</strong> for advisor review.</p>
+                    {% elif topic == 'placement_full' %}
+                    <p class="np-pl-structure__note">Calculator unlocks on <strong>question 30</strong> and <strong>questions 61–70</strong> — same as the blank PDF.</p>
+                    {% endif %}
+                </section>
+                {% endif %}
+            </div>
+
+            <aside class="np-pl-landing__aside np-pl-reveal">
+                <div class="np-pl-pillar">
+                    <p class="np-pl-pillar__eyebrow">Ready when you are</p>
+                    <h2 class="np-pl-pillar__title">Start the diagnostic</h2>
+                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic in ('enhanced_math_1', 'enhanced_math_2') %}Bluebook-style sections with transitions between MCQ, graphing, and free response.{% else %}Full upper-school placement with instant scoring and a shareable parent report.{% endif %}</p>
+                    <a href="{{ url_for('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta">
+                        Begin placement test
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. Transitions after Q50 and Q54.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. Transitions after Q55 and Q59.{% else %}About <strong>95 minutes</strong>. Calculator rules match the PDF.{% endif %}</p>
+                </div>
+                <div class="np-pl-pdf">
+                    <div class="np-pl-pdf__icon" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="np-pl-pdf__copy">
+                        <h3>Blank test PDF</h3>
+                        <p>Same paper experience for in-person proctoring or print-at-home.</p>
+                    </div>
+                    <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-pdf__btn">Download PDF</a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}
