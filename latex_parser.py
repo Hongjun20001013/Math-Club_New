@@ -233,10 +233,14 @@ def _clean_table_cell(cell: str) -> str:
     cell = re.sub(r"\\;\s*", " ", cell)
     # Percent signs must survive clean_latex_junk comment stripping in HTML tables.
     cell = cell.replace("%", "&#37;")
-    if re.search(
-        r"\\(?:overline|underline|phantom|frac|sqrt|cdot|times|left|right|text)\b",
+    # Normalize $...$ once so clean_latex_junk does not nest MATHSEG vaults inside \(...\).
+    m_dollar = re.fullmatch(r"\$(.+)\$", cell.strip(), flags=re.S)
+    if m_dollar:
+        cell = f"\\(\\displaystyle {m_dollar.group(1).strip()}\\)"
+    elif re.search(
+        r"\\(?:overline|underline|phantom)\b",
         cell,
-    ) and not re.search(r"\\\(|\\\[", cell):
+    ) and not re.search(r"\\\(|\\\[|\$", cell):
         cell = f"\\({cell}\\)"
     return cell.strip()
 
@@ -424,8 +428,8 @@ def _shield_math_delimited_segments(text: str) -> tuple[str, list[str]]:
 
 
 def _unshield_math_delimited_segments(text: str, vault: list[str]) -> str:
-    for i, chunk in enumerate(vault):
-        text = text.replace(f"<<<MATHSEG{i}>>>", chunk)
+    for i in range(len(vault) - 1, -1, -1):
+        text = text.replace(f"<<<MATHSEG{i}>>>", vault[i])
     return text
 
 
@@ -872,6 +876,8 @@ def _mathjax_safe_lt_in_tex_math(s: str) -> str:
 
     def _fix_inner(inner: str) -> str:
         if "<div" in inner or "<svg" in inner or "<table" in inner:
+            return inner
+        if "MATHSEG" in inner:
             return inner
         inner = inner.replace("<=", "§LE§").replace(">=", "§GE§")
         inner = inner.replace("<", r"\lt ")
