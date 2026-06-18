@@ -1719,6 +1719,111 @@ def _enrich_placement_rec(row: dict, raw_score: int, total_q: int, topic: str | 
     return out
 
 
+def _placement_gate_scores_from_sections(
+    section_stats: list[dict], meta: dict
+) -> list[dict]:
+    """Merge per-section stats with ``gate_rubric`` thresholds from placement meta."""
+    rubric = meta.get("gate_rubric") or []
+    if not rubric:
+        return []
+    by_sec = {str(s.get("section")): s for s in section_stats}
+    out: list[dict] = []
+    for row in rubric:
+        if not isinstance(row, dict):
+            continue
+        gate = int(row.get("gate") or 0)
+        if gate < 1:
+            continue
+        sec_key = str(gate)
+        stat = by_sec.get(sec_key, {})
+        correct = int(stat.get("correct") or 0)
+        total = int(row.get("items") or stat.get("total") or 0)
+        standard = int(row.get("standard_pass") or 0)
+        strong = int(row.get("strong_pass") or standard)
+        if correct >= strong:
+            pass_tier = "strong"
+        elif correct >= standard:
+            pass_tier = "standard"
+        else:
+            pass_tier = "below"
+        pct = round(100.0 * correct / total) if total else 0
+        title = stat.get("title_en") or f"Gate {gate} — {row.get('readiness_label', '')}"
+        out.append(
+            {
+                "gate": gate,
+                "section": sec_key,
+                "range": str(row.get("range") or ""),
+                "readiness_label": str(row.get("readiness_label") or ""),
+                "correct": correct,
+                "total": total,
+                "pct": pct,
+                "standard_pass": standard,
+                "strong_pass": strong,
+                "passed": correct >= standard if standard else False,
+                "pass_tier": pass_tier,
+                "title_en": title,
+            }
+        )
+    return out
+
+
+def _placement_gate_recommendation(
+    gate_scores: list[dict], meta: dict
+) -> dict | None:
+    """Gate-first placement label from the printed Five-Gate Hybrid teacher guide."""
+    if not gate_scores:
+        return None
+    g = {int(x["gate"]): int(x.get("correct") or 0) for x in gate_scores}
+    c1, c2, c3, c4, c5 = (
+        g.get(1, 0),
+        g.get(2, 0),
+        g.get(3, 0),
+        g.get(4, 0),
+        g.get(5, 0),
+    )
+    if c1 >= 12 and c2 >= 16 and c3 >= 12 and c4 >= 12 and c5 >= 11:
+        course_key = "calculus_readiness"
+        headline = "Gate profile: calculus-track readiness on this diagnostic."
+    elif c1 >= 11 and c2 >= 13 and c3 >= 11 and c4 >= 12:
+        course_key = "precalculus"
+        headline = "Gate profile: strong precalculus readiness; calculus bridge may be appropriate."
+    elif c1 >= 11 and c2 >= 13 and c3 >= 11:
+        course_key = "precalculus"
+        headline = "Gate profile: precalculus is the matched next course level."
+    elif c1 >= 11 and c2 >= 13:
+        course_key = "algebra_ii"
+        headline = "Gate profile: algebra II is the natural next step."
+    elif c1 >= 11:
+        course_key = "geometry"
+        headline = "Gate profile: geometry readiness with algebra foundations in place."
+    else:
+        course_key = "algebra_i"
+        headline = "Gate profile: strengthen algebra foundations before advancing."
+
+    band_row = None
+    for row in meta.get("score_band_rubric") or []:
+        if isinstance(row, dict) and row.get("course_key") == course_key:
+            band_row = row
+            break
+    title = str((band_row or {}).get("title") or course_key.replace("_", " ").title())
+    summary = str(
+        (band_row or {}).get("summary")
+        or "Interpret gate scores together with classwork quality and school prerequisites."
+    )
+    tier = int(
+        (band_row or {}).get("tier")
+        or _placement_tier_for_course_key(course_key, "placement_full")
+    )
+    return {
+        "course_key": course_key,
+        "title": title,
+        "headline": headline,
+        "summary": summary,
+        "tier": tier,
+        "gate_scores": gate_scores,
+    }
+
+
 def _placement_recommendation(
     meta: dict, raw_score: int, total_q: int, topic: str | None = None
 ) -> dict | None:
@@ -11329,6 +11434,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         part_order = ("A", "B", "G", "FR")
     elif domain == "placement" and topic == "middle_level":
         part_order = ("I", "II", "III", "IV", "V")
+    elif domain == "placement" and topic == "placement_full":
+        part_order = ("1", "2", "3", "4", "5")
     elif domain == "placement":
         part_order = ("I", "II", "III", "IV", "V")
     elif domain == "algebra":
@@ -11368,6 +11475,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
 
     placement_meta = _load_placement_meta_file(topic if domain == "placement" else None)
     placement_rec = None
+    placement_gate_scores: list[dict] = []
+    placement_gate_rec: dict | None = None
     placement_brand: dict | None = None
     if domain == "placement":
         flow_cfg = _placement_flow_config(topic)
@@ -11376,6 +11485,20 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         placement_rec = _placement_recommendation(
             placement_meta, rec_correct, rec_total, topic
         )
+        if topic == "placement_full":
+            placement_gate_scores = _placement_gate_scores_from_sections(
+                section_stats, placement_meta
+            )
+            placement_gate_rec = _placement_gate_recommendation(
+                placement_gate_scores, placement_meta
+            )
+            if placement_rec and placement_gate_rec:
+                placement_rec = dict(placement_rec)
+                placement_rec["gate_title"] = placement_gate_rec.get("title")
+                placement_rec["gate_headline"] = placement_gate_rec.get("headline")
+                placement_rec["gate_summary"] = placement_gate_rec.get("summary")
+                placement_rec["gate_tier"] = placement_gate_rec.get("tier")
+                placement_rec["gate_scores"] = placement_gate_scores
         b = placement_meta.get("brand")
         placement_brand = dict(b) if isinstance(b, dict) else None
         if placement_brand is not None:
@@ -11433,6 +11556,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "session_duration_label": session_duration_label,
         "section_stats": section_stats,
         "placement_rec": placement_rec,
+        "placement_gate_scores": placement_gate_scores,
+        "placement_gate_rec": placement_gate_rec,
         "placement_brand": placement_brand,
         "placement_student": placement_student,
         "celebrate_confetti": celebrate_confetti,
@@ -11446,6 +11571,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
     pdf_ctx = {
         "rows": rows_out,
         "placement_rec": placement_rec,
+        "placement_gate_scores": placement_gate_scores,
+        "placement_gate_rec": placement_gate_rec,
         "section_stats": section_stats,
         "placement_brand": placement_brand,
         "placement_student": placement_student,

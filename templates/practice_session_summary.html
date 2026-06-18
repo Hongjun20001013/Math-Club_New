@@ -11,7 +11,8 @@
     {% if domain != 'placement' %}<a class="np-summary-jump-external" href="{{ url_for('practice_analytics') }}">Mistake analytics</a>{% endif %}
     <a href="#np-study-report">Study report</a>
     {% if domain == 'placement' %}<a href="#np-placement-pdf">Official PDF</a>{% endif %}
-    {% if section_stats %}<a href="#np-by-area">By area</a>{% endif %}
+    {% if placement_gate_scores %}<a href="#np-placement-gates">Gate scores</a>{% endif %}
+    {% if section_stats %}<a href="#np-by-area">{% if placement_gate_scores %}By gate{% else %}By area{% endif %}</a>{% endif %}
     {% if domain != 'placement' and mistake_focus %}<a href="#np-mistake-debrief">Misses</a>{% endif %}
     <a href="#np-summary-full-sheet">Item list</a>
   </nav>
@@ -264,6 +265,39 @@
   </section>
   {% endif %}
 
+  {% if placement_gate_scores %}
+  <section id="np-placement-gates" class="np-placement-gates glass-panel np-glass" aria-label="Five-gate scorecard">
+    <h2 class="np-placement-gates-heading">Five-gate scorecard</h2>
+    {% if placement_gate_rec %}
+    <p class="np-placement-gates-lead"><strong>{{ placement_gate_rec.title }}</strong> — {{ placement_gate_rec.headline }}</p>
+    {% else %}
+    <p class="np-placement-gates-lead">Gate scores matter more than the total alone on this hybrid diagnostic.</p>
+    {% endif %}
+    <div class="np-placement-gates-grid">
+      {% for g in placement_gate_scores %}
+      <div class="np-placement-gate-card np-placement-gate-card--{{ g.pass_tier }}">
+        <div class="np-placement-gate-card-top">
+          <span class="np-placement-gate-num">Gate {{ g.gate }}</span>
+          <span class="np-placement-gate-range">Q {{ g.range }}</span>
+        </div>
+        <p class="np-placement-gate-title">{{ g.title_en }}</p>
+        <p class="np-placement-gate-score">{{ g.correct }} / {{ g.total }} correct</p>
+        <div class="np-knowledge-bar"><span class="np-knowledge-bar-fill" style="width: {{ g.pct }}%;"></span></div>
+        <p class="np-placement-gate-threshold">
+          Pass: {{ g.standard_pass }}/{{ g.total }}{% if g.strong_pass > g.standard_pass %} · strong {{ g.strong_pass }}/{{ g.total }}{% endif %}
+        </p>
+        <span class="np-placement-gate-status">
+          {% if g.pass_tier == 'strong' %}Strong pass{% elif g.pass_tier == 'standard' %}Pass{% else %}Below threshold{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% if placement_gate_rec and placement_gate_rec.summary %}
+    <p class="np-placement-gates-summary">{{ placement_gate_rec.summary }}</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
   {% if placement_rec %}
   <section id="np-placement-rec" class="np-placement-rec np-placement-rec--t{{ placement_rec.tier | default(2) }} glass-panel np-glass" aria-label="Course placement recommendation">
     <div class="np-placement-rec-top">
@@ -282,6 +316,9 @@
     <p class="np-placement-rec-headline-zh">{{ placement_rec.headline_zh }}</p>
     {% endif %}
     <p class="np-placement-rec-course">{{ placement_rec.title }}</p>
+    {% if placement_rec.gate_title %}
+    <p class="np-placement-rec-gate"><strong>Gate-based placement:</strong> {{ placement_rec.gate_title }} — {{ placement_rec.gate_headline }}</p>
+    {% endif %}
     <p class="np-placement-rec-body">{{ placement_rec.summary }}</p>
     {% if placement_rec.summary_zh %}
     <p class="np-placement-rec-body-zh">{{ placement_rec.summary_zh }}</p>
@@ -304,13 +341,13 @@
 
   {% if section_stats %}
   <section id="np-by-area" class="np-knowledge-grid np-knowledge-grid-luxe glass-panel np-glass" aria-label="Results by topic">
-    <h2 class="np-knowledge-heading">By knowledge area</h2>
-    <p class="np-knowledge-sub">{% if domain == 'placement' %}Breakdown by tagged subsection from the diagnostic items.{% elif domain == 'hard_problem' %}Results grouped by SAT Math unit (Algebra, Advanced Math, Problem Solving &amp; Data, Geometry).{% elif domain == 'algebra' %}Each card is a subsection of Unit&nbsp;1—see where to drill next.{% elif domain == 'advanced_math' %}Each card is a subsection of Unit&nbsp;2 (advanced math).{% elif domain == 'problem_solving' %}Each card is a subsection of Unit&nbsp;3 (problem solving &amp; data).{% elif domain == 'geometry' %}Each card is a subsection of Unit&nbsp;4 (geometry).{% else %}Results grouped by knowledge subsection for this set.{% endif %}</p>
+    <h2 class="np-knowledge-heading">{% if placement_gate_scores %}Performance by gate{% else %}By knowledge area{% endif %}</h2>
+    <p class="np-knowledge-sub">{% if placement_gate_scores %}Each card is one gate from the Five-Gate Hybrid diagnostic—compare against the pass thresholds above.{% elif domain == 'placement' %}Breakdown by tagged subsection from the diagnostic items.{% elif domain == 'hard_problem' %}Results grouped by SAT Math unit (Algebra, Advanced Math, Problem Solving &amp; Data, Geometry).{% elif domain == 'algebra' %}Each card is a subsection of Unit&nbsp;1—see where to drill next.{% elif domain == 'advanced_math' %}Each card is a subsection of Unit&nbsp;2 (advanced math).{% elif domain == 'problem_solving' %}Each card is a subsection of Unit&nbsp;3 (problem solving &amp; data).{% elif domain == 'geometry' %}Each card is a subsection of Unit&nbsp;4 (geometry).{% else %}Results grouped by knowledge subsection for this set.{% endif %}</p>
     <div class="np-knowledge-cards">
       {% for s in section_stats %}
       <div class="np-knowledge-card">
         <div class="np-knowledge-card-top">
-          <span class="np-knowledge-sec">{{ s.section }}</span>
+          <span class="np-knowledge-sec">{% if placement_gate_scores %}Gate {{ s.section }}{% else %}{{ s.section }}{% endif %}</span>
           <span class="np-knowledge-pct">{{ s.pct }}%</span>
         </div>
         <p class="np-knowledge-title">{{ s.title_en }}</p>

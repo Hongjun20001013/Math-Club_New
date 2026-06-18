@@ -354,6 +354,131 @@ def _draw_panel_title(pdf: FPDF, font: str, title: str) -> None:
     pdf.ln(5)
 
 
+def _draw_gate_scores_panel(
+    pdf: FPDF,
+    font: str,
+    gate_scores: list[dict[str, Any]],
+    gate_rec: dict[str, Any] | None,
+) -> None:
+    if not gate_scores:
+        return
+    _draw_panel_title(pdf, font, "Five-gate scorecard")
+    if gate_rec:
+        pdf.set_font(font, "B", 10)
+        pdf.set_text_color(*_C_VIOLET)
+        pdf.multi_cell(
+            0,
+            5.2,
+            _pdf_core_font_safe(str(gate_rec.get("title") or "")),
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+        )
+        pdf.set_font(font, "", 8.5)
+        pdf.set_text_color(*_C_MUTED)
+        gh = _pdf_core_font_safe(str(gate_rec.get("headline") or ""))
+        if gh:
+            pdf.multi_cell(0, 4.8, gh, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln(2)
+
+    w = _content_width(pdf)
+    col_gate = w * 0.11
+    col_rng = w * 0.16
+    col_sc = w * 0.18
+    col_thr = w * 0.22
+    col_st = w - col_gate - col_rng - col_sc - col_thr
+
+    pdf.set_font(font, "B", 7.5)
+    pdf.set_fill_color(72, 52, 200)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(col_gate, 6, "Gate", border=1, align="C", fill=True)
+    pdf.cell(col_rng, 6, "Items", border=1, align="C", fill=True)
+    pdf.cell(col_sc, 6, "Correct", border=1, align="C", fill=True)
+    pdf.cell(col_thr, 6, "Pass threshold", border=1, align="C", fill=True)
+    pdf.cell(col_st, 6, "Status", border=1, align="C", fill=True, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+
+    pdf.set_font(font, "", 7.5)
+    line_h = 6.2
+    for idx, row in enumerate(gate_scores):
+        if pdf.get_y() + line_h > pdf.h - pdf.b_margin - 12:
+            pdf.add_page()
+            _draw_panel_title(pdf, font, "Five-gate scorecard (continued)")
+            pdf.set_font(font, "B", 7.5)
+            pdf.set_fill_color(72, 52, 200)
+            pdf.set_text_color(255, 255, 255)
+            pdf.cell(col_gate, 6, "Gate", border=1, align="C", fill=True)
+            pdf.cell(col_rng, 6, "Items", border=1, align="C", fill=True)
+            pdf.cell(col_sc, 6, "Correct", border=1, align="C", fill=True)
+            pdf.cell(col_thr, 6, "Pass threshold", border=1, align="C", fill=True)
+            pdf.cell(col_st, 6, "Status", border=1, align="C", fill=True, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font(font, "", 7.5)
+
+        if idx % 2 == 0:
+            pdf.set_fill_color(252, 251, 255)
+        else:
+            pdf.set_fill_color(246, 243, 255)
+        pdf.set_text_color(*_C_INK)
+        pdf.set_draw_color(*_C_LINE)
+
+        gate = int(row.get("gate") or 0)
+        rng = _pdf_core_font_safe(str(row.get("range") or ""))
+        cor = int(row.get("correct") or 0)
+        tot = int(row.get("total") or 0)
+        standard = int(row.get("standard_pass") or 0)
+        strong = int(row.get("strong_pass") or standard)
+        tier = str(row.get("pass_tier") or "below")
+        if tier == "strong":
+            st_label = "Strong pass"
+            r, g, b = _C_OK
+        elif tier == "standard":
+            st_label = "Pass"
+            r, g, b = (34, 120, 70)
+        else:
+            st_label = "Below threshold"
+            r, g, b = _C_BAD
+
+        pdf.cell(col_gate, line_h, str(gate), border="LRBT", align="C", fill=True)
+        pdf.cell(col_rng, line_h, rng, border="LRBT", align="C", fill=True)
+        pdf.cell(col_sc, line_h, f"{cor} / {tot}", border="LRBT", align="C", fill=True)
+        thr = f"{standard}/{tot}"
+        if strong > standard:
+            thr += f"  (strong {strong})"
+        pdf.cell(col_thr, line_h, _pdf_core_font_safe(thr), border="LRBT", align="C", fill=True)
+        pdf.set_font(font, "B", 7)
+        pdf.set_text_color(r, g, b)
+        pdf.cell(
+            col_st,
+            line_h,
+            _pdf_core_font_safe(st_label),
+            border="LRBT",
+            align="C",
+            fill=True,
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+        )
+        pdf.set_font(font, "", 7.5)
+        pdf.set_text_color(*_C_INK)
+
+    if gate_rec and gate_rec.get("summary"):
+        pdf.ln(2)
+        pdf.set_font(font, "", 8.5)
+        pdf.set_text_color(*_C_INK)
+        pdf.multi_cell(
+            0,
+            4.8,
+            _pdf_core_font_safe(str(gate_rec.get("summary") or "")),
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+        )
+    pdf.ln(4)
+
+
+def _section_card_label(sec: str, use_gates: bool) -> str:
+    s = str(sec or "").strip()
+    if use_gates and s.isdigit():
+        return f"Gate {s}"
+    return f"Part {s}"
+
+
 def _draw_recommendation(
     pdf: FPDF,
     font: str,
@@ -507,7 +632,7 @@ def _draw_one_section_card_at(
     pdf.set_xy(content_x, y_cursor)
     pdf.set_font(font, "B", 9.5)
     pdf.set_text_color(*_C_INK)
-    pdf.cell(inner_w - 24, row1_h, f"Part {sec}", align="L")
+    pdf.cell(inner_w - 24, row1_h, _section_card_label(sec, bool(s.get("use_gate_label"))), align="L")
     pdf.set_text_color(*_C_VIOLET_SOFT)
     pdf.cell(24, row1_h, f"{pct}%", align="R")
     pdf.ln(row1_h)
@@ -743,8 +868,15 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
 
     rows: list[dict[str, Any]] = ctx.get("rows") or []
     placement_rec: dict[str, Any] | None = ctx.get("placement_rec")
+    placement_gate_scores: list[dict[str, Any]] = ctx.get("placement_gate_scores") or []
+    placement_gate_rec: dict[str, Any] | None = ctx.get("placement_gate_rec")
     section_stats: list[dict[str, Any]] = ctx.get("section_stats") or []
     placement_brand: dict[str, Any] | None = ctx.get("placement_brand")
+    use_gate_labels = bool(placement_gate_scores)
+    if use_gate_labels:
+        section_stats = [
+            {**s, "use_gate_label": True} for s in section_stats
+        ]
 
     pdf = _PlacementReportPDF("Helvetica")
     font = _setup_font(pdf)
@@ -755,7 +887,7 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
 
     topic_title = _pdf_core_font_safe(str(ctx.get("topic_title") or "Placement diagnostic"))
     cc = int(ctx.get("correct_count") or 0)
-    tq = int(ctx.get("total_q") or 70)
+    tq = int(ctx.get("total_q") or 85)
     pct = int(ctx.get("score_pct") or 0)
 
     pdf.add_page()
@@ -765,15 +897,50 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
     _draw_score_card(pdf, font, cc, tq, pct)
     _draw_trust_note(pdf, font, placement_brand)
 
+    if placement_gate_scores:
+        _draw_gate_scores_panel(pdf, font, placement_gate_scores, placement_gate_rec)
+
     if placement_rec:
         _draw_panel_title(pdf, font, "Placement summary")
+        if placement_gate_rec and placement_rec.get("gate_headline"):
+            pdf.set_font(font, "B", 10)
+            pdf.set_text_color(*_C_VIOLET)
+            pdf.multi_cell(
+                0,
+                5.2,
+                _pdf_core_font_safe(str(placement_rec.get("gate_title") or "")),
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+            )
+            pdf.set_font(font, "", 8.5)
+            pdf.set_text_color(*_C_MUTED)
+            pdf.multi_cell(
+                0,
+                4.8,
+                _pdf_core_font_safe(str(placement_rec.get("gate_headline") or "")),
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+            )
+            pdf.ln(1)
+            pdf.set_font(font, "", 8)
+            pdf.set_text_color(*_C_MUTED)
+            pdf.multi_cell(
+                0,
+                4.5,
+                _pdf_core_font_safe(
+                    f"Total score band: {placement_rec.get('band_range', '—')} correct (out of {tq})"
+                ),
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+            )
+            pdf.ln(2)
         _draw_recommendation(pdf, font, placement_rec, tq)
 
     # Part snapshots always start on a new page so they never overlap the score block
     # (fpdf cursor + two-column rows previously could land on the same vertical band as RAW SCORE).
     pdf.add_page()
     _draw_sections_continuation_band(pdf, font, topic_title)
-    _draw_panel_title(pdf, font, "Performance by knowledge area")
+    _draw_panel_title(pdf, font, "Performance by gate" if use_gate_labels else "Performance by knowledge area")
     _draw_section_cards(pdf, font, section_stats, topic_title)
 
     attempt_id = ctx.get("attempt_id", "")
