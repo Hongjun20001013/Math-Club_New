@@ -138,6 +138,53 @@ MIDDLE_LEVEL_PART_GATES: List[dict[str, Any]] = [
         "prev_band": "Math 8",
     },
 ]
+
+
+def _upper_placement_gate_gates() -> List[dict[str, Any]]:
+    """Gate 2–5 transition screens for the upper-school Five-Gate diagnostic."""
+    meta = _load_placement_meta_file("placement_full")
+    rubric = meta.get("gate_rubric") or []
+    if not rubric:
+        return []
+    rows = sorted(
+        [r for r in rubric if isinstance(r, dict)],
+        key=lambda r: int(r.get("gate") or 0),
+    )
+    out: List[dict[str, Any]] = []
+    for i, row in enumerate(rows):
+        gate_num = int(row.get("gate") or 0)
+        if gate_num <= 1:
+            continue
+        rng = str(row.get("range") or "")
+        m = re.match(r"(\d+)\s*[–-]\s*(\d+)", rng)
+        if not m:
+            continue
+        q_start = int(m.group(1))
+        q_end = int(m.group(2))
+        item_count = int(row.get("items") or (q_end - q_start + 1))
+        prev = rows[i - 1]
+        prev_num = int(prev.get("gate") or gate_num - 1)
+        prev_label = str(prev.get("readiness_label") or f"Gate {prev_num}")
+        gate_label = str(row.get("readiness_label") or f"Gate {gate_num}")
+        out.append(
+            {
+                "section": f"gate_{gate_num}",
+                "session_flag": f"placement_upper_seen_gate_{gate_num}",
+                "first_qnum": q_start - 1,
+                "after_q_index": q_start - 2,
+                "gate_num": gate_num,
+                "gate_label": gate_label,
+                "gate_title": f"Gate {gate_num} — {gate_label}",
+                "prev_gate": prev_label,
+                "prev_gate_title": f"Gate {prev_num} — {prev_label}",
+                "item_count": item_count,
+                "q_start": q_start,
+                "q_end": q_end,
+            }
+        )
+    return out
+
+
 DESMOS_API_KEY = os.environ.get("DESMOS_API_KEY", "").strip()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 COMPILED_BANK_CACHE = None
@@ -1532,6 +1579,18 @@ def _placement_flow_config(topic: str) -> dict | None:
             "session_prefix": "placement_middle",
             "mc_scored": False,
         }
+    if topic == "placement_full":
+        mc = int(row.get("online_mcq_count") or row.get("online_item_count") or 85)
+        return {
+            "mc_count": mc,
+            "graph_count": 0,
+            "fr_count": 0,
+            "total": mc,
+            "has_gates": True,
+            "gate_kind": "upper_gates",
+            "session_prefix": "placement_upper",
+            "mc_scored": True,
+        }
     mc = int(row.get("online_mcq_count") or 0)
     total = int(row.get("online_item_count") or 0)
     graph = 4 if topic in ("enhanced_math_1", "enhanced_math_2") else 0
@@ -1567,6 +1626,10 @@ def _clear_placement_section_flags(topic: str) -> None:
         return
     if cfg.get("gate_kind") == "middle_parts":
         for gate in MIDDLE_LEVEL_PART_GATES:
+            session.pop(str(gate["session_flag"]), None)
+        return
+    if cfg.get("gate_kind") == "upper_gates":
+        for gate in _upper_placement_gate_gates():
             session.pop(str(gate["session_flag"]), None)
         return
     prefix = cfg.get("session_prefix")
@@ -7665,6 +7728,49 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
                 ],
             }
         return None
+    if cfg.get("gate_kind") == "upper_gates":
+        for gate in _upper_placement_gate_gates():
+            if gate["section"] != section:
+                continue
+            gate_num = int(gate["gate_num"])
+            total_items = int(cfg.get("total") or 85)
+            return {
+                "section": section,
+                "session_flag": str(gate["session_flag"]),
+                "first_qnum": int(gate["first_qnum"]),
+                "kicker": f"Placement · Gate {gate_num} of 5",
+                "title": str(gate["gate_label"]),
+                "lead": (
+                    f"You finished {gate['prev_gate_title']}. "
+                    f"This gate is complete — take a short breath, then continue with "
+                    f"{int(gate['item_count'])} multiple-choice items "
+                    f"(questions {int(gate['q_start'])}–{int(gate['q_end'])} of {total_items})."
+                ),
+                "begin_label": f"Begin Gate {gate_num}",
+                "part_num": gate_num,
+                "part_total": 5,
+                "q_start": int(gate["q_start"]),
+                "q_end": int(gate["q_end"]),
+                "total_items": total_items,
+                "cards": [
+                    {
+                        "icon": str(gate_num),
+                        "title": f"Gate {gate_num}",
+                        "body": str(gate["gate_title"]),
+                    },
+                    {
+                        "icon": str(gate["item_count"]),
+                        "title": f"{gate['item_count']} items",
+                        "body": "Multiple-choice items in the same order as the printable placement test.",
+                    },
+                    {
+                        "icon": "⏱",
+                        "title": "Timer",
+                        "body": "Your placement timer keeps running across all 85 questions.",
+                    },
+                ],
+            }
+        return None
     mc = int(cfg["mc_count"])
     graph = int(cfg["graph_count"])
     fr = int(cfg["fr_count"])
@@ -7757,6 +7863,15 @@ def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
                     section=str(gate["section"]),
                 )
         return None
+    if cfg.get("gate_kind") == "upper_gates":
+        for gate in _upper_placement_gate_gates():
+            if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
+                return url_for(
+                    "placement_section_intro",
+                    slug=slug,
+                    section=str(gate["section"]),
+                )
+        return None
     mc = int(cfg["mc_count"])
     graph = int(cfg["graph_count"])
     fr_start = mc + graph
@@ -7772,6 +7887,16 @@ def _placement_section_back_href(topic: str, section: str) -> str:
     cfg = _placement_flow_config(topic) or {}
     if cfg.get("gate_kind") == "middle_parts":
         for gate in MIDDLE_LEVEL_PART_GATES:
+            if gate["section"] == section:
+                return url_for(
+                    "practice_question",
+                    domain="placement",
+                    topic=topic,
+                    qnum=int(gate["after_q_index"]),
+                )
+        return url_for("practice_question", domain="placement", topic=topic, qnum=0)
+    if cfg.get("gate_kind") == "upper_gates":
+        for gate in _upper_placement_gate_gates():
             if gate["section"] == section:
                 return url_for(
                     "practice_question",
@@ -11079,6 +11204,16 @@ def submit_practice_answer():
             slug = _placement_slug_for_topic(topic)
             if flow.get("gate_kind") == "middle_parts":
                 for gate in MIDDLE_LEVEL_PART_GATES:
+                    if q_index == int(gate["after_q_index"]):
+                        return redirect(
+                            url_for(
+                                "placement_section_intro",
+                                slug=slug,
+                                section=str(gate["section"]),
+                            )
+                        )
+            elif flow.get("gate_kind") == "upper_gates":
+                for gate in _upper_placement_gate_gates():
                     if q_index == int(gate["after_q_index"]):
                         return redirect(
                             url_for(

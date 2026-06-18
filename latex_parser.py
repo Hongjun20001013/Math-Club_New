@@ -851,18 +851,22 @@ def _placement_part_meta(n: int) -> tuple[str, str]:
 
 def _find_balanced_mc_args(block: str, mc_start: int) -> Optional[tuple[list[str], int]]:
     """
-    After ``\\mc``, read five braced groups (supports nested ``{...}``).
-    Returns (args, index_after_fifth_group).
+    After ``\\mc``, read four or five braced groups (supports nested ``{...}``).
+    Returns (args, index_after_last_group).
     """
     j = mc_start + len(r"\mc")
     args: list[str] = []
-    for _ in range(5):
+    while len(args) < 5:
         while j < len(block) and block[j].isspace():
             j += 1
+        if j >= len(block) or block[j] != "{":
+            break
         arg, j = _extract_braced_content(block, j)
         if arg is None:
-            return None
+            break
         args.append(arg)
+    if len(args) not in (4, 5):
+        return None
     return args, j
 
 
@@ -912,7 +916,7 @@ def _extract_placement_choices(block: str) -> Optional[tuple[str, list[str]]]:
     body = em.group(1)
     end_local = em.end() + start
     items = _split_enumerate_choice_body(body)
-    if len(items) != 5:
+    if len(items) not in (4, 5):
         return None
     stem_raw = block[:start].strip()
     return stem_raw, items
@@ -1138,6 +1142,19 @@ def parse_placement_answer_key(tex: str) -> dict[int, str]:
     return out
 
 
+def _placement_gate_span(n: int) -> tuple[int, int]:
+    """1-based question index → (first, last) inclusive for its gate."""
+    if n <= 16:
+        return 1, 16
+    if n <= 37:
+        return 17, 37
+    if n <= 53:
+        return 38, 53
+    if n <= 69:
+        return 54, 69
+    return 70, PLACEMENT_MAX_QUESTIONS
+
+
 def parse_placement_tex_file(path: str):
     """
     Parse Novel Prep upper-school placement items: ``\\circnum{n}`` / ``\\q{n}`` stem,
@@ -1177,12 +1194,19 @@ def parse_placement_tex_file(path: str):
         stem_html = _format_placement_stem_html(stem_raw)
         choices_html = [_format_placement_choice_html(c) for c in choice_raws]
         sec, title_en = _placement_part_meta(n)
+        gate_lo, gate_hi = _placement_gate_span(n)
         questions.append(
             {
                 "stem": stem_html,
                 "choices": choices_html,
-                "question_kind": "mcq5",
+                "question_kind": "mcq5" if len(choice_raws) == 5 else "mcq",
                 "display_number": n,
+                "placement_section": f"gate_{sec}",
+                "placement_section_title": title_en.split("—", 1)[-1].strip() or title_en,
+                "placement_section_index": n - gate_lo + 1,
+                "placement_section_total": gate_hi - gate_lo + 1,
+                "placement_global_index": n,
+                "placement_global_total": PLACEMENT_MAX_QUESTIONS,
                 "knowledge_section": sec,
                 "knowledge_section_title_en": title_en,
                 "knowledge_section_title_zh": title_en,

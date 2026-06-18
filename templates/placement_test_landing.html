@@ -101,7 +101,7 @@
                     {% elif topic == 'enhanced_math_2' %}
                     <p class="np-pl-structure__note">Online: <strong>55 MCQ</strong> auto-scored, then <strong>4 graphing</strong> + <strong>10 free response</strong> for advisor review.</p>
                     {% elif topic == 'placement_full' %}
-                    <p class="np-pl-structure__note">Five-gate hybrid diagnostic: <strong>85 items</strong> from Algebra I readiness through calculus readiness. Calculators off unless your instructor permits them.</p>
+                    <p class="np-pl-structure__note">Five-gate hybrid diagnostic: <strong>85 items</strong>, <strong>A–D</strong> multiple choice. After each gate you’ll see a short transition before the next section begins.</p>
                     {% endif %}
                 </section>
                 {% endif %}
@@ -111,12 +111,12 @@
                 <div class="np-pl-pillar">
                     <p class="np-pl-pillar__eyebrow">Ready when you are</p>
                     <h2 class="np-pl-pillar__title">Start the diagnostic</h2>
-                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic in ('enhanced_math_1', 'enhanced_math_2') %}Bluebook-style sections with transitions between MCQ, graphing, and free response.{% else %}Full upper-school placement with instant scoring and a shareable parent report.{% endif %}</p>
+                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic in ('enhanced_math_1', 'enhanced_math_2') %}Bluebook-style sections with transitions between MCQ, graphing, and free response.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
                     <a href="{{ url_for('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta">
                         Begin placement test
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
-                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. Transitions after Q50 and Q54.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. Transitions after Q55 and Q59.{% else %}About <strong>115 minutes</strong>. Five gates, calculators off unless permitted.{% endif %}</p>
+                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. Transitions after Q50 and Q54.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. Transitions after Q55 and Q59.{% else %}About <strong>115 minutes</strong>. Pause screens after Q16, Q37, Q53, and Q69.{% endif %}</p>
                 </div>
                 <div class="np-pl-pdf">
                     <div class="np-pl-pdf__icon" aria-hidden="true">
