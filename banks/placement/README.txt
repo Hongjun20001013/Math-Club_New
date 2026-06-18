@@ -8,7 +8,7 @@ The placement hub lives at **/placement** (`data/placement_catalog.json`). Each 
   - Meta: `data/placement_middle_level_meta.json`
 - **Enhanced Math 1 / Math I** — `Placement_Enhanced_Math_1.tex` (65 online items; slug `enhanced-math-1`)
 - **Enhanced Math 2 / Math II** — `Placement_Enhanced_Math_2.tex` (69 online items; slug `enhanced-math-2`)
-- **Upper school** — `Placement_Test.tex` (70 MCQ; slug `upper-algebra-precalc`)
+- **Upper school** — `Placement_Test.tex` (85 MCQ, Five-Gate Hybrid; slug `upper-algebra-precalc`)
 
 Build steps
 1. Edit the relevant `.tex` at repo root (source of truth).

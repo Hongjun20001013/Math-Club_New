@@ -1557,7 +1557,8 @@ def _placement_timer_seconds(topic: str) -> int:
         "enhanced_math_1": 120 * 60,
         "enhanced_math_2": 130 * 60,
         "middle_level": 150 * 60,
-    }.get(topic, 95 * 60)
+        "placement_full": 115 * 60,
+    }.get(topic, 115 * 60)
 
 
 def _clear_placement_section_flags(topic: str) -> None:
@@ -3482,11 +3483,11 @@ def _unit_pdf_cards() -> List[dict]:
 
 # Landing page copy for /placement — mirrors `latex_parser._placement_part_meta` ranges.
 PLACEMENT_LANDING_PARTS: List[Dict[str, str]] = [
-    {"code": "I", "range": "1–15", "label": "Foundations & algebra"},
-    {"code": "II", "range": "16–30", "label": "Exponents, rationals & functions"},
-    {"code": "III", "range": "31–45", "label": "Graphs, geometry & radicals"},
-    {"code": "IV", "range": "46–60", "label": "Functions, trig & precalc"},
-    {"code": "V", "range": "61–70", "label": "Geometry & advanced readiness"},
+    {"code": "1", "range": "1–16", "label": "Gate 1 — Algebra I readiness"},
+    {"code": "2", "range": "17–37", "label": "Gate 2 — Geometry readiness"},
+    {"code": "3", "range": "38–53", "label": "Gate 3 — Algebra II readiness"},
+    {"code": "4", "range": "54–69", "label": "Gate 4 — Precalculus readiness"},
+    {"code": "5", "range": "70–85", "label": "Gate 5 — Calculus readiness"},
 ]
 
 # Human-readable labels for /practice/<domain> headers
@@ -3884,7 +3885,7 @@ TOPIC_TITLES = {
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
     "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
-    "placement_full": "Upper school placement (Algebra–Precalculus)",
+    "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
     "enhanced_math_2": "Enhanced Math 2 / Math II placement",
     "middle_level": "Middle level math placement",

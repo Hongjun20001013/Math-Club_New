@@ -83,19 +83,20 @@
           "slug": "upper-algebra-precalc",
           "topic": "placement_full",
           "title": "Algebra 1 · Algebra 2 · Precalculus",
-          "subtitle": "70-item upper-school placement diagnostic",
+          "subtitle": "85-item Five-Gate Hybrid upper-school diagnostic",
           "status": "available",
           "tex_file": "Placement_Test.tex",
           "pdf_file": "Placement_Test.pdf",
           "meta_file": "data/placement_meta.json",
-          "online_mcq_count": 70,
-          "paper_sections": "70 items · five parts",
+          "online_mcq_count": 85,
+          "online_item_count": 85,
+          "paper_sections": "85 items · five gates",
           "parts": [
-            {"code": "I", "range": "1–15", "label": "Foundations & algebra"},
-            {"code": "II", "range": "16–30", "label": "Exponents, rationals & functions"},
-            {"code": "III", "range": "31–45", "label": "Graphs, geometry & radicals"},
-            {"code": "IV", "range": "46–60", "label": "Functions, trig & precalc"},
-            {"code": "V", "range": "61–70", "label": "Geometry & advanced readiness"}
+            {"code": "1", "range": "1–16", "label": "Gate 1 — Algebra I readiness"},
+            {"code": "2", "range": "17–37", "label": "Gate 2 — Geometry readiness"},
+            {"code": "3", "range": "38–53", "label": "Gate 3 — Algebra II readiness"},
+            {"code": "4", "range": "54–69", "label": "Gate 4 — Precalculus readiness"},
+            {"code": "5", "range": "70–85", "label": "Gate 5 — Calculus readiness"}
           ]
         }
       ]

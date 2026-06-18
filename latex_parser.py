@@ -783,17 +783,70 @@ def _strip_needspace(text: str) -> str:
     return re.sub(r"\\needspace\*?\s*\{[^}]*\}", "", text)
 
 
+PLACEMENT_MAX_QUESTIONS = 85
+
+
+def _convert_array_in_display_math(text: str) -> str:
+    """Turn ``\\begin{array}`` blocks inside ``\\[...\\]`` into HTML tables."""
+
+    def repl_block(m: re.Match[str]) -> str:
+        inner = m.group(1)
+        if r"\begin{array}" not in inner and r"\begin{tabular}" not in inner:
+            return m.group(0)
+        converted = latex_array_and_tabular_to_html(inner)
+        return converted if converted != inner else m.group(0)
+
+    return re.sub(r"\\\[(.*?)\\\]", repl_block, text, flags=re.S)
+
+
+def _normalize_placement_question_markers(body: str) -> str:
+    """Support hybrid-gate ``\\q{n}`` and ``\\item[\\circnum{n}]`` markers."""
+    cut = body.find(r"\section*{Student Answer Grid}")
+    if cut != -1:
+        body = body[:cut]
+    body = re.sub(
+        r"\\item\[\s*\\circnum\{(\d+)\}\s*\]",
+        r"\\circnum{\1}",
+        body,
+    )
+    body = re.sub(r"\\q\{(\d+)\}", r"\\circnum{\1}", body)
+    return body
+
+
+def _expand_placement_inline_diagram_macros(text: str) -> str:
+    """Inline hybrid-gate diagram macros (e.g. circle chord figure for Q27)."""
+    if r"\circleChordDiagram" not in text:
+        return text
+    chord_svg = (
+        '<div class="stem-figure-wrap" role="img" aria-label="Circle with chords">'
+        '<svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">'
+        '<circle cx="110" cy="110" r="96" fill="none" stroke="#1f1f26" stroke-width="2.2"/>'
+        '<line x1="28" y="94" x2="192" y="94" stroke="#1f1f26" stroke-width="2"/>'
+        '<line x1="58" y="36" x2="58" y="184" stroke="#1f1f26" stroke-width="2"/>'
+        '<line x1="28" y="94" x2="58" y="36" stroke="#1f1f26" stroke-width="2"/>'
+        '<line x1="58" y="36" x2="192" y="94" stroke="#1f1f26" stroke-width="2"/>'
+        '<text x="8" y="100" font-size="14" font-weight="600">A</text>'
+        '<text x="44" y="28" font-size="14" font-weight="600">B</text>'
+        '<text x="198" y="100" font-size="14" font-weight="600">C</text>'
+        '<text x="44" y="206" font-size="14" font-weight="600">E</text>'
+        '<text x="72" y="118" font-size="14" font-weight="600">D</text>'
+        "</svg></div>"
+    )
+    text = text.replace(r"\circleChordDiagram", chord_svg)
+    return text
+
+
 def _placement_part_meta(n: int) -> tuple[str, str]:
-    """1-based question index → (section code, English title)."""
-    if n <= 15:
-        return "I", "Part I — Foundations and Algebra Skills"
-    if n <= 30:
-        return "II", "Part II — Exponents, Rational Expressions, and Functions"
-    if n <= 45:
-        return "III", "Part III — Graphs, Geometry, and Radical Functions"
-    if n <= 60:
-        return "IV", "Part IV — Functions, Trigonometry, and Precalculus"
-    return "V", "Part V — Geometry, Solid Geometry, and Advanced Readiness"
+    """1-based question index → (gate code, English title)."""
+    if n <= 16:
+        return "1", "Gate 1 — Algebra I Readiness"
+    if n <= 37:
+        return "2", "Gate 2 — Geometry Readiness"
+    if n <= 53:
+        return "3", "Gate 3 — Algebra II Readiness"
+    if n <= 69:
+        return "4", "Gate 4 — Precalculus Readiness"
+    return "5", "Gate 5 — Calculus Readiness"
 
 
 def _find_balanced_mc_args(block: str, mc_start: int) -> Optional[tuple[list[str], int]]:
@@ -1026,9 +1079,12 @@ def _normalize_placement_currency(text: str) -> str:
 def _format_placement_stem_html(raw: str) -> str:
     raw = _strip_needspace(raw)
     raw = _strip_leading_tex_control_space(raw)
+    raw = re.sub(r"\\sectiontag\{[^{}]*\}", "", raw)
     raw = re.sub(r"\\hfill\b\s*", " ", raw)
     raw = re.sub(r"\\hfil\b\s*", " ", raw)
+    raw = _expand_placement_inline_diagram_macros(raw)
     raw = latex_array_and_tabular_to_html(raw)
+    raw = _convert_array_in_display_math(raw)
     raw = _normalize_placement_currency(raw)
     raw = _inject_placement_geometry_svgs(raw)
     raw = replace_tikz_with_svg_html(raw)
@@ -1056,42 +1112,58 @@ def _format_placement_stem_html(raw: str) -> str:
 
 def parse_placement_answer_key(tex: str) -> dict[int, str]:
     """
-    Parse ``n. L`` entries (L is A–E) from the Answer Key ``array`` block.
+    Parse answer letters (A–E) from the Answer Key section.
+    Supports legacy ``n. L`` array rows and hybrid-gate enumerate lists.
     """
     out: dict[int, str] = {}
-    # TeX uses ``.\ `` (control space) between number and letter in the key table.
+    key_m = re.search(
+        r"\\section\*\{Answer Key\}(.*?)\\end\{document\}",
+        tex,
+        flags=re.S,
+    )
+    if key_m:
+        block = key_m.group(1)
+        for i, letter in enumerate(
+            re.findall(r"\\item\s+([A-E])\b", block),
+            start=1,
+        ):
+            if 1 <= i <= PLACEMENT_MAX_QUESTIONS:
+                out[i] = letter.upper()
+        if out:
+            return out
     for m in re.finditer(r"(\d+)\.(?:\\\s+|\s+)([A-E])\b", tex):
         n = int(m.group(1))
-        if 1 <= n <= 70:
+        if 1 <= n <= PLACEMENT_MAX_QUESTIONS:
             out[n] = m.group(2).upper()
     return out
 
 
 def parse_placement_tex_file(path: str):
     """
-    Parse Novel Prep ``Placement_Test.tex`` style items: ``\\circnum{n}`` stem,
+    Parse Novel Prep upper-school placement items: ``\\circnum{n}`` / ``\\q{n}`` stem,
     then ``\\mc{a}{b}{c}{d}{e}`` or a five-item ``enumerate`` (graph options).
-    Only questions 1–70 are returned; answer grid / teacher pages are ignored.
+    Returns questions 1–PLACEMENT_MAX_QUESTIONS; teacher pages are ignored.
     """
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
     doc_i = content.find(r"\begin{document}")
     body = content[doc_i:] if doc_i != -1 else content
+    body = _normalize_placement_question_markers(body)
     macros = _collect_placement_graph_macro_bodies(content)
 
     circ = list(re.finditer(r"\\circnum\{(\d+)\}", body))
     by_num: dict[int, tuple[int, int]] = {}
     for idx, m in enumerate(circ):
         n = int(m.group(1))
-        if n < 1 or n > 70:
+        if n < 1 or n > PLACEMENT_MAX_QUESTIONS:
             continue
         start = m.end()
         end = circ[idx + 1].start() if idx + 1 < len(circ) else len(body)
         by_num[n] = (start, end)
 
     questions: list[dict[str, Any]] = []
-    for n in range(1, 71):
+    for n in range(1, PLACEMENT_MAX_QUESTIONS + 1):
         span = by_num.get(n)
         if not span:
             continue
