@@ -150,7 +150,16 @@ def _convert_latex_lists(text: str) -> str:
                     "</li>"
                 )
             else:
-                lis.append(f"<li>{chunk}</li>")
+                let_m = re.match(r"^([A-D])\.\s*(.*)$", chunk, re.S)
+                if let_m:
+                    lis.append(
+                        '<li class="stem-li-labeled">'
+                        f'<span class="stem-li-marker">{let_m.group(1)}</span> '
+                        f'<span class="stem-li-body">{let_m.group(2).strip()}</span>'
+                        "</li>"
+                    )
+                else:
+                    lis.append(f"<li>{chunk}</li>")
         return '<ul class="stem-itemize">' + "".join(lis) + "</ul>"
 
     def enumerate_repl(match: Any) -> str:
@@ -171,7 +180,16 @@ def _convert_latex_lists(text: str) -> str:
                     "</li>"
                 )
             else:
-                lis.append(f"<li>{chunk}</li>")
+                let_m = re.match(r"^([A-D])\.\s*(.*)$", chunk, re.S)
+                if let_m:
+                    lis.append(
+                        '<li class="stem-li-labeled">'
+                        f'<span class="stem-li-marker">{let_m.group(1)}</span> '
+                        f'<span class="stem-li-body">{let_m.group(2).strip()}</span>'
+                        "</li>"
+                    )
+                else:
+                    lis.append(f"<li>{chunk}</li>")
         return '<ol class="stem-enumerate">' + "".join(lis) + "</ol>"
 
     # Convert innermost list environments first so nested itemize/enumerate parse correctly.
@@ -222,6 +240,26 @@ def _cell_needs_math_delimiters(cell: str) -> bool:
     return False
 
 
+def _expand_dollar_math_segments(cell: str) -> str:
+    """Turn `$p\\%$ of $x$` style cells into inline math plus prose."""
+    parts: list[str] = []
+    pos = 0
+    for m in re.finditer(r"\$(.+?)\$", cell):
+        if m.start() > pos:
+            prose = cell[pos : m.start()].strip()
+            if prose:
+                parts.append(prose.replace("%", "&#37;"))
+        inner = m.group(1).strip()
+        inner = inner.replace(r"\%", "%").replace("%", r"\%")
+        parts.append(f"\\(\\displaystyle {inner}\\)")
+        pos = m.end()
+    if pos < len(cell):
+        tail = cell[pos:].strip()
+        if tail:
+            parts.append(tail.replace("%", "&#37;"))
+    return " ".join(parts)
+
+
 def _clean_table_cell(cell: str) -> str:
     """Strip LaTeX text wrappers from array/tabular cells before HTML output."""
     cell = cell.strip()
@@ -235,8 +273,10 @@ def _clean_table_cell(cell: str) -> str:
             break
         cell = updated
     cell = cell.replace("--", "–")
-    cell = cell.replace(r"\%", "%")
     cell = cell.replace("{,}", ",")
+    if re.search(r"\$.+?\$", cell):
+        return _expand_dollar_math_segments(cell)
+    cell = cell.replace(r"\%", "%")
     cell = re.sub(
         r"\\frac\{([^{}]+)\}\{([^{}]+)\}",
         r"\\(\\frac{\1}{\2}\\)",
@@ -249,7 +289,8 @@ def _clean_table_cell(cell: str) -> str:
     # Normalize $...$ once so clean_latex_junk does not nest MATHSEG vaults inside \(...\).
     m_dollar = re.fullmatch(r"\$(.+)\$", cell.strip(), flags=re.S)
     if m_dollar:
-        cell = f"\\(\\displaystyle {m_dollar.group(1).strip()}\\)"
+        inner = m_dollar.group(1).strip().replace("%", r"\%")
+        cell = f"\\(\\displaystyle {inner}\\)"
     elif _cell_needs_math_delimiters(cell):
         cell = f"\\({cell}\\)"
     return cell.strip()
@@ -258,6 +299,7 @@ def _clean_table_cell(cell: str) -> str:
 def _parse_table_cell(cell: str) -> tuple[int, str]:
     """Return (colspan, cleaned cell HTML) for a tabular cell."""
     cell = cell.strip()
+    cell = re.sub(r"\\(?:rowcolor|cellcolor|arrayrulecolor)(?:\[[^\]]*\])?\{[^}]*\}\s*", "", cell)
     m = re.match(r"\\multicolumn\{(\d+)\}\{[^}]*\}\{(.*)\}\s*$", cell, re.S)
     if m:
         return int(m.group(1)), _clean_table_cell(m.group(2))
@@ -276,6 +318,7 @@ def _array_body_to_html_table(body: str) -> str:
             continue
         if re.fullmatch(r"\\hline\s*", r):
             continue
+        r = re.sub(r"\\(?:rowcolor|cellcolor|arrayrulecolor)(?:\[[^\]]*\])?\{[^}]*\}\s*", "", r)
         r = re.sub(r"^\\hline\s*", "", r)
         r = re.sub(r"\s*\\hline\s*$", "", r).strip()
         if not r:

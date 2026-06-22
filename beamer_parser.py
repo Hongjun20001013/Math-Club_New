@@ -533,13 +533,24 @@ def _strip_beamer_layout_commands(text: str) -> str:
     return text
 
 
+def _enumerate_uses_auto_labels(enum_opt: str) -> bool:
+    opt = (enum_opt or "").strip()
+    if re.match(r"^[A-Da-d]\.?\s*$", opt):
+        return True
+    return bool(re.match(r"^\([A-Da-d]\)$", opt))
+
+
 def _convert_beamer_enumerate(text: str) -> str:
     def repl(m: re.Match[str]) -> str:
         enum_opt = (m.group(1) or "").strip()
         body = m.group(2)
         parts = re.split(r"\\item\s*", body)
         choices: list[tuple[str, str]] = []
-        auto_letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") if re.match(r"^[A-Da-d]\.?\s*$", enum_opt) else []
+        auto_letters = (
+            list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            if _enumerate_uses_auto_labels(enum_opt)
+            else []
+        )
         for chunk in parts:
             chunk = chunk.strip()
             if not chunk:
@@ -857,7 +868,7 @@ def _format_plain_paragraphs(text: str) -> str:
     html_parts: list[str] = []
     i = 0
     while i < len(lines):
-        line = lines[i]
+        line = re.sub(r"\\+\s*$", "", lines[i]).strip()
         if not line:
             i += 1
             continue
@@ -1030,6 +1041,28 @@ def _clean_mcq_body(body: str) -> str:
     return body
 
 
+def _looks_like_plain_mcq_items(items: list[str]) -> bool:
+    """True when four list items look like SAT answer values, not prose bullets."""
+    cleaned = [re.sub(r"<[^>]+>", "", item).strip() for item in items]
+    cleaned = [item for item in cleaned if item]
+    if len(cleaned) != 4:
+        return False
+    if all(re.match(r"^[\d,.\s/+-]+$", item) for item in cleaned):
+        return True
+    if any(re.search(r"\b(the|and|your|always|check|use|write|cancel|need)\b", item, re.I) for item in cleaned):
+        return False
+    return all(len(item) <= 24 and re.search(r"\d", item) for item in cleaned)
+
+
+def _valid_mcq_choice_set(choices: list[tuple[str, str]]) -> bool:
+    if len(choices) not in {3, 4}:
+        return False
+    letters = [letter for letter, _ in choices]
+    if not all(letter in {"A", "B", "C", "D"} for letter in letters):
+        return False
+    return letters == list("ABCD")[: len(letters)]
+
+
 def _extract_mcq_choices_from_list(list_html: str) -> list[tuple[str, str]]:
     choices: list[tuple[str, str]] = []
     for item in re.finditer(
@@ -1047,6 +1080,18 @@ def _extract_mcq_choices_from_list(list_html: str) -> list[tuple[str, str]]:
             list_html,
             flags=re.S,
         ):
+            choices.append((item.group(1), _clean_mcq_body(item.group(2))))
+    if not choices:
+        plain_items = [
+            re.sub(r"<[^>]+>", "", body).strip()
+            for body in re.findall(r"<li>(.*?)</li>", list_html, flags=re.S)
+        ]
+        plain_items = [body for body in plain_items if body]
+        if len(plain_items) == 4 and _looks_like_plain_mcq_items(plain_items):
+            for letter, body in zip("ABCD", plain_items, strict=True):
+                choices.append((letter, _clean_mcq_body(body)))
+    if not choices:
+        for item in re.finditer(r"<li>([A-D])\.\s*(.*?)</li>", list_html, flags=re.S):
             choices.append((item.group(1), _clean_mcq_body(item.group(2))))
     return choices
 
@@ -1152,7 +1197,7 @@ def _wrap_standalone_mcq_list(html: str) -> str:
         return html
     m = matches[-1]
     choices = _extract_mcq_choices_from_list(m.group(2))
-    if len(choices) != 4 or not all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
+    if not _valid_mcq_choice_set(choices):
         return html
     return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
 
@@ -1367,11 +1412,48 @@ def _needs_math_delimiters(text: str) -> bool:
 
 def _strip_inline_math_delimiters(text: str) -> str:
     out = text.strip()
-    out = re.sub(r"^\\?\(", "", out)
-    out = re.sub(r"\\?\)$", "", out)
+    if out.startswith(r"\(") and out.endswith(r"\)"):
+        out = out[2:-2].strip()
+    elif out.startswith(r"\("):
+        out = out[2:].lstrip()
+    elif out.endswith(r"\)"):
+        out = out[:-2].rstrip()
     out = re.sub(r"\\text\{([^}]*)\}", r"\1", out)
     out = re.sub(r"\\mathbf\{([^}]*)\}", r"\1", out)
     return out.strip()
+
+
+def _unwrap_outer_math_delimiters(text: str) -> str:
+    out = text.strip()
+    if out.startswith(r"\(") and out.endswith(r"\)"):
+        return out[2:-2].strip()
+    return out
+
+
+def _format_mcq_letter_answer(raw: str) -> str | None:
+    """Format '(B) \\frac{...}{...}' / 'D) \\displaystyle 14.3' answer cards."""
+    text = re.sub(r"<[^>]+>", "", raw).strip()
+    text = _unwrap_outer_math_delimiters(text)
+    text = re.sub(r"\\?\(\s*\\displaystyle\s*\\?\)\s*", "", text).strip()
+    m = re.match(r"^\(?([A-D])\)?\.?\s*(.*)$", text, re.I | re.S)
+    if not m:
+        return None
+    letter = m.group(1).upper()
+    rest = m.group(2).strip()
+    if not rest:
+        return f"<strong>{letter}</strong>"
+    rest = _unwrap_outer_math_delimiters(rest)
+    rest = re.sub(r"\\displaystyle\s*", "", rest).strip()
+    if (
+        _needs_math_delimiters(rest)
+        or re.search(r"\\(?:d|t)?frac|\\left|\\right|\\dfrac|\\\\|^\\%", rest)
+        or re.search(r"\\%|\d+\.\d+\\%", rest)
+    ):
+        return (
+            f'<strong>{letter}</strong> '
+            f'<span class="cm-answer-card-math">\\({rest}\\)</span>'
+        )
+    return f"<strong>{letter}</strong> {rest}"
 
 
 def _answer_card(label: str, value_html: str) -> str:
@@ -1486,11 +1568,11 @@ def _format_mcq_letter_with_math(inner: str) -> str | None:
 
 def _format_answer_value(raw: str) -> str:
     raw = raw.strip()
+    mcq_formatted = _format_mcq_letter_answer(raw)
+    if mcq_formatted:
+        return mcq_formatted
     raw = re.sub(r"\\?\(\s*\\displaystyle\s*\\?\)\s*", "", raw)
-    # Some source slides write answers as "\( 7350 \) square inches"; after
-    # inline math cleanup, a lone closing delimiter can remain before prose.
-    raw = re.sub(r"(?<!\\)\\[()]", "", raw)
-    raw = re.sub(r"\\[()]", "", raw)
+    raw = _unwrap_outer_math_delimiters(raw)
     plain_preview = re.sub(r"<[^>]+>", "", raw)
     if len(re.findall(r"[A-Za-z]{2,}", plain_preview)) >= 5:
         return _format_mixed_prose_answer(raw)
@@ -1562,7 +1644,13 @@ def _polish_answer_lines(html: str) -> str:
     """Turn legacy \\( … \\) answer markup into premium answer cards."""
     html = _repair_latex_garble(html)
     html = re.sub(
-        r'<p><strong>(Final Answer|Correct Answer|Answer):\s*</strong>\s*(.*?)</p>',
+        r'<p><strong>(Final Answer|Correct Answer|Correct answer|Closest answer|Answer):\s*(\d+(?:\.\d+)?)\s*</strong></p>',
+        lambda m: _answer_card(m.group(1), _format_answer_value(m.group(2))),
+        html,
+        flags=re.S | re.I,
+    )
+    html = re.sub(
+        r'<p><strong>(Final Answer|Correct Answer|Correct answer|Closest answer|Answer):\s*</strong>\s*(.*?)</p>',
         lambda m: _answer_card(m.group(1), _format_answer_value(m.group(2))),
         html,
         flags=re.S | re.I,
@@ -1746,7 +1834,7 @@ def _body_has_mcq_choices(html: str) -> bool:
         flags=re.S,
     ):
         choices = _extract_mcq_choices_from_list(lst.group(1))
-        if len(choices) == 4 and all(letter in {"A", "B", "C", "D"} for letter, _ in choices):
+        if _valid_mcq_choice_set(choices):
             return True
     return False
 
@@ -1771,6 +1859,8 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
         return "answer"
     if tl.startswith("solution:") or (tl.startswith("solution") and "finding" in tl):
         return "solution"
+    if re.match(r"^example:\s*solution\b", tl):
+        return "solution"
     if tl.startswith("challenge:"):
         return "question"
     if re.search(r"\bquestion:\s", plain, re.I) and not re.search(
@@ -1778,7 +1868,14 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
     ):
         if not tl.startswith("solution"):
             return "question"
-    if "question" in tl and not tl.startswith("solution"):
+    if re.search(r"\bquestion\b", tl) and not tl.startswith("solution") and "questions" not in tl:
+        return "question"
+    if (
+        re.search(r"\bproblem\b", tl)
+        and "?" in plain
+        and not tl.startswith("solution")
+        and not re.search(r"step\s*1", plain, re.I)
+    ):
         return "question"
     if tl.startswith("example"):
         return "example"
@@ -1825,21 +1922,62 @@ def _letter_from_answer_value(value: str) -> str | None:
     return None
 
 
+def _match_mcq_from_numeric_answer(
+    answer_html: str, question_html: str
+) -> str | None:
+    """When the answer slide gives a numeric value, map it to the MCQ letter."""
+    if not question_html or "cm-mcq-interactive" not in question_html:
+        return None
+    numeric_answer = None
+    for pattern in (
+        r'cm-answer-card-math">\\?\(\\?\\boxed\{([^}]+)\}',
+        r'cm-answer-card-value"><span class="cm-answer-card-math">\\?\(\\?\\boxed\{([^}]+)\}',
+        r'cm-answer-box">\\?\\boxed\{([^}]+)\}',
+        r'cm-answer-card-label">(?:Final Answer|Answer|Correct Answer|Correct answer)</span>.*?cm-answer-card-value">(.*?)</div>',
+    ):
+        m = re.search(pattern, answer_html, flags=re.S | re.I)
+        if not m:
+            continue
+        raw = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        raw = _strip_inline_math_delimiters(raw)
+        raw = re.sub(r"^\\boxed\{([^}]+)\}$", r"\1", raw)
+        numeric_answer = _normalize_math_snippet(raw)
+        if numeric_answer:
+            break
+    if not numeric_answer:
+        return None
+    for item in re.finditer(
+        r'data-choice="([A-D])".*?cm-mcq-text">(.*?)</span>',
+        question_html,
+        flags=re.S,
+    ):
+        option_value = _normalize_math_snippet(item.group(2))
+        if option_value and option_value == numeric_answer:
+            return item.group(1).upper()
+    return None
+
+
 def _extract_correct_choice(answer_html: str, question_html: str = "") -> str | None:
     plain = _plain_text_from_html(answer_html)
     for pattern in (
         r"correct answer[^a-zA-Z]*([A-D])\b",
         r"correct interpretation[^a-zA-Z]*([A-D])\b",
         r"correct answer is[^a-zA-Z]*([A-D])\b",
+        r"closest answer[^a-zA-Z]*\(?([A-D])\)?",
+        r"\\textbf\{Answer:\}[^a-zA-Z]*\\textcolor\{[^}]+\}\{([A-D])\.",
+        r"<strong>Answer:</strong>\s*(?:<[^>]+>)*([A-D])\.",
         r"option\s*<strong>\s*([A-D])\b",
         r"option\s+\**([A-D])\b",
+        r'cm-answer-box">\s*\(?([A-D])\)?',
         r'cm-answer-box">([A-D])\.',
         r'cm-answer-card-value">\s*<strong>\s*([A-D])\s*</strong>',
         r'cm-answer-card-value">\s*([A-D])\.(?:\s|<|</)',
         r"\\boxed\{\\text\{Correct Answer:\s*([A-D])",
         r"\\boxed\{\\text\{([A-D])\.",
         r"\\boxed\{([A-D])\.?\}",
+        r"\\boxed\{([A-D])\.\s",
         r"\\boxed\{\\text\{([A-D])\}\}",
+        r'cm-answer-card-math">\\?\(\\?\\boxed\{([A-D])\.',
     ):
         m = re.search(pattern, answer_html, flags=re.I | re.S)
         if m:
@@ -1863,6 +2001,14 @@ def _extract_correct_choice(answer_html: str, question_html: str = "") -> str | 
 
     m = re.search(
         r'cm-answer-card-label">Correct Answer</span>.*?cm-answer-card-value">(?:<strong>)?([A-D])',
+        answer_html,
+        flags=re.S | re.I,
+    )
+    if m:
+        return m.group(1).upper()
+
+    m = re.search(
+        r'cm-answer-card-label">Correct answer</span>.*?cm-answer-card-(?:value|math)[^>]*>.*?\(?([A-D])\)',
         answer_html,
         flags=re.S | re.I,
     )
@@ -1897,6 +2043,10 @@ def _extract_correct_choice(answer_html: str, question_html: str = "") -> str | 
             option_value = _normalize_math_snippet(item.group(2))
             if option_value and (option_value == final_value or option_value == final_body):
                 return item.group(1).upper()
+
+    matched = _match_mcq_from_numeric_answer(answer_html, question_html)
+    if matched:
+        return matched
 
     return None
 
@@ -2037,6 +2187,35 @@ def _looks_like_grid_in_value(value: str) -> bool:
     )
 
 
+def _extract_numeric_answer_text(text: str) -> str | None:
+    """Pull a numeric SAT grid-in value from answer prose or markup."""
+    plain = re.sub(r"<[^>]+>", " ", text)
+    plain = re.sub(r"\s+", " ", plain).strip()
+    for pattern in (
+        r"Correct Answer:\s*(\d+(?:\.\d+)?)",
+        r"Final Answer:\s*(?:[^0-9]{0,24})?(\d+(?:\.\d+)?)",
+        r"is\s+(\d+(?:\.\d+)?)\s+greater\s+than",
+        r"(\d+(?:\.\d+)?)\s*[-+×*/]\s*\d+(?:\.\d+)?\s*=\s*(\d+(?:\.\d+)?)",
+        r"=\s*(\\boxed\{(\d+(?:\.\d+)?)\})",
+    ):
+        m = re.search(pattern, plain, re.I)
+        if not m:
+            continue
+        value = m.group(m.lastindex or 1).strip()
+        value = re.sub(r"^\\boxed\{([^}]+)\}$", r"\1", value)
+        if value and re.fullmatch(r"\d+(?:\.\d+)?", value):
+            return value
+    step_blocks = re.findall(r'cm-step-block[^>]*>(.*?)</div>', text, flags=re.S)
+    for block in reversed(step_blocks):
+        eq_m = re.search(
+            r"(\d+(?:\.\d+)?)\s*[-+×*/]\s*\d+(?:\.\d+)?\s*=\s*(\d+(?:\.\d+)?)",
+            re.sub(r"<[^>]+>", " ", block),
+        )
+        if eq_m:
+            return eq_m.group(2)
+    return None
+
+
 def _grid_in_from_latex(latex: str) -> dict[str, Any] | None:
     latex = latex.strip()
     if not _looks_like_grid_in_value(latex):
@@ -2122,6 +2301,10 @@ def _extract_grid_in_answer(answer_html: str) -> dict[str, Any] | None:
         extracted = _grid_in_from_latex(boxed)
         if extracted:
             return extracted
+
+    numeric = _extract_numeric_answer_text(answer_html)
+    if numeric:
+        return _grid_in_from_latex(numeric)
 
     return None
 
@@ -2744,6 +2927,9 @@ def _clean_frame_body(body: str) -> str:
         return ""
 
     body = _strip_beamer_layout_commands(body)
+    body = re.sub(r"\\begin\{table\}(?:\[[^\]]*\])?\s*", "", body)
+    body = re.sub(r"\\end\{table\}\s*", "", body)
+    body = re.sub(r"\\centering\s*", "", body)
     body = _convert_hfill_examples(body)
     body = replace_tikz_with_svg_html(body)
     body = _remove_environment(body, "tikzpicture")
