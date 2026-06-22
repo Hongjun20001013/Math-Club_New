@@ -16345,7 +16345,7 @@
         "correct_answer": "B"
       },
       {
-        "stem": "<p>In the figure shown, points \\(A\\), \\(B\\), \\(C\\), and \\(E\\) lie on the circle, and \\(AB\\lt BC\\). Segment \\(AC\\) is perpendicular to segment \\(BE\\) at point \\(D\\), and \\(BD=\\sqrt{346}\\). The diameter of the circle is \\(175\\). If \\(\\dfrac{CD}{AD}=r\\), what is the value of \\(r\\)?</p>\n<div class=\"stem-figure-wrap\" role=\"img\" aria-label=\"Circle with chords\"><svg viewBox=\"0 0 220 220\" width=\"220\" height=\"220\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"110\" cy=\"110\" r=\"96\" fill=\"none\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/><line x1=\"28\" y=\"94\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"58\" y=\"184\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"28\" y=\"94\" x2=\"58\" y=\"36\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><text x=\"8\" y=\"100\" font-size=\"14\" font-weight=\"600\">A</text><text x=\"44\" y=\"28\" font-size=\"14\" font-weight=\"600\">B</text><text x=\"198\" y=\"100\" font-size=\"14\" font-weight=\"600\">C</text><text x=\"44\" y=\"206\" font-size=\"14\" font-weight=\"600\">E</text><text x=\"72\" y=\"118\" font-size=\"14\" font-weight=\"600\">D</text></svg></div>",
+        "stem": "<p>In the figure shown, points \\(A\\), \\(B\\), \\(C\\), and \\(E\\) lie on the circle, and \\(AB\\lt BC\\). Segment \\(AC\\) is perpendicular to segment \\(BE\\) at point \\(D\\), and \\(BD=\\sqrt{346}\\). The diameter of the circle is \\(175\\). If \\(\\dfrac{CD}{AD}=r\\), what is the value of \\(r\\) (\\(\\angle ABC\\) is a right angle)?</p>\n<div class=\"stem-figure-wrap\" role=\"img\" aria-label=\"Circle with chords\"><svg viewBox=\"0 0 220 220\" width=\"220\" height=\"220\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"110\" cy=\"110\" r=\"96\" fill=\"none\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/><line x1=\"28\" y=\"94\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"58\" y=\"184\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"28\" y=\"94\" x2=\"58\" y=\"36\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><text x=\"8\" y=\"100\" font-size=\"14\" font-weight=\"600\">A</text><text x=\"44\" y=\"28\" font-size=\"14\" font-weight=\"600\">B</text><text x=\"198\" y=\"100\" font-size=\"14\" font-weight=\"600\">C</text><text x=\"44\" y=\"206\" font-size=\"14\" font-weight=\"600\">E</text><text x=\"72\" y=\"118\" font-size=\"14\" font-weight=\"600\">D</text></svg></div>",
         "choices": [
           "\\(86.5\\)",
           "\\(85.5\\)",
@@ -16496,7 +16496,7 @@
         "knowledge_section": "2",
         "knowledge_section_title_en": "Gate 2 — Geometry Readiness",
         "knowledge_section_title_zh": "Gate 2 — Geometry Readiness",
-        "correct_answer": "A"
+        "correct_answer": "B"
       },
       {
         "stem": "<p>A bowl contains \\(6\\) red marbles and \\(3\\) blue marbles. Three marbles are drawn at random, one after another, without replacement. What is the probability of getting a red marble first, then a blue marble, then a red marble?</p>",

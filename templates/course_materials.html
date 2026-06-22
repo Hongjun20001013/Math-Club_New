@@ -23,6 +23,15 @@
           <p class="np-cm-hub-kicker">Teaching library</p>
           <h1>SAT course materials</h1>
           <p class="np-cm-hub-lede">Premium slide decks for every chapter — full math rendering, study mode, Desmos, and printable PDFs for class and review.</p>
+          <div class="np-cm-hub-phase-tabs" role="tablist" aria-label="Course phases">
+            {% for pg in phase_groups %}
+            <button type="button" class="np-cm-hub-phase-tab{% if pg.phase == 1 %} is-active{% endif %}{% if not pg.ready_count %} is-empty{% endif %}" role="tab" aria-selected="{{ 'true' if pg.phase == 1 else 'false' }}" data-cm-phase="{{ pg.phase }}" id="cm-phase-tab-{{ pg.phase }}">
+              <span class="np-cm-hub-phase-tab-label">{{ pg.label }}</span>
+              <span class="np-cm-hub-phase-tab-kicker">{{ pg.kicker }}</span>
+              {% if pg.ready_count %}<span class="np-cm-hub-phase-tab-count">{{ pg.ready_count }} live</span>{% endif %}
+            </button>
+            {% endfor %}
+          </div>
           <div class="np-cm-hub-stats" role="list">
             <div class="np-cm-hub-stat" role="listitem">
               <strong>{{ materials_total }}</strong>
@@ -134,20 +143,31 @@
       </a>
       {% endif %}
 
-      <section class="np-cm-hub-library" aria-label="Course materials by unit">
+      <section class="np-cm-hub-library" aria-label="Course materials by phase">
+        {% for pg in phase_groups %}
+        <div class="np-cm-hub-phase-panel{% if pg.phase == 1 %} is-active{% endif %}" data-cm-phase-panel="{{ pg.phase }}" role="tabpanel" aria-labelledby="cm-phase-tab-{{ pg.phase }}"{% if pg.phase != 1 %} hidden{% endif %}>
         <div class="np-cm-hub-library-head mp-animate-up">
           <div>
-            <p class="np-cm-hub-kicker">Browse by unit</p>
-            <h2>All lessons</h2>
+            <p class="np-cm-hub-kicker">{{ pg.label }} · {{ pg.kicker }}</p>
+            <h2>{% if pg.phase == 1 %}All lessons{% elif pg.phase == 2 %}Hard question sets{% else %}Coming soon{% endif %}</h2>
+            <p class="np-cm-hub-library-note">{{ pg.description }}</p>
           </div>
-          <p class="np-cm-hub-library-note">Tap any live deck to open the slide viewer. Coming-soon lessons unlock when LaTeX + PDF are uploaded.</p>
+          {% if pg.ready_count %}
+          <p class="np-cm-hub-library-note">{{ pg.ready_count }}/{{ pg.total_count }} deck{{ 's' if pg.total_count != 1 else '' }} online</p>
+          {% endif %}
         </div>
 
-        {% for group in unit_groups %}
+        {% if pg.phase == 3 and not pg.ready_count %}
+        <div class="np-cm-hub-phase-placeholder mp-animate-up">
+          <p>Phase 3 tracks are in development. Phase 1 lessons and Phase 2 hard questions are available now.</p>
+        </div>
+        {% endif %}
+
+        {% for group in pg.unit_groups %}
         <article class="np-cm-hub-unit np-cm-hub-unit--u{{ group.unit }} mp-animate-up">
           <header class="np-cm-hub-unit-head">
             <div class="np-cm-hub-unit-title">
-              <span class="np-cm-hub-unit-num">Unit {{ group.unit }}</span>
+              <span class="np-cm-hub-unit-num">{% if pg.phase == 1 %}Unit {{ group.unit }}{% else %}{{ group.unit_name }}{% endif %}</span>
               <h3>{{ group.unit_name }}</h3>
             </div>
             <div class="np-cm-hub-unit-progress">
@@ -175,7 +195,7 @@
               </div>
               <h4>{{ m.title }}</h4>
               {% if m.tex_available %}
-              <p class="np-cm-hub-card-meta">{{ m.slide_count }} slides{% if m.pdf_available %} · PDF ready{% endif %}</p>
+              <p class="np-cm-hub-card-meta">{{ m.slide_count }} slides{% if m.pdf_available %} · PDF ready{% endif %}{% if m.interactive_count %} · {{ m.interactive_count }} challenges{% endif %}</p>
               <span class="np-cm-hub-card-cta">Open deck →</span>
               {% else %}
               <p class="np-cm-hub-card-meta">Waiting for LaTeX + PDF upload</p>
@@ -189,6 +209,8 @@
             {% endfor %}
           </div>
         </article>
+        {% endfor %}
+        </div>
         {% endfor %}
       </section>
 
@@ -228,4 +250,34 @@
 })();
 </script>
 {% endif %}
+<script>
+(function () {
+  var tabs = document.querySelectorAll("[data-cm-phase]");
+  var panels = document.querySelectorAll("[data-cm-phase-panel]");
+  if (!tabs.length) return;
+  function activate(phase) {
+    tabs.forEach(function (tab) {
+      var on = tab.getAttribute("data-cm-phase") === String(phase);
+      tab.classList.toggle("is-active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      var on = panel.getAttribute("data-cm-phase-panel") === String(phase);
+      panel.classList.toggle("is-active", on);
+      if (on) panel.removeAttribute("hidden");
+      else panel.setAttribute("hidden", "");
+    });
+    try { localStorage.setItem("np-cm-hub-phase", String(phase)); } catch (e) {}
+  }
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      activate(tab.getAttribute("data-cm-phase"));
+    });
+  });
+  try {
+    var saved = localStorage.getItem("np-cm-hub-phase");
+    if (saved && document.querySelector('[data-cm-phase-panel="' + saved + '"]')) activate(saved);
+  } catch (e) {}
+})();
+</script>
 {% endblock %}

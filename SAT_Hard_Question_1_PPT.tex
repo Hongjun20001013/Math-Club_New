@@ -1,0 +1,253 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Hard Question 1]{\textbf{SAT Hard Question\\ Set 1}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 2 · Hard Question Practice}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Hard Question Set 1}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Hard Question Set 1}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{11 SAT-style challenge problems}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+In the given expression, \(a\) and \(c\) are positive constants. If \(px + q\) is a factor of the expression,
+\[
+ax^2 + 176x + c = (px + q)(rx + s),
+\]
+where \(p\) and \(q\) are positive constants, what is the greatest possible value of \(ac\)?
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Final Answer:} $\boxed{7744}$
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+In the given expression,
+\[
+34z^{18} + b z^9 + 30,
+\]
+\(b\) is a positive integer. If \(qz^9 + r\) is a factor of the expression, where \(q\) and \(r\) are positive integers, what is the greatest possible value of \(b\)?
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Final Answer:} $\boxed{1021}$
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+The expression
+\[
+6x^4 + 17x^2 + 7
+\]
+can be rewritten as \((3x^2 + a)(2x^2 + b)\), where \(a\) and \(b\) are positive integers, or as \((3x^2 + c)(2x^2 + d)\), where \(c\) and \(d\) are positive non-integers.
+
+What is the value of \(a + c\)?
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Final Answer:} $\boxed{\dfrac{17}{2}}$
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+The given quadratic function
+\[
+54x^4 + 219x^2 + 105
+\]
+has factors in the form \((k)(ax^2 + b)(cx^2 + d)\). If \(a, b, c, d, k\) are integers, what is the smallest possible value of \(ab\)?
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Final Answer:} $\boxed{14}$
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+The equation of a parabola is written in the form
+\[
+y = ax^2 + bx + c,
+\]
+where \(a, b, c\) are constants. When graphed in the \(xy\)-plane, the parabola has vertex \((-1, 4)\) and does not intersect the \(x\)-axis. Which of the following could be the value of \(a - b - c\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 2
+    \item[B.] 4
+    \item[C.] -1
+    \item[D.] -6
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+A quadratic function with vertex \((1, 32)\) can be written as
+\[
+ -ax^2 + bx + c \quad (a, b, c \text{ are all positive integers}).
+\]
+What is the maximum value of \(b\)?
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Final Answer:} $\boxed{62}$
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+An object's speed is increasing at a rate of \(7.7\ \text{meters per second squared}\). What is this rate in \textbf{miles per minute squared}, rounded to the nearest tenth? (Use \(1\ \text{mile} = 1609\ \text{meters}\).)
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 0.3
+    \item[B.] 17.2
+    \item[C.] 206.5
+    \item[D.] 209
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+The function \(f\) is defined by
+\[
+f(x) = ab^{\frac{x}{n}},
+\]
+where \(a, b, n\) are constants, and \(b, n\) are integers. If \(f(2) = 6\) and \(f(4) = 150\), what is the value of \(f(5)\)?
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Final Answer:} $\boxed{750}$
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+The graph of \(y = f(x)\) in the \(xy\)-plane has a vertex at \((4, -7)\), contains the point \((3, -9)\), and has a \(y\)-intercept at \((0, a)\). The graph of \(y = 6 \cdot f(x)\) has a \(y\)-intercept at \((0, b)\). What is the positive difference between \(a\) and \(b\)?
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Final Answer:} $\boxed{195}$
+\end{frame}
+
+% --- Question 10 ---
+\begin{frame}{Question 10}
+\small
+The function \(f\) is defined by
+\[
+f(x) = ax^2 + bx + c,
+\]
+where \(a, b, c\) are constants. The graph of \(y = f(x)\) passes through the points \((9, 0)\) and \((-2, 0)\). If \(a\) is an integer greater than 1, which of the following could be the value of \(a + b\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 8
+    \item[B.] 7
+    \item[C.] -6
+    \item[D.] -12
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 10}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 11 ---
+\begin{frame}{Question 11}
+\small
+Which of the following expressions has a factor of \(x + 2b\), where \(b\) is a positive integer constant?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(3x^2 + 7x + 14b\)
+    \item[B.] \(3x^2 + 22x + 14b\)
+    \item[C.] \(3x^2 + 30x + 14b\)
+    \item[D.] \(3x^2 + 37x + 14b\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 11}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

@@ -33,6 +33,7 @@
                     <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Course placement diagnostics') }}</h1>
                     <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the track that matches your student\'s school math pathway.') }}</p>
                     <ul class="np-pl-tags" aria-label="Features">
+                        <li class="np-pl-tag">Bluebook-style flow</li>
                         <li class="np-pl-tag">Instant score report</li>
                         <li class="np-pl-tag">Parent-ready PDF</li>
                         <li class="np-pl-tag">Blank test download</li>
@@ -67,6 +68,7 @@
         <div class="np-pl-tiers" data-pl-stagger>
             {% for tier in catalog.tiers %}
             <section class="np-pl-tier np-pl-tier--{{ tier.id }}" aria-labelledby="np-tier-{{ tier.id }}"{% if loop.index > 1 %} data-pl-reveal{% endif %}>
+                <div class="np-pl-tier__panel">
                 <header class="np-pl-tier__head">
                     <span class="np-pl-tier__index" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
                     <div class="np-pl-tier__icon" aria-hidden="true">
@@ -103,13 +105,20 @@
                             {% if test.subtitle %}
                             <p class="np-pl-card__sub">{{ test.subtitle }}</p>
                             {% endif %}
+                            {% if test.pdf_meta and test.pdf_meta.available %}
+                            <p class="np-pl-card__pdf-note">
+                                <span class="np-pl-card__pdf-pill">Print PDF</span>
+                                {{ test.pdf_meta.pages }} pages · {{ test.pdf_meta.updated_label }}
+                            </p>
+                            {% endif %}
                             {% if test.online_item_count or test.online_mcq_count %}
-                            <div class="np-pl-card__meta">
-                                <span class="np-pl-card__count">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
-                                <span class="np-pl-card__unit">items</span>
+                            <div class="np-pl-card__stats">
+                                <div class="np-pl-card__stat-primary">
+                                    <span class="np-pl-card__count">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
+                                    <span class="np-pl-card__unit">items</span>
+                                </div>
                                 {% if test.paper_sections %}
-                                <span class="np-pl-card__sep" aria-hidden="true">·</span>
-                                <span class="np-pl-card__format">{{ test.paper_sections }}</span>
+                                <p class="np-pl-card__format">{{ test.paper_sections }}</p>
                                 {% endif %}
                             </div>
                             {% endif %}
@@ -126,6 +135,7 @@
                         </div>
                     </article>
                     {% endfor %}
+                </div>
                 </div>
             </section>
             {% endfor %}

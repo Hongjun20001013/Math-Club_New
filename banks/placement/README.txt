@@ -12,8 +12,8 @@ The placement hub lives at **/placement** (`data/placement_catalog.json`). Each 
 
 Build steps
 1. Edit the relevant `.tex` at repo root (source of truth).
-2. Run `python3 scripts/build_question_bank.py` to refresh `data/question_bank.json`.
-3. Compile PDF if needed: `pdflatex Placement_Middle_Level.tex`, etc.
+2. Run `bash scripts/build_placement_pdfs.sh` to compile all blank-test PDFs.
+3. Run `python3 scripts/build_question_bank.py` to refresh `data/question_bank.json`.
 
 URLs
 - Catalog: `/placement`

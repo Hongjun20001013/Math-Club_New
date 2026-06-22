@@ -36621,3 +36621,27 @@ html[data-exam-theme="dark"] .np-pl2-input {
     color: #f5f3ff;
     border-color: rgba(139, 92, 246, 0.25);
 }
+
+/* Response studio layout — keep answer pane inside split card */
+.sat-practice-page-wrap--split-lock .sat-pane-choices {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.sat-practice-page-wrap--split-lock .sat-response-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sat-practice-page-wrap--split-lock .sat-pane-choices > .sat-scratchpad,
+.sat-practice-page-wrap--split-lock .sat-pane-choices > .sat-submit-wrap {
+    flex-shrink: 0;
+}
+
+.sat-practice-page-wrap--split-lock .sat-pane-choices > .sat-submit-wrap {
+    margin-top: auto;
+}

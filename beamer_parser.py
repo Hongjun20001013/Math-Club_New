@@ -15,6 +15,7 @@ from latex_parser import (
     latex_array_and_tabular_to_html,
     strip_document_noise,
 )
+from tikz_svg import replace_tikz_with_svg_html
 
 
 def _strip_beamer_preamble(tex: str) -> str:
@@ -260,6 +261,7 @@ def _resolve_course_material_figure(fname: str) -> tuple[str, str] | None:
     base, ext = os.path.splitext(safe)
     root = os.path.dirname(__file__)
     search_dirs = (
+        ("hard", os.path.join(root, "static", "hard")),
         ("unit4", os.path.join(root, "static", "unit4")),
         ("course_materials", os.path.join(root, "static", "course_materials")),
     )
@@ -279,6 +281,21 @@ def _resolve_course_material_figure(fname: str) -> tuple[str, str] | None:
     return None
 
 
+def _hard_figure_style(fname: str) -> str:
+    """Per-asset sizing tuned for hard-question diagrams (matches practice bank)."""
+    styles = {
+        "hard_2_f1.png": "max-width: 300px; max-height: 220px; object-fit: contain;",
+        "hard_2_f2.jpg": "max-width: 320px; max-height: 240px; object-fit: contain;",
+        "hard_3_f9.png": "max-width: 260px; max-height: 190px; object-fit: contain;",
+        "hard_7_f4.png": "max-width: 280px; max-height: 200px; object-fit: contain;",
+        "hard_8_f5.png": "max-width: 300px; max-height: 190px; object-fit: contain;",
+        "hard_9_f7.png": "max-width: 300px; max-height: 200px; object-fit: contain;",
+        "hard_10_f8.png": "max-width: 280px; max-height: 200px; object-fit: contain;",
+        "hard_14_f12.png": "max-width: 300px; max-height: 220px; object-fit: contain;",
+    }
+    return styles.get(fname, "")
+
+
 def _replace_course_material_figures(text: str) -> str:
     """Turn \\includegraphics{file} into slide figures under /static/."""
 
@@ -289,10 +306,15 @@ def _replace_course_material_figures(text: str) -> str:
         if not resolved:
             return ""
         prefix, safe = resolved
-        style = _includegraphics_width_style(options)
+        hard_cls = " stem-figure-img--hard" if prefix == "hard" else ""
+        hard_style = _hard_figure_style(safe)
+        if hard_style:
+            style_attr = f' style="{hard_style}"'
+        else:
+            style_attr = _includegraphics_width_style(options)
         return (
-            f'<div class="cm-slide-figure"><img class="stem-figure-img cm-slide-figure-img" '
-            f'src="/static/{prefix}/{safe}" alt="" loading="lazy"{style} /></div>'
+            f'<div class="cm-slide-figure"><img class="stem-figure-img cm-slide-figure-img{hard_cls}" '
+            f'src="/static/{prefix}/{safe}" alt="" loading="lazy"{style_attr} /></div>'
         )
 
     return re.sub(
@@ -788,6 +810,18 @@ def _normalize_display_math(text: str) -> str:
 
 
 def _clean_beamer_noise(text: str) -> str:
+    html_vault: list[str] = []
+
+    def _vault_html(m: re.Match[str]) -> str:
+        html_vault.append(m.group(0))
+        return f"<<<HTMLVAULT_{len(html_vault) - 1}>>>"
+
+    text = re.sub(
+        r'<div class="cm-slide-figure">.*?</div>|<div class="stem-figure-wrap"[^>]*>.*?</div>',
+        _vault_html,
+        text,
+        flags=re.S,
+    )
     math_vault: list[str] = []
 
     def _vault_math(m: re.Match[str]) -> str:
@@ -809,6 +843,8 @@ def _clean_beamer_noise(text: str) -> str:
     text = text.replace(r"\%", "%")
     for idx, block in enumerate(math_vault):
         text = text.replace(f"<<<MATHVAULT_{idx}>>>", block)
+    for idx, block in enumerate(html_vault):
+        text = text.replace(f"<<<HTMLVAULT_{idx}>>>", block)
     return strip_document_noise(text)
 
 
@@ -848,7 +884,9 @@ def _format_beamer_html(text: str) -> str:
         r'|<div class="cm-slide-closing">.*?</div>'
         r'|<div class="cm-intro-canvas">.*?</div>'
         r'|<div class="cm-content-canvas">.*?</div>'
-        r'|<div class="cm-closing-canvas">.*?</div>)'
+        r'|<div class="cm-closing-canvas">.*?</div>'
+        r'|<div class="cm-slide-figure">.*?</div>'
+        r'|<div class="stem-figure-wrap"[^>]*>.*?</div>)'
     )
     parts = re.split(block_pat, text, flags=re.S)
     out: list[str] = []
@@ -1200,9 +1238,63 @@ def _remove_try_banners(html: str) -> str:
     return html.strip()
 
 
+def _extract_figure_blocks(html: str) -> tuple[str, list[str]]:
+    """Pull figure containers out of question HTML for reordering."""
+    figures: list[str] = []
+    rest = html
+    for pat in (
+        r'<div class="cm-slide-figure">.*?</div>',
+        r'<div class="stem-figure-wrap"[^>]*>.*?</div>',
+    ):
+        while True:
+            m = re.search(pat, rest, flags=re.S)
+            if not m:
+                break
+            figures.append(m.group(0))
+            rest = (rest[: m.start()] + rest[m.end() :]).strip()
+    return rest, figures
+
+
+def _normalize_question_figure_layout(html: str) -> str:
+    """Figure above stem text (after strategy / role chips) for every diagram question."""
+    rest, figures = _extract_figure_blocks(html)
+    if not figures:
+        return html
+    fig_block = "\n".join(figures)
+    chip_pat = re.compile(
+        r'(<div class="cm-strategy-chip"[\s\S]*?</div>'
+        r'|<div class="cm-slide-role[^"]*"[\s\S]*?</div>)',
+        flags=re.S,
+    )
+    chips = list(chip_pat.finditer(rest))
+    if chips:
+        insert_at = chips[-1].end()
+        rest = rest[:insert_at] + "\n" + fig_block + "\n" + rest[insert_at:].lstrip()
+    else:
+        rest = fig_block + "\n" + rest
+    return rest.strip()
+
+
 def _finalize_question_slide_layout(html: str, strategy_hint: str = "") -> str:
     if "cm-question-workspace" in html:
+        stem_m = re.search(
+            r'(<div class="cm-question-stem">)(.*?)(</div>\s*<div class="cm-question-interact")',
+            html,
+            flags=re.S,
+        )
+        if stem_m:
+            stem = _normalize_question_figure_layout(stem_m.group(2))
+            return html[: stem_m.start(2)] + stem + html[stem_m.end(2) :]
+        stem_only = re.search(
+            r'(<div class="cm-question-stem">)(.*?)(</div>\s*</div>\s*$)',
+            html,
+            flags=re.S,
+        )
+        if stem_only:
+            stem = _normalize_question_figure_layout(stem_only.group(2))
+            return html[: stem_only.start(2)] + stem + html[stem_only.end(2) :]
         return html
+
     html = _remove_try_banners(html)
     stem = html
     interact = ""
@@ -1211,8 +1303,9 @@ def _finalize_question_slide_layout(html: str, strategy_hint: str = "") -> str:
         if block:
             interact = block
             break
-    stem = stem.strip()
-    if not interact:
+    stem = _normalize_question_figure_layout(stem.strip())
+    has_figure = "cm-slide-figure" in stem or "stem-figure-wrap" in stem
+    if not interact and not has_figure:
         return html
     strategy_html = ""
     if strategy_hint.strip():
@@ -1223,10 +1316,16 @@ def _finalize_question_slide_layout(html: str, strategy_hint: str = "") -> str:
             f"<p>{safe_hint}</p>"
             f"</div>"
         )
+    if interact:
+        return (
+            f'<div class="cm-question-workspace">'
+            f'<div class="cm-question-stem">{strategy_html}{stem}</div>'
+            f'<div class="cm-question-interact">{interact}</div>'
+            f"</div>"
+        )
     return (
-        f'<div class="cm-question-workspace">'
+        f'<div class="cm-question-workspace cm-question-workspace--figure-only">'
         f'<div class="cm-question-stem">{strategy_html}{stem}</div>'
-        f'<div class="cm-question-interact">{interact}</div>'
         f"</div>"
     )
 
@@ -1236,7 +1335,9 @@ def _finalize_all_question_slides(slides: list[dict[str, Any]]) -> None:
         if slide.get("kind") not in {"question", "practice", "example"}:
             continue
         html = slide.get("html") or ""
-        if "data-cm-mcq" not in html and "data-cm-grid-in" not in html:
+        has_interact = "data-cm-mcq" in html or "data-cm-grid-in" in html
+        has_figure = "cm-slide-figure" in html or "stem-figure-wrap" in html
+        if not has_interact and not has_figure:
             continue
         slide["html"] = _finalize_question_slide_layout(
             html,
@@ -1290,6 +1391,8 @@ def _format_mixed_prose_answer(raw: str) -> str:
         r"<strong>\1</strong>",
         text,
     )
+    # Delimiters may already be stripped upstream (e.g. _format_answer_value).
+    text = re.sub(r"\\mathbf\{([^}]*)\}", r"<strong>\1</strong>", text)
 
     out: list[str] = []
     i = 0
@@ -1400,14 +1503,20 @@ def _format_answer_value(raw: str) -> str:
     box_m = re.search(r'<span class="cm-answer-box">(.*?)</span>', raw, flags=re.S)
     if box_m and raw.strip() not in {box_m.group(0), f"\\({box_m.group(0)}\\)"}:
         inner = _strip_inline_math_delimiters(box_m.group(1))
-        suffix = (raw[: box_m.start()] + raw[box_m.end() :]).strip()
-        suffix = re.sub(r"\\[()]", "", suffix).strip()
-        suffix = re.sub(r"\s+", " ", suffix)
+        prefix = raw[: box_m.start()].strip()
+        tail = raw[box_m.end() :].strip()
+        prefix = re.sub(r"\\[()$]", "", prefix).strip()
+        prefix = re.sub(r"\\displaystyle\s*", "", prefix).strip()
+        tail = re.sub(r"\\[()$]", "", tail).strip()
+        tail = re.sub(r"\\displaystyle\s*", "", tail).strip()
+        if re.match(r"^[A-Za-z]\s*=\s*$", prefix):
+            return f'<span class="cm-answer-card-math">\\({prefix}{inner}\\)</span>'
         if _needs_math_delimiters(inner):
             value = f'<span class="cm-answer-card-math">\\(\\boxed{{{inner}}}\\)</span>'
         else:
             value = f'<span class="cm-answer-box">{inner}</span>'
-        return f"{value} {suffix}".strip()
+        extra = " ".join(p for p in (prefix, tail) if p)
+        return f"{value} {extra}".strip()
     if box_m and raw.strip() in {box_m.group(0), f"\\({box_m.group(0)}\\)"}:
         inner = _strip_inline_math_delimiters(box_m.group(1))
         mcq_formatted = _format_mcq_letter_with_math(inner)
@@ -1651,7 +1760,7 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
         return "content"
     if "cm-section-divider" in html:
         return "section"
-    if "thank you" in t or "cm-slide-closing" in html or "cm-closing-canvas" in html:
+    if "thank you" in t or "great work" in t or "cm-slide-closing" in html or "cm-closing-canvas" in html:
         return "closing"
     if (
         tl.startswith("answer:")
@@ -2615,7 +2724,7 @@ def _count_interactive_stats(slides: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def _clean_frame_body(body: str) -> str:
-    if re.search(r"thank you", body, re.I):
+    if re.search(r"thank you|great work", body, re.I):
         return _build_closing_html(body)
 
     body = _unwrap_beamer_block_environment(body)
@@ -2636,9 +2745,9 @@ def _clean_frame_body(body: str) -> str:
 
     body = _strip_beamer_layout_commands(body)
     body = _convert_hfill_examples(body)
+    body = replace_tikz_with_svg_html(body)
     body = _remove_environment(body, "tikzpicture")
     body = _flatten_columns(body)
-    body = _replace_course_material_figures(body)
     body = _unwrap_environment(body, "center")
     body = _remove_environment(body, "flushright")
     body = _remove_environment(body, "flushleft")
@@ -2679,6 +2788,7 @@ def _clean_frame_body(body: str) -> str:
     body = _fix_html_in_display_math(body)
     body = _scrub_latex_remnants(body)
     body = _convert_markdown_bold(body)
+    body = _replace_course_material_figures(body)
     body = _format_beamer_html(body)
     body = _mathjax_safe_lt_in_tex_math(body)
     body = re.sub(r"<p>\s*</p>", "", body)
@@ -2852,7 +2962,7 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
     if slides and slides[-1].get("kind") == "closing":
         closing_body = ""
         for ftitle, fbody in reversed(_split_frames(body)):
-            if re.search(r"thank you", fbody, re.I):
+            if re.search(r"thank you|great work", fbody, re.I):
                 closing_body = fbody
                 break
         slides[-1]["html"] = _build_closing_html(

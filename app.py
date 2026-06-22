@@ -211,7 +211,7 @@ app.config.update(
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260617-spr-math-input")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260618-atelier-v8")
 
 _DB_SCHEMA_READY = False
 
@@ -1712,6 +1712,58 @@ def _placement_slug_for_topic(topic: str) -> str:
     return topic.replace("_", "-")
 
 
+def _placement_pdf_meta(pdf_file: str | None) -> dict[str, Any]:
+    """Lightweight metadata for blank-test PDF download cards."""
+    name = str(pdf_file or "").strip()
+    if not name:
+        return {"available": False}
+    path = os.path.join(APP_DIR, name)
+    if not os.path.isfile(path):
+        return {"available": False, "file": name}
+    pages: int | None = None
+    log_path = os.path.splitext(path)[0] + ".log"
+    if os.path.isfile(log_path):
+        try:
+            with open(log_path, "r", encoding="utf-8", errors="ignore") as lf:
+                for line in lf:
+                    m = re.search(r"Output written on .*?\((\d+) pages,", line)
+                    if m:
+                        pages = int(m.group(1))
+                        break
+        except OSError:
+            pass
+    mtime = datetime.fromtimestamp(os.path.getmtime(path))
+    updated_label = mtime.strftime("%b %d, %Y").replace(" 0", " ")
+    return {
+        "available": True,
+        "file": name,
+        "pages": pages,
+        "updated_at": mtime.isoformat(),
+        "updated_label": updated_label,
+        "size_kb": max(1, int(os.path.getsize(path) / 1024)),
+    }
+
+
+def _enrich_placement_catalog_with_pdf_meta(catalog: dict) -> dict:
+    out = dict(catalog)
+    tiers: list[dict] = []
+    for tier in out.get("tiers") or []:
+        if not isinstance(tier, dict):
+            continue
+        tier_copy = dict(tier)
+        tests: list[dict] = []
+        for test in tier_copy.get("tests") or []:
+            if not isinstance(test, dict):
+                continue
+            row = dict(test)
+            row["pdf_meta"] = _placement_pdf_meta(row.get("pdf_file"))
+            tests.append(row)
+        tier_copy["tests"] = tests
+        tiers.append(tier_copy)
+    out["tiers"] = tiers
+    return out
+
+
 def _placement_landing_parts_for_topic(topic: str) -> list[dict[str, str]]:
     row = _placement_test_by_topic(topic)
     parts = row.get("parts") if isinstance(row, dict) else None
@@ -2147,11 +2199,125 @@ def _pick_continue_material(
     return None
 
 
+def _course_materials_user_progress(materials: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    user_progress: dict[str, dict[str, Any]] = {}
+    uid = session.get("user_id")
+    if uid:
+        db = get_db()
+        rows = db.execute(
+            "SELECT lesson_slug, progress_json FROM course_material_progress WHERE user_id = ?",
+            (int(uid),),
+        ).fetchall()
+        for row in rows:
+            try:
+                user_progress[str(row["lesson_slug"])] = json.loads(row["progress_json"] or "{}")
+            except json.JSONDecodeError:
+                continue
+    for m in materials:
+        if not m.get("tex_available"):
+            continue
+        slug = str(m.get("slug") or "")
+        prog = user_progress.get(slug) or {}
+        m["user_mastery_pct"] = mastery_pct_from_progress(
+            prog,
+            int(m.get("slide_count") or 0),
+            int(m.get("checkpoint_count") or 0),
+        )
+    return user_progress
+
+
+def _course_materials_phase_groups(materials: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    phase_meta = {
+        1: {
+            "label": "Phase 1",
+            "kicker": "Units 1–4",
+            "description": "Core SAT lessons — definitions, methods, and guided practice.",
+        },
+        2: {
+            "label": "Phase 2",
+            "kicker": "Hard questions",
+            "description": "Challenge problem sets with interactive slides and student response tracking.",
+        },
+        3: {
+            "label": "Phase 3",
+            "kicker": "Coming soon",
+            "description": "Advanced review tracks will appear here.",
+        },
+    }
+    phase_groups: list[dict[str, Any]] = []
+    for phase_num in (1, 2, 3):
+        phase_rows = [m for m in materials if int(m.get("phase") or 1) == phase_num]
+        unit_groups: list[dict[str, Any]] = []
+        unit_nums = sorted({int(m.get("unit") or 0) for m in phase_rows})
+        for unit_num in unit_nums:
+            rows = [m for m in phase_rows if int(m.get("unit") or 0) == unit_num]
+            if not rows:
+                continue
+            unit_groups.append(
+                {
+                    "unit": unit_num,
+                    "unit_name": rows[0].get("unit_name") or f"Unit {unit_num}",
+                    "materials": rows,
+                    "ready_count": sum(1 for m in rows if m.get("tex_available")),
+                    "pdf_count": sum(1 for m in rows if m.get("pdf_available")),
+                }
+            )
+        phase_groups.append(
+            {
+                "phase": phase_num,
+                "label": phase_meta[phase_num]["label"],
+                "kicker": phase_meta[phase_num]["kicker"],
+                "description": phase_meta[phase_num]["description"],
+                "unit_groups": unit_groups,
+                "materials": phase_rows,
+                "ready_count": sum(1 for m in phase_rows if m.get("tex_available")),
+                "total_count": len(phase_rows),
+            }
+        )
+    return phase_groups
+
+
+def _course_materials_gate_context() -> dict[str, Any]:
+    materials = list(load_course_materials().get("materials") or [])
+    _course_materials_user_progress(materials)
+    phase_groups = _course_materials_phase_groups(materials)
+    return {"phase_cards": phase_groups}
+
+
+def _course_materials_phase_context(phase_num: int) -> dict[str, Any] | None:
+    if phase_num not in (1, 2, 3):
+        return None
+    materials = list(load_course_materials().get("materials") or [])
+    user_progress = _course_materials_user_progress(materials)
+    phase_groups = _course_materials_phase_groups(materials)
+    phase_group = next((g for g in phase_groups if g["phase"] == phase_num), None)
+    if not phase_group:
+        return None
+    phase_ready = sorted(
+        [m for m in phase_group["materials"] if m.get("tex_available")],
+        key=lambda m: tuple(
+            int(p) if p.isdigit() else 0
+            for p in str(m.get("section") or "0").split(".")
+        ),
+    )
+    continue_material = _pick_continue_material(phase_ready, user_progress)
+    spotlight_material = continue_material or (phase_ready[0] if phase_ready else None)
+    spotlight_mode = "resume" if continue_material else "start"
+    return {
+        "phase_group": phase_group,
+        "continue_material": continue_material,
+        "spotlight_material": spotlight_material,
+        "spotlight_mode": spotlight_mode,
+        "user_progress_map": user_progress,
+    }
+
+
 def _course_materials_hub_context() -> dict[str, Any]:
     materials = list(load_course_materials().get("materials") or [])
+    phase_groups = _course_materials_phase_groups(materials)
     unit_groups: list[dict[str, Any]] = []
     for unit_num in (1, 2, 3, 4):
-        rows = [m for m in materials if int(m.get("unit") or 0) == unit_num]
+        rows = [m for m in materials if int(m.get("phase") or 1) == 1 and int(m.get("unit") or 0) == unit_num]
         if not rows:
             continue
         unit_groups.append(
@@ -2175,33 +2341,14 @@ def _course_materials_hub_context() -> dict[str, Any]:
     materials_ready = int(payload.get("available") or len(ready_materials))
     coverage_pct = round(100 * materials_ready / materials_total) if materials_total else 0
     featured = ready_materials[-1] if ready_materials else None
-    user_progress: dict[str, dict[str, Any]] = {}
-    uid = session.get("user_id")
-    if uid:
-        db = get_db()
-        rows = db.execute(
-            "SELECT lesson_slug, progress_json FROM course_material_progress WHERE user_id = ?",
-            (int(uid),),
-        ).fetchall()
-        for row in rows:
-            try:
-                user_progress[str(row["lesson_slug"])] = json.loads(row["progress_json"] or "{}")
-            except json.JSONDecodeError:
-                continue
-    for m in ready_materials:
-        slug = str(m.get("slug") or "")
-        prog = user_progress.get(slug) or {}
-        m["user_mastery_pct"] = mastery_pct_from_progress(
-            prog,
-            int(m.get("slide_count") or 0),
-            int(m.get("checkpoint_count") or 0),
-        )
+    user_progress = _course_materials_user_progress(materials)
     continue_material = _pick_continue_material(ready_materials, user_progress)
     unit1_path = [
         m for m in ready_materials
         if int(m.get("unit") or 0) == 1
     ]
     return {
+        "phase_groups": phase_groups,
         "unit_groups": unit_groups,
         "materials_total": materials_total,
         "materials_ready": materials_ready,
@@ -7967,7 +8114,7 @@ def placement_section_begin(slug: str, section: str):
 @app.route("/placement")
 def placement_landing():
     session["active_track_label"] = "Course placement"
-    catalog = _load_placement_catalog()
+    catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
     return render_template(
         "placement_catalog.html",
         catalog=catalog,
@@ -7992,6 +8139,7 @@ def placement_test_landing(slug: str):
         placement_parts=_placement_landing_parts_for_topic(topic),
         topic=topic,
         slug=slug,
+        pdf_meta=_placement_pdf_meta(test.get("pdf_file")),
     )
 
 
@@ -8135,8 +8283,17 @@ def _practice_test_pdf_for_domain(domain: str) -> dict[str, Any] | None:
 @app.route("/practice/materials")
 def practice_course_materials():
     session["active_track_label"] = "SAT Math"
-    ctx = _course_materials_hub_context()
-    return render_template("course_materials.html", **ctx)
+    ctx = _course_materials_gate_context()
+    return render_template("course_materials_gate.html", **ctx)
+
+
+@app.route("/practice/materials/phase/<int:phase_num>")
+def practice_course_materials_phase(phase_num: int):
+    session["active_track_label"] = "SAT Math"
+    ctx = _course_materials_phase_context(phase_num)
+    if not ctx:
+        abort(404)
+    return render_template("course_materials_phase.html", **ctx)
 
 
 @app.route("/practice/materials/<slug>")

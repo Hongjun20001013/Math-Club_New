@@ -36,6 +36,7 @@ def build() -> dict:
         next_slug = manifest_rows[i + 1]["slug"] if i + 1 < len(manifest_rows) else None
         entry = {
             "slug": row["slug"],
+            "phase": int(row.get("phase") or 1),
             "unit": row["unit"],
             "unit_name": row["unit_name"],
             "section": row["section"],

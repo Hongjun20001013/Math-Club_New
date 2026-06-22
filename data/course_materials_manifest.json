@@ -354,6 +354,132 @@
         "SAT_4.4_Circle.pdf",
         "4.4_Circle.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-1",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 1",
+      "title": "SAT Hard Question 1",
+      "tex_candidates": [
+        "SAT_Hard_Question_1_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_1.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-2",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 2",
+      "title": "SAT Hard Question 2",
+      "tex_candidates": [
+        "SAT_Hard_Question_2_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_2.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-3",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 3",
+      "title": "SAT Hard Question 3",
+      "tex_candidates": [
+        "SAT_Hard_Question_3_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_3.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-4",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 4",
+      "title": "SAT Hard Question 4",
+      "tex_candidates": [
+        "SAT_Hard_Question_4_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_4.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-5",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 5",
+      "title": "SAT Hard Question 5",
+      "tex_candidates": [
+        "SAT_Hard_Question_5_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_5.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-6",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 6",
+      "title": "SAT Hard Question 6",
+      "tex_candidates": [
+        "SAT_Hard_Question_6_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_6.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-7",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 7",
+      "title": "SAT Hard Question 7",
+      "tex_candidates": [
+        "SAT_Hard_Question_7_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_7.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-8",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 8",
+      "title": "SAT Hard Question 8",
+      "tex_candidates": [
+        "SAT_Hard_Question_8_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_8.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-9",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 9",
+      "title": "SAT Hard Question 9",
+      "tex_candidates": [
+        "SAT_Hard_Question_9_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_9.pdf"
+      ]
     }
   ]
 }

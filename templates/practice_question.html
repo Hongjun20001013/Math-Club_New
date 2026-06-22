@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block extra_css %}
+{% if placement_mode %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endif %}
+{% endblock %}
 {% block content %}
 {% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
 
@@ -8,25 +13,30 @@
 
     <div class="sat-exam-chrome{% if placement_mode %} sat-exam-chrome--placement{% endif %}" aria-label="Session controls">
     {% if placement_mode %}
-    <div class="sat-placement-ribbon" role="status">
-      <span class="sat-placement-ribbon-dot" aria-hidden="true"></span>
-      <span class="sat-placement-ribbon-title">Course placement</span>
-      {% if q.placement_section %}
-      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-phase">{{ q.placement_section_title|default('Diagnostic') }}</span>
-      {% if q.placement_global_total %}
-      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-meta">Question {{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total }}</span>
-      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-meta">Item {{ q.placement_section_index|default(1) }} / {{ q.placement_section_total|default(20) }} in this part</span>
-      {% else %}
-      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-meta">{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}</span>
-      {% endif %}
-      {% else %}
-      <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
-      <span class="sat-placement-ribbon-meta">Item {{ qnum + 1 }} / {{ total }}</span>
-      {% endif %}
+    <div class="sat-placement-ribbon sat-placement-ribbon--luxe" role="status">
+      <div class="sat-placement-ribbon-main">
+        <span class="sat-placement-ribbon-dot" aria-hidden="true"></span>
+        <span class="sat-placement-ribbon-title">Course placement</span>
+        {% if q.placement_section %}
+        <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+        <span class="sat-placement-ribbon-phase">{{ q.placement_section_title|default('Diagnostic') }}</span>
+        {% if q.placement_global_total %}
+        <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+        <span class="sat-placement-ribbon-meta">Question {{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total }}</span>
+        <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+        <span class="sat-placement-ribbon-meta">Item {{ q.placement_section_index|default(1) }} / {{ q.placement_section_total|default(20) }} in this part</span>
+        {% else %}
+        <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+        <span class="sat-placement-ribbon-meta">{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}</span>
+        {% endif %}
+        {% else %}
+        <span class="sat-placement-ribbon-sep" aria-hidden="true">·</span>
+        <span class="sat-placement-ribbon-meta">Item {{ qnum + 1 }} / {{ total }}</span>
+        {% endif %}
+      </div>
+      <div class="sat-placement-ribbon-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ qnum + 1 }}" aria-label="Diagnostic progress">
+        <span class="sat-placement-ribbon-progress-fill" style="width: {{ (((qnum + 1) / total) * 100)|round }}%;"></span>
+      </div>
     </div>
     {% endif %}
     <!-- Header -->
@@ -231,13 +241,21 @@
                     <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
                 {% if q.question_kind|default('mcq') == 'constructed_response' %}
-                <div class="sat-constructed-panel">
-                    <label class="sat-constructed-label" for="constructed-answer-input">Your response</label>
-                    <textarea class="sat-constructed-input" name="selected_answer" id="constructed-answer-input" rows="12" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."></textarea>
-                    <p class="sat-constructed-hint">{% if q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
+                <div class="sat-response-scroll">
+                    <div class="sat-response-studio">
+                        <div class="sat-response-studio__head">
+                            <label class="sat-constructed-label" for="constructed-answer-input">Your response</label>
+                            <span class="sat-response-studio__badge">Saved for review</span>
+                        </div>
+                        <div class="sat-response-studio__frame">
+                            <textarea class="sat-constructed-input sat-response-studio__input" name="selected_answer" id="constructed-answer-input" rows="10" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."></textarea>
+                        </div>
+                        <p class="sat-constructed-hint">{% if q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
+                    </div>
                 </div>
                 {% elif q.question_kind|default('mcq') == 'free_response' %}
-                <div class="sat-spr-panel">
+                <div class="sat-response-scroll">
+                <div class="sat-spr-panel sat-response-studio sat-response-studio--spr">
                     <label class="sat-spr-label" for="spr-answer-input">Answer</label>
                     <div class="sat-spr-input-wrap">
                         <div class="sat-spr-input-math" id="spr-answer-math" aria-hidden="true"></div>
@@ -252,6 +270,7 @@
                             <span>Decimal</span>
                         </div>
                     </div>
+                </div>
                 </div>
                 {% else %}
                 <div class="choices-panel choices-stack sat-choices-list">

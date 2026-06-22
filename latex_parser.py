@@ -209,6 +209,19 @@ def strip_document_noise(text: str) -> str:
     return "\n".join(lines_out)
 
 
+def _cell_needs_math_delimiters(cell: str) -> bool:
+    """Detect plain-text LaTeX math in tabular/array cells (e.g. 2x^2 + 7x + 9)."""
+    if not cell or re.search(r"\\\(|\\\[|\$", cell):
+        return False
+    if re.search(r"\\(?:overline|underline|phantom|frac)\b", cell):
+        return True
+    if re.search(r"\^[0-9{]", cell):
+        return True
+    if re.search(r"[0-9]*[a-zA-Z]\s*[-+*/]\s*[0-9a-zA-Z]", cell):
+        return True
+    return False
+
+
 def _clean_table_cell(cell: str) -> str:
     """Strip LaTeX text wrappers from array/tabular cells before HTML output."""
     cell = cell.strip()
@@ -237,10 +250,7 @@ def _clean_table_cell(cell: str) -> str:
     m_dollar = re.fullmatch(r"\$(.+)\$", cell.strip(), flags=re.S)
     if m_dollar:
         cell = f"\\(\\displaystyle {m_dollar.group(1).strip()}\\)"
-    elif re.search(
-        r"\\(?:overline|underline|phantom)\b",
-        cell,
-    ) and not re.search(r"\\\(|\\\[|\$", cell):
+    elif _cell_needs_math_delimiters(cell):
         cell = f"\\({cell}\\)"
     return cell.strip()
 

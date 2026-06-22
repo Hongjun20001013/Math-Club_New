@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}SAT Course Materials · {{ site_brand_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_atelier.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-cm-luxe np-cm-luxe--gate" data-cm-gate>
+  <div class="np-cm-luxe-canvas" aria-hidden="true">
+    <div class="np-cm-luxe-canvas__beam"></div>
+    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--1"></div>
+    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--2"></div>
+    <div class="np-cm-luxe-canvas__grid"></div>
+    <div class="np-cm-luxe-canvas__grain"></div>
+  </div>
+
+  <div class="np-cm-luxe-frame">
+    <nav class="np-cm-luxe-rail" aria-label="SAT navigation">
+      <a href="{{ url_for('practice') }}">SAT modules</a>
+      <span aria-hidden="true">/</span>
+      <span>Course materials</span>
+    </nav>
+
+    <header class="np-cm-luxe-hero">
+      <p class="np-cm-luxe-hero-eyebrow">Novel Prep · Teaching Atelier</p>
+      <h1 class="np-cm-luxe-hero-title">
+        <span class="np-cm-luxe-hero-title-pre">SAT</span>
+        <span class="np-cm-luxe-hero-title-main">Course Materials</span>
+      </h1>
+      <p class="np-cm-luxe-hero-copy">Three curated learning phases — choose your doorway into interactive slides, live student tracking, and printable review.</p>
+    </header>
+
+    <div class="np-cm-luxe-portals" role="list">
+      {% for card in phase_cards %}
+      <a href="{{ url_for('practice_course_materials_phase', phase_num=card.phase) }}"
+         class="np-cm-luxe-portal np-cm-luxe-portal--p{{ card.phase }}{% if not card.ready_count %} is-muted{% endif %}"
+         role="listitem"
+         style="--portal-i: {{ loop.index0 }};">
+        <div class="np-cm-luxe-portal-orbit" aria-hidden="true"></div>
+        <div class="np-cm-luxe-portal-card">
+          <div class="np-cm-luxe-portal-visual" aria-hidden="true">
+            <div class="np-cm-luxe-portal-visual-bg"></div>
+            <div class="np-cm-luxe-portal-stack">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="np-cm-luxe-portal-body">
+            <div class="np-cm-luxe-portal-meta">
+              <span class="np-cm-luxe-portal-index">Phase {{ card.phase }}</span>
+              {% if card.ready_count %}
+              <span class="np-cm-luxe-portal-live"><i></i>{{ card.ready_count }} live</span>
+              {% endif %}
+            </div>
+            <h2>{{ card.label }}</h2>
+            <p class="np-cm-luxe-portal-tag">{{ card.kicker }}</p>
+            <p class="np-cm-luxe-portal-desc">
+              {% if card.phase == 1 %}Core Units 1–4 with definitions, methods, and guided practice decks.
+              {% elif card.phase == 2 %}Challenge problem sets with in-class response tracking.
+              {% else %}Advanced review tracks — arriving soon.{% endif %}
+            </p>
+            <span class="np-cm-luxe-portal-cta">
+              <span>Enter phase</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <ul class="np-cm-luxe-trust" aria-label="Platform features">
+      <li>Interactive slides</li>
+      <li>Student mastery</li>
+      <li>Printable PDFs</li>
+      <li>Live classroom</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function () {
+  var gate = document.querySelector("[data-cm-gate]");
+  if (!gate) return;
+  var portals = gate.querySelectorAll(".np-cm-luxe-portal");
+  portals.forEach(function (portal) {
+    portal.addEventListener("mousemove", function (e) {
+      var r = portal.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      portal.style.setProperty("--tilt-x", (y * -6).toFixed(2) + "deg");
+      portal.style.setProperty("--tilt-y", (x * 8).toFixed(2) + "deg");
+    });
+    portal.addEventListener("mouseleave", function () {
+      portal.style.setProperty("--tilt-x", "0deg");
+      portal.style.setProperty("--tilt-y", "0deg");
+    });
+  });
+})();
+</script>
+{% endblock %}
