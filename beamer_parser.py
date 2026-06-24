@@ -178,64 +178,79 @@ def _flatten_columns(text: str) -> str:
     return _unwrap_environment(out, "columns")
 
 
-def _remove_environment(text: str, env: str) -> str:
-    out = text
-    begin = rf"\begin{{{env}}}"
-    end = rf"\end{{{env}}}"
-    while True:
-        m = re.search(re.escape(begin), out)
-        if not m:
-            break
-        end_idx = out.find(end, m.end())
-        if end_idx == -1:
-            out = out[: m.start()] + out[m.end() :]
-            continue
-        out = out[: m.start()] + out[end_idx + len(end) :]
-    return out
+def _env_begin_pattern(env: str) -> str:
+    """Match \\begin{env} with optional [...] arguments."""
+    return rf"\\begin\{{{re.escape(env)}\}}(?:\[[^\]]*\])?"
+
+
+def _find_env_begin(text: str, env: str, start: int = 0) -> tuple[int, int] | None:
+    """Return (begin_idx, content_start) for \\begin{env} or \\begin{env}[...]."""
+    pat = re.compile(_env_begin_pattern(env))
+    m = pat.search(text, start)
+    if not m:
+        return None
+    return m.start(), m.end()
 
 
 def _unwrap_environment(text: str, env: str) -> str:
     """Replace \\begin{env}…\\end{env} with its inner content (keep figures/text)."""
     out = text
-    begin = rf"\begin{{{env}}}"
     end = rf"\end{{{env}}}"
     while True:
-        m = re.search(re.escape(begin), out)
-        if not m:
+        found = _find_env_begin(out, env)
+        if not found:
             break
-        end_idx = out.find(end, m.end())
-        if end_idx == -1:
-            out = out[: m.start()] + out[m.end() :]
-            continue
-        inner = out[m.end() : end_idx].strip()
-        out = out[: m.start()] + inner + out[end_idx + len(end) :]
-    return out
-
-
-def _unwrap_beamer_block_environment(text: str) -> str:
-    """Unwrap \begin{block}{Title}...\end{block}, preserving the block title."""
-    out = text
-    marker = r"\begin{block}"
-    end = r"\end{block}"
-    while True:
-        idx = out.find(marker)
-        if idx == -1:
-            break
-        pos = idx + len(marker)
-        while pos < len(out) and out[pos].isspace():
-            pos += 1
-        title = ""
-        if pos < len(out) and out[pos] == "{":
-            parsed = _extract_braced_content(out, pos)
-            if parsed[0] is not None:
-                title, pos = parsed
+        idx, pos = found
         end_idx = out.find(end, pos)
         if end_idx == -1:
             out = out[:idx] + out[pos:]
             continue
         inner = out[pos:end_idx].strip()
-        replacement = (rf"\textbf{{{title}}}" + "\n\n" if title.strip() else "") + inner
-        out = out[:idx] + replacement + out[end_idx + len(end) :]
+        out = out[:idx] + inner + out[end_idx + len(end) :]
+    return out
+
+
+def _remove_environment(text: str, env: str) -> str:
+    out = text
+    end = rf"\end{{{env}}}"
+    while True:
+        found = _find_env_begin(out, env)
+        if not found:
+            break
+        idx, pos = found
+        end_idx = out.find(end, pos)
+        if end_idx == -1:
+            out = out[:idx] + out[pos:]
+            continue
+        out = out[:idx] + out[end_idx + len(end) :]
+    return out
+
+
+def _unwrap_beamer_block_environment(text: str) -> str:
+    """Unwrap beamer block/alertblock/exampleblock, preserving the block title."""
+    out = text
+    for env in ("block", "alertblock", "exampleblock"):
+        marker = rf"\begin{{{env}}}"
+        end = rf"\end{{{env}}}"
+        while True:
+            idx = out.find(marker)
+            if idx == -1:
+                break
+            pos = idx + len(marker)
+            while pos < len(out) and out[pos].isspace():
+                pos += 1
+            title = ""
+            if pos < len(out) and out[pos] == "{":
+                parsed = _extract_braced_content(out, pos)
+                if parsed[0] is not None:
+                    title, pos = parsed
+            end_idx = out.find(end, pos)
+            if end_idx == -1:
+                out = out[:idx] + out[pos:]
+                continue
+            inner = out[pos:end_idx].strip()
+            replacement = (rf"\textbf{{{title}}}" + "\n\n" if title.strip() else "") + inner
+            out = out[:idx] + replacement + out[end_idx + len(end) :]
     return out
 
 

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-24T05:57:26.115963Z",
+  "generated_at": "2026-06-24T19:09:51.540505Z",
   "total": 30,
   "available": 30,
   "materials": [
@@ -10625,7 +10625,7 @@
         {
           "index": 35,
           "title": "Question",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>Data set A and Data set B</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>|c|c|}\n\\hline\n\\multicolumn{2}{|c|}{<strong>Data set A</strong>}</th><th colspan=\"2\"><strong>Data set B</strong></th></tr></thead><tbody><tr><td><strong>Value</strong></td><td><strong>Frequency</strong></td><td><strong>Value</strong></td><td><strong>Frequency</strong></td></tr><tr><td>10</td><td>2</td><td>13</td><td>2</td></tr><tr><td>11</td><td>3</td><td>14</td><td>3</td></tr><tr><td>12</td><td>7</td><td>15</td><td>7</td></tr><tr><td>13</td><td>3</td><td>16</td><td>3</td></tr><tr><td>14</td><td>9</td><td>17</td><td>9</td></tr><tr><td>15</td><td>5</td><td>18</td><td>5</td></tr></tbody></table></div>\n<p>The tables show the frequencies of the values for data sets A and B. Which of the following statements best compares the means and the standard deviations of data sets A and B?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">The mean of data set B is equal to the mean of data set A, and the standard deviation of data set B is equal to the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">The mean of data set B is equal to the mean of data set A, and the standard deviation of data set B is greater than the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">The mean of data set B is greater than the mean of data set A, and the standard deviation of data set B is equal to the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">The mean of data set B is greater than the mean of data set A, and the standard deviation of data set B is greater than the standard deviation of data set A.</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>Data set A and Data set B</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th colspan=\"2\"><strong>Data set A</strong></th><th colspan=\"2\"><strong>Data set B</strong></th></tr></thead><tbody><tr><td><strong>Value</strong></td><td><strong>Frequency</strong></td><td><strong>Value</strong></td><td><strong>Frequency</strong></td></tr><tr><td>10</td><td>2</td><td>13</td><td>2</td></tr><tr><td>11</td><td>3</td><td>14</td><td>3</td></tr><tr><td>12</td><td>7</td><td>15</td><td>7</td></tr><tr><td>13</td><td>3</td><td>16</td><td>3</td></tr><tr><td>14</td><td>9</td><td>17</td><td>9</td></tr><tr><td>15</td><td>5</td><td>18</td><td>5</td></tr></tbody></table></div>\n<p>The tables show the frequencies of the values for data sets A and B. Which of the following statements best compares the means and the standard deviations of data sets A and B?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">The mean of data set B is equal to the mean of data set A, and the standard deviation of data set B is equal to the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">The mean of data set B is equal to the mean of data set A, and the standard deviation of data set B is greater than the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">The mean of data set B is greater than the mean of data set A, and the standard deviation of data set B is equal to the standard deviation of data set A.</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">The mean of data set B is greater than the mean of data set A, and the standard deviation of data set B is greater than the standard deviation of data set A.</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
           "interactive": true,
           "answer_index": 36,
@@ -10879,7 +10879,7 @@
           "kind": "question",
           "correct": "C",
           "answer_index": 36,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>Data set A and Data set B</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>|c|c|}\n\\hline\n\\multicolumn{2}{|c|}{<strong>Data set A</strong>}</th><th colspan=\"2\"><strong>Data set B</strong></th></tr></thead><tbody><tr><td><strong>Value</strong></td><td><strong>Frequency</strong></td><td><strong>Value</strong></td><td><strong>Frequency</strong></td></tr><tr><td>10</td><td>2</td><td>13</td><td>2</td></tr><tr><td>11</td><td>3</td><td>14</td><td>3</td></tr><tr><td>12</td><td>7</td><td>15</td><td>7</td></tr><tr><td>13</td><td>3</td><td>16</td><td>3</td></tr><tr><td>14</td><td>9</td><td>17</td><td>9</td></tr><tr><td>15</td><td>5</td><td>18</td><td>5</td></tr></tbody></table></div>\n<p>The tables show the frequencies of the values for data sets A and B. Which of the following statements best compares the means and the standard deviations of data sets A and B?</p></div><div class=\"cm-question-interact\">",
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p><strong>Data set A and Data set B</strong></p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th colspan=\"2\"><strong>Data set A</strong></th><th colspan=\"2\"><strong>Data set B</strong></th></tr></thead><tbody><tr><td><strong>Value</strong></td><td><strong>Frequency</strong></td><td><strong>Value</strong></td><td><strong>Frequency</strong></td></tr><tr><td>10</td><td>2</td><td>13</td><td>2</td></tr><tr><td>11</td><td>3</td><td>14</td><td>3</td></tr><tr><td>12</td><td>7</td><td>15</td><td>7</td></tr><tr><td>13</td><td>3</td><td>16</td><td>3</td></tr><tr><td>14</td><td>9</td><td>17</td><td>9</td></tr><tr><td>15</td><td>5</td><td>18</td><td>5</td></tr></tbody></table></div>\n<p>The tables show the frequencies of the values for data sets A and B. Which of the following statements best compares the means and the standard deviations of data sets A and B?</p></div><div class=\"cm-question-interact\">",
           "choices": [
             {
               "letter": "A",
@@ -12183,7 +12183,7 @@
         {
           "index": 1,
           "title": "SAT Unit 3.6 · Inference from Sample Statistics and Margin Error",
-          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 3.6</p><h1 class=\"cm-intro-title\">Inference from Sample Statistics and Margin Error</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Inference from Sample Statistics</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"8\"><span class=\"cm-intro-chip-num\">02</span><span class=\"cm-intro-chip-label\">Margin of Error</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"15\"><span class=\"cm-intro-chip-num\">03</span><span class=\"cm-intro-chip-label\">Practices</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Unit 3.6</p><h1 class=\"cm-intro-title\">Inference from Sample Statistics and Margin Error</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Inference from Sample Statistics</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"7\"><span class=\"cm-intro-chip-num\">02</span><span class=\"cm-intro-chip-label\">Margin of Error</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"15\"><span class=\"cm-intro-chip-num\">03</span><span class=\"cm-intro-chip-label\">Practices</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
           "kind": "intro",
           "group": "divider",
           "section": "Introduction",
@@ -12192,7 +12192,7 @@
         {
           "index": 2,
           "title": "Lesson outline",
-          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Unit 3.6</p><h2 class=\"cm-content-title\">Inference from Sample Statistics and Margin Error</h2><p class=\"cm-content-lede\">24 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Inference from Sample Statistics</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"8\"><span class=\"cm-content-num\">02</span><span class=\"cm-content-copy\"><strong>Margin of Error</strong><span>Session 02 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"15\"><span class=\"cm-content-num\">03</span><span class=\"cm-content-copy\"><strong>Practices</strong><span>Session 03 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Unit 3.6</p><h2 class=\"cm-content-title\">Inference from Sample Statistics and Margin Error</h2><p class=\"cm-content-lede\">24 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Inference from Sample Statistics</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"7\"><span class=\"cm-content-num\">02</span><span class=\"cm-content-copy\"><strong>Margin of Error</strong><span>Session 02 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"15\"><span class=\"cm-content-num\">03</span><span class=\"cm-content-copy\"><strong>Practices</strong><span>Session 03 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
           "kind": "content",
           "group": "divider",
           "section": "Introduction",
@@ -12209,29 +12209,20 @@
         },
         {
           "index": 4,
-          "title": "What is Inference from Sample Statistics?",
-          "html": "<div class=\"cm-slide-role cm-slide-role--concept\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Learn the rule</strong><p>Understand the definition, formula, or theorem before trying a problem.</p></div><div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong></p>\n<p><strong>Inference</strong> refers to the process of using data from a sample to draw conclusions about a population.</p>\n<p><strong>Why do we use samples?</strong></p>\n<ul class=\"stem-itemize\"><li>Studying an entire population is often impractical or impossible.</li><li>A well-designed sample provides useful, reliable insight.</li></ul>\n<p><strong>Example:</strong></p>\n<p>If we randomly sample 200 voters and 65% support a policy, we can estimate the population support is around 65%.</p>\n<p><strong>Important:</strong> Conclusions are not certain — they are probabilistic.</p>",
-          "kind": "concept",
-          "group": "learn",
-          "section": "Inference from Sample Statistics",
-          "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
-        },
-        {
-          "index": 5,
-          "title": "Key Properties and Considerations",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>1. Random Sampling:</strong></p>\n<p>A sample must be random to avoid bias and make valid inferences.</p>\n<p><strong>2. Sample Size:</strong></p>\n<p>Larger samples tend to yield more accurate estimates (smaller margin of error).</p>\n<p><strong>3. Variability:</strong></p>\n<p>Different random samples produce slightly different statistics. This is expected.</p>\n<p><strong>4. Population vs. Sample:</strong></p>\n<ul class=\"stem-itemize\"><li><strong>Parameter</strong> – a fixed value describing the population (unknown).</li><li><strong>Statistic</strong> – a computed value from a sample (known).</li></ul>\n<p><strong>Notation:</strong></p>\n<ul class=\"stem-itemize\"><li>Population mean: \\(\\displaystyle \\mu\\), Sample mean: \\(\\displaystyle \\bar{x}\\)</li><li>Population proportion: \\(\\displaystyle p\\), Sample proportion: \\(\\displaystyle \\hat{p}\\)</li></ul>",
+          "title": "Inference from Samples",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p>Use a <strong>random sample</strong> to estimate a <strong>population</strong> we cannot measure fully.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Statistic</strong> (sample)</th><th>known — e.g. \\(\\displaystyle \\hat{p} = 65\\%\\)</th></tr></thead><tbody><tr><td><strong>Parameter</strong> (population)</td><td>unknown — true rate for everyone</td></tr></tbody></table></div>\n\n<ul class=\"stem-itemize\"><li>Larger sample \\(\\displaystyle ⇒\\) better estimate (smaller MOE)</li><li>Results are <strong>plausible</strong>, not guaranteed</li></ul>",
           "kind": "lesson",
           "group": "learn",
           "section": "Inference from Sample Statistics",
           "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
         },
         {
-          "index": 6,
+          "index": 5,
           "title": "Question: Predicting Election Outcome from Poll Data",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The table shows the results of a poll. A total of \\( 803 \\) voters selected at random were asked which candidate they would vote for in the upcoming election.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Candidate</strong></th><th><strong>Votes</strong></th></tr></thead><tbody><tr><td>Angel Cruz</td><td>483</td></tr><tr><td>Terry Smith</td><td>320</td></tr></tbody></table></div>\n<p>According to the poll, if \\( 6,424 \\) people vote in the election, by how many votes would Angel Cruz be expected to win?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">163</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">1,304</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">3,864</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">5,621</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
           "interactive": true,
-          "answer_index": 7,
+          "answer_index": 6,
           "correct_choice": "B",
           "group": "practice",
           "section": "Inference from Sample Statistics",
@@ -12239,17 +12230,17 @@
           "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
         },
         {
-          "index": 7,
+          "index": 6,
           "title": "Answer: Calculating Predicted Vote Margin",
           "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1:</strong> Compute proportions of votes from the poll.</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{Angel Cruz's proportion: } \\frac{483}{803},  \n\\text{Terry Smith's proportion: } \\frac{320}{803}\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2:</strong> Apply these proportions to the total of \\( 6,424 \\) voters.</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{Votes for Cruz: } \\frac{483}{803} \\times 6424 \\approx 3864.01\n\\]</div>\n\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{Votes for Smith: } \\frac{320}{803} \\times 6424 \\approx 2560.00\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3:</strong> Subtract to find the expected margin.</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n3864 - 2560 = \\boxed{1304}\n\\]</div>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong> 1,304</div></div></div>",
           "kind": "answer",
-          "question_index": 6,
+          "question_index": 5,
           "group": "practice",
           "section": "Inference from Sample Statistics",
           "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
         },
         {
-          "index": 8,
+          "index": 7,
           "title": "Up next Margin of Error",
           "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">02</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Margin of Error</h3></div>",
           "kind": "section",
@@ -12258,18 +12249,27 @@
           "study_tip": ""
         },
         {
-          "index": 9,
-          "title": "Understanding Margin of Error",
-          "html": "<div class=\"cm-slide-role cm-slide-role--concept\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Learn the rule</strong><p>Understand the definition, formula, or theorem before trying a problem.</p></div><div class=\"cm-learn-focus\"><span class=\"cm-learn-focus-tag\">Core concept</span><p>Understand this definition — every example and practice problem in this lesson builds on it.</p></div><p><strong>Definition:</strong></p>\n<p>The <strong>margin of error (MOE)</strong> is the maximum expected difference between the true population parameter and a sample estimate.</p>\n<p><strong>General Formula:</strong></p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{Margin of Error} = z^* \\cdot \\frac{\\sigma}{\\sqrt{n}}\n\\]</div>\n<p>or for proportions:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{MOE} = z^* \\cdot \\sqrt{\\frac{\\hat{p}(1 - \\hat{p})}{n}}\n\\]</div>\n<p><strong>Where:</strong></p>\n<ul class=\"stem-itemize\"><li>\\(\\displaystyle z^*\\) is the z-score based on confidence level (e.g., 1.96 for 95%),</li><li>\\(\\displaystyle \\sigma\\) is the population standard deviation (or estimate),</li><li>\\(\\displaystyle n\\) is the sample size,</li><li>\\(\\displaystyle \\hat{p}\\) is the sample proportion.</li></ul>",
-          "kind": "concept",
+          "index": 8,
+          "title": "Margin of Error (MOE)",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Margin of error</strong> = how far a <strong>sample result</strong> might be from the <strong>true population value</strong>.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Sample estimate</strong></th><th>from your data (e.g. 52&#37;)</th></tr></thead><tbody><tr><td><strong>Population parameter</strong></td><td>true value for everyone (unknown)</td></tr></tbody></table></div>\n\n<ul class=\"stem-itemize\"><li><strong>Not this:</strong> The survey is ``wrong by MOE.''</li><li><strong>This:</strong> Truth is probably within MOE of the estimate.</li></ul>\n<p><strong>SAT:</strong> sample % = <strong>center</strong> of a range, not an exact fact.</p>",
+          "kind": "lesson",
           "group": "learn",
           "section": "Margin of Error",
-          "study_tip": "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        },
+        {
+          "index": 9,
+          "title": "How to Read MOE",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Poll:</strong> 1,000 voters — <strong>52%</strong> support Candidate A, MOE <strong>\\(\\displaystyle \\pm 3\\%\\)</strong></p>\n<p>\\(\\displaystyle 52\\% \\pm 3\\% \\;=\\; [49\\%,\\ 55\\%]\\)</p>\n<p><ul class=\"stem-itemize\"><li><strong>52%</strong> = sample estimate</p>\n<p><strong>Target analogy</strong></p>\n<p>Arrow at <strong>52</strong>; bullseye (truth) likely in <strong>49–55</strong>, not exactly at 52.</p>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "Margin of Error",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
         },
         {
           "index": 10,
-          "title": "Properties of Margin Error",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Properties:</strong></p>\n<div class=\"cm-rule-grid cm-rule-grid--compact\"><span class=\"cm-rule-grid-tag\">Properties</span><div class=\"cm-rule-group\"><div class=\"cm-rule-cards\"><div class=\"cm-rule-card\"><span class=\"cm-rule-name\">Property</span><span class=\"cm-rule-formula\"><strong>Smaller MOE</strong> = more precise estimate.</span></div><div class=\"cm-rule-card\"><span class=\"cm-rule-name\">Property</span><span class=\"cm-rule-formula\"><strong>Larger MOE</strong> = more uncertainty.</span></div></div></div></div>\n<p><strong>Factors that Affect Margin of Error:</strong></p>\n<ul class=\"stem-itemize\"><li><strong>Sample size (\\(\\displaystyle n\\))</strong>: Larger \\(\\displaystyle n\\) → smaller MOE.</li><li><strong>Confidence level:</strong> Higher confidence → larger \\(\\displaystyle z^*\\) → larger MOE.</li><li><strong>Population variability:</strong> More variation → larger MOE.</li></ul>\n<p><strong>Key Idea:</strong></p>\n<p>To decrease MOE, increase the sample size or reduce the confidence level.</p>",
+          "title": "What Affects MOE?",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Change</strong></th><th><strong>MOE</strong></th></tr></thead><tbody><tr><td>Larger sample size ( \\(\\displaystyle n\\) )</td><td>Smaller \\(\\displaystyle \\downarrow\\)</td></tr><tr><td>Higher confidence level</td><td>Larger \\(\\displaystyle \\uparrow\\)</td></tr><tr><td>More population variability</td><td>Larger \\(\\displaystyle \\uparrow\\)</td></tr></tbody></table></div>\n<p><strong>On the SAT:</strong> bigger MOE \\(\\displaystyle ⇒\\) check for a <strong>smaller sample</strong> first.</p>",
           "kind": "lesson",
           "group": "learn",
           "section": "Margin of Error",
@@ -12291,7 +12291,7 @@
         {
           "index": 12,
           "title": "Answer: Margin of Error Interpretation",
-          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p><strong>Estimated percent:</strong> \\( 30\\% \\)</p>\n<p><strong>Margin of error:</strong> \\( \\pm 3\\% \\)</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n\\text{Confidence interval: } [30\\% - 3\\%, 30\\% + 3\\%] = [27\\%, 33\\%]\n\\]</div>\n\n<ul class=\"stem-itemize\"><li><strong>A.</strong> Incorrect: Margin of error relates to population estimates, not misclassification of sample responses.</li><li><strong>B.</strong> Incorrect: While values outside the interval are less likely, we cannot claim impossibility.</li><li><strong>C.</strong> Incorrect: 33% is the upper bound; the true value could be anywhere in the interval.</li><li><strong>D.</strong> <strong>Correct:</strong> 35% is outside the margin of error range. Therefore, it is <em>doubtful</em> that the true percentage is as high as 35%.</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\boxed{D}\\)</span></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p>\\(\\displaystyle 30\\% \\pm 3\\% = [27\\%,\\ 33\\%]\\)</p>\n<ul class=\"stem-itemize\"><li><strong>A–C:</strong> misread MOE (sample mislabel, ``impossible,'' or picks a bound only)</li><li><strong>D:</strong> 35% is <strong>outside</strong> the range \\(\\displaystyle ⇒\\) doubtful</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
           "kind": "answer",
           "question_index": 11,
           "group": "practice",
@@ -12314,7 +12314,7 @@
         {
           "index": 14,
           "title": "Answer: Margin of Error and Sample Size",
-          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong> Sample A had a smaller sample size.</div></div>\n<p><strong>Explanation:</strong></p>\n<p>Margin of error decreases as sample size increases. Since both samples were selected from the same population and analyzed using the same method, the greater margin of error in Sample A suggests it had a smaller sample size.</p>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong> — Sample A had a smaller sample size.</div></div>\n<p>Same population, same method \\(\\displaystyle ⇒\\) larger MOE means <strong>smaller</strong> \\(\\displaystyle n\\).</p>",
           "kind": "answer",
           "question_index": 13,
           "group": "practice",
@@ -12346,7 +12346,7 @@
         {
           "index": 17,
           "title": "Answer",
-          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> The estimate is 65% with a margin of error of 4%. So the confidence interval is:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n65\\% \\pm 4\\% = (61\\%, 69\\%).\n\\]</div>\n</div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Analyze the choices:</p>\n<ul class=\"stem-itemize\"><li>A: Incorrect, as 65% to 69% does not include the lower bound (61%).</li><li>B: Incorrect interpretation of margin of error; it doesn't refer to individual gymnasts.</li><li>C: Correct—60% is outside the confidence interval, making it unlikely.</li><li>D: Incorrect—70% is outside the confidence interval but not strictly impossible.</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>C</strong></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p>\\(\\displaystyle 65\\% \\pm 4\\% = [61\\%,\\ 69\\%]\\)</p>\n<ul class=\"stem-itemize\"><li><strong>A:</strong> wrong range (misses 61%)</li><li><strong>B:</strong> MOE is not about individuals in the sample</li><li><strong>C:</strong> 60% is <strong>outside</strong> the range \\(\\displaystyle ⇒\\) unlikely</li><li><strong>D:</strong> outside, but ``not possible'' is too strong</li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>C</strong></div></div>",
           "kind": "answer",
           "question_index": 16,
           "group": "practice",
@@ -12415,7 +12415,7 @@
         {
           "index": 23,
           "title": "Answer",
-          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p><strong>Explanation:</strong></p>\n<p>A larger margin of error typically occurs when the sample size is smaller (fewer data points lead to more variability in the estimate). So the most likely reason is:</p>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong> — Sample B had fewer customers (smaller \\(n\\) \\(⇒\\) larger MOE).</div></div>",
           "kind": "answer",
           "question_index": 22,
           "group": "practice",
@@ -12447,7 +12447,7 @@
           "title": "Inference from Sample Statistics"
         },
         {
-          "index": 8,
+          "index": 7,
           "title": "Margin of Error"
         },
         {
@@ -12457,12 +12457,12 @@
       ],
       "checkpoint": [
         {
-          "slide_index": 6,
+          "slide_index": 5,
           "title": "Predicting Election Outcome from Poll Data",
           "section": "Inference from Sample Statistics",
           "kind": "question",
           "correct": "B",
-          "answer_index": 7,
+          "answer_index": 6,
           "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The table shows the results of a poll. A total of \\( 803 \\) voters selected at random were asked which candidate they would vote for in the upcoming election.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th><strong>Candidate</strong></th><th><strong>Votes</strong></th></tr></thead><tbody><tr><td>Angel Cruz</td><td>483</td></tr><tr><td>Terry Smith</td><td>320</td></tr></tbody></table></div>\n<p>According to the poll, if \\( 6,424 \\) people vote in the election, by how many votes would Angel Cruz be expected to win?</p></div><div class=\"cm-question-interact\">",
           "choices": [
             {
@@ -12654,27 +12654,20 @@
           "items": [
             {
               "index": 4,
-              "kind": "concept",
-              "title": "What is Inference from Sample Statistics?",
+              "kind": "lesson",
+              "title": "Inference from Samples",
               "interactive": false,
               "has_mcq": false
             },
             {
               "index": 5,
-              "kind": "lesson",
-              "title": "Key Properties and Considerations",
-              "interactive": false,
-              "has_mcq": false
-            },
-            {
-              "index": 6,
               "kind": "question",
               "title": "Question: Predicting Election Outcome from Poll Data",
               "interactive": true,
               "has_mcq": true
             },
             {
-              "index": 7,
+              "index": 6,
               "kind": "answer",
               "title": "Answer: Calculating Predicted Vote Margin",
               "interactive": false,
@@ -12684,19 +12677,26 @@
         },
         {
           "title": "Margin of Error",
-          "start_index": 8,
+          "start_index": 7,
           "items": [
             {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Margin of Error (MOE)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
               "index": 9,
-              "kind": "concept",
-              "title": "Understanding Margin of Error",
+              "kind": "lesson",
+              "title": "How to Read MOE",
               "interactive": false,
               "has_mcq": false
             },
             {
               "index": 10,
               "kind": "lesson",
-              "title": "Properties of Margin Error",
+              "title": "What Affects MOE?",
               "interactive": false,
               "has_mcq": false
             },
@@ -15512,7 +15512,7 @@
         {
           "index": 16,
           "title": "What If the Angle is Greater Than 90 Degrees?",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Big idea:</strong> for angles outside a right triangle, do not start by drawing a new triangle.</p>\n<p>Start with the angle's position on the coordinate plane.</p>\n<p><strong>Use this 4-step routine:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Draw the angle in <strong>standard position</strong>: start on the positive \\(x\\)-axis and rotate counterclockwise.</li><li>Identify the <strong>quadrant</strong> where the terminal side lands.</li><li>Find the <strong>reference angle</strong>: the acute angle between the terminal side and the \\(x\\)-axis.</li><li>Use the reference-angle value, then attach the correct sign.</li></ol>\n\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Quadrant</th><th>Positive trig ratio</th></tr></thead><tbody><tr><td>I</td><td>\\sin,\\ \\cos,\\ \\tan</td></tr><tr><td>II</td><td>\\sin</td></tr><tr><td>III</td><td>\\tan</td></tr><tr><td>IV</td><td>\\cos</td></tr></tbody></table></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Knowledge Point</span><strong>Build the method</strong><p>Focus on the worked idea and the steps you will reuse later.</p></div><p><strong>Big idea:</strong> for angles outside a right triangle, do not start by drawing a new triangle.</p>\n<p>Start with the angle's position on the coordinate plane.</p>\n<p><strong>Use this 4-step routine:</strong></p>\n<ol class=\"stem-enumerate cm-beamer-list\"><li>Draw the angle in <strong>standard position</strong>: start on the positive \\(x\\)-axis and rotate counterclockwise.</li><li>Identify the <strong>quadrant</strong> where the terminal side lands.</li><li>Find the <strong>reference angle</strong>: the acute angle between the terminal side and the \\(x\\)-axis.</li><li>Use the reference-angle value, then attach the correct sign.</li></ol>\n\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Quadrant</th><th>Positive trig ratio</th></tr></thead><tbody><tr><td>I</td><td>\\sin, \\cos, \\tan</td></tr><tr><td>II</td><td>\\sin</td></tr><tr><td>III</td><td>\\tan</td></tr><tr><td>IV</td><td>\\cos</td></tr></tbody></table></div>",
           "kind": "lesson",
           "group": "learn",
           "section": "Trigonometric In Unit Circle",

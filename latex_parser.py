@@ -272,6 +272,8 @@ def _clean_table_cell(cell: str) -> str:
         if updated == cell:
             break
         cell = updated
+    cell = re.sub(r"\\(?:~| )", " ", cell)
+    cell = cell.replace("---", "—")
     cell = cell.replace("--", "–")
     cell = cell.replace("{,}", ",")
     if re.search(r"\$.+?\$", cell):
@@ -316,11 +318,11 @@ def _array_body_to_html_table(body: str) -> str:
         r = raw.strip()
         if not r:
             continue
-        if re.fullmatch(r"\\hline\s*", r):
+        if re.fullmatch(r"\\(?:hline|toprule|midrule|bottomrule|addlinespace)\s*", r):
             continue
         r = re.sub(r"\\(?:rowcolor|cellcolor|arrayrulecolor)(?:\[[^\]]*\])?\{[^}]*\}\s*", "", r)
-        r = re.sub(r"^\\hline\s*", "", r)
-        r = re.sub(r"\s*\\hline\s*$", "", r).strip()
+        r = re.sub(r"^\\(?:hline|toprule|midrule|bottomrule)\s*", "", r)
+        r = re.sub(r"\s*\\(?:hline|toprule|midrule|bottomrule)\s*$", "", r).strip()
         if not r:
             continue
         rows.append([_parse_table_cell(c) for c in r.split("&")])
@@ -396,20 +398,41 @@ def _replace_tabularx_blocks(text: str) -> str:
     return "".join(out)
 
 
+def _replace_latex_env_blocks(text: str, env: str, convert_body) -> str:
+    """Replace \\begin{env}{...}...\\end{env} using balanced-brace column specs."""
+    begin = rf"\begin{{{env}}}"
+    end = rf"\end{{{env}}}"
+    out: list[str] = []
+    last = 0
+    while True:
+        idx = text.find(begin, last)
+        if idx == -1:
+            out.append(text[last:])
+            break
+        out.append(text[last:idx])
+        pos = idx + len(begin)
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+        if pos < len(text) and text[pos] == "{":
+            spec, pos = _extract_braced_content(text, pos)
+            if spec is None:
+                out.append(text[idx : idx + len(begin)])
+                last = idx + len(begin)
+                continue
+        end_idx = text.find(end, pos)
+        if end_idx == -1:
+            out.append(text[idx:])
+            break
+        body = text[pos:end_idx]
+        out.append(convert_body(body))
+        last = end_idx + len(end)
+    return "".join(out)
+
+
 def latex_array_and_tabular_to_html(text: str) -> str:
     """Convert array/tabular environments to HTML before other cleanup (avoids stray & for MathJax)."""
-    text = re.sub(
-        r"\\begin\{array\}\{[^}]*\}(.*?)\\end\{array\}",
-        lambda m: _array_body_to_html_table(m.group(1)),
-        text,
-        flags=re.S,
-    )
-    text = re.sub(
-        r"\\begin\{tabular\}\{[^}]*\}(.*?)\\end\{tabular\}",
-        lambda m: _array_body_to_html_table(m.group(1)),
-        text,
-        flags=re.S,
-    )
+    text = _replace_latex_env_blocks(text, "array", _array_body_to_html_table)
+    text = _replace_latex_env_blocks(text, "tabular", _array_body_to_html_table)
     text = _replace_tabularx_blocks(text)
     text = re.sub(
         r"\\\[\s*(<div class=\"stem-table-wrap\">.*?</div>)\s*\\\]",

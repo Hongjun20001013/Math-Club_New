@@ -8,6 +8,7 @@
 \usepackage[table]{xcolor}  % 增强颜色支持，特别是灰色背景
 \usepackage{array}        % 增强表格功能（对齐方式等）
 \usepackage{booktabs}
+\usepackage{enumerate}
 
 
 
@@ -46,29 +47,6 @@
     \begin{flushright}
         \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
     \end{flushright}
-\end{frame}
-\begin{frame}
-    \begin{tikzpicture}[remember picture, overlay]
-        % 设置浅色渐变背景
-        \shade[top color=softPurple, bottom color=softGray] 
-            (current page.north west) rectangle (current page.south east);
-        
-        % 添加高斯模糊光晕
-        \fill[white, opacity=0.3] (current page.center) circle (4cm);
-        
-        % 主标题
-        \node[align=center] at (current page.center) {
-            {\Huge\bfseries\textcolor{purpleblue}{Practices}} \\[0.5cm]
-            {\Large\itshape\textcolor{lightText}{Excellence in SAT Prep}}
-        };
-
-        % 添加柔和光点（点缀）
-        \foreach \x in {1,2,3,4,5} {
-            \fill[purpleblue, opacity=0.2] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
-        }
-
-        ;
-    \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
@@ -131,50 +109,26 @@
 \end{frame}
 
 
-\begin{frame}{What is Inference from Sample Statistics?}
+\begin{frame}{Inference from Samples}
 \small
 
-\textbf{Definition:}  
-\textbf{Inference} refers to the process of using data from a sample to draw conclusions about a population.
+Use a \textbf{random sample} to estimate a \textbf{population} we cannot measure fully.
 
-\vspace{0.3cm}
-\textbf{Why do we use samples?}
+\vspace{0.2cm}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Statistic} (sample) & known --- e.g. $\hat{p} = 65\%$ \\
+\hline
+\textbf{Parameter} (population) & unknown --- true rate for everyone \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.2cm}
 \begin{itemize}
-    \item Studying an entire population is often impractical or impossible.
-    \item A well-designed sample provides useful, reliable insight.
-\end{itemize}
-
-\vspace{0.3cm}
-\textbf{Example:}  
-If we randomly sample 200 voters and 65\% support a policy, we can estimate the population support is around 65\%.
-
-\textbf{Important:} Conclusions are not certain — they are probabilistic.
-
-\end{frame}
-
-
-\begin{frame}{Key Properties and Considerations}
-\small
-
-\textbf{1. Random Sampling:}  
-A sample must be random to avoid bias and make valid inferences.
-
-\textbf{2. Sample Size:}  
-Larger samples tend to yield more accurate estimates (smaller margin of error).
-
-\textbf{3. Variability:}  
-Different random samples produce slightly different statistics. This is expected.
-
-\textbf{4. Population vs. Sample:}
-\begin{itemize}
-    \item \textbf{Parameter} – a fixed value describing the population (unknown).
-    \item \textbf{Statistic} – a computed value from a sample (known).
-\end{itemize}
-
-\textbf{Notation:}
-\begin{itemize}
-    \item Population mean: $\mu$, Sample mean: $\bar{x}$
-    \item Population proportion: $p$, Sample proportion: $\hat{p}$
+    \item Larger sample $\Rightarrow$ better estimate (smaller MOE)
+    \item Results are \textbf{plausible}, not guaranteed
 \end{itemize}
 
 \end{frame}
@@ -256,52 +210,77 @@ According to the poll, if \( 6{,}424 \) people vote in the election, by how many
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Understanding Margin of Error}
+\begin{frame}{Margin of Error (MOE)}
 \small
 
-\textbf{Definition:}  
-The \textbf{margin of error (MOE)} is the maximum expected difference between the true population parameter and a sample estimate.
+\textbf{Margin of error} = how far a \textbf{sample result} might be from the \textbf{true population value}.
 
-\vspace{0.3cm}
-\textbf{General Formula:}
-\[
-\text{Margin of Error} = z^* \cdot \frac{\sigma}{\sqrt{n}}
-\]
-or for proportions:
-\[
-\text{MOE} = z^* \cdot \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
-\]
+\vspace{0.2cm}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Sample estimate} & from your data (e.g. 52\%) \\
+\hline
+\textbf{Population parameter} & true value for everyone (unknown) \\
+\hline
+\end{tabular}
+\end{center}
 
-\textbf{Where:}
+\vspace{0.15cm}
 \begin{itemize}
-    \item $z^*$ is the z-score based on confidence level (e.g., 1.96 for 95\%),
-    \item $\sigma$ is the population standard deviation (or estimate),
-    \item $n$ is the sample size,
-    \item $\hat{p}$ is the sample proportion.
+    \item \textbf{Not this:} The survey is ``wrong by MOE.''
+    \item \textbf{This:} Truth is probably within MOE of the estimate.
 \end{itemize}
 
-\vspace{0.3cm}
-
+\vspace{0.05cm}
+\textbf{SAT:} sample \% = \textbf{center} of a range, not an exact fact.
 
 \end{frame}
 
-\begin{frame}{Properties of Margin Error}
-    \textbf{Properties:}
+\begin{frame}{How to Read MOE}
+\small
+
+\textbf{Poll:} 1{,}000 voters — \textbf{52\%} support Candidate A, MOE \textbf{$\pm 3\%$}
+
+\vspace{0.15cm}
+\begin{center}
+\Large
+$52\% \pm 3\% \;=\; [49\%,\ 55\%]$
+\end{center}
+
+\vspace{0.1cm}
 \begin{itemize}
-    \item \textbf{Smaller MOE} = more precise estimate.
-    \item \textbf{Larger MOE} = more uncertainty.
+    \item \textbf{52\%} = sample estimate \hfill \textbf{49–55\%} = plausible range for all voters
+    \item Outside the range (e.g.\ 35\%, 60\%) $\Rightarrow$ \textbf{doubtful}
 \end{itemize}
 
-\textbf{Factors that Affect Margin of Error:}
-\begin{itemize}
-    \item \textbf{Sample size ($n$)}: Larger $n$ → smaller MOE.
-    \item \textbf{Confidence level:} Higher confidence → larger $z^*$ → larger MOE.
-    \item \textbf{Population variability:} More variation → larger MOE.
-\end{itemize}
+\vspace{0.1cm}
+\begin{block}{Target analogy}
+Arrow at \textbf{52}; bullseye (truth) likely in \textbf{49–55}, not exactly at 52.
+\end{block}
 
-\vspace{0.2cm}
-\textbf{Key Idea:}  
-To decrease MOE, increase the sample size or reduce the confidence level.
+\end{frame}
+
+\begin{frame}{What Affects MOE?}
+\small
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Change} & \textbf{MOE} \\
+\hline
+Larger sample size ($n$) & Smaller $\downarrow$ \\
+\hline
+Higher confidence level & Larger $\uparrow$ \\
+\hline
+More population variability & Larger $\uparrow$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.25cm}
+\textbf{On the SAT:} bigger MOE $\Rightarrow$ check for a \textbf{smaller sample} first.
+
 \end{frame}
 
 \begin{frame}{\textbf{Question: Interpreting Margin of Error }}
@@ -333,22 +312,17 @@ Based on the data from the study, an estimate of the percent of US teens who are
 \end{frame}
 
 \begin{frame}{\textbf{Answer: Margin of Error Interpretation}}
+\small
 
-\textbf{Estimated percent:} \( 30\% \) \\
-\textbf{Margin of error:} \( \pm 3\% \)
+$30\% \pm 3\% = [27\%,\ 33\%]$
 
-\[
-\text{Confidence interval: } [30\% - 3\%, 30\% + 3\%] = [27\%, 33\%]
-\]
-
+\vspace{0.1cm}
 \begin{itemize}
-    \item \textbf{A.} Incorrect: Margin of error relates to population estimates, not misclassification of sample responses.
-    \item \textbf{B.} Incorrect: While values outside the interval are less likely, we cannot claim impossibility.
-    \item \textbf{C.} Incorrect: 33\% is the upper bound; the true value could be anywhere in the interval.
-    \item \textbf{D.} \textbf{Correct:} 35\% is outside the margin of error range. Therefore, it is \emph{doubtful} that the true percentage is as high as 35\%.
+    \item \textbf{A–C:} misread MOE (sample mislabel, ``impossible,'' or picks a bound only)
+    \item \textbf{D:} 35\% is \textbf{outside} the range $\Rightarrow$ doubtful
 \end{itemize}
 
-\textbf{Correct Answer:} \(\boxed{\text{D}}\)
+\textbf{Answer:} \boxed{D}
 
 \end{frame}
 
@@ -383,10 +357,11 @@ The samples were selected from the same population, and the margins of error wer
 
 
 \begin{frame}{\textbf{Answer: Margin of Error and Sample Size}}
-\textbf{Correct Answer:} \textbf{D.} Sample A had a smaller sample size.
+\textbf{Answer:} \textbf{D} — Sample A had a smaller sample size.
 
-\textbf{Explanation:} 
-Margin of error decreases as sample size increases. Since both samples were selected from the same population and analyzed using the same method, the greater margin of error in Sample A suggests it had a smaller sample size.
+\vspace{0.1cm}
+\small
+Same population, same method $\Rightarrow$ larger MOE means \textbf{smaller} $n$.
 \end{frame}
 
 
@@ -429,17 +404,14 @@ In a psychological study, 600 college gymnasts were randomly selected and put in
 
 
 \begin{frame}{Answer}
-\textbf{Step 1.} The estimate is 65\% with a margin of error of 4\%. So the confidence interval is:
-\[
-65\% \pm 4\% = (61\%, 69\%).
-\]
+$65\% \pm 4\% = [61\%,\ 69\%]$
 
-\textbf{Step 2.} Analyze the choices:
+\vspace{0.1cm}
 \begin{itemize}
-    \item A: Incorrect, as 65\% to 69\% does not include the lower bound (61\%).
-    \item B: Incorrect interpretation of margin of error; it doesn't refer to individual gymnasts.
-    \item C: Correct—60\% is outside the confidence interval, making it unlikely.
-    \item D: Incorrect—70\% is outside the confidence interval but not strictly impossible.
+    \item \textbf{A:} wrong range (misses 61\%)
+    \item \textbf{B:} MOE is not about individuals in the sample
+    \item \textbf{C:} 60\% is \textbf{outside} the range $\Rightarrow$ unlikely
+    \item \textbf{D:} outside, but ``not possible'' is too strong
 \end{itemize}
 
 \textbf{Answer:} C.
@@ -532,10 +504,7 @@ If the margin of error was calculated the same way for both samples, which of th
 
 
 \begin{frame}{Answer}
-\textbf{Explanation:}  
-A larger margin of error typically occurs when the sample size is smaller (fewer data points lead to more variability in the estimate). So the most likely reason is:
-
-\textbf{Answer:} D.
+\textbf{Answer:} D — Sample B had \textbf{fewer} customers (smaller $n$ $\Rightarrow$ larger MOE).
 \end{frame}
 
 
