@@ -392,9 +392,9 @@
   var inkStrokes = [];
   var inkCurrentStroke = null;
   var inkDrawing = false;
-  var inkColor = "#ef4444";
+  var inkColor = "#5b3df5";
   var inkTool = "pen";
-  var inkSizeKey = "m";
+  var inkSizeKey = "s";
   var inkEnabled = false;
   var inkExpanded = false;
   var inkUpdatedAt = null;
@@ -420,11 +420,15 @@
   var inkClearArmTimer = null;
   var inkLocalSlideCache = {};
   var inkActiveSlideIndex = null;
-  var INK_DOCK_VERSION = "v7";
+  var INK_DOCK_VERSION = "v8";
+  var INK_PREFS_KEY = "np-cm-ink-prefs-v1";
 
-  var INK_SIZES = { s: 2.4, m: 5.5, l: 11 };
-  var INK_ERASER_RADIUS = { s: 0.007, m: 0.016, l: 0.034 };
-  var INK_LASER_SCALE = { s: 0.5, m: 0.85, l: 1.25 };
+  var INK_SIZES = { xs: 1.5, s: 2.6, m: 4.8, l: 9 };
+  var INK_ERASER_RADIUS = { xs: 0.005, s: 0.009, m: 0.016, l: 0.032 };
+  var INK_LASER_SCALE = { xs: 0.45, s: 0.7, m: 0.95, l: 1.3 };
+  var INK_SIZE_LABELS = { xs: "Extra fine", s: "Fine", m: "Medium", l: "Bold" };
+  var INK_TOOL_LABELS = { pen: "Pen", highlighter: "Highlight", laser: "Laser", eraser: "Eraser" };
+  var INK_SIZE_ORDER = ["xs", "s", "m", "l"];
   var INK_ICON_PEN =
     '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16l1.2-4.2L14.5 2.7a1.2 1.2 0 011.7 0l1.1 1.1a1.2 1.2 0 010 1.7L7 14.8 4 16z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
   var INK_ICON_HIGHLIGHTER =
@@ -437,15 +441,49 @@
     '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 7H14a4 4 0 010 8H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 4L5 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function inkWidthPx() {
-    return INK_SIZES[inkSizeKey] || INK_SIZES.m;
+    return INK_SIZES[inkSizeKey] || INK_SIZES.s;
   }
 
   function inkEraserRadius() {
-    return INK_ERASER_RADIUS[inkSizeKey] || INK_ERASER_RADIUS.m;
+    return INK_ERASER_RADIUS[inkSizeKey] || INK_ERASER_RADIUS.s;
   }
 
   function inkLaserScale() {
-    return INK_LASER_SCALE[inkSizeKey] || INK_LASER_SCALE.m;
+    return INK_LASER_SCALE[inkSizeKey] || INK_LASER_SCALE.s;
+  }
+
+  function loadInkPrefs() {
+    try {
+      var raw = localStorage.getItem(INK_PREFS_KEY);
+      if (!raw) return;
+      var prefs = JSON.parse(raw);
+      if (prefs.color) inkColor = prefs.color;
+      if (prefs.tool && INK_TOOL_LABELS[prefs.tool]) inkTool = prefs.tool;
+      if (prefs.sizeKey && INK_SIZES[prefs.sizeKey]) inkSizeKey = prefs.sizeKey;
+    } catch (e) {}
+  }
+
+  function saveInkPrefs() {
+    try {
+      localStorage.setItem(
+        INK_PREFS_KEY,
+        JSON.stringify({ color: inkColor, tool: inkTool, sizeKey: inkSizeKey })
+      );
+    } catch (e) {}
+  }
+
+  function stepInkSize(delta) {
+    var idx = INK_SIZE_ORDER.indexOf(inkSizeKey);
+    if (idx < 0) idx = 1;
+    idx = Math.max(0, Math.min(INK_SIZE_ORDER.length - 1, idx + delta));
+    inkSizeKey = INK_SIZE_ORDER[idx];
+    if (inkDockEl) {
+      inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-ink-size") === inkSizeKey);
+      });
+    }
+    saveInkPrefs();
+    syncInkDockState();
   }
 
   function disarmInkClear(btn) {
@@ -515,10 +553,14 @@
       inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
         b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === inkTool);
       });
+      inkDockEl.querySelectorAll("[data-ink-color]").forEach(function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-ink-color") === inkColor);
+      });
       inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (b) {
         b.classList.toggle("is-active", b.getAttribute("data-ink-size") === inkSizeKey);
       });
     }
+    saveInkPrefs();
     ensureInkLayer();
     updateInkToolHint();
     syncInkDockState();
@@ -540,6 +582,13 @@
         "data-ink-mode",
         inkTool === "laser" ? "laser" : inkTool === "eraser" ? "eraser" : "draw"
       );
+    }
+    var hintEl = inkDockEl.querySelector("[data-ink-hint]");
+    if (hintEl) {
+      hintEl.textContent =
+        (INK_TOOL_LABELS[inkTool] || "Pen") +
+        " · " +
+        (INK_SIZE_LABELS[inkSizeKey] || "Fine");
     }
   }
 
@@ -893,17 +942,20 @@
       "</div>" +
       '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
       '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--colors">' +
-      '<button type="button" class="np-cm-ink-swatch is-active" data-ink-color="#ef4444" aria-label="Red"></button>' +
+      '<button type="button" class="np-cm-ink-swatch is-active" data-ink-color="#5b3df5" aria-label="Purple"></button>' +
+      '<button type="button" class="np-cm-ink-swatch" data-ink-color="#ef4444" aria-label="Red"></button>' +
       '<button type="button" class="np-cm-ink-swatch" data-ink-color="#2563eb" aria-label="Blue"></button>' +
       '<button type="button" class="np-cm-ink-swatch" data-ink-color="#059669" aria-label="Green"></button>' +
       '<button type="button" class="np-cm-ink-swatch" data-ink-color="#1e293b" aria-label="Black"></button>' +
       "</div>" +
       '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
       '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--sizes">' +
-      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="s" title="Small"><i></i></button>' +
-      '<button type="button" class="np-cm-ink-size-btn is-active" data-ink-size="m" title="Medium"><i></i></button>' +
-      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="l" title="Large"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="xs" title="Extra fine"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn is-active" data-ink-size="s" title="Fine"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="m" title="Medium"><i></i></button>' +
+      '<button type="button" class="np-cm-ink-size-btn" data-ink-size="l" title="Bold"><i></i></button>' +
       "</div>" +
+      '<span class="np-cm-ink-rail-hint" data-ink-hint aria-live="polite">Pen · Fine</span>' +
       '<span class="np-cm-ink-rail-vsep" aria-hidden="true"></span>' +
       '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--edit">' +
       '<button type="button" class="np-cm-ink-chip" data-ink-undo title="Undo (U)" disabled>' + INK_ICON_UNDO + "</button>" +
@@ -974,6 +1026,7 @@
         }
         updateInkToolHint();
         syncInkDockState();
+        saveInkPrefs();
       });
     });
 
@@ -991,6 +1044,7 @@
           updateInkToolHint();
         }
         syncInkDockState();
+        saveInkPrefs();
       });
     });
 
@@ -1001,6 +1055,7 @@
           b.classList.toggle("is-active", b === btn);
         });
         syncInkDockState();
+        saveInkPrefs();
         if (inkTool === "eraser" && inkEraserRingEl && !inkEraserRingEl.hidden) {
           var ex = parseFloat(inkEraserRingEl.style.getPropertyValue("--eraser-x")) / 100;
           var ey = parseFloat(inkEraserRingEl.style.getPropertyValue("--eraser-y")) / 100;
@@ -1149,6 +1204,15 @@
       inkDockEl.removeAttribute("data-cm-ink-bound");
       bindInkDockEvents();
     }
+    inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === inkTool);
+    });
+    inkDockEl.querySelectorAll("[data-ink-color]").forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-ink-color") === inkColor);
+    });
+    inkDockEl.querySelectorAll("[data-ink-size]").forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-ink-size") === inkSizeKey);
+    });
     syncInkDockState();
     updateInkActionButtons();
   }
@@ -2338,7 +2402,7 @@
     }
     saveFocusMode(on);
     if (on && isInkTeacher()) {
-      openInkForTeaching({ tool: "pen", sizeKey: "l" });
+      openInkForTeaching({ tool: "pen", sizeKey: "s" });
     }
     if (on) window.requestAnimationFrame(resizeInkCanvas);
   }
@@ -2922,6 +2986,12 @@
       }
       updateInkToolHint();
       syncInkDockState();
+      saveInkPrefs();
+      return;
+    }
+    if ((e.key === "[" || e.key === "]") && isInkTeacher() && inkExpanded) {
+      e.preventDefault();
+      stepInkSize(e.key === "]" ? 1 : -1);
       return;
     }
     if (e.key === "f" || e.key === "F") { e.preventDefault(); toggleFocusMode(); }
@@ -2974,6 +3044,7 @@
     }
   }
   if (isInkTeacher()) {
+    loadInkPrefs();
     updateInkDock();
   }
   setFocusMode(loadFocusMode(), { fullscreen: false });

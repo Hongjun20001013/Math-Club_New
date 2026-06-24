@@ -807,6 +807,13 @@ def init_db():
                         "UPDATE users SET access_grants = ? WHERE access_scope = ? AND (access_grants IS NULL OR access_grants = '')",
                         (grants_json, scope),
                     )
+    user_cols = _table_columns(db, "users")
+    if "registered_by" not in user_cols:
+        db.execute("ALTER TABLE users ADD COLUMN registered_by INTEGER")
+    if "student_view_scope" not in user_cols:
+        db.execute(
+            "ALTER TABLE users ADD COLUMN student_view_scope TEXT NOT NULL DEFAULT 'own'"
+        )
     cols = _table_columns(db, "practice_responses")
     if "question_index" not in cols:
         db.execute("ALTER TABLE practice_responses ADD COLUMN question_index INTEGER")
@@ -1177,6 +1184,8 @@ ROLE_ADMIN = "admin"
 ROLE_STAFF = "staff"
 ROLE_STUDENT = "student"
 STAFF_ROLES = frozenset({ROLE_ADMIN, ROLE_STAFF})
+STAFF_VIEW_ALL = "all"
+STAFF_VIEW_OWN = "own"
 
 STUDENT_RESOURCE_GRANTS: tuple[dict[str, str], ...] = (
     {
@@ -1426,6 +1435,61 @@ def current_user_is_supervisor() -> bool:
 def current_user_can_access_admin() -> bool:
     """Supervisor or colleague — student data & account management."""
     return current_user_role() in STAFF_ROLES
+
+
+def _current_staff_view_scope(db: sqlite3.Connection) -> str:
+    if current_user_is_supervisor():
+        return STAFF_VIEW_ALL
+    if current_user_role() != ROLE_STAFF:
+        return STAFF_VIEW_OWN
+    uid = session.get("user_id")
+    if not uid:
+        return STAFF_VIEW_OWN
+    row = db.execute(
+        "SELECT student_view_scope FROM users WHERE id = ? AND role = ?",
+        (uid, ROLE_STAFF),
+    ).fetchone()
+    if row is None:
+        return STAFF_VIEW_OWN
+    scope = str(row["student_view_scope"] or STAFF_VIEW_OWN).strip().lower()
+    return scope if scope == STAFF_VIEW_ALL else STAFF_VIEW_OWN
+
+
+def _staff_student_scope_clause(
+    db: sqlite3.Connection, table_alias: str = "u"
+) -> tuple[str, list[Any]]:
+    """Limit student listings for colleagues who only manage their own enrollments."""
+    if current_user_is_supervisor():
+        return "", []
+    if current_user_role() != ROLE_STAFF:
+        return "", []
+    if _current_staff_view_scope(db) == STAFF_VIEW_ALL:
+        return "", []
+    uid = session.get("user_id")
+    if not uid:
+        return f" AND {table_alias}.id = 0", []
+    return f" AND {table_alias}.registered_by = ?", [int(uid)]
+
+
+def _staff_can_view_student(db: sqlite3.Connection, student_id: int) -> bool:
+    if current_user_is_supervisor():
+        return True
+    if current_user_role() != ROLE_STAFF:
+        return False
+    row = db.execute(
+        "SELECT registered_by FROM users WHERE id = ? AND role = 'student'",
+        (student_id,),
+    ).fetchone()
+    if row is None:
+        return False
+    if _current_staff_view_scope(db) == STAFF_VIEW_ALL:
+        return True
+    return int(row["registered_by"] or 0) == int(session.get("user_id") or 0)
+
+
+def _require_student_access(db: sqlite3.Connection, student_id: int) -> None:
+    if not _staff_can_view_student(db, student_id):
+        abort(403)
 
 
 def current_user_is_admin() -> bool:
@@ -12198,6 +12262,7 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
     if q:
         filters.append("u.username LIKE ?")
         params.append(like)
+    scope_clause, scope_params = _staff_student_scope_clause(db)
 
     rows = db.execute(
         f"""
@@ -12209,6 +12274,7 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
             u.access_scope,
             u.created_at,
             u.last_login_at,
+            u.registered_by,
             COUNT(DISTINCT pa.id) AS attempts_total,
             COUNT(pr.id) AS responses_total,
             SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_total,
@@ -12216,11 +12282,11 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
         FROM users u
         LEFT JOIN practice_attempts pa ON pa.user_id = u.id
         LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
-        WHERE {" AND ".join(filters)}
+        WHERE {" AND ".join(filters)}{scope_clause}
         GROUP BY u.id
         ORDER BY u.is_active DESC, last_activity DESC, u.created_at DESC
         """,
-        tuple(params),
+        tuple(params) + tuple(scope_params),
     ).fetchall()
 
     out: List[dict] = []
@@ -12255,21 +12321,31 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
 def _staff_rows(db: sqlite3.Connection) -> List[dict]:
     rows = db.execute(
         """
-        SELECT id, username, role, is_active, created_at, last_login_at
+        SELECT id, username, role, is_active, created_at, last_login_at, student_view_scope
         FROM users
         WHERE role = ?
         ORDER BY is_active DESC, created_at DESC
         """,
         (ROLE_STAFF,),
     ).fetchall()
-    return [dict(row) for row in rows]
+    out: List[dict] = []
+    for row in rows:
+        item = dict(row)
+        scope = str(item.get("student_view_scope") or STAFF_VIEW_OWN).strip().lower()
+        item["student_view_scope"] = scope if scope == STAFF_VIEW_ALL else STAFF_VIEW_OWN
+        item["student_view_scope_label"] = (
+            "All students" if item["student_view_scope"] == STAFF_VIEW_ALL else "Own students only"
+        )
+        out.append(item)
+    return out
 
 
 def _recent_record_rows(db: sqlite3.Connection) -> List[dict]:
+    scope_clause, scope_params = _staff_student_scope_clause(db, "u")
     return [
         dict(row)
         for row in db.execute(
-            """
+            f"""
             SELECT
                 pa.id,
                 u.username,
@@ -12284,10 +12360,12 @@ def _recent_record_rows(db: sqlite3.Connection) -> List[dict]:
             FROM practice_attempts pa
             LEFT JOIN users u ON u.id = pa.user_id
             LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
+            WHERE u.role = 'student'{scope_clause}
             GROUP BY pa.id
             ORDER BY COALESCE(last_submitted_at, pa.created_at) DESC
             LIMIT 100
-            """
+            """,
+            tuple(scope_params),
         ).fetchall()
     ]
 
@@ -13188,8 +13266,11 @@ def _admin_weekly_digest(
             return False
         if cohort_member_ids is not None and uid not in cohort_member_ids:
             return False
+        if not _staff_can_view_student(db, uid):
+            return False
         return True
 
+    scope_clause, scope_params = _staff_student_scope_clause(db)
     student_rows = db.execute(
         f"""
         SELECT
@@ -13208,11 +13289,11 @@ def _admin_weekly_digest(
         LEFT JOIN practice_attempts pa
           ON pa.user_id = u.id AND pa.created_at >= datetime('now', ?)
         LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
-        WHERE u.role = 'student' AND u.is_active = 1
+        WHERE u.role = 'student' AND u.is_active = 1{scope_clause}
         GROUP BY u.id, u.username, u.last_login_at
         ORDER BY last_activity DESC, lower(u.username)
         """,
-        (window_sql,),
+        (window_sql, *scope_params),
     ).fetchall()
 
     exam_rows = db.execute(
@@ -14075,6 +14156,12 @@ def admin():
         "active_students": sum(1 for s in students if s["is_active"]),
         "responses": sum(int(s["responses_total"] or 0) for s in students),
     }
+    staff_scope = _current_staff_view_scope(db) if current_user_role() == ROLE_STAFF else STAFF_VIEW_ALL
+    staff_view_scope_label = (
+        "All students"
+        if staff_scope == STAFF_VIEW_ALL
+        else "Your registered students only"
+    )
     return render_template(
         "admin.html",
         students=students,
@@ -14093,6 +14180,7 @@ def admin():
         student_cohorts=student_cohorts,
         q=q,
         user_is_supervisor=current_user_is_supervisor(),
+        staff_view_scope_label=staff_view_scope_label,
         db_persistence=_db_persistence_status(),
         student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
     )
@@ -14114,6 +14202,8 @@ def admin_student_detail(user_id: int):
     ).fetchone()
     if student is None:
         abort(404)
+    if not _staff_can_view_student(db, user_id):
+        abort(403)
     student_dict = dict(student)
     student_dict["access_grants_label"] = _access_grants_label(
         student["access_grants"] or student["access_scope"]
@@ -14163,6 +14253,8 @@ def admin_student_report(user_id: int):
     ).fetchone()
     if student is None:
         abort(404)
+    if not _staff_can_view_student(db, user_id):
+        abort(403)
     student_dict = dict(student)
     return render_template(
         "student_report.html",
@@ -14183,6 +14275,7 @@ def admin_student_report_print(user_id: int):
     ).fetchone()
     if student is None:
         abort(404)
+    _require_student_access(db, user_id)
     return render_template(
         "student_report_print.html",
         **_student_report_context(db, user_id, viewer="admin", student=dict(student)),
@@ -14213,13 +14306,19 @@ def admin_create_student():
         flash("Enter a password for this student.")
     else:
         db = get_db()
+        creator_id = session.get("user_id")
         try:
             db.execute(
                 """
-                INSERT INTO users (username, password, password_hash, role, is_active, access_grants, created_at)
-                VALUES (?, '', ?, 'student', 1, ?, CURRENT_TIMESTAMP)
+                INSERT INTO users (username, password, password_hash, role, is_active, access_grants, registered_by, created_at)
+                VALUES (?, '', ?, 'student', 1, ?, ?, CURRENT_TIMESTAMP)
                 """,
-                (username, generate_password_hash(password), grants_json),
+                (
+                    username,
+                    generate_password_hash(password),
+                    grants_json,
+                    int(creator_id) if creator_id else None,
+                ),
             )
             db.commit()
             label = _access_grants_label(grants_json)
@@ -14239,6 +14338,9 @@ def admin_create_staff():
 
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
+    view_scope = (request.form.get("student_view_scope") or STAFF_VIEW_OWN).strip().lower()
+    if view_scope not in (STAFF_VIEW_ALL, STAFF_VIEW_OWN):
+        view_scope = STAFF_VIEW_OWN
 
     if not username or len(username) > 160:
         flash("Enter a colleague email or username.")
@@ -14249,13 +14351,14 @@ def admin_create_staff():
         try:
             db.execute(
                 """
-                INSERT INTO users (username, password, password_hash, role, is_active, created_at)
-                VALUES (?, '', ?, ?, 1, CURRENT_TIMESTAMP)
+                INSERT INTO users (username, password, password_hash, role, is_active, student_view_scope, created_at)
+                VALUES (?, '', ?, ?, 1, ?, CURRENT_TIMESTAMP)
                 """,
-                (username, generate_password_hash(password), ROLE_STAFF),
+                (username, generate_password_hash(password), ROLE_STAFF, view_scope),
             )
             db.commit()
-            flash(f"Colleague account created for {username}. They can view student data in Admin.")
+            scope_label = "all students" if view_scope == STAFF_VIEW_ALL else "only students they register"
+            flash(f"Colleague account created for {username}. They can view {scope_label}.")
             _backup_after_account_change(db)
         except sqlite3.IntegrityError:
             flash("That username already exists.")
@@ -14339,6 +14442,36 @@ def admin_delete_staff(user_id: int):
     return redirect(url_for("admin"))
 
 
+@app.route("/admin/staff/<int:user_id>/view-scope", methods=["POST"])
+def admin_update_staff_view_scope(user_id: int):
+    gate = _require_supervisor_response()
+    if gate is not None:
+        return gate
+
+    view_scope = (request.form.get("student_view_scope") or STAFF_VIEW_OWN).strip().lower()
+    if view_scope not in (STAFF_VIEW_ALL, STAFF_VIEW_OWN):
+        view_scope = STAFF_VIEW_OWN
+
+    db = get_db()
+    row = db.execute(
+        "SELECT username FROM users WHERE id = ? AND role = ?",
+        (user_id, ROLE_STAFF),
+    ).fetchone()
+    if row is None:
+        flash("Colleague account not found.")
+        return redirect(url_for("admin"))
+
+    db.execute(
+        "UPDATE users SET student_view_scope = ? WHERE id = ? AND role = ?",
+        (view_scope, user_id, ROLE_STAFF),
+    )
+    db.commit()
+    label = "all students" if view_scope == STAFF_VIEW_ALL else "only their registered students"
+    flash(f"Updated {row['username']} — can now view {label}.")
+    _backup_after_account_change(db)
+    return redirect(url_for("admin"))
+
+
 @app.route("/admin/students/<int:user_id>/access", methods=["POST"])
 def admin_update_student_access(user_id: int):
     gate = _require_admin_response()
@@ -14354,6 +14487,7 @@ def admin_update_student_access(user_id: int):
     if row is None:
         flash("Student not found.")
         return redirect(url_for("admin"))
+    _require_student_access(db, user_id)
     db.execute(
         "UPDATE users SET access_grants = ?, access_scope = 'full' WHERE id = ?",
         (grants_json, user_id),
@@ -14376,6 +14510,7 @@ def admin_reset_student_password(user_id: int):
         return redirect(url_for("admin"))
 
     db = get_db()
+    _require_student_access(db, user_id)
     db.execute(
         """
         UPDATE users
@@ -14406,6 +14541,7 @@ def admin_toggle_student_active(user_id: int):
     if row is None:
         flash("Student not found.")
     else:
+        _require_student_access(db, user_id)
         next_active = 0 if int(row["is_active"] or 0) == 1 else 1
         db.execute("UPDATE users SET is_active = ? WHERE id = ?", (next_active, user_id))
         db.commit()

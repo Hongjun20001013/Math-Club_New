@@ -404,14 +404,14 @@ Which of the following could be an equation of the line of best fit?
 \begin{frame}{\textbf{Answer: Line of Best Fit Interpretation}}
 From the scatterplot:
 \begin{itemize}
-    \item The line of best fit appears to pass through approximately \( (12, 500) \) and \( (24, 900) \)
+    \item The line of best fit appears to pass through approximately \( (12, 480) \) and \( (24, 876) \)
     \item Estimating the slope:
     \[
-    \text{slope} = \frac{900 - 500}{24 - 12} = \frac{400}{12} \approx 33.3
+    \text{slope} = \frac{876 - 480}{24 - 12} = \frac{396}{12} = 33
     \]
     \item Plug into point-slope form:
     \[
-    d - 500 = 33(t - 12) \Rightarrow d = 33t + 84
+    d - 480 = 33(t - 12) \Rightarrow d = 33t + 84
     \]
 \end{itemize}
 
@@ -455,15 +455,14 @@ From the scatterplot:
         xlabel={$x$},
         ylabel={$y$},
         xmin=0, xmax=8,
-        ymin=0, ymax=24,
+        ymin=6, ymax=23,
+        ytick={8,10,12,14,16,18,20,22},
         grid=major,
-        width=9cm,
-        height=5cm,
+        width=5.5cm,
+        height=3.2cm,
         axis lines=left,
-        legend style={at={(0.5,-0.15)},anchor=north},
         title={Scatterplot with Regression Line}
     ]
-    % Scatterplot points (approximate)
     \addplot[
         only marks,
         mark=*,
@@ -476,18 +475,15 @@ From the scatterplot:
         (4,13)
         (5,11)
         (6,9)
-        (7,7)
-        (8,6)
+        (7,8)
+        (8,7.5)
     };
-    \addlegendentry{Data Points}
     
-    % Regression line: y = -1.875x + 21
     \addplot[
         domain=0:8,
         color=red,
         thick
-    ] {-1.33*x + 18};
-    \addlegendentry{Line of Best Fit}
+    ] {-1.5*x + 18};
     \end{axis}
 \end{tikzpicture}
 \end{center}

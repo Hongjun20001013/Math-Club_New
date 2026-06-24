@@ -11,19 +11,20 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "static" / "course_materials" / "E34.png"
 
+# Coordinates measured from the official SAT-style Ice Cream Sales scatterplot.
 POINTS = [
-    (12, 490),
-    (14, 510),
-    (16, 600),
-    (17, 650),
-    (18, 700),
-    (19, 730),
-    (20, 770),
-    (21, 810),
-    (22, 750),
-    (23, 800),
-    (24, 850),
-    (25, 880),
+    (11.9, 480),
+    (14.2, 520),
+    (15.2, 630),
+    (16.4, 620),
+    (17.2, 710),
+    (18.1, 720),
+    (18.5, 710),
+    (19.4, 710),
+    (22.1, 820),
+    (22.6, 750),
+    (23.4, 840),
+    (25.1, 910),
 ]
 
 

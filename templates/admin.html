@@ -26,6 +26,9 @@
         <p class="np-admin-kicker">Administration</p>
         <h1>{% if user_is_supervisor %}Command center{% else %}Staff console{% endif %}</h1>
         <p class="np-admin-hero-lead">{% if user_is_supervisor %}Accounts, access control, practice records, and launch tools — one place for your program.{% else %}Register students, review progress, and open session reports.{% endif %}</p>
+        {% if not user_is_supervisor and staff_view_scope_label %}
+        <p class="np-admin-hero-scope"><span class="np-admin-scope-badge">{{ staff_view_scope_label }}</span></p>
+        {% endif %}
         <div class="np-admin-hero-actions">
           <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-hero-btn">Export CSV</a>
           <a href="{{ url_for('admin_export_weekly_digest_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Weekly digest CSV</a>
@@ -138,76 +141,149 @@
       </div>
     </section>
 
-    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
-      <header class="np-admin-section-head np-admin-section-head--split">
+    <section class="np-admin-card np-admin-card--staff glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-add-staff">
+      <header class="np-admin-section-head np-admin-section-head--staff">
         <div>
           <p class="np-admin-kicker">Team access</p>
           <h2 id="np-admin-add-staff">Colleague accounts</h2>
-          <p>Staff can view students and register accounts — not wipe data or manage other staff.</p>
+          <p>Invite teachers with their own login — register students, review progress, and run live class. Colleagues cannot wipe data or manage other staff.</p>
         </div>
+        {% if staff_members %}
+        <div class="np-admin-staff-stat" aria-label="Team size">
+          <strong>{{ staff_members|length }}</strong>
+          <span>Colleague{{ 's' if staff_members|length != 1 else '' }}</span>
+        </div>
+        {% endif %}
       </header>
-      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-toolbar-form">
-        <label class="np-admin-toolbar-field">
-          <span>Email or username</span>
-          <input name="username" type="text" autocomplete="username" placeholder="teacher@example.com" required>
-        </label>
-        <label class="np-admin-toolbar-field">
-          <span>Password</span>
-          <input name="password" type="text" autocomplete="new-password" placeholder="Temporary password" required>
-        </label>
-        <button type="submit" class="np-admin-btn np-admin-btn--primary">Create colleague</button>
+
+      <form method="post" action="{{ url_for('admin_create_staff') }}" class="np-admin-staff-form" data-staff-create-form>
+        <div class="np-admin-staff-composer">
+          <div class="np-admin-staff-composer-col">
+            <div class="np-admin-staff-composer-head">
+              <span class="np-admin-staff-step">Step 1</span>
+              <h3>Login credentials</h3>
+              <p>Email or username and a temporary password to share securely.</p>
+            </div>
+            <div class="np-admin-staff-fields">
+              <label class="np-admin-staff-field">
+                <span>Email or username</span>
+                <input name="username" type="text" autocomplete="username" placeholder="teacher@example.com" required>
+              </label>
+              <label class="np-admin-staff-field">
+                <span>Temporary password</span>
+                <input name="password" type="text" autocomplete="new-password" placeholder="Starter password" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="np-admin-staff-composer-divider" aria-hidden="true"></div>
+
+          <div class="np-admin-staff-composer-col">
+            <div class="np-admin-staff-composer-head">
+              <span class="np-admin-staff-step">Step 2</span>
+              <h3>Student visibility</h3>
+              <p>Choose what student data this colleague can access.</p>
+            </div>
+            <div class="np-admin-staff-scope-list">
+              <label class="np-admin-staff-scope-row">
+                <input type="radio" name="student_view_scope" value="all" class="np-admin-staff-scope-input" checked>
+                <span class="np-admin-staff-scope-row-face">
+                  <span class="np-admin-staff-scope-copy">
+                    <strong>Full roster access</strong>
+                    <em>All students, learning pulse, and practice records</em>
+                  </span>
+                  <span class="np-admin-staff-scope-check" aria-hidden="true"></span>
+                </span>
+              </label>
+              <label class="np-admin-staff-scope-row">
+                <input type="radio" name="student_view_scope" value="own" class="np-admin-staff-scope-input">
+                <span class="np-admin-staff-scope-row-face">
+                  <span class="np-admin-staff-scope-copy">
+                    <strong>Own students only</strong>
+                    <em>Only learners this colleague registers</em>
+                  </span>
+                  <span class="np-admin-staff-scope-check" aria-hidden="true"></span>
+                </span>
+              </label>
+            </div>
+            <p class="np-admin-staff-scope-note">Change visibility anytime from the team directory.</p>
+          </div>
+        </div>
+        <footer class="np-admin-staff-composer-foot">
+          <p>Colleagues get Admin access to register students — not supervisor tools like data reset.</p>
+          <button type="submit" class="np-admin-btn np-admin-btn--cta">Create colleague</button>
+        </footer>
       </form>
 
       {% if staff_members %}
-      <div class="np-admin-directory np-admin-directory--staff">
-        <div class="np-admin-directory-head" aria-hidden="true">
-          <span>Colleague</span>
-          <span>Status</span>
-          <span>Last login</span>
-          <span>Manage</span>
+      <div class="np-admin-staff-roster">
+        <div class="np-admin-staff-roster-head">
+          <div>
+            <h3>Team directory</h3>
+            <p>Visibility, passwords, and account status for each colleague.</p>
+          </div>
         </div>
-        <div class="np-admin-directory-body">
+        <div class="np-admin-staff-grid">
           {% for member in staff_members %}
-          <article class="np-admin-dir-entry" data-admin-entry>
-            <div class="np-admin-directory-row">
-              <div class="np-admin-directory-student">
-                <div class="np-admin-student-avatar" aria-hidden="true">{{ member.username[:1]|upper }}</div>
-                <div class="np-admin-directory-identity">
+          <article class="np-admin-staff-card{% if not member.is_active %} is-inactive{% endif %}" data-admin-entry>
+            <div class="np-admin-staff-card-main">
+              <div class="np-admin-staff-card-identity">
+                <div class="np-admin-staff-avatar" aria-hidden="true">{{ member.username[:1]|upper }}</div>
+                <div class="np-admin-staff-card-copy">
                   <strong>{{ member.username }}</strong>
-                  <span class="np-admin-directory-meta">Staff · joined {{ member.created_at or "—" }}</span>
+                  <span>Joined {{ member.created_at[:10] if member.created_at else "—" }}</span>
                 </div>
               </div>
-              <div class="np-admin-directory-stat np-admin-directory-stat--badge" data-label="Status">
-                <span class="np-admin-status{% if not member.is_active %} is-inactive{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
+              <div class="np-admin-staff-card-meta">
+                <span class="np-admin-staff-pill{% if member.student_view_scope == 'all' %} is-all{% endif %}">{{ member.student_view_scope_label }}</span>
+                <span class="np-admin-staff-status{% if member.is_active %} is-active{% endif %}">{{ "Active" if member.is_active else "Inactive" }}</span>
               </div>
-              <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last login">
-                <strong>{{ member.last_login_at or "Never" }}</strong>
-              </div>
-              <div class="np-admin-directory-manage">
-                <button type="button" class="np-admin-action-trigger" data-action-toggle aria-expanded="false">Actions</button>
+              <div class="np-admin-staff-card-foot">
+                <span class="np-admin-staff-login">Last login · <strong>{{ member.last_login_at[:10] if member.last_login_at else "Never" }}</strong></span>
+                <button type="button" class="np-admin-staff-manage" data-action-toggle aria-expanded="false">Manage</button>
               </div>
             </div>
-            <div class="np-admin-drawer" hidden>
-              <div class="np-admin-drawer-inner">
-                <section class="np-admin-drawer-block">
-                  <h3 class="np-admin-drawer-title">Account status</h3>
+            <div class="np-admin-staff-drawer" hidden>
+              <div class="np-admin-staff-drawer-inner">
+                <section class="np-admin-staff-drawer-block">
+                  <h4>Student visibility</h4>
+                  <form method="post" action="{{ url_for('admin_update_staff_view_scope', user_id=member.id) }}" class="np-admin-scope-grid np-admin-scope-grid--compact">
+                    <label class="np-admin-scope-card np-admin-scope-card--compact">
+                      <input type="radio" name="student_view_scope" value="all" class="np-admin-scope-input"{% if member.student_view_scope == 'all' %} checked{% endif %}>
+                      <span class="np-admin-scope-card-face">
+                        <span class="np-admin-scope-copy"><strong>Full roster</strong></span>
+                        <span class="np-admin-scope-tick" aria-hidden="true"></span>
+                      </span>
+                    </label>
+                    <label class="np-admin-scope-card np-admin-scope-card--compact">
+                      <input type="radio" name="student_view_scope" value="own" class="np-admin-scope-input"{% if member.student_view_scope != 'all' %} checked{% endif %}>
+                      <span class="np-admin-scope-card-face">
+                        <span class="np-admin-scope-copy"><strong>Own students</strong></span>
+                        <span class="np-admin-scope-tick" aria-hidden="true"></span>
+                      </span>
+                    </label>
+                    <button type="submit" class="np-admin-staff-drawer-save">Save visibility</button>
+                  </form>
+                </section>
+                <section class="np-admin-staff-drawer-block">
+                  <h4>Account status</h4>
                   <form method="post" action="{{ url_for('admin_toggle_staff_active', user_id=member.id) }}">
-                    <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--ghost">{{ "Deactivate colleague" if member.is_active else "Reactivate colleague" }}</button>
+                    <button type="submit" class="np-admin-staff-drawer-btn np-admin-staff-drawer-btn--ghost">{{ "Deactivate account" if member.is_active else "Reactivate account" }}</button>
                   </form>
                 </section>
-                <section class="np-admin-drawer-block">
-                  <h3 class="np-admin-drawer-title">Reset password</h3>
-                  <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}" class="np-admin-drawer-inline">
+                <section class="np-admin-staff-drawer-block">
+                  <h4>Reset password</h4>
+                  <form method="post" action="{{ url_for('admin_reset_staff_password', user_id=member.id) }}" class="np-admin-staff-drawer-inline">
                     <input name="password" type="text" placeholder="New password" aria-label="New password for {{ member.username }}" required>
-                    <button type="submit" class="np-admin-drawer-btn">Save password</button>
+                    <button type="submit" class="np-admin-staff-drawer-btn">Update</button>
                   </form>
                 </section>
-                <section class="np-admin-drawer-block np-admin-drawer-block--danger">
-                  <h3 class="np-admin-drawer-title">Remove account</h3>
-                  <p class="np-admin-drawer-hint">Permanently deletes this colleague login. Type DELETE to confirm.</p>
-                  <form method="post" action="{{ url_for('admin_delete_staff', user_id=member.id) }}" class="np-admin-drawer-inline np-admin-drawer-inline--danger">
+                <section class="np-admin-staff-drawer-block np-admin-staff-drawer-block--danger">
+                  <h4>Remove account</h4>
+                  <p>Type DELETE to permanently remove this colleague login.</p>
+                  <form method="post" action="{{ url_for('admin_delete_staff', user_id=member.id) }}" class="np-admin-staff-drawer-inline np-admin-staff-drawer-inline--danger">
                     <input name="confirm" type="text" placeholder="DELETE" aria-label="Confirm deleting {{ member.username }}">
-                    <button type="submit" class="np-admin-drawer-btn np-admin-drawer-btn--danger">Delete account</button>
+                    <button type="submit" class="np-admin-staff-drawer-btn np-admin-staff-drawer-btn--danger">Delete</button>
                   </form>
                 </section>
               </div>
@@ -217,7 +293,16 @@
         </div>
       </div>
       {% else %}
-      <p class="np-admin-empty np-admin-empty--inline">No colleague accounts yet — create one above.</p>
+      <div class="np-admin-staff-empty">
+        <div class="np-admin-staff-empty-visual" aria-hidden="true">
+          <span class="np-admin-staff-empty-ring"></span>
+          <span class="np-admin-staff-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 19c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16.5 11.5h4M18.5 9.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+        <h3>No colleagues yet</h3>
+        <p>Create your first teacher account above — they'll get a dedicated login to register and track their students.</p>
+      </div>
       {% endif %}
     </section>
     {% endif %}
@@ -656,14 +741,14 @@
   }
 
   function closeAllDrawers() {
-    document.querySelectorAll(".np-admin-drawer").forEach(function (drawer) {
+    document.querySelectorAll(".np-admin-drawer, .np-admin-staff-drawer").forEach(function (drawer) {
       drawer.hidden = true;
     });
     document.querySelectorAll("[data-action-toggle]").forEach(function (btn) {
       btn.setAttribute("aria-expanded", "false");
       btn.classList.remove("is-open");
     });
-    document.querySelectorAll(".np-admin-dir-entry").forEach(function (entry) {
+    document.querySelectorAll(".np-admin-dir-entry, .np-admin-staff-card").forEach(function (entry) {
       entry.classList.remove("is-drawer-open");
     });
   }
@@ -673,7 +758,7 @@
       event.stopPropagation();
       var entry = btn.closest("[data-admin-entry]");
       if (!entry) return;
-      var drawer = entry.querySelector(".np-admin-drawer");
+      var drawer = entry.querySelector(".np-admin-drawer, .np-admin-staff-drawer");
       if (!drawer) return;
       var willOpen = drawer.hidden;
       closeAllDrawers();

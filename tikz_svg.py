@@ -470,6 +470,9 @@ def _pgfplots_to_svg(tikz_block: str) -> Optional[str]:
     w, hg = 420, 420
     if xmax <= 22 and ymax <= 12 and (xmax - xmin) >= (ymax - ymin):
         w, hg = 480, 300
+    # Compact scatterplot with regression line (e.g. SAT 3.4 practice slope)
+    elif xmax <= 9 and ymax >= 20:
+        w, hg = 320, 200
 
     return _svg_axes_plot(
         xmin,

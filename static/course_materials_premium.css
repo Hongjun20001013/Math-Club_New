@@ -1242,6 +1242,13 @@ button.cm-intro-chip:focus-visible {
     margin: 0 0 12px;
 }
 
+.cm-question-stem .stem-figure-wrap .stem-tikz-svg {
+    display: block;
+    max-width: min(100%, 320px);
+    max-height: 200px;
+    margin: 0 auto;
+}
+
 .cm-question-stem > p {
     margin: 0;
     line-height: 1.6;

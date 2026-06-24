@@ -26239,6 +26239,816 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     background: rgba(248, 246, 255, 0.72);
 }
 
+.np-admin-toolbar-form--staff {
+    grid-template-columns: minmax(180px, 1fr) minmax(140px, 0.7fr) minmax(240px, 1.2fr) auto;
+}
+
+/* ── Colleague accounts studio ── */
+.np-admin-card--staff {
+    background: rgba(255, 255, 255, 0.76);
+}
+
+.np-admin-section-head--staff {
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.np-admin-staff-stat {
+    display: grid;
+    gap: 2px;
+    min-width: 92px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(79, 50, 240, 0.14);
+    background: linear-gradient(145deg, rgba(237, 233, 255, 0.92), rgba(255, 255, 255, 0.88));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    text-align: center;
+}
+
+.np-admin-staff-stat strong {
+    font: 950 1.55rem / 1 "Inter Tight", sans-serif;
+    color: #4f32f0;
+}
+
+.np-admin-staff-stat span {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8b83a8;
+}
+
+.np-admin-staff-form {
+    display: grid;
+    gap: 0;
+    margin-bottom: 28px;
+}
+
+/* Unified composer — single surface, two equal columns */
+.np-admin-staff-composer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    align-items: stretch;
+    min-height: 300px;
+    border-radius: 22px;
+    border: 1px solid rgba(91, 77, 255, 0.11);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow:
+        0 20px 50px rgba(49, 38, 130, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    overflow: hidden;
+}
+
+.np-admin-staff-composer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: clamp(22px, 2.8vw, 28px);
+    min-width: 0;
+}
+
+.np-admin-staff-composer-divider {
+    width: 1px;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(91, 77, 255, 0.14) 18%,
+        rgba(91, 77, 255, 0.14) 82%,
+        transparent 100%
+    );
+}
+
+.np-admin-staff-composer-head {
+    display: grid;
+    gap: 6px;
+}
+
+.np-admin-staff-step {
+    font: 800 0.68rem / 1 "Manrope", sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4f32f0;
+}
+
+.np-admin-staff-composer-head h3 {
+    margin: 0;
+    font: 850 1.05rem / 1.25 "Manrope", sans-serif;
+    color: #171326;
+}
+
+.np-admin-staff-composer-head p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #8b83a8;
+}
+
+.np-admin-staff-fields {
+    display: grid;
+    gap: 14px;
+    flex: 1;
+    align-content: center;
+}
+
+.np-admin-staff-scope-list {
+    display: grid;
+    gap: 12px;
+    flex: 1;
+    align-content: center;
+}
+
+.np-admin-staff-field {
+    display: grid;
+    gap: 7px;
+}
+
+.np-admin-staff-field span {
+    font: 750 0.72rem / 1 "Manrope", sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #7c7494;
+}
+
+.np-admin-staff-field input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #171326;
+    font: 600 0.9rem / 1.25 "Manrope", sans-serif;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-staff-field input::placeholder {
+    color: #b8b0cc;
+}
+
+.np-admin-staff-field input:focus {
+    outline: none;
+    border-color: rgba(79, 50, 240, 0.42);
+    box-shadow: 0 0 0 3px rgba(79, 50, 240, 0.1);
+}
+
+.np-admin-staff-scope-row {
+    display: block;
+    cursor: pointer;
+}
+
+.np-admin-staff-scope-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.np-admin-staff-scope-row-face {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(91, 77, 255, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.np-admin-staff-scope-row:hover .np-admin-staff-scope-row-face {
+    border-color: rgba(79, 50, 240, 0.22);
+}
+
+.np-admin-staff-scope-input:checked + .np-admin-staff-scope-row-face {
+    border-color: rgba(79, 50, 240, 0.34);
+    background: linear-gradient(135deg, rgba(243, 240, 255, 0.98), rgba(255, 255, 255, 0.98));
+    box-shadow: inset 3px 0 0 #4f32f0;
+}
+
+.np-admin-staff-scope-copy strong {
+    display: block;
+    font: 800 0.88rem / 1.3 "Manrope", sans-serif;
+    color: #171326;
+}
+
+.np-admin-staff-scope-copy em {
+    display: block;
+    margin-top: 3px;
+    font-style: normal;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: #8b83a8;
+}
+
+.np-admin-staff-scope-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 2px solid rgba(91, 77, 255, 0.18);
+    background: #fff;
+    flex-shrink: 0;
+    transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.np-admin-staff-scope-input:checked + .np-admin-staff-scope-row-face .np-admin-staff-scope-check {
+    border-color: #4f32f0;
+    background: #4f32f0;
+    box-shadow: inset 0 0 0 3px #fff;
+}
+
+.np-admin-staff-scope-note {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: #a39db8;
+}
+
+.np-admin-staff-composer-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-admin-staff-composer-foot p {
+    margin: 0;
+    max-width: 36rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #8b83a8;
+}
+
+@media (max-width: 860px) {
+    .np-admin-staff-composer {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+
+    .np-admin-staff-composer-divider {
+        width: auto;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(91, 77, 255, 0.14) 18%,
+            rgba(91, 77, 255, 0.14) 82%,
+            transparent 100%
+        );
+    }
+}
+
+.np-admin-scope-well {
+    padding: 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background:
+        linear-gradient(180deg, rgba(248, 246, 255, 0.96) 0%, rgba(255, 255, 255, 0.84) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+.np-admin-create-panel--scope {
+    display: grid;
+    gap: 20px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(79, 50, 240, 0.08), transparent 48%),
+        rgba(255, 255, 255, 0.68);
+}
+
+.np-admin-create-panel--scope .np-admin-panel-cap {
+    margin-bottom: 2px;
+}
+
+.np-admin-scope-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.np-admin-scope-grid--compact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+}
+
+.np-admin-scope-card {
+    display: block;
+    cursor: pointer;
+    position: relative;
+    isolation: isolate;
+}
+
+.np-admin-scope-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.np-admin-scope-card-face {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    min-height: 88px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.np-admin-scope-card:hover .np-admin-scope-card-face {
+    border-color: rgba(79, 50, 240, 0.26);
+    box-shadow: 0 8px 22px rgba(49, 38, 130, 0.07);
+}
+
+.np-admin-scope-input:checked + .np-admin-scope-card-face {
+    border-color: rgba(79, 50, 240, 0.38);
+    background: linear-gradient(135deg, rgba(243, 240, 255, 0.98), rgba(255, 255, 255, 0.98));
+    box-shadow:
+        inset 0 0 0 1px rgba(79, 50, 240, 0.1),
+        0 6px 18px rgba(79, 50, 240, 0.1);
+}
+
+.np-admin-scope-footnote {
+    margin: 14px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid rgba(91, 77, 255, 0.08);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #a39db8;
+}
+
+.np-admin-scope-glyph {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #5240d4, #6c4eff);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(79, 50, 240, 0.22);
+}
+
+.np-admin-scope-glyph svg {
+    width: 22px;
+    height: 22px;
+}
+
+.np-admin-scope-glyph--solo {
+    background: linear-gradient(145deg, #6366f1, #8b5cf6);
+}
+
+.np-admin-scope-input:checked + .np-admin-scope-card-face .np-admin-scope-glyph {
+    box-shadow: 0 10px 22px rgba(79, 50, 240, 0.38);
+}
+
+.np-admin-scope-copy strong {
+    display: block;
+    color: #171326;
+    font: 850 0.94rem / 1.3 "Manrope", sans-serif;
+}
+
+.np-admin-scope-copy em {
+    display: block;
+    margin-top: 5px;
+    color: #8b83a8;
+    font-style: normal;
+    font-size: 0.79rem;
+    line-height: 1.5;
+}
+
+.np-admin-scope-tick {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 2px solid rgba(91, 77, 255, 0.2);
+    background: rgba(255, 255, 255, 0.92);
+    transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.np-admin-scope-input:checked + .np-admin-scope-card-face .np-admin-scope-tick {
+    border-color: #4f32f0;
+    background: #4f32f0;
+    box-shadow: inset 0 0 0 2px #fff;
+}
+
+.np-admin-scope-card--compact .np-admin-scope-card-face {
+    grid-template-columns: 1fr auto;
+    padding: 12px 14px;
+    border-radius: 14px;
+}
+
+.np-admin-scope-card--compact .np-admin-scope-copy strong {
+    font-size: 0.86rem;
+}
+
+.np-admin-staff-roster {
+    padding-top: 8px;
+    border-top: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-admin-staff-roster-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.np-admin-staff-roster-head h3 {
+    margin: 0;
+    font: 850 1.12rem / 1.2 "Manrope", sans-serif;
+    color: #171326;
+}
+
+.np-admin-staff-roster-head p {
+    margin: 4px 0 0;
+    font-size: 0.84rem;
+    color: #8b83a8;
+}
+
+.np-admin-staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 14px;
+}
+
+.np-admin-staff-card {
+    border-radius: 22px;
+    border: 1px solid rgba(91, 77, 255, 0.1);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    overflow: hidden;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.np-admin-staff-card:hover {
+    border-color: rgba(79, 50, 240, 0.22);
+    box-shadow: 0 16px 36px rgba(49, 38, 130, 0.08);
+}
+
+.np-admin-staff-card.is-drawer-open {
+    border-color: rgba(79, 50, 240, 0.32);
+    box-shadow: 0 18px 40px rgba(79, 50, 240, 0.12);
+}
+
+.np-admin-staff-card.is-inactive {
+    opacity: 0.72;
+}
+
+.np-admin-staff-card-main {
+    display: grid;
+    gap: 14px;
+    padding: 18px 18px 16px;
+}
+
+.np-admin-staff-card-identity {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.np-admin-staff-avatar {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(79, 50, 240, 0.16), rgba(79, 50, 240, 0.06));
+    color: #4f32f0;
+    font: 950 1rem / 1 "Inter Tight", sans-serif;
+}
+
+.np-admin-staff-card-copy strong {
+    display: block;
+    color: #171326;
+    font: 850 0.98rem / 1.25 "Manrope", sans-serif;
+    word-break: break-word;
+}
+
+.np-admin-staff-card-copy span {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.78rem;
+    color: #9b93b0;
+}
+
+.np-admin-staff-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.np-admin-staff-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.16);
+    color: #4338ca;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.np-admin-staff-pill.is-all {
+    background: rgba(79, 50, 240, 0.1);
+    border-color: rgba(79, 50, 240, 0.18);
+    color: #4f32f0;
+}
+
+.np-admin-staff-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.np-admin-staff-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #94a3b8;
+}
+
+.np-admin-staff-status.is-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #047857;
+}
+
+.np-admin-staff-status.is-active::before {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+}
+
+.np-admin-staff-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(91, 77, 255, 0.12);
+}
+
+.np-admin-staff-login {
+    font-size: 0.78rem;
+    color: #9b93b0;
+}
+
+.np-admin-staff-login strong {
+    color: #5b5670;
+    font-weight: 800;
+}
+
+.np-admin-staff-manage {
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: rgba(79, 50, 240, 0.08);
+    color: #4f32f0;
+    font: 800 0.78rem / 1 "Manrope", sans-serif;
+    cursor: pointer;
+    transition: background 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.np-admin-staff-manage:hover,
+.np-admin-staff-manage.is-open {
+    background: linear-gradient(135deg, #5240d4, #4f32f0);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(79, 50, 240, 0.24);
+}
+
+.np-admin-staff-drawer {
+    border-top: 1px solid rgba(91, 77, 255, 0.1);
+    background: linear-gradient(180deg, rgba(248, 246, 255, 0.96), rgba(255, 255, 255, 0.92));
+}
+
+.np-admin-staff-drawer-inner {
+    display: grid;
+    gap: 14px;
+    padding: 16px 18px 18px;
+}
+
+.np-admin-staff-drawer-block h4 {
+    margin: 0 0 8px;
+    font: 850 0.82rem / 1.2 "Manrope", sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6f6784;
+}
+
+.np-admin-staff-drawer-block p {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    color: #9b93b0;
+}
+
+.np-admin-staff-drawer-save,
+.np-admin-staff-drawer-btn {
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: #4f32f0;
+    color: #fff;
+    font: 800 0.8rem / 1 "Manrope", sans-serif;
+    cursor: pointer;
+}
+
+.np-admin-staff-drawer-save {
+    grid-column: 1 / -1;
+    justify-self: start;
+}
+
+.np-admin-staff-drawer-btn--ghost {
+    background: rgba(79, 50, 240, 0.08);
+    color: #4f32f0;
+}
+
+.np-admin-staff-drawer-btn--danger {
+    background: #dc2626;
+}
+
+.np-admin-staff-drawer-inline {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+}
+
+.np-admin-staff-drawer-inline input {
+    border: 1px solid rgba(91, 77, 255, 0.14);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    background: rgba(255, 255, 255, 0.94);
+}
+
+.np-admin-staff-drawer-block--danger {
+    padding-top: 4px;
+    border-top: 1px dashed rgba(239, 68, 68, 0.18);
+}
+
+.np-admin-staff-empty {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 34px 24px 38px;
+    border-radius: 24px;
+    border: 1px dashed rgba(91, 77, 255, 0.16);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(79, 50, 240, 0.06), transparent 55%),
+        rgba(255, 255, 255, 0.55);
+    text-align: center;
+}
+
+.np-admin-staff-empty-visual {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin-bottom: 4px;
+}
+
+.np-admin-staff-empty-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 240, 0.14);
+    background: radial-gradient(circle, rgba(237, 233, 255, 0.9), rgba(255, 255, 255, 0.4));
+    animation: np-admin-staff-orbit 4s ease-in-out infinite;
+}
+
+.np-admin-staff-empty-icon {
+    position: absolute;
+    inset: 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #5240d4, #6c4eff);
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(79, 50, 240, 0.28);
+}
+
+.np-admin-staff-empty-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.np-admin-staff-empty h3 {
+    margin: 0;
+    font: 850 1.08rem / 1.25 "Manrope", sans-serif;
+    color: #171326;
+}
+
+.np-admin-staff-empty p {
+    margin: 0;
+    max-width: 28rem;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: #8b83a8;
+}
+
+@keyframes np-admin-staff-orbit {
+    0%, 100% { transform: scale(1); opacity: 0.92; }
+    50% { transform: scale(1.04); opacity: 1; }
+}
+
+@media (max-width: 900px) {
+    .np-admin-section-head--staff {
+        flex-direction: column;
+    }
+
+    .np-admin-staff-stat {
+        width: 100%;
+    }
+
+    .np-admin-scope-grid--compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+.np-admin-toolbar-field--scope {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.np-admin-toolbar-field--scope legend {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9b93b0;
+    margin-bottom: 6px;
+}
+
+.np-admin-scope-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.np-admin-scope-choice + .np-admin-scope-choice {
+    margin-top: 6px;
+}
+
+.np-admin-scope-choice input {
+    margin-top: 2px;
+    accent-color: #5b3df5;
+}
+
+.np-admin-scope-choice strong {
+    color: #1f2937;
+}
+
+.np-admin-hero-scope {
+    margin: 10px 0 0;
+}
+
+.np-admin-scope-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(91, 77, 255, 0.1);
+    border: 1px solid rgba(91, 77, 255, 0.18);
+    color: #4338ca;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.np-admin-drawer-scope {
+    display: grid;
+    gap: 8px;
+}
+
+.np-admin-directory-stat--scope strong {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4338ca;
+}
+
 .np-admin-toolbar-field {
     display: grid;
     gap: 6px;
