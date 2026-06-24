@@ -7,7 +7,7 @@
 \usepackage{colortbl}     % 支持 \rowcolor
 \usepackage[table]{xcolor}  % 增强颜色支持，特别是灰色背景
 \usepackage{array}        % 增强表格功能（对齐方式等）
-\usepackage{booktabs
+\usepackage{booktabs}
 
 
 
@@ -192,10 +192,10 @@ Data set F consists of 55 integers between 170 and 290. Data set G consists of a
 
 Which of the following must be less for data set F than for data set G?
 
-\begin{enumerate}
-    \item The mean
-    \item The median
-\end{enumerate}
+\begin{itemize}
+    \item[I.] The mean
+    \item[II.] The median
+\end{itemize}
 
 \begin{itemize}
     \item[A.] I only
@@ -208,17 +208,13 @@ Which of the following must be less for data set F than for data set G?
 
 \begin{frame}{\textbf{Answer and Explanation}}
 \begin{itemize}
-    \item Adding an extreme low value (like 10) to data set F will significantly reduce the \textbf{mean} of the data set, since the mean is sensitive to outliers.
-    \item However, the \textbf{median} is the middle value. Since 10 is far below the range of values in set F (170–290), it will simply be placed at the beginning and not affect the central value of the sorted list.
+    \item Adding the extreme low value 10 to data set F \textbf{lowers the mean}, so $\text{mean of G} < \text{mean of F}$. The mean is \textbf{not} less for F than for G.
+    \item The \textbf{median} is unchanged: 10 is far below the range in set F (170–290), so it does not shift the middle value when all 56 values are ordered.
 \end{itemize}
 
-\textbf{Conclusion:}
-\begin{itemize}
-    \item Mean of F $>$ Mean of G
-    \item Median remains unchanged
-\end{itemize}
+\textbf{Conclusion:} Neither the mean nor the median is less for data set F than for data set G.
 
-\textbf{Correct Answer: A. I only}
+\textbf{Correct Answer: D. Neither I nor II}
 \end{frame}
 
 
@@ -320,8 +316,7 @@ Which of the following measures does \textbf{NOT} have the same value in both th
 \begin{frame}{\textbf{Answer and Explanation}}
 \begin{itemize}
     \item The \textbf{median} stays the same, since the middle number (33) is unchanged.
-    \item The \textbf{mean} unchanged.
-    \item The \textbf{sum} of the values changes for the same reason the mean does — because of the increases and decreases.
+    \item The \textbf{mean} and \textbf{sum} are unchanged: every increase of 7 is matched by a decrease of 7.
     \item The \textbf{standard deviation} increases, since numbers are being moved further from the center (more spread).
 \end{itemize}
 
@@ -396,10 +391,6 @@ A \textbf{box plot}, also known as a box-and-whisker plot, graphically represent
     \begin{center}
     \includegraphics[width=0.8\linewidth]{E30.png}
     \end{center}
-\end{frame}
-    
-\end{frame}
-    
 \end{frame}
 
 \begin{frame}{Contingency Table (Two-Way Table)}
