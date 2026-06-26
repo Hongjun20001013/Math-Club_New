@@ -6,6 +6,7 @@
     <meta name="description" content="{{ site_meta_description }}">
     <meta name="theme-color" content="#5240d4">
     <meta name="apple-mobile-web-app-title" content="{{ site_brand_short }}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <script>
     (function () {
         try {
@@ -201,6 +202,41 @@
 {% if show_np_desmos %}
 {% include "partials/np_desmos.html" %}
 {% endif %}
+
+<script>
+(function () {
+  var meta = document.querySelector('meta[name="csrf-token"]');
+  if (!meta) return;
+  var token = meta.getAttribute("content") || "";
+  if (!token) return;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('form[method="post"], form[method="POST"]').forEach(function (form) {
+      if (form.querySelector('input[name="csrf_token"]')) return;
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "csrf_token";
+      input.value = token;
+      form.appendChild(input);
+    });
+  });
+
+  if (!window.fetch) return;
+  var nativeFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    init = init || {};
+    var method = (init.method || "GET").toUpperCase();
+    if (method !== "GET" && method !== "HEAD" && method !== "OPTIONS") {
+      var headers = new Headers(init.headers || {});
+      if (!headers.has("X-CSRF-Token")) {
+        headers.set("X-CSRF-Token", token);
+      }
+      init.headers = headers;
+    }
+    return nativeFetch(input, init);
+  };
+})();
+</script>
 
 </body>
 </html>

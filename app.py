@@ -204,11 +204,49 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=os.environ.get("RENDER", "").lower() in ("true", "1", "yes"),
+    SESSION_COOKIE_SECURE=(
+        os.environ.get("RENDER", "").lower() in ("true", "1", "yes")
+        or os.environ.get("FORCE_HTTPS", "").lower() in ("true", "1", "yes")
+        or os.environ.get("FLASK_ENV", "").lower() == "production"
+    ),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
 )
 
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
+
+_CSRF_EXEMPT_ENDPOINTS = frozenset({
+    "static",
+    "health",
+    "health_db",
+    "health_stylesheet_bundle",
+    "login",
+    "logout",
+    "admin_setup",
+    "student_guide",
+})
+
+
+def _ensure_csrf_token() -> str:
+    token = session.get("csrf_token")
+    if not token:
+        token = secrets.token_hex(32)
+        session["csrf_token"] = token
+    return str(token)
+
+
+def _csrf_token() -> str:
+    """Template helper: current session CSRF token."""
+    return _ensure_csrf_token()
+
+
+def _safe_redirect_target(raw: str, *, default: str = "") -> str:
+    """Allow only same-site relative paths (blocks //evil.com open redirects)."""
+    target = (raw or "").strip()
+    if not target.startswith("/") or target.startswith("//"):
+        return default
+    if "://" in target.split("?", 1)[0]:
+        return default
+    return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
 STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260618-atelier-v8")
@@ -340,6 +378,10 @@ def _production_config_guard() -> None:
         app.logger.warning(
             "SECRET_KEY is missing or still the dev default on Render. "
             "Set SECRET_KEY in Environment or use generateValue in render.yaml."
+        )
+    if not os.environ.get("DESMOS_API_KEY", "").strip():
+        app.logger.warning(
+            "DESMOS_API_KEY is not set. Graph practice pages will not load Desmos."
         )
 
 
@@ -1049,6 +1091,14 @@ def init_db():
         "CREATE INDEX IF NOT EXISTS idx_student_cohort_members_user "
         "ON student_cohort_members(user_id)"
     )
+    db.execute(
+        """
+        UPDATE users
+        SET password = ''
+        WHERE password_hash IS NOT NULL AND TRIM(password_hash) != ''
+          AND password IS NOT NULL AND TRIM(password) != ''
+        """
+    )
     _seed_users_if_empty(db)
     _sync_render_users_seed_snapshot(db)
     _maybe_auto_backup_database()
@@ -1172,6 +1222,7 @@ def inject_template_config():
         "load_mathjax": load_mathjax,
         "style_css_revision": STYLE_CSS_REVISION,
         "hard_drill_meta": _hard_drill_display_meta(),
+        "csrf_token": _csrf_token(),
         **_site_branding_context(),
     }
 
@@ -1570,6 +1621,38 @@ def _require_supervisor_response():
 def _require_admin_response():
     """Legacy name — most admin routes allow staff; use _require_supervisor_response for owner-only."""
     return _require_staff_response()
+
+
+@app.before_request
+def _prepare_csrf_token():
+    if request.endpoint not in _CSRF_EXEMPT_ENDPOINTS:
+        _ensure_csrf_token()
+
+
+@app.before_request
+def _validate_csrf_on_mutations():
+    if request.method not in ("POST", "PUT", "PATCH", "DELETE"):
+        return None
+    endpoint = request.endpoint or ""
+    if endpoint in _CSRF_EXEMPT_ENDPOINTS or endpoint == "":
+        return None
+    submitted = (
+        request.form.get("csrf_token")
+        or request.headers.get("X-CSRF-Token")
+        or ""
+    )
+    expected = str(session.get("csrf_token") or "")
+    if expected and secrets.compare_digest(str(submitted), expected):
+        return None
+    wants_json = (
+        request.is_json
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or "application/json" in (request.accept_mimetypes.best or "")
+    )
+    if wants_json:
+        return jsonify({"ok": False, "error": "Invalid or missing CSRF token."}), 403
+    flash("Your session expired or the form was invalid. Please try again.")
+    return redirect(request.referrer or url_for("index"))
 
 
 @app.before_request
@@ -5282,7 +5365,9 @@ def health_db():
         and (status["db_exists"] or status["writable"])
         and status["user_count"] != 0
     )
-    return jsonify(ok=ok, **status), (200 if ok else 503)
+    if current_user_can_access_admin():
+        return jsonify(ok=ok, **status), (200 if ok else 503)
+    return jsonify(ok=ok, persistence_ok=status["persistence_ok"]), (200 if ok else 503)
 
 
 @app.route("/admin/data/backup-now", methods=["POST"])
@@ -12151,6 +12236,16 @@ def admin_setup():
         return redirect(url_for("login"))
 
     if request.method == "POST":
+        setup_token = os.environ.get("ADMIN_SETUP_TOKEN", "").strip()
+        if setup_token:
+            submitted = request.form.get("setup_token", "").strip()
+            if not secrets.compare_digest(submitted, setup_token):
+                flash("Invalid setup token.")
+                return render_template(
+                    "admin_setup.html",
+                    setup_token_required=True,
+                )
+
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
         confirm_password = request.form.get("confirm_password", "").strip()
@@ -12181,7 +12276,10 @@ def admin_setup():
                 flash("Admin account created. Please sign in.")
                 return redirect(url_for("login"))
 
-    return render_template("admin_setup.html")
+    return render_template(
+        "admin_setup.html",
+        setup_token_required=bool(os.environ.get("ADMIN_SETUP_TOKEN", "").strip()),
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -12226,9 +12324,7 @@ def login():
             db.commit()
             _clear_failed_logins(username)
             _set_login_session(user)
-            next_url = (request.args.get("next") or "").strip()
-            if not next_url.startswith("/"):
-                next_url = ""
+            next_url = _safe_redirect_target(request.args.get("next") or "")
             if current_user_can_access_admin():
                 return redirect(next_url or url_for("admin"))
             grants = _normalize_access_grants(user["access_grants"] or user["access_scope"])

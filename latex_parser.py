@@ -231,7 +231,12 @@ def _cell_needs_math_delimiters(cell: str) -> bool:
     """Detect plain-text LaTeX math in tabular/array cells (e.g. 2x^2 + 7x + 9)."""
     if not cell or re.search(r"\\\(|\\\[|\$", cell):
         return False
-    if re.search(r"\\(?:overline|underline|phantom|frac)\b", cell):
+    if re.search(
+        r"\\(?:sin|cos|tan|cot|sec|csc|theta|pi|alpha|beta|gamma|phi|angle|"
+        r"overline|underline|phantom|frac|sqrt|log|ln|cdot|times|div|pm|mp|"
+        r"leq|geq|neq|infty|degree|text|mathbf|mathrm)\b",
+        cell,
+    ):
         return True
     if re.search(r"\^[0-9{]", cell):
         return True

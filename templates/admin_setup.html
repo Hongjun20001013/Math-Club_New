@@ -19,6 +19,10 @@
         <p class="np-login-lead">This page is only available while no active supervisor account exists. You can add colleague (staff) accounts later from Admin.</p>
       </header>
       <form method="post" class="np-login-form">
+        {% if setup_token_required %}
+        <label class="np-login-label" for="np-admin-setup-token">Setup token</label>
+        <input id="np-admin-setup-token" class="np-login-input" name="setup_token" type="password" autocomplete="off" required>
+        {% endif %}
         <label class="np-login-label" for="np-admin-user">Admin email or username</label>
         <input id="np-admin-user" class="np-login-input" name="username" type="text" autocomplete="username" required>
 

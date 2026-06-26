@@ -552,7 +552,34 @@ def _enumerate_uses_auto_labels(enum_opt: str) -> bool:
     opt = (enum_opt or "").strip()
     if re.match(r"^[A-Da-d]\.?\s*$", opt):
         return True
+    if re.search(r"\\Alph\*|\\alph\*", opt):
+        return True
     return bool(re.match(r"^\([A-Da-d]\)$", opt))
+
+
+def _convert_choices_environment(text: str) -> str:
+    """Convert ``\\begin{choices}`` / ``\\choice`` blocks into A–D enumerate for MCQ UI."""
+
+    def repl(m: re.Match[str]) -> str:
+        body = m.group(1).strip()
+        parts = re.split(r"\\choice\s*", body)
+        items = [p.strip() for p in parts if p.strip()]
+        if not items:
+            return m.group(0)
+        return (
+            r"\begin{enumerate}[label=(\Alph*)]"
+            + "\n"
+            + "\n".join(rf"\item {item}" for item in items)
+            + "\n"
+            + r"\end{enumerate}"
+        )
+
+    return re.sub(
+        r"\\begin\{choices\}(.*?)\\end\{choices\}",
+        repl,
+        text,
+        flags=re.S,
+    )
 
 
 def _convert_beamer_enumerate(text: str) -> str:
@@ -1413,26 +1440,28 @@ def _needs_math_delimiters(text: str) -> bool:
         return False
     if re.match(r"^[A-D]\.$", t.strip()):
         return False
+    if re.search(
+        r"\\(?:d|t)?frac|\\sqrt|\\left|\\right|\\Rightarrow|\\neq|\\boxed"
+        r"|\\(?:pi|theta|sin|cos|tan|angle|widehat|overline)\b"
+        r"|=|\^|_[{]|\d+\.?\d*[a-z]|[a-z]\s*[-+]\s*(?:\d|\\)",
+        t,
+    ):
+        return True
     if len(re.findall(r"[A-Za-z]{2,}", t)) >= 5:
         return False
-    return bool(
-        re.search(
-            r"\\(?:d|t)?frac|\\sqrt|\\left|\\right|\\Rightarrow|\\neq"
-            r"|\\(?:pi|theta|sin|cos|tan|angle|widehat|overline)\b"
-            r"|=|\^|_[{]|\\boxed|\d+\.?\d*[a-z]|[a-z]\s*[-+]\s*(?:\d|\\)",
-            t,
-        )
-    )
+    return False
 
 
 def _strip_inline_math_delimiters(text: str) -> str:
+    """Remove delimiters only when the entire string is one inline-math block."""
     out = text.strip()
-    if out.startswith(r"\(") and out.endswith(r"\)"):
+    if (
+        out.startswith(r"\(")
+        and out.endswith(r"\)")
+        and out.count(r"\(") == 1
+        and out.count(r"\)") == 1
+    ):
         out = out[2:-2].strip()
-    elif out.startswith(r"\("):
-        out = out[2:].lstrip()
-    elif out.endswith(r"\)"):
-        out = out[:-2].rstrip()
     out = re.sub(r"\\text\{([^}]*)\}", r"\1", out)
     out = re.sub(r"\\mathbf\{([^}]*)\}", r"\1", out)
     return out.strip()
@@ -1586,9 +1615,15 @@ def _format_answer_value(raw: str) -> str:
     mcq_formatted = _format_mcq_letter_answer(raw)
     if mcq_formatted:
         return mcq_formatted
+    if r"\(" in raw or r"\)" in raw:
+        if not re.search(r'<span class="cm-answer-(?:box|highlight|card)', raw):
+            raw = _format_mixed_prose_answer(raw)
     raw = re.sub(r"\\?\(\s*\\displaystyle\s*\\?\)\s*", "", raw)
     raw = _unwrap_outer_math_delimiters(raw)
     plain_preview = re.sub(r"<[^>]+>", "", raw)
+    plain_stripped = _strip_inline_math_delimiters(plain_preview)
+    if re.search(r"\\boxed\{", plain_stripped) and _needs_math_delimiters(plain_stripped):
+        return f'<span class="cm-answer-card-math">\\({plain_stripped}\\)</span>'
     if len(re.findall(r"[A-Za-z]{2,}", plain_preview)) >= 5:
         return _format_mixed_prose_answer(raw)
     raw = re.sub(
@@ -1648,6 +1683,10 @@ def _format_answer_value(raw: str) -> str:
     plain = _strip_inline_math_delimiters(plain)
     if plain in {"A", "B", "C", "D"} or re.match(r"^[A-D]\.?$", plain):
         return f"<strong>{plain.rstrip('.')}</strong>"
+    if re.search(r"\\[\(\)]", plain):
+        if "<span class=" in raw:
+            return raw
+        return f'<span class="cm-answer-card-math">{plain}</span>'
     if _needs_math_delimiters(plain):
         return f'<span class="cm-answer-card-math">\\({plain}\\)</span>'
     if plain and not re.search(r"[<>]", raw):
@@ -1729,6 +1768,28 @@ def _polish_answer_lines(html: str) -> str:
     html = re.sub(
         r'(<span class="cm-answer-card-math">)\\\(\s*\\boxed\{([^{}]+)\}\s*[.,;:]\s*\\\)(</span>)',
         lambda m: f'{m.group(1)}\\(\\boxed{{{m.group(2).strip()}}}\\){m.group(3)}',
+        html,
+        flags=re.S,
+    )
+    html = re.sub(
+        r'(<span class="cm-answer-card-math">)\\\((.*?)\\\)(\\\))(</span>)',
+        lambda m: (
+            f'{m.group(1)}\\({m.group(2)}\\){m.group(4)}'
+            if m.group(2).count(r"\(") == 0 and m.group(2).count(r"\)") == 0
+            else m.group(0)
+        ),
+        html,
+        flags=re.S,
+    )
+    html = re.sub(
+        r'(<div class="cm-answer-card-value">)([^<]*?)\\\)([^<]*?)(</div>)',
+        lambda m: (
+            f"{m.group(1)}{m.group(2).strip()}{m.group(3).strip()}{m.group(4)}"
+            if m.group(2).strip()
+            and not m.group(2).strip().startswith(r"\(")
+            and r"\(" not in m.group(2)
+            else m.group(0)
+        ),
         html,
         flags=re.S,
     )
@@ -2959,6 +3020,9 @@ def _clean_frame_body(body: str) -> str:
             inner = m.group(1)
             if r"\begin{array}" not in inner and r"\begin{tabular}" not in inner:
                 return m.group(0)
+            # Arrays inside \left...\right or with inference arrows belong in MathJax.
+            if re.search(r"\\left|\\right|\\Rightarrow|\\Leftrightarrow|\\implies", inner):
+                return m.group(0)
             converted = latex_array_and_tabular_to_html(inner)
             return converted if converted != inner else m.group(0)
 
@@ -2977,6 +3041,7 @@ def _clean_frame_body(body: str) -> str:
     body = _unwrap_inline_markup(body)
     body = latex_array_and_tabular_to_html(body)
     body = _unshield_vaulted_blocks(body, math_vault)
+    body = _convert_choices_environment(body)
     body = _convert_beamer_enumerate(body)
     body = _convert_align_blocks_for_mathjax(body)
     body = _fix_aligned_prose(body)

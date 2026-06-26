@@ -36,4 +36,4 @@ services:
       - key: SITE_BRAND_SHORT
         value: Novel Prep
       - key: DESMOS_API_KEY
-        value: 21ef094557044d28bb31dde928d488b5
+        sync: false

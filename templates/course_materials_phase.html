@@ -4,14 +4,19 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_atelier.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_aurora.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
-<div class="np-cm-luxe np-cm-luxe--phase np-cm-luxe--phase-{{ phase_group.phase }}" data-cm-phase-view="{{ phase_group.phase }}">
+<div class="np-cm-luxe np-cm-aurora np-cm-luxe--phase np-cm-luxe--phase-{{ phase_group.phase }}" data-cm-phase-view="{{ phase_group.phase }}">
   <div class="np-cm-luxe-canvas" aria-hidden="true">
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--a"></div>
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--b"></div>
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--c"></div>
     <div class="np-cm-luxe-canvas__beam"></div>
     <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--1"></div>
     <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--2"></div>
+    <div class="np-cm-luxe-canvas__grid"></div>
     <div class="np-cm-luxe-canvas__grain"></div>
   </div>
 
