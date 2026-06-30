@@ -1142,6 +1142,27 @@ def _extract_mcq_choices_from_ul(ul_html: str) -> list[tuple[str, str]]:
     return _extract_mcq_choices_from_list(ul_html)
 
 
+def _extract_mcq_choices_from_table(table_html: str) -> list[tuple[str, str]]:
+    """Parse A/B/C/D rows from stem-table HTML (array MCQ converted to table)."""
+    choices: list[tuple[str, str]] = []
+    for cell_a, cell_b in re.findall(
+        r"<t(?:h|d)[^>]*>(.*?)</t(?:h|d)>\s*"
+        r"<t(?:h|d)[^>]*>(.*?)</t(?:h|d)>",
+        table_html,
+        flags=re.S | re.I,
+    ):
+        plain_a = re.sub(r"<[^>]+>", "", cell_a).strip()
+        letter_m = re.match(r"^([A-D])\.?$", plain_a, flags=re.I)
+        if not letter_m:
+            continue
+        letter = letter_m.group(1).upper()
+        body = _clean_mcq_body(cell_b)
+        if _needs_math_delimiters(body) and not re.search(r"\\\(|\\\[", body):
+            body = f"\\({body}\\)"
+        choices.append((letter, body))
+    return choices
+
+
 def _build_mcq_interactive(
     choices: list[tuple[str, str]], *, correct: str | None = None
 ) -> str:
@@ -1242,6 +1263,25 @@ def _wrap_standalone_mcq_list(html: str) -> str:
     if not _valid_mcq_choice_set(choices):
         return html
     return html[: m.start()] + _build_mcq_interactive(choices) + html[m.end() :]
+
+
+def _wrap_table_mcq_list(html: str) -> str:
+    """Turn stem-table A/B/C/D rows into clickable MCQs."""
+    if "cm-mcq-interactive" in html:
+        return html
+
+    def repl(m: re.Match[str]) -> str:
+        choices = _extract_mcq_choices_from_table(m.group(0))
+        if not _valid_mcq_choice_set(choices):
+            return m.group(0)
+        return _build_mcq_interactive(choices)
+
+    return re.sub(
+        r'<div class="stem-table-wrap">\s*<table class="stem-table">.*?</table>\s*</div>',
+        repl,
+        html,
+        flags=re.S,
+    )
 
 
 def _wrap_display_array_mcq_list(html: str) -> str:
@@ -1882,6 +1922,7 @@ def _slide_role_banner(kind: str) -> str:
 def _enrich_slide_html(html: str, kind: str, title: str) -> str:
     html = html.replace("%%HFILL%%", " ")
     if kind in {"question", "practice", "example"}:
+        html = _wrap_table_mcq_list(html)
         html = _wrap_display_array_mcq_list(html)
     html = _wrap_answer_choices(html)
     if kind in {"question", "practice", "example"}:
@@ -1912,6 +1953,14 @@ def _body_has_mcq_choices(html: str) -> bool:
         choices = _extract_mcq_choices_from_list(lst.group(1))
         if _valid_mcq_choice_set(choices):
             return True
+    for tbl in re.finditer(
+        r'<div class="stem-table-wrap">\s*<table class="stem-table">.*?</table>\s*</div>',
+        html,
+        flags=re.S,
+    ):
+        choices = _extract_mcq_choices_from_table(tbl.group(0))
+        if _valid_mcq_choice_set(choices):
+            return True
     return False
 
 
@@ -1928,9 +1977,12 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
         return "closing"
     if (
         tl.startswith("answer:")
+        or tl.startswith("answer :")
         or tl.startswith("answer explanation:")
+        or tl.startswith("answer to")
         or tl == "answer"
         or tl.startswith("answer explanation")
+        or re.match(r"^answer\b", tl)
     ):
         return "answer"
     if tl.startswith("solution:") or (tl.startswith("solution") and "finding" in tl):
@@ -2041,6 +2093,8 @@ def _extract_correct_choice(answer_html: str, question_html: str = "") -> str | 
         r"correct answer is[^a-zA-Z]*([A-D])\b",
         r"closest answer[^a-zA-Z]*\(?([A-D])\)?",
         r"\\textbf\{Answer:\}[^a-zA-Z]*\\textcolor\{[^}]+\}\{([A-D])\.",
+        r"\\textcolor\{[^}]+\}\{([A-D])\.?\}",
+        r"correct answer is[^a-zA-Z]*\\textcolor\{[^}]+\}\{([A-D])",
         r"<strong>Answer:</strong>\s*(?:<[^>]+>)*([A-D])\.",
         r"option\s*<strong>\s*([A-D])\b",
         r"option\s+\**([A-D])\b",
@@ -2451,7 +2505,7 @@ def _inject_grid_in_widgets(slides: list[dict[str, Any]]) -> None:
             continue
         if "data-cm-mcq" in html or "data-cm-grid-in" in html:
             continue
-        if slide.get("kind") == "example" and _body_has_mcq_choices(html):
+        if _body_has_mcq_choices(html):
             continue
         answer_index = slide.get("answer_index")
         if not answer_index:
@@ -2538,6 +2592,8 @@ def _link_question_answer_slides(slides: list[dict[str, Any]]) -> None:
             nxt = slides[j]
             nk = nxt.get("kind", "lesson")
             nt = nxt.get("title", "").lower()
+            if nk in question_kinds:
+                break
             if nk in answer_kinds or nt.startswith("answer") or nt.startswith("solution"):
                 slide["answer_index"] = nxt["index"]
                 nxt["question_index"] = slide["index"]
