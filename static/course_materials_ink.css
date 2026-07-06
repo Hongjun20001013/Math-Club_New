@@ -110,6 +110,14 @@
     padding: 4px 8px 5px;
 }
 
+.np-cm-ink-rail-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
 .np-cm-ink-rail-host:not([hidden]) {
     display: block;
     width: 100%;
@@ -182,6 +190,274 @@
     background: rgba(91, 77, 255, 0.1);
     border-color: rgba(91, 77, 255, 0.22);
     color: #5b3df5;
+}
+
+.np-cm-ink-chip--smart.is-active {
+    background: rgba(234, 179, 8, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(202, 138, 4, 0.22);
+    color: #a16207;
+}
+
+.np-cm-ink-chip--math.is-active {
+    background: rgba(59, 130, 246, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+    color: #1d4ed8;
+}
+
+.np-cm-ink-math-row {
+    align-items: center;
+    backdrop-filter: blur(14px) saturate(1.12);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    padding: 5px 8px;
+}
+
+.np-cm-ink-math-row[hidden] {
+    display: none !important;
+}
+
+.np-cm-ink-math-btn {
+    background: rgba(239, 246, 255, 0.9);
+    border: 1px solid rgba(59, 130, 246, 0.14);
+    border-radius: 8px;
+    color: #1e3a8a;
+    cursor: pointer;
+    font: 600 0.92rem/1 "Source Serif 4", "Times New Roman", serif;
+    min-width: 28px;
+    padding: 4px 7px;
+    transition: background 0.12s ease, transform 0.1s ease;
+}
+
+.np-cm-ink-math-btn:hover {
+    background: rgba(219, 234, 254, 0.95);
+    transform: translateY(-1px);
+}
+
+.np-cm-ink-math-btn.is-active {
+    background: rgba(59, 130, 246, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.28);
+    color: #1d4ed8;
+}
+
+.np-cm-ink-formula-open {
+    background: linear-gradient(135deg, rgba(91, 61, 245, 0.14), rgba(59, 130, 246, 0.12));
+    border: 1px solid rgba(91, 61, 245, 0.22);
+    border-radius: 8px;
+    color: #4338ca;
+    cursor: pointer;
+    font: 700 0.82rem/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.02em;
+    min-width: 34px;
+    padding: 4px 8px;
+    transition: background 0.12s ease, transform 0.1s ease;
+}
+
+.np-cm-ink-formula-open:hover {
+    background: linear-gradient(135deg, rgba(91, 61, 245, 0.2), rgba(59, 130, 246, 0.16));
+    transform: translateY(-1px);
+}
+
+.np-cm-ink-latex-layer {
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 3;
+}
+
+.np-cm-ink-latex-stamp {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+}
+
+.np-cm-formula-pad {
+    backdrop-filter: blur(16px) saturate(1.15);
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(91, 61, 245, 0.16);
+    border-radius: 16px;
+    bottom: 88px;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
+    left: 50%;
+    max-width: min(420px, calc(100vw - 24px));
+    padding: 12px 14px 14px;
+    position: fixed;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 120;
+}
+
+.np-cm-formula-pad.is-dragging {
+    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.18);
+    user-select: none;
+}
+
+.np-cm-formula-pad-head {
+    align-items: center;
+    cursor: grab;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    touch-action: none;
+}
+
+.np-cm-formula-pad-head.is-dragging {
+    cursor: grabbing;
+}
+
+.np-cm-formula-pad-grip {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    letter-spacing: -0.12em;
+    line-height: 1;
+    user-select: none;
+}
+
+.np-cm-formula-pad-head strong {
+    color: #312e81;
+    font-size: 0.92rem;
+}
+
+.np-cm-formula-pad-close {
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1.2rem;
+    height: 28px;
+    line-height: 1;
+    width: 28px;
+}
+
+.np-cm-formula-pad-close:hover {
+    background: rgba(15, 23, 42, 0.06);
+    color: #334155;
+}
+
+.np-cm-formula-pad-lead {
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    margin: 0 0 8px;
+}
+
+.np-cm-formula-pad-lead code {
+    background: rgba(91, 61, 245, 0.08);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    padding: 1px 4px;
+}
+
+.np-cm-formula-input {
+    border: 1px solid rgba(91, 61, 245, 0.18);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font: 500 0.88rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-bottom: 8px;
+    min-height: 88px;
+    padding: 8px 10px;
+    resize: vertical;
+    width: 100%;
+}
+
+.np-cm-formula-input:focus {
+    border-color: rgba(91, 61, 245, 0.45);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(91, 61, 245, 0.12);
+}
+
+.np-cm-formula-preview {
+    align-items: center;
+    background: rgba(248, 250, 252, 0.95);
+    border: 1px dashed rgba(91, 61, 245, 0.16);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+    min-height: 52px;
+    overflow-x: auto;
+    padding: 8px 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.np-cm-formula-preview-empty {
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.np-cm-formula-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.np-cm-formula-key {
+    background: rgba(239, 246, 255, 0.95);
+    border: 1px solid rgba(59, 130, 246, 0.14);
+    border-radius: 7px;
+    color: #1e3a8a;
+    cursor: pointer;
+    font: 600 0.72rem/1 ui-sans-serif, system-ui, sans-serif;
+    padding: 4px 7px;
+}
+
+.np-cm-formula-key:hover {
+    background: rgba(219, 234, 254, 0.98);
+}
+
+.np-cm-formula-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.np-cm-formula-place {
+    background: linear-gradient(135deg, #5b3df5, #4338ca);
+    border: none;
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    font: 700 0.78rem/1 ui-sans-serif, system-ui, sans-serif;
+    padding: 8px 14px;
+}
+
+.np-cm-formula-place:hover {
+    filter: brightness(1.05);
+}
+
+.np-cm-ink-shape-toast {
+    background: rgba(234, 179, 8, 0.14);
+    border-radius: 999px;
+    color: #92400e;
+    flex-shrink: 0;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    padding: 3px 8px;
+    transform: translateY(2px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.np-cm-ink-shape-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.np-cm-ink-canvas.is-smart-tool.is-drawable {
+    cursor: cell;
+}
+
+.np-cm-ink-canvas.is-stamp-pending.is-drawable {
+    cursor: copy;
 }
 
 .np-cm-ink-chip {

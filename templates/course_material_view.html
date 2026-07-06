@@ -4,6 +4,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_ink.css') }}?v={{ style_css_revision }}">
+<script defer src="{{ url_for('static', filename='course_materials_ink_smart.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}
 
 {% block content %}

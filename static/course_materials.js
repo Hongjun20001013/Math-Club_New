@@ -385,6 +385,8 @@
   var classroomPollInFlight = false;
 
   var inkLayerEl = null;
+  var inkLatexLayerEl = null;
+  var inkFormulaPadEl = null;
   var inkCanvasEl = null;
   var inkDockEl = null;
   var inkReaderEl = null;
@@ -420,15 +422,31 @@
   var inkClearArmTimer = null;
   var inkLocalSlideCache = {};
   var inkActiveSlideIndex = null;
-  var INK_DOCK_VERSION = "v8";
-  var INK_PREFS_KEY = "np-cm-ink-prefs-v1";
+  var inkPendingStamp = null;
+  var inkPendingLatex = null;
+  var inkFormulaPlaceMode = false;
+  var inkShapeToastTimer = null;
+  var INK_DOCK_VERSION = "v10";
+  var INK_PREFS_KEY = "np-cm-ink-prefs-v2";
 
   var INK_SIZES = { xs: 1.5, s: 2.6, m: 4.8, l: 9 };
   var INK_ERASER_RADIUS = { xs: 0.005, s: 0.009, m: 0.016, l: 0.032 };
   var INK_LASER_SCALE = { xs: 0.45, s: 0.7, m: 0.95, l: 1.3 };
   var INK_SIZE_LABELS = { xs: "Extra fine", s: "Fine", m: "Medium", l: "Bold" };
-  var INK_TOOL_LABELS = { pen: "Pen", highlighter: "Highlight", laser: "Laser", eraser: "Eraser" };
+  var INK_TOOL_LABELS = {
+    pen: "Pro pen",
+    smart: "Smart shapes",
+    math: "Math ink",
+    formula: "Formula pad",
+    highlighter: "Highlight",
+    laser: "Laser",
+    eraser: "Eraser",
+  };
   var INK_SIZE_ORDER = ["xs", "s", "m", "l"];
+  var INK_ICON_SMART =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2l1.4 4.3H16l-3.7 2.7 1.4 4.3L10 10.6 6.3 13.3l1.4-4.3L4 6.3h4.6L10 2z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>';
+  var INK_ICON_MATH =
+    '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16V4h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
   var INK_ICON_PEN =
     '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16l1.2-4.2L14.5 2.7a1.2 1.2 0 011.7 0l1.1 1.1a1.2 1.2 0 010 1.7L7 14.8 4 16z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
   var INK_ICON_HIGHLIGHTER =
@@ -439,6 +457,42 @@
     '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 12l6-6 7 7-6 6H4v-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
   var INK_ICON_UNDO =
     '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 7H14a4 4 0 010 8H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 4L5 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function inkSmart() {
+    return window.NpInkSmart || null;
+  }
+
+  function showInkShapeToast(label) {
+    if (!inkDockEl) return;
+    var rail = inkDockEl.querySelector(".np-cm-ink-rail");
+    if (!rail) return;
+    var toast = rail.querySelector("[data-ink-shape-toast]");
+    if (!toast) {
+      toast = document.createElement("span");
+      toast.className = "np-cm-ink-shape-toast";
+      toast.setAttribute("data-ink-shape-toast", "true");
+      var hint = rail.querySelector("[data-ink-hint]");
+      if (hint) rail.insertBefore(toast, hint);
+      else rail.appendChild(toast);
+    }
+    toast.textContent = label;
+    toast.classList.add("is-visible");
+    if (inkShapeToastTimer) window.clearTimeout(inkShapeToastTimer);
+    inkShapeToastTimer = window.setTimeout(function () {
+      toast.classList.remove("is-visible");
+    }, 1400);
+  }
+
+  function shapeToastLabel(stroke) {
+    if (!stroke || stroke.kind !== "shape") return "";
+    var names = {
+      circle: "Circle",
+      line: "Line",
+      triangle: "Triangle",
+      rect: "Rectangle",
+    };
+    return (names[stroke.shape] || "Shape") + " ✓";
+  }
 
   function inkWidthPx() {
     return INK_SIZES[inkSizeKey] || INK_SIZES.s;
@@ -571,6 +625,9 @@
     if (tool === "highlighter") {
       return { color: color, width: inkWidthPx() * 2.4, alpha: 0.38, tool: "highlighter" };
     }
+    if (tool === "smart" || tool === "math") {
+      return { color: color, width: inkWidthPx() * 1.05, alpha: 1, tool: tool };
+    }
     return { color: color, width: inkWidthPx(), alpha: 1, tool: "pen" };
   }
 
@@ -585,11 +642,243 @@
     }
     var hintEl = inkDockEl.querySelector("[data-ink-hint]");
     if (hintEl) {
+      var extra = "";
+      if (inkTool === "smart") extra = " — draw ○ △ □";
+      if (inkTool === "math") {
+        extra = inkPendingStamp
+          ? " — tap slide to place " + inkPendingStamp
+          : inkPendingLatex
+            ? " — tap slide to place formula"
+            : " — symbols, fraction bars, or open ƒx pad";
+      }
+      if (inkFormulaPlaceMode) extra = " — tap slide to place formula";
       hintEl.textContent =
         (INK_TOOL_LABELS[inkTool] || "Pen") +
         " · " +
-        (INK_SIZE_LABELS[inkSizeKey] || "Fine");
+        (INK_SIZE_LABELS[inkSizeKey] || "Fine") +
+        extra;
     }
+    var mathRow = inkDockEl.querySelector("[data-ink-math-row]");
+    if (mathRow) {
+      mathRow.hidden = inkTool !== "math";
+    }
+  }
+
+  function renderLatexOverlays() {
+    if (!inkLatexLayerEl || !slideEl) return;
+    inkLatexLayerEl.innerHTML = "";
+    var latexStrokes = inkStrokes.filter(function (s) { return s && s.kind === "latex" && s.latex; });
+    if (!latexStrokes.length) return;
+    latexStrokes.forEach(function (stroke, idx) {
+      var el = document.createElement("div");
+      el.className = "np-cm-ink-latex-stamp";
+      el.style.left = String(stroke.x * 100) + "%";
+      el.style.top = String(stroke.y * 100) + "%";
+      el.style.color = stroke.color || inkColor;
+      el.style.fontSize = Math.max(14, (stroke.size || 0.038) * slideEl.offsetHeight) + "px";
+      el.style.whiteSpace = "normal";
+      el.style.maxWidth = Math.max(120, slideEl.offsetWidth * 0.55) + "px";
+      el.setAttribute("data-latex-idx", String(idx));
+      el.textContent = "\\(" + stroke.latex + "\\)";
+      inkLatexLayerEl.appendChild(el);
+    });
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([inkLatexLayerEl]).catch(function () {});
+    }
+  }
+
+  function openFormulaPad() {
+    ensureFormulaPad();
+    if (!inkFormulaPadEl) return;
+    inkFormulaPadEl.hidden = false;
+    inkExpanded = true;
+    inkEnabled = true;
+    var input = inkFormulaPadEl.querySelector("[data-formula-input]");
+    if (input) {
+      input.focus();
+      updateFormulaPreview(input.value);
+    }
+  }
+
+  function closeFormulaPad() {
+    if (inkFormulaPadEl) inkFormulaPadEl.hidden = true;
+    inkFormulaPlaceMode = false;
+    inkPendingLatex = null;
+    syncInkDockState();
+  }
+
+  function ensureFormulaPad() {
+    if (inkFormulaPadEl || !root) return;
+    var smart = inkSmart();
+    var keysHtml = "";
+    if (smart && smart.FORMULA_KEYS) {
+      smart.FORMULA_KEYS.forEach(function (k) {
+        keysHtml +=
+          '<button type="button" class="np-cm-formula-key" data-formula-insert="' +
+          k.insert.replace(/"/g, "&quot;") +
+          '">' +
+          k.label +
+          "</button>";
+      });
+    }
+    inkFormulaPadEl = document.createElement("div");
+    inkFormulaPadEl.className = "np-cm-formula-pad";
+    inkFormulaPadEl.hidden = true;
+    inkFormulaPadEl.innerHTML =
+      '<div class="np-cm-formula-pad-head" data-formula-drag-handle title="Drag to move">' +
+      '<span class="np-cm-formula-pad-grip" aria-hidden="true">⋮⋮</span>' +
+      '<strong>ƒx Formula pad</strong>' +
+      '<button type="button" class="np-cm-formula-pad-close" data-formula-close aria-label="Close">×</button>' +
+      "</div>" +
+      '<p class="np-cm-formula-pad-lead">Type like Desmos — <code>Enter</code> for new line, <code>Ctrl+Enter</code> to place.</p>' +
+      '<textarea class="np-cm-formula-input" data-formula-input rows="4" placeholder="Line 1: y = mx + b&#10;Line 2: \\frac{a}{b}" spellcheck="false" autocomplete="off"></textarea>' +
+      '<div class="np-cm-formula-preview" data-formula-preview></div>' +
+      '<div class="np-cm-formula-keys">' +
+      keysHtml +
+      "</div>" +
+      '<div class="np-cm-formula-actions">' +
+      '<button type="button" class="np-cm-formula-place" data-formula-place>Place on slide</button>' +
+      "</div>";
+    root.appendChild(inkFormulaPadEl);
+    bindFormulaPadEvents();
+  }
+
+  function updateFormulaPreview(raw) {
+    if (!inkFormulaPadEl) return;
+    var preview = inkFormulaPadEl.querySelector("[data-formula-preview]");
+    var input = inkFormulaPadEl.querySelector("[data-formula-input]");
+    if (!preview) return;
+    var smart = inkSmart();
+    var latex = smart && smart.normalizeLatexInput ? smart.normalizeLatexInput(raw || (input && input.value) || "") : (raw || "");
+    if (!latex) {
+      preview.innerHTML = '<span class="np-cm-formula-preview-empty">Preview appears here</span>';
+      return;
+    }
+    preview.innerHTML = "\\(" + latex + "\\)";
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([preview]).catch(function () {});
+    }
+  }
+
+  function bindFormulaPadEvents() {
+    if (!inkFormulaPadEl || inkFormulaPadEl.getAttribute("data-bound") === "1") return;
+    inkFormulaPadEl.setAttribute("data-bound", "1");
+    var input = inkFormulaPadEl.querySelector("[data-formula-input]");
+    var closeBtn = inkFormulaPadEl.querySelector("[data-formula-close]");
+    var placeBtn = inkFormulaPadEl.querySelector("[data-formula-place]");
+    if (input) {
+      input.addEventListener("input", function () {
+        updateFormulaPreview(input.value);
+      });
+      input.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) {
+          ev.preventDefault();
+          armFormulaPlacement();
+        }
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener("click", closeFormulaPad);
+    if (placeBtn) placeBtn.addEventListener("click", armFormulaPlacement);
+    bindFormulaPadDrag();
+    inkFormulaPadEl.querySelectorAll("[data-formula-insert]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (!input) return;
+        var insert = btn.getAttribute("data-formula-insert") || "";
+        var start = input.selectionStart || input.value.length;
+        var end = input.selectionEnd || start;
+        input.value = input.value.slice(0, start) + insert + input.value.slice(end);
+        input.focus();
+        input.selectionStart = input.selectionEnd = start + insert.length;
+        updateFormulaPreview(input.value);
+      });
+    });
+  }
+
+  function bindFormulaPadDrag() {
+    if (!inkFormulaPadEl) return;
+    var handle = inkFormulaPadEl.querySelector("[data-formula-drag-handle]");
+    if (!handle || handle.getAttribute("data-drag-bound") === "1") return;
+    handle.setAttribute("data-drag-bound", "1");
+    var dragging = false;
+    var offsetX = 0;
+    var offsetY = 0;
+
+    function onMove(e) {
+      if (!dragging || !inkFormulaPadEl) return;
+      var x = e.clientX - offsetX;
+      var y = e.clientY - offsetY;
+      var padW = inkFormulaPadEl.offsetWidth;
+      var padH = inkFormulaPadEl.offsetHeight;
+      x = Math.max(8, Math.min(window.innerWidth - padW - 8, x));
+      y = Math.max(8, Math.min(window.innerHeight - padH - 8, y));
+      inkFormulaPadEl.style.left = x + "px";
+      inkFormulaPadEl.style.top = y + "px";
+    }
+
+    function onUp(e) {
+      if (!dragging) return;
+      dragging = false;
+      inkFormulaPadEl.classList.remove("is-dragging");
+      handle.classList.remove("is-dragging");
+      try { handle.releasePointerCapture(e.pointerId); } catch (err) {}
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    }
+
+    handle.addEventListener("pointerdown", function (e) {
+      if (e.target.closest("[data-formula-close]")) return;
+      dragging = true;
+      var rect = inkFormulaPadEl.getBoundingClientRect();
+      inkFormulaPadEl.style.bottom = "auto";
+      inkFormulaPadEl.style.transform = "none";
+      inkFormulaPadEl.style.left = rect.left + "px";
+      inkFormulaPadEl.style.top = rect.top + "px";
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      inkFormulaPadEl.classList.add("is-dragging");
+      handle.classList.add("is-dragging");
+      handle.setPointerCapture(e.pointerId);
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      e.preventDefault();
+    });
+  }
+
+  function armFormulaPlacement() {
+    var input = inkFormulaPadEl && inkFormulaPadEl.querySelector("[data-formula-input]");
+    var smart = inkSmart();
+    if (!input || !smart || !smart.normalizeLatexInput) return;
+    var latex = smart.normalizeLatexInput(input.value);
+    if (!latex) return;
+    inkPendingLatex = latex;
+    inkPendingStamp = null;
+    inkFormulaPlaceMode = true;
+    inkTool = "math";
+    inkEnabled = true;
+    if (inkDockEl) {
+      inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "math");
+      });
+      inkDockEl.querySelectorAll("[data-ink-stamp]").forEach(function (b) {
+        b.classList.remove("is-active");
+      });
+    }
+    updateInkToolHint();
+    syncInkDockState();
+    if (inkFormulaPadEl) inkFormulaPadEl.hidden = true;
+  }
+
+  function placeLatexStamp(pt, latex) {
+    var smart = inkSmart();
+    if (!smart || !smart.createLatexStamp || !latex) return;
+    inkStrokes.push(smart.createLatexStamp(latex, pt[0], pt[1], inkColor, 0.042));
+    inkPendingLatex = null;
+    inkFormulaPlaceMode = false;
+    redrawInkCanvas();
+    scheduleInkSave();
+    updateInkActionButtons();
+    updateInkToolHint();
+    syncInkDockState();
   }
 
   function ensureInkLayer() {
@@ -602,6 +891,10 @@
       inkCanvasEl.className = "np-cm-ink-canvas";
       inkCanvasEl.setAttribute("data-cm-ink-canvas", "true");
       inkLayerEl.appendChild(inkCanvasEl);
+      inkLatexLayerEl = document.createElement("div");
+      inkLatexLayerEl.className = "np-cm-ink-latex-layer";
+      inkLatexLayerEl.setAttribute("data-cm-ink-latex-layer", "true");
+      inkLayerEl.appendChild(inkLatexLayerEl);
       slideEl.appendChild(inkLayerEl);
       inkCtx = inkCanvasEl.getContext("2d");
       window.addEventListener("resize", resizeInkCanvas);
@@ -611,6 +904,11 @@
         inkResizeObserver.observe(slideEl);
       }
       bindInkPointerEvents();
+    } else if (!inkLatexLayerEl) {
+      inkLatexLayerEl = document.createElement("div");
+      inkLatexLayerEl.className = "np-cm-ink-latex-layer";
+      inkLatexLayerEl.setAttribute("data-cm-ink-latex-layer", "true");
+      inkLayerEl.appendChild(inkLatexLayerEl);
     }
     ensureLaserCanvas();
     ensureEraserRing();
@@ -932,10 +1230,27 @@
   }
 
   function buildInkDockHtml() {
+    var smart = inkSmart();
+    var mathBtns = "";
+    if (smart && smart.MATH_STAMPS) {
+      smart.MATH_STAMPS.forEach(function (item) {
+        mathBtns +=
+          '<button type="button" class="np-cm-ink-math-btn" data-ink-stamp="' +
+          item.t.replace(/"/g, "&quot;") +
+          '" title="' +
+          item.label +
+          '">' +
+          item.t +
+          "</button>";
+      });
+    }
     return (
+      '<div class="np-cm-ink-rail-wrap">' +
       '<div class="np-cm-ink-rail">' +
       '<div class="np-cm-ink-rail-group np-cm-ink-rail-group--tools">' +
-      '<button type="button" class="np-cm-ink-chip is-active" data-ink-tool="pen" title="Pen">' + INK_ICON_PEN + "</button>" +
+      '<button type="button" class="np-cm-ink-chip is-active" data-ink-tool="pen" title="Pro pen (smooth ink)">' + INK_ICON_PEN + "</button>" +
+      '<button type="button" class="np-cm-ink-chip np-cm-ink-chip--smart" data-ink-tool="smart" title="Smart shapes (M) — circle, triangle, line">' + INK_ICON_SMART + "</button>" +
+      '<button type="button" class="np-cm-ink-chip np-cm-ink-chip--math" data-ink-tool="math" title="Math ink (G) — symbols &amp; fraction bars">' + INK_ICON_MATH + "</button>" +
       '<button type="button" class="np-cm-ink-chip" data-ink-tool="highlighter" title="Highlighter">' + INK_ICON_HIGHLIGHTER + "</button>" +
       '<button type="button" class="np-cm-ink-chip np-cm-ink-chip--laser" data-ink-tool="laser" title="Laser (L) — hover to aim, drag for beam">' + INK_ICON_LASER + "</button>" +
       '<button type="button" class="np-cm-ink-chip" data-ink-tool="eraser" title="Eraser (E)">' + INK_ICON_ERASER + "</button>" +
@@ -964,6 +1279,11 @@
       '<span class="np-cm-ink-sync is-synced" data-ink-status title="Ready">' +
       '<span class="np-cm-ink-sync-dot"></span></span>' +
       '<button type="button" class="np-cm-ink-rail-close" data-ink-collapse title="Close (P)" aria-label="Close pen toolbar">×</button>' +
+      "</div>" +
+      '<div class="np-cm-ink-math-row" data-ink-math-row hidden>' +
+      '<button type="button" class="np-cm-ink-formula-open" data-ink-formula-open title="Formula pad (F) — Desmos-style LaTeX">ƒx</button>' +
+      mathBtns +
+      "</div>" +
       "</div>"
     );
   }
@@ -1007,6 +1327,12 @@
     inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         inkTool = btn.getAttribute("data-ink-tool") || "pen";
+        inkPendingStamp = null;
+        inkPendingLatex = null;
+        inkFormulaPlaceMode = false;
+        inkDockEl.querySelectorAll("[data-ink-stamp]").forEach(function (b) {
+          b.classList.remove("is-active");
+        });
         inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
           b.classList.toggle("is-active", b === btn);
         });
@@ -1029,6 +1355,44 @@
         saveInkPrefs();
       });
     });
+
+    inkDockEl.querySelectorAll("[data-ink-stamp]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var sym = btn.getAttribute("data-ink-stamp") || "";
+        if (inkPendingStamp === sym) {
+          inkPendingStamp = null;
+          btn.classList.remove("is-active");
+        } else {
+          inkPendingStamp = sym;
+          inkPendingLatex = null;
+          inkFormulaPlaceMode = false;
+          inkDockEl.querySelectorAll("[data-ink-stamp]").forEach(function (b) {
+            b.classList.toggle("is-active", b === btn);
+          });
+          inkTool = "math";
+          inkEnabled = true;
+          inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+            b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "math");
+          });
+        }
+        updateInkToolHint();
+        syncInkDockState();
+      });
+    });
+
+    var formulaOpenBtn = inkDockEl.querySelector("[data-ink-formula-open]");
+    if (formulaOpenBtn) {
+      formulaOpenBtn.addEventListener("click", function () {
+        inkTool = "math";
+        inkEnabled = true;
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "math");
+        });
+        openFormulaPad();
+        updateInkToolHint();
+        syncInkDockState();
+      });
+    }
 
     inkDockEl.querySelectorAll("[data-ink-color]").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -1149,6 +1513,8 @@
       inkCanvasEl.classList.toggle("is-eraser", inkTool === "eraser" && inkEnabled);
       inkCanvasEl.classList.toggle("is-highlighter", inkTool === "highlighter" && inkEnabled);
       inkCanvasEl.classList.toggle("is-laser", laserMode);
+      inkCanvasEl.classList.toggle("is-smart-tool", (inkTool === "smart" || inkTool === "math") && inkEnabled);
+      inkCanvasEl.classList.toggle("is-stamp-pending", !!(inkTool === "math" && (inkPendingStamp || inkPendingLatex || inkFormulaPlaceMode) && inkEnabled));
     }
     updateInkActionButtons();
     updateInkToolHint();
@@ -1241,12 +1607,19 @@
     inkCtx.clearRect(0, 0, inkCanvasEl.width, inkCanvasEl.height);
     inkStrokes.forEach(function (stroke) { drawInkStroke(stroke); });
     if (inkCurrentStroke) drawInkStroke(inkCurrentStroke);
+    renderLatexOverlays();
   }
 
   function drawInkStroke(stroke) {
-    if (!inkCtx || !stroke || !stroke.points || stroke.points.length < 2) return;
+    if (!inkCtx || !inkCanvasEl) return;
     var bw = inkCanvasEl.width;
     var bh = inkCanvasEl.height;
+    var smart = inkSmart();
+    if (smart && smart.drawStroke) {
+      smart.drawStroke(inkCtx, stroke, bw, bh, inkDpr, { pro: true });
+      return;
+    }
+    if (!stroke || !stroke.points || stroke.points.length < 2) return;
     var lw = (stroke.width || 4) * (inkDpr || 1);
     inkCtx.save();
     inkCtx.strokeStyle = stroke.color || "#ef4444";
@@ -1268,13 +1641,20 @@
     inkCtx.restore();
   }
 
+  function strokeHitPoints(stroke) {
+    var smart = inkSmart();
+    if (smart && smart.sampleStrokePoints) return smart.sampleStrokePoints(stroke);
+    return stroke && stroke.points ? stroke.points : [];
+  }
+
   function eraseStrokesNearPoint(pt, radius) {
     if (!pt) return false;
     radius = radius == null ? inkEraserRadius() : radius;
     var before = inkStrokes.length;
     inkStrokes = inkStrokes.filter(function (stroke) {
-      if (!stroke || !stroke.points) return false;
-      return !stroke.points.some(function (p) {
+      var pts = strokeHitPoints(stroke);
+      if (!pts.length) return false;
+      return !pts.some(function (p) {
         return Math.hypot(p[0] - pt[0], p[1] - pt[1]) <= radius;
       });
     });
@@ -1325,11 +1705,33 @@
         inkCanvasEl.setPointerCapture(e.pointerId);
         return;
       }
+      if (inkTool === "math" && inkPendingLatex) {
+        placeLatexStamp(pt, inkPendingLatex);
+        return;
+      }
+      if (inkTool === "math" && inkPendingStamp) {
+        var smart = inkSmart();
+        if (smart && smart.createStamp) {
+          inkStrokes.push(smart.createStamp(inkPendingStamp, pt[0], pt[1], inkColor, 0.034));
+          inkPendingStamp = null;
+          if (inkDockEl) {
+            inkDockEl.querySelectorAll("[data-ink-stamp]").forEach(function (b) {
+              b.classList.remove("is-active");
+            });
+          }
+          redrawInkCanvas();
+          scheduleInkSave();
+          updateInkActionButtons();
+          updateInkToolHint();
+          syncInkDockState();
+        }
+        return;
+      }
       inkDrawing = true;
       hideEraserRing();
       var style = inkStrokeStyle(inkColor, inkTool);
       inkCurrentStroke = {
-        points: [pt],
+        points: [[pt[0], pt[1], Date.now()]],
         color: style.color,
         width: style.width,
         alpha: style.alpha,
@@ -1370,8 +1772,8 @@
       if (!inkCurrentStroke) return;
       var pts = inkCurrentStroke.points;
       var last = pts[pts.length - 1];
-      if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) < 0.0008) return;
-      pts.push(pt);
+      if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) < 0.0012) return;
+      pts.push([pt[0], pt[1], Date.now()]);
       redrawInkCanvas();
     });
     function finishStroke(e) {
@@ -1388,7 +1790,14 @@
       if (!inkDrawing) return;
       inkDrawing = false;
       if (inkTool !== "eraser" && inkCurrentStroke && inkCurrentStroke.points.length >= 2) {
-        inkStrokes.push(inkCurrentStroke);
+        var smart = inkSmart();
+        var finalized = inkCurrentStroke;
+        if (smart && smart.finalizeStroke && inkTool === "smart") {
+          finalized = smart.finalizeStroke(inkCurrentStroke, inkTool) || inkCurrentStroke;
+          var toast = shapeToastLabel(finalized);
+          if (toast) showInkShapeToast(toast);
+        }
+        inkStrokes.push(finalized);
         scheduleInkSave();
         updateInkActionButtons();
       }
@@ -2979,9 +3388,53 @@
       e.preventDefault();
       inkTool = "eraser";
       inkEnabled = true;
+      inkPendingStamp = null;
       if (inkDockEl) {
         inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
           b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "eraser");
+        });
+      }
+      updateInkToolHint();
+      syncInkDockState();
+      saveInkPrefs();
+      return;
+    }
+    if ((e.key === "m" || e.key === "M") && isInkTeacher() && inkExpanded) {
+      e.preventDefault();
+      inkTool = "smart";
+      inkEnabled = true;
+      inkPendingStamp = null;
+      if (inkDockEl) {
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "smart");
+        });
+      }
+      updateInkToolHint();
+      syncInkDockState();
+      saveInkPrefs();
+      return;
+    }
+    if ((e.key === "f" || e.key === "F") && isInkTeacher() && inkExpanded) {
+      e.preventDefault();
+      inkTool = "math";
+      inkEnabled = true;
+      if (inkDockEl) {
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "math");
+        });
+      }
+      openFormulaPad();
+      updateInkToolHint();
+      syncInkDockState();
+      return;
+    }
+    if ((e.key === "g" || e.key === "G") && isInkTeacher() && inkExpanded) {
+      e.preventDefault();
+      inkTool = "math";
+      inkEnabled = true;
+      if (inkDockEl) {
+        inkDockEl.querySelectorAll("[data-ink-tool]").forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-ink-tool") === "math");
         });
       }
       updateInkToolHint();

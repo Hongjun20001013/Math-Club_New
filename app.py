@@ -2690,11 +2690,84 @@ def _cm_save_slide_ink(
             width = float(stroke.get("width") or 3)
         except (TypeError, ValueError):
             width = 3.0
+        kind = str(stroke.get("kind") or "")
+        if kind == "latex":
+            latex = str(stroke.get("latex") or "")[:500]
+            if not latex:
+                continue
+            try:
+                sx = max(0.0, min(1.0, float(stroke.get("x") or norm_points[0][0])))
+                sy = max(0.0, min(1.0, float(stroke.get("y") or norm_points[0][1])))
+                ssize = max(0.01, min(0.12, float(stroke.get("size") or 0.038)))
+            except (TypeError, ValueError):
+                continue
+            safe_strokes.append(
+                {
+                    "kind": "latex",
+                    "latex": latex,
+                    "x": sx,
+                    "y": sy,
+                    "size": ssize,
+                    "color": color,
+                    "width": max(1.0, min(12.0, width)),
+                    "points": [[sx, sy], [sx, sy]],
+                    "tool": str(stroke.get("tool") or "math")[:16],
+                }
+            )
+            continue
+        if kind == "stamp":
+            text = str(stroke.get("text") or "")[:8]
+            if not text:
+                continue
+            try:
+                sx = max(0.0, min(1.0, float(stroke.get("x") or norm_points[0][0])))
+                sy = max(0.0, min(1.0, float(stroke.get("y") or norm_points[0][1])))
+                ssize = max(0.01, min(0.12, float(stroke.get("size") or 0.032)))
+            except (TypeError, ValueError):
+                continue
+            safe_strokes.append(
+                {
+                    "kind": "stamp",
+                    "text": text,
+                    "x": sx,
+                    "y": sy,
+                    "size": ssize,
+                    "color": color,
+                    "width": max(1.0, min(12.0, width)),
+                    "points": [[sx, sy], [sx, sy]],
+                    "tool": str(stroke.get("tool") or "math")[:16],
+                }
+            )
+            continue
         safe_strokes.append(
             {
                 "points": norm_points,
                 "color": color,
                 "width": max(1.0, min(12.0, width)),
+                **{
+                    k: stroke.get(k)
+                    for k in (
+                        "alpha",
+                        "tool",
+                        "kind",
+                        "shape",
+                        "cx",
+                        "cy",
+                        "r",
+                        "x1",
+                        "y1",
+                        "x2",
+                        "y2",
+                        "x",
+                        "y",
+                        "w",
+                        "h",
+                        "text",
+                        "latex",
+                        "size",
+                    )
+                    if stroke.get(k) is not None
+                },
             }
         )
     payload = json.dumps(safe_strokes, separators=(",", ":"))
