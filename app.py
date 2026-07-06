@@ -11895,6 +11895,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         )
 
     score_pct = round(100.0 * correct_count / total_q) if total_q else 0
+    placement_gradable_total = sum(1 for q in questions if extract_correct_answer(q))
+    placement_ungraded_count = max(0, total_q - placement_gradable_total)
     placement_mcq_correct = correct_count
     placement_mcq_total = total_q
     flow_cfg = _placement_flow_config(topic) if domain == "placement" else None
@@ -11906,18 +11908,8 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         ]
         placement_mcq_total = len(mcq_rows)
         placement_mcq_correct = sum(1 for row, _ in mcq_rows if row["status"] == "correct")
-        score_pct = (
-            round(100.0 * placement_mcq_correct / placement_mcq_total)
-            if placement_mcq_total
-            else 0
-        )
-        correct_count = placement_mcq_correct
-    elif domain == "placement" and topic == "middle_level":
-        submitted_count = sum(1 for r in rows_out if r["status"] == "submitted")
-        placement_mcq_correct = submitted_count
-        placement_mcq_total = total_q
-        score_pct = round(100.0 * submitted_count / total_q) if total_q else 0
-        correct_count = submitted_count
+    if domain == "placement" and placement_gradable_total:
+        score_pct = round(100.0 * correct_count / placement_gradable_total)
     mistake_focus: List[dict] = []
     skipped_count = sum(1 for r in rows_out if r["status"] == "skipped")
     if domain != "placement":
@@ -11939,8 +11931,6 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         acc[sec]["total"] += 1
         acc[sec]["title"] = qobj.get("knowledge_section_title_en", "") or acc[sec]["title"]
         if row["status"] == "correct":
-            acc[sec]["correct"] += 1
-        elif domain == "placement" and topic == "middle_level" and row["status"] == "submitted":
             acc[sec]["correct"] += 1
     if domain == "placement" and topic == "enhanced_math_1":
         part_order = ("A", "B", "C", "G", "FR")
@@ -12051,6 +12041,9 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
                     "practice_miss_quiz_start", domain=domain, topic=topic
                 )
 
+    placement_score_total = (
+        placement_gradable_total if domain == "placement" and placement_gradable_total else total_q
+    )
     render = {
         "domain": domain,
         "topic": topic,
@@ -12059,6 +12052,9 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "rows": rows_out,
         "correct_count": correct_count,
         "total_q": total_q,
+        "placement_gradable_total": placement_gradable_total if domain == "placement" else None,
+        "placement_ungraded_count": placement_ungraded_count if domain == "placement" else None,
+        "placement_score_total": placement_score_total if domain == "placement" else None,
         "score_pct": score_pct,
         "answered_count": total_q - skipped_count,
         "answered_pct": (
@@ -12092,6 +12088,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "placement_student": placement_student,
         "correct_count": correct_count,
         "total_q": total_q,
+        "placement_score_total": placement_score_total if domain == "placement" else total_q,
         "score_pct": score_pct,
         "session_duration_seconds": duration_seconds,
         "session_duration_label": session_duration_label,

@@ -887,7 +887,7 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
 
     topic_title = _pdf_core_font_safe(str(ctx.get("topic_title") or "Placement diagnostic"))
     cc = int(ctx.get("correct_count") or 0)
-    tq = int(ctx.get("total_q") or 85)
+    tq = int(ctx.get("placement_score_total") or ctx.get("total_q") or 85)
     pct = int(ctx.get("score_pct") or 0)
 
     pdf.add_page()

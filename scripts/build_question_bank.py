@@ -15,7 +15,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import APP_DIR, BANKS, DOMAIN_SAT_UNIT, HARD_ANSWER_KEYS, _apply_hard_question_units, _enrich_domain_sat_unit
 from latex_parser import (
     parse_enhanced_math_placement_answer_key,
+    parse_enhanced_math_placement_fr_answer_key,
     parse_enhanced_math_placement_tex_file,
+    parse_middle_level_placement_answer_key,
     parse_middle_level_placement_tex_file,
     parse_placement_answer_key,
     parse_placement_tex_file,
@@ -997,19 +999,63 @@ def build_bank():
                             tex_full = pf.read()
                         keys = parse_enhanced_math_placement_answer_key(tex_full)
                     elif topic_key == "middle_level":
+                        with open(full_path, "r", encoding="utf-8") as pf:
+                            tex_full = pf.read()
                         questions = parse_middle_level_placement_tex_file(
                             full_path, topic=topic_key
                         )
-                        keys = {}
+                        keys = parse_middle_level_placement_answer_key(tex_full)
                     else:
                         questions = parse_placement_tex_file(full_path)
                         with open(full_path, "r", encoding="utf-8") as pf:
                             tex_full = pf.read()
                         keys = parse_placement_answer_key(tex_full)
                     for i, q in enumerate(questions):
-                        ca = keys.get(i + 1)
-                        if ca:
+                        qnum = int(q.get("display_number") or (i + 1))
+                        if topic_key in ("enhanced_math_1", "enhanced_math_2"):
+                            if q.get("question_kind") != "mcq":
+                                continue
+                        elif topic_key == "placement_full":
+                            if q.get("question_kind") not in ("mcq", "mcq5"):
+                                continue
+                        key_entry = keys.get(qnum)
+                        if isinstance(key_entry, dict):
+                            ca = key_entry.get("correct_answer")
+                            if ca:
+                                q["correct_answer"] = ca
+                            alts = key_entry.get("answer_alternates")
+                            if alts:
+                                q["answer_alternates"] = alts
+                        elif key_entry:
+                            q["correct_answer"] = str(key_entry)
+                    if topic_key in ("enhanced_math_1", "enhanced_math_2"):
+                        fr_keys = parse_enhanced_math_placement_fr_answer_key(tex_full)
+                        mcq_count = sum(
+                            1 for q in questions if q.get("question_kind") == "mcq"
+                        )
+                        graph_count = sum(
+                            1
+                            for q in questions
+                            if q.get("placement_section") == "graphing"
+                        )
+                        fr_offset = mcq_count + graph_count
+                        for fr_num, entry in fr_keys.items():
+                            idx = fr_offset + fr_num - 1
+                            if idx < 0 or idx >= len(questions):
+                                continue
+                            q = questions[idx]
+                            ca = entry.get("correct_answer")
+                            if not ca:
+                                continue
                             q["correct_answer"] = ca
+                            alts = entry.get("answer_alternates")
+                            if alts:
+                                q["answer_alternates"] = alts
+                            q["question_kind"] = "free_response"
+                    elif topic_key == "middle_level":
+                        for q in questions:
+                            if q.get("correct_answer"):
+                                q["question_kind"] = "free_response"
                 else:
                     questions = parse_tex_file(full_path)
                 if domain == "hard_problem":

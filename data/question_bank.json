@@ -16433,7 +16433,7 @@
         "correct_answer": "A"
       },
       {
-        "stem": "<p>In right triangle \\(\\triangle ABC\\), \\(\\angle B=90^\\circ\\), \\(\\overline{AB}=12\\), and point \\(D\\) lies on \\(\\overline{AC}\\). Segment \\(\\overline{BD}\\) is drawn. Which of the following must be true?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>I.</th><th>\\(\\overline{BC}=12\\tan(\\angle CAB)\\)</th></tr></thead><tbody><tr><td>II.</td><td>\\cos(\\angle ABD)-\\sin(\\angle DBC)=0</td></tr><tr><td>III.</td><td>\\angle ABD=\\angle BDC</td></tr></tbody></table></div>",
+        "stem": "<p>In right triangle \\(\\triangle ABC\\), \\(\\angle B=90^\\circ\\), \\(\\overline{AB}=12\\), and point \\(D\\) lies on \\(\\overline{AC}\\). Segment \\(\\overline{BD}\\) is drawn. Which of the following must be true?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>I.</th><th>\\(\\overline{BC}=12\\tan(\\angle CAB)\\)</th></tr></thead><tbody><tr><td>II.</td><td>\\(\\cos(\\angle ABD)-\\sin(\\angle DBC)=0\\)</td></tr><tr><td>III.</td><td>\\(\\angle ABD=\\angle BDC\\)</td></tr></tbody></table></div>",
         "choices": [
           "I and II only",
           "II and III only",
@@ -18649,7 +18649,7 @@
       {
         "stem": "<p>Equation Reasoning. Solve the equation and determine whether it has one solution, no solution, or infinitely many solutions.</p>\n<div class=\"stem-math-block\">\\[\n4(3x-5)+7=2(6x-9)-1\n\\]</div>\n<p>Show each step and explain your conclusion.</p>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 1,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18657,12 +18657,18 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "No solution, because simplifying gives 12x-13=12x-19.",
+        "answer_alternates": [
+          "no solution",
+          "nosolution",
+          "none"
+        ]
       },
       {
         "stem": "<p>Linear Modeling. A tutoring center charges an enrollment fee plus a constant hourly rate. A student pays &#36;150 for 4 hours and &#36;255 for 9 hours.</p>\n<ol class=\"stem-enumerate\"><li>Write a linear equation for the total cost \\(\\displaystyle C\\) after \\(\\displaystyle h\\) hours.</li><li>Interpret the slope and \\(\\displaystyle C\\)-intercept in context.</li><li>Predict the cost for 14 hours.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 2,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18670,12 +18676,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "C=21h+66; slope is hourly rate 21, intercept is enrollment fee 66; C(14)=360."
       },
       {
         "stem": "<p>Systems and Context. A school sells adult tickets and student tickets for a performance. Adult tickets cost &#36;12 and student tickets cost &#36;8. The school sells 210 tickets and collects &#36;2,120.</p>\n<ol class=\"stem-enumerate\"><li>Define variables and write a system of equations.</li><li>Solve the system.</li><li>Explain what the solution means in context.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 3,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18683,12 +18690,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "a+s=210, 12a+8s=2120; adult 110, student 100."
       },
       {
         "stem": "<p>Linear vs. Exponential. Two savings plans are shown below.</p>\n<div class=\"stem-math-block\">\\[\n\\text{Plan A: } A(n)=250+40n \\qquad \\text{Plan B: } B(n)=250(1.12)^n\n\\]</div>\n<ol class=\"stem-enumerate\"><li>Identify which plan is linear and which is exponential.</li><li>Find the amount in each plan after 5 years.</li><li>Explain which plan is growing faster at year 5 and why.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 4,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18696,12 +18704,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Plan A linear, Plan B exponential; A(5)=450, B(5)\\approx440.59."
       },
       {
         "stem": "<p>Sequences. A geometric sequence begins \\(\\displaystyle 5,15,45,135,\\ldots\\)</p>\n<ol class=\"stem-enumerate\"><li>Write an explicit formula for the \\(\\displaystyle n\\)th term.</li><li>Find the 10th term.</li><li>Compare this sequence to the arithmetic sequence \\(\\displaystyle a_n=5+10(n-1)\\) at \\(\\displaystyle n=10\\).</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 5,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18709,12 +18718,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "a_n=5(3)^n-1; a_10=98,415; arithmetic value is 95."
       },
       {
         "stem": "<p>Statistics and Outliers. The data set gives quiz scores:</p>\n<div class=\"stem-math-block\">\\[\n62,\\ 70,\\ 74,\\ 76,\\ 79,\\ 80,\\ 82,\\ 84,\\ 86,\\ 88,\\ 91,\\ 100\n\\]</div>\n<ol class=\"stem-enumerate\"><li>Find the mean and median.</li><li>Find the interquartile range.</li><li>Explain whether the mean or median better represents the typical score.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 6,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18722,12 +18732,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Mean 81, median 81; IQR 12; either measure is reasonable because the set is fairly balanced."
       },
       {
         "stem": "<p>Bivariate Data. A line of best fit for a data set is \\(\\displaystyle y=-3.6x+92\\).</p>\n<ol class=\"stem-enumerate\"><li>Interpret the slope in context if \\(\\displaystyle x\\) is hours of screen time and \\(\\displaystyle y\\) is test score.</li><li>Predict the score for \\(\\displaystyle x=6\\).</li><li>If the actual score is \\(\\displaystyle 68\\), find and interpret the residual.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 7,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18735,12 +18746,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Slope means each extra hour predicts a 3.6 point lower score; predicted 70.4; residual -2.4."
       },
       {
         "stem": "<p>Pythagorean Theorem and Radicals. A rectangular park is 48 meters long and 20 meters wide.</p>\n<ol class=\"stem-enumerate\"><li>Find the diagonal distance across the park.</li><li>A student walks from one corner to the opposite corner and then back along the outside edges. How many meters shorter is the diagonal path than the edge path from one corner to the opposite corner?</li><li>Explain why the Pythagorean Theorem applies.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 8,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18748,12 +18760,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Diagonal 52 m; edge path 68 m, so diagonal is 16 m shorter."
       },
       {
         "stem": "<p>Coordinate Geometry Classification. Quadrilateral \\(\\displaystyle ABCD\\) has vertices</p>\n<div class=\"stem-math-block\">\\[\nA(-2,1),\\quad B(3,3),\\quad C(5,-2),\\quad D(0,-4).\n\\]</div>\n<p>Classify the quadrilateral as specifically as possible. Support your answer using slope, distance, or both.</p>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 9,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18761,12 +18774,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Square; all four side lengths are \\sqrt29 and adjacent slopes are negative reciprocals."
       },
       {
         "stem": "<p>Transformation and Congruence Proof. Triangle \\(\\displaystyle ABC\\) has vertices</p>\n<div class=\"stem-math-block\">\\[\nA(-3,2),\\quad B(-1,6),\\quad C(2,3).\n\\]</div>\n<p>It is reflected across the \\(\\displaystyle y\\)-axis and then translated 4 units down.</p>\n<ol class=\"stem-enumerate\"><li>Give the coordinates of \\(\\displaystyle A'B'C'\\).</li><li>Explain why \\(\\displaystyle \\triangle ABC\\cong\\triangle A'B'C'\\).</li><li>Name the rigid motions used.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 10,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18774,12 +18788,13 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "A'(3,-2), B'(1,2), C'(-2,-1); reflection and translation preserve distance and angle measure."
       },
       {
         "stem": "<p>Enhanced Challenge: Nonlinear Systems Graphically. Consider the functions</p>\n<div class=\"stem-math-block\">\\[\nf(x)=2^x-1,\\qquad g(x)=x+1.\n\\]</div>\n<ol class=\"stem-enumerate\"><li>Complete a table for \\(\\displaystyle x=-1,0,1,2,3\\) for both functions.</li><li>Estimate all intersection points from the table or a graph.</li><li>Explain what each intersection means as a solution to a system.</li></ol>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\(\\displaystyle x\\)</th><th>\\(\\displaystyle -1\\)</th><th>\\(\\displaystyle 0\\)</th><th>\\(\\displaystyle 1\\)</th><th>\\(\\displaystyle 2\\)</th><th>\\(\\displaystyle 3\\)</th></tr></thead><tbody><tr><td>\\(\\displaystyle f(x)\\)</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>\\(\\displaystyle g(x)\\)</td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>\n<div class=\"stem-figure-wrap stem-figure-wrap--choice\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 220 220\" class=\"stem-tikz-svg stem-tikz-svg--choice\" role=\"img\" aria-label=\"Graph choice\"><line x1=\"20.00\" y1=\"20.00\" x2=\"20.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"31.25\" y1=\"20.00\" x2=\"31.25\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"42.50\" y1=\"20.00\" x2=\"42.50\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"53.75\" y1=\"20.00\" x2=\"53.75\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"65.00\" y1=\"20.00\" x2=\"65.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"76.25\" y1=\"20.00\" x2=\"76.25\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"87.50\" y1=\"20.00\" x2=\"87.50\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"98.75\" y1=\"20.00\" x2=\"98.75\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"110.00\" y1=\"20.00\" x2=\"110.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"121.25\" y1=\"20.00\" x2=\"121.25\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"132.50\" y1=\"20.00\" x2=\"132.50\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"143.75\" y1=\"20.00\" x2=\"143.75\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"155.00\" y1=\"20.00\" x2=\"155.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"166.25\" y1=\"20.00\" x2=\"166.25\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"177.50\" y1=\"20.00\" x2=\"177.50\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"188.75\" y1=\"20.00\" x2=\"188.75\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"200.00\" y1=\"20.00\" x2=\"200.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"200.00\" x2=\"200.00\" y2=\"200.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"188.75\" x2=\"200.00\" y2=\"188.75\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"177.50\" x2=\"200.00\" y2=\"177.50\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"166.25\" x2=\"200.00\" y2=\"166.25\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"155.00\" x2=\"200.00\" y2=\"155.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"143.75\" x2=\"200.00\" y2=\"143.75\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"132.50\" x2=\"200.00\" y2=\"132.50\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"121.25\" x2=\"200.00\" y2=\"121.25\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"110.00\" x2=\"200.00\" y2=\"110.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"98.75\" x2=\"200.00\" y2=\"98.75\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"87.50\" x2=\"200.00\" y2=\"87.50\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"76.25\" x2=\"200.00\" y2=\"76.25\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"65.00\" x2=\"200.00\" y2=\"65.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"53.75\" x2=\"200.00\" y2=\"53.75\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"42.50\" x2=\"200.00\" y2=\"42.50\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"31.25\" x2=\"200.00\" y2=\"31.25\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"20.00\" x2=\"200.00\" y2=\"20.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"20.00\" y1=\"110.00\" x2=\"200.00\" y2=\"110.00\" stroke=\"#333\" stroke-width=\"1.2\"/><line x1=\"110.00\" y1=\"200.00\" x2=\"110.00\" y2=\"20.00\" stroke=\"#333\" stroke-width=\"1.2\"/><text x=\"202.00\" y=\"114.00\" font-size=\"10\" fill=\"#333\">x</text><text x=\"114.00\" y=\"16.00\" font-size=\"10\" fill=\"#333\">y</text><text x=\"20.00\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-8</text><text x=\"31.25\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-7</text><text x=\"42.50\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-6</text><text x=\"53.75\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-5</text><text x=\"65.00\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-4</text><text x=\"76.25\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-3</text><text x=\"87.50\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-2</text><text x=\"98.75\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">-1</text><text x=\"110.00\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">0</text><text x=\"121.25\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">1</text><text x=\"132.50\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">2</text><text x=\"143.75\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">3</text><text x=\"155.00\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">4</text><text x=\"166.25\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">5</text><text x=\"177.50\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">6</text><text x=\"188.75\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">7</text><text x=\"200.00\" y=\"214.00\" text-anchor=\"middle\" font-size=\"9\" fill=\"#43318f\">8</text><text x=\"14.00\" y=\"203.00\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-8</text><text x=\"14.00\" y=\"191.75\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-7</text><text x=\"14.00\" y=\"180.50\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-6</text><text x=\"14.00\" y=\"169.25\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-5</text><text x=\"14.00\" y=\"158.00\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-4</text><text x=\"14.00\" y=\"146.75\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-3</text><text x=\"14.00\" y=\"135.50\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-2</text><text x=\"14.00\" y=\"124.25\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">-1</text><text x=\"14.00\" y=\"113.00\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">0</text><text x=\"14.00\" y=\"101.75\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">1</text><text x=\"14.00\" y=\"90.50\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">2</text><text x=\"14.00\" y=\"79.25\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">3</text><text x=\"14.00\" y=\"68.00\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">4</text><text x=\"14.00\" y=\"56.75\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">5</text><text x=\"14.00\" y=\"45.50\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">6</text><text x=\"14.00\" y=\"34.25\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">7</text><text x=\"14.00\" y=\"23.00\" text-anchor=\"end\" font-size=\"9\" fill=\"#43318f\">8</text></svg></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 11,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -18787,7 +18802,8 @@
         "placement_section_total": 11,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Intersections at approximately (-1.7,-0.7) and (2,3). \\enditemize"
       }
     ],
     "enhanced_math_2": [
@@ -19891,7 +19907,7 @@
       {
         "stem": "<p>Quadratic Modeling. A ball is launched from a platform. Its height in feet after \\(\\displaystyle t\\) seconds is modeled by</p>\n<div class=\"stem-math-block\">\\[\nh(t)=-16t^2+64t+80.\n\\]</div>\n<ol class=\"stem-enumerate\"><li>Find the maximum height and the time when it occurs.</li><li>Find when the ball hits the ground.</li><li>Explain what the \\(\\displaystyle h\\)-intercept means in context.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 1,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19899,12 +19915,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Vertex time t=2; maximum height 144 ft; hits ground at t=5 sec; h(0)=80 is initial height."
       },
       {
         "stem": "<p>Polynomial and Complex Number Fluency.</p>\n<ol class=\"stem-enumerate\"><li>Factor \\(\\displaystyle 2x^2-7x-15\\) completely.</li><li>Solve \\(\\displaystyle 2x^2-7x-15=0\\).</li><li>Simplify \\(\\displaystyle (5-3i)-(2+4i)\\).</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 2,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19912,12 +19929,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "(2x+3)(x-5); x=-3/2,5; 3-7i."
       },
       {
         "stem": "<p>Radicals and Rational Exponents.</p>\n<ol class=\"stem-enumerate\"><li>Simplify \\(\\displaystyle \\sqrt{108x^6}\\) assuming \\(\\displaystyle x\\) is real.</li><li>Rewrite \\(\\displaystyle \\sqrt[3]{x^5}\\) using rational exponents.</li><li>Solve \\(\\displaystyle \\sqrt{x+3}=x+1\\) and check for extraneous solutions.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 3,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19925,12 +19943,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "6|x^3|\\sqrt3; x^5/3; solution x=1 only."
       },
       {
         "stem": "<p>Probability. A bag contains 5 red, 4 blue, and 3 green tiles. Two tiles are drawn without replacement.</p>\n<ol class=\"stem-enumerate\"><li>Find the probability both tiles are blue.</li><li>Find the probability the first tile is red and the second tile is green.</li><li>Find the probability at least one of the two tiles is green.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 4,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19938,12 +19957,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "1/11; 5/44; 5/11."
       },
       {
         "stem": "<p>Similarity and Trigonometry. A person standing 48 feet from a building measures an angle of elevation of \\(\\displaystyle 38^\\circ\\) to the top of the building. The person's eye height is 5 feet.</p>\n<ol class=\"stem-enumerate\"><li>Draw and label a right-triangle model.</li><li>Find the height of the building to the nearest foot.</li><li>State which trigonometric ratio you used and why.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 5,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19951,12 +19971,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "Height \\approx 48\\tan(38^\\circ)+5\\approx 43 ft; tangent is used because opposite and adjacent sides are involved."
       },
       {
         "stem": "<p>Enhanced Statistics. A normally distributed test has mean \\(\\displaystyle 76\\) and standard deviation \\(\\displaystyle 8\\).</p>\n<ol class=\"stem-enumerate\"><li>Find the \\(\\displaystyle z\\)-score for a score of \\(\\displaystyle 92\\).</li><li>Approximate the percentile for a score of \\(\\displaystyle 92\\) using the empirical rule.</li><li>A student scored \\(\\displaystyle 68\\). Explain whether \\(\\displaystyle 92\\) or \\(\\displaystyle 68\\) is more unusual.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 6,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19964,12 +19985,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "z=2; about 97.5th percentile; a score of 92 is more unusual because it is 2 standard deviations above the mean, while 68 is only 1 standard deviation below the mean."
       },
       {
         "stem": "<p>Enhanced Conics.</p>\n<ol class=\"stem-enumerate\"><li>Write the equation of the circle with center \\(\\displaystyle (-3,4)\\) and circumference \\(\\displaystyle 10\\pi\\).</li><li>Write the equation of the ellipse centered at \\(\\displaystyle (1,-2)\\) with horizontal semi-major axis \\(\\displaystyle 5\\) and vertical semi-minor axis \\(\\displaystyle 3\\).</li><li>Write the equation of the parabola with vertex \\(\\displaystyle (0,1)\\) and directrix \\(\\displaystyle y=-1\\).</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 7,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19977,12 +19999,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "(x+3)^2+(y-4)^2=25; (x-1)^2/25+(y+2)^2/9=1; x^2=8(y-1)."
       },
       {
         "stem": "<p>Enhanced Triangle Trigonometry. In \\(\\displaystyle \\triangle ABC\\), \\(\\displaystyle a=12\\), \\(\\displaystyle b=15\\), and \\(\\displaystyle C=42^\\circ\\).</p>\n<ol class=\"stem-enumerate\"><li>Use the Law of Cosines to find side \\(\\displaystyle c\\) to the nearest tenth.</li><li>Find the area of the triangle to the nearest tenth.</li><li>Explain why right-triangle trigonometry alone is not enough for this triangle.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 8,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -19990,12 +20013,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "c\\approx10.0; area \\approx60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed."
       },
       {
         "stem": "<p>Law of Sines and the Ambiguous Case. In \\(\\displaystyle \\triangle ABC\\), \\(\\displaystyle A=35^\\circ\\), \\(\\displaystyle a=12\\), and \\(\\displaystyle b=18\\).</p>\n<ol class=\"stem-enumerate\"><li>Use the Law of Sines to find all possible measures of angle \\(\\displaystyle B\\) to the nearest tenth.</li><li>Find the corresponding possible measures of angle \\(\\displaystyle C\\).</li><li>Explain why this information creates the ambiguous case.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 9,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -20003,12 +20027,13 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "\\sin B=18\\sin35^\\circ/12, so B\\approx59.4^\\circ or 120.6^\\circ; C\\approx85.6^\\circ or 24.4^\\circ."
       },
       {
         "stem": "<p>Circle Relationships and Sector Area.</p>\n<ol class=\"stem-enumerate\"><li>Two chords intersect inside a circle. One chord has segments \\(\\displaystyle 5\\) and \\(\\displaystyle 12\\); the other has segments \\(\\displaystyle 6\\) and \\(\\displaystyle x\\). Find \\(\\displaystyle x\\).</li><li>A circle has radius \\(\\displaystyle 6\\). A sector has area \\(\\displaystyle 15\\pi\\). Find the central angle in radians.</li><li>Find the arc length of that sector.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
         "choices": [],
-        "question_kind": "constructed_response",
+        "question_kind": "free_response",
         "display_number": 10,
         "placement_section": "free_response",
         "placement_section_title": "Free response — modeling & reasoning",
@@ -20016,7 +20041,8 @@
         "placement_section_total": 10,
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
-        "knowledge_section_title_zh": "Free response"
+        "knowledge_section_title_zh": "Free response",
+        "correct_answer": "x=10; central angle \\theta=5\\pi/6; arc length 5\\pi. \\enditemize"
       }
     ],
     "middle_level": [
@@ -20033,7 +20059,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "3.14"
       },
       {
         "stem": "<p>Seventy-five beans were equally divided into five pots. How many beans were in each pot?</p>",
@@ -20048,7 +20075,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "15",
+        "answer_alternates": [
+          "15 beans"
+        ]
       },
       {
         "stem": "<p>Robo could run 7 miles in 1 hour. At that rate, how many miles could Robo run in 3 hours?</p>",
@@ -20063,7 +20094,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "21",
+        "answer_alternates": [
+          "21 miles"
+        ]
       },
       {
         "stem": "<p>At 11:45 A.M. Jason glanced at the clock. His doctor's appointment was in \\(2\\frac12\\) hours. At what time was his appointment?</p>",
@@ -20078,7 +20113,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "2:15 PM",
+        "answer_alternates": [
+          "2:15 P.M."
+        ]
       },
       {
         "stem": "<p>Find the sixth number in this counting sequence:</p>\n<div class=\"stem-math-block\">\\[\n7,\\ 14,\\ 21,\\ \\ldots\n\\]</div>",
@@ -20093,7 +20132,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "42"
       },
       {
         "stem": "<p>Write the number of shaded rectangles shown as a mixed number.  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Shaded rectangles\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/rectmixed.png\" alt=\"Shaded rectangles\" loading=\"lazy\" data-ml-figure=\"rectmixed\" style=\"max-width:240px\" /></div></p>",
@@ -20108,7 +20148,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "3 1/6"
       },
       {
         "stem": "<p>Twenty-five percent of this square is shaded. What percent of the square is not shaded?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Square with one quarter shaded\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/quarterSquare.png\" alt=\"Square with one quarter shaded\" loading=\"lazy\" data-ml-figure=\"quarterSquare\" style=\"max-width:120px\" /></div></p>",
@@ -20123,7 +20164,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "75\\%"
       },
       {
         "stem": "<p>What is the perimeter of this rectangle?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"6 inch by 4 inch rectangle\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/rectangleSixFour.png\" alt=\"6 inch by 4 inch rectangle\" loading=\"lazy\" data-ml-figure=\"rectangleSixFour\" style=\"max-width:200px\" /></div></p>",
@@ -20138,7 +20180,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "20",
+        "answer_alternates": [
+          "20 in."
+        ]
       },
       {
         "stem": "<p>A square has one side that is 7 inches long. What is the area of the square?</p>",
@@ -20153,7 +20199,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "49",
+        "answer_alternates": [
+          "49 sq. in."
+        ]
       },
       {
         "stem": "<p>To what number is the arrow pointing?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Number line near 286\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/numberLineTwoEightSix.png\" alt=\"Number line near 286\" loading=\"lazy\" data-ml-figure=\"numberLineTwoEightSix\" style=\"max-width:320px\" /></div></p>",
@@ -20168,7 +20218,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "286"
       },
       {
         "stem": "<p>Add:</p>\n<div class=\"stem-math-block\">\\[\n4.2+3.5+0.25+4.0\n\\]</div>",
@@ -20183,7 +20234,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "11.95"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"placement-vertical-op placement-vertical-op--mul\" role=\"math\" aria-label=\"multiplication\"><div class=\"placement-vertical-op__row\">460</div><div class=\"placement-vertical-op__row placement-vertical-op__row--op\">× 9</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div></div>",
@@ -20198,7 +20250,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "4140"
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-figure-wrap stem-figure-wrap--middle stem-figure-wrap--longdiv\" role=\"img\" aria-label=\"long division\"><img class=\"stem-figure-img stem-figure-img--placement-middle stem-figure-img--longdiv\" src=\"/static/placement_middle/longdiv_6_3795.png\" alt=\"Long division\" loading=\"lazy\" style=\"max-width:140px\" /></div>",
@@ -20213,7 +20266,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "632 R3",
+        "answer_alternates": [
+          "632 R3"
+        ]
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n6\\times 4\\times 10\n\\]</div>",
@@ -20228,7 +20285,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "240"
       },
       {
         "stem": "<p>Add:</p>\n<div class=\"placement-vertical-op placement-vertical-op--add\" role=\"math\" aria-label=\"addition\"><div class=\"placement-vertical-op__row\">$4.86</div><div class=\"placement-vertical-op__row\">+$2.95</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div></div>",
@@ -20243,7 +20301,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "7.81"
       },
       {
         "stem": "<p>Find the missing number:</p>\n<div class=\"placement-vertical-op placement-vertical-op--add\" role=\"math\" aria-label=\"addition\"><div class=\"placement-vertical-op__row\">z</div><div class=\"placement-vertical-op__row\">+179</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div><div class=\"placement-vertical-op__row\">496</div></div>",
@@ -20258,7 +20317,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "317"
       },
       {
         "stem": "<p>Find the missing number:</p>\n<div class=\"placement-vertical-op placement-vertical-op--sub\" role=\"math\" aria-label=\"subtraction\"><div class=\"placement-vertical-op__row\">67</div><div class=\"placement-vertical-op__row\">-B</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div><div class=\"placement-vertical-op__row\">16</div></div>",
@@ -20273,7 +20333,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "51"
       },
       {
         "stem": "<p>Use digits to write the number three hundred forty-three.</p>",
@@ -20288,7 +20349,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "343"
       },
       {
         "stem": "<p>Which digit in \\(6.125\\) is in the hundredths place?</p>",
@@ -20303,7 +20365,8 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "2"
       },
       {
         "stem": "<p>What is the length of \\(\\overline{ST}\\)?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Ruler from R to T\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/rulerST.png\" alt=\"Ruler from R to T\" loading=\"lazy\" data-ml-figure=\"rulerST\" style=\"max-width:360px\" /></div></p>",
@@ -20318,7 +20381,11 @@
         "placement_global_total": 100,
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
-        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness"
+        "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
+        "correct_answer": "5",
+        "answer_alternates": [
+          "5 cm"
+        ]
       },
       {
         "stem": "<p>In 2 hours the 3 boys picked a total of 1347 cherries. If they share the cherries evenly, then each boy will get how many cherries?</p>",
@@ -20333,7 +20400,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "449 cherries"
       },
       {
         "stem": "<p>After paying \\(&#36;7.50\\) for a movie ticket, Salvador still had \\(&#36;3.75\\). How much money did Salvador have before paying for a ticket?</p>",
@@ -20348,7 +20416,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "11.25"
       },
       {
         "stem": "<p>When three new members joined the club, the number of members increased to 28. How many members were in the club before the new members arrived?</p>",
@@ -20363,7 +20432,11 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "25",
+        "answer_alternates": [
+          "25 members"
+        ]
       },
       {
         "stem": "<p>Adriana's age is \\(\\frac13\\) of her dad's age. If her dad is 36 years old, how old is Adriana?</p>",
@@ -20378,7 +20451,11 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "12",
+        "answer_alternates": [
+          "12 years old"
+        ]
       },
       {
         "stem": "<p>Estimate the sum of 672 and 830 by rounding to the nearest hundred before adding.</p>",
@@ -20393,7 +20470,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "1500"
       },
       {
         "stem": "<p>Use digits to write eight hundred eighteen thousand, eighty.</p>",
@@ -20408,7 +20486,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "818,080"
       },
       {
         "stem": "<p>Add:</p>\n<div class=\"placement-vertical-op placement-vertical-op--add\" role=\"math\" aria-label=\"addition\"><div class=\"placement-vertical-op__row\">$2.54</div><div class=\"placement-vertical-op__row\">$5.36</div><div class=\"placement-vertical-op__row\">+$0.75</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div></div>",
@@ -20423,7 +20502,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "8.65"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n7\\times 8\\times 10\n\\]</div>",
@@ -20438,7 +20518,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "560"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"placement-vertical-op placement-vertical-op--mul\" role=\"math\" aria-label=\"multiplication\"><div class=\"placement-vertical-op__row\">4287</div><div class=\"placement-vertical-op__row placement-vertical-op__row--op\">× 5</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div></div>",
@@ -20453,7 +20534,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "21,435"
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-figure-wrap stem-figure-wrap--middle stem-figure-wrap--longdiv\" role=\"img\" aria-label=\"long division\"><img class=\"stem-figure-img stem-figure-img--placement-middle stem-figure-img--longdiv\" src=\"/static/placement_middle/longdiv_6_3647.png\" alt=\"Long division\" loading=\"lazy\" style=\"max-width:140px\" /></div>",
@@ -20468,7 +20550,11 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "607 R5",
+        "answer_alternates": [
+          "607 R5"
+        ]
       },
       {
         "stem": "<p>Subtract:</p>\n<div class=\"placement-vertical-op placement-vertical-op--sub\" role=\"math\" aria-label=\"subtraction\"><div class=\"placement-vertical-op__row\">41026</div><div class=\"placement-vertical-op__row\">-39543</div><div class=\"placement-vertical-op__rule\" aria-hidden=\"true\"></div></div>",
@@ -20483,7 +20569,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "1483"
       },
       {
         "stem": "<p>Find \\(m\\):</p>\n<div class=\"stem-math-block\">\\[\n30m=6000\n\\]</div>",
@@ -20498,7 +20585,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "200"
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n&#36;10-(&#36;5.80+28\\text{ cents})\n\\]</div>",
@@ -20513,7 +20601,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "3.92"
       },
       {
         "stem": "<p>Add:</p>\n<div class=\"stem-math-block\">\\[\n1\\frac34+1\\frac34\n\\]</div>",
@@ -20528,7 +20617,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "3 1/2"
       },
       {
         "stem": "<p>Find the missing number:</p>\n<div class=\"stem-math-block\">\\[\n\\frac{7}{25}=\\frac{\\phantom{00}}{100}\n\\]</div>",
@@ -20543,7 +20633,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "28"
       },
       {
         "stem": "<p>Half of 100 is 50, and half of 50 is 25. What number is half of 25?</p>",
@@ -20558,7 +20649,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "12 1/2"
       },
       {
         "stem": "<p>A stop sign is the shape of an octagon. An octagon has how many sides?</p>",
@@ -20573,7 +20665,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "8 sides"
       },
       {
         "stem": "<p>What are the next three terms in this counting sequence?</p>\n<div class=\"stem-math-block\">\\[\n\\ldots,\\ 2700,\\ 2800,\\ 2900,\\ \\underline{\\phantom{000}},\\ \\underline{\\phantom{000}},\\ \\underline{\\phantom{000}},\\ \\ldots\n\\]</div>",
@@ -20588,7 +20681,8 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "3000, 3100, 3200"
       },
       {
         "stem": "<p>This rectangle is half as wide as it is long. What is the perimeter of the rectangle?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Rectangle on ruler\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/rectRuler.png\" alt=\"Rectangle on ruler\" loading=\"lazy\" data-ml-figure=\"rectRuler\" style=\"max-width:260px\" /></div></p>",
@@ -20603,7 +20697,11 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "12",
+        "answer_alternates": [
+          "12 cm"
+        ]
       },
       {
         "stem": "<p>The length of segment \\(\\overline{AC}\\) is 78 millimeters. If \\(\\overline{BC}\\) is 29 millimeters, then what is the length of segment \\(\\overline{AB}\\)?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Segment A-B-C\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/segmentABC.png\" alt=\"Segment A-B-C\" loading=\"lazy\" data-ml-figure=\"segmentABC\" style=\"max-width:300px\" /></div></p>",
@@ -20618,7 +20716,11 @@
         "placement_global_total": 100,
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
-        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness"
+        "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
+        "correct_answer": "49",
+        "answer_alternates": [
+          "49 mm"
+        ]
       },
       {
         "stem": "<p>Which digit is in the hundred-thousands place in the number \\(987,654,321\\)?</p>",
@@ -20633,7 +20735,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "6"
       },
       {
         "stem": "<p>Write the number twenty-one and five hundredths.</p>",
@@ -20648,7 +20751,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "21.05"
       },
       {
         "stem": "<p>In an auditorium there are 25 rows with 18 chairs in each row. How many chairs are in the auditorium?</p>",
@@ -20663,7 +20767,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "450 chairs"
       },
       {
         "stem": "<p>The average pumpkin weighs 6 pounds. The prize-winning pumpkin weighs 324 pounds. The prize-winning pumpkin weighs as much as how many average pumpkins?</p>",
@@ -20678,7 +20783,11 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "54",
+        "answer_alternates": [
+          "54 average pumpkins"
+        ]
       },
       {
         "stem": "<p>What is the total price of a \\(&#36;45.79\\) item when \\(7\\%\\) sales tax is added?</p>",
@@ -20693,7 +20802,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "49.00"
       },
       {
         "stem": "<p>How many quarter-pound hamburgers can be made from 100 pounds of ground beef?</p>",
@@ -20708,7 +20818,11 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "400",
+        "answer_alternates": [
+          "400 hamburgers"
+        ]
       },
       {
         "stem": "<p>There were 13 original states. There are now 50 states. What fraction of the states are the original states?</p>",
@@ -20723,7 +20837,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "13/50"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n\\frac83\\cdot\\frac31\n\\]</div>",
@@ -20738,7 +20853,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "8"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n3.7\\times 0.25\n\\]</div>",
@@ -20753,7 +20869,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "0.925"
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-math-block\">\\[\n0.8\\div 5\n\\]</div>",
@@ -20768,7 +20885,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "0.16"
       },
       {
         "stem": "<p>Add:</p>\n<div class=\"stem-math-block\">\\[\n2\\frac12+1\\frac16\n\\]</div>",
@@ -20783,7 +20901,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "3 2/3"
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-math-block\">\\[\n\\frac34\\div 1\\frac12\n\\]</div>",
@@ -20798,7 +20917,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "\\frac12"
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n2^3+\\sqrt{25}\\cdot 3-4^2\\div \\sqrt{4}\n\\]</div>",
@@ -20813,7 +20933,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "15"
       },
       {
         "stem": "<p>What is the average of \\(4.2,\\ 2.61,\\) and \\(3.6\\)?</p>",
@@ -20828,7 +20949,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "3.47"
       },
       {
         "stem": "<p>The area of a square is \\(64\\text{ cm}^2\\). What is the perimeter of the square?</p>",
@@ -20843,7 +20965,11 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "32",
+        "answer_alternates": [
+          "32 cm"
+        ]
       },
       {
         "stem": "<p>What is the area of this polygon?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"L-shaped polygon\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/lShapeArea.png\" alt=\"L-shaped polygon\" loading=\"lazy\" data-ml-figure=\"lShapeArea\" style=\"max-width:340px\" /></div></p>",
@@ -20858,7 +20984,11 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "138",
+        "answer_alternates": [
+          "138 m^2"
+        ]
       },
       {
         "stem": "<p>Find \\(w\\):</p>\n<div class=\"stem-math-block\">\\[\n26.9+12+w=49.25\n\\]</div>",
@@ -20873,7 +21003,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "10.35"
       },
       {
         "stem": "<p>If \\(d=rt\\), and if \\(r=60\\) and \\(t=4\\), what does \\(d\\) equal?</p>",
@@ -20888,7 +21019,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "240"
       },
       {
         "stem": "<p>Complete the table.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Fraction</th><th>Decimal</th><th>Percent</th></tr></thead><tbody><tr><td>\\(\\frac{5}{8}\\)</td><td>0.625</td><td>\\(\\underline{\\phantom{000}}\\)</td></tr></tbody></table></div>",
@@ -20903,7 +21035,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "62.5\\%"
       },
       {
         "stem": "<p>Complete the table.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Fraction</th><th>Decimal</th><th>Percent</th></tr></thead><tbody><tr><td>\\(\\underline{\\phantom{000}}\\)</td><td>1.25</td><td>125&#37;</td></tr></tbody></table></div>",
@@ -20918,7 +21051,8 @@
         "placement_global_total": 100,
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
-        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness"
+        "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
+        "correct_answer": "1 1/4"
       },
       {
         "stem": "<p>Round \\(7.49362\\) to the nearest thousandth.</p>",
@@ -20933,7 +21067,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "7.494"
       },
       {
         "stem": "<p>President Franklin D. Roosevelt died in office in 1945 at the age of 63. In what year was he born?</p>",
@@ -20948,7 +21083,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "1882"
       },
       {
         "stem": "<p>Eric ran 8 laps in 11 minutes 44 seconds. How many seconds did it take Eric to run 8 laps?</p>",
@@ -20963,7 +21099,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "704",
+        "answer_alternates": [
+          "704 seconds"
+        ]
       },
       {
         "stem": "<p>A one-quart container of oil costs 89 cents. A case of 12 one-quart containers costs \\(&#36;8.64\\). How much is saved per container by buying the oil by the case?</p>",
@@ -20978,7 +21118,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "0.17",
+        "answer_alternates": [
+          "0.17 per container"
+        ]
       },
       {
         "stem": "<p>Ricardo ran the 400-meter race 3 times. His fastest time was 54.3 seconds. His slowest time was 56.1 seconds. If his average time was 55.0 seconds, what was his time for the third race?</p>",
@@ -20993,7 +21137,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "54.6",
+        "answer_alternates": [
+          "54.6 seconds"
+        ]
       },
       {
         "stem": "<p>The perimeter of a square is one yard. What is the area of the square in square inches?</p>",
@@ -21008,7 +21156,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "81",
+        "answer_alternates": [
+          "81 square inches"
+        ]
       },
       {
         "stem": "<p>The perimeter of the square equals the perimeter of the regular pentagon. Each side of the pentagon is 16 cm long. How long is each side of the square?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Square and pentagon\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/pentagonSquare.png\" alt=\"Square and pentagon\" loading=\"lazy\" data-ml-figure=\"pentagonSquare\" style=\"max-width:200px\" /></div></p>",
@@ -21023,7 +21175,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "20",
+        "answer_alternates": [
+          "20 cm"
+        ]
       },
       {
         "stem": "<p>Find the volume of the triangular prism shown. Dimensions are in millimeters.  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Triangular prism\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/triPrism.png\" alt=\"Triangular prism\" loading=\"lazy\" data-ml-figure=\"triPrism\" style=\"max-width:300px\" /></div></p>",
@@ -21038,7 +21194,11 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "30,000",
+        "answer_alternates": [
+          "30,000 mm^3"
+        ]
       },
       {
         "stem": "<p>The sale price of an item on sale for \\(40\\%\\) off is \\(&#36;48\\). What was the regular price?</p>",
@@ -21053,7 +21213,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "80"
       },
       {
         "stem": "<p>A bag contains 3 red marbles, 4 white marbles, and 5 blue marbles. If one marble is drawn from the bag, what is the probability that the marble will be blue?</p>",
@@ -21068,7 +21229,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "5/12"
       },
       {
         "stem": "<p>Find \\(w\\):</p>\n<div class=\"stem-math-block\">\\[\n6w=6^3\n\\]</div>",
@@ -21083,7 +21245,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "36"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n4\\frac45\\cdot 1\\frac19\\cdot 1\\frac78\n\\]</div>",
@@ -21098,7 +21261,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "10"
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n3\\frac56-\\left(\\frac23-\\frac12\\right)\n\\]</div>",
@@ -21113,7 +21277,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "3 2/3"
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n(0.15)(0.05)\n\\]</div>",
@@ -21128,7 +21293,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "0.0075"
       },
       {
         "stem": "<p>Find \\(a\\):</p>\n<div class=\"stem-math-block\">\\[\n\\frac{1.2}{4.4}=\\frac{3}{a}\n\\]</div>",
@@ -21143,7 +21309,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "11"
       },
       {
         "stem": "<p>If \\(\\frac{w}{x}=3\\), what does \\(\\frac{x}{w}\\) equal?</p>",
@@ -21158,7 +21325,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "\\frac13"
       },
       {
         "stem": "<p>Write a fraction equal to \\(\\frac12\\) with a denominator of 6 and a fraction equal to \\(\\frac13\\) with a denominator of 6. Then add the fractions.</p>",
@@ -21173,7 +21341,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "\\frac56"
       },
       {
         "stem": "<p>Evaluate:</p>\n<div class=\"stem-math-block\">\\[\nx^3-xy-\\frac{x}{y}\\quad\\text{if }x=2\\text{ and }y=0.5\n\\]</div>",
@@ -21188,7 +21357,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "3"
       },
       {
         "stem": "<p>Forty percent of what number is 60?</p>",
@@ -21203,7 +21373,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "150"
       },
       {
         "stem": "<p>Only three-tenths of the print area of the newspaper carried news. The rest of the area was filled with advertisements. What percent of the print area was filled with advertisements?</p>",
@@ -21218,7 +21389,8 @@
         "placement_global_total": 100,
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
-        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness"
+        "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
+        "correct_answer": "70\\%"
       },
       {
         "stem": "<p>The first flock contained 5283 birds. The second flock contained 5 times as many birds. The third flock had twice as many birds as the second flock. How many birds were there in all?</p>",
@@ -21233,7 +21405,11 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "84,528",
+        "answer_alternates": [
+          "84,528 birds"
+        ]
       },
       {
         "stem": "<p>The whole batch cost \\(&#36;28,000\\) and contained 140 items. Write the two rates (ratios) implied by this statement. What would be the price for 200 items?</p>",
@@ -21248,7 +21424,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "40,000"
       },
       {
         "stem": "<p>For 4 hours Sam traveled at 40 miles per hour. Then he increased his speed to 60 miles per hour and drove for another 3 hours. How far did he go in the 7 hours he traveled?</p>",
@@ -21263,7 +21440,11 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "340",
+        "answer_alternates": [
+          "340 mi"
+        ]
       },
       {
         "stem": "<p>The ratio of roses to snapdragons was 4 to 5. If there were 26,000 roses on the float, how many snapdragons were there?</p>",
@@ -21278,7 +21459,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "32,500"
       },
       {
         "stem": "<p>The number of red frogs exceeded the number of blue frogs by 80. The number of green frogs was 20 less than the number of blue frogs. If there were 120 blue fogs, what was the sum of the reds, the blues, and the greens?</p>",
@@ -21293,7 +21475,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "420 frogs"
       },
       {
         "stem": "<p>Six times a number is 45 greater than the product of the number and \\(-3\\). Find the number.</p>",
@@ -21308,7 +21491,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "5"
       },
       {
         "stem": "<p>If 200 is increased by 130 percent, what is the resulting number?</p>",
@@ -21323,7 +21507,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "460"
       },
       {
         "stem": "<div class=\"stem-figure-row stem-figure-row--stacked\"><div class=\"stem-figure-row__text\">Find \\(x\\).</div><div class=\"stem-figure-row__fig\"><div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Similar triangles\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/similarTriangles.png\" alt=\"Similar triangles\" loading=\"lazy\" data-ml-figure=\"similarTriangles\" style=\"max-width:240px\" /></div></div></div>",
@@ -21338,7 +21523,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "11/9"
       },
       {
         "stem": "<div class=\"stem-figure-row stem-figure-row--stacked\"><div class=\"stem-figure-row__text\">Find the surface area of this right solid. Dimensions are in centimeters.</div><div class=\"stem-figure-row__fig\"><div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Trapezoidal prism\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/trapezoidSolid.png\" alt=\"Trapezoidal prism\" loading=\"lazy\" data-ml-figure=\"trapezoidSolid\" style=\"max-width:220px\" /></div></div></div>",
@@ -21353,7 +21539,11 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "736",
+        "answer_alternates": [
+          "736 cm^2"
+        ]
       },
       {
         "stem": "<div class=\"stem-figure-row stem-figure-row--stacked\"><div class=\"stem-figure-row__text\">What is the volume in cubic meters of the right solid whose base is the figure shown on the left and whose sides are 200 centimeters tall? Dimensions are in meters. All angles are right angles.</div><div class=\"stem-figure-row__fig\"><div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Composite solid base\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/baseSolid.png\" alt=\"Composite solid base\" loading=\"lazy\" data-ml-figure=\"baseSolid\" style=\"max-width:280px\" /></div></div></div>",
@@ -21368,7 +21558,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "800 m^3"
       },
       {
         "stem": "<p>Write \\(0.000387\\) in scientific notation.</p>",
@@ -21383,7 +21574,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "3.87e-4"
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-math-block\">\\[\n\\frac{1821.5}{0.7}\n\\]</div>",
@@ -21398,7 +21590,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "2602.142857"
       },
       {
         "stem": "<p>Subtract:</p>\n<div class=\"stem-math-block\">\\[\n9\\frac{2}{14}-3\\frac{15}{21}\n\\]</div>",
@@ -21413,7 +21606,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "5 3/7"
       },
       {
         "stem": "<p>Subtract:</p>\n<div class=\"stem-math-block\">\\[\n9876.5-643.99\n\\]</div>",
@@ -21428,7 +21622,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "9232.51"
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n3\\frac12\\times 6\\frac13\\div 2\\frac13\\times 1\\frac13\n\\]</div>",
@@ -21443,7 +21638,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "38/3"
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n3^2+3\\left[2^3\\left(\\sqrt{49}-2^2\\right)\\left(3^2-2^3\\right)-2^2\\right]\n\\]</div>",
@@ -21458,7 +21654,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "69"
       },
       {
         "stem": "<p>Reduce to lowest terms:</p>\n<div class=\"stem-math-block\">\\[\n\\frac{102}{170}\n\\]</div>",
@@ -21473,7 +21670,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "\\frac35"
       },
       {
         "stem": "<p>Convert \\(250.025\\) to a mixed number.</p>",
@@ -21488,7 +21686,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "250 1/40"
       },
       {
         "stem": "<p>Use two unit multipliers to convert 144 square feet to square miles. Round any decimal answer to two places.</p>",
@@ -21503,7 +21702,11 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "5.17e-6",
+        "answer_alternates": [
+          "5.17e-6 mi^2"
+        ]
       },
       {
         "stem": "<p>Evaluate:</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt[m]{p}+\\frac{x}{\\sqrt{p}}\\quad\\text{if }p=16,\\ m=4,\\text{ and }x=3\n\\]</div>",
@@ -21518,7 +21721,8 @@
         "placement_global_total": 100,
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
-        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness"
+        "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
+        "correct_answer": "2 3/4"
       }
     ]
   }

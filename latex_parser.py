@@ -1961,3 +1961,115 @@ def parse_middle_level_placement_tex_file(path: str, *, topic: str = "middle_lev
             }
         )
     return questions
+
+
+def _strip_latex_answer_text(raw: str) -> str:
+    """Turn an answer-key \\item body into plain text for auto-grading."""
+    s = raw.strip()
+    s = re.sub(r"^\\item\s*", "", s)
+    s = s.replace(r"\$", "").replace("$", "")
+    s = re.sub(r"\\overline\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\text\{([^}]*)\}", r"\1", s)
+    s = re.sub(r"\\(?:left|right)", "", s)
+    s = re.sub(
+        r"(\d+)\\frac\{(\d+)\}\{(\d+)\}",
+        lambda m: f"{m.group(1)} {m.group(2)}/{m.group(3)}",
+        s,
+    )
+    s = re.sub(
+        r"(\d+)\\frac(\d)(\d)",
+        lambda m: f"{m.group(1)} {m.group(2)}/{m.group(3)}",
+        s,
+    )
+    s = re.sub(r"\\frac\{([^}]+)\}\{([^}]+)\}", r"\1/\2", s)
+    s = re.sub(r"\\times\s*10\^\{([^}]+)\}", r"e\1", s)
+    s = re.sub(r"\^\{([^}]+)\}", r"^\1", s)
+    s = re.sub(r"\\[(),]", "", s)
+    s = re.sub(r"\{|\}", "", s)
+    s = re.sub(r"\\end\{item\}", "", s, flags=re.I)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
+def _normalize_middle_level_answer(raw: str) -> str:
+    s = _strip_latex_answer_text(raw)
+    s = re.sub(
+        r"\s+(beans|miles|mi|in\.|sq\. in\.|square inches|members|years old|cm|mm|seconds|birds|hamburgers|average pumpkins|containers|m\^2|mm\^3|mi\^2|per container).*$",
+        "",
+        s,
+        flags=re.I,
+    )
+    s = s.replace("P.M.", "PM").replace("A.M.", "AM")
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
+def _middle_level_answer_alternates(raw: str, canonical: str) -> list[str]:
+    alts: list[str] = []
+    plain = _strip_latex_answer_text(raw)
+    if plain and plain != canonical:
+        alts.append(plain)
+    if " R" in plain.upper():
+        alts.append(plain)
+    return list(dict.fromkeys(a for a in alts if a))
+
+
+def parse_middle_level_placement_answer_key(tex: str) -> dict[int, dict[str, Any]]:
+    """Parse the 100-item Answer Key enumerate from Placement_Middle_Level.tex."""
+    out: dict[int, dict[str, Any]] = {}
+    key_m = re.search(
+        r"\\section\*\{Answer Key\}(.*?)\\end\{document\}",
+        tex,
+        flags=re.S,
+    )
+    if not key_m:
+        return out
+    block = key_m.group(1)
+    enum_m = re.search(r"\\begin\{enumerate\}(.*?)\\end\{enumerate\}", block, flags=re.S)
+    if not enum_m:
+        return out
+    items = _split_top_level_enumerate_items(enum_m.group(0))
+    for i, raw in enumerate(items, start=1):
+        if i > 100:
+            break
+        canonical = _normalize_middle_level_answer(raw)
+        if not canonical:
+            continue
+        entry: dict[str, Any] = {"correct_answer": canonical}
+        alts = _middle_level_answer_alternates(raw, canonical)
+        if alts:
+            entry["answer_alternates"] = alts
+        out[i] = entry
+    return out
+
+
+def parse_enhanced_math_placement_fr_answer_key(tex: str) -> dict[int, dict[str, Any]]:
+    """Parse FR1–FRn selected answers from Enhanced Math placement TeX."""
+    out: dict[int, dict[str, Any]] = {}
+    block_m = re.search(
+        r"Selected Free Response Answers(.*?)\\end\{document\}",
+        tex,
+        flags=re.S | re.I,
+    )
+    if not block_m:
+        return out
+    block = block_m.group(1)
+    for m in re.finditer(r"\\item\s+FR(\d+):\s*(.+?)(?=\\item\s+FR|\Z)", block, flags=re.S):
+        n = int(m.group(1))
+        raw = m.group(2).strip()
+        text = _strip_latex_answer_text(raw)
+        if not text:
+            continue
+        entry: dict[str, Any] = {"correct_answer": text}
+        alts: list[str] = []
+        if "no solution" in text.lower():
+            alts.extend(["no solution", "nosolution", "none"])
+        if len(text) <= 24 and re.fullmatch(
+            r"[-+]?\d+(?:\.\d+)?(?:/\d+)?",
+            text.replace(",", "").strip(),
+        ):
+            alts.append(text.replace(",", ""))
+        if alts:
+            entry["answer_alternates"] = list(dict.fromkeys(alts))
+        out[n] = entry
+    return out

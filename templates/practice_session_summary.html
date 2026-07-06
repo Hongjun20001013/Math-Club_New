@@ -52,14 +52,19 @@
       <div class="np-summary-hero-visual">
         <div class="np-score-pedestal">
         <div class="np-score-ring-wrap">
+          {% set score_den = placement_score_total if domain == 'placement' and placement_score_total else total_q %}
           <div class="np-score-ring" style="--pct: {{ score_pct }};">
             <div class="np-score-ring-inner">
               <span class="np-score-num">{{ correct_count }}</span>
-              <span class="np-score-den">/ {{ total_q }}</span>
+              <span class="np-score-den">/ {{ score_den }}</span>
             </div>
           </div>
           <p class="np-score-pct"><span id="np-score-pct-num" data-target="{{ score_pct }}">0</span>% correct</p>
+          {% if domain == 'placement' %}
+          <p class="np-summary-score-foot">{{ correct_count }} correct of {{ score_den }} auto-graded items{% if placement_ungraded_count %} · {{ answered_count }} answered overall ({{ placement_ungraded_count }} graphing item(s) need teacher review){% else %} · {{ answered_count }} answered{% endif %}</p>
+          {% else %}
           <p class="np-summary-score-foot">{{ correct_count }} correct of {{ total_q }} questions in this set</p>
+          {% endif %}
         </div>
         </div>
       </div>
@@ -404,6 +409,8 @@
             <span class="np-badge np-badge-bad">Incorrect</span>
           {% elif row.status == 'nocheck' %}
             <span class="np-badge np-badge-muted">Key N/A</span>
+          {% elif row.status == 'submitted' %}
+            <span class="np-badge np-badge-muted">Submitted</span>
           {% else %}
             <span class="np-badge np-badge-muted">Skipped</span>
           {% endif %}
