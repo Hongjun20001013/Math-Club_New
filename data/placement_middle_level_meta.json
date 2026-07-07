@@ -7,11 +7,11 @@
   },
   "calculator_by_index": {},
   "bands": [
-    {"code": "I", "range": "1–20", "label": "Math 5/4 readiness", "advance_label": "Math 6 readiness"},
-    {"code": "II", "range": "21–40", "label": "Math 6/5 readiness", "advance_label": "Math 7 readiness"},
-    {"code": "III", "range": "41–60", "label": "Math 7/6 readiness", "advance_label": "Math 8 readiness"},
-    {"code": "IV", "range": "61–80", "label": "Math 8/7 readiness", "advance_label": "Algebra 1/2 readiness"},
-    {"code": "V", "range": "81–100", "label": "Algebra 1/2 readiness", "advance_label": "Algebra 1 or higher diagnostic"}
+    {"code": "I", "range": "1–20", "label": "Math 5/4 readiness", "label_zh": "Math 5/4 准备度", "advance_label": "Math 6 readiness"},
+    {"code": "II", "range": "21–40", "label": "Math 6/5 readiness", "label_zh": "Math 6/5 准备度", "advance_label": "Math 7 readiness"},
+    {"code": "III", "range": "41–60", "label": "Math 7/6 readiness", "label_zh": "Math 7/6 准备度", "advance_label": "Math 8 readiness"},
+    {"code": "IV", "range": "61–80", "label": "Math 8/7 readiness", "label_zh": "Math 8/7 准备度", "advance_label": "Algebra 1/2 readiness"},
+    {"code": "V", "range": "81–100", "label": "Algebra 1/2 readiness", "label_zh": "Algebra 1/2 准备度", "advance_label": "Algebra 1 or higher diagnostic"}
   ],
   "score_band_rubric": [
     {

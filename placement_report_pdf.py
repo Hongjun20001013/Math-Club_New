@@ -866,6 +866,12 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
     if FPDF is None or XPos is None or YPos is None:
         raise ImportError(_FPDF2_INSTALL_HINT)
 
+    intelligent = ctx.get("intelligent_report")
+    if isinstance(intelligent, dict) and intelligent.get("report_kind") == "bilingual_assessment":
+        from placement_bilingual_pdf import build_bilingual_assessment_pdf
+
+        return build_bilingual_assessment_pdf(intelligent)
+
     rows: list[dict[str, Any]] = ctx.get("rows") or []
     placement_rec: dict[str, Any] | None = ctx.get("placement_rec")
     placement_gate_scores: list[dict[str, Any]] = ctx.get("placement_gate_scores") or []

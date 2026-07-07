@@ -46,6 +46,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
+from placement_intelligent_report import build_intelligent_placement_report
 
 # =====================================================
 # BASIC CONFIG
@@ -12014,6 +12015,26 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
             if not placement_brand.get("trust_line_zh"):
                 placement_brand["trust_line_zh"] = "分数区间与纸质分班测试官方说明一致。"
 
+    placement_intelligent_report: dict | None = None
+    if domain == "placement":
+        placement_intelligent_report = build_intelligent_placement_report(
+            topic=topic,
+            topic_title=TOPIC_TITLES.get(topic, topic),
+            attempt_id=attempt_id,
+            rows=rows_out,
+            questions=questions,
+            section_stats=section_stats,
+            placement_student=placement_student,
+            placement_rec=placement_rec,
+            placement_gate_scores=placement_gate_scores,
+            correct_count=correct_count,
+            gradable_total=placement_gradable_total if placement_gradable_total else total_q,
+            score_pct=score_pct,
+            meta=placement_meta if domain == "placement" else {},
+        )
+        if not placement_intelligent_report:
+            placement_intelligent_report = None
+
     celebrate_confetti = bool(domain == "placement" or score_pct >= 55)
 
     topic_title = TOPIC_TITLES.get(topic, topic)
@@ -12070,6 +12091,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "placement_gate_rec": placement_gate_rec,
         "placement_brand": placement_brand,
         "placement_student": placement_student,
+        "placement_intelligent_report": placement_intelligent_report,
         "celebrate_confetti": celebrate_confetti,
         "mistake_focus": mistake_focus,
         "skipped_count": skipped_count,
@@ -12094,6 +12116,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "session_duration_label": session_duration_label,
         "topic_title": topic_title,
         "attempt_id": attempt_id,
+        "intelligent_report": placement_intelligent_report,
     }
     return {"render": render, "pdf_ctx": pdf_ctx}
 
