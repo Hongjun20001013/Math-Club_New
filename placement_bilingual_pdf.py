@@ -42,10 +42,7 @@ _C_ROW_B = (246, 243, 255)
 def _setup_bilingual_font(pdf: Any) -> str:
     """Return one Unicode font for the whole report (Noto SC preferred)."""
     font_dir = os.path.join(_APP_DIR, "fonts")
-    candidates = (
-        os.path.join(font_dir, "NotoSansSC-Regular.otf"),
-        os.path.join(font_dir, "NotoSansSC-Regular.ttf"),
-    )
+    candidates = (os.path.join(font_dir, "NotoSansSC-Regular.otf"),)
     for path in candidates:
         try:
             if os.path.isfile(path):
@@ -75,29 +72,44 @@ def _set_font(pdf: FPDF, primary: str, size: float, style: str = "") -> None:
         pdf.set_font(primary, style, size)
 
 
-def _line_count(text: str, col_width_mm: float, font_size_pt: float) -> int:
-    """Fast wrap estimate — avoids fpdf offset_rendering (OOM on Render)."""
+def _line_h_for(font_size: float) -> float:
+    return max(4.2, font_size * 0.45)
+
+
+def _wrap_lines_measured(pdf: FPDF, max_w: float, text: str) -> list[str]:
     if not text:
-        return 1
-    char_w_mm = max(1.0, font_size_pt * 0.19)
-    cols = max(4, int(col_width_mm / char_w_mm))
-    total = 0
-    for raw in text.split("\n"):
-        line = raw.strip() or " "
-        units = sum(2 if ord(ch) > 127 else 1 for ch in line)
-        total += max(1, (units + cols - 1) // cols)
-    return max(1, total)
+        return [""]
+    lines: list[str] = []
+    usable = max(6.0, max_w)
+    for paragraph in text.split("\n"):
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+        current = ""
+        for ch in paragraph:
+            trial = current + ch
+            if current and pdf.get_string_width(trial) > usable:
+                lines.append(current)
+                current = ch
+            else:
+                current = trial
+        if current:
+            lines.append(current)
+    return lines or [""]
 
 
 def _measure_cell_height(
+    pdf: FPDF,
+    primary: str,
     width: float,
     text: str,
     line_h: float,
     font_size: float = 8.0,
-    pad: float = 1.8,
+    pad: float = 2.0,
 ) -> float:
-    lines = _line_count(text, max(8.0, width - 2.4), font_size)
-    return lines * line_h + pad
+    _set_font(pdf, primary, font_size)
+    lines = _wrap_lines_measured(pdf, max(8.0, width - 2.4), text)
+    return len(lines) * line_h + pad
 
 
 def _draw_table_row(
@@ -107,22 +119,23 @@ def _draw_table_row(
     cells: Sequence[str],
     *,
     y: float | None = None,
-    line_h: float = 4.0,
+    line_h: float | None = None,
     font_size: float = 8.0,
     header: bool = False,
     fill: tuple[int, int, int] | None = None,
     min_h: float = 8.0,
 ) -> float:
-    """Draw one table row with equal-height cells; text wraps inside each cell."""
+    """Draw one table row; each cell uses measured wrapping and fixed line height."""
     x0 = pdf.l_margin
     y0 = y if y is not None else pdf.get_y()
+    row_line_h = line_h or _line_h_for(font_size)
     if header:
         pdf.set_text_color(*_C_WHITE)
     else:
         pdf.set_text_color(*_C_INK)
 
     heights = [
-        _measure_cell_height(max(8, w - 2.4), cell, line_h, font_size=font_size)
+        _measure_cell_height(pdf, primary, max(8, w - 2.4), cell, row_line_h, font_size=font_size)
         for w, cell in zip(col_widths, cells)
     ]
     row_h = max(min_h, *heights)
@@ -133,12 +146,81 @@ def _draw_table_row(
         elif fill:
             pdf.set_fill_color(*fill)
         pdf.rect(x, y0, w, row_h, style="DF" if (fill or header) else "D")
-        pdf.set_xy(x + 1.2, y0 + 1.5)
         _set_font(pdf, primary, font_size)
-        pdf.multi_cell(w - 2.4, line_h, cell or "", align="L")
+        inner_w = w - 2.4
+        wrapped = _wrap_lines_measured(pdf, inner_w, cell or "")
+        cy = y0 + 1.5
+        for line in wrapped:
+            if cy + row_line_h > y0 + row_h + 0.2:
+                break
+            pdf.set_xy(x + 1.2, cy)
+            pdf.cell(
+                inner_w,
+                row_line_h,
+                line,
+                align="L",
+                new_x=XPos.LEFT,
+                new_y=YPos.TOP,
+            )
+            cy += row_line_h
         x += w
     pdf.set_xy(x0, y0 + row_h)
     pdf.set_text_color(*_C_INK)
+    return y0 + row_h
+
+
+def _draw_missed_row(
+    pdf: FPDF,
+    primary: str,
+    col_widths: Sequence[float],
+    cells: Sequence[str],
+    *,
+    font_size: float = 8.0,
+    fill: tuple[int, int, int] | None = None,
+) -> float:
+    """Missed-item row: short cols on one line; note uses EN/ZH stacked lines."""
+    x0 = pdf.l_margin
+    y0 = pdf.get_y()
+    line_h = _line_h_for(font_size)
+    q, part, student, correct, note = cells
+    note_lines = (note or "").split("\n", 1)
+    note_en = note_lines[0].strip()
+    note_zh = note_lines[1].strip() if len(note_lines) > 1 else ""
+    row_h = max(9.0, line_h * (2 if note_zh else 1) + 2.5)
+
+    pdf.set_text_color(*_C_INK)
+    x = x0
+    short_vals = [q, part, student, correct]
+    for w, val in zip(col_widths[:4], short_vals):
+        if fill:
+            pdf.set_fill_color(*fill)
+        pdf.rect(x, y0, w, row_h, style="DF" if fill else "D")
+        _set_font(pdf, primary, font_size)
+        pdf.set_xy(x + 1.0, y0 + 1.6)
+        pdf.cell(
+            w - 2.0,
+            line_h,
+            val,
+            align="L",
+            new_x=XPos.LEFT,
+            new_y=YPos.TOP,
+        )
+        x += w
+
+    note_w = col_widths[4]
+    if fill:
+        pdf.set_fill_color(*fill)
+    pdf.rect(x, y0, note_w, row_h, style="DF" if fill else "D")
+    _set_font(pdf, primary, font_size)
+    cy = y0 + 1.5
+    for line in (note_en, note_zh):
+        if not line:
+            continue
+        pdf.set_xy(x + 1.2, cy)
+        pdf.cell(note_w - 2.4, line_h, line, align="L", new_x=XPos.LEFT, new_y=YPos.TOP)
+        cy += line_h
+
+    pdf.set_xy(x0, y0 + row_h)
     return y0 + row_h
 
 
@@ -365,7 +447,7 @@ def _draw_list_box(
     for item in items[:5]:
         blocks.append(_bilingual_block(item.get("en") or "", item.get("zh") or ""))
     body_text = "\n\n".join(f"- {b}" for b in blocks if b) or "- —"
-    body_h = _measure_cell_height(w - 6, body_text, line_h, font_size=8, pad=3.2) + 2
+    body_h = _measure_cell_height(pdf, primary, w - 6, body_text, line_h, font_size=8, pad=3.2) + 2
 
     pdf.set_fill_color(*bg)
     pdf.set_draw_color(*border)
@@ -410,11 +492,11 @@ def _draw_missed_table(pdf: FPDF, primary: str, items: list[dict[str, Any]]) -> 
     headers = ["Q", "Part", "Student", "Correct", "Note 批改说明"]
 
     def _header_row() -> None:
-        _draw_table_row(pdf, primary, cols, headers, line_h=3.6, font_size=7.8, header=True, min_h=7.5)
+        _draw_table_row(pdf, primary, cols, headers, font_size=8, header=True, min_h=8)
 
     _header_row()
     for idx, it in enumerate(items):
-        if pdf.get_y() > pdf.h - pdf.b_margin - 10:
+        if pdf.get_y() > pdf.h - pdf.b_margin - 12:
             pdf.add_page()
             _section_title(pdf, primary, "Incorrect / Skipped (cont.)", "错题清单（续）")
             _header_row()
@@ -429,7 +511,7 @@ def _draw_missed_table(pdf: FPDF, primary: str, items: list[dict[str, Any]]) -> 
             _answer_display_for_pdf(str(it.get("correct") or "")),
             _bilingual_block(str(it.get("note_en") or ""), str(it.get("note_zh") or "")),
         ]
-        _draw_table_row(pdf, primary, cols, cells, line_h=3.8, font_size=7.8, fill=fill, min_h=8)
+        _draw_missed_row(pdf, primary, cols, cells, font_size=8, fill=fill)
     pdf.ln(2)
 
 
@@ -465,7 +547,7 @@ def _draw_final_box(pdf: FPDF, primary: str, report: dict[str, Any]) -> None:
     teacher = report.get("teacher_summary") or {}
     y0 = pdf.get_y()
     summary = _bilingual_block(str(teacher.get("en") or ""), str(teacher.get("zh") or ""))
-    box_h = max(24, _measure_cell_height(w - 14, summary, 4.0, font_size=8.5, pad=10))
+    box_h = max(24, _measure_cell_height(pdf, primary, w - 14, summary, 4.0, font_size=8.5, pad=10))
 
     pdf.set_fill_color(*_C_LILAC_BG)
     pdf.set_draw_color(*_C_VIOLET)
