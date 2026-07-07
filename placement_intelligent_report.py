@@ -212,11 +212,13 @@ def _recommendation_from_bands(
 
 def _strengths_and_growth(
     bands: list[dict[str, Any]],
-    error_counts: dict[str, int],
+    incorrect_counts: dict[str, int],
     categories: dict,
     *,
     answered: int,
     total: int,
+    skill_map: dict,
+    first_fail_idx: int | None,
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     strengths: list[dict[str, str]] = []
     passed_bands = [b for b in bands if int(b.get("correct") or 0) >= 16]
@@ -268,7 +270,7 @@ def _strengths_and_growth(
             )
 
     growth: list[dict[str, str]] = []
-    ranked = sorted(error_counts.items(), key=lambda x: (-x[1], x[0]))
+    ranked = sorted(incorrect_counts.items(), key=lambda x: (-x[1], x[0]))
     for cat_key, count in ranked[:5]:
         cat = categories.get(cat_key) or {}
         label_en = str(cat.get("label_en") or cat_key.replace("_", " ").title())
@@ -279,6 +281,21 @@ def _strengths_and_growth(
                 "zh": f"{label_zh}（{count} 题）",
             }
         )
+
+    if not growth:
+        tier_key = "all_pass" if first_fail_idx is None else str(first_fail_idx)
+        diag = (skill_map.get("diagnostic_study_plans") or {}).get(tier_key) or {}
+        summary_en = str(diag.get("summary_focus_en") or "")
+        summary_zh = str(diag.get("summary_focus_zh") or "")
+        if summary_en:
+            growth.append({"en": summary_en, "zh": summary_zh})
+        elif answered < total * 0.5:
+            growth.append(
+                {
+                    "en": "Complete the diagnostic first — skipped items prevent a skill profile.",
+                    "zh": "请先完成诊断 — 跳过题目过多，无法形成技能画像。",
+                }
+            )
 
     defaults = [
         {"en": "Multi-step problem setup", "zh": "多步骤题目设定"},
@@ -330,34 +347,73 @@ def _error_patterns(
     return out
 
 
-def _study_plan(error_counts: dict[str, int], skill_map: dict, bands: list[dict]) -> list[dict[str, str]]:
-    modules = skill_map.get("study_plan_modules") or []
-    tags_needed = {k for k, v in error_counts.items() if v > 0}
+def _study_plan(
+    incorrect_counts: dict[str, int],
+    skill_map: dict,
+    bands: list[dict],
+    *,
+    skipped_count: int,
+    answered: int,
+    gradable_total: int,
+    recommendation: dict[str, Any],
+) -> list[dict[str, str]]:
+    diag_plans = skill_map.get("diagnostic_study_plans") or {}
     first_fail = next((i for i, b in enumerate(bands) if int(b.get("correct") or 0) < 16), None)
+    tier_key = "all_pass" if first_fail is None else str(first_fail)
+    diag = diag_plans.get(tier_key) or diag_plans.get("0") or {}
 
     plan: list[dict[str, str]] = []
-    for mod in modules:
-        mod_tags = set(mod.get("tags") or [])
-        if not mod_tags or mod_tags & tags_needed:
-            plan.append(
-                {
-                    "phase_en": str(mod.get("phase_en") or ""),
-                    "phase_zh": str(mod.get("phase_zh") or ""),
-                    "focus_en": str(mod.get("focus_en") or ""),
-                    "focus_zh": str(mod.get("focus_zh") or ""),
-                }
-            )
-    if first_fail is not None and first_fail >= 2:
-        band_code = bands[first_fail]["code"]
+    if diag:
+        summary_en = str(diag.get("summary_focus_en") or "")
+        summary_zh = str(diag.get("summary_focus_zh") or "")
+        lessons_en = str(diag.get("lessons_en") or "")
+        lessons_zh = str(diag.get("lessons_zh") or "")
         plan.append(
             {
-                "phase_en": "Priority re-test",
-                "phase_zh": "优先重测",
-                "focus_en": f"Re-test Part {band_code} and the next band after 2-4 weeks of bridge work.",
-                "focus_zh": f"衔接训练 2-4 周后优先重测 Part {band_code} 及下一档。",
+                "phase_en": str(diag.get("diagnostic_en") or recommendation.get("title_en") or ""),
+                "phase_zh": str(diag.get("diagnostic_zh") or recommendation.get("title_zh") or ""),
+                "focus_en": f"{lessons_en} — {summary_en}".strip(" —"),
+                "focus_zh": f"{lessons_zh} — {summary_zh}".strip(" —"),
             }
         )
-    return plan[:6]
+
+    skipped_ratio = skipped_count / gradable_total if gradable_total else 0.0
+    if skipped_ratio > 0.5 or answered < gradable_total * 0.25:
+        plan.append(
+            {
+                "phase_en": "First step",
+                "phase_zh": "第一步",
+                "focus_en": "Complete skipped items or re-take the full diagnostic before following this plan.",
+                "focus_zh": "先补做跳过的题目或完整重做诊断，再按此计划补习。",
+            }
+        )
+
+    for phase in diag.get("phases") or []:
+        plan.append(
+            {
+                "phase_en": str(phase.get("phase_en") or ""),
+                "phase_zh": str(phase.get("phase_zh") or ""),
+                "focus_en": str(phase.get("focus_en") or ""),
+                "focus_zh": str(phase.get("focus_zh") or ""),
+            }
+        )
+
+    if incorrect_counts and skipped_ratio <= 0.5:
+        categories = skill_map.get("categories") or {}
+        top_cat, top_n = max(incorrect_counts.items(), key=lambda x: x[1])
+        cat = categories.get(top_cat) or {}
+        insert_at = max(1, len(plan) - 1)
+        plan.insert(
+            insert_at,
+            {
+                "phase_en": "Priority focus",
+                "phase_zh": "优先补强",
+                "focus_en": f"Target {cat.get('label_en', top_cat)} ({top_n} incorrect).",
+                "focus_zh": f"重点突破{cat.get('label_zh', top_cat)}（{top_n} 题答错）。",
+            },
+        )
+
+    return plan[:7]
 
 
 def build_middle_level_intelligent_report(
@@ -410,7 +466,9 @@ def build_middle_level_intelligent_report(
 
     missed_items: list[dict[str, Any]] = []
     missed_qnums: list[int] = []
-    error_counts: dict[str, int] = defaultdict(int)
+    incorrect_qnums: list[int] = []
+    incorrect_counts: dict[str, int] = defaultdict(int)
+    skipped_count = 0
 
     for row, qobj in zip(rows, questions):
         status = str(row.get("status") or "")
@@ -422,7 +480,11 @@ def build_middle_level_intelligent_report(
         missed_qnums.append(qn)
         qinfo = qmeta.get(str(qn)) or {}
         cat = str(qinfo.get("category") or "basic_arithmetic")
-        error_counts[cat] += 1
+        if status == "skipped":
+            skipped_count += 1
+        else:
+            incorrect_qnums.append(qn)
+            incorrect_counts[cat] += 1
         yours = row.get("yours_display") or "—"
         if status == "skipped" or yours == "—":
             yours = "Skipped"
@@ -439,25 +501,60 @@ def build_middle_level_intelligent_report(
         )
 
     missed_skipped = len(missed_items)
-    answered = max(0, gradable_total - sum(1 for row in rows if row.get("status") == "skipped"))
+    answered = max(0, gradable_total - skipped_count)
+    first_fail_idx = next(
+        (i for i, b in enumerate(bands) if int(b.get("correct") or 0) < 16), None
+    )
     recommendation = _recommendation_from_bands(bands, skill_map, student_name)
     strengths, growth = _strengths_and_growth(
-        bands, error_counts, categories, answered=answered, total=gradable_total
+        bands,
+        incorrect_counts,
+        categories,
+        answered=answered,
+        total=gradable_total,
+        skill_map=skill_map,
+        first_fail_idx=first_fail_idx,
     )
-    error_patterns = _error_patterns(missed_qnums, skill_map)
-    study_plan = _study_plan(error_counts, skill_map, bands)
+    error_patterns = _error_patterns(incorrect_qnums, skill_map)
+    study_plan = _study_plan(
+        incorrect_counts,
+        skill_map,
+        bands,
+        skipped_count=skipped_count,
+        answered=answered,
+        gradable_total=gradable_total,
+        recommendation=recommendation,
+    )
 
     fn = _first_name(student_name)
-    if recommendation.get("first_fail_band"):
+    if answered < gradable_total * 0.25:
         final_en = (
-            f"{fn} is strongest in foundational arithmetic and early middle-school readiness. "
-            f"The corrected score profile does not support direct Algebra 1 placement yet, "
-            "but targeted bridge instruction should produce clear gains."
+            f"{fn} submitted an incomplete diagnostic ({answered}/{gradable_total} answered). "
+            "Re-test when ready; the study plan below follows the placement tier, not skipped-item patterns."
         )
         final_zh = (
-            f"{fn} 在基础计算和低阶中学数学方面表现较好。"
-            "目前修正后的成绩不支持直接进入 Algebra 1，但针对薄弱点进行系统衔接训练，提升空间明确。"
+            f"{fn} 本次诊断完成度很低（作答 {answered}/{gradable_total}）。"
+            "建议补做或重做；下方学习计划按分班档位制定，而非根据跳过题目推断。"
         )
+    elif recommendation.get("first_fail_band"):
+        if first_fail_idx is not None and first_fail_idx <= 1:
+            final_en = (
+                f"{fn} needs foundational middle-school readiness work before advancing. "
+                "Targeted arithmetic and place-value instruction should produce clear gains."
+            )
+            final_zh = (
+                f"{fn} 在初中低阶准备度上仍需加强。"
+                "建议先进行算术与位值的针对性训练，提升空间明确。"
+            )
+        else:
+            final_en = (
+                f"{fn} shows usable skills in earlier bands, but the score profile does not support "
+                "direct Algebra 1 placement yet. Targeted bridge instruction should produce clear gains."
+            )
+            final_zh = (
+                f"{fn} 在前几档有一定基础，但修正后的成绩尚不支持直接进入 Algebra 1。"
+                "针对薄弱点进行系统衔接训练，提升空间明确。"
+            )
     else:
         final_en = (
             f"{fn} performed strongly across all readiness bands on this diagnostic. "

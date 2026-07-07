@@ -164,12 +164,96 @@
     "100": {"category": "advanced_readiness", "note_en": "Incomplete or incorrect final response.", "note_zh": "未完成或最终答案错误。"}
   },
   "study_plan_modules": [
-    {"phase_en": "Weeks 1-2", "phase_zh": "第 1-2 周", "focus_en": "Fractions, mixed numbers, decimals, percents, and conversions.", "focus_zh": "分数、带分数、小数、百分比及转换。", "tags": ["fractions_percent_ratios"]},
-    {"phase_en": "Weeks 3-4", "phase_zh": "第 3-4 周", "focus_en": "Ratios, proportions, unit rates, and percent word problems.", "focus_zh": "比例、比例式、单位率、百分比应用题。", "tags": ["fractions_percent_ratios", "word_problem_setup"]},
-    {"phase_en": "Weeks 5-6", "phase_zh": "第 5-6 周", "focus_en": "Geometry and measurement: perimeter, area, volume, and unit conversion.", "focus_zh": "几何测量：周长、面积、体积、单位转换。", "tags": ["geometry_measurement"]},
-    {"phase_en": "Weeks 7-8", "phase_zh": "第 7-8 周", "focus_en": "Pre-Algebra readiness: expressions, equations, scientific notation, and multi-step problems.", "focus_zh": "Pre-Algebra 预备：表达式、方程、科学计数法、多步骤题。", "tags": ["advanced_readiness", "place_value", "word_problem_setup"]},
-    {"phase_en": "Final Check", "phase_zh": "最终检测", "focus_en": "Re-test weaker bands first. Move toward Algebra readiness after consistently reaching 16/20 or higher.", "focus_zh": "优先重测薄弱档位；稳定达到 16/20 以上后再考虑 Algebra readiness。", "tags": []}
+    {"phase_en": "Weeks 1-2", "phase_zh": "第 1-2 周", "focus_en": "Fractions, mixed numbers, decimals, percents, and conversions.", "focus_zh": "分数、带分数、小数、百分比及转换。", "tags": ["fractions_percent_ratios"], "min_tier": 2},
+    {"phase_en": "Weeks 3-4", "phase_zh": "第 3-4 周", "focus_en": "Ratios, proportions, unit rates, and percent word problems.", "focus_zh": "比例、比例式、单位率、百分比应用题。", "tags": ["fractions_percent_ratios", "word_problem_setup"], "min_tier": 2},
+    {"phase_en": "Weeks 5-6", "phase_zh": "第 5-6 周", "focus_en": "Geometry and measurement: perimeter, area, volume, and unit conversion.", "focus_zh": "几何测量：周长、面积、体积、单位转换。", "tags": ["geometry_measurement"], "min_tier": 2},
+    {"phase_en": "Weeks 7-8", "phase_zh": "第 7-8 周", "focus_en": "Pre-Algebra readiness: expressions, equations, scientific notation, and multi-step problems.", "focus_zh": "Pre-Algebra 预备：表达式、方程、科学计数法、多步骤题。", "tags": ["advanced_readiness", "place_value", "word_problem_setup"], "min_tier": 3}
   ],
+  "diagnostic_study_plans": {
+    "0": {
+      "diagnostic_en": "Not ready for Math 6",
+      "diagnostic_zh": "暂未达到 Math 6",
+      "lessons_en": "20–28 lessons",
+      "lessons_zh": "20–28 课时",
+      "summary_focus_en": "Whole-number operations, place value, long division, money/measurement, basic fractions, perimeter/area, and word-problem translation.",
+      "summary_focus_zh": "整数运算、位值、长除法、金钱/测量、基础分数、周长面积、应用题翻译。",
+      "phases": [
+        {"phase_en": "Weeks 1–3", "phase_zh": "第 1–3 周", "focus_en": "Whole-number operations, place value, and long division with remainder.", "focus_zh": "整数四则运算、位值、带余数长除法。"},
+        {"phase_en": "Weeks 4–6", "phase_zh": "第 4–6 周", "focus_en": "Money and measurement, basic fractions, perimeter and area.", "focus_zh": "金钱与测量、基础分数、周长与面积。"},
+        {"phase_en": "Weeks 7–8", "phase_zh": "第 7–8 周", "focus_en": "Word-problem translation and number-sense review.", "focus_zh": "应用题翻译与数感复习。"},
+        {"phase_en": "Re-test", "phase_zh": "重测", "focus_en": "Re-test Part I first; reach 16/20 before advancing to Part II.", "focus_zh": "优先重测 Part I；达到 16/20 后再进入 Part II。"}
+      ]
+    },
+    "1": {
+      "diagnostic_en": "Ready for Math 6 track",
+      "diagnostic_zh": "Math 6 准备课程",
+      "lessons_en": "12–16 lessons",
+      "lessons_zh": "12–16 课时",
+      "summary_focus_en": "Fraction operations, decimal operations, ratios, percent foundations, estimation, multi-step arithmetic, and geometry vocabulary.",
+      "summary_focus_zh": "分数运算、小数运算、比例、百分比基础、估算、多步算术、几何词汇。",
+      "phases": [
+        {"phase_en": "Weeks 1–2", "phase_zh": "第 1–2 周", "focus_en": "Fraction and decimal fluency; fix Part I–II misses.", "focus_zh": "分数与小数流畅度；巩固 Part I–II 错题。"},
+        {"phase_en": "Weeks 3–4", "phase_zh": "第 3–4 周", "focus_en": "Percent foundations, estimation, and multi-step arithmetic.", "focus_zh": "百分比基础、估算、多步算术。"},
+        {"phase_en": "Weeks 5–6", "phase_zh": "第 5–6 周", "focus_en": "Geometry vocabulary, perimeter/area, and word-problem setup.", "focus_zh": "几何词汇、周长面积、应用题设定。"},
+        {"phase_en": "Re-test", "phase_zh": "重测", "focus_en": "Re-test Parts I–II; stabilize 16/20 before Part III.", "focus_zh": "重测 Part I–II；稳定 16/20 后再测 Part III。"}
+      ]
+    },
+    "2": {
+      "diagnostic_en": "Math 7 / Pre-Algebra Bridge",
+      "diagnostic_zh": "Math 7 / Pre-Algebra 衔接",
+      "lessons_en": "16–22 lessons",
+      "lessons_zh": "16–22 课时",
+      "summary_focus_en": "Fraction/decimal/percent fluency, rates, proportions, signed-number readiness, exponents/order of operations, area/volume, and equation setup.",
+      "summary_focus_zh": "分数/小数/百分比流畅度、比率、比例、有理数准备、指数/运算顺序、面积体积、方程设定。",
+      "phases": [
+        {"phase_en": "Weeks 1–2", "phase_zh": "第 1–2 周", "focus_en": "Fraction, decimal, and percent conversions (Part III misses).", "focus_zh": "分数、小数、百分比转换（Part III 薄弱点）。"},
+        {"phase_en": "Weeks 3–4", "phase_zh": "第 3–4 周", "focus_en": "Rates, proportions, and percent word problems.", "focus_zh": "比率、比例式、百分比应用题。"},
+        {"phase_en": "Weeks 5–6", "phase_zh": "第 5–6 周", "focus_en": "Geometry, measurement, and multi-step setup.", "focus_zh": "几何测量与多步应用题设定。"},
+        {"phase_en": "Re-test", "phase_zh": "重测", "focus_en": "Re-test Parts III–IV after bridge work; target 16/20 per band.", "focus_zh": "衔接后重测 Part III–IV；每档目标 16/20。"}
+      ]
+    },
+    "3": {
+      "diagnostic_en": "Math 8 / Pre-Algebra",
+      "diagnostic_zh": "Math 8 / Pre-Algebra",
+      "lessons_en": "18–24 lessons",
+      "lessons_zh": "18–24 课时",
+      "summary_focus_en": "Proportional reasoning, percent change, probability, unit conversion, variable expressions, formulas, exponents, roots, and multi-step word problems.",
+      "summary_focus_zh": "比例推理、百分比变化、概率、单位转换、代数式、公式、指数、根式、多步应用题。",
+      "phases": [
+        {"phase_en": "Weeks 1–2", "phase_zh": "第 1–2 周", "focus_en": "Ratios, measurement, and Part IV word-problem setup.", "focus_zh": "比例、测量、Part IV 应用题设定。"},
+        {"phase_en": "Weeks 3–5", "phase_zh": "第 3–5 周", "focus_en": "Variable expressions, formulas, exponents, and unit conversion.", "focus_zh": "代数式、公式、指数、单位转换。"},
+        {"phase_en": "Weeks 6–8", "phase_zh": "第 6–8 周", "focus_en": "Multi-step problems and pre-algebra readiness review.", "focus_zh": "多步应用题与 Pre-Algebra 预备复习。"},
+        {"phase_en": "Re-test", "phase_zh": "重测", "focus_en": "Re-test Part IV–V after stabilization.", "focus_zh": "稳定后重测 Part IV–V。"}
+      ]
+    },
+    "4": {
+      "diagnostic_en": "Algebra 1/2 Readiness Bridge",
+      "diagnostic_zh": "Algebra 1/2 预备衔接",
+      "lessons_en": "20–28 lessons",
+      "lessons_zh": "20–28 课时",
+      "summary_focus_en": "Linear equations, ratios and rates, algebraic translation, integer/rational operations, scientific notation, geometry formulas, and complex order of operations.",
+      "summary_focus_zh": "一次方程、比率、代数翻译、整数/有理数运算、科学计数法、几何公式、复杂运算顺序。",
+      "phases": [
+        {"phase_en": "Weeks 1–3", "phase_zh": "第 1–3 周", "focus_en": "Rational operations, scientific notation, and Part V fraction/algebra items.", "focus_zh": "有理数运算、科学计数法、Part V 分数/代数题。"},
+        {"phase_en": "Weeks 4–6", "phase_zh": "第 4–6 周", "focus_en": "Linear equation setup, rates, and geometry formulas.", "focus_zh": "一次方程设定、比率、几何公式。"},
+        {"phase_en": "Weeks 7–8", "phase_zh": "第 7–8 周", "focus_en": "Complex order of operations and multi-step algebra readiness.", "focus_zh": "复杂运算顺序与多步代数预备。"},
+        {"phase_en": "Re-test", "phase_zh": "重测", "focus_en": "Re-test Part V; consider separate Algebra 1 diagnostic if 16/20+.", "focus_zh": "重测 Part V；若达 16/20+ 可另做 Algebra 1 诊断。"}
+      ]
+    },
+    "all_pass": {
+      "diagnostic_en": "Ready for Algebra 1 or higher",
+      "diagnostic_zh": "可进入 Algebra 1 或更高阶",
+      "lessons_en": "8–12 lessons",
+      "lessons_zh": "8–12 课时",
+      "summary_focus_en": "Algebra 1 bridge: linear equations, slope/intercepts, graphing readiness, systems foundations, exponent laws, radicals, and advanced word problems.",
+      "summary_focus_zh": "Algebra 1 衔接：一次方程、斜率/截距、图像准备、方程组基础、指数法则、根式、高阶应用题。",
+      "phases": [
+        {"phase_en": "Weeks 1–4", "phase_zh": "第 1–4 周", "focus_en": "Linear equations, slope/intercepts, and graphing readiness.", "focus_zh": "一次方程、斜率/截距、图像准备。"},
+        {"phase_en": "Weeks 5–8", "phase_zh": "第 5–8 周", "focus_en": "Systems foundations, exponent laws, and advanced word problems.", "focus_zh": "方程组基础、指数法则、高阶应用题。"},
+        {"phase_en": "Next step", "phase_zh": "下一步", "focus_en": "Take Algebra 1 or upper-school placement diagnostic.", "focus_zh": "进行 Algebra 1 或更高阶分班诊断。"}
+      ]
+    }
+  },
   "placement_paths": [
     {"first_fail_band": 0, "label_en": "Math 5 Foundations", "label_zh": "Math 5 基础强化", "bridge_en": "Not ready for Math 6 — focus on whole-number operations and place value.", "bridge_zh": "暂未达到 Math 6 — 建议巩固整数运算与位值。"},
     {"first_fail_band": 1, "label_en": "Math 6 Readiness Track", "label_zh": "Math 6 准备课程", "bridge_en": "Build fraction, decimal, and early ratio skills before Math 7.", "bridge_zh": "进入 Math 7 前先补强分数、小数与初步比例。"},
