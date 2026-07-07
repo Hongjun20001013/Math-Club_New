@@ -303,11 +303,12 @@ def _strengths_and_growth(
         {"en": "Geometry and measurement", "zh": "几何、面积、体积和单位"},
     ]
     seen = {g["en"] for g in growth}
-    for d in defaults:
-        if len(growth) >= 5:
-            break
-        if d["en"] not in seen:
-            growth.append(d)
+    if answered >= total * 0.25:
+        for d in defaults:
+            if len(growth) >= 5:
+                break
+            if d["en"] not in seen:
+                growth.append(d)
     return strengths[:4], growth[:5]
 
 

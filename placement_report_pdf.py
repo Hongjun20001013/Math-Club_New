@@ -82,6 +82,31 @@ def _pdf_core_font_safe(s: str) -> str:
     return t.encode("latin-1", errors="replace").decode("latin-1")
 
 
+def _answer_display_for_pdf(s: str, *, max_len: int = 32) -> str:
+    """Readable answer text for PDF cells (no raw LaTeX like \\frac12 or 75\\%)."""
+    t = _strip_html(s or "").strip()
+    if not t or t in ("—", "-"):
+        return t or "—"
+    t = t.translate(_PDF_SAFE_TRANS)
+    if t.startswith(r"\(") and t.endswith(r"\)"):
+        t = t[2:-2].strip()
+    t = re.sub(r"\\displaystyle\s*", "", t)
+    t = re.sub(r"\\(?:d|t)?frac\{([^{}]+)\}\{([^{}]+)\}", r"\1/\2", t)
+    t = re.sub(r"\\frac(\d)(\d)\b", r"\1/\2", t)
+    t = re.sub(r"\\frac\{?(\d+)\}?/\{?(\d+)\}?", r"\1/\2", t)
+    t = t.replace(r"\%", "%")
+    t = re.sub(r"\^\{([^{}]+)\}", r"^\1", t)
+    t = re.sub(r"\\cdot\b", "·", t)
+    t = re.sub(r"\\times\b", "×", t)
+    t = re.sub(r"\\(?:left|right)\b", "", t)
+    t = re.sub(r"\\text\{([^}]*)\}", r"\1", t)
+    t = re.sub(r"\\mathbf\{([^}]*)\}", r"\1", t)
+    t = re.sub(r"\\boxed\{([^{}]*)\}", r"\1", t)
+    t = re.sub(r"\\[a-zA-Z]+\b", "", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t[:max_len] if t else "—"
+
+
 def _pdf_line_for_font(font: str, s: str) -> str:
     """Use full Unicode when DejaVu is active; otherwise Latin-1-safe."""
     t = _strip_html(s or "").strip()
