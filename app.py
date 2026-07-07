@@ -11749,7 +11749,9 @@ def _exam_session_summary_payload(
     return {"render": render, "pdf_ctx": render}
 
 
-def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple[str, int]:
+def _practice_session_summary_payload(
+    attempt_id: int, *, for_pdf: bool = False
+) -> dict[str, Any] | tuple[str, int]:
     """Shared data for HTML summary and placement PDF export."""
     db = get_db()
     att = db.execute(
@@ -12016,7 +12018,7 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
                 placement_brand["trust_line_zh"] = "分数区间与纸质分班测试官方说明一致。"
 
     placement_intelligent_report: dict | None = None
-    if domain == "placement":
+    if domain == "placement" and for_pdf:
         placement_intelligent_report = build_intelligent_placement_report(
             topic=topic,
             topic_title=TOPIC_TITLES.get(topic, topic),
@@ -12091,7 +12093,6 @@ def _practice_session_summary_payload(attempt_id: int) -> dict[str, Any] | tuple
         "placement_gate_rec": placement_gate_rec,
         "placement_brand": placement_brand,
         "placement_student": placement_student,
-        "placement_intelligent_report": placement_intelligent_report,
         "celebrate_confetti": celebrate_confetti,
         "mistake_focus": mistake_focus,
         "skipped_count": skipped_count,
@@ -12235,7 +12236,7 @@ def practice_session_item(attempt_id: int, q_index: int):
 
 @app.route("/practice/session/<int:attempt_id>/placement-report.pdf")
 def practice_placement_report_pdf(attempt_id: int):
-    payload = _practice_session_summary_payload(attempt_id)
+    payload = _practice_session_summary_payload(attempt_id, for_pdf=True)
     if isinstance(payload, tuple):
         abort(payload[1])
     render = payload["render"]
@@ -12249,6 +12250,11 @@ def practice_placement_report_pdf(attempt_id: int):
             status=503,
             mimetype="text/plain; charset=utf-8",
         )
+    except Exception:
+        app.logger.exception("Bilingual placement PDF failed for attempt %s", attempt_id)
+        pdf_ctx = dict(payload["pdf_ctx"])
+        pdf_ctx.pop("intelligent_report", None)
+        body = build_placement_parent_pdf(pdf_ctx)
     name = f"novelprep-placement-report-{attempt_id}.pdf"
     return Response(
         body,

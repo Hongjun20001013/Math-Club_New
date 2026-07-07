@@ -38,17 +38,12 @@ _C_ROW_B = (246, 243, 255)
 
 
 def _setup_bilingual_font(pdf: Any) -> tuple[str, str]:
+    """Load only Noto SC for bilingual PDFs (skip heavy DejaVu duplicate)."""
     font_dir = os.path.join(_APP_DIR, "fonts")
     noto = os.path.join(font_dir, "NotoSansSC-Regular.otf")
-    dejavu = os.path.join(font_dir, "DejaVuSans.ttf")
-    dejavu_b = os.path.join(font_dir, "DejaVuSans-Bold.ttf")
     latin = "Helvetica"
     cjk = ""
     try:
-        if os.path.isfile(dejavu):
-            pdf.add_font("DejaVu", "", dejavu)
-            pdf.add_font("DejaVu", "B", dejavu_b if os.path.isfile(dejavu_b) else dejavu)
-            latin = "DejaVu"
         if os.path.isfile(noto):
             pdf.add_font("NotoSC", "", noto)
             pdf.add_font("NotoSC", "B", noto)
@@ -78,15 +73,29 @@ def _set_font(pdf: FPDF, primary: str, size: float, style: str = "") -> None:
     pdf.set_font(primary, style, size)
 
 
-def _measure_cell_height(
-    pdf: FPDF, width: float, text: str, line_h: float, pad: float = 1.2
-) -> float:
+def _line_count(text: str, col_width_mm: float, font_size_pt: float) -> int:
+    """Fast wrap estimate — avoids fpdf offset_rendering (OOM on Render)."""
     if not text:
-        return line_h + pad
-    with pdf.offset_rendering() as draft:
-        draft.set_xy(0, 0)
-        draft.multi_cell(width, line_h, text)
-        return max(line_h + pad, draft.get_y() + pad)
+        return 1
+    char_w_mm = max(0.9, font_size_pt * 0.17)
+    cols = max(4, int(col_width_mm / char_w_mm))
+    total = 0
+    for raw in text.split("\n"):
+        line = raw.strip() or " "
+        units = sum(2 if ord(ch) > 127 else 1 for ch in line)
+        total += max(1, (units + cols - 1) // cols)
+    return max(1, total)
+
+
+def _measure_cell_height(
+    width: float,
+    text: str,
+    line_h: float,
+    font_size: float = 7.0,
+    pad: float = 1.6,
+) -> float:
+    lines = _line_count(text, max(8.0, width - 2.4), font_size)
+    return lines * line_h + pad
 
 
 def _draw_table_row(
@@ -112,7 +121,7 @@ def _draw_table_row(
         pdf.set_text_color(*_C_INK)
 
     heights = [
-        _measure_cell_height(pdf, max(8, w - 2.4), cell, line_h)
+        _measure_cell_height(max(8, w - 2.4), cell, line_h, font_size=font_size)
         for w, cell in zip(col_widths, cells)
     ]
     row_h = max(min_h, *heights)
@@ -348,7 +357,7 @@ def _draw_list_box(
     for item in items[:5]:
         blocks.append(_bilingual_block(item.get("en") or "", item.get("zh") or ""))
     body_text = "\n\n".join(f"• {b}" for b in blocks if b) or "• —"
-    body_h = _measure_cell_height(pdf, w - 6, body_text, line_h, pad=3) + 4
+    body_h = _measure_cell_height(w - 6, body_text, line_h, font_size=7.1, pad=3) + 2
 
     pdf.set_fill_color(*bg)
     pdf.set_draw_color(*border)
@@ -448,7 +457,7 @@ def _draw_final_box(pdf: FPDF, primary: str, report: dict[str, Any]) -> None:
     teacher = report.get("teacher_summary") or {}
     y0 = pdf.get_y()
     summary = _bilingual_block(str(teacher.get("en") or ""), str(teacher.get("zh") or ""))
-    box_h = max(22, _measure_cell_height(pdf, w - 14, summary, 3.8, pad=10))
+    box_h = max(22, _measure_cell_height(w - 14, summary, 3.8, font_size=8, pad=10))
 
     pdf.set_fill_color(*_C_LILAC_BG)
     pdf.set_draw_color(*_C_VIOLET)

@@ -207,8 +207,8 @@
           <li>Error pattern summary + missed-item appendix</li>
           <li>Recommended study plan (EN / 中文)</li>
         </ul>
-        {% if placement_intelligent_report and placement_intelligent_report.recommendation %}
-        <p class="np-placement-pdf-preview"><strong>{{ placement_intelligent_report.recommendation.title_en }}</strong> — {{ placement_intelligent_report.recommendation.narrative_en }}</p>
+        {% if placement_rec and placement_rec.headline %}
+        <p class="np-placement-pdf-preview"><strong>{{ placement_rec.title }}</strong> — {{ placement_rec.headline }}</p>
         {% endif %}
       </div>
       <div class="np-placement-pdf-suite-aside">
