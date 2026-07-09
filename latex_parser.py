@@ -1967,7 +1967,10 @@ def _strip_latex_answer_text(raw: str) -> str:
     """Turn an answer-key \\item body into plain text for auto-grading."""
     s = raw.strip()
     s = re.sub(r"^\\item\s*", "", s)
+    if s.startswith(r"\(") and s.endswith(r"\)"):
+        s = s[2:-2].strip()
     s = s.replace(r"\$", "").replace("$", "")
+    s = s.replace(r"\%", "%")
     s = re.sub(r"\\overline\{([^}]+)\}", r"\1", s)
     s = re.sub(r"\\text\{([^}]*)\}", r"\1", s)
     s = re.sub(r"\\(?:left|right)", "", s)
@@ -1982,19 +1985,29 @@ def _strip_latex_answer_text(raw: str) -> str:
         s,
     )
     s = re.sub(r"\\frac\{([^}]+)\}\{([^}]+)\}", r"\1/\2", s)
+    s = re.sub(r"\\frac(\d)(\d)\b", r"\1/\2", s)
     s = re.sub(r"\\times\s*10\^\{([^}]+)\}", r"e\1", s)
     s = re.sub(r"\^\{([^}]+)\}", r"^\1", s)
     s = re.sub(r"\\[(),]", "", s)
     s = re.sub(r"\{|\}", "", s)
     s = re.sub(r"\\end\{item\}", "", s, flags=re.I)
+    s = re.sub(r"\\[a-zA-Z]+\b", "", s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
 
+_MIDDLE_LEVEL_UNIT_SUFFIX = (
+    r"beans|miles|mi|in\.|sq\. in\.|square inches|members|years old|cm|mm|seconds|"
+    r"birds|hamburgers|average pumpkins|containers|m\^2|mm\^3|mi\^2|per container|"
+    r"cherries|chairs|frogs|sides"
+)
+
+
 def _normalize_middle_level_answer(raw: str) -> str:
     s = _strip_latex_answer_text(raw)
+    s = re.sub(r"%\s*$", "", s).strip()
     s = re.sub(
-        r"\s+(beans|miles|mi|in\.|sq\. in\.|square inches|members|years old|cm|mm|seconds|birds|hamburgers|average pumpkins|containers|m\^2|mm\^3|mi\^2|per container).*$",
+        rf"\s+(?:{_MIDDLE_LEVEL_UNIT_SUFFIX}).*$",
         "",
         s,
         flags=re.I,
@@ -2009,8 +2022,37 @@ def _middle_level_answer_alternates(raw: str, canonical: str) -> list[str]:
     plain = _strip_latex_answer_text(raw)
     if plain and plain != canonical:
         alts.append(plain)
+    if plain and re.search(r"%\s*$", plain):
+        alts.append(re.sub(r"%\s*$", "", plain).strip())
+    unit_m = re.match(
+        rf"^(.+?)\s+(?:{_MIDDLE_LEVEL_UNIT_SUFFIX})\s*$",
+        plain,
+        flags=re.I,
+    )
+    if unit_m:
+        core = unit_m.group(1).strip()
+        if core and core != canonical:
+            alts.append(core)
+    mixed = re.fullmatch(r"(-?\d+)\s+(\d+)/(\d+)", canonical)
+    if mixed:
+        try:
+            whole = int(mixed.group(1))
+            frac_val = int(mixed.group(2)) / int(mixed.group(3))
+            dec = whole + frac_val if whole >= 0 else whole - frac_val
+            alts.append(f"{dec:g}")
+        except (ValueError, ZeroDivisionError):
+            pass
+    if re.fullmatch(r"-?\d+/\d+", canonical):
+        try:
+            from fractions import Fraction
+
+            alts.append(f"{float(Fraction(canonical)):g}")
+        except (ValueError, ZeroDivisionError):
+            pass
     if " R" in plain.upper():
         alts.append(plain)
+    if plain.replace("P.M.", "PM").replace("A.M.", "AM") != plain:
+        alts.append(plain.replace("P.M.", "PM").replace("A.M.", "AM"))
     return list(dict.fromkeys(a for a in alts if a))
 
 

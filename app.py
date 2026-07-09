@@ -1,5 +1,5 @@
 from __future__ import annotations
-from answer_grader import grade_for_db, response_is_correct
+from answer_grader import display_answer_plain, grade_for_db, response_is_correct
 from course_materials_progress import (
     build_coach_system_prompt,
     build_coach_user_message,
@@ -11871,11 +11871,11 @@ def _practice_session_summary_payload(
         if r is None:
             status = "skipped"
             yours = "—"
-            key_display = key if key else "—"
+            key_display = display_answer_plain(key) if key else "—"
         else:
             yours_raw = (r["selected_answer"] or "").strip()
             yours = yours_raw if yours_raw else "—"
-            key_display = key if key else (r["correct_answer"] or "—")
+            key_display = display_answer_plain(key if key else (r["correct_answer"] or "—"))
             if yours == "—":
                 status = "skipped"
             elif not key:
@@ -12164,8 +12164,8 @@ def practice_session_item(attempt_id: int, q_index: int):
     ).fetchone()
     yours_raw = (resp["selected_answer"] or "").strip() if resp else ""
     correct_key = extract_correct_answer(qobj)
-    key_display = correct_key if correct_key else (
-        (resp["correct_answer"] or "").strip() if resp else "—"
+    key_display = display_answer_plain(correct_key) if correct_key else (
+        display_answer_plain((resp["correct_answer"] or "").strip()) if resp else "—"
     )
     if resp is None:
         status = "skipped"

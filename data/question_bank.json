@@ -18803,7 +18803,7 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "Intersections at approximately (-1.7,-0.7) and (2,3). \\enditemize"
+        "correct_answer": "Intersections at approximately (-1.7,-0.7) and (2,3)."
       }
     ],
     "enhanced_math_2": [
@@ -19972,7 +19972,7 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "Height \\approx 48\\tan(38^\\circ)+5\\approx 43 ft; tangent is used because opposite and adjacent sides are involved."
+        "correct_answer": "Height 48(38^)+5 43 ft; tangent is used because opposite and adjacent sides are involved."
       },
       {
         "stem": "<p>Enhanced Statistics. A normally distributed test has mean \\(\\displaystyle 76\\) and standard deviation \\(\\displaystyle 8\\).</p>\n<ol class=\"stem-enumerate\"><li>Find the \\(\\displaystyle z\\)-score for a score of \\(\\displaystyle 92\\).</li><li>Approximate the percentile for a score of \\(\\displaystyle 92\\) using the empirical rule.</li><li>A student scored \\(\\displaystyle 68\\). Explain whether \\(\\displaystyle 92\\) or \\(\\displaystyle 68\\) is more unusual.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -20028,7 +20028,7 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "\\sin B=18\\sin35^\\circ/12, so B\\approx59.4^\\circ or 120.6^\\circ; C\\approx85.6^\\circ or 24.4^\\circ."
+        "correct_answer": "B=18\\sin35^/12, so B\\approx59.4^ or 120.6^; C\\approx85.6^ or 24.4^."
       },
       {
         "stem": "<p>Circle Relationships and Sector Area.</p>\n<ol class=\"stem-enumerate\"><li>Two chords intersect inside a circle. One chord has segments \\(\\displaystyle 5\\) and \\(\\displaystyle 12\\); the other has segments \\(\\displaystyle 6\\) and \\(\\displaystyle x\\). Find \\(\\displaystyle x\\).</li><li>A circle has radius \\(\\displaystyle 6\\). A sector has area \\(\\displaystyle 15\\pi\\). Find the central angle in radians.</li><li>Find the arc length of that sector.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -20042,7 +20042,7 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "x=10; central angle \\theta=5\\pi/6; arc length 5\\pi. \\enditemize"
+        "correct_answer": "x=10; central angle =5/6; arc length 5."
       }
     ],
     "middle_level": [
@@ -20116,7 +20116,8 @@
         "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
         "correct_answer": "2:15 PM",
         "answer_alternates": [
-          "2:15 P.M."
+          "2:15 P.M.",
+          "2:15 PM"
         ]
       },
       {
@@ -20149,7 +20150,10 @@
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
         "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
-        "correct_answer": "3 1/6"
+        "correct_answer": "3 1/6",
+        "answer_alternates": [
+          "3.16667"
+        ]
       },
       {
         "stem": "<p>Twenty-five percent of this square is shaded. What percent of the square is not shaded?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Square with one quarter shaded\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/quarterSquare.png\" alt=\"Square with one quarter shaded\" loading=\"lazy\" data-ml-figure=\"quarterSquare\" style=\"max-width:120px\" /></div></p>",
@@ -20165,7 +20169,11 @@
         "knowledge_section": "I",
         "knowledge_section_title_en": "Part I — Math 5/4 Readiness",
         "knowledge_section_title_zh": "Part I — Math 5/4 Readiness",
-        "correct_answer": "75\\%"
+        "correct_answer": "75",
+        "answer_alternates": [
+          "75%",
+          "75"
+        ]
       },
       {
         "stem": "<p>What is the perimeter of this rectangle?  <div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"6 inch by 4 inch rectangle\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/rectangleSixFour.png\" alt=\"6 inch by 4 inch rectangle\" loading=\"lazy\" data-ml-figure=\"rectangleSixFour\" style=\"max-width:200px\" /></div></p>",
@@ -20401,7 +20409,10 @@
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
         "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
-        "correct_answer": "449 cherries"
+        "correct_answer": "449",
+        "answer_alternates": [
+          "449 cherries"
+        ]
       },
       {
         "stem": "<p>After paying \\(&#36;7.50\\) for a movie ticket, Salvador still had \\(&#36;3.75\\). How much money did Salvador have before paying for a ticket?</p>",
@@ -20618,7 +20629,10 @@
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
         "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
-        "correct_answer": "3 1/2"
+        "correct_answer": "3 1/2",
+        "answer_alternates": [
+          "3.5"
+        ]
       },
       {
         "stem": "<p>Find the missing number:</p>\n<div class=\"stem-math-block\">\\[\n\\frac{7}{25}=\\frac{\\phantom{00}}{100}\n\\]</div>",
@@ -20650,7 +20664,10 @@
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
         "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
-        "correct_answer": "12 1/2"
+        "correct_answer": "12 1/2",
+        "answer_alternates": [
+          "12.5"
+        ]
       },
       {
         "stem": "<p>A stop sign is the shape of an octagon. An octagon has how many sides?</p>",
@@ -20666,7 +20683,10 @@
         "knowledge_section": "II",
         "knowledge_section_title_en": "Part II — Math 6/5 Readiness",
         "knowledge_section_title_zh": "Part II — Math 6/5 Readiness",
-        "correct_answer": "8 sides"
+        "correct_answer": "8",
+        "answer_alternates": [
+          "8 sides"
+        ]
       },
       {
         "stem": "<p>What are the next three terms in this counting sequence?</p>\n<div class=\"stem-math-block\">\\[\n\\ldots,\\ 2700,\\ 2800,\\ 2900,\\ \\underline{\\phantom{000}},\\ \\underline{\\phantom{000}},\\ \\underline{\\phantom{000}},\\ \\ldots\n\\]</div>",
@@ -20768,7 +20788,10 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "450 chairs"
+        "correct_answer": "450",
+        "answer_alternates": [
+          "450 chairs"
+        ]
       },
       {
         "stem": "<p>The average pumpkin weighs 6 pounds. The prize-winning pumpkin weighs 324 pounds. The prize-winning pumpkin weighs as much as how many average pumpkins?</p>",
@@ -20838,7 +20861,10 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "13/50"
+        "correct_answer": "13/50",
+        "answer_alternates": [
+          "0.26"
+        ]
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n\\frac83\\cdot\\frac31\n\\]</div>",
@@ -20902,7 +20928,10 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "3 2/3"
+        "correct_answer": "3 2/3",
+        "answer_alternates": [
+          "3.66667"
+        ]
       },
       {
         "stem": "<p>Divide:</p>\n<div class=\"stem-math-block\">\\[\n\\frac34\\div 1\\frac12\n\\]</div>",
@@ -20918,7 +20947,10 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "\\frac12"
+        "correct_answer": "1/2",
+        "answer_alternates": [
+          "0.5"
+        ]
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n2^3+\\sqrt{25}\\cdot 3-4^2\\div \\sqrt{4}\n\\]</div>",
@@ -21036,7 +21068,11 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "62.5\\%"
+        "correct_answer": "62.5",
+        "answer_alternates": [
+          "62.5%",
+          "62.5"
+        ]
       },
       {
         "stem": "<p>Complete the table.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Fraction</th><th>Decimal</th><th>Percent</th></tr></thead><tbody><tr><td>\\(\\underline{\\phantom{000}}\\)</td><td>1.25</td><td>125&#37;</td></tr></tbody></table></div>",
@@ -21052,7 +21088,10 @@
         "knowledge_section": "III",
         "knowledge_section_title_en": "Part III — Math 7/6 Readiness",
         "knowledge_section_title_zh": "Part III — Math 7/6 Readiness",
-        "correct_answer": "1 1/4"
+        "correct_answer": "1 1/4",
+        "answer_alternates": [
+          "1.25"
+        ]
       },
       {
         "stem": "<p>Round \\(7.49362\\) to the nearest thousandth.</p>",
@@ -21230,7 +21269,10 @@
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
         "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
-        "correct_answer": "5/12"
+        "correct_answer": "5/12",
+        "answer_alternates": [
+          "0.416667"
+        ]
       },
       {
         "stem": "<p>Find \\(w\\):</p>\n<div class=\"stem-math-block\">\\[\n6w=6^3\n\\]</div>",
@@ -21278,7 +21320,10 @@
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
         "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
-        "correct_answer": "3 2/3"
+        "correct_answer": "3 2/3",
+        "answer_alternates": [
+          "3.66667"
+        ]
       },
       {
         "stem": "<p>Multiply:</p>\n<div class=\"stem-math-block\">\\[\n(0.15)(0.05)\n\\]</div>",
@@ -21326,7 +21371,10 @@
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
         "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
-        "correct_answer": "\\frac13"
+        "correct_answer": "1/3",
+        "answer_alternates": [
+          "0.333333"
+        ]
       },
       {
         "stem": "<p>Write a fraction equal to \\(\\frac12\\) with a denominator of 6 and a fraction equal to \\(\\frac13\\) with a denominator of 6. Then add the fractions.</p>",
@@ -21342,7 +21390,10 @@
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
         "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
-        "correct_answer": "\\frac56"
+        "correct_answer": "5/6",
+        "answer_alternates": [
+          "0.833333"
+        ]
       },
       {
         "stem": "<p>Evaluate:</p>\n<div class=\"stem-math-block\">\\[\nx^3-xy-\\frac{x}{y}\\quad\\text{if }x=2\\text{ and }y=0.5\n\\]</div>",
@@ -21390,7 +21441,11 @@
         "knowledge_section": "IV",
         "knowledge_section_title_en": "Part IV — Math 8/7 Readiness",
         "knowledge_section_title_zh": "Part IV — Math 8/7 Readiness",
-        "correct_answer": "70\\%"
+        "correct_answer": "70",
+        "answer_alternates": [
+          "70%",
+          "70"
+        ]
       },
       {
         "stem": "<p>The first flock contained 5283 birds. The second flock contained 5 times as many birds. The third flock had twice as many birds as the second flock. How many birds were there in all?</p>",
@@ -21476,7 +21531,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "420 frogs"
+        "correct_answer": "420",
+        "answer_alternates": [
+          "420 frogs"
+        ]
       },
       {
         "stem": "<p>Six times a number is 45 greater than the product of the number and \\(-3\\). Find the number.</p>",
@@ -21524,7 +21582,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "11/9"
+        "correct_answer": "11/9",
+        "answer_alternates": [
+          "1.22222"
+        ]
       },
       {
         "stem": "<div class=\"stem-figure-row stem-figure-row--stacked\"><div class=\"stem-figure-row__text\">Find the surface area of this right solid. Dimensions are in centimeters.</div><div class=\"stem-figure-row__fig\"><div class=\"stem-figure-wrap stem-figure-wrap--middle\" role=\"img\" aria-label=\"Trapezoidal prism\"><img class=\"stem-figure-img stem-figure-img--placement-middle\" src=\"/static/placement_middle/trapezoidSolid.png\" alt=\"Trapezoidal prism\" loading=\"lazy\" data-ml-figure=\"trapezoidSolid\" style=\"max-width:220px\" /></div></div></div>",
@@ -21607,7 +21668,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "5 3/7"
+        "correct_answer": "5 3/7",
+        "answer_alternates": [
+          "5.42857"
+        ]
       },
       {
         "stem": "<p>Subtract:</p>\n<div class=\"stem-math-block\">\\[\n9876.5-643.99\n\\]</div>",
@@ -21639,7 +21703,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "38/3"
+        "correct_answer": "38/3",
+        "answer_alternates": [
+          "12.6667"
+        ]
       },
       {
         "stem": "<p>Simplify:</p>\n<div class=\"stem-math-block\">\\[\n3^2+3\\left[2^3\\left(\\sqrt{49}-2^2\\right)\\left(3^2-2^3\\right)-2^2\\right]\n\\]</div>",
@@ -21671,7 +21738,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "\\frac35"
+        "correct_answer": "3/5",
+        "answer_alternates": [
+          "0.6"
+        ]
       },
       {
         "stem": "<p>Convert \\(250.025\\) to a mixed number.</p>",
@@ -21687,7 +21757,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "250 1/40"
+        "correct_answer": "250 1/40",
+        "answer_alternates": [
+          "250.025"
+        ]
       },
       {
         "stem": "<p>Use two unit multipliers to convert 144 square feet to square miles. Round any decimal answer to two places.</p>",
@@ -21722,7 +21795,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "2 3/4"
+        "correct_answer": "2 3/4",
+        "answer_alternates": [
+          "2.75"
+        ]
       }
     ]
   }

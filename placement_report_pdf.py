@@ -17,6 +17,8 @@ if os.path.isdir(os.path.join(_THIRD_PARTY, "fpdf")):
     if _abs_tp not in sys.path:
         sys.path.insert(0, _abs_tp)
 
+from answer_grader import display_answer_plain
+
 # PyPI package name is fpdf2; it exposes the import path `fpdf`.
 try:
     from fpdf import FPDF
@@ -869,8 +871,8 @@ def _draw_itemized_table(
         st = str(row.get("status", "") or "")
         q = _pdf_core_font_safe(str(row.get("q_display", "")))
         part = _pdf_core_font_safe(str(row.get("knowledge_section", ""))[:8])
-        yv = _pdf_core_font_safe(str(row.get("yours_display", ""))[:24])
-        kv = _pdf_core_font_safe(str(row.get("key_display", ""))[:24])
+        yv = _pdf_core_font_safe(display_answer_plain(str(row.get("yours_display", "")), max_len=24))
+        kv = _pdf_core_font_safe(display_answer_plain(str(row.get("key_display", "")), max_len=24))
         st_label = _pdf_core_font_safe(_status_label(st))
         r, g, b = _status_color(st)
 
