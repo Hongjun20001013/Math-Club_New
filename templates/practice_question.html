@@ -496,7 +496,7 @@ function toggleQuestionPicker() {
 }
 
 function syncQuestionPickerMarks() {
-    const prefix = "{{ domain }}_{{ topic }}_";
+    const prefix = "{{ domain }}_{{ topic }}_att{{ attempt_id }}_";
     document.querySelectorAll(".q-picker-grid .q-nav-btn[data-q-index]").forEach((btn) => {
         const idx = btn.getAttribute("data-q-index");
         const flagged = localStorage.getItem(prefix + idx + "_review_flag") === "1";
@@ -516,9 +516,24 @@ document.addEventListener("keydown", (e) => {
 
 /* ================= CHOICE SELECT ================= */
 
-const storageKey = "{{ domain }}_{{ topic }}_{{ qnum }}";
+const practiceStoragePrefix = "{{ domain }}_{{ topic }}_att" + String(practiceAttemptId) + "_";
+const storageKey = practiceStoragePrefix + "{{ qnum }}";
 const scratchKey = storageKey + "_scratch";
 const reviewFlagKey = storageKey + "_review_flag";
+const questionAlreadyAnswered = {{ (qnum in answered_qset) | tojson }};
+
+function clearLegacyPracticeDrafts() {
+    if (!practiceAttemptId) return;
+    const legacyPrefix = "{{ domain }}_{{ topic }}_";
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(legacyPrefix)) continue;
+        if (key.startsWith(practiceStoragePrefix)) continue;
+        keysToRemove.push(key);
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+}
 const selectedInput = document.getElementById("selected-answer-input");
 const sprInput = document.getElementById("spr-answer-input");
 const constructedInput = document.getElementById("constructed-answer-input");
@@ -606,6 +621,9 @@ window.addEventListener("pageshow", scheduleRevealQuestionContent);
 
 window.addEventListener("load", () => {
     scheduleRevealQuestionContent();
+    {% if placement_clear_storage %}
+    clearLegacyPracticeDrafts();
+    {% endif %}
 
     document.querySelectorAll("#question-area img").forEach((img) => {
         if (!img.complete) {
@@ -654,7 +672,7 @@ window.addEventListener("load", () => {
         });
     }
 
-    const saved = localStorage.getItem(storageKey);
+    const saved = questionAlreadyAnswered ? null : localStorage.getItem(storageKey);
     if (constructedInput && saved !== null) {
         constructedInput.value = saved;
         setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");

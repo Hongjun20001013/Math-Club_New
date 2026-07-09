@@ -46,7 +46,6 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
-from placement_intelligent_report import build_intelligent_placement_report
 
 # =====================================================
 # BASIC CONFIG
@@ -11262,6 +11261,11 @@ def practice_question(domain, topic, qnum):
                 "SELECT id FROM practice_attempts WHERE id = ? AND domain = ? AND topic = ?",
                 (attempt_id, domain, topic),
             ).fetchone()
+            if row is not None and not _attempt_user_matches(db, int(row["id"]), user_id):
+                session.pop(sk, None)
+                session.modified = True
+                row = None
+                attempt_id = None
         if row is None:
             if domain == "placement" and not _placement_profile_from_session()[0]:
                 flash("Please complete the student information before starting the diagnostic.")
@@ -11369,6 +11373,10 @@ def practice_question(domain, topic, qnum):
                 f"in this set before mistakes count toward your error log."
             )
 
+    placement_clear_storage = bool(
+        placement_mode and attempt_id is not None and answered_count == 0
+    )
+
     return render_template(
         "practice_question.html",
         q=_sanitize_question_for_render(q),
@@ -11397,6 +11405,7 @@ def practice_question(domain, topic, qnum):
         mistake_analytics_part=analytics_part_q,
         mistake_miss_anchor=miss_anchor_q,
         tracked_responses_hint=tracked_responses_hint,
+        placement_clear_storage=placement_clear_storage,
     )
 
 
@@ -11500,6 +11509,13 @@ def submit_practice_answer():
                 "SELECT id FROM practice_attempts WHERE id = ?",
                 (attempt_id,),
             ).fetchone()
+            if attempt_exists is not None and not _attempt_user_matches(
+                db, attempt_id, session.get("user_id")
+            ):
+                session.pop(_practice_session_key(domain, topic), None)
+                session.modified = True
+                attempt_exists = None
+                attempt_id = None
 
         if attempt_id is None or attempt_exists is None:
             user_id = session.get("user_id")
@@ -12018,24 +12034,6 @@ def _practice_session_summary_payload(
                 placement_brand["trust_line_zh"] = "分数区间与纸质分班测试官方说明一致。"
 
     placement_intelligent_report: dict | None = None
-    if domain == "placement" and for_pdf:
-        placement_intelligent_report = build_intelligent_placement_report(
-            topic=topic,
-            topic_title=TOPIC_TITLES.get(topic, topic),
-            attempt_id=attempt_id,
-            rows=rows_out,
-            questions=questions,
-            section_stats=section_stats,
-            placement_student=placement_student,
-            placement_rec=placement_rec,
-            placement_gate_scores=placement_gate_scores,
-            correct_count=correct_count,
-            gradable_total=placement_gradable_total if placement_gradable_total else total_q,
-            score_pct=score_pct,
-            meta=placement_meta if domain == "placement" else {},
-        )
-        if not placement_intelligent_report:
-            placement_intelligent_report = None
 
     celebrate_confetti = bool(domain == "placement" or score_pct >= 55)
 
