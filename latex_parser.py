@@ -1987,7 +1987,16 @@ def _strip_latex_answer_text(raw: str) -> str:
     s = re.sub(r"\\frac\{([^}]+)\}\{([^}]+)\}", r"\1/\2", s)
     s = re.sub(r"\\frac(\d)(\d)\b", r"\1/\2", s)
     s = re.sub(r"\\times\s*10\^\{([^}]+)\}", r"e\1", s)
-    s = re.sub(r"\^\{([^}]+)\}", r"^\1", s)
+    s = re.sub(r"\\approx", "≈", s)
+    s = re.sub(r"\\sqrt\{([^{}]+)\}", r"√\1", s)
+    s = re.sub(r"\\sqrt(\d+)", r"√\1", s)
+    s = re.sub(r"\\sin", "sin", s)
+    s = re.sub(r"\\cos", "cos", s)
+    s = re.sub(r"\\tan", "tan", s)
+    s = re.sub(r"\\theta", "θ", s)
+    s = re.sub(r"\\pi", "π", s)
+    s = re.sub(r"\^?\\circ", "°", s)
+    s = re.sub(r"\^\{([^}]+)\}", r"^(\1)", s)
     s = re.sub(r"\\[(),]", "", s)
     s = re.sub(r"\{|\}", "", s)
     s = re.sub(r"\\end\{item\}", "", s, flags=re.I)
@@ -1998,7 +2007,7 @@ def _strip_latex_answer_text(raw: str) -> str:
 
 _MIDDLE_LEVEL_UNIT_SUFFIX = (
     r"beans|miles|mi|in\.|sq\. in\.|square inches|members|years old|cm|mm|seconds|"
-    r"birds|hamburgers|average pumpkins|containers|m\^2|mm\^3|mi\^2|per container|"
+    r"birds|hamburgers|average pumpkins|containers|m\^3|m\^2|mm\^3|mi\^2|per container|"
     r"cherries|chairs|frogs|sides"
 )
 
@@ -2085,6 +2094,47 @@ def parse_middle_level_placement_answer_key(tex: str) -> dict[int, dict[str, Any
     return out
 
 
+def _enhanced_fr_answer_alternates(text: str) -> list[str]:
+    """Extract short forms students may enter for Enhanced Math FR items.
+
+    Only keep high-confidence tokens (approx values, radicals, pi forms, and
+    explicit short whole-key answers). Avoid harvesting every number from a
+    multi-part rubric, which would over-accept partial answers.
+    """
+    alts: list[str] = []
+    low = text.lower()
+    if "no solution" in low:
+        alts.extend(["no solution", "nosolution", "none"])
+
+    compact = text.replace(",", "").strip()
+    if len(compact) <= 24 and re.fullmatch(
+        r"[-+]?\d+(?:\.\d+)?(?:/\d+)?",
+        compact,
+    ):
+        alts.append(compact)
+
+    # Values written after ≈ that are complete numbers (not 48tan...).
+    # Allow trailing punctuation like "440.59." at end of sentence.
+    for m in re.finditer(r"≈\s*(-?\d+(?:\.\d+)?)(?![A-Za-z0-9])", text):
+        alts.append(m.group(1))
+
+    # Result angles only: ≈59.4° or 120.6° (not input angles like tan(38°)).
+    for m in re.finditer(r"(?:≈|or)\s*(-?\d+(?:\.\d+)?)°", text):
+        alts.append(m.group(1))
+
+    # Radical / pi tokens that are themselves the answer.
+    for tok in re.findall(r"√\d+|5π|5\s*π", text):
+        cleaned = tok.replace(" ", "")
+        alts.append(cleaned)
+        if cleaned.startswith("√"):
+            n = cleaned[1:]
+            alts.extend([f"sqrt({n})", f"sqrt{n}", f"√{n}"])
+        if "π" in cleaned:
+            alts.extend([cleaned.replace("π", "pi"), cleaned.replace("π", "π")])
+
+    return list(dict.fromkeys(a for a in alts if a))
+
+
 def parse_enhanced_math_placement_fr_answer_key(tex: str) -> dict[int, dict[str, Any]]:
     """Parse FR1–FRn selected answers from Enhanced Math placement TeX."""
     out: dict[int, dict[str, Any]] = {}
@@ -2103,15 +2153,8 @@ def parse_enhanced_math_placement_fr_answer_key(tex: str) -> dict[int, dict[str,
         if not text:
             continue
         entry: dict[str, Any] = {"correct_answer": text}
-        alts: list[str] = []
-        if "no solution" in text.lower():
-            alts.extend(["no solution", "nosolution", "none"])
-        if len(text) <= 24 and re.fullmatch(
-            r"[-+]?\d+(?:\.\d+)?(?:/\d+)?",
-            text.replace(",", "").strip(),
-        ):
-            alts.append(text.replace(",", ""))
+        alts = _enhanced_fr_answer_alternates(text)
         if alts:
-            entry["answer_alternates"] = list(dict.fromkeys(alts))
+            entry["answer_alternates"] = alts
         out[n] = entry
     return out

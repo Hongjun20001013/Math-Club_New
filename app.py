@@ -11923,11 +11923,14 @@ def _practice_session_summary_payload(
         mcq_rows = [
             (row, qobj)
             for row, qobj in zip(rows_out, questions)
-            if qobj.get("question_kind") == "mcq"
+            if qobj.get("question_kind") in ("mcq", "mcq5")
         ]
         placement_mcq_total = len(mcq_rows)
         placement_mcq_correct = sum(1 for row, _ in mcq_rows if row["status"] == "correct")
-    if domain == "placement" and placement_gradable_total:
+        # Enhanced Math course placement is MCQ-based; keep displayed % aligned.
+        if placement_mcq_total:
+            score_pct = round(100.0 * placement_mcq_correct / placement_mcq_total)
+    elif domain == "placement" and placement_gradable_total:
         score_pct = round(100.0 * correct_count / placement_gradable_total)
     mistake_focus: List[dict] = []
     skipped_count = sum(1 for r in rows_out if r["status"] == "skipped")
@@ -12063,7 +12066,18 @@ def _practice_session_summary_payload(
                 )
 
     placement_score_total = (
-        placement_gradable_total if domain == "placement" and placement_gradable_total else total_q
+        placement_mcq_total
+        if flow_cfg and flow_cfg.get("mc_scored") and placement_mcq_total
+        else (
+            placement_gradable_total
+            if domain == "placement" and placement_gradable_total
+            else total_q
+        )
+    )
+    display_correct_count = (
+        placement_mcq_correct
+        if flow_cfg and flow_cfg.get("mc_scored") and placement_mcq_total
+        else correct_count
     )
     render = {
         "domain": domain,
@@ -12071,7 +12085,7 @@ def _practice_session_summary_payload(
         "topic_title": topic_title,
         "attempt_id": attempt_id,
         "rows": rows_out,
-        "correct_count": correct_count,
+        "correct_count": display_correct_count,
         "total_q": total_q,
         "placement_gradable_total": placement_gradable_total if domain == "placement" else None,
         "placement_ungraded_count": placement_ungraded_count if domain == "placement" else None,
@@ -12172,7 +12186,10 @@ def practice_session_item(attempt_id: int, q_index: int):
     elif not yours_raw:
         status = "skipped"
     elif not correct_key:
-        status = "nocheck"
+        if qobj.get("question_kind") in ("constructed_response", "free_response"):
+            status = "submitted"
+        else:
+            status = "nocheck"
     else:
         graded = response_is_correct(qobj, yours_raw)
         if graded is True:
@@ -12181,11 +12198,15 @@ def practice_session_item(attempt_id: int, q_index: int):
             status = "incorrect"
         else:
             status = "nocheck"
-    choice_letters = ["A", "B", "C", "D"]
+    choice_letters = ["A", "B", "C", "D", "E"]
     result_choices: List[dict] = []
-    if qobj.get("question_kind", "mcq") == "mcq" and qobj.get("choices"):
+    kind = qobj.get("question_kind", "mcq")
+    if kind in ("mcq", "mcq5") and qobj.get("choices"):
+        max_letters = 5 if kind == "mcq5" else 4
         for j, html in enumerate(qobj["choices"]):
-            letter = choice_letters[j] if j < len(choice_letters) else "?"
+            if j >= max_letters:
+                break
+            letter = choice_letters[j]
             is_selected = yours_raw.upper() == letter if yours_raw else False
             is_correct_choice = (
                 correct_key.upper() == letter if correct_key and len(correct_key) == 1 else False

@@ -18705,7 +18705,10 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "Plan A linear, Plan B exponential; A(5)=450, B(5)\\approx440.59."
+        "correct_answer": "Plan A linear, Plan B exponential; A(5)=450, B(5)≈440.59.",
+        "answer_alternates": [
+          "440.59"
+        ]
       },
       {
         "stem": "<p>Sequences. A geometric sequence begins \\(\\displaystyle 5,15,45,135,\\ldots\\)</p>\n<ol class=\"stem-enumerate\"><li>Write an explicit formula for the \\(\\displaystyle n\\)th term.</li><li>Find the 10th term.</li><li>Compare this sequence to the arithmetic sequence \\(\\displaystyle a_n=5+10(n-1)\\) at \\(\\displaystyle n=10\\).</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -18719,7 +18722,7 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "a_n=5(3)^n-1; a_10=98,415; arithmetic value is 95."
+        "correct_answer": "a_n=5(3)^(n-1); a_10=98,415; arithmetic value is 95."
       },
       {
         "stem": "<p>Statistics and Outliers. The data set gives quiz scores:</p>\n<div class=\"stem-math-block\">\\[\n62,\\ 70,\\ 74,\\ 76,\\ 79,\\ 80,\\ 82,\\ 84,\\ 86,\\ 88,\\ 91,\\ 100\n\\]</div>\n<ol class=\"stem-enumerate\"><li>Find the mean and median.</li><li>Find the interquartile range.</li><li>Explain whether the mean or median better represents the typical score.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -18775,7 +18778,12 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "Square; all four side lengths are \\sqrt29 and adjacent slopes are negative reciprocals."
+        "correct_answer": "Square; all four side lengths are √29 and adjacent slopes are negative reciprocals.",
+        "answer_alternates": [
+          "√29",
+          "sqrt(29)",
+          "sqrt29"
+        ]
       },
       {
         "stem": "<p>Transformation and Congruence Proof. Triangle \\(\\displaystyle ABC\\) has vertices</p>\n<div class=\"stem-math-block\">\\[\nA(-3,2),\\quad B(-1,6),\\quad C(2,3).\n\\]</div>\n<p>It is reflected across the \\(\\displaystyle y\\)-axis and then translated 4 units down.</p>\n<ol class=\"stem-enumerate\"><li>Give the coordinates of \\(\\displaystyle A'B'C'\\).</li><li>Explain why \\(\\displaystyle \\triangle ABC\\cong\\triangle A'B'C'\\).</li><li>Name the rigid motions used.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -19944,7 +19952,12 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "6|x^3|\\sqrt3; x^5/3; solution x=1 only."
+        "correct_answer": "6|x^3|√3; x^(5/3); solution x=1 only.",
+        "answer_alternates": [
+          "√3",
+          "sqrt(3)",
+          "sqrt3"
+        ]
       },
       {
         "stem": "<p>Probability. A bag contains 5 red, 4 blue, and 3 green tiles. Two tiles are drawn without replacement.</p>\n<ol class=\"stem-enumerate\"><li>Find the probability both tiles are blue.</li><li>Find the probability the first tile is red and the second tile is green.</li><li>Find the probability at least one of the two tiles is green.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -19972,7 +19985,10 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "Height 48(38^)+5 43 ft; tangent is used because opposite and adjacent sides are involved."
+        "correct_answer": "Height ≈ 48tan(38°)+5≈ 43 ft; tangent is used because opposite and adjacent sides are involved.",
+        "answer_alternates": [
+          "43"
+        ]
       },
       {
         "stem": "<p>Enhanced Statistics. A normally distributed test has mean \\(\\displaystyle 76\\) and standard deviation \\(\\displaystyle 8\\).</p>\n<ol class=\"stem-enumerate\"><li>Find the \\(\\displaystyle z\\)-score for a score of \\(\\displaystyle 92\\).</li><li>Approximate the percentile for a score of \\(\\displaystyle 92\\) using the empirical rule.</li><li>A student scored \\(\\displaystyle 68\\). Explain whether \\(\\displaystyle 92\\) or \\(\\displaystyle 68\\) is more unusual.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -20014,7 +20030,11 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "c\\approx10.0; area \\approx60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed."
+        "correct_answer": "c≈10.0; area ≈60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed.",
+        "answer_alternates": [
+          "10.0",
+          "60.2"
+        ]
       },
       {
         "stem": "<p>Law of Sines and the Ambiguous Case. In \\(\\displaystyle \\triangle ABC\\), \\(\\displaystyle A=35^\\circ\\), \\(\\displaystyle a=12\\), and \\(\\displaystyle b=18\\).</p>\n<ol class=\"stem-enumerate\"><li>Use the Law of Sines to find all possible measures of angle \\(\\displaystyle B\\) to the nearest tenth.</li><li>Find the corresponding possible measures of angle \\(\\displaystyle C\\).</li><li>Explain why this information creates the ambiguous case.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -20028,7 +20048,13 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "B=18\\sin35^/12, so B\\approx59.4^ or 120.6^; C\\approx85.6^ or 24.4^."
+        "correct_answer": "sin B=18sin35°/12, so B≈59.4° or 120.6°; C≈85.6° or 24.4°.",
+        "answer_alternates": [
+          "59.4",
+          "85.6",
+          "120.6",
+          "24.4"
+        ]
       },
       {
         "stem": "<p>Circle Relationships and Sector Area.</p>\n<ol class=\"stem-enumerate\"><li>Two chords intersect inside a circle. One chord has segments \\(\\displaystyle 5\\) and \\(\\displaystyle 12\\); the other has segments \\(\\displaystyle 6\\) and \\(\\displaystyle x\\). Find \\(\\displaystyle x\\).</li><li>A circle has radius \\(\\displaystyle 6\\). A sector has area \\(\\displaystyle 15\\pi\\). Find the central angle in radians.</li><li>Find the arc length of that sector.</li></ol>\n<div class=\"placement-work-space placement-work-space--long\" role=\"note\"><span class=\"placement-work-label\">Space for work on paper</span></div>",
@@ -20042,7 +20068,11 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "x=10; central angle =5/6; arc length 5."
+        "correct_answer": "x=10; central angle θ=5π/6; arc length 5π.",
+        "answer_alternates": [
+          "5π",
+          "5pi"
+        ]
       }
     ],
     "middle_level": [
@@ -21620,7 +21650,10 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "800 m^3"
+        "correct_answer": "800",
+        "answer_alternates": [
+          "800 m^3"
+        ]
       },
       {
         "stem": "<p>Write \\(0.000387\\) in scientific notation.</p>",

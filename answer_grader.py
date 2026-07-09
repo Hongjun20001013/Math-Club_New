@@ -23,6 +23,17 @@ def _try_numeric_value(s: str) -> Optional[float]:
     t = _strip_input(s)
     if not t:
         return None
+    # Scientific notation written as "3.87 x 10^-4" / "3.87×10^-4"
+    sci = re.fullmatch(
+        r"([-+]?\d+(?:\.\d+)?)\s*[x×]\s*10\s*\^?\s*([-+]?\d+)",
+        t,
+        flags=re.I,
+    )
+    if sci:
+        try:
+            return float(sci.group(1)) * (10.0 ** int(sci.group(2)))
+        except ValueError:
+            return None
     try:
         return float(Fraction(t))
     except (ValueError, ZeroDivisionError):
@@ -42,13 +53,15 @@ _MIDDLE_LEVEL_UNITS = (
     r"cherries|chairs|frogs|birds|beans|miles|mi\b|members|years\s*old|"
     r"hamburgers|average\s*pumpkins|per\s*container|containers|seconds|"
     r"sides|square\s*inches|sq\.\s*in\.|in\.|mm\b|cm\b|"
-    r"m\^2|mm\^3|mi\^2"
+    r"m\^3|m\^2|mm\^3|mi\^2"
 )
 
 
 def _strip_trailing_units(s: str) -> str:
     t = s.strip()
     t = re.sub(rf"\s+(?:{_MIDDLE_LEVEL_UNITS})\s*$", "", t, flags=re.I)
+    # Also accept glued forms like 800m^3 / 138m^2
+    t = re.sub(r"(?<=\d)(?:m\^3|m\^2|mm\^3|mi\^2|cm|mm)\s*$", "", t, flags=re.I)
     return t.strip()
 
 
@@ -73,7 +86,7 @@ def _clean_answer_text(s: str) -> str:
     t = re.sub(r"\\(?:left|right)\b", "", t)
     t = re.sub(r"\\times\s*10\^\{?([^}]+)\}?", r"e\1", t, flags=re.I)
     t = re.sub(r"\\cdot\b", "", t)
-    t = re.sub(r"\^\{([^{}]+)\}", r"^\1", t)
+    t = re.sub(r"\^\{([^{}]+)\}", r"^(\1)", t)
     t = re.sub(r"\\[(),]", "", t)
     t = re.sub(r"\{|\}", "", t)
     t = re.sub(r"\\approx", "≈", t)
@@ -82,8 +95,18 @@ def _clean_answer_text(s: str) -> str:
     t = re.sub(r"\\sin", "sin", t)
     t = re.sub(r"\\cos", "cos", t)
     t = re.sub(r"\\tan", "tan", t)
+    t = re.sub(r"\\theta", "θ", t)
+    t = re.sub(r"\\pi", "π", t)
+    t = re.sub(r"\^?\\circ", "°", t)
     t = re.sub(r"\\[a-zA-Z]+\b", "", t)
     t = t.replace("P.M.", "PM").replace("A.M.", "AM").replace("p.m.", "PM").replace("a.m.", "AM")
+    # Word-style scientific notation → e-form for display/compare helpers
+    t = re.sub(
+        r"([-+]?\d+(?:\.\d+)?)\s*[x×]\s*10\s*\^?\s*([-+]?\d+)",
+        r"\1e\2",
+        t,
+        flags=re.I,
+    )
     t = re.sub(r"\s+", " ", t).strip()
     return t
 
@@ -105,6 +128,14 @@ def _mixed_number_to_decimal(s: str) -> Optional[str]:
         return None
 
 
+def _remainder_parts(s: str) -> Optional[tuple[str, str]]:
+    """Parse division-with-remainder answers like '632 R3'."""
+    m = re.fullmatch(r"(-?\d+)\s*[rR]\s*(-?\d+)", s.strip())
+    if not m:
+        return None
+    return m.group(1), m.group(2)
+
+
 def _answer_variants(s: str) -> Set[str]:
     """Comparable forms for a reference or student answer."""
     variants: Set[str] = set()
@@ -120,6 +151,10 @@ def _answer_variants(s: str) -> Set[str]:
             continue
         variants.add(_norm_text(cand))
         variants.add(_norm_text(cand.replace(",", "")))
+        rem = _remainder_parts(cand)
+        if rem:
+            # Canonical remainder form only (reject bare quotient).
+            variants.add(_norm_text(f"{rem[0]}R{rem[1]}"))
         dec = _mixed_number_to_decimal(cand)
         if dec:
             variants.add(_norm_text(dec))
@@ -155,6 +190,16 @@ def free_response_matches(student: str, canonical: str, alternates: List[str], t
     if not _strip_input(student):
         return False
 
+    # Remainder answers must keep both quotient and remainder.
+    can_rem = _remainder_parts(_clean_answer_text(canonical))
+    stu_rem = _remainder_parts(_clean_answer_text(student))
+    if can_rem is not None:
+        if stu_rem is None:
+            return False
+        if can_rem == stu_rem:
+            return True
+        # Still allow exact alternate remainder strings below.
+
     student_vars = _answer_variants(student)
     refs = [canonical, *alternates]
     for ref in refs:
@@ -163,9 +208,11 @@ def free_response_matches(student: str, canonical: str, alternates: List[str], t
             return True
 
     sn = _try_numeric_value(student)
-    if sn is not None:
+    if sn is not None and can_rem is None:
         for ref in refs:
             for rv in _answer_variants(str(ref)):
+                if _remainder_parts(rv) is not None:
+                    continue
                 rn = _try_numeric_value(rv)
                 if rn is not None and numeric_match(sn, rn, tol):
                     return True

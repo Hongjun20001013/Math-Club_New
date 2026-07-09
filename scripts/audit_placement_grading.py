@@ -14,15 +14,49 @@ from answer_grader import display_answer_plain, response_is_correct  # noqa: E40
 BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 
 MIDDLE_LEVEL_CASES = [
+    # Format-equivalent correct
     (7, "75", True),
+    (7, "75%", True),
     (21, "449", True),
+    (21, "449 cherries", True),
     (43, "450", True),
     (59, "62.5", True),
     (52, "1/2", True),
     (80, "70", True),
     (36, "12.5", True),
+    (36, "12 1/2", True),
+    (90, "800", True),
+    (90, "800 m^3", True),
+    (99, "5.17e-6", True),
+    (99, "5.17 x 10^-6", True),
+    (99, "5.17×10^-6", True),
+    (13, "632 R3", True),
+    (13, "632R3", True),
+    (26, "818080", True),
+    (38, "3000,3100,3200", True),
+    # Must stay wrong
     (37, "5", False),
     (76, "no", False),
+    (13, "632", False),
+    (4, "14:11", False),
+    (1, "2.83", False),
+]
+
+ENHANCED_FR_CASES = [
+    ("enhanced_math_1", 55, "no solution", True),
+    ("enhanced_math_1", 55, "none", True),
+    ("enhanced_math_1", 58, "440.59", True),
+    ("enhanced_math_1", 63, "√29", True),
+    ("enhanced_math_2", 64, "43", True),
+    ("enhanced_math_2", 64, "48", False),
+    ("enhanced_math_2", 64, "38", False),
+    ("enhanced_math_2", 67, "10.0", True),
+    ("enhanced_math_2", 68, "59.4", True),
+    ("enhanced_math_2", 68, "35", False),
+    ("enhanced_math_2", 69, "5π", True),
+    # Should not over-accept unrelated numbers from long rubrics
+    ("enhanced_math_1", 56, "21", False),
+    ("enhanced_math_2", 60, "2", False),
 ]
 
 
@@ -55,6 +89,24 @@ def main() -> int:
             errors.append(
                 f"middle_level Q{qnum}: student {student!r} expected {expect}, got {got}"
             )
+
+    for topic, qnum, student, expect in ENHANCED_FR_CASES:
+        q = bank["placement"][topic][qnum - 1]
+        got = response_is_correct(q, student)
+        if got is not expect:
+            errors.append(
+                f"{topic} Q{qnum}: student {student!r} expected {expect}, got {got} "
+                f"(key={q.get('correct_answer')!r} alts={q.get('answer_alternates')!r})"
+            )
+
+    # MCQ letter completeness
+    for topic, kind in (("placement_full", "mcq5"), ("enhanced_math_1", "mcq"), ("enhanced_math_2", "mcq")):
+        qs = [q for q in bank["placement"][topic] if q.get("question_kind") == kind]
+        for i, q in enumerate(qs, start=1):
+            key = str(q.get("correct_answer") or "").upper()
+            allowed = set("ABCDE") if kind == "mcq5" else set("ABCD")
+            if key not in allowed:
+                errors.append(f"{topic} MCQ#{i}: invalid key {key!r}")
 
     if errors:
         print("PLACEMENT GRADING AUDIT FAILED")
