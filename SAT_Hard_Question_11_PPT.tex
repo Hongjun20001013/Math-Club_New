@@ -1,0 +1,332 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Hard Question 11]{\textbf{SAT Hard Question\\ Set 11}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 2 · Hard Question Practice}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Hard Question Set 11}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Hard Question Set 11}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{12 SAT-style challenge problems}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+In the given equation, \(a\) and \(b\) are positive constants.
+The sum of the solutions to the given equation is \(k(6a + b)\), where \(k\) is constant.
+What is the value of \(k\)?
+\[
+24x^2 - (12a + 2b)x + ab = 0
+\]
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\frac{1}{12}\)
+    \item[B.] \(-\frac{1}{12}\)
+    \item[C.] 12
+    \item[D.] -12
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+The positive number \(a\) is 2,136\% of the sum of the positive numbers \(b\) and \(c\),
+and \(b\) is 89\% of \(c\). What percent of \(b\) is \(a\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 4,536\%
+    \item[B.] 2,400\%
+    \item[C.] 4,037\%
+    \item[D.] 2,225\%
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+The graphs in the \(xy\)-plane of the following quadratic equations each have
+\(x\)-intercepts of \(-2\) and 4. The graph of which equation has its vertex
+\textbf{farthest from the \(x\)-axis}?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(y = -7(x + 2)(x - 4)\)
+    \item[B.] \(y = \frac{1}{10}(x + 2)(x - 4)\)
+    \item[C.] \(y = -\frac{1}{2}(x + 2)(x - 4)\)
+    \item[D.] \(y = 5(x + 2)(x - 4)\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+In one hour, the distance, \(d(s)\), in kilometers that a ferry can travel up and down a river
+flowing with a constant speed \(s\), in meters per second, is:
+\[
+d(s) = 10.7 - 1.2s^2
+\]
+where \(s\) and \(d(s)\) are positive.
+
+Which of the following equivalent expressions for \(d(s)\) contains the speed
+of the river in meters per second, as a constant or coefficient, for which
+the ferry can travel a distance of 8 kilometers in one hour?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(8 - 1.2(s - 1.5)(s + 1.5)\)
+    \item[B.] \(8 + 1.2(2.25 - s^2)\)
+    \item[C.] \(8(1 - 0.15s^2) + 2.7\)
+    \item[D.] \(11.9 - 1.2(s - 1)^2 - 2.4s\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+A minor league hockey team has been collecting ticket sales data over the past year.
+At a current price of \$25 per ticket, an average of 4{,}000 seats are purchased.
+For each \$1 increase in ticket price, 100 fewer tickets will be sold.
+
+Which of the following functions best models the total revenue \(y\), in dollars,
+from ticket sales when the ticket price increases by \(x\) dollars?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(y = (25 + x)(4000 - 100x)\)
+    \item[B.] \(y = (25 - x)(4000 + 100x)\)
+    \item[C.] \(y = x(4000 - 100x)\)
+    \item[D.] \(y = 4000(25 + x)\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+In the given expression:
+\[
+34z^{14} + bz^7 + 70,
+\]
+\(b\) is a positive integer. If \(qz^7 + r\) is a factor of the expression, where \(q\) and \(r\) are positive integers,
+what is the greatest possible value of \(b\)?
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Final Answer:} $\boxed{2381}$
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+Point \(N\) lies on a unit circle in the \(xy\)-plane and has coordinates \((1, 0)\).
+Point \(O\) is the center of the circle and has coordinates \((0, 0)\).
+Point \(M\) also lies on the unit circle, and the measure of angle \(\angle NOM\) is \(\frac{266\pi}{3}\) radians.
+If the coordinates of point \(M\) are \((a, b)\), where \(a\) and \(b\) are constants, what is the value of \(a\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\frac{1}{2}\)
+    \item[B.] \(\frac{\sqrt{3}}{2}\)
+    \item[C.] \(-\frac{1}{2}\)
+    \item[D.] \(-\frac{\sqrt{3}}{2}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+For each of two rectangles, the ratio of the rectangle's length to its width is \(10 : 5\).
+The width of rectangle \(X\) is 16.5 times the width of rectangle \(Y\).
+How does the length of rectangle \(X\) compare to the length of rectangle \(Y\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The length of rectangle \(X\) is 0.5 times the length of rectangle \(Y\)
+    \item[B.] The length of rectangle \(X\) is 2 times the length of rectangle \(Y\)
+    \item[C.] The length of rectangle \(X\) is 16.5 times the length of rectangle \(Y\)
+    \item[D.] The length of rectangle \(X\) is 33 times the length of rectangle \(Y\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+In the \(xy\)-plane, a circle has center \(C\) with coordinates \((h, k)\).
+Points \(A\) and \(B\) lie on the circle. Point \(A\) has coordinates \((h + 1, k + \sqrt{102})\),
+and \(\angle ACB\) is a right angle. What is the length of \(\overline{AB}\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\sqrt{206}\)
+    \item[B.] \(2\sqrt{102}\)
+    \item[C.] \(103\sqrt{2}\)
+    \item[D.] \(103\sqrt{3}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 10 ---
+\begin{frame}{Question 10}
+\small
+\[
+y = a\left(\frac{6}{b}\right)^{x} - c
+\]
+
+How many times does the graph of the given equation in the \(xy\)-plane cross the \(x\)-axis,
+where \(a\), \(b\), and \(c\) are positive constants such that \(a > 6\) and \(b > c\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] Zero
+    \item[B.] One
+    \item[C.] Two
+    \item[D.] Three
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 10}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 11 ---
+\begin{frame}{Question 11}
+\small
+Two lines intersect at exactly one point, forming two acute angles and two obtuse angles.
+The measure of one of these angles is \(9x - 110^\circ\).
+Which of the following could \textbf{NOT} be the sum of the measures of any two of these angles?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(-18x + 220^\circ\)
+    \item[B.] \(-18x + 580^\circ\)
+    \item[C.] \(18x - 220^\circ\)
+    \item[D.] \(180^\circ\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 11}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 12 ---
+\begin{frame}{Question 12}
+\small
+The function \(f\) is defined by:
+\[
+f(x) = a(3.1^x + 3.1^b),
+\]
+where \(a\) and \(b\) are integer constants and \(0 < a < b\).
+The functions \(g\) and \(h\) are equivalent to function \(f\), where \(k\) and \(m\) are constants.
+
+Which of the following equations displays the \(y\)-coordinate of the \(y\)-intercept of the graph
+of \(y = f(x)\) in the \(xy\)-plane as a constant or coefficient?
+
+\begin{itemize}
+\item[I.] \(g(x) = a(3.1^x + k)\)
+\item[II.] \(h(x) = a(3.1^x) + m\)
+\end{itemize}
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] I only
+    \item[B.] II only
+    \item[C.] I and II only
+    \item[D.] Neither I nor II
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 12}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

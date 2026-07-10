@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}{{ phase_group.label }} · SAT Course Materials · {{ site_brand_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_atelier.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_aurora.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-cm-luxe np-cm-aurora np-cm-luxe--phase np-cm-luxe--phase-{{ phase_group.phase }}" data-cm-phase-view="{{ phase_group.phase }}">
+  <div class="np-cm-luxe-canvas" aria-hidden="true">
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--a"></div>
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--b"></div>
+    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--c"></div>
+    <div class="np-cm-luxe-canvas__beam"></div>
+    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--1"></div>
+    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--2"></div>
+    <div class="np-cm-luxe-canvas__grid"></div>
+    <div class="np-cm-luxe-canvas__grain"></div>
+  </div>
+
+  <div class="np-cm-luxe-frame">
+    <nav class="np-cm-luxe-rail" aria-label="Course navigation">
+      <a href="{{ url_for('practice') }}">SAT modules</a>
+      <span>/</span>
+      <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
+      <span>/</span>
+      <span>{{ phase_group.label }}</span>
+    </nav>
+
+    <header class="np-cm-luxe-phase-hero">
+      <div class="np-cm-luxe-phase-hero-watermark" aria-hidden="true">0{{ phase_group.phase }}</div>
+      <div class="np-cm-luxe-phase-hero-main">
+        <a href="{{ url_for('practice_course_materials') }}" class="np-cm-luxe-phase-back">← All phases</a>
+        <p class="np-cm-luxe-phase-eyebrow">{{ phase_group.label }}</p>
+        <h1>{{ phase_group.kicker }}</h1>
+        <p>{{ phase_group.description }}</p>
+        <div class="np-cm-luxe-phase-stats">
+          <div><strong>{{ phase_group.ready_count }}</strong><span>Live</span></div>
+          <div><strong>{{ phase_group.total_count }}</strong><span>Catalog</span></div>
+        </div>
+      </div>
+      <div class="np-cm-luxe-phase-hero-ring" style="--ring-pct: {{ (100 * phase_group.ready_count / phase_group.total_count)|round|int if phase_group.total_count else 0 }};">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="np-cm-luxe-ring-track"/><circle cx="60" cy="60" r="52" class="np-cm-luxe-ring-fill"/></svg>
+        <div class="np-cm-luxe-phase-hero-ring-label"><strong>{{ phase_group.ready_count }}</strong><span>online</span></div>
+      </div>
+    </header>
+
+    {% if phase_group.phase == 3 and not phase_group.ready_count %}
+    <section class="np-cm-luxe-empty">
+      <h2>Phase 3 is on the way</h2>
+      <p>Advanced review tracks are in development.</p>
+      <div class="np-cm-luxe-empty-actions">
+        <a href="{{ url_for('practice_course_materials_phase', phase_num=1) }}" class="np-cm-luxe-btn">Phase 1</a>
+        <a href="{{ url_for('practice_course_materials_phase', phase_num=2) }}" class="np-cm-luxe-btn np-cm-luxe-btn--ghost">Phase 2</a>
+      </div>
+    </section>
+    {% else %}
+
+    {% if spotlight_material %}
+    <a href="{{ url_for('practice_course_material_view', slug=spotlight_material.slug) }}?slide={{ spotlight_material.continue_slide if spotlight_mode == 'resume' else 1 }}"
+       class="np-cm-luxe-spotlight">
+      <div class="np-cm-luxe-spotlight-glow" aria-hidden="true"></div>
+      <div class="np-cm-luxe-spotlight-visual" aria-hidden="true">
+        <div class="np-cm-luxe-spotlight-stack"><span></span><span></span><span></span></div>
+      </div>
+      <div class="np-cm-luxe-spotlight-copy">
+        <p class="np-cm-luxe-spotlight-kicker">{% if spotlight_mode == 'resume' %}Continue learning{% else %}Start here{% endif %}</p>
+        <h2>{{ spotlight_material.section }} · {{ spotlight_material.title }}</h2>
+        <p>
+          {% if spotlight_mode == 'resume' %}
+          Slide {{ spotlight_material.continue_slide }} of {{ spotlight_material.slide_count }}{% if spotlight_material.continue_mastery_pct %} · {{ spotlight_material.continue_mastery_pct }}% mastery{% endif %}
+          {% else %}
+          {{ spotlight_material.slide_count or '—' }} slides{% if spotlight_material.interactive_count %} · {{ spotlight_material.interactive_count }} challenges{% endif %}
+          {% endif %}
+        </p>
+      </div>
+      <span class="np-cm-luxe-spotlight-cta">{% if spotlight_mode == 'resume' %}Resume{% else %}Open deck{% endif %} →</span>
+    </a>
+    {% endif %}
+
+    <div class="np-cm-luxe-command">
+      {% if phase_group.unit_groups|length > 1 %}
+      <div class="np-cm-luxe-segment" role="tablist">
+        <button type="button" class="is-active" data-cm-unit-filter="all" role="tab" aria-selected="true">All</button>
+        {% for group in phase_group.unit_groups %}
+        <button type="button" data-cm-unit-filter="{{ group.unit }}" role="tab" aria-selected="false">
+          {% if phase_group.phase == 1 %}Unit {{ group.unit }}{% else %}{{ group.unit_name }}{% endif %}
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <label class="np-cm-luxe-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="sr-only">Search</span>
+        <input type="search" placeholder="Search section or title…" data-cm-phase-search autocomplete="off" />
+      </label>
+    </div>
+
+    {% for group in phase_group.unit_groups %}
+    <section class="np-cm-luxe-collection" data-cm-unit-section="{{ group.unit }}">
+      <header class="np-cm-luxe-collection-head">
+        <span class="np-cm-luxe-collection-watermark" aria-hidden="true">{% if phase_group.phase == 1 %}{{ group.unit }}{% else %}★{% endif %}</span>
+        <div>
+          <p>{% if phase_group.phase == 1 %}Unit {{ group.unit }}{% else %}{{ group.unit_name }}{% endif %}</p>
+          <h2>{{ group.unit_name }}</h2>
+        </div>
+        <span class="np-cm-luxe-collection-count">{{ group.ready_count }}/{{ group.materials|length }}</span>
+      </header>
+
+      <div class="np-cm-luxe-bento">
+        {% for m in group.materials %}
+        <article class="np-cm-luxe-deck{% if not m.tex_available %} is-pending{% endif %}{% if m.user_mastery_pct and m.user_mastery_pct >= 100 %} is-done{% elif m.user_mastery_pct %} is-active{% endif %}"
+                 data-cm-lesson
+                 data-cm-unit="{{ group.unit }}"
+                 data-cm-search="{{ m.section }} {{ m.title }} {{ group.unit_name }}"
+                 style="--deck-i: {{ loop.index0 }}; --deck-progress: {{ m.user_mastery_pct or 0 }};">
+          {% if m.tex_available %}
+          <a href="{{ url_for('practice_course_material_view', slug=m.slug) }}" class="np-cm-luxe-deck-link">
+            <div class="np-cm-luxe-deck-accent" aria-hidden="true"></div>
+            <div class="np-cm-luxe-deck-layout">
+              <div class="np-cm-luxe-deck-side" aria-hidden="true">
+                <span class="np-cm-luxe-deck-section">{{ m.section }}</span>
+                <div class="np-cm-luxe-deck-preview">
+                  <span class="np-cm-luxe-deck-preview-card"></span>
+                  <span class="np-cm-luxe-deck-preview-card"></span>
+                  <span class="np-cm-luxe-deck-preview-card is-front"></span>
+                </div>
+              </div>
+              <div class="np-cm-luxe-deck-main">
+                <div class="np-cm-luxe-deck-top">
+                  <span class="np-cm-luxe-deck-badge">Live</span>
+                  {% if user_logged_in and m.user_mastery_pct %}
+                  <span class="np-cm-luxe-deck-mastery">{{ m.user_mastery_pct }}%</span>
+                  {% endif %}
+                </div>
+                <h3>{{ m.title }}</h3>
+                <p>{{ m.slide_count or '—' }} slides{% if m.interactive_count %} · {{ m.interactive_count }} challenges{% endif %}{% if m.pdf_available %} · PDF{% endif %}</p>
+                <div class="np-cm-luxe-deck-progress" aria-hidden="true"><span></span></div>
+                <span class="np-cm-luxe-deck-go">Open deck <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+            </div>
+          </a>
+          {% else %}
+          <div class="np-cm-luxe-deck-link is-static">
+            <div class="np-cm-luxe-deck-accent is-muted" aria-hidden="true"></div>
+            <div class="np-cm-luxe-deck-layout">
+              <div class="np-cm-luxe-deck-side is-muted" aria-hidden="true">
+                <span class="np-cm-luxe-deck-section">{{ m.section }}</span>
+              </div>
+              <div class="np-cm-luxe-deck-main">
+                <span class="np-cm-luxe-deck-badge is-soon">Soon</span>
+                <h3>{{ m.title }}</h3>
+                <p>Upload LaTeX + PDF to publish</p>
+                <div class="np-cm-luxe-deck-progress" aria-hidden="true"><span></span></div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    <p class="np-cm-luxe-no-match" data-cm-phase-no-results hidden>No lessons match your search.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector("[data-cm-phase-view]");
+  if (!root) return;
+  var search = root.querySelector("[data-cm-phase-search]");
+  var tabs = root.querySelectorAll("[data-cm-unit-filter]");
+  var lessons = root.querySelectorAll("[data-cm-lesson]");
+  var sections = root.querySelectorAll("[data-cm-unit-section]");
+  var noResults = root.querySelector("[data-cm-phase-no-results]");
+  var activeUnit = "all";
+  function apply() {
+    var q = (search && search.value || "").trim().toLowerCase();
+    var n = 0;
+    lessons.forEach(function (el) {
+      var ok = (activeUnit === "all" || el.getAttribute("data-cm-unit") === activeUnit)
+        && (!q || (el.getAttribute("data-cm-search") || "").toLowerCase().indexOf(q) !== -1);
+      el.style.display = ok ? "" : "none";
+      if (ok) n++;
+    });
+    sections.forEach(function (sec) {
+      if (activeUnit !== "all" && sec.getAttribute("data-cm-unit-section") !== activeUnit) {
+        sec.style.display = "none"; return;
+      }
+      var any = false;
+      sec.querySelectorAll("[data-cm-lesson]").forEach(function (el) { if (el.style.display !== "none") any = true; });
+      sec.style.display = any ? "" : "none";
+    });
+    if (noResults) noResults.hidden = n > 0;
+  }
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      activeUnit = tab.getAttribute("data-cm-unit-filter") || "all";
+      tabs.forEach(function (t) {
+        t.classList.toggle("is-active", t === tab);
+        t.setAttribute("aria-selected", t === tab ? "true" : "false");
+      });
+      apply();
+    });
+  });
+  if (search) search.addEventListener("input", apply);
+})();
+</script>
+{% endblock %}

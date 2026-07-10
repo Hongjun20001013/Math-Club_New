@@ -27,9 +27,10 @@
             <div class="np-pl-landing__main">
                 <header class="np-pl-landing-hero np-pl-reveal">
                     <div class="np-pl-landing-hero__copy">
+                        <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                         <p class="np-pl-eyebrow">
                             <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
-                            School track · Course placement
+                            Course placement · Diagnostic
                         </p>
                         <h1 class="np-pl-display np-pl-display--md" id="np-pl-heading">{{ test.title }}</h1>
                         {% if test.subtitle %}

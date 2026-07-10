@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block extra_css %}
+{% if domain == 'placement' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endif %}
+{% endblock %}
 {% block content %}
 
 <div class="np-page-shell">
@@ -34,6 +39,7 @@
     <div class="np-summary-hero-split">
       <div class="np-summary-hero-text">
         <p class="np-summary-kicker">{% if domain == 'placement' %}Diagnostic complete{% else %}Session complete{% endif %}</p>
+        {% if domain == 'placement' %}<p class="np-pl-brand" style="margin-bottom:8px;">{{ site_brand_name }}</p>{% endif %}
         <h1 class="np-summary-title">{% if domain == 'placement' %}Your placement report{% else %}Your results{% endif %}</h1>
         {% if domain == 'placement' and placement_student and placement_student.name %}
         <p class="np-summary-for-student">For <strong>{{ placement_student.name }}</strong>{% if placement_student.grade %} · {{ placement_student.grade }}{% endif %}</p>

@@ -1,92 +1,55 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
 {% block content %}
-<div class="np-page-shell">
-<div class="np-placement-landing" aria-labelledby="np-pl-heading">
-    <p class="np-pw-breadcrumb np-pl-breadcrumb"><a href="{{ url_for('index') }}">← Math Studio home</a></p>
-    <div class="np-pl-bg" aria-hidden="true">
-        <span class="np-pl-orb np-pl-orb--a"></span>
-        <span class="np-pl-orb np-pl-orb--b"></span>
-        <span class="np-pl-orb np-pl-orb--c"></span>
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier" aria-labelledby="np-pl-heading">
+    <div class="np-pl2-mesh" aria-hidden="true">
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
+        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
+        <span class="np-pl2-mesh__aurora"></span>
+        <span class="np-pl2-mesh__noise"></span>
     </div>
-    <div class="np-pl-layout">
-        <div class="np-pl-main">
-            <header class="np-pl-hero np-pl-hero--lux glass-panel np-glass mp-animate-in">
-                <div class="np-sh-hero-noise" aria-hidden="true"></div>
-                <p class="np-pl-kicker">School track · Course placement</p>
-                <h1 class="np-pl-title" id="np-pl-heading">Place students with confidence—not guesswork</h1>
-                <p class="np-pl-lead">
-                    A <strong>single, premium diagnostic</strong> for honors, AP, and in-school tracks—<em>not</em> SAT prep. Eighty-five questions, five gates, and a <strong>parent-ready PDF</strong> plus instant analytics when they finish.
-                </p>
-                <p class="np-pl-promise">Built so families leave with something concrete: a score band, a recommended path, and language you can reuse in advising conversations.</p>
-                <div class="np-pl-trust-strip" aria-label="Why families choose this diagnostic">
-                    <span class="np-pl-trust-pill">Shareable PDF + on-screen report</span>
-                    <span class="np-pl-trust-pill">Same band rubric as the paper guide</span>
-                    <span class="np-pl-trust-pill">Calculator rules match the printable test</span>
-                </div>
-                <ul class="np-pl-list">
-                    <li><span class="np-pl-li-icon" aria-hidden="true"></span>One polished run—then full item review, subsection bars, and highlights you can screenshot or export.</li>
-                    <li><span class="np-pl-li-icon" aria-hidden="true"></span>Feels serious but calm: clear typography, Jump navigation, and no noisy ads—just the test.</li>
-                    <li><span class="np-pl-li-icon" aria-hidden="true"></span>Five-gate hybrid structure (85 items) with gate-first interpretation—easy to explain to parents.</li>
-                </ul>
-                <ol class="np-pl-flow" aria-label="What happens after you start">
-                    <li class="np-pl-flow-item">
-                        <span class="np-pl-flow-num">1</span>
-                        <span class="np-pl-flow-body"><strong>Diagnostic</strong><span class="np-pl-flow-sub">Work straight through or use Jump</span></span>
-                    </li>
-                    <li class="np-pl-flow-item">
-                        <span class="np-pl-flow-num">2</span>
-                        <span class="np-pl-flow-body"><strong>Instant report</strong><span class="np-pl-flow-sub">Bands, highlights, by-area bars</span></span>
-                    </li>
-                    <li class="np-pl-flow-item">
-                        <span class="np-pl-flow-num">3</span>
-                        <span class="np-pl-flow-body"><strong>Export PDF</strong><span class="np-pl-flow-sub">Parent-ready one-pager</span></span>
-                    </li>
-                </ol>
-                <div class="np-pl-stat-row" role="list">
-                    <div class="np-pl-stat" role="listitem"><span class="np-pl-stat-val">85</span><span class="np-pl-stat-lbl">items</span></div>
-                    <div class="np-pl-stat" role="listitem"><span class="np-pl-stat-val">5</span><span class="np-pl-stat-lbl">parts</span></div>
-                    <div class="np-pl-stat np-pl-stat--accent" role="listitem"><span class="np-pl-stat-val">PDF</span><span class="np-pl-stat-lbl">blank + report</span></div>
-                </div>
-                <div class="np-pl-actions">
-                    <a href="{{ url_for('placement_start') }}" class="big-btn mp-btn-pill mp-btn-glow">Start placement test</a>
-                    <a href="{{ url_for('index') }}" class="big-btn mp-btn-secondary mp-btn-pill">Back to dashboard</a>
-                </div>
-                <p class="np-pl-cta-note">Most students finish in <strong>under 90 minutes</strong>. We’ll ask for a quick student profile first—so the on-screen report and PDF look polished for families and counselors.</p>
-            </header>
 
-            <section class="np-pl-parts glass-panel np-glass mp-animate-in" aria-labelledby="np-pl-parts-heading" style="animation-delay: 0.06s;">
-                <div class="np-pl-parts-head">
-                    <p class="np-pl-parts-kicker">Structure</p>
-                    <h2 class="np-pl-parts-title" id="np-pl-parts-heading">How the seventy items are grouped</h2>
-                    <p class="np-pl-parts-lead">Same five-part arc as the paper placement—helps you pace and interpret the breakdown chart.</p>
-                </div>
-                <div class="np-pl-parts-grid">
-                    {% for p in placement_parts %}
-                    <article class="np-pl-part-chip">
-                        <span class="np-pl-part-code">Part {{ p.code }}</span>
-                        <span class="np-pl-part-range">Q&nbsp;{{ p.range }}</span>
-                        <span class="np-pl-part-label">{{ p.label }}</span>
-                    </article>
-                    {% endfor %}
-                </div>
-                <p class="np-pl-parts-note"><span class="np-pl-parts-note-icon" aria-hidden="true">⏱</span> Calculators <strong>off by default</strong> unless your instructor permits them—identical to the blank PDF.</p>
-            </section>
-        </div>
-
-        <aside class="np-pl-side glass-panel np-glass mp-animate-in" style="animation-delay: 0.1s;">
-            <p class="np-pl-side-kicker">Print &amp; share</p>
-            <h2 class="np-pl-side-title">Blank test (PDF)</h2>
-            <p class="np-pl-side-body">Offer the <strong>same paper experience</strong> for families who want a physical packet—or proctor it in person. When students run the online version, they still get the <strong>branded score PDF</strong> to attach to email or print for school offices.</p>
-            <a href="{{ url_for('placement_blank_test_pdf') }}" class="np-pl-download">
-                <span class="np-pl-download-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v12m0 0l4-4m-4 4l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                </span>
-                Download blank placement (PDF)
+    <div class="np-pl-canvas__inner">
+        <nav class="np-pl2-nav np-pl-reveal">
+            <a href="{{ url_for('index') }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Math Studio
             </a>
-            <p class="np-pl-side-foot">Report PDF unlocks on the summary page as soon as the attempt is scored.</p>
-        </aside>
+        </nav>
+
+        <header class="np-pl-hero np-pl-reveal">
+            <div class="np-pl-hero__layout">
+                <div class="np-pl-hero__copy">
+                    <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+                    <p class="np-pl-eyebrow">
+                        <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                        Novel Prep · Course placement
+                    </p>
+                    <h1 class="np-pl-display" id="np-pl-heading">Place students with confidence</h1>
+                    <p class="np-pl-lead">A premium diagnostic for school math tracks—not SAT prep. Instant analytics, band language, and a counselor-ready PDF when they finish.</p>
+                    <div class="np-pl-intake__actions" style="margin-top:28px;">
+                        <a href="{{ url_for('placement_landing') }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow">Browse all diagnostics
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="np-pl-hero__visual" aria-hidden="true">
+                    <div class="np-pl-hero__visual-copy">
+                        <strong>Official placement</strong>
+                        <span>Same band rubric as the printable guide · Shareable PDF · Clear advising language.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="np-pl-hero__rule" aria-hidden="true"></div>
+        </header>
     </div>
 </div>
 </div>
+{% include 'partials/placement_atelier_scripts.html' %}
 {% endblock %}

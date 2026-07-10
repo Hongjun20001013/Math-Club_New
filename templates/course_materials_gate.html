@@ -2,88 +2,105 @@
 {% block title %}SAT Course Materials · {{ site_brand_name }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_atelier.css') }}?v={{ style_css_revision }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_aurora.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_violet_v2.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
-<div class="np-cm-luxe np-cm-aurora np-cm-luxe--gate" data-cm-gate>
-  <div class="np-cm-luxe-canvas" aria-hidden="true">
-    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--a"></div>
-    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--b"></div>
-    <div class="np-cm-luxe-canvas__mesh np-cm-luxe-canvas__mesh--c"></div>
-    <div class="np-cm-luxe-canvas__beam"></div>
-    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--1"></div>
-    <div class="np-cm-luxe-canvas__orb np-cm-luxe-canvas__orb--2"></div>
-    <div class="np-cm-luxe-canvas__grid"></div>
-    <div class="np-cm-luxe-canvas__grain"></div>
+{% set total_live = phase_cards | sum(attribute='ready_count') %}
+{% set total_decks = phase_cards | sum(attribute='total_count') %}
+<div class="np-cm-vio np-cm-vio--v3" data-cm-gate>
+  <div class="np-cm-vio__canvas" aria-hidden="true">
+    <span class="np-cm-vio__orb np-cm-vio__orb--1"></span>
+    <span class="np-cm-vio__orb np-cm-vio__orb--2"></span>
+    <span class="np-cm-vio__orb np-cm-vio__orb--3"></span>
+    <span class="np-cm-vio__sheen"></span>
+    <span class="np-cm-vio__noise"></span>
   </div>
 
-  <div class="np-cm-luxe-frame">
-    <nav class="np-cm-luxe-rail" aria-label="SAT navigation">
+  <div class="np-cm-vio__frame">
+    <nav class="np-cm-vio__rail" aria-label="SAT navigation">
       <a href="{{ url_for('practice') }}">SAT modules</a>
       <span aria-hidden="true">/</span>
       <span>Course materials</span>
     </nav>
 
-    <header class="np-cm-luxe-hero">
-      <div class="np-cm-aurora-hero-glow" aria-hidden="true"></div>
-      <p class="np-cm-luxe-hero-eyebrow">Novel Prep · Teaching Atelier</p>
-      <h1 class="np-cm-luxe-hero-title">
-        <span class="np-cm-luxe-hero-title-pre">SAT</span>
-        <span class="np-cm-luxe-hero-title-main">Course Materials</span>
-      </h1>
-      <p class="np-cm-luxe-hero-copy">Three curated learning phases — interactive slides, live tracking, and printable review. Pick your path.</p>
-      {% set total_live = phase_cards | sum(attribute='ready_count') %}
-      {% set total_decks = phase_cards | sum(attribute='total_count') %}
-      <div class="np-cm-aurora-hero-stats" aria-label="Catalog overview">
-        <div class="np-cm-aurora-stat"><strong>{{ total_live }}</strong><span>Live decks</span></div>
-        <div class="np-cm-aurora-stat"><strong>3</strong><span>Phases</span></div>
-        <div class="np-cm-aurora-stat"><strong>{{ total_decks }}</strong><span>Total units</span></div>
+    <header class="np-cm-vio-hero np-cm-vio-hero--cinema">
+      <div class="np-cm-vio-hero__stage">
+        <p class="np-cm-vio-brand np-cm-vio-brand--xl">{{ site_brand_name }}</p>
+        <p class="np-cm-vio-eyebrow">Teaching atelier · SAT library</p>
+        <h1 class="np-cm-vio-title">Course Materials</h1>
+        <p class="np-cm-vio-lede">Interactive decks, live mastery, and printable review — three phases, one polished path.</p>
+        <div class="np-cm-vio-hero__actions">
+          <a href="{{ url_for('practice_course_materials_phase', phase_num=1) }}" class="np-cm-vio-hero__cta">Start Phase 1
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="{{ url_for('practice_course_materials_phase', phase_num=2) }}" class="np-cm-vio-hero__cta np-cm-vio-hero__cta--ghost">Hard drills</a>
+        </div>
       </div>
+      <aside class="np-cm-vio-hero-panel np-cm-vio-hero-panel--rich" aria-hidden="true">
+        <div class="np-cm-vio-hero-panel__glow"></div>
+        <div class="np-cm-vio-hero-panel__stack">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="np-cm-vio-hero-panel__copy">
+          <strong>{{ total_live }} live decks</strong>
+          <span>Math-perfect slides · classroom mode · PDF export</span>
+        </div>
+      </aside>
     </header>
 
-    <div class="np-cm-luxe-portals" role="list">
-      {% for card in phase_cards %}
-      <a href="{{ url_for('practice_course_materials_phase', phase_num=card.phase) }}"
-         class="np-cm-luxe-portal np-cm-luxe-portal--p{{ card.phase }}{% if not card.ready_count %} is-muted{% endif %}"
-         role="listitem"
-         style="--portal-i: {{ loop.index0 }};">
-        <div class="np-cm-luxe-portal-orbit" aria-hidden="true"></div>
-        <div class="np-cm-luxe-portal-card">
-          <span class="np-cm-aurora-portal-num" aria-hidden="true">0{{ card.phase }}</span>
-          <div class="np-cm-luxe-portal-visual" aria-hidden="true">
-            <div class="np-cm-luxe-portal-visual-bg"></div>
-            <div class="np-cm-luxe-portal-stack">
-              <span></span><span></span><span></span>
-            </div>
+    <div class="np-cm-vio-meter" aria-label="Catalog overview">
+      <div class="np-cm-vio-meter__item"><em>{{ total_live }}</em><span>Live decks</span></div>
+      <div class="np-cm-vio-meter__item"><em>3</em><span>Phases</span></div>
+      <div class="np-cm-vio-meter__item"><em>{{ total_decks }}</em><span>Catalog units</span></div>
+      <div class="np-cm-vio-meter__bar" aria-hidden="true"><i style="width: {{ (100 * total_live / total_decks)|round|int if total_decks else 0 }}%;"></i></div>
+    </div>
+
+    <section class="np-cm-vio-portals-wrap" aria-labelledby="np-cm-vio-phases-heading">
+      <div class="np-cm-vio-section-head">
+        <h2 id="np-cm-vio-phases-heading">Choose your phase</h2>
+        <p>Each portal opens a curated teaching library.</p>
+      </div>
+      <div class="np-cm-vio-portals" role="list">
+        {% for card in phase_cards %}
+        <a href="{{ url_for('practice_course_materials_phase', phase_num=card.phase) }}"
+           class="np-cm-vio-portal np-cm-vio-portal--p{{ card.phase }}{% if not card.ready_count %} is-muted{% endif %}"
+           role="listitem"
+           style="--portal-i: {{ loop.index0 }};">
+          <div class="np-cm-vio-portal__banner">
+            <span class="np-cm-vio-portal__shimmer" aria-hidden="true"></span>
+            <span class="np-cm-vio-portal__num">0{{ card.phase }}</span>
+            <span class="np-cm-vio-portal__glyph" aria-hidden="true">
+              {% if card.phase == 1 %}∑{% elif card.phase == 2 %}★{% else %}∞{% endif %}
+            </span>
           </div>
-          <div class="np-cm-luxe-portal-body">
-            <div class="np-cm-luxe-portal-meta">
-              <span class="np-cm-luxe-portal-index">Phase {{ card.phase }}</span>
+          <div class="np-cm-vio-portal__body">
+            <div class="np-cm-vio-portal__meta">
+              <span class="np-cm-vio-portal__index">Phase {{ card.phase }}</span>
               {% if card.ready_count %}
-              <span class="np-cm-luxe-portal-live"><i></i>{{ card.ready_count }} live</span>
+              <span class="np-cm-vio-portal__live"><i></i>{{ card.ready_count }} live</span>
+              {% else %}
+              <span class="np-cm-vio-portal__soon">Soon</span>
               {% endif %}
             </div>
-            <h2>{{ card.label }}</h2>
-            <p class="np-cm-luxe-portal-tag">{{ card.kicker }}</p>
-            <p class="np-cm-luxe-portal-desc">
+            <h3>{{ card.label }}</h3>
+            <p class="np-cm-vio-portal__tag">{{ card.kicker }}</p>
+            <p class="np-cm-vio-portal__desc">
               {% if card.phase == 1 %}Core Units 1–4 with definitions, methods, and guided practice decks.
               {% elif card.phase == 2 %}Challenge problem sets with in-class response tracking.
               {% else %}Advanced review tracks — arriving soon.{% endif %}
             </p>
-            <span class="np-cm-luxe-portal-cta np-cm-aurora-cta-pill">
-              <span>Enter phase</span>
+            <span class="np-cm-vio-portal__cta">
+              <span>{% if card.ready_count %}Enter phase{% else %}Coming soon{% endif %}</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
           </div>
-        </div>
-      </a>
-      {% endfor %}
-    </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
 
-    <ul class="np-cm-luxe-trust" aria-label="Platform features">
+    <ul class="np-cm-vio-trust" aria-label="Platform features">
       <li>Interactive slides</li>
       <li>Student mastery</li>
       <li>Printable PDFs</li>
@@ -96,7 +113,7 @@
 (function () {
   var gate = document.querySelector("[data-cm-gate]");
   if (!gate) return;
-  var portals = gate.querySelectorAll(".np-cm-luxe-portal");
+  var portals = gate.querySelectorAll(".np-cm-vio-portal");
   portals.forEach(function (portal) {
     portal.addEventListener("mousemove", function (e) {
       var r = portal.getBoundingClientRect();
@@ -104,6 +121,8 @@
       var y = (e.clientY - r.top) / r.height - 0.5;
       portal.style.setProperty("--tilt-x", (y * -6).toFixed(2) + "deg");
       portal.style.setProperty("--tilt-y", (x * 8).toFixed(2) + "deg");
+      portal.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+      portal.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100).toFixed(1) + "%");
     });
     portal.addEventListener("mouseleave", function () {
       portal.style.setProperty("--tilt-x", "0deg");

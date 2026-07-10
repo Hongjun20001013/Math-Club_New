@@ -37455,3 +37455,197 @@ html[data-exam-theme="dark"] .np-pl2-input {
 .sat-practice-page-wrap--split-lock .sat-pane-choices > .sat-submit-wrap {
     margin-top: auto;
 }
+
+/* ── Dashboard placement spotlight (Novel Prep lavender) ── */
+.np-pl-dash-spotlight {
+    position: relative;
+    display: block;
+    margin: 18px 0 22px;
+    padding: 0;
+    border-radius: 28px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    isolation: isolate;
+    background:
+        linear-gradient(135deg, #140a3c 0%, #2a1a68 42%, #4f2fd8 78%, #6c4eff 100%);
+    box-shadow:
+        0 28px 64px rgba(49, 38, 130, 0.28),
+        0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.np-pl-dash-spotlight:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 34px 72px rgba(49, 38, 130, 0.34),
+        0 1px 0 rgba(255, 255, 255, 0.22) inset;
+}
+
+.np-pl-dash-spotlight__glow {
+    position: absolute;
+    inset: -20% -10% auto auto;
+    width: 55%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(155, 140, 255, 0.45), transparent 68%);
+    pointer-events: none;
+}
+
+.np-pl-dash-spotlight__grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.18;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(120deg, transparent 10%, #000 45%, transparent 90%);
+    pointer-events: none;
+}
+
+.np-pl-dash-spotlight__body {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 22px;
+    padding: clamp(22px, 3vw, 32px) clamp(22px, 3.2vw, 34px);
+}
+
+@media (min-width: 900px) {
+    .np-pl-dash-spotlight__body {
+        grid-template-columns: minmax(0, 1.4fr) minmax(220px, 280px);
+        align-items: center;
+    }
+}
+
+.np-pl-dash-spotlight__brand {
+    display: block;
+    margin-bottom: 8px;
+    font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #c4b5fd;
+}
+
+.np-pl-dash-spotlight__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 233, 254, 0.72);
+}
+
+.np-pl-dash-spotlight__kicker::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.22);
+}
+
+.np-pl-dash-spotlight__title {
+    display: block;
+    margin: 0;
+    font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+    font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: #faf8ff;
+}
+
+.np-pl-dash-spotlight__lead {
+    display: block;
+    margin: 12px 0 0;
+    max-width: 52ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(237, 233, 254, 0.82);
+}
+
+.np-pl-dash-spotlight__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 11px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 750;
+    color: #140a3c;
+    background: linear-gradient(135deg, #faf8ff, #e9e4ff);
+    box-shadow: 0 10px 24px rgba(20, 10, 60, 0.22);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.np-pl-dash-spotlight:hover .np-pl-dash-spotlight__cta {
+    transform: translateX(3px);
+    box-shadow: 0 14px 28px rgba(20, 10, 60, 0.28);
+}
+
+.np-pl-dash-spotlight__aside {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+@media (min-width: 900px) {
+    .np-pl-dash-spotlight__aside {
+        grid-template-columns: 1fr;
+    }
+}
+
+.np-pl-dash-spotlight__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+}
+
+.np-pl-dash-spotlight__stat em {
+    font-style: normal;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: #fff;
+    line-height: 1;
+}
+
+.np-pl-dash-spotlight__stat small {
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(237, 233, 254, 0.7);
+}
+
+.np-pl-dash-spotlight__stat--accent {
+    background: rgba(167, 139, 250, 0.22);
+    border-color: rgba(196, 181, 253, 0.35);
+}
+
+.mp-catalog-block--school {
+    background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(243, 240, 255, 0.88) 100%);
+}
+
+.mp-catalog-block--school .mp-catalog-title {
+    font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.mp-catalog-block--school .mp-catalog-eyebrow--school {
+    color: #6c4eff;
+}

@@ -26,33 +26,26 @@
         <header class="np-pl-hero np-pl-reveal">
             <div class="np-pl-hero__layout">
                 <div class="np-pl-hero__copy">
+                    <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                     <p class="np-pl-eyebrow">
                         <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
-                        School track · Placement diagnostics
+                        Novel Prep · Course placement
                     </p>
-                    <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Course placement diagnostics') }}</h1>
+                    <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Place with clarity') }}</h1>
                     <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the track that matches your student\'s school math pathway.') }}</p>
                     <ul class="np-pl-tags" aria-label="Features">
-                        <li class="np-pl-tag">Bluebook-style flow</li>
+                        <li class="np-pl-tag">Timed diagnostic</li>
                         <li class="np-pl-tag">Instant score report</li>
-                        <li class="np-pl-tag">Parent-ready PDF</li>
+                        <li class="np-pl-tag">Counselor-ready PDF</li>
                         <li class="np-pl-tag">Blank test download</li>
                     </ul>
                 </div>
-                <aside class="np-pl-stat-stack" aria-label="Overview">
-                    <div class="np-pl-stat-stack__item">
-                        <span class="np-pl-stat-stack__num">3</span>
-                        <span class="np-pl-stat-stack__lbl">Pathways</span>
+                <div class="np-pl-hero__visual" aria-hidden="true">
+                    <div class="np-pl-hero__visual-copy">
+                        <strong>Four live pathways</strong>
+                        <span>Middle · Enhanced · Upper — one polished diagnostic experience.</span>
                     </div>
-                    <div class="np-pl-stat-stack__item">
-                        <span class="np-pl-stat-stack__num">4</span>
-                        <span class="np-pl-stat-stack__lbl">Live tests</span>
-                    </div>
-                    <div class="np-pl-stat-stack__item np-pl-stat-stack__item--accent">
-                        <span class="np-pl-stat-stack__num">100%</span>
-                        <span class="np-pl-stat-stack__lbl">Online + PDF</span>
-                    </div>
-                </aside>
+                </div>
             </div>
             <div class="np-pl-hero__rule" aria-hidden="true"></div>
         </header>

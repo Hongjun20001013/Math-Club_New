@@ -480,6 +480,36 @@
       "pdf_candidates": [
         "SAT_Hard_Question_9.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-10",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 10",
+      "title": "SAT Hard Question 10",
+        "tex_candidates": [
+        "SAT_Hard_Question_10_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_10_PPT.pdf",
+        "SAT_Hard_Question_10.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-11",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 11",
+      "title": "SAT Hard Question 11",
+      "tex_candidates": [
+        "SAT_Hard_Question_11_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_11_PPT.pdf",
+        "SAT_Hard_Question_11.pdf"
+      ]
     }
   ]
 }
