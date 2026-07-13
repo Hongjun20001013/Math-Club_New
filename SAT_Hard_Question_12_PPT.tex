@@ -1,0 +1,280 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Hard Question 12]{\textbf{SAT Hard Question\\ Set 12}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 2 · Hard Question Practice}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Hard Question Set 12}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Hard Question Set 12}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{9 SAT-style challenge problems}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+In the given equation, \(a\) and \(b\) are non-zero constants.
+Which of the following expressions gives a solution to the equation?
+\[
+7ax^2 + (7b - 12a)x - 12b = 0
+\]
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(-\frac{a}{b}\)
+    \item[B.] \(-\frac{b}{a}\)
+    \item[C.] \(\frac{a}{b}\)
+    \item[D.] \(\frac{b}{a}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+In the given equation, \(a\) and \(b\) are constants.
+The equation has infinitely many solutions.
+What is the value of \(b\)?
+\[
+\frac{ax + b}{3} = \frac{6}{17}x - \frac{13}{12}
+\]
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(-\frac{18}{17}\)
+    \item[B.] \(\frac{18}{17}\)
+    \item[C.] \(-\frac{13}{4}\)
+    \item[D.] \(\frac{13}{4}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+In the \(xy\)-plane, a parabola has \(x\)-intercepts at \((-17, 0)\) and \((37, 0)\).
+If the equation of the parabola is written as:
+\[
+y = ax^2 + bx + c,
+\]
+where \(a\), \(b\), and \(c\) are constants,
+which of the following expressions gives \(c\) in terms of \(a\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(c = -1080a\)
+    \item[B.] \(c = -629a\)
+    \item[C.] \(c = \frac{a}{34}\)
+    \item[D.] \(c = 51a\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+In triangle \(ABC\), the measure of angle \(B\) is \(90^\circ\) and \(BD\) is an altitude of the triangle.
+The length of \(AB\) is 15, and the length of \(AC\) is 23 greater than the length of \(AB\).
+What is the value of \(\frac{BC}{BD}\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\frac{15}{38}\)
+    \item[B.] \(\frac{15}{23}\)
+    \item[C.] \(\frac{23}{15}\)
+    \item[D.] \(\frac{38}{15}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+A certain investment account offers a special interest rate for the first 4 months the account is open followed by a lower interest rate for the remainder of the time the account is open.
+Akeyla opened one of these accounts with an original account balance of \$700.00 and did not make any other deposits or withdrawals.
+
+\begin{itemize}
+\item 4 months after Akeyla opened the account, the balance had increased by 0.6\% of the original balance.
+\item 6 months after opening, the balance had increased by an additional 0.1\% of the balance at the end of the first 4 months.
+\item Every 2 months after the first 6 months, the balance increased by an additional 0.1\% of the balance 2 months before.
+\end{itemize}
+
+Which of the following equations could represent the account balance \(B(x)\), in dollars, \(x\) months after the account was opened, where \(x \geq 4\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(B(x) = 704.20(1.001)^{\frac{x - 4}{2}}\)
+    \item[B.] \(B(x) = 700.00(1.001)^{\frac{x - 4}{2}}\)
+    \item[C.] \(B(x) = 704.20(1.001)^{2(x - 4)}\)
+    \item[D.] \(B(x) = 700.00(1.001)^{2(x - 4)}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+The area of a rectangular region is increasing at a rate of 180 square centimeters per hour.
+What is this rate, in square meters per minute?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 3
+    \item[B.] 0.3
+    \item[C.] 0.03
+    \item[D.] 0.0003
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+The exponential function \(f(x)\) is defined by
+\[
+f(x) = ab^x
+\]
+where \(a\) and \(b\) are positive constants.
+
+If
+\[
+f(n - 1) = f(n) + \frac{82}{100} f(n - 1)
+\]
+where \(n\) is a constant, what is the value of \(b\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 1
+    \item[B.] 0.82
+    \item[C.] 0.18
+    \item[D.] 10
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+The function \(f\) is defined by the given equation, where \(k\) is a constant.
+The value of \(f(x)\) increases by 83\% for every increase of \(x\) by 1.
+\[
+f(x) = k(1.83)^x
+\]
+For which of the following functions, where \(k\) is a constant, does the value of \(g(z)\) increase by 83\% for every increase of \(z\) by \(\frac{1}{4}\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(g(z) = k(1.83^z)^{\frac{1}{4}}\)
+    \item[B.] \(g(z) = k(1.83)^{z + \frac{1}{4}}\)
+    \item[C.] \(g(z) = k(1.83^z)^4\)
+    \item[D.] \(g(z) = k(1.83)^{z - 4}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+A right square pyramid has a height of 11 centimeters (cm).
+A second right square pyramid has a height of 22 centimeters.
+The area of the bases of each of the two pyramids is \(100\text{ cm}^2\).
+
+Which of the following is closest to the difference in the surface area of the second pyramid and the surface area of the first pyramid, in \(\text{cm}^2\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 209
+    \item[B.] 220
+    \item[C.] 367
+    \item[D.] 551
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

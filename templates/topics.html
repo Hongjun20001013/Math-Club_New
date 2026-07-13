@@ -49,9 +49,9 @@
   <section class="np-hard-hero np-hard-hero--catalog np-hard-hero--unit glass-panel np-glass mp-animate-in">
     <div class="np-sh-hero-noise" aria-hidden="true"></div>
     <div class="np-hard-hero-copy">
-      <p class="np-hard-kicker">SAT Math · Unit {{ unit_num }}</p>
+      <p class="np-hard-kicker">{{ site_brand_short }} · Unit {{ unit_num }}</p>
       <div class="np-hard-hero-title-row">
-        <h1>{{ unit_name }} studio.</h1>
+        <h1>{{ unit_name }}.</h1>
         <span class="np-hard-hero-pill">
           {% if bank_groups %}
           {{ bank_groups.chapters|length }} chapters{% if bank_groups.practice_tests %} · practice test{% endif %}
@@ -60,7 +60,7 @@
           {% endif %}
         </span>
       </div>
-      <p>Full bank, chapter slices, and a timed practice test — pick a bank, track progress, and redo mistakes in one studio.</p>
+      <p>Full bank, chapter slices, and a practice test — progress and mistake redo in one focused studio.</p>
       <div class="np-hard-hero-stats">
         <span class="np-hard-hero-stat np-hard-hero-stat--done"><i aria-hidden="true"></i>{{ topic_stats.done }} completed</span>
         <span class="np-hard-hero-stat np-hard-hero-stat--progress"><i aria-hidden="true"></i>{{ topic_stats.progress }} active</span>

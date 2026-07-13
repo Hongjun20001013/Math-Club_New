@@ -1,0 +1,390 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[SAT Hard Question 13]{\textbf{SAT Hard Question\\ Set 13}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 2 · Hard Question Practice}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Hard Question Set 13}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Hard Question Set 13}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{13 SAT-style challenge problems}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+A circle has center \(O\), and points \(A\) and \(B\) lie on the circle.
+The measure of arc \(AB\) is \(60^\circ\), and the length of this arc is 4 inches.
+What is the circumference, in inches, of the circle?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 4
+    \item[B.] 8
+    \item[C.] 16
+    \item[D.] 24
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+In the \(xy\)-plane, the graph of function \(f\), where \(y = f(x)\), has exactly 8 \(x\)-intercepts.
+One of these \(x\)-intercepts is \((17, 0)\).
+The rational function \(g\) is defined by:
+\[
+g(x) = \frac{f(x)}{x - 17}
+\]
+In the \(xy\)-plane, how many \(x\)-intercepts does the graph of \(y = g(x)\) have?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 5
+    \item[B.] 6
+    \item[C.] 7
+    \item[D.] 8
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+A researcher investigated two species of mites: a predator and its prey.
+At the start of a week, there was an equal number of the two species.
+At the end of the week:
+
+\begin{itemize}
+\item The number of prey had increased by 2700\% of the number of prey at the start of the week.
+\item The number of predators had increased by 180\% of the number of predators at the start of the week.
+\end{itemize}
+
+The number of prey at the end of the week was \(p\%\) greater than the number of predators at the end of the week.
+What is the value of \(p\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 9
+    \item[B.] 90
+    \item[C.] 900
+    \item[D.] 9000
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+The exponential function \(f\) is defined by
+\[
+f(x) = ab^x,
+\]
+where \(a\) and \(b\) are positive constants.
+If \(f(s) = t\) and \(f(s + 1) = t - 0.87t\), where \(s\) and \(t\) are constants, what is the value of \(b\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 0.13
+    \item[B.] 0.87
+    \item[C.] 1.13
+    \item[D.] 1.87
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+A beekeeper's initial observation of the population of a certain bee colony was 1,100 bees.
+The beekeeper set a goal to increase the population to 2,600 bees.
+
+The beekeeper uses a model that predicts the population of this bee colony:
+
+\begin{itemize}
+\item begins at 1,100
+\item increases by 120 bees per week in the first two weeks
+\item then increases by 180 bees per week until the goal is reached
+\end{itemize}
+
+According to this model, at the end of week \(w\) after the initial observation, where \(w > 2\),
+which of the following functions gives the predicted number of bees still needed to reach the beekeeper's goal?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(p(w) = 2600 - 180w\)
+    \item[B.] \(p(w) = 2480 + 180w\)
+    \item[C.] \(p(w) = 1620 - 180w\)
+    \item[D.] \(p(w) = -120 + 180w\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+Given the quadratic equation:
+\[
+7rx^2 - 28sx + 7r = 0
+\]
+In the equation:
+
+\begin{itemize}
+\item \(r\) is a positive constant
+\item \(s\) is a negative constant
+\item The equation has two solutions
+\end{itemize}
+
+If \(\frac{r}{s} > k\), what is the minimum value of \(k\)?
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Final Answer:} $\boxed{-2}$
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+A square map has a side length of 55 inches, and 1 inch on the map represents an actual distance of 13 miles.
+A larger version of the same map is printed as a square with the side length 90\% longer than the side length of the previous map.
+On the larger map, which of the following is closest to the actual distance, in miles, represented by 1 inch?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 1.30
+    \item[B.] 6.84
+    \item[C.] 24.70
+    \item[D.] 49.50
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+In isosceles triangle \(ABC\), sides \(AB\) and \(AC\) are congruent.
+Point \(D\) divides side \(\overline{BC}\) such that the length of \(\overline{BD}\) is \(\frac{4}{7}\) of the length of \(\overline{BC}\).
+Point \(E\) lies on side \(AB\) and point \(F\) lies on side \(AC\) such that when segments \(\overline{DE}\) and \(\overline{DF}\) are drawn, \(\angle BED\) is congruent to \(\angle CFD\).
+If the length of \(\overline{BE}\) is 8, what is the length of \(\overline{CF}\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 6
+    \item[B.] 14
+    \item[C.] 32
+    \item[D.] 56
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+\[
+\frac{\sqrt[3]{x^{17}y^5}}{5x^2\left(\sqrt[8]{y^8}\right)}
+\]
+
+For all positive values of \(x\) and \(y\), the given expression is equivalent to which of the following?
+
+\begin{itemize}
+\item[I] \(\dfrac{x^{\frac{14}{3}}y^{\frac{5}{3}}}{5xy}\)
+\item[II] \(\dfrac{\sqrt[3]{x^{11}y^2}}{5}\)
+\end{itemize}
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] I only
+    \item[B.] II only
+    \item[C.] I and II
+    \item[D.] Neither I nor II
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 10 ---
+\begin{frame}{Question 10}
+\small
+The table shows three values of \(x\) and their corresponding values of \(y\), where \(s\) is a constant.
+There is a linear relationship between \(x\) and \(y\).
+Which of the following equations represents this relationship?
+
+\[
+\begin{array}{|c|c|}
+\hline
+x & y \\
+\hline
+-2s & 24 \\
+-s & 21 \\
+s & 15 \\
+\hline
+\end{array}
+\]
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(sx + 3y = 18s\)
+    \item[B.] \(3x + sy = 18s\)
+    \item[C.] \(3x + sy = 18\)
+    \item[D.] \(sx + 3y = 18\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 10}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 11 ---
+\begin{frame}{Question 11}
+\small
+The cost of renting a carpet cleaner is \$52 for the first day and \$26 for each additional day.
+Which of the following functions gives the cost \(C(d)\), in dollars, of renting the carpet cleaner for \(d\) days, where \(d\) is a positive integer?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(C(d) = 26d + 26\)
+    \item[B.] \(C(d) = 26d + 52\)
+    \item[C.] \(C(d) = 52d - 26\)
+    \item[D.] \(C(d) = 52d + 78\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 11}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 12 ---
+\begin{frame}{Question 12}
+\small
+The speed of a vehicle is increasing at a rate of 7.3 meters per second squared.
+What is this rate, in miles per minute squared, rounded to the nearest tenth?
+(Use 1 mile = 1,609 meters.)
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 0.3
+    \item[B.] 16.3
+    \item[C.] 195.8
+    \item[D.] 220.4
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 12}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 13 ---
+\begin{frame}{Question 13}
+\small
+The table shows three values of \(x\) and their corresponding values of \(g(x)\), where
+\[
+g(x) = \frac{f(x)}{x + 5}
+\]
+and \(f\) is a linear function.
+What is the \(y\)-intercept of the graph of \(y = f(x)\) in the \(xy\)-plane?
+
+\[
+\begin{array}{|c|c|}
+\hline
+x & g(x) \\
+\hline
+-20 & 4 \\
+-8 & 0 \\
+10 & 6 \\
+\hline
+\end{array}
+\]
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \((0, -8)\)
+    \item[B.] \((0, 5)\)
+    \item[C.] \((0, 8)\)
+    \item[D.] \((0, 40)\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 13}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

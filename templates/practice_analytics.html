@@ -19,9 +19,9 @@
 
     <header class="np-analytics-hero np-analytics-hero--lux glass-panel np-glass mp-animate-in">
         <div class="np-sh-hero-noise" aria-hidden="true"></div>
-        <p class="np-analytics-kicker">SAT Mistake Analytics</p>
-        <h1 class="np-analytics-title">{{ selected_partition.label if selected_partition else 'SAT Math' }} mistakes</h1>
-        <p class="np-analytics-lead">Only SAT mistakes appear here. Review Unit 1 Algebra, Unit 2 Advanced Math, Unit 3 Data, Unit 4 Geometry, and classified hard-question mistakes.</p>
+        <p class="np-analytics-kicker">{{ site_brand_short }} · Mistake Analytics</p>
+        <h1 class="np-analytics-title">{% if selected_partition %}{{ selected_partition.label }}{% else %}Turn misses into momentum{% endif %}</h1>
+        <p class="np-analytics-lead">Only real SAT mistakes land here — Units 1–4 plus hard sets — classified so you know exactly what to fix next.</p>
         <p class="np-analytics-quality-note">Quick previews are filtered out automatically: only SAT sessions with 3+ submitted questions count here.</p>
         {% if selected_partition %}
         <div class="np-analytics-hero-insights" aria-label="Quick mistake insights">

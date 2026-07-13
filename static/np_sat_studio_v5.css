@@ -1,0 +1,1013 @@
+/* ═══════════════════════════════════════════════════════════
+   Novel Prep SAT Studio v5 — full SAT workspace redesign
+   ───────────────────────────────────────────────────────────
+   Covers: hub, specialized, unit studio, hard drill, exams,
+           analytics, progress, random-test intro chrome.
+   REVERT: remove this <link> from base.html (+ optional v4).
+   Contrast rule: ink on white · white only on deep purple.
+   ═══════════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap");
+
+body.np-atelier-v4 .np-sat-atelier {
+  --sat5-ink: #1e1638;
+  --sat5-soft: #3a3358;
+  --sat5-muted: #6a6286;
+  --sat5-deep: #7c66f0;
+  --sat5-mid: #4a32d6;
+  --sat5-bright: #6c4eff;
+  --sat5-line: rgba(18, 10, 44, 0.1);
+  --sat5-shadow: 0 20px 50px rgba(108, 78, 255, 0.12);
+  --sat5-lift: 0 30px 70px rgba(108, 78, 255, 0.18);
+  --sat5-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Shared rail ── */
+body.np-atelier-v4 .np-sat-atelier .np-atelier-rail {
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--sat5-muted);
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-rail a {
+  color: var(--sat5-mid);
+  text-decoration: none;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-rail a:hover {
+  color: var(--sat5-deep);
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-rail-current {
+  color: var(--sat5-ink);
+  font-weight: 750;
+}
+
+/* ── Universal hero (white + left accent) ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-hero,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-hero,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-analytics-hero,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-progress-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px !important;
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  box-shadow: var(--sat5-lift) !important;
+  padding: clamp(26px, 3.5vw, 40px) !important;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-hero::before,
+body.np-atelier-v4 .np-sat-atelier .np-hard-hero::before,
+body.np-atelier-v4 .np-sat-atelier .np-analytics-hero::before,
+body.np-atelier-v4 .np-sat-atelier .np-progress-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: linear-gradient(180deg, #7c66f0, #6c4eff);
+  z-index: 2;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-hero h1,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-hero h1,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-analytics-title,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-progress-hero h1 {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.038em;
+  color: var(--sat5-ink) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  font-size: clamp(2rem, 4.2vw, 3rem) !important;
+  line-height: 1.05 !important;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-kicker,
+body.np-atelier-v4 .np-sat-atelier .np-hard-kicker,
+body.np-atelier-v4 .np-sat-atelier .np-analytics-kicker {
+  color: var(--sat5-bright) !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.14em !important;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-hero-lead,
+body.np-atelier-v4 .np-sat-atelier .np-hard-hero p,
+body.np-atelier-v4 .np-sat-atelier .np-analytics-lead,
+body.np-atelier-v4 .np-sat-atelier .np-progress-lead {
+  color: var(--sat5-soft) !important;
+  font-size: 1.05rem !important;
+  line-height: 1.55 !important;
+  max-width: 48ch;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-stat {
+  background: #f4f1fc;
+  border: 1px solid var(--sat5-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-stat strong {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+  color: var(--sat5-deep) !important;
+  font-size: 1.45rem;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-stat span {
+  color: var(--sat5-muted) !important;
+  font-weight: 650;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Deep purple aside panels */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress {
+  background: linear-gradient(155deg, #6c4eff 0%, #7c66f0 45%, #4a32d6 100%) !important;
+  color: #fff !important;
+  border-radius: 22px !important;
+  border: none !important;
+  box-shadow: 0 20px 44px rgba(108, 78, 255, 0.16) !important;
+  padding: 22px !important;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-aside *,
+body.np-atelier-v4 .np-sat-atelier .np-hard-progress * {
+  color: inherit;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-label,
+body.np-atelier-v4 .np-sat-atelier .np-hard-progress > span,
+body.np-atelier-v4 .np-sat-atelier .np-hard-progress em,
+body.np-atelier-v4 .np-sat-atelier .np-hard-progress-next {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-aside strong,
+body.np-atelier-v4 .np-sat-atelier .np-hard-progress strong {
+  color: #fff !important;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+  font-size: 1.75rem;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-track,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress-track {
+  background: rgba(255, 255, 255, 0.2) !important;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-track i,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress-track i {
+  background: #fff !important;
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-links a {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside .np-atelier-links a:hover {
+  background: #fff !important;
+  color: var(--sat5-deep) !important;
+}
+
+/* Hero links outside aside stay ink */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-hero > div > .np-atelier-links a {
+  background: #f4f1fc !important;
+  color: var(--sat5-deep) !important;
+  border: 1px solid rgba(74, 50, 214, 0.2) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-btn--primary {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 12px 28px rgba(108, 78, 255, 0.28);
+  border-radius: 999px;
+  font-weight: 750;
+}
+
+body.np-atelier-v4 .np-sat-atelier .np-atelier-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(108, 78, 255, 0.32);
+  color: #fff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-btn--ghost {
+  background: #fff !important;
+  color: var(--sat5-soft) !important;
+  border: 1.5px solid var(--sat5-line) !important;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* ── Launch path ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 26px !important;
+  box-shadow: var(--sat5-shadow);
+  padding: clamp(22px, 3vw, 32px) !important;
+}
+
+body.np-atelier-v4 .np-launch-path-head h2 {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--sat5-ink) !important;
+  font-weight: 650 !important;
+  font-size: 1.55rem !important;
+}
+
+body.np-atelier-v4 .np-launch-path-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path-grid a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 16px !important;
+  border-radius: 18px !important;
+  background: #f7f5fd !important;
+  border: 1px solid var(--sat5-line) !important;
+  text-decoration: none;
+  transition: transform 0.35s var(--sat5-ease), box-shadow 0.35s ease, border-color 0.3s;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path-grid a:hover {
+  transform: translateY(-4px);
+  background: #fff !important;
+  border-color: rgba(74, 50, 214, 0.35) !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-launch-path-grid a strong {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.75rem;
+  color: var(--sat5-deep);
+  line-height: 1;
+}
+
+body.np-atelier-v4 .np-launch-path-grid a span {
+  color: var(--sat5-ink);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+body.np-atelier-v4 .np-launch-path-grid a em {
+  color: var(--sat5-muted);
+  font-style: normal;
+  font-size: 12.5px;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-continue-card {
+  background: #f4f1fc !important;
+  border: 1px solid rgba(74, 50, 214, 0.15) !important;
+  border-radius: 18px !important;
+  padding: 16px 18px;
+}
+
+body.np-atelier-v4 .np-launch-continue-card strong {
+  color: var(--sat5-ink);
+  font-family: "Fraunces", Georgia, serif;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-live-banner {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  border-radius: 18px;
+}
+
+/* ── Hub course materials spotlight ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card {
+  display: grid !important;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  align-items: center;
+  padding: clamp(26px, 3.5vw, 40px) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(125deg, #1e1638 0%, #6c4eff 30%, #7c66f0 65%, #5b3df5 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 32px 70px rgba(108, 78, 255, 0.18) !important;
+  text-decoration: none;
+  overflow: hidden;
+  position: relative;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: clamp(1.7rem, 3vw, 2.35rem) !important;
+  font-weight: 650 !important;
+  color: #fff !important;
+  letter-spacing: -0.03em;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-lede,
+body.np-atelier-v4 .np-hub-spotlight-stat {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-cta {
+  background: #fff !important;
+  color: #1e1638 !important;
+  margin-top: 8px;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide--front {
+  background: #fff !important;
+  color: var(--sat5-ink) !important;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+body.np-atelier-v4 .np-hub-slide--front strong {
+  color: var(--sat5-ink) !important;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+/* ── Mode / unit cards ── */
+body.np-atelier-v4 .np-hub-modes-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--sat5-ink) !important;
+  font-weight: 650 !important;
+  font-size: 1.7rem !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--hub,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--unit,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--mode {
+  position: relative;
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--sat5-shadow);
+  padding: 24px !important;
+  overflow: hidden;
+  transition: transform 0.4s var(--sat5-ease), box-shadow 0.4s ease, border-color 0.3s;
+}
+
+body.np-atelier-v4 .np-atelier-card--hub:hover,
+body.np-atelier-v4 .np-atelier-card--unit:hover,
+body.np-atelier-v4 .np-atelier-card--mode:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--sat5-lift);
+  border-color: rgba(74, 50, 214, 0.3) !important;
+}
+
+body.np-atelier-v4 .np-atelier-card--unit::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+}
+
+body.np-atelier-v4 .np-atelier-card--u1::after { background: linear-gradient(90deg, #7c66f0, #6c4eff); }
+body.np-atelier-v4 .np-atelier-card--u2::after { background: linear-gradient(90deg, #5b21b6, #a78bfa); }
+body.np-atelier-v4 .np-atelier-card--u3::after { background: linear-gradient(90deg, #3730a3, #818cf8); }
+body.np-atelier-v4 .np-atelier-card--u4::after { background: linear-gradient(90deg, #1e3a8a, #60a5fa); }
+
+body.np-atelier-v4 .np-atelier-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  color: var(--sat5-ink) !important;
+  font-size: 1.4rem !important;
+  letter-spacing: -0.025em;
+}
+
+body.np-atelier-v4 .np-atelier-desc,
+body.np-atelier-v4 .np-atelier-count {
+  color: var(--sat5-soft) !important;
+}
+
+body.np-atelier-v4 .np-atelier-card-watermark {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-size: 4.5rem !important;
+  color: rgba(74, 50, 214, 0.08) !important;
+  font-weight: 700;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-pill--live {
+  background: #efeaff !important;
+  color: var(--sat5-deep) !important;
+  border: 1px solid rgba(74, 50, 214, 0.2);
+  font-weight: 750;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-progress-track {
+  background: #ebe6f8 !important;
+  border-radius: 999px;
+  height: 7px;
+  overflow: hidden;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-progress-fill {
+  background: linear-gradient(90deg, #7c66f0, #6c4eff) !important;
+  height: 100%;
+  border-radius: inherit;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-action--full {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  border-radius: 14px;
+}
+
+body.np-atelier-v4 .np-atelier-action--full .np-atelier-action-kicker,
+body.np-atelier-v4 .np-atelier-action--full .np-atelier-action-label {
+  color: #fff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-action--pdf {
+  background: #f4f1fc !important;
+  border: 1px solid var(--sat5-line);
+  border-radius: 14px;
+  color: var(--sat5-ink);
+}
+
+/* PDF suite */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-unit-pdf-suite {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 26px !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-unit-pdf-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-ink);
+  font-weight: 650;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-unit-pdf-card {
+  background: #f7f5fd !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 18px !important;
+  transition: transform 0.35s var(--sat5-ease), box-shadow 0.35s;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 a.np-unit-pdf-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sat5-shadow);
+  background: #fff !important;
+}
+
+body.np-atelier-v4 .np-unit-pdf-card strong {
+  color: var(--sat5-ink);
+  font-family: "Fraunces", Georgia, serif;
+}
+
+/* Upgrade strip */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-studio {
+  background: linear-gradient(120deg, #6c4eff, #4a32d6) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 26px !important;
+}
+
+body.np-atelier-v4 .np-upgrade-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: #fff !important;
+  font-weight: 650 !important;
+}
+
+body.np-atelier-v4 .np-upgrade-eyebrow {
+  color: #c4b5fd !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-feature {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  color: #fff;
+}
+
+body.np-atelier-v4 .np-upgrade-feature span {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.np-atelier-v4 .np-upgrade-feature strong {
+  color: #fff !important;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+/* ── Hard drill library ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-studio {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 26px !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-hard-studio-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-ink);
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-hard-studio-lead {
+  color: var(--sat5-soft);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero-pill {
+  background: #efeaff !important;
+  color: var(--sat5-deep) !important;
+  border: 1px solid rgba(74, 50, 214, 0.2);
+}
+
+body.np-atelier-v4 .np-hard-hero-stat {
+  background: #f4f1fc;
+  border: 1px solid var(--sat5-line);
+  color: var(--sat5-soft);
+  border-radius: 999px;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero-continue {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgba(108, 78, 255, 0.28);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-studio-filters button {
+  background: #f4f1fc !important;
+  color: var(--sat5-soft) !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-studio-filters button.is-active {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-picker-tile {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 16px !important;
+  transition: transform 0.3s var(--sat5-ease), box-shadow 0.3s, border-color 0.3s;
+}
+
+body.np-atelier-v4 .np-hard-picker-tile:hover,
+body.np-atelier-v4 .np-hard-picker-tile[aria-selected="true"] {
+  transform: translateY(-3px);
+  border-color: rgba(74, 50, 214, 0.4) !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-hard-picker-roman {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--sat5-deep) !important;
+  font-weight: 650;
+}
+
+/* ── Exams ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-window-card,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-category-shell,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-word-exam-card {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--sat5-shadow);
+  transition: transform 0.35s var(--sat5-ease), box-shadow 0.35s;
+}
+
+body.np-atelier-v4 .np-exam-window-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sat5-lift);
+}
+
+body.np-atelier-v4 .np-exam-window-card h2,
+body.np-atelier-v4 .np-exam-category-main h2,
+body.np-atelier-v4 .np-word-exam-card h4 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-ink);
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-exam-window-card p,
+body.np-atelier-v4 .np-exam-category-main p {
+  color: var(--sat5-soft);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-category-badge,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-window-topline .np-exam-category-badge {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+}
+
+/* ── Analytics ── */
+body.np-atelier-v4 .np-analytics-stat {
+  background: #f4f1fc;
+  border: 1px solid var(--sat5-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+body.np-atelier-v4 .np-analytics-stat strong {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-deep);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-mistake-library,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-analytics-empty {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-mistake-library-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-ink);
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-analytics-quality-note {
+  color: var(--sat5-muted) !important;
+}
+
+/* ── Progress ── */
+body.np-atelier-v4 .np-progress-hero-stat {
+  background: #f4f1fc;
+  border: 1px solid var(--sat5-line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+body.np-atelier-v4 .np-progress-hero-stat strong {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-deep);
+  font-size: 1.6rem;
+}
+
+body.np-atelier-v4 .np-progress-hero-stat span {
+  color: var(--sat5-muted);
+  font-weight: 650;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-progress-card {
+  background: #fff !important;
+  border: 1px solid var(--sat5-line) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--sat5-shadow);
+}
+
+body.np-atelier-v4 .np-progress-card-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--sat5-ink);
+  font-weight: 650;
+}
+
+/* ── Random test / Bluebook intro — brand it ── */
+body.np-atelier-v4 .np-bluebook-shell {
+  max-width: 780px;
+  margin: 32px auto;
+  padding: 0 20px 48px;
+}
+
+body.np-atelier-v4 .np-bluebook-intro {
+  background: #fff;
+  border: 1px solid var(--sat5-line);
+  border-radius: 28px;
+  padding: clamp(28px, 4vw, 44px);
+  box-shadow: var(--sat5-lift);
+  position: relative;
+  overflow: hidden;
+}
+
+body.np-atelier-v4 .np-bluebook-intro::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: linear-gradient(180deg, #7c66f0, #6c4eff);
+}
+
+body.np-atelier-v4 .np-bluebook-intro h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  letter-spacing: -0.035em;
+  color: var(--sat5-ink);
+  margin: 0 0 24px;
+}
+
+body.np-atelier-v4 .np-bluebook-instruction-card {
+  display: grid;
+  gap: 12px;
+}
+
+body.np-atelier-v4 .np-bluebook-instruction-card article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f7f5fd;
+  border: 1px solid var(--sat5-line);
+}
+
+body.np-atelier-v4 .np-bluebook-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c66f0, #5b3df5);
+  color: #fff;
+  font-weight: 800;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+body.np-atelier-v4 .np-bluebook-instruction-card h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: var(--sat5-ink);
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-bluebook-instruction-card p {
+  margin: 0;
+  color: var(--sat5-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-bluebook-active-attempt {
+  background: #efeaff !important;
+  border-color: rgba(74, 50, 214, 0.25) !important;
+}
+
+body.np-atelier-v4 .np-bluebook-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 4px;
+}
+
+body.np-atelier-v4 .np-bluebook-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 750;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+body.np-atelier-v4 .np-bluebook-btn--primary {
+  background: linear-gradient(135deg, #7c66f0, #5b3df5);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(108, 78, 255, 0.28);
+}
+
+body.np-atelier-v4 .np-bluebook-btn--ghost {
+  background: #fff;
+  color: var(--sat5-soft);
+  border: 1.5px solid var(--sat5-line);
+}
+
+/* Session summary (non-placement) */
+body.np-atelier-v4 .np-summary-hero,
+body.np-atelier-v4 .np-pw-summary,
+body.np-atelier-v4 .practice-summary-shell {
+  border-radius: 26px;
+}
+
+@media (max-width: 980px) {
+  body.np-atelier-v4 .np-launch-path-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body.np-atelier-v4 .np-hub-spotlight-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  body.np-atelier-v4 .np-launch-path-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   v5.1 Soft Luminous — airy lilac, not deep indigo
+   ═══════════════════════════════════════════════════════════ */
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier {
+  --sat5-ink: #1e1638;
+  --sat5-soft: #4a4268;
+  --sat5-muted: #7a7194;
+  --sat5-deep: #6c4eff;
+  --sat5-mid: #8b7cff;
+  --sat5-bright: #6c4eff;
+}
+
+/* Soft page wash */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-page-shell:has(.np-sat-atelier) {
+  /* inherited from body */
+}
+
+/* Accent rail — soft */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-hero::before,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-hero::before,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-analytics-hero::before,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-progress-hero::before,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-bluebook-intro::before {
+  background: linear-gradient(180deg, #9b8cff, #6c4eff) !important;
+}
+
+/* Aside / progress — soft lilac panel, dark text */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress {
+  background: linear-gradient(165deg, #f7f4ff 0%, #ebe4ff 50%, #e0d6ff 100%) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+  box-shadow: 0 14px 36px rgba(108, 78, 255, 0.12) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-label,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress > span,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress em,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress-next,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside em {
+  color: #5a5278 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside strong,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress strong {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-track,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress-track {
+  background: rgba(108, 78, 255, 0.15) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside-track i,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-progress-track i {
+  background: linear-gradient(90deg, #8b7cff, #6c4eff) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside .np-atelier-links a {
+  background: rgba(255, 255, 255, 0.75) !important;
+  color: #5b3df5 !important;
+  border: 1px solid rgba(108, 78, 255, 0.22) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-aside .np-atelier-links a:hover {
+  background: #6c4eff !important;
+  color: #fff !important;
+}
+
+/* Primary buttons — medium purple, not navy */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-btn--primary,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-hero-continue,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-atelier-action--full,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-bluebook-btn--primary {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  box-shadow: 0 10px 24px rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-sat-atelier .np-hard-studio-filters button.is-active {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+}
+
+/* Hub course materials spotlight — SOFT luminous, dark ink */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card {
+  background:
+    radial-gradient(ellipse 70% 80% at 90% 20%, rgba(155, 140, 255, 0.35), transparent 55%),
+    linear-gradient(135deg, #f8f5ff 0%, #efe8ff 42%, #e4dbff 100%) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+  box-shadow: 0 24px 56px rgba(108, 78, 255, 0.14) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card:hover {
+  box-shadow: 0 30px 64px rgba(108, 78, 255, 0.2) !important;
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-title {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-lede,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-stat {
+  color: #4a4268 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-stat strong {
+  color: #5b3df5 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card .np-atelier-kicker {
+  color: #6c4eff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card .np-atelier-pill--live {
+  background: #fff !important;
+  color: #5b3df5 !important;
+  border: 1px solid rgba(108, 78, 255, 0.25);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-cta {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(108, 78, 255, 0.3);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-stats .np-hub-spotlight-stat {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(108, 78, 255, 0.14);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide--front {
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+/* Upgrade strip — soft, not deep */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-studio {
+  background: linear-gradient(120deg, #efe8ff, #e0d6ff) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-title {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-eyebrow {
+  color: #6c4eff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-feature {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(108, 78, 255, 0.14) !important;
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-feature span {
+  color: #5a5278 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-upgrade-feature strong {
+  color: #5b3df5 !important;
+}
+
+/* Live banner soft */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-live-banner {
+  background: linear-gradient(135deg, #efe8ff, #ddd4ff) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.2);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-live-banner strong,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-live-banner span {
+  color: #1e1638 !important;
+}
+
+/* Exam badges softer */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-category-badge,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-exam-window-topline .np-exam-category-badge,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-bluebook-icon {
+  background: linear-gradient(135deg, #8b7cff, #6c4eff) !important;
+}
+
+/* Soft unit card top bars */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--u1::after { background: linear-gradient(90deg, #9b8cff, #6c4eff) !important; }
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--u2::after { background: linear-gradient(90deg, #c4b5fd, #8b5cf6) !important; }
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--u3::after { background: linear-gradient(90deg, #a5b4fc, #818cf8) !important; }
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--u4::after { background: linear-gradient(90deg, #93c5fd, #60a5fa) !important; }

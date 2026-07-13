@@ -7,6 +7,10 @@
 <script defer src="{{ url_for('static', filename='course_materials_ink_smart.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}
 
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_dark.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
 {% block content %}
 <div class="np-cm-cinema">
 <div class="np-cm-cinema-ambient" aria-hidden="true"></div>

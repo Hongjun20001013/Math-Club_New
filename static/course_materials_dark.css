@@ -1,0 +1,633 @@
+/* ═══════════════════════════════════════════════════════════
+   Course Materials viewer — dark theme (loads AFTER global dark)
+   Max specificity to beat style.css + premium light canvases.
+   ═══════════════════════════════════════════════════════════ */
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-viewer,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-page-shell--cm {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-ambient,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-ambient::before,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-ambient::after {
+  background: #0c0a14 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-ambient::before {
+  background: radial-gradient(ellipse 70% 50% at 20% 0%, rgba(108, 78, 255, 0.22), transparent 55%) !important;
+}
+
+/* Hero */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-viewer .np-cm-hero.glass-panel,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-viewer .np-cm-hero {
+  background: #1c1730 !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  color: #f3f0ff !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-hero-copy h1,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-kicker,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-hero-stat-copy,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-hero-stat-copy strong,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-rail,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-rail a {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-cinema-rail a {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--ghost,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--focus,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--desmos,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--pdf,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--classroom {
+  background: #221c38 !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--study.is-active,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn.is-active {
+  background: rgba(108, 78, 255, 0.28) !important;
+  color: #e9e4ff !important;
+  border-color: rgba(155, 140, 255, 0.35) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-btn--checkpoint {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #6ee7b7 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-lesson-nav-link {
+  background: #221c38 !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  color: #c8c0e0 !important;
+}
+
+/* Workspace + path sidebar */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-workspace.glass-panel,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-workspace.np-glass,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-workspace {
+  background: linear-gradient(180deg, #161225 0%, #12101c 100%) !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path {
+  background: linear-gradient(180deg, #1a1630 0%, #141022 100%) !important;
+  border-right-color: rgba(196, 181, 253, 0.12) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path-toggle,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path-toggle span,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-filter {
+  color: #9a90b8 !important;
+  background: transparent !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path-filters {
+  background: rgba(108, 78, 255, 0.12) !important;
+  border-color: rgba(196, 181, 253, 0.12) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-filter.is-active {
+  background: #2a2450 !important;
+  color: #e9e4ff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path-current {
+  background: rgba(108, 78, 255, 0.18) !important;
+  color: #c4b5fd !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge {
+  background: rgba(108, 78, 255, 0.1) !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-label {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-btn:hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-name {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-pct {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-knowledge-bar {
+  background: rgba(155, 140, 255, 0.18) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-btn {
+  background: transparent !important;
+  color: #c8c0e0 !important;
+  border-color: transparent !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-btn.is-active {
+  background: linear-gradient(135deg, rgba(108, 78, 255, 0.28), rgba(124, 58, 237, 0.16)) !important;
+  border-color: rgba(155, 140, 255, 0.3) !important;
+  color: #f3f0ff !important;
+  box-shadow: inset 3px 0 0 #6c4eff, 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-num,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-label,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-outline-meta {
+  color: inherit !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-live-chip,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-sync,
+html[data-exam-theme="dark"] body.np-atelier-v4 [class*="np-cm-live"] {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Deck / chrome / rail */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-deck {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(108, 78, 255, 0.14), transparent 55%),
+    linear-gradient(180deg, #161225, #12101c) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-deck-chrome {
+  background: rgba(22, 18, 37, 0.95) !important;
+  border-bottom-color: rgba(196, 181, 253, 0.12) !important;
+  color: #c8c0e0 !important;
+  backdrop-filter: blur(16px);
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-badge,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-deck-chrome span,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-counter {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-progress-track {
+  background: rgba(155, 140, 255, 0.15) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-stage::before {
+  background: linear-gradient(180deg, rgba(18, 16, 28, 0.85), transparent) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-coach {
+  background: linear-gradient(90deg, rgba(108, 78, 255, 0.16), rgba(124, 58, 237, 0.08)) !important;
+  border-bottom-color: rgba(196, 181, 253, 0.12) !important;
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-deck-rail {
+  background: rgba(22, 18, 37, 0.98) !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-rail-btn {
+  background: #221c38 !important;
+  color: #c8c0e0 !important;
+  border-color: rgba(196, 181, 253, 0.18) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-rail-btn:hover {
+  background: #2a2450 !important;
+  color: #fff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-rail-btn--accent {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-rail-indicator {
+  background: #2a2450 !important;
+  color: #c4b5fd !important;
+  border-color: rgba(196, 181, 253, 0.18) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-path-open {
+  background: #221c38 !important;
+  color: #c8c0e0 !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+}
+
+/* Slides */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(108, 78, 255, 0.16), transparent 42%),
+    linear-gradient(168deg, #1c1730, #161225) !important;
+  color: #f3f0ff !important;
+  border-color: rgba(196, 181, 253, 0.1) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide.np-cm-slide--canvas {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-head h2,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide h1,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide h2,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide h3,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body p,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body li {
+  color: #f3f0ff !important;
+}
+
+/* Intro / closing title canvases (the white slide in your screenshot) */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-canvas,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide--canvas .cm-intro-canvas {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 18%, rgba(108, 78, 255, 0.28), transparent 62%),
+    radial-gradient(ellipse 55% 45% at 88% 82%, rgba(124, 58, 237, 0.16), transparent 58%),
+    linear-gradient(168deg, #1a1630 0%, #161225 42%, #12101c 100%) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-closing-canvas,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide--canvas .cm-closing-canvas,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-content-canvas {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 12%, rgba(108, 78, 255, 0.26), transparent 60%),
+    linear-gradient(175deg, #1a1630 0%, #161225 38%, #12101c 100%) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-title,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-closing-title,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide--canvas .cm-intro-title {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-lede,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-kicker,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-cta,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-unit,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-cta strong {
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-meta-item,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-chip,
+html[data-exam-theme="dark"] body.np-atelier-v4 button.cm-intro-chip,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-overview-stats li {
+  background: #221c38 !important;
+  border: 1px solid rgba(196, 181, 253, 0.14) !important;
+  color: #f3f0ff !important;
+  box-shadow: none !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 button.cm-intro-chip:hover,
+html[data-exam-theme="dark"] body.np-atelier-v4 button.cm-intro-chip:focus-visible {
+  background: #2a2450 !important;
+  border-color: rgba(155, 140, 255, 0.35) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-meta-item em,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-chip-num,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-overview-stats strong {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-chip-label,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-overview-kicker {
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-intro-grid {
+  opacity: 0.18 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-section-divider,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-closing {
+  background: linear-gradient(168deg, #1a1630, #12101c) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body .stem-math-block,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body .cm-math-block,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-answer-card,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-interactive {
+  background: rgba(108, 78, 255, 0.12) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #f3f0ff !important;
+  box-shadow: none !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body .cm-slide-figure-img {
+  background: #221c38 !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide .MathJax,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide mjx-container {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-checkpoint-dialog {
+  background: linear-gradient(165deg, #1c1730, #161225) !important;
+  color: #f3f0ff !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-ink-rail {
+  background: #1c1730 !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-ink-reader {
+  background: rgba(108, 78, 255, 0.16) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #c4b5fd !important;
+}
+
+/* Classroom dashboard */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-shell .glass-panel,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-hero,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-roster,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-panel {
+  background: #1c1730 !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-btn {
+  background: #221c38 !important;
+  color: #c8c0e0 !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-classroom-btn--primary {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  color: #fff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Slide chrome + in-slide content cards (were still white)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Sticky slide title bar */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-head {
+  background: linear-gradient(180deg, rgba(28, 23, 48, 0.98) 70%, rgba(28, 23, 48, 0)) !important;
+  border-bottom-color: rgba(196, 181, 253, 0.12) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-head h2,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-section,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-head-copy {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-section {
+  color: #9b8cff !important;
+}
+
+/* Knowledge Point / role banners */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--concept,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--lesson {
+  background: linear-gradient(135deg, #221c38, #1c1730) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role-label {
+  background: rgba(108, 78, 255, 0.22) !important;
+  color: #c4b5fd !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role strong {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role p {
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--question,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--practice {
+  background: linear-gradient(135deg, #2a2418, #221c14) !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--question .cm-slide-role-label,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--practice .cm-slide-role-label {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--answer,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--solution {
+  background: linear-gradient(135deg, #14241c, #121c18) !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--answer .cm-slide-role-label,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--solution .cm-slide-role-label {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #6ee7b7 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--example {
+  background: linear-gradient(135deg, #182030, #141c28) !important;
+  border-color: rgba(59, 130, 246, 0.28) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-slide-role--example .cm-slide-role-label {
+  background: rgba(59, 130, 246, 0.18) !important;
+  color: #93c5fd !important;
+}
+
+/* Core concept / learn focus */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-learn-focus {
+  background: linear-gradient(90deg, rgba(108, 78, 255, 0.18), rgba(108, 78, 255, 0.06)) !important;
+  border-left-color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-learn-focus-tag {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-learn-focus p {
+  color: #c8c0e0 !important;
+}
+
+/* Recap / try / strategy / content chips */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-recap-banner,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-try-banner,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-strategy-chip,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-content-item,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-question-workspace {
+  background: linear-gradient(135deg, #221c38, #1c1730) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #f3f0ff !important;
+  box-shadow: none !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-recap-copy strong,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-try-banner-copy strong,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-strategy-chip p,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-content-copy,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-question-stem,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-question-stem > p {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-recap-copy span,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-try-banner-copy span,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-strategy-chip-label {
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-recap-icon,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-try-banner-icon,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-content-num {
+  color: #9b8cff !important;
+  background: rgba(108, 78, 255, 0.2) !important;
+}
+
+/* Answer / rule / grid-in / MCQ cards */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-answer-card,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-answer-card--step,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-rule-card,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-interactive,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-interactive,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-choice,
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide--practice .cm-mcq-interactive {
+  background: linear-gradient(135deg, #221c38, #1c1730) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  color: #f3f0ff !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-answer-card-label,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-rule-name,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-prompt,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-prompt {
+  color: #9b8cff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-answer-card-value,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-rule-formula,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-text {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-rule-example,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-hint,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-feedback {
+  color: #c8c0e0 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-input {
+  background: #161225 !important;
+  border-color: rgba(196, 181, 253, 0.22) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-letter {
+  background: rgba(108, 78, 255, 0.22) !important;
+  color: #c4b5fd !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-interactive .cm-mcq-choice.is-selected {
+  border-color: rgba(155, 140, 255, 0.45) !important;
+  background: rgba(108, 78, 255, 0.2) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-steps-toolbar,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-step-block,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-solution-panel {
+  background: #221c38 !important;
+  border-color: rgba(196, 181, 253, 0.14) !important;
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-steps-btn,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-reveal-btn,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-skip {
+  background: #2a2450 !important;
+  color: #c8c0e0 !important;
+  border-color: rgba(196, 181, 253, 0.18) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-mcq-check,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-grid-in-check,
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-steps-btn:not(.cm-steps-btn--ghost) {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-reflect {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.12), rgba(22, 18, 37, 0.95)) !important;
+  border-top-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-reflect-q {
+  color: #6ee7b7 !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-reflect-btn {
+  background: #221c38 !important;
+  color: #c8c0e0 !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+
+/* Section divider slides */
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-section-divider {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(108, 78, 255, 0.2), transparent 50%),
+    linear-gradient(180deg, #1a1630, #12101c) !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+  box-shadow: none !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-section-title {
+  color: #f3f0ff !important;
+}
+
+html[data-exam-theme="dark"] body.np-atelier-v4 .cm-section-kicker {
+  background: rgba(108, 78, 255, 0.2) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(196, 181, 253, 0.16) !important;
+}
+
+/* Catch-all: any remaining light card inside slide body */
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body [class*="cm-"][class*="card"],
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body [class*="cm-"][class*="banner"],
+html[data-exam-theme="dark"] body.np-atelier-v4 .np-cm-slide-body [class*="cm-"][class*="chip"]:not(.cm-intro-chip-num) {
+  border-color: rgba(196, 181, 253, 0.14);
+}

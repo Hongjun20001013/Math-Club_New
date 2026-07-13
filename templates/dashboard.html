@@ -77,19 +77,19 @@
   <div class="np-sh-hero-noise" aria-hidden="true"></div>
   <div class="mp-hero-grid">
     <div class="mp-hero-copy">
-      <p class="mp-eyebrow mp-eyebrow--lux">{{ site_brand_short }} · Student Dashboard</p>
+      <p class="mp-eyebrow mp-eyebrow--lux">{{ site_brand_short }} · Studio</p>
       {% if dashboard_username %}
       <p class="mp-hero-welcome">Welcome back, <strong>{{ dashboard_username }}</strong></p>
       {% endif %}
       <h1 class="mp-title">
         {% if dashboard_username %}
-        <span>Your SAT workspace</span>
+        <span>Ready when you are.</span>
         {% else %}
-        <span>Your SAT plan,</span>
-        <span>ready to run.</span>
+        <span>A studio built</span>
+        <span>for real practice.</span>
         {% endif %}
       </h1>
-      <p class="mp-subtitle">{% if dashboard_username %}Jump back into practice, review misses, or open today’s lesson deck.{% else %}Start with the next unit, review recent misses, and keep every answer connected to your {{ site_brand_short }} account.{% endif %}</p>
+      <p class="mp-subtitle">{% if dashboard_username %}Continue a unit, clear misses, or open today’s deck — everything stays crisp and easy to find.{% else %}Premium SAT practice: clear decks, sharp drills, and feedback that makes progress feel visible.{% endif %}</p>
       <div class="mp-hero-actions">
         {% if resume_practice %}
         <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">{{ resume_practice.label }}</a>
@@ -266,7 +266,7 @@
     </div>
   </section>
 
-  <a href="{{ url_for('placement_landing') }}" class="np-pl-dash-spotlight mp-animate-up" style="animation-delay: 0.06s" aria-label="Open course placement diagnostics">
+  <a href="{{ url_for('placement_landing') }}" class="np-pl-dash-spotlight np-pl-dash-spotlight--v41 mp-animate-up" style="animation-delay: 0.06s" aria-label="Open course placement diagnostics">
     <span class="np-pl-dash-spotlight__glow" aria-hidden="true"></span>
     <span class="np-pl-dash-spotlight__grid" aria-hidden="true"></span>
     <span class="np-pl-dash-spotlight__body">

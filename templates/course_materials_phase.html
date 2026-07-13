@@ -1,146 +1,128 @@
 {% extends "base.html" %}
 {% block title %}{{ phase_group.label }} · SAT Course Materials · {{ site_brand_name }}{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_violet_v2.css') }}?v={{ style_css_revision }}">
+{% block extra_css %}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cm-vio np-cm-vio--v3" data-cm-phase-view="{{ phase_group.phase }}">
-  <div class="np-cm-vio__canvas" aria-hidden="true">
-    <span class="np-cm-vio__orb np-cm-vio__orb--1"></span>
-    <span class="np-cm-vio__orb np-cm-vio__orb--2"></span>
-    <span class="np-cm-vio__orb np-cm-vio__orb--3"></span>
-    <span class="np-cm-vio__sheen"></span>
-    <span class="np-cm-vio__noise"></span>
+<div class="np-cmx" data-cm-phase-view="{{ phase_group.phase }}">
+  <div class="np-cmx-stage" aria-hidden="true">
+    <div class="np-cmx-stage__wash"></div>
+    <div class="np-cmx-stage__beam np-cmx-stage__beam--phase"></div>
+    <div class="np-cmx-stage__grain"></div>
   </div>
 
-  <div class="np-cm-vio__frame">
-    <nav class="np-cm-vio__rail" aria-label="Course navigation">
-      <a href="{{ url_for('practice') }}">SAT modules</a>
-      <span aria-hidden="true">/</span>
-      <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
-      <span aria-hidden="true">/</span>
-      <span>{{ phase_group.label }}</span>
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb" aria-label="Course navigation">
+      <a href="{{ url_for('practice') }}">SAT</a>
+      <span>/</span>
+      <a href="{{ url_for('practice_course_materials') }}">Library</a>
+      <span>/</span>
+      <em>{{ phase_group.label }}</em>
     </nav>
 
-    <header class="np-cm-vio-phase-hero np-cm-vio-phase-hero--v3">
-      <div class="np-cm-vio-phase-hero__watermark" aria-hidden="true">0{{ phase_group.phase }}</div>
-      <div class="np-cm-vio-phase-hero__copy">
-        <a href="{{ url_for('practice_course_materials') }}" class="np-cm-vio-back">← All phases</a>
-        <p class="np-cm-vio-brand">{{ site_brand_name }}</p>
-        <p class="np-cm-vio-eyebrow">{{ phase_group.label }}</p>
-        <h1>{{ phase_group.kicker }}</h1>
-        <p>{{ phase_group.description }}</p>
-        <div class="np-cm-vio-phase-chips" aria-label="Phase stats">
-          <span><strong>{{ phase_group.ready_count }}</strong> live</span>
-          <span><strong>{{ phase_group.total_count }}</strong> cataloged</span>
+    <header class="np-cmx-phase">
+      <div class="np-cmx-phase__mark" aria-hidden="true">0{{ phase_group.phase }}</div>
+      <div class="np-cmx-phase__copy">
+        <a href="{{ url_for('practice_course_materials') }}" class="np-cmx-back">← All phases</a>
+        <p class="np-cmx-brand">{{ site_brand_name }}</p>
+        <p class="np-cmx-eyebrow">{{ phase_group.label }}</p>
+        <h1 class="np-cmx-phase__title">{{ phase_group.kicker }}</h1>
+        <p class="np-cmx-lede">{{ phase_group.description }}</p>
+        <div class="np-cmx-stats">
+          <div><strong>{{ phase_group.ready_count }}</strong><span>live</span></div>
+          <div><strong>{{ phase_group.total_count }}</strong><span>cataloged</span></div>
         </div>
-      </div>
-      <div class="np-cm-vio-ring np-cm-vio-ring--glow" style="--ring-pct: {{ (100 * phase_group.ready_count / phase_group.total_count)|round|int if phase_group.total_count else 0 }};">
-        <svg viewBox="0 0 120 120" aria-hidden="true">
-          <circle cx="60" cy="60" r="52" class="np-cm-vio-ring-track"/>
-          <circle cx="60" cy="60" r="52" class="np-cm-vio-ring-fill"/>
-        </svg>
-        <div class="np-cm-vio-ring-label"><strong>{{ phase_group.ready_count }}</strong><span>online</span></div>
       </div>
     </header>
 
     {% if phase_group.phase == 3 and not phase_group.ready_count %}
-    <section class="np-cm-vio-empty">
+    <section class="np-cmx-empty">
       <h2>Phase 3 is on the way</h2>
       <p>Advanced review tracks are in development.</p>
-      <div class="np-cm-vio-empty-actions">
-        <a href="{{ url_for('practice_course_materials_phase', phase_num=1) }}" class="np-cm-vio-btn">Phase 1</a>
-        <a href="{{ url_for('practice_course_materials_phase', phase_num=2) }}" class="np-cm-vio-btn np-cm-vio-btn--ghost">Phase 2</a>
+      <div class="np-cmx-empty__actions">
+        <a href="{{ url_for('practice_course_materials_phase', phase_num=1) }}" class="np-cmx-cta">Phase 1</a>
+        <a href="{{ url_for('practice_course_materials_phase', phase_num=2) }}" class="np-cmx-cta np-cmx-cta--ghost">Phase 2</a>
       </div>
     </section>
     {% else %}
 
     {% if spotlight_material %}
     <a href="{{ url_for('practice_course_material_view', slug=spotlight_material.slug) }}?slide={{ spotlight_material.continue_slide if spotlight_mode == 'resume' else 1 }}"
-       class="np-cm-vio-spotlight np-cm-vio-spotlight--v3">
-      <div class="np-cm-vio-spotlight__visual" aria-hidden="true">
-        <span class="np-cm-vio-spotlight__orb"></span>
-        <span class="np-cm-vio-spotlight__mark">{% if spotlight_mode == 'resume' %}↻{% else %}★{% endif %}</span>
-      </div>
-      <div class="np-cm-vio-spotlight__copy">
-        <p class="np-cm-vio-spotlight__kicker">{% if spotlight_mode == 'resume' %}Continue learning{% else %}Start here{% endif %}</p>
+       class="np-cmx-feature">
+      <div class="np-cmx-feature__rail" aria-hidden="true"></div>
+      <div class="np-cmx-feature__copy">
+        <p class="np-cmx-feature__kicker">{% if spotlight_mode == 'resume' %}Continue{% else %}Start here{% endif %}</p>
         <h2>{{ spotlight_material.section }} · {{ spotlight_material.title }}</h2>
         <p>
           {% if spotlight_mode == 'resume' %}
-          Slide {{ spotlight_material.continue_slide }} of {{ spotlight_material.slide_count }}{% if spotlight_material.continue_mastery_pct %} · {{ spotlight_material.continue_mastery_pct }}% mastery{% endif %}
+          Slide {{ spotlight_material.continue_slide }} / {{ spotlight_material.slide_count }}{% if spotlight_material.continue_mastery_pct %} · {{ spotlight_material.continue_mastery_pct }}% mastery{% endif %}
           {% else %}
           {{ spotlight_material.slide_count or '—' }} slides{% if spotlight_material.interactive_count %} · {{ spotlight_material.interactive_count }} challenges{% endif %}
           {% endif %}
         </p>
       </div>
-      <span class="np-cm-vio-spotlight__cta">{% if spotlight_mode == 'resume' %}Resume{% else %}Open deck{% endif %}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
+      <span class="np-cmx-feature__cta">{% if spotlight_mode == 'resume' %}Resume{% else %}Open{% endif %} →</span>
     </a>
     {% endif %}
 
-    <div class="np-cm-vio-command">
-      <label class="np-cm-vio-search">
+    <div class="np-cmx-toolbar">
+      <label class="np-cmx-search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span class="sr-only">Search</span>
-        <input type="search" placeholder="Search section or title…" data-cm-phase-search autocomplete="off" />
+        <input type="search" placeholder="Find a lesson…" data-cm-phase-search autocomplete="off" />
       </label>
     </div>
 
     {% for group in phase_group.unit_groups %}
-    <section class="np-cm-vio-collection" data-cm-unit-section="{{ group.unit }}">
-      <header class="np-cm-vio-collection__head">
+    <section class="np-cmx-unit" data-cm-unit-section="{{ group.unit }}">
+      <header class="np-cmx-unit__head">
         <div>
-          <p>{% if phase_group.phase == 1 %}Unit {{ group.unit }}{% else %}{{ group.unit_name }}{% endif %}</p>
+          <p>{% if phase_group.phase == 1 %}Unit {{ group.unit }}{% else %}Collection{% endif %}</p>
           <h2>{{ group.unit_name }}</h2>
         </div>
-        <span class="np-cm-vio-collection__count">{{ group.ready_count }}/{{ group.materials|length }}</span>
+        <span>{{ group.ready_count }}/{{ group.materials|length }}</span>
       </header>
 
-      <div class="np-cm-vio-bento">
+      <div class="np-cmx-grid" role="list">
         {% for m in group.materials %}
-        <article class="np-cm-vio-deck{% if not m.tex_available %} is-pending{% endif %}{% if m.user_mastery_pct and m.user_mastery_pct >= 100 %} is-done{% elif m.user_mastery_pct %} is-active{% endif %}"
+        <article class="np-cmx-deck{% if not m.tex_available %} is-soon{% endif %}{% if m.user_mastery_pct and m.user_mastery_pct >= 100 %} is-done{% elif m.user_mastery_pct %} is-active{% endif %}"
                  data-cm-lesson
                  data-cm-unit="{{ group.unit }}"
                  data-cm-search="{{ m.section }} {{ m.title }} {{ group.unit_name }}"
-                 style="--deck-i: {{ loop.index0 }}; --deck-progress: {{ m.user_mastery_pct or 0 }};">
+                 role="listitem"
+                 style="--progress: {{ m.user_mastery_pct or 0 }}; --deck-i: {{ loop.index0 }};">
           {% if m.tex_available %}
-          <a href="{{ url_for('practice_course_material_view', slug=m.slug) }}" class="np-cm-vio-deck-link">
-            <div class="np-cm-vio-deck-side" aria-hidden="true">
-              <span class="np-cm-vio-deck-section">{{ m.section }}</span>
-              <div class="np-cm-vio-deck-preview">
-                <span class="np-cm-vio-deck-preview-card"></span>
-                <span class="np-cm-vio-deck-preview-card"></span>
-                <span class="np-cm-vio-deck-preview-card is-front"></span>
-              </div>
+          <a href="{{ url_for('practice_course_material_view', slug=m.slug) }}" class="np-cmx-deck__link">
+            <div class="np-cmx-deck__top" aria-hidden="true">
+              <span class="np-cmx-deck__code">{{ m.section }}</span>
+              <span class="np-cmx-deck__mark">{% if phase_group.phase == 2 %}✦{% else %}∑{% endif %}</span>
             </div>
-            <div class="np-cm-vio-deck-main">
-              <div class="np-cm-vio-deck-top">
-                <span class="np-cm-vio-deck-badge">Live</span>
+            <div class="np-cmx-deck__body">
+              <div class="np-cmx-deck__badges">
+                <span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span>
                 {% if user_logged_in and m.user_mastery_pct %}
-                <span class="np-cm-vio-deck-mastery">{{ m.user_mastery_pct }}%</span>
+                <span class="np-cmx-deck__pct">{{ m.user_mastery_pct }}%</span>
                 {% endif %}
               </div>
               <h3>{{ m.title }}</h3>
               <p>{{ m.slide_count or '—' }} slides{% if m.interactive_count %} · {{ m.interactive_count }} challenges{% endif %}{% if m.pdf_available %} · PDF{% endif %}</p>
-              <div class="np-cm-vio-deck-progress" aria-hidden="true"><span></span></div>
-              <span class="np-cm-vio-deck-go">Open deck <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="np-cmx-deck__bar" aria-hidden="true"><i></i></div>
+              <span class="np-cmx-deck__cta">Open deck <em aria-hidden="true">→</em></span>
             </div>
           </a>
           {% else %}
-          <div class="np-cm-vio-deck-link is-static">
-            <div class="np-cm-vio-deck-side is-muted" aria-hidden="true">
-              <span class="np-cm-vio-deck-section">{{ m.section }}</span>
+          <div class="np-cmx-deck__link is-static">
+            <div class="np-cmx-deck__top is-muted" aria-hidden="true">
+              <span class="np-cmx-deck__code">{{ m.section }}</span>
             </div>
-            <div class="np-cm-vio-deck-main">
-              <div class="np-cm-vio-deck-top">
-                <span class="np-cm-vio-deck-badge" style="color:#64748b;background:rgba(100,116,139,.1);">Soon</span>
-              </div>
+            <div class="np-cmx-deck__body">
+              <div class="np-cmx-deck__badges"><span class="np-cmx-chip">Soon</span></div>
               <h3>{{ m.title }}</h3>
-              <p>Upload LaTeX + PDF to publish</p>
-              <div class="np-cm-vio-deck-progress" aria-hidden="true"><span></span></div>
+              <p>Coming soon</p>
             </div>
           </div>
           {% endif %}
@@ -150,7 +132,7 @@
     </section>
     {% endfor %}
 
-    <p class="np-cm-vio-empty" data-cm-phase-no-results hidden style="margin-top:24px;">No lessons match your search.</p>
+    <p class="np-cmx-empty np-cmx-empty--inline" data-cm-phase-no-results hidden>No lessons match your search.</p>
     {% endif %}
   </div>
 </div>

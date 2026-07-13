@@ -1715,3 +1715,24 @@
     justify-content: center;
   }
 }
+
+/* Soft luminous portals — lighter banners */
+.np-cm-vio--v3 .np-cm-vio-portal__banner,
+.np-cm-vio-portal__banner {
+  background: linear-gradient(135deg, #8b7cff, #6c4eff 55%, #a78bfa) !important;
+}
+.np-cm-vio-portal--p2 .np-cm-vio-portal__banner {
+  background: linear-gradient(135deg, #9b8cff, #7c3aed 50%, #c4b5fd) !important;
+}
+.np-cm-vio-portal--p3 .np-cm-vio-portal__banner {
+  background: linear-gradient(135deg, #818cf8, #6366f1 50%, #c7d2fe) !important;
+}
+.np-cm-vio-hero-panel--rich {
+  background:
+    linear-gradient(155deg, rgba(108, 78, 255, 0.88), rgba(155, 140, 255, 0.75) 50%, rgba(196, 181, 253, 0.85)) !important;
+}
+.np-cm-vio-brand--xl {
+  background: linear-gradient(120deg, #5b3df5 0%, #6c4eff 45%, #9b8cff 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}

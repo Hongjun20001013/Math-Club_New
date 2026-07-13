@@ -27,15 +27,7 @@
 
     <!-- Main Style: serve only via this Flask app (/static/). file:// breaks absolute /static URLs. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ style_css_revision }}" type="text/css">
-    {# Atelier v4 premium skin — revert: restore base.html.bak or remove this link #}
-    <link rel="stylesheet" href="{{ url_for('static', filename='np_atelier_v4.css') }}?v={{ style_css_revision }}" type="text/css">
-    {# SAT Studio v5 — full workspace redesign; remove this link to revert SAT surfaces only #}
-    <link rel="stylesheet" href="{{ url_for('static', filename='np_sat_studio_v5.css') }}?v={{ style_css_revision }}" type="text/css">
     {% block extra_css %}{% endblock %}
-    {# Global dark mode — load AFTER page skins so overrides win #}
-    <link rel="stylesheet" href="{{ url_for('static', filename='np_dark_mode_global.css') }}?v={{ style_css_revision }}" type="text/css">
-    {# Page-specific dark overrides that must beat premium/skin CSS #}
-    {% block late_css %}{% endblock %}
 
     {% if load_mathjax|default(true) %}
     <!-- MathJax Config (omitted on light pages — see inject_template_config load_mathjax) -->
@@ -54,7 +46,7 @@
     {% endif %}
 </head>
 
-<body class="np-app-body np-lux-motion np-atelier-v4">
+<body class="np-app-body np-lux-motion">
 <script>
 (function () {
   try {

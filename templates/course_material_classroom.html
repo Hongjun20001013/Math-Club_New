@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Classroom · {{ material.section }} · {{ site_brand_name }}{% endblock %}
 
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_dark.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
 {% block content %}
 <section class="np-classroom-shell" data-classroom-dashboard data-summary-api="{{ summary_api }}" data-start-api="{{ start_api }}" data-end-api="{{ end_api }}" data-students='{{ student_roster|tojson }}' data-cohorts='{{ student_cohorts|tojson }}'>
   <header class="np-classroom-hero glass-panel np-glass">

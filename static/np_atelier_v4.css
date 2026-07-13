@@ -1,0 +1,998 @@
+/* ═══════════════════════════════════════════════════════════
+   Novel Prep Atelier v4.1 — high-contrast premium skin
+   ───────────────────────────────────────────────────────────
+   REVERT: restore templates/base.html.bak → base.html
+           (or remove this stylesheet + body.np-atelier-v4)
+   RULE: white text ONLY on deep purple. Ink text on light.
+   ═══════════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap");
+
+:root {
+  --np4-ink: #140c2e;
+  --np4-ink-soft: #3d3558;
+  --np4-muted: #6b6288;
+  --np4-accent: #5b3df5;
+  --np4-deep: #3f27c7;
+  --np4-lilac: #7c66f0;
+  --np4-mist: #f4f1fc;
+  --np4-line: rgba(20, 12, 46, 0.1);
+  --np4-shadow: 0 18px 48px rgba(63, 39, 199, 0.14), 0 2px 8px rgba(20, 12, 46, 0.06);
+  --np4-shadow-lift: 0 28px 64px rgba(63, 39, 199, 0.22), 0 8px 20px rgba(20, 12, 46, 0.08);
+  --np4-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Page wash: soft but not washed-out ── */
+body.np-app-body.np-atelier-v4 {
+  color: var(--np4-ink);
+  background:
+    radial-gradient(ellipse 85% 50% at 6% -6%, rgba(91, 61, 245, 0.11), transparent 52%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(124, 102, 240, 0.1), transparent 48%),
+    linear-gradient(180deg, #f7f5fd 0%, #f1eef9 100%);
+}
+
+body.np-app-body.np-atelier-v4::before {
+  opacity: 0.4;
+  animation: none;
+}
+
+/* ── Navbar: saturated jewel, crisp type ── */
+body.np-atelier-v4 > .navbar {
+  background: linear-gradient(115deg, #2e1a9e 0%, #3f27c7 35%, #5b3df5 70%, #7c66f0 100%);
+  box-shadow: 0 14px 40px rgba(46, 26, 158, 0.4);
+}
+
+body.np-atelier-v4 > .navbar::before {
+  content: none;
+}
+
+body.np-atelier-v4 .nav-title {
+  font-family: "Fraunces", "Outfit", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(1.12rem, 2vw, 1.38rem);
+  letter-spacing: -0.028em;
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(10, 4, 40, 0.35);
+}
+
+body.np-atelier-v4 .nav-subtitle {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.np-atelier-v4 .nav-links a {
+  padding: 8px 13px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .nav-links a.is-active,
+body.np-atelier-v4 .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ── Glass: white paper, dark ink — never pale-on-pale ── */
+body.np-atelier-v4 .glass-panel,
+body.np-atelier-v4 .np-glass {
+  background: #ffffff;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+  box-shadow: var(--np4-shadow);
+  backdrop-filter: none;
+  color: var(--np4-ink);
+}
+
+/* ── Primary CTAs ── */
+body.np-atelier-v4 .big-btn.mp-btn-glow,
+body.np-atelier-v4 .np-atelier-btn--primary,
+body.np-atelier-v4 .mp-btn-pill.mp-btn-glow {
+  background: linear-gradient(135deg, #3f27c7, #5b3df5);
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(63, 39, 199, 0.35);
+  border: none;
+}
+
+body.np-atelier-v4 .big-btn.mp-btn-glow:hover,
+body.np-atelier-v4 .np-atelier-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(63, 39, 199, 0.42);
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .mp-btn-secondary,
+body.np-atelier-v4 .np-atelier-btn--ghost {
+  background: #fff;
+  color: var(--np4-ink-soft) !important;
+  border: 1.5px solid rgba(20, 12, 46, 0.12);
+}
+
+body.np-atelier-v4 .mp-btn-secondary:hover {
+  border-color: rgba(91, 61, 245, 0.4);
+  color: var(--np4-deep) !important;
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD HERO — ink on white + deep rail
+   ══════════════════════════════════════ */
+body.np-atelier-v4 .mp-hero--pro {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: clamp(28px, 3.5vw, 40px);
+  background: #fff;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+  box-shadow: var(--np4-shadow-lift);
+}
+
+body.np-atelier-v4 .mp-hero--pro::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #3f27c7, #7c66f0);
+}
+
+body.np-atelier-v4 .mp-hero--pro::after {
+  content: "";
+  position: absolute;
+  right: -8%;
+  top: -30%;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 61, 245, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
+body.np-atelier-v4 .mp-eyebrow--lux,
+body.np-atelier-v4 .mp-eyebrow {
+  color: var(--np4-accent) !important;
+  letter-spacing: 0.14em;
+  font-weight: 750;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-hero--pro .mp-title,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-hero--pro .mp-title span {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.035em;
+  color: var(--np4-ink) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+body.np-atelier-v4 .mp-subtitle {
+  color: var(--np4-ink-soft) !important;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+body.np-atelier-v4 .mp-hero-welcome {
+  color: var(--np4-ink-soft);
+}
+
+body.np-atelier-v4 .mp-hero-welcome strong {
+  color: var(--np4-deep);
+}
+
+body.np-atelier-v4 .mp-hero-badge {
+  background: #efeaff;
+  color: var(--np4-deep);
+  border: 1px solid rgba(91, 61, 245, 0.18);
+  font-weight: 700;
+}
+
+body.np-atelier-v4 .mp-stat-item {
+  background: #f7f5fd;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+  border-radius: 16px;
+}
+
+body.np-atelier-v4 .mp-stat-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--np4-shadow);
+  background: #fff;
+}
+
+body.np-atelier-v4 .mp-stat-value {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+  color: var(--np4-deep) !important;
+}
+
+body.np-atelier-v4 .mp-stat-label {
+  color: var(--np4-muted) !important;
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .mp-stat-stack-eyebrow {
+  color: var(--np4-muted);
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+body.np-atelier-v4 .mp-next-unit-card {
+  background: linear-gradient(145deg, #3f27c7, #5b3df5);
+  color: #fff;
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(63, 39, 199, 0.3);
+}
+
+body.np-atelier-v4 .mp-next-unit-card span,
+body.np-atelier-v4 .mp-next-unit-card em,
+body.np-atelier-v4 .mp-next-unit-card a {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.np-atelier-v4 .mp-next-unit-card strong {
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .mp-hero-footprint-fill {
+  background: linear-gradient(90deg, #3f27c7, #7c66f0);
+}
+
+body.np-atelier-v4 .mp-hero-footprint-title,
+body.np-atelier-v4 .mp-hero-footprint-frac {
+  color: var(--np4-ink);
+  font-weight: 700;
+}
+
+body.np-atelier-v4 .mp-hero-footprint-hint {
+  color: var(--np4-muted);
+}
+
+/* Command center */
+body.np-atelier-v4 .np-cmd-center {
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+}
+
+body.np-atelier-v4 .np-cmd-center-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-cmd-center-stats span {
+  color: var(--np4-ink-soft);
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-cmd-card {
+  background: #f7f5fd;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+  color: var(--np4-ink);
+  border-radius: 16px;
+}
+
+body.np-atelier-v4 .np-cmd-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--np4-shadow);
+  background: #fff;
+  border-color: rgba(91, 61, 245, 0.25);
+}
+
+body.np-atelier-v4 .np-cmd-card strong {
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-cmd-card span,
+body.np-atelier-v4 .np-cmd-card em {
+  color: var(--np4-ink-soft);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-cmd-card--primary {
+  background: linear-gradient(145deg, #3f27c7, #5b3df5) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 14px 36px rgba(63, 39, 199, 0.32);
+}
+
+body.np-atelier-v4 .np-cmd-card--primary strong,
+body.np-atelier-v4 .np-cmd-card--primary span,
+body.np-atelier-v4 .np-cmd-card--primary em {
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-cmd-card--primary em {
+  opacity: 0.85;
+}
+
+/* Track cards */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-track-card {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  box-shadow: var(--np4-shadow);
+}
+
+body.np-atelier-v4 .mp-track-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--np4-shadow-lift);
+  border-color: rgba(91, 61, 245, 0.28) !important;
+}
+
+body.np-atelier-v4 .mp-track-card h3 {
+  color: var(--np4-ink) !important;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .mp-track-desc {
+  color: var(--np4-ink-soft) !important;
+}
+
+body.np-atelier-v4 .mp-catalog-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  color: var(--np4-ink) !important;
+}
+
+body.np-atelier-v4 .mp-catalog-lead {
+  color: var(--np4-ink-soft) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-catalog-block {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+}
+
+/* Activity panels */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-panel {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08);
+}
+
+body.np-atelier-v4 .mp-panel-head h3 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-ink);
+}
+
+/* ══════════════════════════════════════
+   PLACEMENT SPOTLIGHT — DEEP purple only
+   (fixes white-on-pale bug from earlier v4)
+   ══════════════════════════════════════ */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight {
+  display: block;
+  margin: 20px 0 24px;
+  border-radius: 28px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff !important;
+  background: linear-gradient(125deg, #1a0f4a 0%, #2e1a9e 38%, #3f27c7 72%, #5b3df5 100%) !important;
+  border: none !important;
+  box-shadow: 0 28px 60px rgba(46, 26, 158, 0.38) !important;
+  transition: transform 0.35s var(--np4-ease), box-shadow 0.35s ease;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 36px 72px rgba(46, 26, 158, 0.45) !important;
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__brand {
+  color: #c4b5fd !important;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__kicker {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__title {
+  color: #ffffff !important;
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  text-shadow: 0 2px 20px rgba(10, 4, 40, 0.35);
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__lead {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 15px !important;
+  line-height: 1.6;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__cta {
+  background: #ffffff !important;
+  color: #1a0f4a !important;
+  font-weight: 750;
+  box-shadow: 0 10px 24px rgba(10, 4, 40, 0.28);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__stat em {
+  color: #ffffff !important;
+}
+
+body.np-atelier-v4 .np-pl-dash-spotlight__stat small {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat--accent {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ══════════════════════════════════════
+   SAT WORKSPACE HUB
+   ══════════════════════════════════════ */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-hero {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--np4-shadow-lift) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-hero h1 {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.035em;
+  color: var(--np4-ink) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+body.np-atelier-v4 .np-atelier-kicker {
+  color: var(--np4-accent) !important;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+body.np-atelier-v4 .np-atelier-hero-lead {
+  color: var(--np4-ink-soft) !important;
+}
+
+body.np-atelier-v4 .np-atelier-stat strong {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-deep) !important;
+}
+
+body.np-atelier-v4 .np-atelier-stat span {
+  color: var(--np4-muted) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-aside {
+  background: linear-gradient(155deg, #2e1a9e, #5b3df5) !important;
+  color: #fff !important;
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(46, 26, 158, 0.35);
+}
+
+body.np-atelier-v4 .np-atelier-aside-label,
+body.np-atelier-v4 .np-atelier-aside em,
+body.np-atelier-v4 .np-atelier-aside strong {
+  color: #fff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-links a {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-links a:hover {
+  background: #fff !important;
+  color: var(--np4-deep) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-continue-card {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  border-radius: 22px;
+}
+
+body.np-atelier-v4 .np-launch-path h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-ink);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path-grid a {
+  background: #f7f5fd !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  border-radius: 16px;
+  color: var(--np4-ink);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-launch-path-grid a:hover {
+  background: #fff !important;
+  border-color: rgba(91, 61, 245, 0.3) !important;
+  box-shadow: var(--np4-shadow);
+  transform: translateY(-3px);
+}
+
+body.np-atelier-v4 .np-launch-path-grid a strong {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-deep);
+}
+
+body.np-atelier-v4 .np-launch-path-grid a span {
+  color: var(--np4-ink);
+  font-weight: 650;
+}
+
+body.np-atelier-v4 .np-launch-path-grid a em {
+  color: var(--np4-muted);
+}
+
+/* ══════════════════════════════════════
+   HARD DRILL
+   ══════════════════════════════════════ */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--np4-shadow-lift) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero h1 {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  color: var(--np4-ink) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+body.np-atelier-v4 .np-hard-kicker {
+  color: var(--np4-accent) !important;
+  font-weight: 750;
+}
+
+body.np-atelier-v4 .np-hard-hero p {
+  color: var(--np4-ink-soft) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero-pill {
+  background: #efeaff !important;
+  color: var(--np4-deep) !important;
+  border: 1px solid rgba(91, 61, 245, 0.2);
+  font-weight: 750;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-progress {
+  background: linear-gradient(155deg, #2e1a9e, #5b3df5) !important;
+  color: #fff !important;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(46, 26, 158, 0.35);
+}
+
+body.np-atelier-v4 .np-hard-progress span,
+body.np-atelier-v4 .np-hard-progress em,
+body.np-atelier-v4 .np-hard-progress-next {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+body.np-atelier-v4 .np-hard-progress strong {
+  color: #fff !important;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-progress-track {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-progress-track i {
+  background: #fff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-hero-continue {
+  background: linear-gradient(135deg, #3f27c7, #5b3df5) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(63, 39, 199, 0.35);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-studio {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.08) !important;
+  border-radius: 26px !important;
+}
+
+body.np-atelier-v4 .np-hard-studio-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-hard-studio-lead {
+  color: var(--np4-ink-soft);
+}
+
+body.np-atelier-v4 .np-hard-studio-filters button {
+  background: #f7f5fd;
+  color: var(--np4-ink-soft);
+  border: 1px solid rgba(20, 12, 46, 0.08);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-studio-filters button.is-active {
+  background: linear-gradient(135deg, #3f27c7, #5b3df5) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* ══════════════════════════════════════
+   LOGIN
+   ══════════════════════════════════════ */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-intro-head h1 {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  color: var(--np4-ink) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-panel {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.1) !important;
+  border-radius: 26px;
+  box-shadow: var(--np4-shadow-lift);
+}
+
+body.np-atelier-v4 .np-login-panel-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-login-panel-kicker {
+  color: var(--np4-accent);
+  font-weight: 750;
+}
+
+body.np-atelier-v4 .np-login-role-card {
+  background: #fff;
+  border: 1px solid rgba(20, 12, 46, 0.1);
+  border-radius: 16px;
+}
+
+body.np-atelier-v4 .np-login-role-card h2 {
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-login-role-card p {
+  color: var(--np4-ink-soft);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview {
+  background: linear-gradient(155deg, #2e1a9e, #5b3df5) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+body.np-atelier-v4 .np-login-preview-top span,
+body.np-atelier-v4 .np-login-preview-top strong,
+body.np-atelier-v4 .np-login-preview-grid strong,
+body.np-atelier-v4 .np-login-preview-grid span,
+body.np-atelier-v4 .np-login-preview .np-atelier-progress-row {
+  color: #fff !important;
+}
+
+/* ── Practice choice polish ── */
+body.np-atelier-v4 .sat-choice:hover,
+body.np-atelier-v4 .choice-btn:hover {
+  border-color: rgba(91, 61, 245, 0.45);
+  box-shadow: 0 6px 18px rgba(91, 61, 245, 0.12);
+}
+
+body.np-atelier-v4 .sat-choice.is-selected,
+body.np-atelier-v4 .choice-btn.selected {
+  border-color: var(--np4-accent);
+  box-shadow: 0 0 0 3px rgba(91, 61, 245, 0.18);
+}
+
+/* ── Footer ── */
+body.np-atelier-v4 .np-site-footer {
+  background: #fff;
+  border-top: 1px solid rgba(20, 12, 46, 0.08);
+  color: var(--np4-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.np-atelier-v4 .np-pl-dash-spotlight:hover,
+  body.np-atelier-v4 .mp-track-card:hover,
+  body.np-atelier-v4 .np-cmd-card:hover {
+    transform: none;
+  }
+}
+
+/* ══════════════════════════════════════
+   HUB SPOTLIGHT + MODE CARDS
+   ══════════════════════════════════════ */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card {
+  display: grid;
+  background: linear-gradient(125deg, #1a0f4a 0%, #2e1a9e 40%, #5b3df5 100%) !important;
+  color: #fff !important;
+  border-radius: 28px !important;
+  border: none !important;
+  box-shadow: 0 28px 60px rgba(46, 26, 158, 0.36) !important;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 34px 70px rgba(46, 26, 158, 0.42) !important;
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-weight: 650 !important;
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-lede,
+body.np-atelier-v4 .np-hub-spotlight-stat {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-stat strong {
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-hub-spotlight-card .np-atelier-kicker {
+  color: #c4b5fd !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-cta.np-atelier-btn--primary {
+  background: #fff !important;
+  color: #1a0f4a !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide--front {
+  background: #fff !important;
+  color: var(--np4-ink) !important;
+  box-shadow: 0 16px 40px rgba(10, 4, 40, 0.3);
+}
+
+body.np-atelier-v4 .np-hub-slide--front strong {
+  color: var(--np4-ink) !important;
+}
+
+body.np-atelier-v4 .np-hub-modes-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--np4-ink) !important;
+  font-weight: 650 !important;
+}
+
+body.np-atelier-v4 .np-hub-modes-lede {
+  color: var(--np4-ink-soft) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--hub,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--mode {
+  background: #fff !important;
+  border: 1px solid rgba(20, 12, 46, 0.1) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--np4-shadow);
+  color: var(--np4-ink);
+}
+
+body.np-atelier-v4 .np-atelier-card--hub:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--np4-shadow-lift);
+  border-color: rgba(91, 61, 245, 0.3) !important;
+}
+
+body.np-atelier-v4 .np-atelier-title {
+  font-family: "Fraunces", Georgia, serif !important;
+  color: var(--np4-ink) !important;
+  font-weight: 650 !important;
+}
+
+body.np-atelier-v4 .np-atelier-desc,
+body.np-atelier-v4 .np-atelier-count {
+  color: var(--np4-ink-soft) !important;
+}
+
+body.np-atelier-v4 .np-atelier-card-watermark {
+  color: rgba(91, 61, 245, 0.12) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-pill--live {
+  background: #efeaff !important;
+  color: var(--np4-deep) !important;
+  border: 1px solid rgba(91, 61, 245, 0.2);
+  font-weight: 750;
+}
+
+/* Placement landing: ink titles on light canvas */
+body.np-atelier-v4 .np-pl2--atelier .np-pl-display,
+body.np-atelier-v4 .np-pl-display {
+  color: #140c2e !important;
+  font-weight: 650 !important;
+}
+
+body.np-atelier-v4 .np-pl2--atelier .np-pl-lead,
+body.np-atelier-v4 .np-pl-lead {
+  color: #3d3558 !important;
+}
+
+body.np-atelier-v4 .np-pl2--atelier .np-pl-brand,
+body.np-atelier-v4 .np-pl-brand {
+  color: #5b3df5 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-hero__visual {
+  background: linear-gradient(145deg, #2e1a9e, #5b3df5) !important;
+  color: #fff !important;
+  box-shadow: 0 24px 50px rgba(46, 26, 158, 0.35);
+}
+
+body.np-atelier-v4 .np-pl-hero__visual-copy strong {
+  color: #fff !important;
+}
+
+body.np-atelier-v4 .np-pl-hero__visual-copy span {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   v4.2 Soft Luminous — lighter brand surfaces
+   ═══════════════════════════════════════════════════════════ */
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 > .navbar {
+  background: linear-gradient(115deg, #5b3df5 0%, #6c4eff 40%, #8b7cff 75%, #a78bfa 100%) !important;
+  box-shadow: 0 12px 32px rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .big-btn.mp-btn-glow,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-btn--primary,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-btn-pill.mp-btn-glow {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  box-shadow: 0 10px 24px rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-hero--pro::before,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-cmd-card--primary {
+  /* keep medium accent */
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-hero--pro::before {
+  background: linear-gradient(180deg, #9b8cff, #6c4eff) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-cmd-card--primary {
+  background: linear-gradient(145deg, #7c66f0, #6c4eff) !important;
+  box-shadow: 0 12px 28px rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card {
+  background: linear-gradient(145deg, #efe8ff, #ddd4ff) !important;
+  color: #1e1638 !important;
+  box-shadow: 0 12px 28px rgba(108, 78, 255, 0.14) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card span,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card em,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card a,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card strong {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .mp-next-unit-card a {
+  color: #5b3df5 !important;
+  font-weight: 750;
+}
+
+/* Placement spotlight — soft lilac, dark text */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight {
+  background:
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgba(155, 140, 255, 0.35), transparent 50%),
+    linear-gradient(125deg, #f7f4ff 0%, #ebe4ff 45%, #ddd4ff 100%) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+  box-shadow: 0 22px 50px rgba(108, 78, 255, 0.14) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight:hover {
+  color: #1e1638 !important;
+  box-shadow: 0 28px 60px rgba(108, 78, 255, 0.2) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__brand {
+  color: #6c4eff !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__kicker {
+  color: #5a5278 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__title {
+  color: #1e1638 !important;
+  text-shadow: none !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__lead {
+  color: #4a4268 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__cta {
+  background: linear-gradient(135deg, #7c66f0, #6c4eff) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat em {
+  color: #5b3df5 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat small {
+  color: #5a5278 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__stat--accent {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(108, 78, 255, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__glow {
+  background: radial-gradient(circle, rgba(155, 140, 255, 0.35), transparent 68%) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-dash-spotlight__grid {
+  opacity: 0.08 !important;
+  background-image:
+    linear-gradient(rgba(108, 78, 255, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 78, 255, 0.2) 1px, transparent 1px) !important;
+}
+
+/* Soft asides elsewhere */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-aside,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-progress {
+  background: linear-gradient(165deg, #f7f4ff, #e8e0ff) !important;
+  color: #1e1638 !important;
+  border: 1px solid rgba(108, 78, 255, 0.16) !important;
+  box-shadow: 0 14px 36px rgba(108, 78, 255, 0.12) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-aside *,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hard-progress * {
+  color: inherit;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview {
+  background: linear-gradient(155deg, #f4f0ff, #ddd4ff) !important;
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview-top span,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview-top strong,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview-grid strong,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview-grid span,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-login-preview .np-atelier-progress-row {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-hero__visual {
+  background: linear-gradient(145deg, #efe8ff, #d4c8ff) !important;
+  color: #1e1638 !important;
+  box-shadow: 0 18px 40px rgba(108, 78, 255, 0.16) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-hero__visual-copy strong {
+  color: #1e1638 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-pl-hero__visual-copy span {
+  color: #4a4268 !important;
+}
