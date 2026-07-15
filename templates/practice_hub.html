@@ -14,12 +14,12 @@
     <div class="np-sh-hero-noise" aria-hidden="true"></div>
     <div>
       <p class="np-atelier-kicker">{{ site_brand_short }} · SAT Math Studio</p>
-      <h1>A brighter studio for better practice.</h1>
-      <p class="np-atelier-hero-lead">Slides, unit banks, hard sets, exams, and mistake reviews — one studio students actually want to open.</p>
+      <h1>Practice that feels premium.</h1>
+      <p class="np-atelier-hero-lead">Slides, unit banks, hard sets, exams, and mistake reviews — one luminous studio built for focus and flow.</p>
       <div class="np-atelier-hero-stats" role="list">
         <div class="np-atelier-stat" role="listitem"><strong>{% if cm_total is defined %}{{ cm_total }}{% else %}21{% endif %}</strong><span>lessons</span></div>
         <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>units live</span></div>
-        <div class="np-atelier-stat" role="listitem"><strong>{{ hard_drill_meta.count or 15 }}</strong><span>hard sets</span></div>
+        <div class="np-atelier-stat" role="listitem"><strong>{{ hard_drill_meta.count or 16 }}</strong><span>hard sets</span></div>
       </div>
       <div class="np-atelier-hero-cta-row" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;">
         <a href="{{ url_for('practice_specialized') }}" class="np-atelier-btn np-atelier-btn--primary">Start unit training →</a>

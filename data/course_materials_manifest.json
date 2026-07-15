@@ -555,6 +555,36 @@
         "SAT_Hard_Question_Part_14_PPT.pdf",
         "SAT_Hard_Question_14.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-15",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 15",
+      "title": "SAT Hard Question 15",
+      "tex_candidates": [
+        "SAT_Hard_Question_15_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_15_PPT.pdf",
+        "SAT_Hard_Question_Part_15.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-16",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 16",
+      "title": "SAT Hard Question 16",
+      "tex_candidates": [
+        "SAT_Hard_Question_16_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_16_PPT.pdf",
+        "SAT_Hard_Question_Part_16.pdf"
+      ]
     }
   ]
 }

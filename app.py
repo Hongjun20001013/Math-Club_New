@@ -249,7 +249,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260713-cm-deck-grid-v8")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260715-luxe-impact-v6")
 
 _DB_SCHEMA_READY = False
 
@@ -3679,6 +3679,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_12": "banks/hard/hard_12.tex",
         "hard_13": "banks/hard/hard_13.tex",
         "hard_14": "banks/hard/hard_14.tex",
+        "hard_15": "banks/hard/hard_15.tex",
         "hard_16": "banks/hard/hard_16.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
@@ -3912,6 +3913,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Classroom presentation version for walkthrough lessons.",
             "download_name": "NovelPrep-SAT-Hard-Practice-14-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_15": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_15.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Printable worksheet — Hard Practice XV.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-15-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_15_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Slide deck with worked solutions for classroom review.",
+            "download_name": "NovelPrep-SAT-Hard-Practice-15-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4418,6 +4435,7 @@ TOPIC_TITLES = {
     "hard_12": "SAT Hard Question Set 12 (Practice XII)",
     "hard_13": "SAT Hard Question Set 13 (Practice XIII)",
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
+    "hard_15": "SAT Hard Question Set 15 (Practice XV)",
     "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
@@ -4715,6 +4733,33 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "1944"},
         {"correct_answer": "A"},
         {"correct_answer": "127"},
+    ],
+    "hard_15": [
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "72"},
+        {"correct_answer": "80"},
+        {"correct_answer": "50/33", "answer_alternates": ["1.515", "1.52"]},
+        {"correct_answer": "0.128"},
+        {"correct_answer": "198"},
+        {"correct_answer": "D"},
+        {"correct_answer": "361"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "128"},
+        {"correct_answer": "26"},
+        {"correct_answer": "A"},
+        {"correct_answer": "8"},
+        {"correct_answer": "30"},
+        {"correct_answer": "A"},
+        {"correct_answer": "15"},
+        {"correct_answer": "35"},
+        {"correct_answer": "-5", "answer_alternates": ["-5.0"]},
+        {"correct_answer": "3125"},
+        {"correct_answer": "360"},
+        {"correct_answer": "2"},
+        {"correct_answer": "C"},
+        {"correct_answer": "C"},
     ],
     "hard_16": [
         {"correct_answer": "1.6", "answer_alternates": ["8/5", "1.60"]},

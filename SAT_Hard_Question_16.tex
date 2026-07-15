@@ -1,273 +1,178 @@
-\documentclass[12pt]{article}
-\everymath{\displaystyle}
-\usepackage{unicode-math}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepackage{amsmath}
-
-
-
-\usepackage[margin=1in]{geometry}
-\usepackage{tcolorbox}
-\usepackage{graphicx}
-\usepackage{tikz}
-\usepackage{amssymb}
-\usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{fancyhdr}
-\usepackage{pifont}
-\usepackage{xcolor}
-\newcounter{questionnum}
-\setcounter{questionnum}{0}
-\usepackage{eso-pic} % for page background
-
-% --------- 主题颜色设置 ---------
-\definecolor{novelblue}{RGB}{70,60,150}
-\definecolor{headerbg}{RGB}{240,240,255}
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\headrule}{\hbox to\headwidth{\color{novelblue}\leaders\hrule height 0.4pt\hfill}}
-
-% --------- 页眉背景色条 ---------
-\newcommand{\headbackground}{
-  \AddToShipoutPictureBG*{
-    \begin{tikzpicture}[remember picture, overlay]
-      \fill[blue!5!purple!10] (current page.north west) rectangle ([yshift=-60pt]current page.north east);
-    \end{tikzpicture}
-  }
-}
-
-% --------- 页眉设置 ---------
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyhead[L]{\color{novelblue}\textbf{\textbf{Novel Prep} }}
-\fancyhead[C]{\color{novelblue}\textbf {SAT Preparation}}
-\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
-
-
-\newtcolorbox{SATCard}[1][]{%
-  enhanced,
-  colback=white,
-  colframe=novelblue,
-  coltitle=white,
-  boxrule=0.6pt,
-  arc=4pt,
-  boxsep=5pt,
-  left=8pt, right=8pt, top=10pt, bottom=10pt,
-  sharp corners=south,
-  drop shadow south east,
-  #1
-}
-
-% --------- 顶部 Mark for Review 栏 ---------
-\newcommand{\markforreview}{
-  \stepcounter{questionnum} % 自动递增题号
-  \begin{tikzpicture}[scale=1.1]
-    % 黑色题号
-    \fill[black] (0,0) rectangle (0.8,0.6);
-    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
-
-    % 灰底主栏
-    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
-
-    % Mark for Review
-    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
-
-    % ABC 按钮区域
-    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
-    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
-  \end{tikzpicture}
-
-
-  \newcommand{\choiceboxcircled}[2]{%
-  \begin{tcolorbox}[
-    colback=white,
-    colframe=black,
-    boxrule=0.5pt,
-    rounded corners=6pt,
-    left=6pt, right=6pt, top=6pt, bottom=6pt,
-    width=\linewidth
-  ]
-    \textbf{\large\textcircled{\textbf{#1}}} \ #2
-  \end{tcolorbox}
-}
-}
-
-% --------- 选项框样式 ---------
-\newcommand{\choicebox}[2]{%
-  \begin{tcolorbox}[
-    colback=white, 
-    colframe=novelblue,
-    boxrule=0.5pt, 
-    rounded corners=4pt, 
-    left=6pt, right=6pt, top=6pt, bottom=6pt,
-    width=\linewidth
-  ]
-  \textbf{#1.} \ #2
-  \end{tcolorbox}
-}
-
-
-\begin{document}
-
-
-\section*{SAT Hard Question 16}
-
-
-
 \noindent\markforreview
 \vspace{1em}
 
-The function $h$ is defined as:
+The function \(h\) is defined as:
 \[
 h(t) = -16t^2 + b
 \]
-The function $h$ estimates an object’s height, in feet, above the ground $t$ seconds after the object is dropped, where $b$ is a constant.
+The function \(h\) estimates an object's height, in feet, above the ground \(t\) seconds after the object is dropped, where \(b\) is a constant.
 
-The function estimates that the object is $40.96$ feet above the ground when it is dropped at $t = 0$.
+The function estimates that the object is \(40.96\) feet above the ground when it is dropped at \(t = 0\).
 
 How many seconds after being dropped does the function estimate the object will hit the ground?
 
 \vspace{2em}
+\newpage
+
 \noindent\markforreview
 \vspace{1em}
 
-For a set of three consecutive integers, the result of subtracting the greatest integer from the sum of the other two integers is $48$.
+For a set of three consecutive integers, the result of subtracting the greatest integer from the sum of the other two integers is \(48\).
 
 What is the value of the greatest of the three integers?
-\vspace{2em}
-
-\noindent\markforreview
-
-
-A researcher surveyed undergraduate students, graduate students, and postdoctoral students. The number of undergraduate students surveyed was $7,150\%$ of the number of postdoctoral students surveyed, and the number of graduate students surveyed was $45\%$ of the number of undergraduate students surveyed.
-
-If there were $6,435$ graduate students surveyed, what was the sum of the number of undergraduate students and postdoctoral students surveyed?
 
 \vspace{2em}
-\noindent\markforreview
-\vspace{1em}
-
-\[
-16x - 20y = 6y + 8
-\]
-\[
-ty = 8x + \frac{1}{5}
-\]
-
-In the given system of equations, $t$ is a constant. If the system has no solution, what is the value of $t$?
-
-\newpage
-\noindent\markforreview
-\vspace{1em}
-
-The bone mineral density of a certain person's thoracic spine was estimated to be $0.812$ grams per square centimeter. What is this estimated bone mineral density in grams per square millimeter? (1 centimeter = 10 millimeters)
-
-\choicebox{A}{81.2}
-\choicebox{B}{8.12}
-\choicebox{C}{0.0812}
-\choicebox{D}{0.00812}
-
-
-\vspace{2em}
-
-\noindent\markforreview
-\vspace{1em}
-
-\[
-\frac{5}{9}(5x + 9)(x + \sqrt{5k+ 9} )(x - \sqrt{5k+ 9} ) = 0
-\]
-
-In the given equation, $k$ is a positive constant. The product of the solutions to the equation is $72$.  
-What is the value of $k$?
-
-\vspace{2em}
-\noindent\markforreview
-\vspace{1em}
-
-A right rectangular prism has a base area of $56t$ square centimeters (cm$^2$).  
-The length of the base of the rectangular prism is $\frac{14}{3}$ cm, and the height of the rectangular prism is $3$ cm.  
-
-Which expression represents the surface area, in cm$^2$, of the right rectangular prism?
-
-\choicebox{A}{$112t + 56$}
-\choicebox{B}{$184t + 28$}
-\choicebox{C}{$1,680t + 28$}
-\choicebox{D}{$168t$}
-
-\newpage
-\noindent\markforreview
-\vspace{1em}
-
-In the $xy$-plane, a unit circle with center at the origin $O$ contains point $A$ with coordinates $(1, 0)$ and point $B$ with coordinates $\left( \frac{5}{\sqrt{34}}, -\frac{3}{\sqrt{34}} \right)$.  
-
-If the measure of angle $AOB$ is $p$ radians, what is the value of $\frac{\cos p}{\sin p}$?
-
-\vspace{2em}
-\noindent\markforreview
-\vspace{1em}
-
-The function $h$ is defined by:
-\[
-h(x) = -\sqrt{x^2+ bx + c} 
-\]
-where $b$ and $c$ are constants. In the $xy$-plane, the graph of $y = h(x)$ contains the points $(2, 0)$ and $\left( 0, -\sqrt{334} \right)$.
-
-If $h(m) = 0$, what is the greatest possible value of $m$?
-
-\vspace{2em}
-
-\noindent\markforreview
-\vspace{1em}
-
-A computer repair specialist charges \$160 for the first two hours of repair plus an hourly fee for each additional hour. The total cost for $6$ hours of repair is \$360.
-
-Which function $f$ gives the total cost, in dollars, for $x$ hours of repair, where $x \geq 2$?
-
-\choicebox{A}{$f(x) = 50x + 60$}
-\choicebox{B}{$f(x) = 50x + 160$}
-\choicebox{C}{$f(x) = 60x$}
-\choicebox{D}{$f(x) = 60x + 160$}
-
-
 \newpage
 
 \noindent\markforreview
 \vspace{1em}
 
-A painting studio is offering a promotion where the first class is free, the second class is half off the regular price, and the remaining classes are regularly priced. If the regular price of a class is \$26.40, which function $f$ gives the total cost, in dollars, of $x$ classes taken using this promotion, where $x > 2$?
+A researcher surveyed undergraduate students, graduate students, and postdoctoral students. The number of undergraduate students surveyed was \(7{,}150\%\) of the number of postdoctoral students surveyed, and the number of graduate students surveyed was \(45\%\) of the number of undergraduate students surveyed.
 
-\choicebox{A}{$f(x) = 26.40(x-1) + 13.20$}
-\choicebox{B}{$f(x) = 26.40(x-2) + 13.20$}
-\choicebox{C}{$f(x) = 26.40(x-1) + 13.20(x-2)$}
-\choicebox{D}{$f(x) = 26.40(x-2) + 13.20(x-1)$}
+If there were \(6{,}435\) graduate students surveyed, what was the sum of the number of undergraduate students and postdoctoral students surveyed?
 
 \vspace{2em}
+\newpage
 
 \noindent\markforreview
 \vspace{1em}
 
-The function $f$ is defined by the given equation:
+\[
+\begin{aligned}
+16x - 20y &= 6y + 8 \\
+ty &= 8x + \frac{1}{5}
+\end{aligned}
+\]
+
+In the given system of equations, \(t\) is a constant. If the system has no solution, what is the value of \(t\)?
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The bone mineral density of a certain person's thoracic spine was estimated to be \(0.812\) grams per square centimeter. What is this estimated bone mineral density in grams per square millimeter? (\(1\) centimeter \(= 10\) millimeters)
+
+\vspace{0.75em}
+
+\choicebox{A}{\(81.2\)}
+\choicebox{B}{\(8.12\)}
+\choicebox{C}{\(0.0812\)}
+\choicebox{D}{\(0.00812\)}
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+\[
+\frac{5}{9}(5x + 9)\left(x + \sqrt{5k + 9}\right)\left(x - \sqrt{5k + 9}\right) = 0
+\]
+
+In the given equation, \(k\) is a positive constant. The product of the solutions to the equation is \(72\).
+
+What is the value of \(k\)?
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A right rectangular prism has a base area of \(56t\) square centimeters (\(\text{cm}^2\)). The length of the base of the rectangular prism is \(\frac{14}{3}\) cm, and the height of the rectangular prism is \(3\) cm.
+
+Which expression represents the surface area, in \(\text{cm}^2\), of the right rectangular prism?
+
+\vspace{0.75em}
+
+\choicebox{A}{\(112t + 56\)}
+\choicebox{B}{\(184t + 28\)}
+\choicebox{C}{\(1{,}680t + 28\)}
+\choicebox{D}{\(168t\)}
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+In the \(xy\)-plane, a unit circle with center at the origin \(O\) contains point \(A\) with coordinates \((1, 0)\) and point \(B\) with coordinates \(\left(\frac{5}{\sqrt{34}}, -\frac{3}{\sqrt{34}}\right)\).
+
+If the measure of angle \(AOB\) is \(p\) radians, what is the value of \(\frac{\cos p}{\sin p}\)?
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The function \(h\) is defined by
+\[
+h(x) = -\sqrt{x^2 + bx + c},
+\]
+where \(b\) and \(c\) are constants. In the \(xy\)-plane, the graph of \(y = h(x)\) contains the points \((2, 0)\) and \(\left(0, -\sqrt{334}\right)\).
+
+If \(h(m) = 0\), what is the greatest possible value of \(m\)?
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A computer repair specialist charges \(\$160\) for the first two hours of repair plus an hourly fee for each additional hour. The total cost for \(6\) hours of repair is \(\$360\).
+
+Which function \(f\) gives the total cost, in dollars, for \(x\) hours of repair, where \(x \geq 2\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{\(f(x) = 50x + 60\)}
+\choicebox{B}{\(f(x) = 50x + 160\)}
+\choicebox{C}{\(f(x) = 60x\)}
+\choicebox{D}{\(f(x) = 60x + 160\)}
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A painting studio is offering a promotion where the first class is free, the second class is half off the regular price, and the remaining classes are regularly priced. If the regular price of a class is \(\$26.40\), which function \(f\) gives the total cost, in dollars, of \(x\) classes taken using this promotion, where \(x > 2\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{\(f(x) = 26.40(x - 1) + 13.20\)}
+\choicebox{B}{\(f(x) = 26.40(x - 2) + 13.20\)}
+\choicebox{C}{\(f(x) = 26.40(x - 1) + 13.20(x - 2)\)}
+\choicebox{D}{\(f(x) = 26.40(x - 2) + 13.20(x - 1)\)}
+
+\vspace{2em}
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The function \(f\) is defined by the given equation:
 \[
 f(x) = x^2 - 4x - 320
 \]
 Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?
 
-\choicebox{A}{$f(x) = x^2 -4(x+80)$}
-\choicebox{B}{$f(x) = (x-2)^2 + (-324)$}
-\choicebox{C}{$f(x) = x(x-4) + (-320)$}
-\choicebox{D}{$f(x) = (x+16)(x-20)$}
+\vspace{0.75em}
 
+\choicebox{A}{\(f(x) = x^2 - 4(x + 80)\)}
+\choicebox{B}{\(f(x) = (x - 2)^2 + (-324)\)}
+\choicebox{C}{\(f(x) = x(x - 4) + (-320)\)}
+\choicebox{D}{\(f(x) = (x + 16)(x - 20)\)}
+
+\vspace{2em}
 \newpage
 
 \noindent\markforreview
 \vspace{1em}
 
-The composition of an animal is defined as the muscles, bones, and fat of the animal. A scientist studied the composition of one young swamp buffalo and determined the buffalo had $133$ kilograms of muscle, which made up approximately $65.9\%$ of its composition. Of the remaining composition of this buffalo, approximately $46.2\%$ was bone, and the remainder was fat. Based on these approximations, to the nearest tenth, how many kilograms of this buffalo's composition was bone?
+The composition of an animal is defined as the muscles, bones, and fat of the animal. A scientist studied the composition of one young swamp buffalo and determined the buffalo had \(133\) kilograms of muscle, which made up approximately \(65.9\%\) of its composition. Of the remaining composition of this buffalo, approximately \(46.2\%\) was bone, and the remainder was fat. Based on these approximations, to the nearest tenth, how many kilograms of this buffalo's composition was bone?
 
-
-
-\end{document}
+\vspace{2em}

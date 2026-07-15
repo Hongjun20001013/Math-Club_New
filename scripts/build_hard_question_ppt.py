@@ -248,16 +248,16 @@ def build_set(set_num: int) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-14)")
-    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-14")
+    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-16)")
+    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-16")
     args = parser.parse_args()
 
     if args.all:
-        sets = list(range(1, 15))
+        sets = list(range(1, 17))
     elif args.sets:
         sets = args.sets
     else:
-        sets = list(range(4, 15))
+        sets = list(range(4, 17))
 
     for n in sets:
         tex = build_set(n)

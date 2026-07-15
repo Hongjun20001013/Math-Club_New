@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-13T05:02:54.263756Z",
-  "total": 35,
-  "available": 35,
+  "generated_at": "2026-07-15T20:23:17.867178Z",
+  "total": 37,
+  "available": 37,
   "materials": [
     {
       "slug": "1-1-linear-equations",
@@ -26467,7 +26467,7 @@
         }
       ],
       "prev_lesson_slug": "hard-question-13",
-      "next_lesson_slug": null,
+      "next_lesson_slug": "hard-question-15",
       "tex_available": true,
       "pdf_available": true,
       "tex_file": "SAT_Hard_Question_14_PPT.tex",
@@ -26913,6 +26913,2062 @@
               "index": 37,
               "kind": "answer",
               "title": "Answer 17",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "hard-question-15",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 15",
+      "title": "SAT Hard Question 15",
+      "deck_title": "SAT Hard Question · Set 15",
+      "slide_count": 54,
+      "slides": [
+        {
+          "index": 1,
+          "title": "SAT Hard Question · Set 15",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Hard Question</p><h1 class=\"cm-intro-title\">Set 15</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Hard Question Set 15</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
+          "kind": "intro",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "This is your lesson overview — tap a section chip or press Next for the full outline."
+        },
+        {
+          "index": 2,
+          "title": "Lesson outline",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Hard Question</p><h2 class=\"cm-content-title\">Set 15</h2><p class=\"cm-content-lede\">54 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Hard Question Set 15</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "kind": "content",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "Use this outline to jump straight to any section — great for review or picking up where you left off."
+        },
+        {
+          "index": 3,
+          "title": "Up next Hard Question Set 15",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">01</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Hard Question Set 15</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Hard Question Set 15",
+          "study_tip": ""
+        },
+        {
+          "index": 4,
+          "title": "Question 1",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>For the function</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = a\\sqrt{b - x} + \\frac{12}{\\sqrt{b - x}},\n\\]</div>\n<p>\\(a\\) and \\(b\\) are constants, and \\(f(4) = 0\\). If \\(f(5) > 0\\), which of the following could be a value for \\(a + b\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(-20\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(-12\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(-8\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(-4\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 5,
+          "correct_choice": "D",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 5,
+          "title": "Answer 1",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
+          "kind": "answer",
+          "question_index": 4,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 6,
+          "title": "Question 2",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\frac{16}{a} = \\frac{16}{b} + \\frac{16}{c}\n\\]</div>\n<p>Which of the following expresses \\(a\\) in terms of \\(b\\) and \\(c\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(a = \\dfrac{b + c}{bc}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(a = \\dfrac{bc}{b + c}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(a = bc(b + c)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(a = 16bc(b + c)\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 7,
+          "correct_choice": "B",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 7,
+          "title": "Answer 2",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>",
+          "kind": "answer",
+          "question_index": 6,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 8,
+          "title": "Question 3",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\frac{ax^3 + bx^2 + cx + d}{(x^2 - 9)(x + 2)} = \\frac{5}{x + 3} + \\frac{6x}{x - 3}\n\\]</div>\n<p>What is the value of \\(a + b + c\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;72&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 9,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "72",
+            "accept": [
+              "72"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 9,
+          "title": "Answer 3",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">72</div></div>",
+          "kind": "answer",
+          "question_index": 8,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 10,
+          "title": "Question 4",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>There are two lawn mowing companies. Company A charges a flat fee of \\(&#36;80\\) for the first hour, then an hourly rate of \\(&#36;60\\) for each additional hour. Company B charges no flat fee, but an hourly rate of \\(&#36;75\\) per hour. After how many minutes will company B's total cost exceed company A's?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;80&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 11,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "80",
+            "accept": [
+              "80"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 11,
+          "title": "Answer 4",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">80</div></div>",
+          "kind": "answer",
+          "question_index": 10,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 12,
+          "title": "Question 5",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Match coefficients of x and constants on both sides — they must be identical.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\begin{aligned}\n\\frac{5}{6}x + ay &= b \\\\\n\\frac{11}{10}x + cy &= 2d\n\\end{aligned}\n\\]</div>\n<p>If the system of equations above has infinitely many solutions, what must be the value of \\(\\dfrac{b}{d}\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;50/33&quot;, &quot;1.5151515151515151&quot;, &quot;1.5152&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Fraction or decimal, e.g. 7/6\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><p class=\"cm-grid-in-hint\">Enter an exact fraction or decimal equivalent.</p><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 13,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "\\dfrac{50}{33}",
+            "accept": [
+              "50/33",
+              "1.5151515151515151",
+              "1.5152"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Infinite solutions mean the two sides are the same line — all coefficients must match.",
+          "strategy_hint": "Match coefficients of x and constants on both sides — they must be identical."
+        },
+        {
+          "index": 13,
+          "title": "Answer 5",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\dfrac{50}{33}\\)</span></div></div>",
+          "kind": "answer",
+          "question_index": 12,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 14,
+          "title": "Question 6",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Translate the percent change into a multiplier, then match the time unit in the exponent.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>\\(a\\) is \\(540\\%\\) more than \\(b\\) and \\(b\\) is \\(0.02\\%\\) of \\(c\\). If \\(a\\) is \\(k\\%\\) of \\(c\\), then what must \\(k\\) equal?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;0.128&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 15,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "0.128",
+            "accept": [
+              "0.128"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Translate the percent change into a multiplier, then match the time unit in the exponent."
+        },
+        {
+          "index": 15,
+          "title": "Answer 6",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">0.128</div></div>",
+          "kind": "answer",
+          "question_index": 14,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 16,
+          "title": "Question 7",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nf(t) = a \\cdot 2^{\\frac{2t}{11}}\n\\]</div>\n<p>The given function \\(f(t)\\) models the amount of money in an investment account \\(t\\) years after the account is opened, where \\(a\\) is a constant. How many months will it take for the initial investment to increase by \\(700\\%\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;198&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 17,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "198",
+            "accept": [
+              "198"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 17,
+          "title": "Answer 7",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">198</div></div>",
+          "kind": "answer",
+          "question_index": 16,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 18,
+          "title": "Question 8",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(f\\) is defined by</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = k^{3kx} + b\n\\]</div>\n<p>for \\(x \\ge 0\\). \\(k\\) and \\(b\\) are positive constants and \\(k \\lt  1\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The maximum value of the function is displayed as a constant or coefficient of the function.</li><li>II. \\(f(1) = f(0) \\cdot k\\)</li><li>III. \\(f(a) \\lt  b\\) for some \\(a > 0\\)</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Neither I, II, nor III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 19,
+          "correct_choice": "D",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 19,
+          "title": "Answer 8",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
+          "kind": "answer",
+          "question_index": 18,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 20,
+          "title": "Question 9",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n15x^{18} + kx^{9} + 24\n\\]</div>\n<p>The expression above has factors \\(ax^{9} + b\\) and \\(cx^{9} + d\\), where \\(a\\), \\(b\\), \\(c\\), and \\(d\\) are all integer constants. What is the maximum value of \\(k\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;361&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 21,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "361",
+            "accept": [
+              "361"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 21,
+          "title": "Answer 9",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">361</div></div>",
+          "kind": "answer",
+          "question_index": 20,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 22,
+          "title": "Question 10",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n(hx + k)(qx + z) = ax^{2} + bx + 35\n\\]</div>\n<p>For the expression above, \\(h\\), \\(k\\), \\(q\\), and \\(z\\) are all integer constants. Which of the following must be an integer?</p>\n<ul class=\"stem-itemize\"><li>I. \\(\\dfrac{35}{k}\\)</li><li>II. \\(b\\)</li><li>III. \\(-\\dfrac{a}{q}\\)</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 23,
+          "correct_choice": "D",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 23,
+          "title": "Answer 10",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
+          "kind": "answer",
+          "question_index": 22,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 24,
+          "title": "Question 11",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nf(x) = -3x^{2} + bx + c\n\\]</div>\n<p>In the given quadratic function, \\(b\\) and \\(c\\) are constants. The graph of \\(y = f(x)\\) in the \\(xy\\)-plane is a parabola that has a vertex at the point \\((h, k)\\), where \\(h\\) and \\(k\\) are constants. If \\(f(-4) = f(8)\\), and the quadratic function has \\(x\\)-intercepts at \\((r, 0)\\) and \\((s, 0)\\), which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(r + s = 4\\)</li><li>II. \\(b \\lt  0\\)</li><li>III. \\(c \\lt  k\\)</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 25,
+          "correct_choice": "C",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 25,
+          "title": "Answer 11",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>C</strong></div></div>",
+          "kind": "answer",
+          "question_index": 24,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 26,
+          "title": "Question 12",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Use the graph shape, vertex or symmetry, and discriminant to narrow the answer.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A quadratic function models a rock's height, in feet, above the ground in terms of the time, in seconds, after it is thrown. The rock was thrown from an initial height of \\(c\\) feet above the ground and reached a maximum height of \\(200\\) feet above the ground \\(3\\) seconds after it was thrown. Then it hit the ground \\(8\\) seconds after being thrown. At what initial height \\(c\\) was the rock thrown?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;128&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 27,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "128",
+            "accept": [
+              "128"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Use the graph shape, vertex or symmetry, and discriminant to narrow the answer."
+        },
+        {
+          "index": 27,
+          "title": "Answer 12",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">128</div></div>",
+          "kind": "answer",
+          "question_index": 26,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 28,
+          "title": "Question 13",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the initial value, growth or decay factor, and how the exponent scales with time.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n2rx^{2} - 5sx + 8r = 0\n\\]</div>\n<p>If the quadratic equation above has one real solution and \\(rs = 160\\), what is \\(\\lvert r + s \\rvert\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;26&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 29,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "26",
+            "accept": [
+              "26"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify the initial value, growth or decay factor, and how the exponent scales with time."
+        },
+        {
+          "index": 29,
+          "title": "Answer 13",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">26</div></div>",
+          "kind": "answer",
+          "question_index": 28,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 30,
+          "title": "Question 14",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nf(x) = -(x + a)^{2}(x - b)(x - c)\n\\]</div>\n<p>For the polynomial function above, \\(a\\), \\(b\\), and \\(c\\) are positive constants. Let \\(b \\lt  k \\lt  c\\) for some constant \\(k\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(k > 0\\)</li><li>II. \\(f(k) > 0\\)</li><li>III. \\(f(0) > 0\\)</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 31,
+          "correct_choice": "A",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 31,
+          "title": "Answer 14",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>A</strong></div></div>",
+          "kind": "answer",
+          "question_index": 30,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 32,
+          "title": "Question 15",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Three consecutive even integers are ordered from smallest to largest. \\(5\\) times the first integer is at least \\(9\\) more than the sum of the second and third integers. What is the minimum possible value for the second integer?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;8&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 33,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "8",
+            "accept": [
+              "8"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 33,
+          "title": "Answer 15",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">8</div></div>",
+          "kind": "answer",
+          "question_index": 32,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 34,
+          "title": "Question 16",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>If a car accelerates at \\(108\\) kilometers per hour squared, what is its acceleration in meters per minute squared? (\\(1\\) kilometer \\(= 1000\\) meters)</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;30&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 35,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "30",
+            "accept": [
+              "30"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 35,
+          "title": "Answer 16",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">30</div></div>",
+          "kind": "answer",
+          "question_index": 34,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 36,
+          "title": "Question 17",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>In triangle \\(\\triangle ABC\\), the measure of \\(\\angle B\\) is \\(90^\\circ\\), \\(AB\\) is a leg with a length of \\(12\\), and point \\(D\\) lies on segment \\(AC\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(BC = 12\\tan(\\angle CAB)\\)</li><li>II. \\(\\cos(\\angle ABD) - \\sin(\\angle DBC) = 0\\)</li><li>III. \\(\\angle ABD = \\angle BDC\\)</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 37,
+          "correct_choice": "A",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Mark known angles and side relationships first, then use triangle or parallel-line facts."
+        },
+        {
+          "index": 37,
+          "title": "Answer 17",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>A</strong></div></div>",
+          "kind": "answer",
+          "question_index": 36,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 38,
+          "title": "Question 18",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>In triangle \\(\\triangle ABC\\), the measure of \\(\\angle B\\) is \\(90^\\circ\\), and \\(BD\\) is an altitude of the triangle. The length of \\(BC\\) is \\(10\\) and \\(\\angle ABD = 60^\\circ\\). What is the length of \\(AD\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;15&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 39,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "15",
+            "accept": [
+              "15"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Mark known angles and side relationships first, then use triangle or parallel-line facts."
+        },
+        {
+          "index": 39,
+          "title": "Answer 18",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">15</div></div>",
+          "kind": "answer",
+          "question_index": 38,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 40,
+          "title": "Question 19",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div>\n<div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f19.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 294px; max-height: 212px; object-fit: contain;\" /></div>\n<p>In the circle above, \\(AC\\) is a diameter and \\(\\angle ACB = 20^\\circ\\). If the circumference of the circle is \\(90\\) inches, what is the length of arc \\(BC\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;35&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 41,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "35",
+            "accept": [
+              "35"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Mark known angles and side relationships first, then use triangle or parallel-line facts."
+        },
+        {
+          "index": 41,
+          "title": "Answer 19",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">35</div></div>",
+          "kind": "answer",
+          "question_index": 40,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 42,
+          "title": "Question 20",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>In the \\(xy\\)-plane, the graph of \\(x^{2} + 6x + y^{2} + 2y = 15\\) is a circle. Line \\(k\\) has a slope of \\(\\dfrac{3}{4}\\) and is tangent to this circle at the point \\((a, b)\\), where \\(b\\) is negative. What is the value of \\(b\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;-5&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 43,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "-5",
+            "accept": [
+              "-5"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 43,
+          "title": "Answer 20",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">-5</div></div>",
+          "kind": "answer",
+          "question_index": 42,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 44,
+          "title": "Question 21",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the formula, then track how scaling or unit changes affect the result.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Rectangular prism \\(A\\) and rectangular prism \\(B\\) are similar. The height of rectangular prism \\(A\\) is \\(4\\) inches and the height of rectangular prism \\(B\\) is \\(10\\) inches. If the volume of prism \\(A\\) is \\(200\\) cubic inches, then what is the volume of prism \\(B\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;3125&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 45,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "3125",
+            "accept": [
+              "3125"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify the formula, then track how scaling or unit changes affect the result."
+        },
+        {
+          "index": 45,
+          "title": "Answer 21",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">3125</div></div>",
+          "kind": "answer",
+          "question_index": 44,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 46,
+          "title": "Question 22",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the formula, then track how scaling or unit changes affect the result.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Consider a square right pyramid with a volume of \\(400\\) cubic inches and a slant height of \\(13\\) inches. The pyramid's length, width, and height (in inches) are all integers. What is the surface area of the pyramid in square inches?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;360&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 47,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "360",
+            "accept": [
+              "360"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify the formula, then track how scaling or unit changes affect the result."
+        },
+        {
+          "index": 47,
+          "title": "Answer 22",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">360</div></div>",
+          "kind": "answer",
+          "question_index": 46,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 48,
+          "title": "Question 23",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Data set \\(A\\) consists of \\(4\\) integers greater than or equal to \\(10\\) but less than or equal to \\(20\\). Data set \\(B\\) consists of the same four integers and adds one more integer, which must also be between \\(10\\) and \\(20\\). What is the largest possible difference between the mean of data set \\(A\\) and the mean of data set \\(B\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;2&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 49,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "2",
+            "accept": [
+              "2"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 49,
+          "title": "Answer 23",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">2</div></div>",
+          "kind": "answer",
+          "question_index": 48,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 50,
+          "title": "Question 24",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Data</th><th>Frequency</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>5</td></tr><tr><td>3</td><td>6</td></tr><tr><td>4</td><td>5</td></tr><tr><td>5</td><td>2</td></tr></tbody></table></div>\n<p>The frequency table above summarizes data set \\(A\\). Data set \\(B\\) is created by multiplying all of the values in data set \\(A\\) by \\(2\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The difference between the mean and median of data set \\(B\\) is \\(0\\).</li><li>II. The standard deviation of data set \\(B\\) is equal to the standard deviation of data set \\(A\\).</li><li>III. The range of data set \\(B\\) is double the range of data set \\(A\\).</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">I and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 51,
+          "correct_choice": "C",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 51,
+          "title": "Answer 24",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>C</strong></div></div>",
+          "kind": "answer",
+          "question_index": 50,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 52,
+          "title": "Question 25",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Translate the percent change into a multiplier, then match the time unit in the exponent.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A sample of students was selected at random from all 11th graders at a school. Based on the sample, it is estimated that the proportion of 11th graders in at least one AP class is \\(60\\%\\) with a margin of error of \\(5\\%\\). Which of the following conclusions are appropriate?</p>\n<ul class=\"stem-itemize\"><li>I. It is not possible for just \\(40\\%\\) of the 11th graders in the school to be in at least one AP class.</li><li>II. It is plausible that the proportion of all students at the school in at least one AP class is between \\(45\\%\\) and \\(55\\%\\).</li><li>III. If the sample size is increased, the margin of error will drop below \\(5\\%\\).</li></ul></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">I and II only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">II and III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">III only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">I, II, and III</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 53,
+          "correct_choice": "C",
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Translate the percent change into a multiplier, then match the time unit in the exponent."
+        },
+        {
+          "index": 53,
+          "title": "Answer 25",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>C</strong></div></div>",
+          "kind": "answer",
+          "question_index": 52,
+          "group": "practice",
+          "section": "Hard Question Set 15",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 54,
+          "title": "Thank You",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 54 slides on <strong>Set 15</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Hard Question Set 15</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "kind": "closing",
+          "group": "review",
+          "section": "Hard Question Set 15",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        }
+      ],
+      "prev_lesson_slug": "hard-question-14",
+      "next_lesson_slug": "hard-question-16",
+      "tex_available": true,
+      "pdf_available": true,
+      "tex_file": "SAT_Hard_Question_15_PPT.tex",
+      "pdf_file": "SAT_Hard_Question_Part_15_PPT.pdf",
+      "interactive_count": 25,
+      "learn_count": 0,
+      "practice_slide_count": 50,
+      "lesson_path": [
+        {
+          "index": 3,
+          "title": "Hard Question Set 15"
+        }
+      ],
+      "checkpoint": [
+        {
+          "slide_index": 4,
+          "title": "Question 1",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 5,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>For the function</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = a\\sqrt{b - x} + \\frac{12}{\\sqrt{b - x}},\n\\]</div>\n<p>\\(a\\) and \\(b\\) are constants, and \\(f(4) = 0\\). If \\(f(5) > 0\\), which of the following could be a value for \\(a + b\\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(-20\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(-12\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(-8\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(-4\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 6,
+          "title": "Question 2",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "B",
+          "answer_index": 7,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\frac{16}{a} = \\frac{16}{b} + \\frac{16}{c}\n\\]</div>\n<p>Which of the following expresses \\(a\\) in terms of \\(b\\) and \\(c\\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(a = \\dfrac{b + c}{bc}\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(a = \\dfrac{bc}{b + c}\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(a = bc(b + c)\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(a = 16bc(b + c)\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 18,
+          "title": "Question 8",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 19,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(f\\) is defined by</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = k^{3kx} + b\n\\]</div>\n<p>for \\(x \\ge 0\\). \\(k\\) and \\(b\\) are positive constants and \\(k \\lt  1\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The maximum value of the function is displayed as a constant or coefficient of the function.</li><li>II. \\(f(1) = f(0) \\cdot k\\)</li><li>III. \\(f(a) \\lt  b\\) for some \\(a > 0\\)</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "Neither I, II, nor III"
+            }
+          ]
+        },
+        {
+          "slide_index": 22,
+          "title": "Question 10",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 23,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n(hx + k)(qx + z) = ax^{2} + bx + 35\n\\]</div>\n<p>For the expression above, \\(h\\), \\(k\\), \\(q\\), and \\(z\\) are all integer constants. Which of the following must be an integer?</p>\n<ul class=\"stem-itemize\"><li>I. \\(\\dfrac{35}{k}\\)</li><li>II. \\(b\\)</li><li>III. \\(-\\dfrac{a}{q}\\)</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        },
+        {
+          "slide_index": 24,
+          "title": "Question 11",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 25,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nf(x) = -3x^{2} + bx + c\n\\]</div>\n<p>In the given quadratic function, \\(b\\) and \\(c\\) are constants. The graph of \\(y = f(x)\\) in the \\(xy\\)-plane is a parabola that has a vertex at the point \\((h, k)\\), where \\(h\\) and \\(k\\) are constants. If \\(f(-4) = f(8)\\), and the quadratic function has \\(x\\)-intercepts at \\((r, 0)\\) and \\((s, 0)\\), which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(r + s = 4\\)</li><li>II. \\(b \\lt  0\\)</li><li>III. \\(c \\lt  k\\)</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        },
+        {
+          "slide_index": 30,
+          "title": "Question 14",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "A",
+          "answer_index": 31,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\nf(x) = -(x + a)^{2}(x - b)(x - c)\n\\]</div>\n<p>For the polynomial function above, \\(a\\), \\(b\\), and \\(c\\) are positive constants. Let \\(b \\lt  k \\lt  c\\) for some constant \\(k\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(k > 0\\)</li><li>II. \\(f(k) > 0\\)</li><li>III. \\(f(0) > 0\\)</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        },
+        {
+          "slide_index": 36,
+          "title": "Question 17",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "A",
+          "answer_index": 37,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>In triangle \\(\\triangle ABC\\), the measure of \\(\\angle B\\) is \\(90^\\circ\\), \\(AB\\) is a leg with a length of \\(12\\), and point \\(D\\) lies on segment \\(AC\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(BC = 12\\tan(\\angle CAB)\\)</li><li>II. \\(\\cos(\\angle ABD) - \\sin(\\angle DBC) = 0\\)</li><li>III. \\(\\angle ABD = \\angle BDC\\)</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        },
+        {
+          "slide_index": 50,
+          "title": "Question 24",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 51,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Data</th><th>Frequency</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>5</td></tr><tr><td>3</td><td>6</td></tr><tr><td>4</td><td>5</td></tr><tr><td>5</td><td>2</td></tr></tbody></table></div>\n<p>The frequency table above summarizes data set \\(A\\). Data set \\(B\\) is created by multiplying all of the values in data set \\(A\\) by \\(2\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The difference between the mean and median of data set \\(B\\) is \\(0\\).</li><li>II. The standard deviation of data set \\(B\\) is equal to the standard deviation of data set \\(A\\).</li><li>III. The range of data set \\(B\\) is double the range of data set \\(A\\).</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "I and III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        },
+        {
+          "slide_index": 52,
+          "title": "Question 25",
+          "section": "Hard Question Set 15",
+          "kind": "question",
+          "correct": "C",
+          "answer_index": 53,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Translate the percent change into a multiplier, then match the time unit in the exponent.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A sample of students was selected at random from all 11th graders at a school. Based on the sample, it is estimated that the proportion of 11th graders in at least one AP class is \\(60\\%\\) with a margin of error of \\(5\\%\\). Which of the following conclusions are appropriate?</p>\n<ul class=\"stem-itemize\"><li>I. It is not possible for just \\(40\\%\\) of the 11th graders in the school to be in at least one AP class.</li><li>II. It is plausible that the proportion of all students at the school in at least one AP class is between \\(45\\%\\) and \\(55\\%\\).</li><li>III. If the sample size is increased, the margin of error will drop below \\(5\\%\\).</li></ul></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "I and II only"
+            },
+            {
+              "letter": "B",
+              "text": "II and III only"
+            },
+            {
+              "letter": "C",
+              "text": "III only"
+            },
+            {
+              "letter": "D",
+              "text": "I, II, and III"
+            }
+          ]
+        }
+      ],
+      "checkpoint_count": 9,
+      "knowledge_map": [
+        {
+          "title": "Hard Question Set 15",
+          "start_index": 3,
+          "items": [
+            {
+              "index": 4,
+              "kind": "question",
+              "title": "Question 1",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 5,
+              "kind": "answer",
+              "title": "Answer 1",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 6,
+              "kind": "question",
+              "title": "Question 2",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 7,
+              "kind": "answer",
+              "title": "Answer 2",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 8,
+              "kind": "question",
+              "title": "Question 3",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 9,
+              "kind": "answer",
+              "title": "Answer 3",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 10,
+              "kind": "question",
+              "title": "Question 4",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 11,
+              "kind": "answer",
+              "title": "Answer 4",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 12,
+              "kind": "question",
+              "title": "Question 5",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 13,
+              "kind": "answer",
+              "title": "Answer 5",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 14,
+              "kind": "question",
+              "title": "Question 6",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 15,
+              "kind": "answer",
+              "title": "Answer 6",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 16,
+              "kind": "question",
+              "title": "Question 7",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 17,
+              "kind": "answer",
+              "title": "Answer 7",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 18,
+              "kind": "question",
+              "title": "Question 8",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 19,
+              "kind": "answer",
+              "title": "Answer 8",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 20,
+              "kind": "question",
+              "title": "Question 9",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 21,
+              "kind": "answer",
+              "title": "Answer 9",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 22,
+              "kind": "question",
+              "title": "Question 10",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 23,
+              "kind": "answer",
+              "title": "Answer 10",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 24,
+              "kind": "question",
+              "title": "Question 11",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 25,
+              "kind": "answer",
+              "title": "Answer 11",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 26,
+              "kind": "question",
+              "title": "Question 12",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 27,
+              "kind": "answer",
+              "title": "Answer 12",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 28,
+              "kind": "question",
+              "title": "Question 13",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 29,
+              "kind": "answer",
+              "title": "Answer 13",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 30,
+              "kind": "question",
+              "title": "Question 14",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 31,
+              "kind": "answer",
+              "title": "Answer 14",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 32,
+              "kind": "question",
+              "title": "Question 15",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 33,
+              "kind": "answer",
+              "title": "Answer 15",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 34,
+              "kind": "question",
+              "title": "Question 16",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 35,
+              "kind": "answer",
+              "title": "Answer 16",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 36,
+              "kind": "question",
+              "title": "Question 17",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 37,
+              "kind": "answer",
+              "title": "Answer 17",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 38,
+              "kind": "question",
+              "title": "Question 18",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 39,
+              "kind": "answer",
+              "title": "Answer 18",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 40,
+              "kind": "question",
+              "title": "Question 19",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 41,
+              "kind": "answer",
+              "title": "Answer 19",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 42,
+              "kind": "question",
+              "title": "Question 20",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 43,
+              "kind": "answer",
+              "title": "Answer 20",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 44,
+              "kind": "question",
+              "title": "Question 21",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 45,
+              "kind": "answer",
+              "title": "Answer 21",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 46,
+              "kind": "question",
+              "title": "Question 22",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 47,
+              "kind": "answer",
+              "title": "Answer 22",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 48,
+              "kind": "question",
+              "title": "Question 23",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 49,
+              "kind": "answer",
+              "title": "Answer 23",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 50,
+              "kind": "question",
+              "title": "Question 24",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 51,
+              "kind": "answer",
+              "title": "Answer 24",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 52,
+              "kind": "question",
+              "title": "Question 25",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 53,
+              "kind": "answer",
+              "title": "Answer 25",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "hard-question-16",
+      "phase": 2,
+      "unit": 1,
+      "unit_name": "Hard Question Drills",
+      "section": "Set 16",
+      "title": "SAT Hard Question 16",
+      "deck_title": "SAT Hard Question · Set 16",
+      "slide_count": 30,
+      "slides": [
+        {
+          "index": 1,
+          "title": "SAT Hard Question · Set 16",
+          "html": "<div class=\"cm-intro-canvas\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Lesson introduction</span><p class=\"cm-intro-unit\">SAT Hard Question</p><h1 class=\"cm-intro-title\">Set 16</h1><p class=\"cm-intro-lede\">Work through guided examples and SAT-style practice. Use study mode to try problems before revealing solutions.</p><div class=\"cm-intro-meta\"><span class=\"cm-intro-meta-item\"><em>Presenter</em>Jack Zeng</span><span class=\"cm-intro-meta-item\"><em>From</em>Novel Prep</span></div><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">01</span><span class=\"cm-intro-chip-label\">Hard Question Set 16</span></button></div><p class=\"cm-intro-cta\">Tap a section above, or press <strong>Next</strong> for the full outline</p></div></div>",
+          "kind": "intro",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "This is your lesson overview — tap a section chip or press Next for the full outline."
+        },
+        {
+          "index": 2,
+          "title": "Lesson outline",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Hard Question</p><h2 class=\"cm-content-title\">Set 16</h2><p class=\"cm-content-lede\">30 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Hard Question Set 16</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "kind": "content",
+          "group": "divider",
+          "section": "Introduction",
+          "study_tip": "Use this outline to jump straight to any section — great for review or picking up where you left off."
+        },
+        {
+          "index": 3,
+          "title": "Up next Hard Question Set 16",
+          "html": "<div class=\"cm-section-divider\"><span class=\"cm-section-num\">01</span><span class=\"cm-section-kicker\">Up next</span><h3 class=\"cm-section-title\">Hard Question Set 16</h3></div>",
+          "kind": "section",
+          "group": "divider",
+          "section": "Hard Question Set 16",
+          "study_tip": ""
+        },
+        {
+          "index": 4,
+          "title": "Question 1",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(h\\) is defined as:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nh(t) = -16t^2 + b\n\\]</div>\n<p>The function \\(h\\) estimates an object's height, in feet, above the ground \\(t\\) seconds after the object is dropped, where \\(b\\) is a constant.</p>\n<p>The function estimates that the object is \\(40.96\\) feet above the ground when it is dropped at \\(t = 0\\).</p>\n<p>How many seconds after being dropped does the function estimate the object will hit the ground?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;1.6&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 5,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "1.6",
+            "accept": [
+              "1.6"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 5,
+          "title": "Answer 1",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">1.6</div></div>",
+          "kind": "answer",
+          "question_index": 4,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 6,
+          "title": "Question 2",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>For a set of three consecutive integers, the result of subtracting the greatest integer from the sum of the other two integers is \\(48\\).</p>\n<p>What is the value of the greatest of the three integers?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;51&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 7,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "51",
+            "accept": [
+              "51"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 7,
+          "title": "Answer 2",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">51</div></div>",
+          "kind": "answer",
+          "question_index": 6,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 8,
+          "title": "Question 3",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Rewrite the equation in standard form to read off the center and radius.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A researcher surveyed undergraduate students, graduate students, and postdoctoral students. The number of undergraduate students surveyed was \\(7,150\\%\\) of the number of postdoctoral students surveyed, and the number of graduate students surveyed was \\(45\\%\\) of the number of undergraduate students surveyed.</p>\n<p>If there were \\(6,435\\) graduate students surveyed, what was the sum of the number of undergraduate students and postdoctoral students surveyed?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;14500&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 9,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "14500",
+            "accept": [
+              "14500"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Rewrite the equation in standard form to read off the center and radius."
+        },
+        {
+          "index": 9,
+          "title": "Answer 3",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">14500</div></div>",
+          "kind": "answer",
+          "question_index": 8,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 10,
+          "title": "Question 4",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\begin{aligned}\n16x - 20y &= 6y + 8 \\\\\nty &= 8x + \\frac{1}{5}\n\\end{aligned}\n\\]</div>\n<p>In the given system of equations, \\(t\\) is a constant. If the system has no solution, what is the value of \\(t\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;13&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 11,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "13",
+            "accept": [
+              "13"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "No-solution means parallel lines: same slope (coefficient of x), different constants.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 11,
+          "title": "Answer 4",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">13</div></div>",
+          "kind": "answer",
+          "question_index": 10,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 12,
+          "title": "Question 5",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The bone mineral density of a certain person's thoracic spine was estimated to be \\(0.812\\) grams per square centimeter. What is this estimated bone mineral density in grams per square millimeter? (\\(1\\) centimeter \\(= 10\\) millimeters)</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(81.2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(8.12\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(0.0812\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(0.00812\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 13,
+          "correct_choice": "D",
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify what type of linear equation this is (one solution, none, or infinite) before solving."
+        },
+        {
+          "index": 13,
+          "title": "Answer 5",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>D</strong></div></div>",
+          "kind": "answer",
+          "question_index": 12,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 14,
+          "title": "Question 6",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><div class=\"stem-math-block cm-math-block\">\\[\n\\frac{5}{9}(5x + 9)\\left(x + \\sqrt{5k + 9}\\right)\\left(x - \\sqrt{5k + 9}\\right) = 0\n\\]</div>\n<p>In the given equation, \\(k\\) is a positive constant. The product of the solutions to the equation is \\(72\\).</p>\n<p>What is the value of \\(k\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;6.2&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 15,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "6.2",
+            "accept": [
+              "6.2"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 15,
+          "title": "Answer 6",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">6.2</div></div>",
+          "kind": "answer",
+          "question_index": 14,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 16,
+          "title": "Question 7",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the formula, then track how scaling or unit changes affect the result.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A right rectangular prism has a base area of \\(56t\\) square centimeters (\\(\\text{cm}^2\\)). The length of the base of the rectangular prism is \\(\\frac{14}{3}\\) cm, and the height of the rectangular prism is \\(3\\) cm.</p>\n<p>Which expression represents the surface area, in \\(\\text{cm}^2\\), of the right rectangular prism?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(112t + 56\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(184t + 28\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(1,680t + 28\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(168t\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 17,
+          "correct_choice": "B",
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Identify the formula, then track how scaling or unit changes affect the result."
+        },
+        {
+          "index": 17,
+          "title": "Answer 7",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>",
+          "kind": "answer",
+          "question_index": 16,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 18,
+          "title": "Question 8",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>In the \\(xy\\)-plane, a unit circle with center at the origin \\(O\\) contains point \\(A\\) with coordinates \\((1, 0)\\) and point \\(B\\) with coordinates \\(\\left(\\frac{5}{\\sqrt{34}}, -\\frac{3}{\\sqrt{34}}\\right)\\).</p>\n<p>If the measure of angle \\(AOB\\) is \\(p\\) radians, what is the value of \\(\\frac{\\cos p}{\\sin p}\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;-5/3&quot;, &quot;-1.6666666666666667&quot;, &quot;-1.6667&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Fraction or decimal, e.g. 7/6\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><p class=\"cm-grid-in-hint\">Enter an exact fraction or decimal equivalent.</p><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 19,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "\\dfrac{-5}{3}",
+            "accept": [
+              "-5/3",
+              "-1.6666666666666667",
+              "-1.6667"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Mark known angles and side relationships first, then use triangle or parallel-line facts."
+        },
+        {
+          "index": 19,
+          "title": "Answer 8",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\dfrac{-5}{3}\\)</span></div></div>",
+          "kind": "answer",
+          "question_index": 18,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 20,
+          "title": "Question 9",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(h\\) is defined by</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nh(x) = -\\sqrt{x^2 + bx + c},\n\\]</div>\n<p>where \\(b\\) and \\(c\\) are constants. In the \\(xy\\)-plane, the graph of \\(y = h(x)\\) contains the points \\((2, 0)\\) and \\(\\left(0, -\\sqrt{334}\\right)\\).</p>\n<p>If \\(h(m) = 0\\), what is the greatest possible value of \\(m\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;167&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 21,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "167",
+            "accept": [
+              "167"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 21,
+          "title": "Answer 9",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">167</div></div>",
+          "kind": "answer",
+          "question_index": 20,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 22,
+          "title": "Question 10",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A computer repair specialist charges \\(&#36;160\\) for the first two hours of repair plus an hourly fee for each additional hour. The total cost for \\(6\\) hours of repair is \\(&#36;360\\).</p>\n<p>Which function \\(f\\) gives the total cost, in dollars, for \\(x\\) hours of repair, where \\(x \\geq 2\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 50x + 60\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 50x + 160\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 60x\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 60x + 160\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 23,
+          "correct_choice": "A",
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 23,
+          "title": "Answer 10",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>A</strong></div></div>",
+          "kind": "answer",
+          "question_index": 22,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 24,
+          "title": "Question 11",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A painting studio is offering a promotion where the first class is free, the second class is half off the regular price, and the remaining classes are regularly priced. If the regular price of a class is \\(&#36;26.40\\), which function \\(f\\) gives the total cost, in dollars, of \\(x\\) classes taken using this promotion, where \\(x > 2\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = 26.40(x - 1) + 13.20\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = 26.40(x - 2) + 13.20\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = 26.40(x - 1) + 13.20(x - 2)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = 26.40(x - 2) + 13.20(x - 1)\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 25,
+          "correct_choice": "B",
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 25,
+          "title": "Answer 11",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>",
+          "kind": "answer",
+          "question_index": 24,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 26,
+          "title": "Question 12",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(f\\) is defined by the given equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = x^2 - 4x - 320\n\\]</div>\n<p>Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(f(x) = x^2 - 4(x + 80)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(f(x) = (x - 2)^2 + (-324)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(x) = x(x - 4) + (-320)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(x) = (x + 16)(x - 20)\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "kind": "question",
+          "interactive": true,
+          "answer_index": 27,
+          "correct_choice": "B",
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "For multiple choice, eliminate obviously wrong options before doing full algebra.",
+          "strategy_hint": "Label opposite, adjacent, and hypotenuse relative to the given angle."
+        },
+        {
+          "index": 27,
+          "title": "Answer 12",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Correct Answer</span><div class=\"cm-answer-card-value\"><strong>B</strong></div></div>",
+          "kind": "answer",
+          "question_index": 26,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 28,
+          "title": "Question 13",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Translate the percent change into a multiplier, then match the time unit in the exponent.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The composition of an animal is defined as the muscles, bones, and fat of the animal. A scientist studied the composition of one young swamp buffalo and determined the buffalo had \\(133\\) kilograms of muscle, which made up approximately \\(65.9\\%\\) of its composition. Of the remaining composition of this buffalo, approximately \\(46.2\\%\\) was bone, and the remainder was fat. Based on these approximations, to the nearest tenth, how many kilograms of this buffalo's composition was bone?</p></div><div class=\"cm-question-interact\"><div class=\"cm-grid-in-interactive\" data-cm-grid-in data-cm-accept=\"[&quot;31.8&quot;]\"><p class=\"cm-grid-in-prompt\">Your answer</p><div class=\"cm-grid-in-row\"><input type=\"text\" class=\"cm-grid-in-input\" inputmode=\"text\" placeholder=\"Your answer\" autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Your answer\" /><button type=\"button\" class=\"cm-grid-in-check\" data-cm-check-grid-in disabled>Check</button></div><div class=\"cm-grid-in-actions\"><button type=\"button\" class=\"cm-reveal-btn cm-reveal-btn--ghost\" data-cm-go-answer\">View worked solution →</button></div><p class=\"cm-grid-in-feedback\" aria-live=\"polite\"></p></div></div></div>",
+          "kind": "question",
+          "answer_index": 29,
+          "interactive": true,
+          "grid_in_answer": {
+            "display": "31.8",
+            "accept": [
+              "31.8"
+            ]
+          },
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
+          "strategy_hint": "Translate the percent change into a multiplier, then match the time unit in the exponent."
+        },
+        {
+          "index": 29,
+          "title": "Answer 13",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\">31.8</div></div>",
+          "kind": "answer",
+          "question_index": 28,
+          "group": "practice",
+          "section": "Hard Question Set 16",
+          "study_tip": "Walk through each step and ask: why is this move valid? Could you explain it to a friend?"
+        },
+        {
+          "index": 30,
+          "title": "Thank You",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 30 slides on <strong>Set 16</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Hard Question Set 16</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "kind": "closing",
+          "group": "review",
+          "section": "Hard Question Set 16",
+          "study_tip": "Take notes on anything that feels new — you'll reuse these ideas in practice sets."
+        }
+      ],
+      "prev_lesson_slug": "hard-question-15",
+      "next_lesson_slug": null,
+      "tex_available": true,
+      "pdf_available": true,
+      "tex_file": "SAT_Hard_Question_16_PPT.tex",
+      "pdf_file": "SAT_Hard_Question_Part_16_PPT.pdf",
+      "interactive_count": 13,
+      "learn_count": 0,
+      "practice_slide_count": 26,
+      "lesson_path": [
+        {
+          "index": 3,
+          "title": "Hard Question Set 16"
+        }
+      ],
+      "checkpoint": [
+        {
+          "slide_index": 12,
+          "title": "Question 5",
+          "section": "Hard Question Set 16",
+          "kind": "question",
+          "correct": "D",
+          "answer_index": 13,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify what type of linear equation this is (one solution, none, or infinite) before solving.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The bone mineral density of a certain person's thoracic spine was estimated to be \\(0.812\\) grams per square centimeter. What is this estimated bone mineral density in grams per square millimeter? (\\(1\\) centimeter \\(= 10\\) millimeters)</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(81.2\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(8.12\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(0.0812\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(0.00812\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 16,
+          "title": "Question 7",
+          "section": "Hard Question Set 16",
+          "kind": "question",
+          "correct": "B",
+          "answer_index": 17,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Identify the formula, then track how scaling or unit changes affect the result.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A right rectangular prism has a base area of \\(56t\\) square centimeters (\\(\\text{cm}^2\\)). The length of the base of the rectangular prism is \\(\\frac{14}{3}\\) cm, and the height of the rectangular prism is \\(3\\) cm.</p>\n<p>Which expression represents the surface area, in \\(\\text{cm}^2\\), of the right rectangular prism?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(112t + 56\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(184t + 28\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(1,680t + 28\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(168t\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 22,
+          "title": "Question 10",
+          "section": "Hard Question Set 16",
+          "kind": "question",
+          "correct": "A",
+          "answer_index": 23,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A computer repair specialist charges \\(&#36;160\\) for the first two hours of repair plus an hourly fee for each additional hour. The total cost for \\(6\\) hours of repair is \\(&#36;360\\).</p>\n<p>Which function \\(f\\) gives the total cost, in dollars, for \\(x\\) hours of repair, where \\(x \\geq 2\\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(f(x) = 50x + 60\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(f(x) = 50x + 160\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(f(x) = 60x\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(f(x) = 60x + 160\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 24,
+          "title": "Question 11",
+          "section": "Hard Question Set 16",
+          "kind": "question",
+          "correct": "B",
+          "answer_index": 25,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>A painting studio is offering a promotion where the first class is free, the second class is half off the regular price, and the remaining classes are regularly priced. If the regular price of a class is \\(&#36;26.40\\), which function \\(f\\) gives the total cost, in dollars, of \\(x\\) classes taken using this promotion, where \\(x > 2\\)?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(f(x) = 26.40(x - 1) + 13.20\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(f(x) = 26.40(x - 2) + 13.20\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(f(x) = 26.40(x - 1) + 13.20(x - 2)\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(f(x) = 26.40(x - 2) + 13.20(x - 1)\\)"
+            }
+          ]
+        },
+        {
+          "slide_index": 26,
+          "title": "Question 12",
+          "section": "Hard Question Set 16",
+          "kind": "question",
+          "correct": "B",
+          "answer_index": 27,
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>The function \\(f\\) is defined by the given equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\nf(x) = x^2 - 4x - 320\n\\]</div>\n<p>Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?</p></div><div class=\"cm-question-interact\">",
+          "choices": [
+            {
+              "letter": "A",
+              "text": "\\(f(x) = x^2 - 4(x + 80)\\)"
+            },
+            {
+              "letter": "B",
+              "text": "\\(f(x) = (x - 2)^2 + (-324)\\)"
+            },
+            {
+              "letter": "C",
+              "text": "\\(f(x) = x(x - 4) + (-320)\\)"
+            },
+            {
+              "letter": "D",
+              "text": "\\(f(x) = (x + 16)(x - 20)\\)"
+            }
+          ]
+        }
+      ],
+      "checkpoint_count": 5,
+      "knowledge_map": [
+        {
+          "title": "Hard Question Set 16",
+          "start_index": 3,
+          "items": [
+            {
+              "index": 4,
+              "kind": "question",
+              "title": "Question 1",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 5,
+              "kind": "answer",
+              "title": "Answer 1",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 6,
+              "kind": "question",
+              "title": "Question 2",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 7,
+              "kind": "answer",
+              "title": "Answer 2",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 8,
+              "kind": "question",
+              "title": "Question 3",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 9,
+              "kind": "answer",
+              "title": "Answer 3",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 10,
+              "kind": "question",
+              "title": "Question 4",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 11,
+              "kind": "answer",
+              "title": "Answer 4",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 12,
+              "kind": "question",
+              "title": "Question 5",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 13,
+              "kind": "answer",
+              "title": "Answer 5",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 14,
+              "kind": "question",
+              "title": "Question 6",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 15,
+              "kind": "answer",
+              "title": "Answer 6",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 16,
+              "kind": "question",
+              "title": "Question 7",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 17,
+              "kind": "answer",
+              "title": "Answer 7",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 18,
+              "kind": "question",
+              "title": "Question 8",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 19,
+              "kind": "answer",
+              "title": "Answer 8",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 20,
+              "kind": "question",
+              "title": "Question 9",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 21,
+              "kind": "answer",
+              "title": "Answer 9",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 22,
+              "kind": "question",
+              "title": "Question 10",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 23,
+              "kind": "answer",
+              "title": "Answer 10",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 24,
+              "kind": "question",
+              "title": "Question 11",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 25,
+              "kind": "answer",
+              "title": "Answer 11",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 26,
+              "kind": "question",
+              "title": "Question 12",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 27,
+              "kind": "answer",
+              "title": "Answer 12",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 28,
+              "kind": "question",
+              "title": "Question 13",
+              "interactive": true,
+              "has_mcq": false
+            },
+            {
+              "index": 29,
+              "kind": "answer",
+              "title": "Answer 13",
               "interactive": false,
               "has_mcq": false
             }
