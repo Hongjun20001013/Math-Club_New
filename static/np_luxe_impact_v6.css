@@ -188,21 +188,123 @@ body.np-atelier-v4 .big-btn.mp-btn-glow:hover {
   box-shadow: 0 20px 40px rgba(63, 39, 199, 0.45) !important;
 }
 
-/* ── Hub spotlight & cards ── */
-html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card {
-  border-radius: 32px !important;
+/* ── Hub spotlight: soft luminous paper (never deep navy) ── */
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card,
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card--luxe {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.25fr) minmax(200px, 0.78fr) !important;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 28px) !important;
+  min-height: 0 !important;
+  padding: clamp(20px, 2.6vw, 28px) clamp(22px, 2.8vw, 32px) !important;
+  border-radius: 26px !important;
+  border: 1px solid rgba(108, 78, 255, 0.14) !important;
+  color: #1a1430 !important;
   background:
-    radial-gradient(ellipse 80% 70% at 85% 20%, rgba(255, 255, 255, 0.22), transparent 50%),
-    linear-gradient(125deg, #160e36 0%, #4f2fd8 28%, #6c4eff 58%, #9b8cff 100%) !important;
+    radial-gradient(ellipse 55% 70% at 92% 18%, rgba(155, 140, 255, 0.22), transparent 58%),
+    radial-gradient(ellipse 40% 50% at 8% 90%, rgba(108, 78, 255, 0.08), transparent 55%),
+    linear-gradient(145deg, #ffffff 0%, #faf8ff 48%, #f3efff 100%) !important;
   box-shadow:
-    0 40px 90px rgba(79, 47, 216, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.18) inset !important;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s;
+    0 22px 50px rgba(108, 78, 255, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s, border-color 0.3s;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 5px;
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(180deg, #b6a4ff, #6c4eff 55%, #5b3df5);
+  box-shadow: 0 0 16px rgba(108, 78, 255, 0.28);
+  z-index: 2;
 }
 
 html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 48px 100px rgba(79, 47, 216, 0.42) !important;
+  transform: translateY(-3px);
+  border-color: rgba(108, 78, 255, 0.28) !important;
+  box-shadow: 0 28px 60px rgba(108, 78, 255, 0.16) !important;
+  color: #1a1430 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-glow {
+  background:
+    radial-gradient(circle at 88% 30%, rgba(155, 140, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 12% 80%, rgba(108, 78, 255, 0.08), transparent 40%) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-title {
+  color: #171326 !important;
+  font-size: clamp(1.55rem, 2.8vw, 2.1rem) !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.08 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-lede {
+  color: #564e72 !important;
+  max-width: 44ch;
+  margin-top: 8px !important;
+  font-size: 0.95rem !important;
+  line-height: 1.55 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-stat {
+  color: #43318f !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(108, 78, 255, 0.14) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-stat strong {
+  color: #5b3df5 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card .np-atelier-kicker {
+  color: #6c4eff !important;
+  background: rgba(108, 78, 255, 0.08);
+  border: 1px solid rgba(108, 78, 255, 0.14);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card .np-atelier-pill--live {
+  background: #fff !important;
+  color: #5b3df5 !important;
+  border: 1px solid rgba(108, 78, 255, 0.22);
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-cta {
+  margin-top: 16px !important;
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px rgba(91, 61, 245, 0.28) !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-visual {
+  min-height: 160px !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide-stack {
+  width: min(100%, 260px) !important;
+  height: 168px !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide--front {
+  background: #fff !important;
+  border: 1px solid rgba(108, 78, 255, 0.12) !important;
+  box-shadow: 0 16px 36px rgba(108, 78, 255, 0.14) !important;
+  color: #171326 !important;
+}
+
+html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-slide--front strong {
+  color: #171326 !important;
+}
+
+@media (max-width: 900px) {
+  html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card,
+  html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-hub-spotlight-card--luxe {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 html:not([data-exam-theme="dark"]) body.np-atelier-v4 .np-atelier-card--hub,

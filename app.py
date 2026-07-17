@@ -249,7 +249,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260715-hub-hero-fix")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260717-spotlight-soft")
 
 _DB_SCHEMA_READY = False
 
