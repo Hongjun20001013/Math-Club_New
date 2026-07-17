@@ -15615,281 +15615,127 @@
     ],
     "hard_15": [
       {
-        "stem": "<p>For the function</p>\n<div class=\"stem-math-block\">\\[\nf(x) = a\\sqrt{b - x} + \\frac{12}{\\sqrt{b - x}},\n\\]</div>\n<p>\\(a\\) and \\(b\\) are constants, and \\(f(4) = 0\\). If \\(f(5) > 0\\), which of the following could be a value for \\(a + b\\)?</p>",
+        "stem": "<p>Which of the following ensures that the quadratic equation</p>\n<div class=\"stem-math-block\">\\[\nax^{2} - 4x + c = 0\n\\]</div>\n<p>has at least one real root?</p>",
         "choices": [
-          "\\(-20\\)",
-          "\\(-12\\)",
-          "\\(-8\\)",
-          "\\(-4\\)"
+          "\\(a > 0\\)",
+          "\\(a = 0\\)",
+          "\\(c > 0\\)",
+          "\\(c = 0\\)"
         ],
         "question_kind": "mcq",
         "correct_answer": "D",
         "knowledge_section": "Unit 2",
         "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Radical function / domain sign"
+        "hard_skill": "Quadratic discriminant / real roots"
       },
       {
-        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{16}{a} = \\frac{16}{b} + \\frac{16}{c}\n\\]</div>\n<p>Which of the following expresses \\(a\\) in terms of \\(b\\) and \\(c\\)?</p>",
+        "stem": "<p>As shown in the figure, \\(O\\) is the center of a circle with radius \\(1\\), and the circle intersects the coordinate axes at points \\(A\\) and \\(B\\). Point \\(P\\) lies on arc \\(\\overset{\\frown}{AB}\\) (not overlapping with \\(A\\) or \\(B\\)). Connect \\(OP\\), and let \\(\\angle POB = \\alpha\\). What are the coordinates of point \\(P\\)?</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f2.png\" alt=\"\" loading=\"lazy\" /></p>",
         "choices": [
-          "\\(a = \\dfrac{b + c}{bc}\\)",
-          "\\(a = \\dfrac{bc}{b + c}\\)",
-          "\\(a = bc(b + c)\\)",
-          "\\(a = 16bc(b + c)\\)"
+          "\\((\\sin\\alpha,\\ \\sin\\alpha)\\)",
+          "\\((\\cos\\alpha,\\ \\cos\\alpha)\\)",
+          "\\((\\cos\\alpha,\\ \\sin\\alpha)\\)",
+          "\\((\\sin\\alpha,\\ \\cos\\alpha)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Unit circle coordinates"
+      },
+      {
+        "stem": "<p>The following table shows the age distribution of a school choir's members:</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Age (years)</th><th>\\(13\\)</th><th>\\(14\\)</th><th>\\(15\\)</th><th>\\(16\\)</th></tr></thead><tbody><tr><td>Frequency</td><td>\\(5\\)</td><td>\\(15\\)</td><td>\\(x\\)</td><td>\\(10 - x\\)</td></tr></tbody></table></div>\n<p>For different values of \\(x\\), which pair of statistical measures regarding age will not change?</p>",
+        "choices": [
+          "Mean, Median",
+          "Mode, Median",
+          "Mean, Standard Deviation",
+          "Median, Standard Deviation"
         ],
         "question_kind": "mcq",
         "correct_answer": "B",
-        "knowledge_section": "Unit 1",
-        "knowledge_section_title_en": "Algebra",
-        "hard_skill": "Reciprocal equation rearrange"
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Frequency table — mode & median"
       },
       {
-        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{ax^3 + bx^2 + cx + d}{(x^2 - 9)(x + 2)} = \\frac{5}{x + 3} + \\frac{6x}{x - 3}\n\\]</div>\n<p>What is the value of \\(a + b + c\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "72",
+        "stem": "<p>Given that the line \\(y = kx + k + 1\\) passes through the points \\((m,\\ n + 3)\\) and \\((m + 1,\\ 2n - 1)\\), and that \\(0 \\lt  k \\lt  2\\), what is a possible value of \\(n\\)?</p>",
+        "choices": [
+          "\\(3\\)",
+          "\\(4\\)",
+          "\\(5\\)",
+          "\\(6\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Line through two points / slope range"
+      },
+      {
+        "stem": "<p>The graph of the quadratic function \\(y = |a|x^{2} + bx + c\\) passes through the following five points:</p>\n<div class=\"stem-math-block\">\\[\nA(m,\\ n),\\quad B(0,\\ y_{1}),\\quad C(3 - m,\\ n),\\quad D(\\sqrt{2},\\ y_{2}),\\quad E(2,\\ y_{3}).\n\\]</div>\n<p>What is the correct order of \\(y_{1}\\), \\(y_{2}\\), \\(y_{3}\\)?</p>",
+        "choices": [
+          "\\(y_{1} \\lt  y_{2} \\lt  y_{3}\\)",
+          "\\(y_{1} \\lt  y_{3} \\lt  y_{2}\\)",
+          "\\(y_{3} \\lt  y_{2} \\lt  y_{1}\\)",
+          "\\(y_{2} \\lt  y_{3} \\lt  y_{1}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
         "knowledge_section": "Unit 2",
         "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Partial fractions identity"
+        "hard_skill": "Parabola symmetry / value order"
       },
       {
-        "stem": "<p>There are two lawn mowing companies. Company A charges a flat fee of \\(&#36;80\\) for the first hour, then an hourly rate of \\(&#36;60\\) for each additional hour. Company B charges no flat fee, but an hourly rate of \\(&#36;75\\) per hour. After how many minutes will company B's total cost exceed company A's?</p>",
+        "stem": "<p>As shown in the figure, \\(6\\) identical rhombuses form a grid. The vertices of the rhombuses are called grid points. It is known that one angle of the rhombus, \\(\\angle O\\), is \\(60^\\circ\\), and points \\(A\\), \\(B\\), and \\(C\\) are located on grid points. Find the value of \\(\\tan\\angle ABC\\).</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f6.jpg\" alt=\"\" loading=\"lazy\" /></p>",
         "choices": [],
         "question_kind": "free_response",
-        "correct_answer": "80",
-        "knowledge_section": "Unit 1",
-        "knowledge_section_title_en": "Algebra",
-        "hard_skill": "Linear cost crossover"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n\\frac{5}{6}x + ay &= b \\\\\n\\frac{11}{10}x + cy &= 2d\n\\end{aligned}\n\\]</div>\n<p>If the system of equations above has infinitely many solutions, what must be the value of \\(\\dfrac{b}{d}\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "50/33",
+        "correct_answer": "\\sqrt{3}/2",
         "answer_alternates": [
-          "1.515",
-          "1.52"
+          "√3/2",
+          "sqrt(3)/2",
+          "(\\sqrt{3})/2",
+          "0.866",
+          "0.8660",
+          "0.87"
         ],
-        "knowledge_section": "Unit 1",
-        "knowledge_section_title_en": "Algebra",
-        "hard_skill": "Infinite solutions system"
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Rhombus grid / tan of angle"
       },
       {
-        "stem": "<p>\\(a\\) is \\(540\\%\\) more than \\(b\\) and \\(b\\) is \\(0.02\\%\\) of \\(c\\). If \\(a\\) is \\(k\\%\\) of \\(c\\), then what must \\(k\\) equal?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "0.128",
-        "knowledge_section": "Unit 3",
-        "knowledge_section_title_en": "Problem Solving & Data",
-        "hard_skill": "Percent of percent"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\nf(t) = a \\cdot 2^{\\frac{2t}{11}}\n\\]</div>\n<p>The given function \\(f(t)\\) models the amount of money in an investment account \\(t\\) years after the account is opened, where \\(a\\) is a constant. How many months will it take for the initial investment to increase by \\(700\\%\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "198",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Exponential growth time"
-      },
-      {
-        "stem": "<p>The function \\(f\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nf(x) = k^{3kx} + b\n\\]</div>\n<p>for \\(x \\ge 0\\). \\(k\\) and \\(b\\) are positive constants and \\(k \\lt  1\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The maximum value of the function is displayed as a constant or coefficient of the function.</li><li>II. \\(f(1) = f(0) \\cdot k\\)</li><li>III. \\(f(a) \\lt  b\\) for some \\(a > 0\\)</li></ul>",
+        "stem": "<p>Given the quadratic function</p>\n<div class=\"stem-math-block\">\\[\ny = x^{2} - 2ax + a \\quad (a \\neq 0)\n\\]</div>\n<p>passes through two points \\(A\\!\\left(\\dfrac{a}{2},\\ y_{1}\\right)\\) and \\(B(3a,\\ y_{2})\\), which of the following statements is correct?</p>",
         "choices": [
-          "I only",
-          "II and III only",
-          "I and III only",
-          "Neither I, II, nor III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "D",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Exponential function properties"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\n15x^{18} + kx^{9} + 24\n\\]</div>\n<p>The expression above has factors \\(ax^{9} + b\\) and \\(cx^{9} + d\\), where \\(a\\), \\(b\\), \\(c\\), and \\(d\\) are all integer constants. What is the maximum value of \\(k\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "361",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Polynomial factoring max k"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\n(hx + k)(qx + z) = ax^{2} + bx + 35\n\\]</div>\n<p>For the expression above, \\(h\\), \\(k\\), \\(q\\), and \\(z\\) are all integer constants. Which of the following must be an integer?</p>\n<ul class=\"stem-itemize\"><li>I. \\(\\dfrac{35}{k}\\)</li><li>II. \\(b\\)</li><li>III. \\(-\\dfrac{a}{q}\\)</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "I and III only",
-          "I, II, and III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "D",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Quadratic expansion integers"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\nf(x) = -3x^{2} + bx + c\n\\]</div>\n<p>In the given quadratic function, \\(b\\) and \\(c\\) are constants. The graph of \\(y = f(x)\\) in the \\(xy\\)-plane is a parabola that has a vertex at the point \\((h, k)\\), where \\(h\\) and \\(k\\) are constants. If \\(f(-4) = f(8)\\), and the quadratic function has \\(x\\)-intercepts at \\((r, 0)\\) and \\((s, 0)\\), which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(r + s = 4\\)</li><li>II. \\(b \\lt  0\\)</li><li>III. \\(c \\lt  k\\)</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "I and III only",
-          "I, II, and III"
+          "There exists a real number \\(a\\) such that \\(y_{1} > a\\).",
+          "For all real numbers \\(a\\), \\(y_{1} > a\\) is always true.",
+          "There exists a real number \\(a\\) such that \\(y_{2} \\lt  0\\).",
+          "For all real numbers \\(a\\), \\(y_{2} \\lt  0\\) is always true."
         ],
         "question_kind": "mcq",
         "correct_answer": "C",
         "knowledge_section": "Unit 2",
         "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Parabola symmetry / vertex"
+        "hard_skill": "Quadratic reasoning / exists vs always"
       },
       {
-        "stem": "<p>A quadratic function models a rock's height, in feet, above the ground in terms of the time, in seconds, after it is thrown. The rock was thrown from an initial height of \\(c\\) feet above the ground and reached a maximum height of \\(200\\) feet above the ground \\(3\\) seconds after it was thrown. Then it hit the ground \\(8\\) seconds after being thrown. At what initial height \\(c\\) was the rock thrown?</p>",
+        "stem": "<p>As shown in the figure, in triangle \\(\\triangle ABC\\), \\(\\angle BAC = 90^\\circ\\), \\(AB = AC\\). Circle \\(O\\) has diameter \\(AB\\), and intersects \\(BC\\) at point \\(D\\). Line \\(AE \\perp OC\\), with foot of the perpendicular at point \\(E\\). The extension of line \\(BE\\) intersects \\(AD\\) at point \\(F\\). Find the value of \\(\\dfrac{OE}{AE}\\).</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f8.jpg\" alt=\"\" loading=\"lazy\" /></p>",
         "choices": [],
         "question_kind": "free_response",
-        "correct_answer": "128",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Projectile quadratic model"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\n2rx^{2} - 5sx + 8r = 0\n\\]</div>\n<p>If the quadratic equation above has one real solution and \\(rs = 160\\), what is \\(\\lvert r + s \\rvert\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "26",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Discriminant one solution"
-      },
-      {
-        "stem": "<div class=\"stem-math-block\">\\[\nf(x) = -(x + a)^{2}(x - b)(x - c)\n\\]</div>\n<p>For the polynomial function above, \\(a\\), \\(b\\), and \\(c\\) are positive constants. Let \\(b \\lt  k \\lt  c\\) for some constant \\(k\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(k > 0\\)</li><li>II. \\(f(k) > 0\\)</li><li>III. \\(f(0) > 0\\)</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "I and III only",
-          "I, II, and III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "A",
-        "knowledge_section": "Unit 2",
-        "knowledge_section_title_en": "Advanced Math",
-        "hard_skill": "Polynomial sign analysis"
-      },
-      {
-        "stem": "<p>Three consecutive even integers are ordered from smallest to largest. \\(5\\) times the first integer is at least \\(9\\) more than the sum of the second and third integers. What is the minimum possible value for the second integer?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "8",
-        "knowledge_section": "Unit 1",
-        "knowledge_section_title_en": "Algebra",
-        "hard_skill": "Consecutive even integers"
-      },
-      {
-        "stem": "<p>If a car accelerates at \\(108\\) kilometers per hour squared, what is its acceleration in meters per minute squared? (\\(1\\) kilometer \\(= 1000\\) meters)</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "30",
-        "knowledge_section": "Unit 3",
-        "knowledge_section_title_en": "Problem Solving & Data",
-        "hard_skill": "Unit conversion acceleration"
-      },
-      {
-        "stem": "<p>In triangle \\(\\triangle ABC\\), the measure of \\(\\angle B\\) is \\(90^\\circ\\), \\(AB\\) is a leg with a length of \\(12\\), and point \\(D\\) lies on segment \\(AC\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. \\(BC = 12\\tan(\\angle CAB)\\)</li><li>II. \\(\\cos(\\angle ABD) - \\sin(\\angle DBC) = 0\\)</li><li>III. \\(\\angle ABD = \\angle BDC\\)</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "I and III only",
-          "I, II, and III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "A",
-        "knowledge_section": "Unit 4",
-        "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Right triangle trig identities"
-      },
-      {
-        "stem": "<p>In triangle \\(\\triangle ABC\\), the measure of \\(\\angle B\\) is \\(90^\\circ\\), and \\(BD\\) is an altitude of the triangle. The length of \\(BC\\) is \\(10\\) and \\(\\angle ABD = 60^\\circ\\). What is the length of \\(AD\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "15",
-        "knowledge_section": "Unit 4",
-        "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Altitude to hypotenuse"
-      },
-      {
-        "stem": "<p>In the circle above, \\(AC\\) is a diameter and \\(\\angle ACB = 20^\\circ\\). If the circumference of the circle is \\(90\\) inches, what is the length of arc \\(BC\\)?</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f19.png\" alt=\"\" loading=\"lazy\" /></p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "35",
-        "knowledge_section": "Unit 4",
-        "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Circle arc length"
-      },
-      {
-        "stem": "<p>In the \\(xy\\)-plane, the graph of \\(x^{2} + 6x + y^{2} + 2y = 15\\) is a circle. Line \\(k\\) has a slope of \\(\\dfrac{3}{4}\\) and is tangent to this circle at the point \\((a, b)\\), where \\(b\\) is negative. What is the value of \\(b\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "-5",
+        "correct_answer": "1/2",
         "answer_alternates": [
-          "-5.0"
+          "0.5",
+          ".5"
         ],
         "knowledge_section": "Unit 4",
         "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Circle tangent slope"
+        "hard_skill": "Circle diameter / length ratio"
       },
       {
-        "stem": "<p>Rectangular prism \\(A\\) and rectangular prism \\(B\\) are similar. The height of rectangular prism \\(A\\) is \\(4\\) inches and the height of rectangular prism \\(B\\) is \\(10\\) inches. If the volume of prism \\(A\\) is \\(200\\) cubic inches, then what is the volume of prism \\(B\\)?</p>",
+        "stem": "<p>In rectangle \\(ABCD\\), point \\(B\\) is the center of a circle \\(\\odot B\\) with radius \\(BC\\). The circle intersects \\(AB\\) at point \\(F\\). Point \\(E\\) lies on \\(AD\\), and segment \\(CE\\) is rotated about \\(E\\) to form \\(EG\\) such that point \\(G\\) lies on \\(\\odot B\\), where \\(\\angle GEC = 90^\\circ\\). Point \\(F\\) is the midpoint of \\(EG\\). Given that \\(AF = 1\\) and \\(AE = 3\\), find the length of \\(CD\\).</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_15_f9.jpg\" alt=\"\" loading=\"lazy\" /></p>",
         "choices": [],
         "question_kind": "free_response",
-        "correct_answer": "3125",
+        "correct_answer": "6",
         "knowledge_section": "Unit 4",
         "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Similar solids volume"
-      },
-      {
-        "stem": "<p>Consider a square right pyramid with a volume of \\(400\\) cubic inches and a slant height of \\(13\\) inches. The pyramid's length, width, and height (in inches) are all integers. What is the surface area of the pyramid in square inches?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "360",
-        "knowledge_section": "Unit 4",
-        "knowledge_section_title_en": "Geometry",
-        "hard_skill": "Pyramid surface area"
-      },
-      {
-        "stem": "<p>Data set \\(A\\) consists of \\(4\\) integers greater than or equal to \\(10\\) but less than or equal to \\(20\\). Data set \\(B\\) consists of the same four integers and adds one more integer, which must also be between \\(10\\) and \\(20\\). What is the largest possible difference between the mean of data set \\(A\\) and the mean of data set \\(B\\)?</p>",
-        "choices": [],
-        "question_kind": "free_response",
-        "correct_answer": "2",
-        "knowledge_section": "Unit 3",
-        "knowledge_section_title_en": "Problem Solving & Data",
-        "hard_skill": "Mean difference maximize"
-      },
-      {
-        "stem": "<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Data</th><th>Frequency</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>5</td></tr><tr><td>3</td><td>6</td></tr><tr><td>4</td><td>5</td></tr><tr><td>5</td><td>2</td></tr></tbody></table></div>\n<p>The frequency table above summarizes data set \\(A\\). Data set \\(B\\) is created by multiplying all of the values in data set \\(A\\) by \\(2\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li>I. The difference between the mean and median of data set \\(B\\) is \\(0\\).</li><li>II. The standard deviation of data set \\(B\\) is equal to the standard deviation of data set \\(A\\).</li><li>III. The range of data set \\(B\\) is double the range of data set \\(A\\).</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "I and III only",
-          "I, II, and III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "C",
-        "knowledge_section": "Unit 3",
-        "knowledge_section_title_en": "Problem Solving & Data",
-        "hard_skill": "Frequency table statistics"
-      },
-      {
-        "stem": "<p>A sample of students was selected at random from all 11th graders at a school. Based on the sample, it is estimated that the proportion of 11th graders in at least one AP class is \\(60\\%\\) with a margin of error of \\(5\\%\\). Which of the following conclusions are appropriate?</p>\n<ul class=\"stem-itemize\"><li>I. It is not possible for just \\(40\\%\\) of the 11th graders in the school to be in at least one AP class.</li><li>II. It is plausible that the proportion of all students at the school in at least one AP class is between \\(45\\%\\) and \\(55\\%\\).</li><li>III. If the sample size is increased, the margin of error will drop below \\(5\\%\\).</li></ul>",
-        "choices": [
-          "I and II only",
-          "II and III only",
-          "III only",
-          "I, II, and III"
-        ],
-        "question_kind": "mcq",
-        "correct_answer": "C",
-        "knowledge_section": "Unit 3",
-        "knowledge_section_title_en": "Problem Solving & Data",
-        "hard_skill": "Margin of error inference"
+        "hard_skill": "Rectangle + rotation geometry"
       }
     ],
     "hard_16": [
