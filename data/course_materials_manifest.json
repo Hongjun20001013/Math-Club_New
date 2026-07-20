@@ -585,6 +585,36 @@
         "SAT_Hard_Question_Part_16_PPT.pdf",
         "SAT_Hard_Question_Part_16.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-20",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Word Problem Training",
+      "section": "Lesson 1",
+      "title": "Word Problem Training",
+      "tex_candidates": [
+        "SAT_Hard_Question_20_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_20_PPT.pdf",
+        "SAT_Hard_Question_Part_20.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-21",
+      "phase": 3,
+      "unit": 2,
+      "unit_name": "Mock Exam Training",
+      "section": "Test 1",
+      "title": "Test 1",
+      "tex_candidates": [
+        "SAT_Hard_Question_21_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_21_PPT.pdf",
+        "SAT_Hard_Question_Part_21.pdf"
+      ]
     }
   ]
 }

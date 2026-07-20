@@ -893,6 +893,8 @@ def _clean_beamer_noise(text: str) -> str:
     text = re.sub(r"\\newpage\s*", "", text)
     text = re.sub(r"\\pagebreak\s*", "", text)
     text = text.replace("{,}", ",")
+    text = text.replace(r",\!", ",")
+    text = text.replace(r",\,", ",")
     text = text.replace(r"\%", "%")
     for idx, block in enumerate(math_vault):
         text = text.replace(f"<<<MATHVAULT_{idx}>>>", block)
@@ -922,8 +924,16 @@ def _format_plain_paragraphs(text: str) -> str:
             lis = "".join(f"<li>{item}</li>" for item in items if item)
             html_parts.append(f'<ul class="stem-itemize cm-dash-list">{lis}</ul>')
             continue
-        html_parts.append(f"<p>{line}</p>")
+        # Soft TeX line breaks → one paragraph (blank line still starts a new one)
+        para_chunks = [line]
         i += 1
+        while i < len(lines):
+            nxt = re.sub(r"\\+\s*$", "", lines[i]).strip()
+            if not nxt or nxt.startswith("- "):
+                break
+            para_chunks.append(nxt)
+            i += 1
+        html_parts.append(f"<p>{' '.join(para_chunks)}</p>")
     return "\n".join(html_parts)
 
 

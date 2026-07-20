@@ -56,7 +56,7 @@
       <div class="np-cmx-feature__rail" aria-hidden="true"></div>
       <div class="np-cmx-feature__copy">
         <p class="np-cmx-feature__kicker">{% if spotlight_mode == 'resume' %}Continue{% else %}Start here{% endif %}</p>
-        <h2>{{ spotlight_material.section }} · {{ spotlight_material.title }}</h2>
+        <h2>{% if phase_group.phase == 3 %}{{ spotlight_material.title }}{% else %}{{ spotlight_material.section }} · {{ spotlight_material.title }}{% endif %}</h2>
         <p>
           {% if spotlight_mode == 'resume' %}
           Slide {{ spotlight_material.continue_slide }} / {{ spotlight_material.slide_count }}{% if spotlight_material.continue_mastery_pct %} · {{ spotlight_material.continue_mastery_pct }}% mastery{% endif %}

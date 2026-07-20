@@ -249,7 +249,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260717-spotlight-soft")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260720-test1-tikz-compact")
 
 _DB_SCHEMA_READY = False
 
@@ -1767,6 +1767,17 @@ def _placement_timer_seconds(topic: str) -> int:
     }.get(topic, 115 * 60)
 
 
+# Phase 3 mock / word-problem sets: ~Digital SAT Module pace (≈35 min / 22 Q).
+PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21"})
+
+
+def _phase3_pace_seconds(domain: str, topic: str) -> int | None:
+    if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS:
+        return PHASE3_PACE_SECONDS
+    return None
+
+
 def _clear_placement_section_flags(topic: str) -> None:
     cfg = _placement_flow_config(topic)
     if not cfg:
@@ -2377,18 +2388,18 @@ def _course_materials_phase_groups(materials: list[dict[str, Any]]) -> list[dict
     phase_meta = {
         1: {
             "label": "Phase 1",
-            "kicker": "Units 1–4",
-            "description": "Core SAT lessons — definitions, methods, and guided practice.",
+            "kicker": "Basic Knowledge Training",
+            "description": "Core SAT foundations — Units 1–4 definitions, methods, and guided practice.",
         },
         2: {
             "label": "Phase 2",
-            "kicker": "Hard questions",
-            "description": "Challenge problem sets with interactive slides and student response tracking.",
+            "kicker": "Hard Question Training",
+            "description": "Challenge problem sets with interactive slides and live classroom tracking.",
         },
         3: {
             "label": "Phase 3",
-            "kicker": "Coming soon",
-            "description": "Advanced review tracks will appear here.",
+            "kicker": "Mock Exam Training",
+            "description": "Full Module 2-style mock sets and exam drills that build speed, stamina, and test readiness.",
         },
     }
     phase_groups: list[dict[str, Any]] = []
@@ -3681,6 +3692,8 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_14": "banks/hard/hard_14.tex",
         "hard_15": "banks/hard/hard_15.tex",
         "hard_16": "banks/hard/hard_16.tex",
+        "hard_20": "banks/hard/hard_20.tex",
+        "hard_21": "banks/hard/hard_21.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -3945,6 +3958,38 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Slide deck with worked solutions for classroom review.",
             "download_name": "NovelPrep-SAT-Hard-Practice-16-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_20": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_20.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Word Problem Training — printable student worksheet.",
+            "download_name": "NovelPrep-Word-Problem-Training-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_20_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Word Problem Training — classroom slide deck.",
+            "download_name": "NovelPrep-Word-Problem-Training-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_21": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_21.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test 1 — full Module 2-style mock set for classroom practice.",
+            "download_name": "NovelPrep-Test-1-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_21_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test 1 — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-1-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4437,6 +4482,8 @@ TOPIC_TITLES = {
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
     "hard_15": "SAT Hard Question Set 15 (Practice XV)",
     "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
+    "hard_20": "Word Problem Training",
+    "hard_21": "Test 1",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -4769,6 +4816,55 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "B"},
         {"correct_answer": "31.8"},
+    ],
+    "hard_20": [
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "1360"},
+        {"correct_answer": "A"},
+        {"correct_answer": "12"},
+        {"correct_answer": "15435", "answer_alternates": ["15,435", "15435.0"]},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "2"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "93"},
+        {"correct_answer": "C"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},
+    ],
+    "hard_21": [
+        {"correct_answer": "B"},
+        {"correct_answer": "31.8"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "403"},
+        {"correct_answer": "D"},
+        {"correct_answer": "-23"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},
+        {"correct_answer": "C"},
+        {"correct_answer": "C"},
+        {"correct_answer": "D"},
+        {"correct_answer": "31"},
+        {"correct_answer": "D"},
+        {"correct_answer": "144"},
+        {"correct_answer": "105"},
+        {"correct_answer": "C"},
+        {"correct_answer": "19.6"},
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "-13"},
+        {"correct_answer": "C"},
     ],
 }
 
@@ -8569,12 +8665,16 @@ def practice_course_material_view(slug: str):
         else None
     )
     prev_material, next_material = _course_material_neighbors(material)
+    material_phase = int(material.get("phase") or 1)
+    pace_training = material_phase == 3
     return render_template(
         "course_material_view.html",
         material=material,
         pdf_href=pdf_href,
         prev_material=prev_material,
         next_material=next_material,
+        pace_training=pace_training,
+        pace_seconds=PHASE3_PACE_SECONDS if pace_training else 0,
         cm_progress_api=url_for("practice_course_material_progress_api", slug=slug),
         cm_classroom_active_api=url_for("practice_course_material_classroom_active_api", slug=slug),
         cm_classroom_response_api=url_for("practice_course_material_classroom_response_api", slug=slug),
@@ -8666,13 +8766,19 @@ def practice_challenge():
             if progress_state == "done"
             else None
         )
+        display_title = (
+            TOPIC_TITLES.get(topic)
+            if topic in {"hard_20", "hard_21"}
+            else f"Hard Practice {set_roman}"
+        )
+        pace_secs = _phase3_pace_seconds("hard_problem", topic)
         hard_sets.append(
             {
                 "index": idx,
                 "set_number": set_number,
                 "roman": set_roman,
                 "topic": topic,
-                "title": f"Hard Practice {set_roman}",
+                "title": display_title,
                 "subtitle": TOPIC_TITLES.get(topic, f"SAT Hard Question Set {idx}"),
                 "total": total,
                 "answered": answered,
@@ -8686,6 +8792,8 @@ def practice_challenge():
                 "range_bucket": (set_number - 1) // 10 + 1,
                 "is_live": total > 0,
                 "materials": materials,
+                "pace_training": bool(pace_secs),
+                "pace_seconds": int(pace_secs or 0),
             }
         )
     total_questions = sum(s["total"] for s in hard_sets)
@@ -10853,6 +10961,9 @@ def _miss_quiz_render_question_step(step: int):
         choice_letters=choice_letters,
         practice_timer_seconds=0,
         practice_timer_summary_url=None,
+        practice_timer_mode="elapsed",
+        pace_training=False,
+        pace_seconds=0,
         miss_quiz_mode=True,
         miss_quiz_step=step,
         miss_quiz_total=len(items),
@@ -11373,6 +11484,7 @@ def practice_question(domain, topic, qnum):
     calc_ok = bool(q.get("calculator_allowed", True))
     placement_mode = domain == "placement"
     choice_letters = [chr(ord("A") + i) for i in range(len(q.get("choices") or []))]
+    pace_seconds = None if mistake_redo_mode else _phase3_pace_seconds(domain, topic)
     if placement_mode:
         practice_timer_seconds = _placement_timer_seconds(topic)
         practice_timer_summary_url = (
@@ -11381,6 +11493,10 @@ def practice_question(domain, topic, qnum):
             else None
         )
         practice_timer_mode = "countdown"
+    elif pace_seconds:
+        practice_timer_seconds = int(pace_seconds)
+        practice_timer_summary_url = None
+        practice_timer_mode = "per_question"
     else:
         practice_timer_seconds = 0
         practice_timer_summary_url = None
@@ -11436,6 +11552,8 @@ def practice_question(domain, topic, qnum):
         practice_timer_seconds=practice_timer_seconds,
         practice_timer_summary_url=practice_timer_summary_url,
         practice_timer_mode=practice_timer_mode,
+        pace_training=bool(pace_seconds),
+        pace_seconds=int(pace_seconds or 0),
         attempt_started_unix=attempt_started_unix,
         miss_quiz_mode=False,
         miss_quiz_v2=False,

@@ -3,7 +3,7 @@
    Light + dark · horizontal trio phase cards · index rows
    ═══════════════════════════════════════════════════════════ */
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,550;9..144,650;9..144,700&family=Sora:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,550;9..144,650;9..144,700&family=Sora:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;600;700&display=swap");
 
 .np-cmx {
   /* Light defaults */
@@ -1034,4 +1034,136 @@ html[data-exam-theme="dark"] .np-cmx-deck__cta {
   .np-cmx-card__banner {
     height: 120px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Cinema v8 — Phase impact · soft luminous · CJK-ready titles
+   ═══════════════════════════════════════════════════════════ */
+
+.np-cmx-stage__wash {
+  background:
+    radial-gradient(ellipse 90% 60% at 8% -14%, rgba(155, 140, 255, 0.28), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgba(196, 181, 253, 0.24), transparent 52%),
+    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(108, 78, 255, 0.1), transparent 60%),
+    linear-gradient(180deg, #fbf9ff 0%, #f3eefc 48%, #ebe4f8 100%) !important;
+}
+
+html[data-exam-theme="dark"] .np-cmx-stage__wash {
+  background:
+    radial-gradient(ellipse 85% 55% at 10% -10%, rgba(124, 92, 255, 0.42), transparent 52%),
+    radial-gradient(ellipse 60% 45% at 100% 10%, rgba(79, 47, 216, 0.3), transparent 48%),
+    linear-gradient(180deg, #0c0a14 0%, #0a0812 100%) !important;
+}
+
+.np-cmx-display {
+  background: linear-gradient(120deg, #171326 0%, #3f27c7 55%, #6c4eff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+html[data-exam-theme="dark"] .np-cmx-display {
+  background: linear-gradient(120deg, #f5f1ff 0%, #c4b5fd 60%, #9b8cff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.np-cmx-card {
+  min-height: 440px;
+  border-radius: 32px !important;
+  box-shadow:
+    0 24px 56px rgba(108, 78, 255, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset !important;
+}
+
+.np-cmx-card:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 36px 72px rgba(108, 78, 255, 0.2) !important;
+}
+
+/* Soft luminous banners — never navy-black */
+.np-cmx-card__banner {
+  height: 156px;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.45), transparent 42%),
+    linear-gradient(135deg, #8b78ff 0%, #6c4eff 48%, #c4b5fd 100%) !important;
+}
+
+.np-cmx-card--p2 .np-cmx-card__banner {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.42), transparent 42%),
+    linear-gradient(135deg, #9b6cff 0%, #7c3aed 48%, #e9d5ff 100%) !important;
+}
+
+.np-cmx-card--p3 .np-cmx-card__banner {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.48), transparent 42%),
+    linear-gradient(135deg, #7c66f0 0%, #6c4eff 42%, #a5b4fc 100%) !important;
+}
+
+.np-cmx-card h3 {
+  font-family: "Fraunces", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif !important;
+  font-size: clamp(1.45rem, 2.1vw, 1.85rem) !important;
+}
+
+.np-cmx-card--p3 h3 {
+  font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Fraunces", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+}
+
+.np-cmx-card__cta {
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+  box-shadow: 0 14px 28px rgba(91, 61, 245, 0.32) !important;
+}
+
+/* Phase page title supports Chinese */
+.np-cmx-phase__title {
+  font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Fraunces", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature {
+  color: #171326 !important;
+  background:
+    radial-gradient(ellipse 70% 80% at 95% 10%, rgba(155, 140, 255, 0.28), transparent 55%),
+    linear-gradient(125deg, #ffffff 0%, #f4efff 55%, #ebe3ff 100%) !important;
+  border: 1px solid rgba(108, 78, 255, 0.16);
+  box-shadow: 0 24px 56px rgba(108, 78, 255, 0.14) !important;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature__kicker {
+  color: #6c4eff !important;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature h2 {
+  font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Fraunces", sans-serif !important;
+  color: #171326 !important;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature p {
+  color: #564e72 !important;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature__cta {
+  color: #fff !important;
+  background: linear-gradient(135deg, #7c66f0, #5b3df5) !important;
+}
+
+html:not([data-exam-theme="dark"]) .np-cmx-feature__rail {
+  background: linear-gradient(180deg, #b6a4ff, #6c4eff) !important;
+}
+
+.np-cmx-deck {
+  border-radius: 22px !important;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s !important;
+  box-shadow: 0 14px 36px rgba(108, 78, 255, 0.08);
+}
+
+.np-cmx-deck:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 52px rgba(108, 78, 255, 0.16);
 }

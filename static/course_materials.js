@@ -74,6 +74,247 @@
   var outlineToggles = Array.prototype.slice.call(root.querySelectorAll("[data-cm-toggle-outline]"));
   var filterBtns = Array.prototype.slice.call(root.querySelectorAll("[data-cm-filter]"));
 
+  /* Phase 3 per-question pace timer (1:35) — visible on teaching projector + study view */
+  var paceEnabled = root.getAttribute("data-cm-pace") === "1";
+  var paceSecondsTotal = parseInt(root.getAttribute("data-cm-pace-seconds") || "95", 10) || 95;
+  var paceTimerEl = root.querySelector("[data-cm-pace-timer]");
+  var paceSlotEl = root.querySelector("[data-cm-pace-slot]");
+  var paceDigitsEl = root.querySelector("[data-cm-pace-digits]");
+  var paceChipTimeEl = root.querySelector("[data-cm-pace-chip-time]");
+  var paceStatusEl = root.querySelector("[data-cm-pace-status]");
+  var paceToggleBtn = root.querySelector("[data-cm-pace-toggle]");
+  var paceToggleLabel = root.querySelector("[data-cm-pace-toggle-label]");
+  var paceResetBtn = root.querySelector("[data-cm-pace-reset]");
+  var paceDockBtn = root.querySelector("[data-cm-pace-dock]");
+  var paceUndockBtn = root.querySelector("[data-cm-pace-undock]");
+  var paceDragEl = root.querySelector("[data-cm-pace-drag]");
+  var paceFloatHome = paceTimerEl ? paceTimerEl.parentNode : null;
+  var paceRemaining = paceSecondsTotal;
+  var paceRunning = false;
+  var paceInterval = null;
+  var paceSlideKey = null;
+  var paceOverNotified = false;
+  var paceMode = "float"; // float | docked
+  var pacePreferFloat = true;
+  var paceDragState = null;
+
+  function paceFormat(sec) {
+    var abs = Math.abs(sec);
+    var m = Math.floor(abs / 60);
+    var s = abs % 60;
+    return (sec < 0 ? "+" : "") + m + ":" + String(s).padStart(2, "0");
+  }
+
+  function paceIsQuestionSlide(slide) {
+    if (!slide) return false;
+    var kind = slide.kind || "";
+    return kind === "question" || kind === "practice" || kind === "example";
+  }
+
+  function isDesmosOpen() {
+    var panel = document.getElementById("np-desmos-panel");
+    return !!(panel && panel.classList.contains("is-open"));
+  }
+
+  function setPaceMode(mode, options) {
+    options = options || {};
+    if (!paceTimerEl) return;
+    paceMode = mode === "docked" ? "docked" : "float";
+    if (!options.silentPrefer) {
+      if (paceMode === "float") pacePreferFloat = true;
+      if (paceMode === "docked" && options.user) pacePreferFloat = false;
+    }
+    paceTimerEl.classList.toggle("is-float", paceMode === "float");
+    paceTimerEl.classList.toggle("is-docked", paceMode === "docked");
+    if (paceMode === "docked" && paceSlotEl) {
+      paceSlotEl.appendChild(paceTimerEl);
+      paceTimerEl.style.left = "";
+      paceTimerEl.style.top = "";
+      paceTimerEl.style.right = "";
+      paceTimerEl.style.bottom = "";
+    } else if (paceFloatHome) {
+      paceFloatHome.appendChild(paceTimerEl);
+    }
+    if (paceUndockBtn) paceUndockBtn.hidden = paceMode !== "docked";
+    if (paceDockBtn) paceDockBtn.hidden = paceMode !== "float";
+    if (paceDragEl) paceDragEl.hidden = paceMode !== "float";
+  }
+
+  function syncPacePlacement() {
+    if (!paceTimerEl || paceTimerEl.hidden) return;
+    if (isDesmosOpen()) {
+      setPaceMode("docked", { silentPrefer: true });
+      return;
+    }
+    if (pacePreferFloat) setPaceMode("float", { silentPrefer: true });
+  }
+
+  function pacePaint() {
+    if (!paceTimerEl) return;
+    var clock = paceFormat(paceRemaining);
+    if (paceDigitsEl) paceDigitsEl.textContent = clock;
+    if (paceChipTimeEl) paceChipTimeEl.textContent = clock;
+    var frac = paceRemaining > 0
+      ? Math.max(0, Math.min(1, paceRemaining / paceSecondsTotal))
+      : 0;
+    paceTimerEl.style.setProperty("--pace-pct", (frac * 100).toFixed(2));
+    paceTimerEl.classList.toggle("is-running", paceRunning);
+    paceTimerEl.classList.toggle("is-warn", paceRemaining > 0 && paceRemaining <= 30);
+    paceTimerEl.classList.toggle("is-critical", paceRemaining > 0 && paceRemaining <= 15);
+    paceTimerEl.classList.toggle("is-over", paceRemaining <= 0);
+    if (paceStatusEl) {
+      if (paceRemaining <= 0) paceStatusEl.textContent = "Over pace";
+      else if (paceRemaining <= 15) paceStatusEl.textContent = "Finish now";
+      else if (paceRemaining <= 30) paceStatusEl.textContent = "30s left";
+      else if (paceRunning) paceStatusEl.textContent = "Live";
+      else paceStatusEl.textContent = "Ready";
+    }
+    if (paceToggleLabel) {
+      paceToggleLabel.textContent = paceRunning ? "Pause" : (paceRemaining <= 0 ? "Restart" : "Start");
+    }
+  }
+
+  function paceStopTicker() {
+    if (paceInterval) {
+      clearInterval(paceInterval);
+      paceInterval = null;
+    }
+    paceRunning = false;
+  }
+
+  function paceStartTicker() {
+    if (paceInterval) return;
+    paceRunning = true;
+    paceInterval = setInterval(function () {
+      paceRemaining -= 1;
+      if (paceRemaining <= 0 && !paceOverNotified) {
+        paceOverNotified = true;
+        if (!isDesmosOpen()) setPaceMode("float", { silentPrefer: true });
+      }
+      pacePaint();
+    }, 1000);
+    pacePaint();
+  }
+
+  function paceReset(autoStart) {
+    paceStopTicker();
+    paceRemaining = paceSecondsTotal;
+    paceOverNotified = false;
+    pacePaint();
+    if (autoStart) paceStartTicker();
+  }
+
+  function syncPaceTimer(slide) {
+    if (!paceEnabled || !paceTimerEl) return;
+    var show = paceIsQuestionSlide(slide);
+    paceTimerEl.hidden = !show;
+    root.classList.toggle("has-pace-active", show);
+    if (!show) {
+      paceStopTicker();
+      pacePaint();
+      return;
+    }
+    syncPacePlacement();
+    var key = String(slide.index);
+    if (key !== paceSlideKey) {
+      paceSlideKey = key;
+      if (pacePreferFloat && !isDesmosOpen()) {
+        setPaceMode("float", { silentPrefer: true });
+        paceTimerEl.style.left = "";
+        paceTimerEl.style.top = "";
+        paceTimerEl.style.right = "";
+        paceTimerEl.style.bottom = "";
+      }
+      paceReset(true);
+      return;
+    }
+    pacePaint();
+  }
+
+  if (paceDockBtn) {
+    paceDockBtn.addEventListener("click", function () {
+      setPaceMode("docked", { user: true });
+    });
+  }
+  if (paceUndockBtn) {
+    paceUndockBtn.addEventListener("click", function () {
+      if (isDesmosOpen()) return;
+      setPaceMode("float", { user: true });
+    });
+  }
+  if (paceToggleBtn) {
+    paceToggleBtn.addEventListener("click", function () {
+      if (!paceIsQuestionSlide(slides[idx])) return;
+      if (paceRemaining <= 0 && !paceRunning) {
+        paceReset(true);
+        return;
+      }
+      if (paceRunning) {
+        paceStopTicker();
+        pacePaint();
+      } else {
+        paceStartTicker();
+      }
+    });
+  }
+  if (paceResetBtn) {
+    paceResetBtn.addEventListener("click", function () {
+      if (!paceIsQuestionSlide(slides[idx])) return;
+      paceReset(false);
+    });
+  }
+
+  // Drag the beautiful float card out of the way when needed.
+  if (paceDragEl && paceTimerEl) {
+    paceDragEl.addEventListener("pointerdown", function (e) {
+      if (paceMode !== "float" || e.button) return;
+      var rect = paceTimerEl.getBoundingClientRect();
+      var deckRect = (deckEl || root).getBoundingClientRect();
+      paceDragState = {
+        ox: e.clientX - rect.left,
+        oy: e.clientY - rect.top,
+        deckLeft: deckRect.left,
+        deckTop: deckRect.top
+      };
+      paceTimerEl.classList.add("is-dragging");
+      paceDragEl.setPointerCapture(e.pointerId);
+    });
+    paceDragEl.addEventListener("pointermove", function (e) {
+      if (!paceDragState) return;
+      var deckRect = (deckEl || root).getBoundingClientRect();
+      var x = e.clientX - paceDragState.ox - deckRect.left;
+      var y = e.clientY - paceDragState.oy - deckRect.top;
+      x = Math.max(8, Math.min(x, deckRect.width - paceTimerEl.offsetWidth - 8));
+      y = Math.max(8, Math.min(y, deckRect.height - paceTimerEl.offsetHeight - 8));
+      paceTimerEl.style.left = x + "px";
+      paceTimerEl.style.top = y + "px";
+      paceTimerEl.style.right = "auto";
+      paceTimerEl.style.bottom = "auto";
+    });
+    function endPaceDrag(e) {
+      if (!paceDragState) return;
+      paceDragState = null;
+      paceTimerEl.classList.remove("is-dragging");
+      try { paceDragEl.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+    paceDragEl.addEventListener("pointerup", endPaceDrag);
+    paceDragEl.addEventListener("pointercancel", endPaceDrag);
+  }
+
+  // Auto-dock when Desmos opens so the luxe card never fights the calculator.
+  var desmosPanel = document.getElementById("np-desmos-panel");
+  if (desmosPanel && typeof MutationObserver !== "undefined") {
+    var desmosObs = new MutationObserver(function () {
+      syncPacePlacement();
+    });
+    desmosObs.observe(desmosPanel, { attributes: true, attributeFilter: ["class"] });
+  }
+  document.querySelectorAll("[data-np-desmos-toggle]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      window.setTimeout(syncPacePlacement, 0);
+    });
+  });
+
   function loadJsonScript(id) {
     var el = document.getElementById(id);
     if (!el) return null;
@@ -3183,6 +3424,7 @@
     bindInteractivity(slide);
     renderLiveResults(slide);
     updateCoach(slide);
+    syncPaceTimer(slide);
     updateClassroomPaceBadge();
     publishCurrentClassroomSlide();
     if (isInkTeacher() && !classroomSession && inkActiveSlideIndex !== null && slide.index !== inkActiveSlideIndex) {

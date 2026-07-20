@@ -8404,17 +8404,21 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
 
 .stem-tikz-svg {
     display: block;
-    max-width: 100%;
+    max-width: min(100%, 540px);
+    max-height: min(400px, 52vh);
+    width: auto;
     height: auto;
     margin: 0 auto;
 }
 
 .stem-tikz-svg--choice {
     max-width: 220px;
+    max-height: none;
 }
 
 .stem-tikz-svg--coord {
-    max-width: min(100%, 460px);
+    max-width: min(100%, 560px);
+    max-height: min(420px, 55vh);
 }
 
 html[data-exam-theme="dark"] .stem-tikz-svg {
@@ -18737,6 +18741,164 @@ html[data-exam-theme="dark"] .np-learning-mastery-count {
     text-transform: uppercase;
 }
 
+.exam-timer--pace {
+    position: relative;
+    min-width: 158px !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 8px;
+    padding: 10px 14px 12px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(109, 94, 252, 0.16) !important;
+    background:
+        radial-gradient(120% 140% at 0% 0%, rgba(124, 92, 255, 0.12), transparent 55%),
+        linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(246, 243, 255, 0.92)) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.75) inset,
+        0 14px 28px rgba(55, 40, 120, 0.1) !important;
+    backdrop-filter: blur(14px);
+}
+
+.exam-timer--pace .exam-timer-icon {
+    display: none;
+}
+
+.exam-timer--pace .exam-timer-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.exam-timer--pace .exam-timer-digits {
+    font-family: "Inter Tight", "SF Pro Display", "Segoe UI", system-ui, sans-serif !important;
+    font-size: 1.35rem !important;
+    font-weight: 780 !important;
+    letter-spacing: -0.04em !important;
+    color: #171326 !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.exam-timer--pace .exam-timer-mode {
+    order: -1;
+    color: #4f3fd4 !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.14em !important;
+}
+
+.exam-timer-rail {
+    display: block;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(109, 94, 252, 0.12);
+    overflow: hidden;
+}
+
+.exam-timer-rail > i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #8b7cff, #4f3fd4);
+    transition: width 0.35s linear, background 0.2s ease;
+    box-shadow: 0 0 10px rgba(109, 94, 252, 0.25);
+}
+
+.exam-timer--warn {
+    border-color: rgba(180, 120, 20, 0.35) !important;
+    background: linear-gradient(180deg, rgba(255, 248, 230, 0.98), #fff) !important;
+}
+
+.exam-timer--warn .exam-timer-mode {
+    color: #a16207 !important;
+}
+
+.exam-timer--warn .exam-timer-rail > i {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.exam-timer--critical {
+    border-color: rgba(185, 50, 50, 0.4) !important;
+    background: linear-gradient(180deg, rgba(255, 240, 240, 0.98), #fff) !important;
+    animation: sat-pace-pulse 1s ease-in-out infinite;
+}
+
+.exam-timer--critical .exam-timer-mode,
+.exam-timer--critical .exam-timer-digits {
+    color: #b91c1c !important;
+}
+
+.exam-timer--critical .exam-timer-rail > i {
+    background: linear-gradient(90deg, #f87171, #dc2626);
+}
+
+.exam-timer--over {
+    border-color: rgba(120, 40, 40, 0.45) !important;
+    background: linear-gradient(180deg, rgba(255, 236, 236, 0.98), #fff) !important;
+}
+
+.exam-timer--over .exam-timer-mode,
+.exam-timer--over .exam-timer-digits {
+    color: #991b1b !important;
+}
+
+.exam-timer--over .exam-timer-digits::before {
+    content: none;
+}
+
+@keyframes sat-pace-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.sat-session-chip--pace {
+    color: #5b45b5 !important;
+    background: rgba(124, 92, 255, 0.12) !important;
+    border-color: rgba(124, 92, 255, 0.22) !important;
+}
+
+.sat-pace-over-banner {
+    margin: 0 0 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(185, 28, 28, 0.22);
+    background: linear-gradient(180deg, rgba(254, 242, 242, 0.98), #fff);
+    color: #7f1d1d;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+html[data-exam-theme="dark"] .exam-timer--pace {
+    border-color: rgba(180, 160, 255, 0.28);
+    background: linear-gradient(180deg, rgba(40, 32, 72, 0.95), rgba(28, 24, 48, 0.92));
+}
+
+html[data-exam-theme="dark"] .exam-timer--pace .exam-timer-mode {
+    color: #c4b5fd;
+}
+
+html[data-exam-theme="dark"] .exam-timer--warn {
+    border-color: rgba(251, 191, 36, 0.4) !important;
+    background: linear-gradient(180deg, rgba(66, 48, 12, 0.95), rgba(36, 28, 16, 0.92)) !important;
+}
+
+html[data-exam-theme="dark"] .exam-timer--critical,
+html[data-exam-theme="dark"] .exam-timer--over {
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    background: linear-gradient(180deg, rgba(70, 24, 24, 0.95), rgba(36, 16, 16, 0.92)) !important;
+}
+
+html[data-exam-theme="dark"] .sat-pace-over-banner {
+    border-color: rgba(248, 113, 113, 0.35);
+    background: linear-gradient(180deg, rgba(70, 24, 24, 0.95), rgba(36, 16, 16, 0.92));
+    color: #fecaca;
+}
+
+html[data-exam-theme="dark"] .sat-session-chip--pace {
+    color: #ddd6fe !important;
+    background: rgba(124, 92, 255, 0.2) !important;
+}
+
 .np-summary-time-spent {
     margin: 8px 0 0;
     color: #6a6388;
@@ -23255,6 +23417,20 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     margin: 8px 0 0;
     color: #6f6784;
     line-height: 1.55;
+}
+
+.np-hard-detail-pace {
+    margin: 10px 0 0 !important;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 92, 255, 0.22);
+    background: rgba(124, 92, 255, 0.1);
+    color: #5b45b5 !important;
+    font-size: 12px !important;
+    font-weight: 750 !important;
+    line-height: 1.2 !important;
 }
 
 .np-hard-detail-stats {

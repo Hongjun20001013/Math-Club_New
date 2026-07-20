@@ -1,0 +1,452 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[Word Problem Training]{\textbf{Word Problem Training}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 3 · Word Problem Training}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Word Problem Training}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Word Problem Training}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{19 word-problem training challenges}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+A computer program models the total mass of the population of a certain type of algae after the algae was placed in an environment where it has no natural predators. According to the model, the estimated total mass of this population of algae at the end of every 6-hour period is \(129\%\) greater than the estimated total mass of this population of algae at the end of the previous 6-hour period, and the estimated total mass of this population of algae is \(613.90\) grams after \(18\) hours.
+Which equation best represents this model, where \(A\) is the estimated total mass, in grams, of the population of algae after \(x\) hours, and \(x < 50\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(A = 34.11(1.29)^{\frac{x}{6}}\)
+    \item[B.] \(A = 34.11(2.29)^{\frac{x}{6}}\)
+    \item[C.] \(A = 51.12(2.29)^{\frac{x}{6}}\)
+    \item[D.] \(A = 285.98(1.29)^{\frac{x}{6}}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+A solar panel is supported by two braces that form acute angles \(X\) and \(Y\) with two perpendicular sides of its frame. The measure of angle \(Y\) is \(32^\circ\), and a load calculation for the braces gives \(\dfrac{\sin X}{\cos Y}=1\).
+What is the measure, in degrees, of angle \(X\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(77\)
+    \item[B.] \(58\)
+    \item[C.] \(45\)
+    \item[D.] \(32\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+A line intersects two parallel lines, forming four acute angles and four obtuse angles. The measure of one of the acute angles is \((7x - 410)^\circ\). The sum of the measures of one of the acute angles and three of the obtuse angles is \((-14x + w)^\circ\).
+What is the value of \(w\)?
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Final Answer:} $\boxed{1360}$
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+The equation \(M = 1{,}800(1.02)^t\) models the number of members, \(M\), of a gym \(t\) years after the gym opens.
+Of the following, which equation models the number of members of the gym \(q\) quarter years after the gym opens?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(M = 1{,}800(1.02)^{\frac{q}{4}}\)
+    \item[B.] \(M = 1{,}800(1.02)^{4q}\)
+    \item[C.] \(M = 1{,}800(1.005)^{4q}\)
+    \item[D.] \(M = 1{,}800(1.082)^q\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+An engineer uses the equation
+\[
+\frac{1}{24}x^{2} + \left(s - \frac{1}{24}t\right)x - st = 0
+\]
+to determine two possible signed calibration adjustments, \(x\), for a machine. In the equation, \(s\) and \(t\) are positive constants.
+The product of the two possible adjustments is \(-2kst\), where \(k\) is a constant.
+What is the value of \(k\)?
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Final Answer:} $\boxed{12}$
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+For a certain type of rope, the equation \(y = 900ax^{2}\), where \(a\) is a constant, gives the estimated breaking strength \(y\), in pounds, of a rope with a circumference of \(x\) inches.
+Based on this equation, if a rope of this type has a circumference of \(1.75\) inches, it has an estimated breaking strength of \(3{,}858.75\) pounds.
+What is the estimated breaking strength, in pounds, of a rope of this type that has a circumference of \(3.50\) inches?
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Final Answer:} $\boxed{15435}$
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+A hollow steel pipe is in the shape of a right circular cylinder.
+The steel pipe has an outside diameter of \(72\) inches, a wall thickness of \(\dfrac{5}{8}\) inches, and a height of \(138\) inches.
+Which of the following is closest to the volume, in cubic inches, of the wall of this steel pipe?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(169\)
+    \item[B.] \(542\)
+    \item[C.] \(3{,}105\)
+    \item[D.] \(19{,}340\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+Trapezoid \(CDEF\) is similar to trapezoid \(JKLM\), such that \(C\), \(D\), \(E\), and \(F\) correspond to \(J\), \(K\), \(L\), and \(M\), respectively. The length of each side of trapezoid \(JKLM\) is \(4\) times the length of its corresponding side in trapezoid \(CDEF\). The measure of angle \(C\) is \(42^\circ\). What is the measure of angle \(J\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(38^\circ\)
+    \item[B.] \(42^\circ\)
+    \item[C.] \(46^\circ\)
+    \item[D.] \(168^\circ\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+A robotic arm rotates through an angle \(F\) of \(\dfrac{\pi}{15}\) radians. Its control panel displays this rotation as \(6n\) degrees, where \(n\) is a constant. What is the value of \(n\)?
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Final Answer:} $\boxed{2}$
+\end{frame}
+
+% --- Question 10 ---
+\begin{frame}{Question 10}
+\small
+The table gives the average time \(t\), in minutes, it takes Adriana to travel a certain distance \(d\), in miles. Which equation could represent this linear relationship?
+
+\begin{center}
+\begin{tabular}{c|c}
+Distance (miles) & Average time (minutes) \\
+\hline
+\(0.18\) & \(9\) \\
+\(0.24\) & \(12\) \\
+\(0.36\) & \(18\) \\
+\end{tabular}
+\end{center}
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(t = 50d\)
+    \item[B.] \(t = \dfrac{1}{2}d\)
+    \item[C.] \(t = 2d\)
+    \item[D.] \(t = \dfrac{1}{50}d\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 10}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 11 ---
+\begin{frame}{Question 11}
+\small
+A wireless phone company pays customers for trading in old smartphones. The payment \(p\), in dollars, is the original retail price of a smartphone minus \(\$135\) for each year since the smartphone was released.
+Which equation represents this situation for a smartphone with an original retail price of \(\$750\) when it was released \(t\) years ago, where \(t\) is a whole number and \(1 \le t \le 4\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(p = 135 - 750t\)
+    \item[B.] \(p = 750 - 135t\)
+    \item[C.] \(t = 135 - 750p\)
+    \item[D.] \(t = 750 - 135p\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 11}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 12 ---
+\begin{frame}{Question 12}
+\small
+A soccer team's goal is to earn at least \(\$1{,}170\) by selling coupon books. The team earns \(\$9\) from selling each coupon book. Which of the following inequalities describes all possible values for the number of coupon books, \(n\), the team can sell to meet the goal?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(n + 9 \le 1{,}170\)
+    \item[B.] \(n + 9 \ge 1{,}170\)
+    \item[C.] \(9n \le 1{,}170\)
+    \item[D.] \(9n \ge 1{,}170\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 12}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 13 ---
+\begin{frame}{Question 13}
+\small
+A car dealership has only sedans, SUVs, and minivans for sale. On Monday, \(20\%\) of the vehicles for sale were sedans and \(50\%\) were SUVs. If there were \(62\) sedans for sale at the dealership on Monday, how many minivans were for sale?
+\end{frame}
+\begin{frame}{Answer 13}
+\small
+\textbf{Final Answer:} $\boxed{93}$
+\end{frame}
+
+% --- Question 14 ---
+\begin{frame}{Question 14}
+\small
+A snack company advertises that bags of pretzels produced by the company weigh, on average, \(1\) pound each.
+To test this, Sam selected at random \(30\) bags of pretzels produced by the company and weighed each bag.
+Based on his measurements, Sam estimated that for all bags of pretzels produced by the company, the average weight per bag is \(1.02\) pounds, with a margin of error of \(0.05\) pounds.
+For all bags of pretzels produced by the company, which of the following is the most appropriate conclusion about the average weight \(w\), in pounds, per bag?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(w = 1.02\)
+    \item[B.] \(0.97 \le w \le 1.02\)
+    \item[C.] \(0.97 \le w \le 1.07\)
+    \item[D.] \(1.02 \le w \le 1.07\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 14}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 15 ---
+\begin{frame}{Question 15}
+\small
+A total of \(3\) equilateral pentagons each have side length \(p\) units.
+A total of \(2\) squares each have side length \(s\) units.
+The sum of the perimeters of all these pentagons and squares is \(136\) units.
+Which equation represents this situation?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(12p + 10s = 136\)
+    \item[B.] \(2p + 3s = 136\)
+    \item[C.] \(3p + 2s = 136\)
+    \item[D.] \(15p + 8s = 136\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 15}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 16 ---
+\begin{frame}{Question 16}
+\small
+A company conducted a study concerning the time spent on extracurricular activities by students in grades \(6\), \(7\), and \(8\) and their level of school spirit.
+A total of \(80\) students were selected at random from all students in grades \(6\), \(7\), and \(8\) in a large school district in the US.
+The selected students were asked to report their level of school spirit as either low, medium, or high.
+The table summarizes the distribution of the selected students by grade.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Grade & \(6\) & \(7\) & \(8\) \\
+\hline
+Number of students & \(26\) & \(25\) & \(29\) \\
+\hline
+\end{tabular}
+\end{center}
+
+If the results of the study suggest a relationship between the self-reported level of school spirit and the amount of time spent on extracurricular activities by students in grades \(6\), \(7\), and \(8\), which of the following aspects of the study would prevent the results from being generalized to all students in grades \(6\), \(7\), and \(8\) in the US?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The selected students are not all from the same school.
+    \item[B.] The number of selected students is too small.
+    \item[C.] The number of selected students from each grade is different.
+    \item[D.] The students were not selected at random from all students in grades \(6\), \(7\), and \(8\) in the US.
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 16}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 17 ---
+\begin{frame}{Question 17}
+\small
+For a study, a research team measured the heights of \(240\) king penguins from the Crozet Islands and \(120\) king penguins from the Falkland Islands.
+The research team determined that the mean height of the \(240\) king penguins from the Crozet Islands was \(86\) centimeters and the mean height of the \(120\) king penguins from the Falkland Islands was \(92\) centimeters.
+What was the mean height, in centimeters, of all \(360\) king penguins the research team measured for this study?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(87\)
+    \item[B.] \(88\)
+    \item[C.] \(89\)
+    \item[D.] \(90\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 17}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 18 ---
+\begin{frame}{Question 18}
+\small
+At a nature preserve, a wildlife biologist counted bald eagles from an observation deck at the same time each day for \(21\) days.
+The table summarizes the resulting data set, data set \(A\).
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Number of bald eagles & Number of days \\
+\hline
+\(0\) & \(1\) \\
+\(1\) & \(3\) \\
+\(2\) & \(4\) \\
+\(3\) & \(5\) \\
+\(4\) & \(4\) \\
+\(5\) & \(3\) \\
+\(19\) & \(1\) \\
+\hline
+\end{tabular}
+\end{center}
+
+The data value \(19\) was recorded in error and is removed from data set \(A\) to create data set \(B\), which consists of the remaining \(20\) data values.
+Which statement best compares the median of data set \(A\) and the median of data set \(B\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The median of data set \(B\) is less than the median of data set \(A\).
+    \item[B.] The median of data set \(B\) is equal to the median of data set \(A\).
+    \item[C.] The median of data set \(B\) is greater than the median of data set \(A\).
+    \item[D.] There is not enough information to compare the medians of the two data sets.
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 18}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 19 ---
+\begin{frame}{Question 19}
+\small
+The table shows the volume of two similar solids, right circular cylinder \(A\) and right circular cylinder \(B\).
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+Right circular cylinder \(A\) & \(392\pi\) \\
+Right circular cylinder \(B\) & \(10{,}584\pi\) \\
+\hline
+\end{tabular}
+\end{center}
+
+The radius of right circular cylinder \(A\) is \(7\) units.
+The surface area of right circular cylinder \(A\) is \(k\pi\) square units, and the surface area of right circular cylinder \(B\) is \(n\pi\) square units, where \(k\) and \(n\) are constants.
+What is the value of \(n - k\)?
+
+(The surface area of a right circular cylinder with radius \(r\) and height \(h\) is \(2\pi r^{2} + 2\pi rh\).)
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(1008\)
+    \item[B.] \(1210\)
+    \item[C.] \(1680\)
+    \item[D.] \(2014\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 19}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

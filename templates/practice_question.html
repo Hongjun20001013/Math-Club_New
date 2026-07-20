@@ -42,12 +42,26 @@
     <!-- Header -->
     <div class="exam-header sat-exam-top">
         {% if not chrome_focus %}
-        <div class="left-header exam-timer{% if not placement_mode %} exam-timer--unlimited{% endif %}">
-            <span class="exam-timer-icon" aria-hidden="true">⏳</span>
+        <div
+            class="left-header exam-timer{% if practice_timer_mode == 'per_question' %} exam-timer--pace{% elif not placement_mode %} exam-timer--unlimited{% endif %}"
+            id="exam-timer"
+            {% if practice_timer_mode == 'per_question' %}
+            data-pace-seconds="{{ practice_timer_seconds|int }}"
+            title="SAT Module pace — aim to finish each question in {{ '%d:%02d'|format((practice_timer_seconds|default(95)) // 60, (practice_timer_seconds|default(95)) % 60) }}"
+            {% endif %}
+        >
+            <span class="exam-timer-icon" aria-hidden="true">{% if practice_timer_mode == 'per_question' %}⏱{% else %}⏳{% endif %}</span>
             <span class="exam-timer-copy">
-                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}{{ '%d:%02d'|format((practice_timer_seconds|default(5700)) // 60, (practice_timer_seconds|default(5700)) % 60) }}{% else %}00:00{% endif %}</span>
-                {% if not placement_mode %}<span class="exam-timer-mode">Unlimited</span>{% endif %}
+                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode or practice_timer_mode == 'per_question' %}{{ '%d:%02d'|format((practice_timer_seconds|default(95)) // 60, (practice_timer_seconds|default(95)) % 60) }}{% else %}00:00{% endif %}</span>
+                {% if practice_timer_mode == 'per_question' %}
+                <span class="exam-timer-mode" id="exam-timer-mode">Pace · 1:35</span>
+                {% elif not placement_mode %}
+                <span class="exam-timer-mode">Unlimited</span>
+                {% endif %}
             </span>
+            {% if practice_timer_mode == 'per_question' %}
+            <span class="exam-timer-rail" aria-hidden="true"><i id="exam-timer-rail-fill"></i></span>
+            {% endif %}
         </div>
         {% elif miss_quiz_mode %}
         <div class="left-header sat-miss-quiz-brand" aria-hidden="true">
@@ -121,6 +135,9 @@
         <span class="sat-session-chip sat-session-chip--topic">{{ domain|replace('_', ' ')|title }} · {{ topic|replace('_', ' ')|title }}</span>
         <span class="sat-session-chip">{{ answered_count }} answered</span>
         <span class="sat-session-chip">{{ remaining_count }} remaining</span>
+        {% if practice_timer_mode == 'per_question' %}
+        <span class="sat-session-chip sat-session-chip--pace">Pace training · 1:35 / question</span>
+        {% endif %}
         {% endif %}
         {% endif %}
         {% if calculator_allowed %}
@@ -129,6 +146,11 @@
         <span class="sat-session-chip sat-session-chip--locked">No calculator</span>
         {% endif %}
     </div>
+    {% if practice_timer_mode == 'per_question' %}
+    <div id="pace-over-banner" class="sat-pace-over-banner" hidden role="status">
+      Time's up for this item — submit when ready, or keep working. Overtime is shown so you can feel real Module pace.
+    </div>
+    {% endif %}
     {% if not placement_mode and not chrome_focus %}
     <p class="sat-data-quality-note">Analytics starts after 3 submitted questions in this session, so quick previews do not pollute progress or mistake reports.</p>
     {% endif %}
@@ -375,10 +397,14 @@ document.addEventListener("DOMContentLoaded", () => {
 const practiceTimerSeconds = {{ practice_timer_seconds|int }};
 const practiceTimerSummaryUrl = {{ practice_timer_summary_url | tojson }};
 const practiceAttemptId = {{ attempt_id|int }};
+const practiceQnum = {{ qnum|int }};
 const placementTimerMode = {{ placement_mode | tojson }};
 const practiceTimerMode = {{ practice_timer_mode|default('elapsed')|tojson }};
+const paceTrainingMode = practiceTimerMode === "per_question";
 const attemptStartedUnix = {{ attempt_started_unix|default(0)|int }};
 const PLACEMENT_DEADLINE_KEY = "sat-placement-deadline-ms-" + String(practiceAttemptId);
+const PACE_DEADLINE_KEY =
+    "sat-pace-deadline-ms-" + String(practiceAttemptId) + "-q" + String(practiceQnum);
 
 function placementDeadlineMs() {
     let raw = sessionStorage.getItem(PLACEMENT_DEADLINE_KEY);
@@ -391,10 +417,24 @@ function placementDeadlineMs() {
     return Number.isFinite(ms) ? ms : Date.now() + practiceTimerSeconds * 1000;
 }
 
+function paceDeadlineMs() {
+    let raw = sessionStorage.getItem(PACE_DEADLINE_KEY);
+    if (!raw) {
+        const end = Date.now() + practiceTimerSeconds * 1000;
+        sessionStorage.setItem(PACE_DEADLINE_KEY, String(end));
+        return end;
+    }
+    const ms = parseInt(raw, 10);
+    return Number.isFinite(ms) ? ms : Date.now() + practiceTimerSeconds * 1000;
+}
+
 function initialTimerSeconds() {
     if (placementTimerMode) {
         const left = Math.floor((placementDeadlineMs() - Date.now()) / 1000);
         return Math.max(0, left);
+    }
+    if (paceTrainingMode) {
+        return Math.floor((paceDeadlineMs() - Date.now()) / 1000);
     }
     if (practiceTimerMode === "elapsed" && attemptStartedUnix > 0) {
         return Math.max(0, Math.floor(Date.now() / 1000) - attemptStartedUnix);
@@ -404,20 +444,71 @@ function initialTimerSeconds() {
 
 let totalSeconds = initialTimerSeconds();
 let timerId = null;
+let paceExpiredNotified = false;
+
+function formatClock(secondsAbs) {
+    const min = Math.floor(secondsAbs / 60);
+    const sec = secondsAbs % 60;
+    return String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
+}
+
+function updatePaceChrome(remaining) {
+    const shell = document.getElementById("exam-timer");
+    const modeEl = document.getElementById("exam-timer-mode");
+    const rail = document.getElementById("exam-timer-rail-fill");
+    if (!shell) return;
+
+    shell.classList.remove(
+        "exam-timer--warn",
+        "exam-timer--critical",
+        "exam-timer--over"
+    );
+
+    if (remaining > 0) {
+        const frac = Math.max(0, Math.min(1, remaining / practiceTimerSeconds));
+        if (rail) rail.style.width = (frac * 100).toFixed(1) + "%";
+        if (remaining <= 15) {
+            shell.classList.add("exam-timer--critical");
+            if (modeEl) modeEl.textContent = "Finish now";
+        } else if (remaining <= 30) {
+            shell.classList.add("exam-timer--warn");
+            if (modeEl) modeEl.textContent = "30s left";
+        } else if (modeEl) {
+            modeEl.textContent = "Pace · 1:35";
+        }
+        return;
+    }
+
+    shell.classList.add("exam-timer--over");
+    if (rail) rail.style.width = "0%";
+    const over = Math.abs(remaining);
+    if (modeEl) modeEl.textContent = "Over +" + formatClock(over);
+}
 
 function renderTime() {
     const el = document.getElementById("time");
     if (!el) return;
-    const min = Math.floor(totalSeconds / 60);
-    const sec = totalSeconds % 60;
-    el.innerText =
-        String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
+    if (paceTrainingMode) {
+        const over = totalSeconds < 0;
+        el.innerText = (over ? "+" : "") + formatClock(Math.abs(totalSeconds));
+        updatePaceChrome(totalSeconds);
+        return;
+    }
+    el.innerText = formatClock(Math.max(0, totalSeconds));
 }
 
 function onTimerExpired() {
     if (placementTimerMode && practiceTimerSummaryUrl) {
         sessionStorage.removeItem(PLACEMENT_DEADLINE_KEY);
         window.location.replace(practiceTimerSummaryUrl);
+        return;
+    }
+    if (paceTrainingMode) {
+        if (!paceExpiredNotified) {
+            paceExpiredNotified = true;
+            const banner = document.getElementById("pace-over-banner");
+            if (banner) banner.hidden = false;
+        }
         return;
     }
     alert("Time is up!");
@@ -429,6 +520,11 @@ function startTimer() {
         onTimerExpired();
         return;
     }
+    if (paceTrainingMode && totalSeconds <= 0) {
+        paceExpiredNotified = true;
+        const banner = document.getElementById("pace-over-banner");
+        if (banner) banner.hidden = false;
+    }
     renderTime();
     timerId = setInterval(() => {
         if (placementTimerMode) {
@@ -436,6 +532,8 @@ function startTimer() {
                 0,
                 Math.floor((placementDeadlineMs() - Date.now()) / 1000)
             );
+        } else if (paceTrainingMode) {
+            totalSeconds = Math.floor((paceDeadlineMs() - Date.now()) / 1000);
         } else {
             totalSeconds++;
         }
@@ -447,6 +545,10 @@ function startTimer() {
             timerId = null;
             onTimerExpired();
             return;
+        }
+
+        if (paceTrainingMode && totalSeconds <= 0) {
+            onTimerExpired();
         }
 
         renderTime();

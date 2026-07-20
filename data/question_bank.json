@@ -15893,6 +15893,253 @@
         "knowledge_section_title_en": "Problem Solving & Data",
         "hard_skill": "Percent composition / word problem"
       }
+    ],
+    "hard_20": [
+      {
+        "stem": "<p>A computer program models the total mass of the population of a certain type of algae after the algae was placed in an environment where it has no natural predators. According to the model, the estimated total mass of this population of algae at the end of every 6-hour period is \\(129\\%\\) greater than the estimated total mass of this population of algae at the end of the previous 6-hour period, and the estimated total mass of this population of algae is \\(613.90\\) grams after \\(18\\) hours.</p>\n<p>Which equation best represents this model, where \\(A\\) is the estimated total mass, in grams, of the population of algae after \\(x\\) hours, and \\(x \\lt  50\\)?</p>",
+        "choices": [
+          "\\(A = 34.11(1.29)^{\\frac{x}{6}}\\)",
+          "\\(A = 34.11(2.29)^{\\frac{x}{6}}\\)",
+          "\\(A = 51.12(2.29)^{\\frac{x}{6}}\\)",
+          "\\(A = 285.98(1.29)^{\\frac{x}{6}}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential growth model / percent greater"
+      },
+      {
+        "stem": "<p>A solar panel is supported by two braces that form acute angles \\(X\\) and \\(Y\\) with two perpendicular sides of its frame. The measure of angle \\(Y\\) is \\(32^\\circ\\), and a load calculation for the braces gives \\(\\dfrac{\\sin X}{\\cos Y}=1\\).</p>\n<p>What is the measure, in degrees, of angle \\(X\\)?</p>",
+        "choices": [
+          "\\(77\\)",
+          "\\(58\\)",
+          "\\(45\\)",
+          "\\(32\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Cofunction identity / acute angles"
+      },
+      {
+        "stem": "<p>A line intersects two parallel lines, forming four acute angles and four obtuse angles. The measure of one of the acute angles is \\((7x - 410)^\\circ\\). The sum of the measures of one of the acute angles and three of the obtuse angles is \\((-14x + w)^\\circ\\).</p>\n<p>What is the value of \\(w\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "1360",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Parallel lines / angle expressions"
+      },
+      {
+        "stem": "<p>The equation \\(M = 1,800(1.02)^t\\) models the number of members, \\(M\\), of a gym \\(t\\) years after the gym opens.</p>\n<p>Of the following, which equation models the number of members of the gym \\(q\\) quarter years after the gym opens?</p>",
+        "choices": [
+          "\\(M = 1,800(1.02)^{\\frac{q}{4}}\\)",
+          "\\(M = 1,800(1.02)^{4q}\\)",
+          "\\(M = 1,800(1.005)^{4q}\\)",
+          "\\(M = 1,800(1.082)^q\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential rewrite / quarter years"
+      },
+      {
+        "stem": "<p>An engineer uses the equation</p>\n<div class=\"stem-math-block\">\\[\n\\frac{1}{24}x^{2} + \\left(s - \\frac{1}{24}t\\right)x - st = 0\n\\]</div>\n<p>to determine two possible signed calibration adjustments, \\(x\\), for a machine. In the equation, \\(s\\) and \\(t\\) are positive constants.</p>\n<p>The product of the two possible adjustments is \\(-2kst\\), where \\(k\\) is a constant.</p>\n<p>What is the value of \\(k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "12",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic product of roots"
+      },
+      {
+        "stem": "<p>For a certain type of rope, the equation \\(y = 900ax^{2}\\), where \\(a\\) is a constant, gives the estimated breaking strength \\(y\\), in pounds, of a rope with a circumference of \\(x\\) inches.</p>\n<p>Based on this equation, if a rope of this type has a circumference of \\(1.75\\) inches, it has an estimated breaking strength of \\(3,858.75\\) pounds.</p>\n<p>What is the estimated breaking strength, in pounds, of a rope of this type that has a circumference of \\(3.50\\) inches?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "15435",
+        "answer_alternates": [
+          "15,435",
+          "15435.0"
+        ],
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic scaling / breaking strength"
+      },
+      {
+        "stem": "<p>A hollow steel pipe is in the shape of a right circular cylinder.</p>\n<p>The steel pipe has an outside diameter of \\(72\\) inches, a wall thickness of \\(\\dfrac{5}{8}\\) inches, and a height of \\(138\\) inches.</p>\n<p>Which of the following is closest to the volume, in cubic inches, of the wall of this steel pipe?</p>",
+        "choices": [
+          "\\(169\\)",
+          "\\(542\\)",
+          "\\(3,105\\)",
+          "\\(19,340\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Cylinder wall volume"
+      },
+      {
+        "stem": "<p>Trapezoid \\(CDEF\\) is similar to trapezoid \\(JKLM\\), such that \\(C\\), \\(D\\), \\(E\\), and \\(F\\) correspond to \\(J\\), \\(K\\), \\(L\\), and \\(M\\), respectively. The length of each side of trapezoid \\(JKLM\\) is \\(4\\) times the length of its corresponding side in trapezoid \\(CDEF\\). The measure of angle \\(C\\) is \\(42^\\circ\\). What is the measure of angle \\(J\\)?</p>",
+        "choices": [
+          "\\(38^\\circ\\)",
+          "\\(42^\\circ\\)",
+          "\\(46^\\circ\\)",
+          "\\(168^\\circ\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Similar figures / corresponding angles"
+      },
+      {
+        "stem": "<p>A robotic arm rotates through an angle \\(F\\) of \\(\\dfrac{\\pi}{15}\\) radians. Its control panel displays this rotation as \\(6n\\) degrees, where \\(n\\) is a constant. What is the value of \\(n\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "2",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Radian–degree conversion"
+      },
+      {
+        "stem": "<p>The table gives the average time \\(t\\), in minutes, it takes Adriana to travel a certain distance \\(d\\), in miles. Which equation could represent this linear relationship?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Distance (miles)</th><th>Average time (minutes)</th></tr></thead><tbody><tr><td>\\(0.18\\)</td><td>\\(9\\)</td></tr><tr><td>\\(0.24\\)</td><td>\\(12\\)</td></tr><tr><td>\\(0.36\\)</td><td>\\(18\\)</td></tr></tbody></table></div>",
+        "choices": [
+          "\\(t = 50d\\)",
+          "\\(t = \\dfrac{1}{2}d\\)",
+          "\\(t = 2d\\)",
+          "\\(t = \\dfrac{1}{50}d\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear relationship from table"
+      },
+      {
+        "stem": "<p>A wireless phone company pays customers for trading in old smartphones. The payment \\(p\\), in dollars, is the original retail price of a smartphone minus \\(&#36;135\\) for each year since the smartphone was released.</p>\n<p>Which equation represents this situation for a smartphone with an original retail price of \\(&#36;750\\) when it was released \\(t\\) years ago, where \\(t\\) is a whole number and \\(1 \\le t \\le 4\\)?</p>",
+        "choices": [
+          "\\(p = 135 - 750t\\)",
+          "\\(p = 750 - 135t\\)",
+          "\\(t = 135 - 750p\\)",
+          "\\(t = 750 - 135p\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear depreciation model"
+      },
+      {
+        "stem": "<p>A soccer team's goal is to earn at least \\(&#36;1,170\\) by selling coupon books. The team earns \\(&#36;9\\) from selling each coupon book. Which of the following inequalities describes all possible values for the number of coupon books, \\(n\\), the team can sell to meet the goal?</p>",
+        "choices": [
+          "\\(n + 9 \\le 1,170\\)",
+          "\\(n + 9 \\ge 1,170\\)",
+          "\\(9n \\le 1,170\\)",
+          "\\(9n \\ge 1,170\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear inequality word problem"
+      },
+      {
+        "stem": "<p>A car dealership has only sedans, SUVs, and minivans for sale. On Monday, \\(20\\%\\) of the vehicles for sale were sedans and \\(50\\%\\) were SUVs. If there were \\(62\\) sedans for sale at the dealership on Monday, how many minivans were for sale?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "93",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent composition / totals"
+      },
+      {
+        "stem": "<p>A snack company advertises that bags of pretzels produced by the company weigh, on average, \\(1\\) pound each.</p>\n<p>To test this, Sam selected at random \\(30\\) bags of pretzels produced by the company and weighed each bag.</p>\n<p>Based on his measurements, Sam estimated that for all bags of pretzels produced by the company, the average weight per bag is \\(1.02\\) pounds, with a margin of error of \\(0.05\\) pounds.</p>\n<p>For all bags of pretzels produced by the company, which of the following is the most appropriate conclusion about the average weight \\(w\\), in pounds, per bag?</p>",
+        "choices": [
+          "\\(w = 1.02\\)",
+          "\\(0.97 \\le w \\le 1.02\\)",
+          "\\(0.97 \\le w \\le 1.07\\)",
+          "\\(1.02 \\le w \\le 1.07\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Margin of error interval"
+      },
+      {
+        "stem": "<p>A total of \\(3\\) equilateral pentagons each have side length \\(p\\) units.</p>\n<p>A total of \\(2\\) squares each have side length \\(s\\) units.</p>\n<p>The sum of the perimeters of all these pentagons and squares is \\(136\\) units.</p>\n<p>Which equation represents this situation?</p>",
+        "choices": [
+          "\\(12p + 10s = 136\\)",
+          "\\(2p + 3s = 136\\)",
+          "\\(3p + 2s = 136\\)",
+          "\\(15p + 8s = 136\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Perimeter modeling"
+      },
+      {
+        "stem": "<p>A company conducted a study concerning the time spent on extracurricular activities by students in grades \\(6\\), \\(7\\), and \\(8\\) and their level of school spirit.</p>\n<p>A total of \\(80\\) students were selected at random from all students in grades \\(6\\), \\(7\\), and \\(8\\) in a large school district in the US.</p>\n<p>The selected students were asked to report their level of school spirit as either low, medium, or high.</p>\n<p>The table summarizes the distribution of the selected students by grade.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Grade</th><th>\\(6\\)</th><th>\\(7\\)</th><th>\\(8\\)</th></tr></thead><tbody><tr><td>Number of students</td><td>\\(26\\)</td><td>\\(25\\)</td><td>\\(29\\)</td></tr></tbody></table></div>\n<p>If the results of the study suggest a relationship between the self-reported level of school spirit and the amount of time spent on extracurricular activities by students in grades \\(6\\), \\(7\\), and \\(8\\), which of the following aspects of the study would prevent the results from being generalized to all students in grades \\(6\\), \\(7\\), and \\(8\\) in the US?</p>",
+        "choices": [
+          "The selected students are not all from the same school.",
+          "The number of selected students is too small.",
+          "The number of selected students from each grade is different.",
+          "The students were not selected at random from all students in grades \\(6\\), \\(7\\), and \\(8\\) in the US."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Sampling / generalizability"
+      },
+      {
+        "stem": "<p>For a study, a research team measured the heights of \\(240\\) king penguins from the Crozet Islands and \\(120\\) king penguins from the Falkland Islands.</p>\n<p>The research team determined that the mean height of the \\(240\\) king penguins from the Crozet Islands was \\(86\\) centimeters and the mean height of the \\(120\\) king penguins from the Falkland Islands was \\(92\\) centimeters.</p>\n<p>What was the mean height, in centimeters, of all \\(360\\) king penguins the research team measured for this study?</p>",
+        "choices": [
+          "\\(87\\)",
+          "\\(88\\)",
+          "\\(89\\)",
+          "\\(90\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Weighted mean"
+      },
+      {
+        "stem": "<p>At a nature preserve, a wildlife biologist counted bald eagles from an observation deck at the same time each day for \\(21\\) days.</p>\n<p>The table summarizes the resulting data set, data set \\(A\\).</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Number of bald eagles</th><th>Number of days</th></tr></thead><tbody><tr><td>\\(0\\)</td><td>\\(1\\)</td></tr><tr><td>\\(1\\)</td><td>\\(3\\)</td></tr><tr><td>\\(2\\)</td><td>\\(4\\)</td></tr><tr><td>\\(3\\)</td><td>\\(5\\)</td></tr><tr><td>\\(4\\)</td><td>\\(4\\)</td></tr><tr><td>\\(5\\)</td><td>\\(3\\)</td></tr><tr><td>\\(19\\)</td><td>\\(1\\)</td></tr></tbody></table></div>\n<p>The data value \\(19\\) was recorded in error and is removed from data set \\(A\\) to create data set \\(B\\), which consists of the remaining \\(20\\) data values.</p>\n<p>Which statement best compares the median of data set \\(A\\) and the median of data set \\(B\\)?</p>",
+        "choices": [
+          "The median of data set \\(B\\) is less than the median of data set \\(A\\).",
+          "The median of data set \\(B\\) is equal to the median of data set \\(A\\).",
+          "The median of data set \\(B\\) is greater than the median of data set \\(A\\).",
+          "There is not enough information to compare the medians of the two data sets."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Median after outlier removal"
+      },
+      {
+        "stem": "<p>The table shows the volume of two similar solids, right circular cylinder \\(A\\) and right circular cylinder \\(B\\).</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Right circular cylinder \\(A\\)</th><th>\\(392\\pi\\)</th></tr></thead><tbody><tr><td>Right circular cylinder \\(B\\)</td><td>\\(10,584\\pi\\)</td></tr></tbody></table></div>\n<p>The radius of right circular cylinder \\(A\\) is \\(7\\) units.</p>\n<p>The surface area of right circular cylinder \\(A\\) is \\(k\\pi\\) square units, and the surface area of right circular cylinder \\(B\\) is \\(n\\pi\\) square units, where \\(k\\) and \\(n\\) are constants.</p>\n<p>What is the value of \\(n - k\\)?</p>\n<p>(The surface area of a right circular cylinder with radius \\(r\\) and height \\(h\\) is \\(2\\pi r^{2} + 2\\pi rh\\).)</p>",
+        "choices": [
+          "\\(1008\\)",
+          "\\(1210\\)",
+          "\\(1680\\)",
+          "\\(2014\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Similar solids / surface area"
+      }
     ]
   },
   "placement": {

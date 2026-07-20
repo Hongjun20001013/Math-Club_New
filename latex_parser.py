@@ -569,10 +569,14 @@ def clean_latex_junk(text: str) -> str:
     text = _convert_align_blocks_to_display_math(text)
     # Normalize thousands separator style from 350{,}000 -> 350,000
     text = text.replace("{,}", ",")
+    # LaTeX thin/neg-thin space used as thousands separators (\! leaks outside math)
+    text = text.replace(r",\!", ",")
+    text = text.replace(r",\,", ",")
     text = text.replace(r"\%", "%")
     text = strip_document_noise(text)
     text = _normalize_arc_notation(text)
-    text = re.sub(r"\n+", "\n", text)
+    # Keep blank lines as paragraph breaks; only collapse runs of 3+ newlines.
+    text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
 
@@ -718,8 +722,26 @@ def _format_stem_html(text: str) -> str:
             html_parts.append(f"<p>{table_lines[0]}</p>")
             continue
 
-        html_parts.append(f"<p>{line}</p>")
+        # Soft line breaks in TeX are not new paragraphs — join consecutive
+        # plain lines so stems (esp. long word problems) stay compact.
+        para_chunks = [line]
         i += 1
+        while i < len(lines):
+            nxt = lines[i].strip()
+            if not nxt:
+                break
+            if (
+                nxt.startswith("<ul ")
+                or nxt.startswith("<ol ")
+                or nxt.startswith("<div ")
+                or nxt == r"\["
+                or "|" in nxt
+                or _contains_table_ampersand(nxt)
+            ):
+                break
+            para_chunks.append(nxt)
+            i += 1
+        html_parts.append(f"<p>{' '.join(para_chunks)}</p>")
 
     return "\n".join(html_parts)
 

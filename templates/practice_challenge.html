@@ -28,11 +28,11 @@
         {% if continue_set %}
         <a class="np-hard-hero-continue" href="{{ continue_set.href }}">
           {% if continue_set.progress_state == 'done' %}
-          View report · Hard Practice {{ continue_set.roman }}
+          View report · {{ continue_set.title }}
           {% elif continue_set.progress_state == 'progress' %}
-          Continue Hard Practice {{ continue_set.roman }} · {{ continue_set.answered }}/{{ continue_set.total }}
+          Continue {{ continue_set.title }} · {{ continue_set.answered }}/{{ continue_set.total }}
           {% else %}
-          Start Hard Practice {{ continue_set.roman }}
+          Start {{ continue_set.title }}
           {% endif %}
           <span aria-hidden="true">→</span>
         </a>
@@ -46,7 +46,7 @@
         </div>
         <em>{{ overall_pct }}% complete across all sets</em>
         {% if next_set and next_set.progress_state != 'done' %}
-        <p class="np-hard-progress-next">Up next: Hard Practice {{ next_set.roman }}</p>
+        <p class="np-hard-progress-next">Up next: {{ next_set.title }}</p>
         {% endif %}
       </aside>
     </section>
@@ -100,10 +100,10 @@
             data-quick-index="{{ set.index }}"
             data-set-number="{{ set.set_number }}"
             data-range="{{ set.range_bucket }}"
-            aria-label="Jump to Hard Practice {{ set.roman }}, {{ set.answered }} of {{ set.total }} answered"
+            aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
           >
-            <strong>{{ set.roman }}</strong>
-            <span>Practice {{ set.set_number }}</span>
+            <strong>{% if set.topic == 'hard_20' %}WP{% elif set.topic == 'hard_21' %}T1{% else %}{{ set.roman }}{% endif %}</strong>
+            <span>{% if set.topic == 'hard_20' %}Word Problem Training{% elif set.topic == 'hard_21' %}Test 1{% else %}Practice {{ set.set_number }}{% endif %}</span>
             <em>{{ set.answered }}/{{ set.total }} · {{ set.total }} Q</em>
           </button>
           {% endfor %}
@@ -128,6 +128,8 @@
               data-index="{{ set.index }}"
               data-set-number="{{ set.set_number }}"
               data-roman="{{ set.roman }}"
+              data-title="{{ set.title }}"
+              data-topic="{{ set.topic }}"
               data-state="{{ set.progress_state }}"
               data-range="{{ set.range_bucket }}"
               data-href="{{ set.href }}"
@@ -137,14 +139,15 @@
               data-answered="{{ set.answered }}"
               data-total="{{ set.total }}"
               data-progress="{{ set.progress_pct }}"
+              data-pace="{% if set.pace_training %}1:35 / question{% endif %}"
               {% if set.materials %}data-materials='{{ set.materials|tojson }}'{% endif %}
               role="option"
               aria-selected="false"
-              aria-label="Hard Practice {{ set.roman }}, set {{ set.index }}, {{ set.answered }} of {{ set.total }} answered"
+              aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
               style="--tile-progress: {{ set.progress_pct }}%;"
             >
-              <span class="np-hard-picker-roman">{{ set.roman }}</span>
-              <span class="np-hard-picker-num">Practice {{ set.set_number }} · {{ set.total }} Q</span>
+              <span class="np-hard-picker-roman">{% if set.topic == 'hard_20' %}WP{% elif set.topic == 'hard_21' %}T1{% else %}{{ set.roman }}{% endif %}</span>
+              <span class="np-hard-picker-num">{% if set.topic == 'hard_20' %}Word Problem Training · {{ set.total }} Q{% elif set.topic == 'hard_21' %}Test 1 · {{ set.total }} Q{% else %}Practice {{ set.set_number }} · {{ set.total }} Q{% endif %}</span>
               <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
               <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
             </button>
@@ -171,6 +174,7 @@
               <p class="np-hard-kicker" data-hard-detail-kicker>Practice 1</p>
               <h3 data-hard-detail-title>Practice 1</h3>
               <p data-hard-detail-subtitle>SAT Hard Question Set 1</p>
+              <p class="np-hard-detail-pace" data-hard-detail-pace hidden>Pace training · 1:35 per question</p>
             </div>
 
             <div class="np-hard-detail-stats">
@@ -228,6 +232,7 @@
   var kicker = library.querySelector("[data-hard-detail-kicker]");
   var title = library.querySelector("[data-hard-detail-title]");
   var subtitle = library.querySelector("[data-hard-detail-subtitle]");
+  var paceEl = library.querySelector("[data-hard-detail-pace]");
   var count = library.querySelector("[data-hard-detail-count]");
   var status = library.querySelector("[data-hard-detail-status]");
   var bar = library.querySelector("[data-hard-detail-bar]");
@@ -342,10 +347,24 @@
         detail.classList.remove("is-updating");
       }, 220);
     }
-    badge.textContent = roman;
-    kicker.textContent = "Practice " + roman;
-    title.textContent = "Hard Practice " + roman;
+    var setTitle = tile.getAttribute("data-title") || ("Hard Practice " + roman);
+    var topic = tile.getAttribute("data-topic") || "";
+    if (topic === "hard_20") badge.textContent = "WP";
+    else if (topic === "hard_21") badge.textContent = "T1";
+    else badge.textContent = roman;
+    kicker.textContent = setTitle;
+    title.textContent = setTitle;
     subtitle.textContent = tile.getAttribute("data-subtitle") || "";
+    var paceText = (tile.getAttribute("data-pace") || "").trim();
+    if (paceEl) {
+      if (paceText) {
+        paceEl.hidden = false;
+        paceEl.textContent = "Pace training · " + paceText;
+      } else {
+        paceEl.hidden = true;
+        paceEl.textContent = "";
+      }
+    }
     count.textContent = (tile.getAttribute("data-answered") || "0") + " / " + (tile.getAttribute("data-total") || "0");
     status.textContent = statusLabels[state] || "Not started";
     bar.style.width = progress + "%";
@@ -431,7 +450,7 @@
       var href = restartBtn.dataset.restartHref;
       if (!href) return;
       var label = activeTile
-        ? ("Hard Practice " + (activeTile.getAttribute("data-roman") || activeTile.getAttribute("data-index")))
+        ? (activeTile.getAttribute("data-title") || ("Hard Practice " + (activeTile.getAttribute("data-roman") || activeTile.getAttribute("data-index"))))
         : "this set";
       if (window.confirm("Restart " + label + "? Your current progress for this set will reset.")) {
         window.location.href = href;

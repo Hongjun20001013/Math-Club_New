@@ -1,0 +1,629 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\definecolor{purpleblue}{RGB}{80, 80, 180}
+\definecolor{novelPurple}{RGB}{98, 54, 255}
+\definecolor{softPurple}{RGB}{180, 170, 255}
+\definecolor{softGray}{RGB}{235, 235, 245}
+\definecolor{lightText}{RGB}{90, 90, 110}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\graphicspath{{static/course_materials/}{static/hard/}{./}}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamercolor{frametitle}{fg=white, bg=novelPurple}
+\setbeamercolor{title}{fg=white, bg=purpleblue}
+
+\title[Test 1]{\textbf{Test 1}}
+\author{\textbf{Jack Zeng}}
+\institute{\textcolor{white}{\textbf{Novel Prep}}}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vfill
+    \begin{flushright}
+        \textcolor{purpleblue}{\Huge \textbf{Novel Prep}}
+    \end{flushright}
+\end{frame}
+
+\begin{frame}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\Huge\bfseries\textcolor{purpleblue}{Novel Prep}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{Phase 3 · Mock Exam Training}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}
+\section{Test 1}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=softPurple, bottom color=softGray]
+            (current page.north west) rectangle (current page.south east);
+        \node[align=center] at (current page.center) {
+            {\LARGE\bfseries\textcolor{purpleblue}{Test 1}} \\[0.5cm]
+            {\Large\itshape\textcolor{lightText}{26 Module 2-style mock exam questions}}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% --- Question 1 ---
+\begin{frame}{Question 1}
+\small
+For the function $f$, for each increase in the value of $x$ by $c$, where $c$ is a positive constant, the value of $f(x)$ increases by a factor of $27$. Which of the following equivalent forms of the function $f$ displays $\frac{1}{c}$ as a coefficient of $x$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $f(x) = 54(3)^{\frac{1}{3}x}$
+    \item[B.] $f(x) = 54(3^3)^{\frac{1}{6}x}$
+    \item[C.] $f(x) = 54(9)^{\frac{1}{4}x}$
+    \item[D.] $f(x) = 54\left(27^{\frac{1}{3}x} \right)^{\frac{1}{2}}$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 1}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 2 ---
+\begin{frame}{Question 2}
+\small
+The composition of an animal is defined as the muscles, bones, and fat of the animal. A scientist studied the composition of one young swamp buffalo and determined the buffalo had $133$ kilograms of muscle, which made up approximately $65.9\%$ of its composition. Of the remaining composition of this buffalo, approximately $46.2\%$ was bone, and the remainder was fat. Based on these approximations, to the nearest tenth, how many kilograms of this buffalo's composition was bone?
+\end{frame}
+\begin{frame}{Answer 2}
+\small
+\textbf{Final Answer:} $\boxed{31.8}$
+\end{frame}
+
+% --- Question 3 ---
+\begin{frame}{Question 3}
+\small
+\[f(x) = 3(x-a)(x-b)(x-c)\]
+
+
+The function $f$ is defined by the given equation, where $a$, $b$, and $c$ are distinct constants. When $a < x < b$, the value of $f(x)$ is positive. The graph of $y = f(x)$ in the $xy$-plane contains the point $(r, s)$, where $r$ and $s$ are constants. If $s = 8$, which of the following could be true?
+
+\begin{itemize}
+\item[I.] $r < a$
+\item[II.] $b < r < c$
+\item[III.] $r > c$
+\end{itemize}
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] I only
+    \item[B.] III only
+    \item[C.] I and III only
+    \item[D.] II and III only
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 3}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 4 ---
+\begin{frame}{Question 4}
+\small
+In isosceles triangle $ABC$, sides $AB$ and $AC$ are congruent. Point $D$ divides side $BC$ such that the length of $\overline{BD}$ is $\dfrac{4}{7}$ of the length of $\overline{BC}$. Point $E$ lies on side $AB$ and point $F$ lies on side $AC$ such that when segments $\overline{DE}$ and $\overline{DF}$ are drawn, angle $\angle BED$ is congruent to angle $\angle CFD$. If the length of $\overline{BE}$ is $8$, what is the length of $\overline{CF}$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 6
+    \item[B.] 14
+    \item[C.] 32
+    \item[D.] 56
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 4}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 5 ---
+\begin{frame}{Question 5}
+\small
+The function $f$ is defined by the given equation: 
+\[
+f(x) = x^2 - 4x - 320
+\]
+Which of the following equivalent forms of the equation displays the minimum value of the function as a constant or coefficient?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $f(x) = x^2 - 4(x + 80)$
+    \item[B.] $f(x) = (x - 2)^2 + (-324)$
+    \item[C.] $f(x) = x(x - 4) + (-320)$
+    \item[D.] $f(x) = (x + 16)(x - 20)$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 5}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 6 ---
+\begin{frame}{Question 6}
+\small
+In the given equation, $s$ and $r$ are constants, and $s > 0$. If the equation has infinitely many solutions, what is the value of $s$?
+\[
+\frac{12x + 28}{4} - \frac{s}{13} = r(x - 8)
+\]
+\end{frame}
+\begin{frame}{Answer 6}
+\small
+\textbf{Final Answer:} $\boxed{403}$
+\end{frame}
+
+% --- Question 7 ---
+\begin{frame}{Question 7}
+\small
+The function $f$ is defined by $f(x) = -39^x$. The function $g$ is a decreasing linear function.  
+In the $xy$-plane, the graphs of $y = f(x)$ and $y = g(x)$ intersect at two points, $(h, j)$ and $(k, m)$, where $j > m$.  
+When $g(x) < f(x)$, which of the following must also be true?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $x > k$
+    \item[B.] $x < h$
+    \item[C.] $x > k$ or $x < h$
+    \item[D.] $h < x < k$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 7}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 8 ---
+\begin{frame}{Question 8}
+\small
+A circle in the $xy$-plane has its center at $(-7, 3)$ and has a radius of $9$.  
+An equation of this circle is $x^2 + y^2 + ax + by + c = 0$, where $a$, $b$, and $c$ are constants.  
+What is the value of $c$?
+\end{frame}
+\begin{frame}{Answer 8}
+\small
+\textbf{Final Answer:} $\boxed{-23}$
+\end{frame}
+
+% --- Question 9 ---
+\begin{frame}{Question 9}
+\small
+At different times on a certain day, a manager at a theme park recorded the number of visitors.  
+An exponential model gives the estimated number of visitors, $V$, at the theme park $t$ hours after the theme park opened, where $t \leq 3$.  
+Based on the model, 80 visitors were estimated to be at the theme park when it opened,  
+and every 30 minutes the estimated number of visitors increased by 150\% of the number 30 minutes earlier.  
+Which of the following equations best represents this model?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $V = 80(2.5)^{2t}$
+    \item[B.] $V = 80(2.5)^{\frac{t}{30}}$
+    \item[C.] $V = 80(1.5)^{2t}$
+    \item[D.] $V = 80(1.5)^{\frac{t}{30}}$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 9}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 10 ---
+\begin{frame}{Question 10}
+\small
+The function $m$ gives the predicted body mass $m(t)$, in kilograms (kg), of a male giraffe $t$ days after it was born in a wildlife reserve, where $t \leq 390$.  
+\[
+m(t) = -0.0274\left(\frac{t}{7}\right)^2 + 7.3873\left(\frac{t}{7}\right) + 75.032
+\]  
+Which of the following is the best interpretation of the statement “$m(370)$ is approximately equal to $389$” in this context?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The predicted body mass of a male giraffe was approximately 370 kg 389 days after it was born.
+    \item[B.] The predicted body mass of a male giraffe was approximately 389 kg 370 days after it was born.
+    \item[C.] The predicted body mass of a male giraffe was approximately 389 kg $\frac{370}{7}$ days after it was born.
+    \item[D.] The predicted body mass of a male giraffe was approximately $\frac{370}{7}$ kg 389 days after it was born.
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 10}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 11 ---
+\begin{frame}{Question 11}
+\small
+At a hotel, guests used the pool for a total of $t$ hours in March. At the same hotel, guests used the pool for $3.61t$ hours in April.  
+What is the percent increase in the number of hours guests used the pool from March to April?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $2.61\%$
+    \item[B.] $3.61\%$
+    \item[C.] $261\%$
+    \item[D.] $361\%$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 11}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 12 ---
+\begin{frame}{Question 12}
+\small
+For data set A, the table summarizes the distribution of the number of pieces of mail received by a business each day during a period of 11 days.
+
+\[
+\begin{array}{|c|c|}
+\hline
+\text{Pieces of mail} & \text{Days} \\
+\hline
+0 & 2 \\
+4 & 2 \\
+5 & 2 \\
+6 & 2 \\
+7 & 1 \\
+8 & 1 \\
+17 & 1 \\
+\hline
+\end{array}
+\]
+
+The data value $17$ is removed from data set A to create data set B, which consists of the remaining 10 data values.  
+Which statement best compares the median of data set A and the median of data set B?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The median of data set B is less than the median of data set A.
+    \item[B.] The median of data set B is greater than the median of data set A.
+    \item[C.] The median of data set B is equal to the median of data set A.
+    \item[D.] There is not enough information to compare the medians of the two data sets.
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 12}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 13 ---
+\begin{frame}{Question 13}
+\small
+Triangle $ABC$ is similar to triangle $DEF$, where $A$ corresponds to $D$ and $C$ corresponds to $F$.  
+Angles $C$ and $F$ are right angles.  
+If $\tan(A) = \sqrt{5}$ and $DF = 53$, what is the length of $DE$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $\dfrac{53\sqrt{3}}{5}$
+    \item[B.] $\dfrac{53\sqrt{3}}{2}$
+    \item[C.] $53\sqrt{6}$
+    \item[D.] $106$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 13}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 14 ---
+\begin{frame}{Question 14}
+\small
+A triangular pyramid has exactly six edges. Each of these edges is 96 centimeters long.  
+If the surface area of the pyramid is $k\sqrt{3}$ square centimeters, what is the value of $k$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 2304
+    \item[B.] 4608
+    \item[C.] 6912
+    \item[D.] 9216
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 14}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 15 ---
+\begin{frame}{Question 15}
+\small
+For the positive quantities $h$, $j$, and $k$, 44\% of $h$ is equivalent to 62\% of $j$, and $j$ is equivalent to 22\% of $k$.  
+What percentage of $k$ is $h$?  
+(Disregard the \% sign when entering your answer. For example, if your answer is 39\%, enter 39)
+\end{frame}
+\begin{frame}{Answer 15}
+\small
+\textbf{Final Answer:} $\boxed{31}$
+\end{frame}
+
+% --- Question 16 ---
+\begin{frame}{Question 16}
+\small
+A right circular cone has a volume of $34{,}496\pi$ cubic centimeters and the area of its base is $3{,}136\pi$ square centimeters.  
+What is the slant height, in centimeters, of this cone?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 11
+    \item[B.] 33
+    \item[C.] 56
+    \item[D.] 65
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 16}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 17 ---
+\begin{frame}{Question 17}
+\small
+A quadratic function models the height, in feet, of an object above the ground in terms of the time, in seconds, after the object was launched.  
+According to the model, the object was launched from a height of 0 feet and reached its maximum height of 400 feet 5 seconds after it was launched.  
+Based on the model, what was the height, in feet, of the object 9 seconds after it was launched?
+\end{frame}
+\begin{frame}{Answer 17}
+\small
+\textbf{Final Answer:} $\boxed{144}$
+\end{frame}
+
+% --- Question 18 ---
+\begin{frame}{Question 18}
+\small
+An environmental scientist is investigating the volatility of 175 organic compounds by finding the boiling point of each compound.  
+The mean boiling point of all 175 compounds is 167 degrees Celsius.  
+The scientist classifies each of these compounds as either semivolatile or volatile.  
+Of the 175 compounds, 50 compounds were classified as semivolatile, and these 50 compounds have a mean boiling point of 322 degrees Celsius.  
+The remaining 125 compounds were classified as volatile.  
+What is the mean boiling point, in degrees Celsius, of the 125 compounds classified as volatile compounds?
+\end{frame}
+\begin{frame}{Answer 18}
+\small
+\textbf{Final Answer:} $\boxed{105}$
+\end{frame}
+
+% --- Question 19 ---
+\begin{frame}{Question 19}
+\small
+A carpenter charges a flat rate of \$228 for the first 2 hours of work and \$95 for each additional hour of work.  
+Which equation gives the total amount $y$, in dollars, that the carpenter charges for $x$ hours of work, where $x > 2$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $y = 95x + 228$
+    \item[B.] $y = 228x + 418$
+    \item[C.] $y = 95x + 38$
+    \item[D.] $y = 228x + 95$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 19}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 20 ---
+\begin{frame}{Question 20}
+\small
+On a plot of land, 48.0\% of the square footage is farmland and the remaining square footage is pasture.  
+There are buildings on exactly 23.5\% of the square footage of the farmland, and there are buildings on exactly 16.0\% of the square footage of the pasture.  
+If there are buildings on exactly $p\%$ of the square footage of the plot of land, what is the value of $p$?
+\end{frame}
+\begin{frame}{Answer 20}
+\small
+\textbf{Final Answer:} $\boxed{19.6}$
+\end{frame}
+
+% --- Question 21 ---
+\begin{frame}{Question 21}
+\small
+A company developed a plan to set the selling price of a product.  
+The company determined that for a selling price of \$120.00, zero products would be sold.  
+For each \$2.50 decrease in the selling price, the number of products sold would increase by one.  
+For a revenue of exactly \$1,437.50, which of the following could be the number of products sold?  
+(revenue = price $\times$ number of products sold)
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 23
+    \item[B.] 24
+    \item[C.] 527
+    \item[D.] 1,440
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 21}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 22 ---
+\begin{frame}{Question 22}
+\small
+A circle in the $xy$-plane has its center at $(2, 9)$.  
+Line $t$ is tangent to this circle at the point $(a, -4)$, where $a$ is a constant.  
+The slope of line $t$ is $\frac{6}{5}$.  
+What is the value of $a$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $-\frac{68}{5}$
+    \item[B.] $-\frac{53}{6}$
+    \item[C.] $\frac{77}{6}$
+    \item[D.] $\frac{88}{5}$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 22}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 23 ---
+\begin{frame}{Question 23}
+\small
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = middle,
+    xlabel = {Company A ($x$)},
+    ylabel = {Company B ($y$)},
+    xmin=0, xmax=100,
+    ymin=0, ymax=60,
+    grid = both,
+    width=12cm,
+    height=8cm,
+    samples=100,
+    domain=0:100,
+    legend pos=north east,
+]
+\addplot[
+    thick,
+    black,
+]
+{(900 - 10*x)/18};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+The graph shows the relationship between the number of shares of stock from Company A, $x$,  
+and the number of shares of stock from Company B, $y$, that Sayen can purchase.  
+Which equation could represent this relationship?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] $y = 10x + 18$
+    \item[B.] $10x + 18y = 900$
+    \item[C.] $y = 18x + 10$
+    \item[D.] $18x + 10y = 900$
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 23}
+\small
+\textbf{Correct Answer:} B
+\end{frame}
+
+% --- Question 24 ---
+\begin{frame}{Question 24}
+\small
+The scatterplot shows data set $A$, which consists of the weights $y$, in pounds,  
+of a Labrador retriever puppy at various ages, $x$, in months.  
+The equation of a line of best fit for the relationship in data set $A$ can be written as  
+$y = -5.1 + 8.7x$, where $2 \leq x \leq 6$.
+
+
+
+
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines=middle,
+    xlabel={$x$ (months)},
+    ylabel={$y$ (pounds)},
+    xmin=0, xmax=10,
+    ymin=0, ymax=65,
+    xtick={0,2,3,4,5,6},
+    ytick={0,10,20,30,40,50},
+    grid=both,
+    legend pos=south east,
+    width=12cm,
+    height=8cm
+]
+
+
+
+
+
+% Original data points
+\addplot[
+    only marks,
+    mark=*,
+    mark size=2pt
+]
+coordinates {
+    (2, 12)
+    (3, 23)
+    (4, 27)
+    (5, 41)
+    (6, 45)
+};
+\addlegendentry{Data Set A}
+
+;
+
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+
+
+The puppy was weighed again at 9 months old and weighed 52 pounds.  
+Data set $B$ consists of all the data points in data set $A$ as well as the data point $(9, 52)$.  
+The equation of a line of best fit for data set $B$ can be written as $y = r + sx$,  
+where $r$ and $s$ are constants and $2 \leq x \leq 9$.  
+Assuming the equations of the lines of best fit are calculated in the same way,  
+which of the following is the best estimate for the value of $s$?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] 5.9
+    \item[B.] 8.7
+    \item[C.] 13.8
+    \item[D.] 17.7
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 24}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 25 ---
+\begin{frame}{Question 25}
+\small
+In the given equation, $b$ is an integer. The equation has no real solutions.  
+What is the least possible value of $b$?
+
+\[
+-x^2 + bx - 49 = 0
+\]
+\end{frame}
+\begin{frame}{Answer 25}
+\small
+\textbf{Final Answer:} $\boxed{-13}$
+\end{frame}
+
+% --- Question 26 ---
+\begin{frame}{Question 26}
+\small
+For a study, a group of gophers will be selected from a habitat consisting of 220 gophers, and a group of groundhogs will be selected from a habitat consisting of 200 groundhogs. Some of the gophers and groundhogs will be in a treatment group, and some of the gophers and groundhogs will be in a control group. Which of the following is necessary for this study to attempt to establish a cause-and-effect relationship between two variables?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] The number of gophers in the treatment group is equal to the number of groundhogs in the treatment group, and the number of gophers in the control group is equal to the number of groundhogs in the control group.
+    \item[B.] The gophers and the groundhogs are randomly selected from their respective habitats.
+    \item[C.] The gophers and the groundhogs are randomly assigned to the treatment and control groups.
+    \item[D.] The average age of the gophers in the treatment group is equal to the average age of the groundhogs in the treatment group, and the average age of the gophers in the control group is equal to the average age of the groundhogs in the control group.
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 26}
+\small
+\textbf{Correct Answer:} C
+\end{frame}
+
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \shade[top color=novelPurple!40, bottom color=white]
+            (current page.north west) rectangle (current page.south east);
+        \fill[white, opacity=0.15] (current page.center) circle (5cm);
+        \foreach \x in {1,2,3,4,5} {
+            \fill[novelPurple, opacity=0.12] (rand*10-5, rand*7-3.5) circle (0.1+\x*0.05);
+        }
+    \end{tikzpicture}
+    \centering
+    \vspace{5em}
+    {\Huge \textbf{\textcolor{novelPurple}{Thank You!}}} \\[1em]
+    {\large \textcolor{gray}{We appreciate your time and focus.}} \\[3em]
+    {\LARGE \textbf{\textcolor{novelPurple}{\textsf{Novel Prep}}}}
+    \vfill
+\end{frame}
+
+\end{document}

@@ -148,6 +148,8 @@ def preamble(set_num: int, short_title: str) -> str:
 \usepackage{{xcolor}}
 \usepackage{{tikz}}
 \usepackage{{amsmath}}
+\usepackage{{pgfplots}}
+\pgfplotsset{{compat=1.18}}
 
 \definecolor{{purpleblue}}{{RGB}}{{80, 80, 180}}
 \definecolor{{novelPurple}}{{RGB}}{{98, 54, 255}}
@@ -226,9 +228,32 @@ def build_set(set_num: int) -> str:
         )
 
     count = len(questions)
-    label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
-    short_title = f"SAT Hard Question {set_num}"
-    parts = [preamble(set_num, short_title).replace("{QUESTION_COUNT_LABEL}", label)]
+    if set_num == 20:
+        label = f"{count} word-problem training challenges"
+        short_title = "Word Problem Training"
+        intro_phase = "Phase 3 · Word Problem Training"
+        overview_title = "Word Problem Training"
+    elif set_num == 21:
+        label = f"{count} Module 2-style mock exam questions"
+        short_title = "Test 1"
+        intro_phase = "Phase 3 · Mock Exam Training"
+        overview_title = "Test 1"
+    else:
+        label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
+        short_title = f"SAT Hard Question {set_num}"
+        intro_phase = "Phase 2 · Hard Question Practice"
+        overview_title = f"Hard Question Set {set_num}"
+    use_phase3_title = set_num in {20, 21}
+    parts = [
+        preamble(set_num, short_title)
+        .replace("{QUESTION_COUNT_LABEL}", label)
+        .replace("Phase 2 · Hard Question Practice", intro_phase)
+        .replace(f"Hard Question Set {set_num}", overview_title)
+        .replace(
+            rf"\textbf{{SAT Hard Question\\ Set {set_num}}}",
+            rf"\textbf{{{overview_title}}}" if use_phase3_title else rf"\textbf{{SAT Hard Question\\ Set {set_num}}}",
+        )
+    ]
 
     for i, block in enumerate(questions, start=1):
         body = transform_question_body(block)
@@ -248,16 +273,16 @@ def build_set(set_num: int) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-16)")
-    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-16")
+    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-16,20,21)")
+    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-16, 20, and 21")
     args = parser.parse_args()
 
     if args.all:
-        sets = list(range(1, 17))
+        sets = list(range(1, 17)) + [20, 21]
     elif args.sets:
         sets = args.sets
     else:
-        sets = list(range(4, 17))
+        sets = list(range(4, 17)) + [20, 21]
 
     for n in sets:
         tex = build_set(n)

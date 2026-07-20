@@ -28,7 +28,7 @@
       <div class="np-cmx-hero__copy">
         <p class="np-cmx-brand">{{ site_brand_name }}</p>
         <h1 class="np-cmx-display">Course Materials</h1>
-        <p class="np-cmx-lede">{{ total_live }} live decks · cinematic phases · classroom ready</p>
+        <p class="np-cmx-lede">Phase 1 · 2 · 3 — {{ total_live }} live decks · classroom ready</p>
       </div>
       <div class="np-cmx-hero__stat np-cmx-hero__stat--inline" aria-label="Library stats">
         <div class="np-cmx-hero__stat-card"><strong>{{ total_live }}</strong><span>Live</span></div>
@@ -40,7 +40,7 @@
     <section class="np-cmx-pick" aria-labelledby="np-cmx-pick-title">
       <div class="np-cmx-pick__head">
         <h2 id="np-cmx-pick-title">Choose your phase</h2>
-        <p>Three portals. One teaching library.</p>
+        <p>Three portals. One luminous teaching library.</p>
       </div>
 
       <div class="np-cmx-trio" role="list">
@@ -66,11 +66,7 @@
               {% endif %}
             </div>
             <h3>{{ card.kicker }}</h3>
-            <p>
-              {% if card.phase == 1 %}Definitions, methods, and guided practice across Units 1–4.
-              {% elif card.phase == 2 %}Challenge sets with live classroom response tracking.
-              {% else %}Advanced review tracks — arriving soon.{% endif %}
-            </p>
+            <p>{{ card.description }}</p>
             <span class="np-cmx-card__cta">
               {% if card.ready_count %}Enter phase{% else %}Coming soon{% endif %}
               <em aria-hidden="true">→</em>
