@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-cm-answer-lock")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-random-test-adaptive")
 
 _DB_SCHEMA_READY = False
 
@@ -950,6 +950,25 @@ def init_db():
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_mistake_progress_learner "
         "ON mistake_learning_progress(learner_key)"
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS random_test_history (
+            learner_key TEXT NOT NULL,
+            item_id TEXT NOT NULL,
+            domain TEXT NOT NULL,
+            topic TEXT NOT NULL,
+            question_index INTEGER NOT NULL,
+            times_seen INTEGER NOT NULL DEFAULT 1,
+            last_is_correct INTEGER,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (learner_key, item_id)
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_random_test_history_learner "
+        "ON random_test_history(learner_key)"
     )
     db.execute(
         """
@@ -7183,6 +7202,22 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
     question_meta_cache: Dict[tuple[str, str], List[dict]] = {}
 
     def _question_meta(domain: str, topic: str, q_index: int) -> dict:
+        # Exam random-test / category exams store responses under exam_* domains
+        # with seed_/set_ topics — rebuild stems from the deterministic seed/set.
+        if str(domain).startswith("exam_"):
+            enrich = _exam_question_enrichment_map(str(domain), str(topic), {})
+            meta = enrich.get(int(q_index)) or {}
+            if meta:
+                return {
+                    "stem": meta.get("stem_html") or "",
+                    "choices": [],
+                    "question_kind": "mcq",
+                    "knowledge_section": meta.get("knowledge_section") or "",
+                    "knowledge_section_title_en": meta.get("knowledge_title_en") or "",
+                    "topic_detail": meta.get("topic_detail") or "",
+                    "hard_skill": meta.get("hard_skill") or "",
+                    "explanation_en": meta.get("explanation_en") or "",
+                }
         cache_key = (domain, topic)
         if cache_key not in question_meta_cache:
             tex_file = BANKS.get(domain, {}).get(topic)
@@ -9389,6 +9424,7 @@ def _hard_problem_exam_bank() -> list[dict]:
 
 
 def _balanced_random_module_items(source_items: list[dict], seed: str, module_id: int) -> list[dict]:
+    """Legacy seed-only picker (kept for old reports without module_ids)."""
     buckets: dict[str, list[dict]] = defaultdict(list)
     for item in source_items:
         buckets[_word_problem_unit_key(item)].append(item)
@@ -9421,6 +9457,223 @@ def _balanced_random_module_items(source_items: list[dict], seed: str, module_id
     return selected[:WORD_PROBLEM_SET_SIZE]
 
 
+def _random_test_item_lookup() -> dict[str, dict]:
+    cached = getattr(g, "_random_test_item_lookup", None)
+    if isinstance(cached, dict):
+        return cached
+    lookup: dict[str, dict] = {}
+    for item in _specialized_exam_bank() + _hard_problem_exam_bank():
+        lookup[str(item["id"])] = item
+    g._random_test_item_lookup = lookup
+    return lookup
+
+
+def _random_test_modules_from_ids(module_ids: dict[str, Any] | None) -> dict[int, list[dict]]:
+    lookup = _random_test_item_lookup()
+    out: dict[int, list[dict]] = {1: [], 2: []}
+    if not isinstance(module_ids, dict):
+        return out
+    for module_id in (1, 2):
+        raw = module_ids.get(str(module_id)) or module_ids.get(module_id) or []
+        if not isinstance(raw, list):
+            continue
+        for item_id in raw:
+            src = lookup.get(str(item_id))
+            if not src:
+                continue
+            copy_item = dict(src)
+            copy_item["module_id"] = module_id
+            copy_item["unit_key"] = _word_problem_unit_key(src)
+            out[module_id].append(copy_item)
+    return out
+
+
+def _random_test_priority_ids(learner_key: str, source_items: list[dict]) -> set[str]:
+    """Unresolved wrongs / open mistake slots that should reappear first."""
+    source_ids = {str(item["id"]) for item in source_items}
+    if not learner_key or not source_ids:
+        return set()
+    db = get_db()
+    priority: set[str] = set()
+    for row in db.execute(
+        """
+        SELECT domain, topic, question_index
+        FROM mistake_learning_progress
+        WHERE learner_key = ? AND status != 'mastered'
+        """,
+        (learner_key,),
+    ).fetchall():
+        item_id = f"{row['domain']}:{row['topic']}:{int(row['question_index'])}"
+        if item_id in source_ids:
+            priority.add(item_id)
+    for row in db.execute(
+        """
+        SELECT item_id
+        FROM random_test_history
+        WHERE learner_key = ?
+          AND (last_is_correct IS NULL OR last_is_correct = 0)
+        """,
+        (learner_key,),
+    ).fetchall():
+        item_id = str(row["item_id"] or "")
+        if item_id in source_ids:
+            priority.add(item_id)
+    return priority
+
+
+def _random_test_seen_correct_ids(learner_key: str, source_items: list[dict]) -> set[str]:
+    """Questions already shown and last answered correctly — skip next time unless still open."""
+    source_ids = {str(item["id"]) for item in source_items}
+    if not learner_key or not source_ids:
+        return set()
+    db = get_db()
+    open_ids = _random_test_priority_ids(learner_key, source_items)
+    seen_correct: set[str] = set()
+    for row in db.execute(
+        """
+        SELECT item_id
+        FROM random_test_history
+        WHERE learner_key = ? AND last_is_correct = 1
+        """,
+        (learner_key,),
+    ).fetchall():
+        item_id = str(row["item_id"] or "")
+        if item_id in source_ids and item_id not in open_ids:
+            seen_correct.add(item_id)
+    return seen_correct
+
+
+def _select_random_test_module_items(
+    source_items: list[dict],
+    seed: str,
+    module_id: int,
+    *,
+    learner_key: str = "",
+) -> list[dict]:
+    """Pick 22 items: open wrongs first, then never-seen, then recycle if needed."""
+    priority_ids = _random_test_priority_ids(learner_key, source_items) if learner_key else set()
+    exclude_ids = _random_test_seen_correct_ids(learner_key, source_items) if learner_key else set()
+
+    priority_items = [item for item in source_items if item["id"] in priority_ids]
+    fresh_items = [
+        item
+        for item in source_items
+        if item["id"] not in priority_ids and item["id"] not in exclude_ids
+    ]
+    recycle_items = [
+        item
+        for item in source_items
+        if item["id"] in exclude_ids and item["id"] not in priority_ids
+    ]
+
+    selected: list[dict] = []
+    selected_ids: set[str] = set()
+
+    def _take(pool: list[dict], n: int, salt: str) -> None:
+        if n <= 0 or not pool:
+            return
+        available = [item for item in pool if item["id"] not in selected_ids]
+        rng = random.Random(f"{seed}:module{module_id}:{salt}")
+        rng.shuffle(available)
+        for item in available[:n]:
+            copy_item = dict(item)
+            copy_item["module_id"] = module_id
+            copy_item["unit_key"] = _word_problem_unit_key(item)
+            selected.append(copy_item)
+            selected_ids.add(item["id"])
+
+    # 1) Unresolved wrongs / open misses always come first.
+    _take(priority_items, WORD_PROBLEM_SET_SIZE, "priority")
+
+    # 2) Fill remaining seats with unit balance from never-seen items.
+    buckets: dict[str, list[dict]] = defaultdict(list)
+    for item in fresh_items:
+        if item["id"] not in selected_ids:
+            buckets[_word_problem_unit_key(item)].append(item)
+    for unit_key, target in RANDOM_TEST_UNIT_TARGETS:
+        have = sum(1 for item in selected if item.get("unit_key") == unit_key)
+        need = max(0, target - have)
+        _take(buckets.get(unit_key) or [], need, f"fresh:{unit_key}")
+
+    if len(selected) < WORD_PROBLEM_SET_SIZE:
+        _take(fresh_items, WORD_PROBLEM_SET_SIZE - len(selected), "fresh-fill")
+
+    # 3) Only if the never-seen pool is exhausted, recycle previously correct items.
+    if len(selected) < WORD_PROBLEM_SET_SIZE:
+        recycle_buckets: dict[str, list[dict]] = defaultdict(list)
+        for item in recycle_items:
+            if item["id"] not in selected_ids:
+                recycle_buckets[_word_problem_unit_key(item)].append(item)
+        for unit_key, target in RANDOM_TEST_UNIT_TARGETS:
+            have = sum(1 for item in selected if item.get("unit_key") == unit_key)
+            need = max(0, target - have)
+            _take(recycle_buckets.get(unit_key) or [], need, f"recycle:{unit_key}")
+        if len(selected) < WORD_PROBLEM_SET_SIZE:
+            _take(recycle_items, WORD_PROBLEM_SET_SIZE - len(selected), "recycle-fill")
+
+    rng = random.Random(f"{seed}:module{module_id}:order")
+    rng.shuffle(selected)
+    return selected[:WORD_PROBLEM_SET_SIZE]
+
+
+def _record_random_test_item_outcome(
+    learner_key: str,
+    item: dict[str, Any],
+    *,
+    is_correct: bool | None,
+) -> None:
+    if not learner_key or not item:
+        return
+    item_id = str(item.get("id") or "")
+    domain = str(item.get("domain") or "")
+    topic = str(item.get("topic") or "")
+    try:
+        q_index = int(item.get("q_index"))
+    except (TypeError, ValueError):
+        return
+    if not item_id or not domain or not topic:
+        return
+    db = get_db()
+    correct_flag = None if is_correct is None else (1 if is_correct else 0)
+    db.execute(
+        """
+        INSERT INTO random_test_history
+            (learner_key, item_id, domain, topic, question_index, times_seen, last_is_correct, updated_at)
+        VALUES (?, ?, ?, ?, ?, 1, ?, datetime('now'))
+        ON CONFLICT(learner_key, item_id) DO UPDATE SET
+            times_seen = random_test_history.times_seen + 1,
+            last_is_correct = excluded.last_is_correct,
+            updated_at = datetime('now')
+        """,
+        (learner_key, item_id, domain, topic, q_index, correct_flag),
+    )
+    if is_correct is True:
+        _mistake_progress_on_correct(db, learner_key, domain, topic, q_index)
+    elif is_correct is False:
+        _mistake_progress_on_wrong(db, learner_key, domain, topic, q_index)
+    _safe_db_commit(db)
+
+
+def _record_random_test_session_history(
+    learner_key: str,
+    modules: dict[int, list[dict]],
+    answers: dict[str, Any],
+) -> None:
+    """Record unanswered selected items; answered items are stored on each submit."""
+    if not learner_key:
+        return
+    for module_id in (1, 2):
+        module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+        if not isinstance(module_answers, dict):
+            module_answers = {}
+        for idx, item in enumerate(modules.get(module_id) or []):
+            selected = str(module_answers.get(str(idx)) or "").strip()
+            if selected:
+                continue
+            # Appeared in the set but never answered → keep in the priority pool.
+            _record_random_test_item_outcome(learner_key, item, is_correct=None)
+
+
 def _random_test_seed() -> str:
     attempt = session.get(RANDOM_TEST_SESSION_KEY)
     if isinstance(attempt, dict) and attempt.get("seed"):
@@ -9443,7 +9696,50 @@ def _random_test_attempt() -> dict[str, Any]:
     return attempt
 
 
-def _random_test_modules(seed: str) -> dict[int, list[dict]]:
+def _random_test_ensure_module_snapshot(attempt: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Build adaptive Module 1/2 lists once per attempt and freeze them in session."""
+    attempt = attempt or _random_test_attempt()
+    seed = str(attempt.get("seed") or _random_test_seed())
+    existing = attempt.get("module_ids")
+    if isinstance(existing, dict) and existing.get("1") and existing.get("2"):
+        return attempt
+    learner_key = _learner_key()
+    modules = {
+        1: _select_random_test_module_items(
+            _specialized_exam_bank(), seed, 1, learner_key=learner_key
+        ),
+        2: _select_random_test_module_items(
+            _hard_problem_exam_bank(), seed, 2, learner_key=learner_key
+        ),
+    }
+    attempt["module_ids"] = {
+        "1": [item["id"] for item in modules[1]],
+        "2": [item["id"] for item in modules[2]],
+    }
+    attempt["seed"] = seed
+    session[RANDOM_TEST_SESSION_KEY] = attempt
+    session.modified = True
+    return attempt
+
+
+def _random_test_modules(
+    seed: str,
+    *,
+    module_ids: dict[str, Any] | None = None,
+    use_session_snapshot: bool = True,
+) -> dict[int, list[dict]]:
+    if module_ids:
+        return _random_test_modules_from_ids(module_ids)
+    if use_session_snapshot:
+        attempt = session.get(RANDOM_TEST_SESSION_KEY)
+        if isinstance(attempt, dict):
+            snap = attempt.get("module_ids")
+            if isinstance(snap, dict) and snap.get("1") and snap.get("2"):
+                return _random_test_modules_from_ids(snap)
+            if str(attempt.get("seed") or "") == str(seed):
+                attempt = _random_test_ensure_module_snapshot(attempt)
+                return _random_test_modules_from_ids(attempt.get("module_ids"))
+    # Legacy fallback for old reports that only stored a seed.
     return {
         1: _balanced_random_module_items(_specialized_exam_bank(), seed, 1),
         2: _balanced_random_module_items(_hard_problem_exam_bank(), seed, 2),
@@ -9783,6 +10079,7 @@ def practice_random_test_start():
     seed = str(random.randrange(10**9, 10**10))
     session[RANDOM_TEST_SESSION_KEY] = {"seed": seed, "answers": {}, "deadlines": {}}
     session.modified = True
+    _random_test_ensure_module_snapshot(session.get(RANDOM_TEST_SESSION_KEY))
     return redirect(url_for("practice_random_test_question", module_id=1, step=0))
 
 
@@ -9791,7 +10088,7 @@ def practice_random_test_question(module_id: int, step: int):
     session["active_track_label"] = "SAT Math"
     if module_id not in (1, 2):
         abort(404)
-    attempt = _random_test_attempt()
+    attempt = _random_test_ensure_module_snapshot(_random_test_attempt())
     modules = _random_test_modules(str(attempt["seed"]))
     items = modules[module_id]
     if not items:
@@ -9834,7 +10131,7 @@ def practice_random_test_question(module_id: int, step: int):
 def practice_random_test_submit(module_id: int):
     if module_id not in (1, 2):
         abort(404)
-    attempt = _random_test_attempt()
+    attempt = _random_test_ensure_module_snapshot(_random_test_attempt())
     modules = _random_test_modules(str(attempt["seed"]))
     total = len(modules[module_id])
     try:
@@ -9847,6 +10144,12 @@ def practice_random_test_submit(module_id: int):
         flash("Please select an answer before continuing.")
         return redirect(url_for("practice_random_test_question", module_id=module_id, step=step))
     _save_random_test_answer(module_id, step, raw_answer)
+    try:
+        item = modules[module_id][step]
+        is_correct = response_is_correct(item.get("q") or {}, raw_answer) is True
+        _record_random_test_item_outcome(_learner_key(), item, is_correct=is_correct)
+    except Exception:
+        app.logger.exception("random-test outcome record failed module=%s step=%s", module_id, step)
     if step >= total - 1:
         if module_id == 1:
             return redirect(url_for("practice_random_test_question", module_id=2, step=0))
@@ -9856,7 +10159,7 @@ def practice_random_test_submit(module_id: int):
 
 @app.route("/practice/exams/random-test/done")
 def practice_random_test_done():
-    attempt = _random_test_attempt()
+    attempt = _random_test_ensure_module_snapshot(_random_test_attempt())
     modules = _random_test_modules(str(attempt["seed"]))
     answers = attempt.get("answers", {})
     review: list[dict[str, Any]] = []
@@ -9926,15 +10229,24 @@ def practice_random_test_done():
     score_pct = round(100 * (score - 200) / 600) if score >= 200 else 0
     module_gap = abs(int(module_results[0]["correct"]) - int(module_results[1]["correct"])) if len(module_results) == 2 else 0
     score_band = "Advanced" if score >= 700 else ("On Track" if score >= 600 else ("Building" if score >= 500 else "Needs Focus"))
+    module_ids = attempt.get("module_ids") if isinstance(attempt.get("module_ids"), dict) else {
+        "1": [item.get("id") for item in modules.get(1) or []],
+        "2": [item.get("id") for item in modules.get(2) or []],
+    }
     exam_meta = {
         "category_slug": "random-test",
         "seed": str(attempt.get("seed") or ""),
+        "module_ids": module_ids,
         "score": score,
         "total_correct": total_correct,
         "total_questions": total_questions,
         "raw_accuracy": raw_accuracy,
         "score_band": score_band,
     }
+    try:
+        _record_random_test_session_history(_learner_key(), modules, answers)
+    except Exception:
+        app.logger.exception("random-test session history persist failed")
     session_summary_href = None
     uid = session.get("user_id")
     if uid:
@@ -12113,6 +12425,103 @@ def submit_practice_answer():
     return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
 
 
+def _exam_question_enrichment_map(
+    domain: str, topic: str, exam_meta: dict[str, Any] | None = None
+) -> dict[int, dict[str, Any]]:
+    """Rebuild exam question stems/metadata from seed or set id for reports."""
+    exam_meta = exam_meta or {}
+    out: dict[int, dict[str, Any]] = {}
+
+    if domain == "exam_random_test":
+        seed = str(exam_meta.get("seed") or "")
+        if not seed and str(topic).startswith("seed_"):
+            seed = str(topic)[5:]
+        module_ids = exam_meta.get("module_ids") if isinstance(exam_meta.get("module_ids"), dict) else None
+        if not seed and not module_ids:
+            return out
+        try:
+            modules = _random_test_modules(
+                seed or "0",
+                module_ids=module_ids,
+                use_session_snapshot=False,
+            )
+        except Exception:
+            app.logger.exception("random-test enrichment failed seed=%s", seed)
+            return out
+        for module_id, items in modules.items():
+            for idx, item in enumerate(items or []):
+                q = item.get("q") if isinstance(item, dict) else None
+                if not isinstance(q, dict):
+                    continue
+                qi = _random_test_question_index(int(module_id), idx)
+                out[qi] = {
+                    "stem_html": q.get("stem") or "",
+                    "explanation_en": q.get("explanation_en") or "",
+                    "knowledge_section": (
+                        q.get("knowledge_section")
+                        or item.get("unit_label")
+                        or item.get("unit_key")
+                        or ""
+                    ),
+                    "knowledge_title_en": (
+                        q.get("knowledge_section_title_en")
+                        or item.get("unit_title")
+                        or item.get("topic_title")
+                        or ""
+                    ),
+                    "topic_detail": q.get("topic_detail") or item.get("topic_title") or "",
+                    "hard_skill": q.get("hard_skill") or "",
+                    "review_href": url_for(
+                        "practice_random_test_question",
+                        module_id=int(module_id),
+                        step=idx,
+                    ),
+                }
+        return out
+
+    slug_by_domain = {
+        "exam_word_problems": "word-problems",
+        "exam_unit_bank": "unit-bank",
+    }
+    category_slug = str(exam_meta.get("category_slug") or "") or slug_by_domain.get(domain, "")
+    set_id = exam_meta.get("set_id")
+    if set_id is None and str(topic).startswith("set_"):
+        try:
+            set_id = int(str(topic)[4:])
+        except (TypeError, ValueError):
+            set_id = None
+    if not category_slug or set_id is None:
+        return out
+    try:
+        _, exam_set = _practice_exam_set_or_404(category_slug, int(set_id))
+    except Exception:
+        return out
+    for idx, item in enumerate(exam_set.get("items") or []):
+        q = item.get("q") if isinstance(item, dict) else None
+        if not isinstance(q, dict):
+            continue
+        out[idx] = {
+            "stem_html": q.get("stem") or "",
+            "explanation_en": q.get("explanation_en") or "",
+            "knowledge_section": q.get("knowledge_section") or item.get("unit_label") or "",
+            "knowledge_title_en": (
+                q.get("knowledge_section_title_en")
+                or item.get("unit_title")
+                or item.get("topic_title")
+                or ""
+            ),
+            "topic_detail": q.get("topic_detail") or item.get("topic_title") or "",
+            "hard_skill": q.get("hard_skill") or "",
+            "review_href": url_for(
+                "practice_exam_question",
+                category_slug=category_slug,
+                set_id=int(set_id),
+                step=idx,
+            ),
+        }
+    return out
+
+
 def _exam_session_summary_payload(
     attempt_id: int, att: sqlite3.Row, db: sqlite3.Connection
 ) -> dict[str, Any]:
@@ -12159,6 +12568,7 @@ def _exam_session_summary_payload(
         if end_raw is not None:
             duration_seconds = max(0, int(end_raw) - start_s)
 
+    enrich_map = _exam_question_enrichment_map(domain, topic, exam_meta)
     rows_out: List[dict] = []
     correct_count = 0
     for r in resp_rows:
@@ -12173,35 +12583,51 @@ def _exam_session_summary_payload(
             status = "incorrect"
         else:
             status = "nocheck"
+        meta = enrich_map.get(qi) or {}
         rows_out.append(
             {
                 "q_index": qi,
                 "q_display": str(qi + 1),
                 "session_q": str(len(rows_out) + 1),
                 "row_id": f"summary-q-{qi}",
-                "knowledge_section": "—",
-                "knowledge_title_en": "",
-                "topic_detail": "",
-                "hard_skill": "",
+                "knowledge_section": meta.get("knowledge_section") or "—",
+                "knowledge_title_en": meta.get("knowledge_title_en") or "",
+                "topic_detail": meta.get("topic_detail") or "",
+                "hard_skill": meta.get("hard_skill") or "",
                 "yours_display": yours_raw or "—",
                 "key_display": key_display,
                 "status": status,
-                "explanation_en": "",
-                "review_href": None,
+                "stem_html": meta.get("stem_html") or "",
+                "explanation_en": meta.get("explanation_en") or "",
+                "review_href": meta.get("review_href"),
             }
         )
 
     total_q = len(rows_out)
-    if exam_meta.get("total"):
+    if exam_meta.get("total_questions") is not None:
+        total_q = max(total_q, int(exam_meta["total_questions"]))
+    elif exam_meta.get("total") is not None:
         total_q = max(total_q, int(exam_meta["total"]))
     if exam_meta.get("total_correct") is not None:
         correct_count = int(exam_meta["total_correct"])
     elif exam_meta.get("correct") is not None:
         correct_count = int(exam_meta["correct"])
-    score_pct = round(100.0 * correct_count / total_q) if total_q else 0
+    if exam_meta.get("raw_accuracy") is not None:
+        score_pct = int(exam_meta["raw_accuracy"])
+    elif exam_meta.get("accuracy") is not None:
+        score_pct = int(exam_meta["accuracy"])
+    else:
+        score_pct = round(100.0 * correct_count / total_q) if total_q else 0
     topic_title = _exam_attempt_label(domain, topic, att["exam_meta_json"] if "exam_meta_json" in att.keys() else None)
     skipped_count = sum(1 for row in rows_out if row["status"] == "skipped")
     mistake_focus = [row for row in rows_out if row["status"] == "incorrect"]
+
+    exam_sat_score = None
+    try:
+        if exam_meta.get("score") is not None:
+            exam_sat_score = int(exam_meta["score"])
+    except (TypeError, ValueError):
+        exam_sat_score = None
 
     render = {
         "domain": domain,
@@ -12233,6 +12659,8 @@ def _exam_session_summary_payload(
         "miss_quiz_all_is_module": False,
         "is_exam_summary": True,
         "exam_meta": exam_meta,
+        "exam_sat_score": exam_sat_score,
+        "phase3_sat": None,
     }
     return {"render": render, "pdf_ctx": render}
 
@@ -12596,6 +13024,9 @@ def _practice_session_summary_payload(
         "miss_quiz_all_count": miss_quiz_all_count,
         "miss_quiz_all_is_module": miss_quiz_all_is_module,
         "phase3_sat": phase3_sat,
+        "exam_sat_score": None,
+        "exam_meta": None,
+        "is_exam_summary": False,
     }
     pdf_ctx = {
         "rows": rows_out,

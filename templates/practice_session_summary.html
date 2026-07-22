@@ -82,6 +82,15 @@
               {% if phase3_sat.module1_wrong %}({{ phase3_sat.module1_wrong }} inferred wrong){% else %}(all correct){% endif %}
             </p>
           </div>
+          {% elif exam_sat_score %}
+          <div class="np-summary-sat-score" style="margin-top:1rem;padding:0.85rem 1rem;border-radius:16px;background:linear-gradient(135deg,rgba(91,77,255,0.12),rgba(255,255,255,0.9));border:1px solid rgba(91,77,255,0.18);">
+            <p style="margin:0;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#5f3df5;">Estimated SAT Math</p>
+            <p style="margin:0.35rem 0 0;font-size:1.85rem;font-weight:800;line-height:1;color:#2d2657;">{{ exam_sat_score }}<span style="font-size:0.95rem;font-weight:600;color:#6b6588;"> / 800</span></p>
+            <p style="margin:0.45rem 0 0;font-size:0.82rem;color:#5a5470;line-height:1.4;">
+              Raw: {{ correct_count }}/{{ total_q }} correct · {{ score_pct }}% accuracy
+              {% if exam_meta and exam_meta.score_band %} · {{ exam_meta.score_band }}{% endif %}
+            </p>
+          </div>
           {% endif %}
         </div>
         </div>
@@ -247,7 +256,12 @@
       <div>
         <p class="np-mistake-debrief-kicker">After this set</p>
         <h2 class="np-mistake-debrief-title">Mistakes to review</h2>
-        <p class="np-mistake-debrief-sub">{{ mistake_focus | length }} item(s) missed. Open the coach note, or start a <strong>miss quiz</strong> above for instant feedback on each redo.</p>
+        <p class="np-mistake-debrief-sub">
+          {{ mistake_focus | length }} item(s) missed
+          {% if score_pct is not none %} · session accuracy <strong>{{ score_pct }}%</strong> ({{ correct_count }}/{{ total_q }}){% endif %}
+          {% if exam_sat_score %} · estimated SAT <strong>{{ exam_sat_score }}/800</strong>{% endif %}.
+          Open the coach note, or start a <strong>miss quiz</strong> above for instant feedback on each redo.
+        </p>
       </div>
       <div class="np-mistake-debrief-actions">
         <a href="{{ url_for('practice_analytics') }}" class="np-mistake-debrief-analytics">Mistake analytics</a>
@@ -272,7 +286,11 @@
           <span class="np-mistake-card-sep">·</span>
           <span>Correct: <strong>{{ m.key_display }}</strong></span>
         </div>
+        {% if m.stem_html %}
         <div class="np-mistake-card-stem question-panel">{{ m.stem_html | safe }}</div>
+        {% else %}
+        <div class="np-mistake-card-stem np-mistake-card-stem--empty question-panel"><p class="np-mistake-stem-missing">Question text unavailable for this item.</p></div>
+        {% endif %}
         {% if m.explanation_en %}
         <details class="np-explain-details np-mistake-card-explain">
           <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>
