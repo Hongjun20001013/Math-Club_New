@@ -3,6 +3,8 @@
 \usepackage{xcolor}
 \usepackage{tikz}
 \usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 \definecolor{purpleblue}{RGB}{80, 80, 180}
 \definecolor{novelPurple}{RGB}{98, 54, 255}
@@ -56,7 +58,7 @@
             (current page.north west) rectangle (current page.south east);
         \node[align=center] at (current page.center) {
             {\LARGE\bfseries\textcolor{purpleblue}{Word Problem Training}} \\[0.5cm]
-            {\Large\itshape\textcolor{lightText}{19 word-problem training challenges}}
+            {\Large\itshape\textcolor{lightText}{22 word-problem training challenges}}
         };
     \end{tikzpicture}
 \end{frame}
@@ -430,6 +432,57 @@ What is the value of \(n - k\)?
 \begin{frame}{Answer 19}
 \small
 \textbf{Correct Answer:} C
+\end{frame}
+
+% --- Question 20 ---
+\begin{frame}{Question 20}
+\small
+A certain investment account offers a special interest rate for the first \(4\) months the account is open followed by a lower interest rate for the remainder of the time the account is open. Bennett opened one of these accounts with an original account balance of \$700 and did not make any other deposits or withdrawals. \(4\) months after Bennett opened the account, the balance had increased by \(0.6\%\) of the original balance. \(6\) months after Bennett opened the account, the balance had increased by an additional \(0.2\%\) of the balance at the end of the first \(4\) months. Every \(2\) months after the first \(6\) months, the balance had increased by an additional \(0.2\%\) of the balance \(2\) months before. Which of the following equations could represent the account balance \(B(x)\), in dollars, \(x\) months after the account was opened, where \(x \ge 4\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(B(x) = 704.20(1 + 0.002)^{\frac{x}{2} - \frac{4}{2}}\)
+    \item[B.] \(B(x) = 704.20(1 + 0.002)^{\frac{x}{2} - 4}\)
+    \item[C.] \(B(x) = 704.20(1 + 0.002)^{2x - 8}\)
+    \item[D.] \(B(x) = 704.20(1 + 0.002)^{2x - 4}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 20}
+\small
+\textbf{Correct Answer:} A
+\end{frame}
+
+% --- Question 21 ---
+\begin{frame}{Question 21}
+\small
+In an architecture elective, students study a triangular support panel used on a small footbridge. On the scale drawing, the panel is labeled as triangle \(JKL\), with vertex \(J\) at the top joint and vertices \(K\) and \(L\) along the base of the panel. The teacher gives the class the angle measures from the drawing: the measure of angle \(J\) is \(90b^{\circ}\), the measure of angle \(K\) is \(66a^{\circ}\), and the measure of angle \(L\) is \(24a^{\circ}\), where \(a\) and \(b\) are constants. Before the students calculate any side lengths for a load estimate, they are asked which comparison of \(\cos L\) and \(\sin K\) must be true based only on this information.
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\cos L > \sin K\)
+    \item[B.] \(\cos L = \sin K\)
+    \item[C.] \(\cos L < \sin K\)
+    \item[D.] There is not enough information to compare the values of \(\cos L\) and \(\sin K\).
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 21}
+\small
+\textbf{Correct Answer:} D
+\end{frame}
+
+% --- Question 22 ---
+\begin{frame}{Question 22}
+\small
+A chemistry lab uses two related formulas when converting a sensor reading into a calibrated output. For a positive constant \(p\) that depends on the sensor model, the intermediate reading is given by the function \(j\) defined by \(j(x) = \dfrac{4x + 2}{9p}\), and the calibrated output is given by the function \(k\) defined by \(k(x) = \dfrac{j(x) \cdot p}{x + 1}\). During one trial, the lab records an input value of \(x = 3\). What is the value of \(k(3)\)?
+\vspace{0.35cm}
+\begin{enumerate}
+    \item[A.] \(\dfrac{7}{18}\)
+    \item[B.] \(\dfrac{4}{9}\)
+    \item[C.] \(\dfrac{14}{13}\)
+    \item[D.] \(\dfrac{10}{9}\)
+\end{enumerate}
+\end{frame}
+\begin{frame}{Answer 22}
+\small
+\textbf{Correct Answer:} A
 \end{frame}
 
 \begin{frame}{}

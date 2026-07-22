@@ -4837,6 +4837,9 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "B"},
         {"correct_answer": "C"},
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
     ],
     "hard_21": [
         {"correct_answer": "B"},

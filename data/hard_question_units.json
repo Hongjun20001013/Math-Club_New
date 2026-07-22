@@ -228,7 +228,10 @@
     {"unit": "U3", "skill": "Sampling / generalizability"},
     {"unit": "U3", "skill": "Weighted mean"},
     {"unit": "U3", "skill": "Median after outlier removal"},
-    {"unit": "U4", "skill": "Similar solids / surface area"}
+    {"unit": "U4", "skill": "Similar solids / surface area"},
+    {"unit": "U2", "skill": "Exponential growth / compound interest model"},
+    {"unit": "U4", "skill": "Triangle angles / sine-cosine comparison"},
+    {"unit": "U2", "skill": "Rational function composition / evaluation"}
   ],
   "hard_21": [
     {"unit": "U2", "skill": "Exponential form / growth factor"},
