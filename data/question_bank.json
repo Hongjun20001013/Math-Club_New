@@ -16508,6 +16508,283 @@
         "knowledge_section_title_en": "Problem Solving & Data",
         "hard_skill": "Experimental design / random assignment"
       }
+    ],
+    "hard_22": [
+      {
+        "stem": "<p>A packaging engineer is optimizing a cardboard sleeve whose width profile is modeled by the quadratic expression \\(ax^2 + 176x + c\\), where \\(a\\) and \\(c\\) are positive constants. If \\(px + q\\) is a factor of the expression,</p>\n<div class=\"stem-math-block\">\\[\nax^2 + 176x + c = (px + q)(rx + s),\n\\]</div>\n<p>where \\(p\\) and \\(q\\) are positive constants, what is the greatest possible value of \\(ac\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "7744",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic factoring / maximize product"
+      },
+      {
+        "stem": "<p>A signal-processing filter uses a polynomial in the variable \\(z^9\\) to tune resonance. In the given expression,</p>\n<div class=\"stem-math-block\">\\[\n34z^{18} + b z^9 + 30,\n\\]</div>\n<p>\\(b\\) is a positive integer. If \\(qz^9 + r\\) is a factor of the expression, where \\(q\\) and \\(r\\) are positive integers, what is the greatest possible value of \\(b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "1021",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Polynomial factoring / maximize middle"
+      },
+      {
+        "stem": "<p>An optics lab rewrites a focusing model into paired quadratic factors in \\(x^2\\). The expression</p>\n<div class=\"stem-math-block\">\\[\n6x^4 + 17x^2 + 7\n\\]</div>\n<p>can be rewritten as \\((3x^2 + a)(2x^2 + b)\\), where \\(a\\) and \\(b\\) are positive integers, or as \\((3x^2 + c)(2x^2 + d)\\), where \\(c\\) and \\(d\\) are positive non-integers.</p>\n<p>What is the value of \\(a + c\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "17/2",
+        "answer_alternates": [
+          "8.5"
+        ],
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Biquadratic factoring"
+      },
+      {
+        "stem": "<p>A materials scientist factors a stiffness polynomial before running a simulation. The given quadratic function</p>\n<div class=\"stem-math-block\">\\[\n54x^4 + 219x^2 + 105\n\\]</div>\n<p>has factors in the form \\((k)(ax^2 + b)(cx^2 + d)\\). If \\(a, b, c, d, k\\) are integers, what is the smallest possible value of \\(ab\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "14",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Polynomial factoring / minimize product"
+      },
+      {
+        "stem": "<p>A drone’s altitude path over a short flight is modeled by a parabola in the \\(xy\\)-plane. The equation of a parabola is written in the form</p>\n<div class=\"stem-math-block\">\\[\ny = ax^2 + bx + c,\n\\]</div>\n<p>where \\(a, b, c\\) are constants. When graphed in the \\(xy\\)-plane, the parabola has vertex \\((-1, 4)\\) and does not intersect the \\(x\\)-axis. Which of the following could be the value of \\(a - b - c\\)?</p>",
+        "choices": [
+          "\\(2\\)",
+          "\\(4\\)",
+          "\\(-1\\)",
+          "\\(-6\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Parabola vertex / no real roots"
+      },
+      {
+        "stem": "<p>A fountain’s water arc is modeled by a downward-opening quadratic with vertex \\((1, 32)\\). A quadratic function with vertex \\((1, 32)\\) can be written as</p>\n<div class=\"stem-math-block\">\\[\n-ax^2 + bx + c \\quad (a, b, c \\text{ are all positive integers}).\n\\]</div>\n<p>What is the maximum value of \\(b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "62",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic vertex / maximize coefficient"
+      },
+      {
+        "stem": "<p>A robotics team measures that a test cart’s speed is increasing at a rate of \\(7.7\\ \\text{meters per second squared}\\). What is this rate in miles per minute squared, rounded to the nearest tenth? (Use \\(1\\ \\text{mile} = 1609\\ \\text{meters}\\).)</p>",
+        "choices": [
+          "\\(0.3\\)",
+          "\\(17.2\\)",
+          "\\(206.5\\)",
+          "\\(209\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Unit conversion / acceleration"
+      },
+      {
+        "stem": "<p>A bacteria culture in a bioreactor is modeled by an exponential growth function. The function \\(f\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nf(x) = ab^{x/n},\n\\]</div>\n<p>where \\(a, b, n\\) are constants, and \\(b, n\\) are integers. If \\(f(2) = 6\\) and \\(f(4) = 150\\), what is the value of \\(f(5)\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "750",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential evaluation"
+      },
+      {
+        "stem": "<p>A roller-coaster design uses a parabolic track segment \\(y = f(x)\\). The graph of \\(y = f(x)\\) in the \\(xy\\)-plane has a vertex at \\((4, -7)\\), contains the point \\((3, -9)\\), and has a \\(y\\)-intercept at \\((0, a)\\). The graph of \\(y = 6 \\cdot f(x)\\) has a \\(y\\)-intercept at \\((0, b)\\). What is the positive difference between \\(a\\) and \\(b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "195",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Parabola transformation / intercepts"
+      },
+      {
+        "stem": "<p>An economist fits a quadratic revenue model \\(y = f(x)\\) that breaks even at two production levels. The function \\(f\\) is defined by</p>\n<div class=\"stem-math-block\">\\[\nf(x) = ax^2 + bx + c,\n\\]</div>\n<p>where \\(a, b, c\\) are constants. The graph of \\(y = f(x)\\) passes through the points \\((9, 0)\\) and \\((-2, 0)\\). If \\(a\\) is an integer greater than 1, which of the following could be the value of \\(a + b\\)?</p>",
+        "choices": [
+          "\\(8\\)",
+          "\\(7\\)",
+          "\\(-6\\)",
+          "\\(-12\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic from roots"
+      },
+      {
+        "stem": "<p>A bridge support cable clearance is checked using polynomial factors in \\(x\\). Which of the following expressions has a factor of \\(x + 2b\\), where \\(b\\) is a positive integer constant?</p>",
+        "choices": [
+          "\\(3x^2 + 7x + 14b\\)",
+          "\\(3x^2 + 22x + 14b\\)",
+          "\\(3x^2 + 30x + 14b\\)",
+          "\\(3x^2 + 37x + 14b\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Polynomial factor test"
+      },
+      {
+        "stem": "<p>A survey crew measures a triangular lot \\(XYZ\\) for a small park. In triangle \\(XYZ\\), the measure of angle \\(Y\\) is \\(38^\\circ\\). The length of \\(XY\\) is 12 meters, and the length of \\(YZ\\) is 5 meters. What is the area, in square meters, of triangle \\(XYZ\\)?</p>",
+        "choices": [
+          "\\(30\\)",
+          "\\(60\\)",
+          "\\(30 \\sin 38^\\circ\\)",
+          "\\(60 \\sin 38^\\circ\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Triangle area / sine"
+      },
+      {
+        "stem": "<p>A quality team selects two random samples to estimate the average lifespan of a street-lamp bulb (in hours). Based on the first sample, the estimated average lifespan is 800 hours, with a margin of error of 20 hours.</p>\n<p>Based on the second sample, the estimated average lifespan is 810 hours, with a margin of error of 35 hours.</p>\n<p>Assuming the margins of error were calculated in the same way, which of the following best explains why the first sample obtained a smaller margin of error than the second sample?</p>",
+        "choices": [
+          "The first sample contained fewer light bulbs than the second sample.",
+          "The first sample contained more light bulbs than the second sample.",
+          "The first sample had a shorter average lifespan than the second sample.",
+          "The first sample had a longer average lifespan than the second sample."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Margin of error / sample size"
+      },
+      {
+        "stem": "<p>A vibration model for a machine mount is given by a quartic that is written in shifted form. The function \\(p(x)\\) is defined by:</p>\n<div class=\"stem-math-block\">\\[\np(x) = a((x - 3)^2 + b)((x - 3)^2 - c),\n\\]</div>\n<p>where \\(a, b,\\) and \\(c\\) are constants. The graph of \\(y = p(x)\\) passes through the points \\((1, 25)\\) and \\((-1, 52)\\).</p>\n<p>What is the value of \\(p(5) + p(7)\\)?</p>",
+        "choices": [
+          "\\(25\\)",
+          "\\(27\\)",
+          "\\(52\\)",
+          "\\(77\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Even function symmetry / evaluation"
+      },
+      {
+        "stem": "<p>A savings balance is modeled by an exponential function of time. In the given function, \\(b\\) is a positive constant. For every increase in the value of \\(x\\) by 1, the value of \\(f(x)\\) increases by \\(c\\%\\), where \\(0 \\lt  c \\lt  100\\).</p>\n<p>Which expression gives the value of \\(c\\) in terms of \\(b\\)?</p>\n<div class=\"stem-math-block\">\\[\nf(x) = 66(b)^x\n\\]</div>",
+        "choices": [
+          "\\(1 + \\dfrac{b}{100}\\)",
+          "\\(b + 100\\)",
+          "\\(100(b + 1)\\)",
+          "\\(100(b - 1)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential percent growth"
+      },
+      {
+        "stem": "<p>A park service tracks the average growth of a young oak. On average, a certain tree grows 87 centimeters every \\(m\\) months. At this rate, which expression represents the number of centimeters, on average, the tree grows every \\(k\\) years?</p>",
+        "choices": [
+          "\\(\\dfrac{29m}{4k}\\)",
+          "\\(\\dfrac{29k}{4m}\\)",
+          "\\(\\dfrac{1044m}{k}\\)",
+          "\\(\\dfrac{1044k}{m}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Rate conversion / growth"
+      },
+      {
+        "stem": "<p>A circular plaza is being surveyed. In the figure shown, points \\(A\\), \\(B\\), \\(C\\), and \\(E\\) lie on the circle, and \\(AB \\lt  BC\\). Angle \\(ABC\\) is a right angle, segment \\(AC\\) is a diameter of the circle, and segment \\(AC\\) is perpendicular to segment \\(BE\\) at point \\(D\\). Also, \\(BD = \\sqrt{346}\\). The diameter of the circle is 175. If \\(\\dfrac{CD}{AD} = r\\), what is the value of \\(r\\)?</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_22_f2.png\" alt=\"\" loading=\"lazy\" /></p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "86.5",
+        "answer_alternates": [
+          "173/2",
+          "86.50"
+        ],
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Circle diameter / intersecting chords"
+      },
+      {
+        "stem": "<p>An engineer solves a timing equation before calibrating two sensors. In the given equation, \\(a\\) and \\(k\\) are constants, where \\(k > 5a\\). The sum of the solutions to the equation is \\(3k + 32\\). What is the value of \\(a\\)?</p>\n<div class=\"stem-math-block\">\\[\n(x - k)^2 = (k - 5a)(x - k)\n\\]</div>",
+        "choices": [
+          "\\(-\\dfrac{32}{5}\\)",
+          "\\(\\dfrac{32}{5}\\)",
+          "\\(-\\dfrac{5}{32}\\)",
+          "\\(\\dfrac{5}{32}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic equation / sum of solutions"
+      },
+      {
+        "stem": "<p>A lab predicts bacteria population (in thousands) with an exponential model. The equation \\(N(m) = 63(Q)^{m/6}\\) gives the predicted population \\(N(m)\\), in thousands, of a certain bacteria colony \\(m\\) minutes after the initial measurement, where \\(Q\\) is a constant greater than 1. The predicted population increases by \\(p\\%\\) every 180 seconds.</p>\n<p>What is the value of \\(p\\) in terms of \\(Q\\)?</p>",
+        "choices": [
+          "\\(100(Q^{30} - 1)\\)",
+          "\\(100(Q^{\\frac{1}{2}} - 1)\\)",
+          "\\(100(Q^{30} + 1)\\)",
+          "\\(100(Q^{1.5} + 1)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential percent in terms of base"
+      },
+      {
+        "stem": "<p>A logistics planner solves an equation whose solutions represent two delivery windows. In the given equation, \\(m\\) and \\(n\\) are constants. The sum and product of the solutions of the equation are 8 and \\(\\dfrac{7}{2}\\), respectively.</p>\n<p>What is the value of \\(\\dfrac{m}{n}\\)?</p>\n<div class=\"stem-math-block\">\\[\n(x - m)^2 = (m + 2n)(2x - n)\n\\]</div>",
+        "choices": [
+          "\\(-\\dfrac{1}{3}\\)",
+          "\\(\\dfrac{1}{3}\\)",
+          "\\(-3\\)",
+          "\\(3\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic sum and product"
+      },
+      {
+        "stem": "<p>A landscaping crew is staining a yard fence and must buy enough product for two coats. One gallon of stain will cover 170 square feet of a surface. A yard has a total fence area of \\(w\\) square feet. Which equation represents the total amount of stain \\(S\\), in gallons, needed to stain the fence in this yard twice?</p>",
+        "choices": [
+          "\\(S = \\dfrac{w}{170}\\)",
+          "\\(S = 170w\\)",
+          "\\(S = 340w\\)",
+          "\\(S = \\dfrac{w}{85}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Coverage rate word problem"
+      },
+      {
+        "stem": "<p>A projectile’s height in a scaled coordinate model is given by \\(y = -x^2 + 9x - 100\\). In the \\(xy\\)-plane, the graph of this equation intersects the line \\(y = c\\) at exactly one point. What is the value of \\(c\\)?</p>",
+        "choices": [
+          "\\(-\\dfrac{481}{4}\\)",
+          "\\(-100\\)",
+          "\\(-\\dfrac{319}{4}\\)",
+          "\\(-\\dfrac{9}{2}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Parabola / horizontal tangent line"
+      }
     ]
   },
   "placement": {

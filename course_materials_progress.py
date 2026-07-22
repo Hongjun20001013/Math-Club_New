@@ -15,12 +15,40 @@ def strip_html(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def merge_answers(existing: Any, incoming: Any) -> dict[str, Any]:
+    """Merge per-slide answers; first locked answer always wins."""
+    out: dict[str, Any] = {}
+    for src in (existing, incoming):
+        if not isinstance(src, dict):
+            continue
+        for key, value in src.items():
+            if not isinstance(value, dict):
+                continue
+            slot = str(key)
+            prev = out.get(slot)
+            if prev and prev.get("locked"):
+                continue
+            if value.get("locked") or not prev:
+                row = dict(value)
+                row["locked"] = bool(value.get("locked"))
+                out[slot] = row
+                continue
+            try:
+                newer = int(value.get("at") or 0) >= int(prev.get("at") or 0)
+            except (TypeError, ValueError):
+                newer = True
+            if newer:
+                out[slot] = dict(value)
+    return out
+
+
 def merge_progress(local: dict[str, Any], remote: dict[str, Any]) -> dict[str, Any]:
     """Merge localStorage and server progress (union + best checkpoint)."""
     out: dict[str, Any] = {
         "viewed": [],
         "done": [],
         "reflections": {},
+        "answers": {},
     }
     for key in ("viewed", "done"):
         merged: set[int] = set()
@@ -37,6 +65,7 @@ def merge_progress(local: dict[str, Any], remote: dict[str, Any]) -> dict[str, A
         out["reflections"] = {**refs_remote, **refs_local}
     else:
         out["reflections"] = refs_local if isinstance(refs_local, dict) else {}
+    out["answers"] = merge_answers(remote.get("answers"), local.get("answers"))
 
     cp_local = local.get("checkpoint") or {}
     cp_remote = remote.get("checkpoint") or {}

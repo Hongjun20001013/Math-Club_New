@@ -8382,6 +8382,11 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
     max-height: 220px;
 }
 
+.sat-stem-body .stem-figure-img--hard[src$="hard_22_f2.png"] {
+    width: min(100%, 360px);
+    max-height: 280px;
+}
+
 .sat-stem-body .stem-table-wrap + .stem-table-wrap {
     margin-top: 0.65em;
 }
@@ -12439,6 +12444,18 @@ body.np-app-body {
     box-shadow:
         0 22px 54px rgba(76, 52, 200, 0.13),
         0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.choice-card.is-locked {
+    cursor: not-allowed;
+    opacity: 0.78;
+    pointer-events: none;
+}
+
+.choice-card.is-locked.is-selected,
+.choice-card.is-locked.selected {
+    opacity: 1;
+    border-color: rgba(108, 78, 255, 0.45);
 }
 
 .sat-submit-wrap {
@@ -29293,6 +29310,7 @@ a.np-cm-card--ready:hover {
 .np-cm-kind-pill--closing { background: rgba(219, 39, 119, 0.1); color: #be185d; }
 .np-cm-kind-pill--section { background: rgba(91, 77, 255, 0.14); color: #43318f; }
 .np-cm-kind-pill--intro { background: rgba(91, 77, 255, 0.16); color: #43318f; }
+.np-cm-kind-pill--score { background: rgba(99, 102, 241, 0.18); color: #3730a3; }
 
 .np-cm-nav {
     width: 46px;

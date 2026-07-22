@@ -1081,6 +1081,12 @@ a.np-cm-card--ready:hover .np-cm-card-cta {
     max-height: 220px;
 }
 
+.np-cm-slide-body .cm-slide-figure-img.stem-figure-img--hard[src$="hard_22_f2.png"],
+.cm-question-stem .stem-figure-img--hard[src$="hard_22_f2.png"] {
+    max-width: min(100%, 380px);
+    max-height: 300px;
+}
+
 .np-cm-slide-body .stem-math-block.cm-math-block:has(.cm-answer-box) {
     display: flex;
     align-items: center;
@@ -4017,6 +4023,340 @@ a.np-cm-gate-card:hover .np-cm-gate-card-arrow {
     .np-cm-phase-toolbar {
         flex-direction: column;
         align-items: stretch;
+    }
+}
+
+/* ── Locked classroom / Check-answer state ── */
+.cm-mcq-interactive.is-answer-locked .cm-mcq-choice,
+.cm-grid-in-interactive.is-answer-locked .cm-grid-in-input {
+    cursor: default;
+    pointer-events: none;
+}
+
+.cm-mcq-interactive.is-answer-locked .cm-mcq-check,
+.cm-grid-in-interactive.is-answer-locked [data-cm-check-grid-in] {
+    opacity: 0.72;
+    cursor: default;
+}
+
+.cm-mcq-interactive.is-answer-locked .cm-mcq-prompt,
+.cm-grid-in-interactive.is-answer-locked .cm-grid-in-feedback {
+    font-weight: 700;
+}
+
+/* ── Phase 3 SAT score reveal (after Question 22) ── */
+.cm-sat-score-reveal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0;
+    background: rgba(18, 12, 48, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+}
+
+.cm-sat-score-reveal.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.np-cm-viewer.is-sat-score-reveal .np-cm-pace,
+.np-cm-viewer.is-sat-score-reveal .np-desmos-panel {
+    visibility: hidden;
+}
+
+.cm-sat-score-reveal .cm-sat-score-canvas,
+.np-cm-slide--score .cm-sat-score-canvas {
+    position: relative;
+    width: min(100%, 920px);
+    margin: auto;
+    min-height: min(92vh, 820px);
+    border-radius: 36px;
+    overflow: hidden;
+    box-shadow:
+        0 40px 100px rgba(28, 18, 72, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.cm-sat-score-reveal .cm-sat-score-canvas {
+    margin: clamp(16px, 3vh, 36px);
+}
+
+.np-cm-slide--score.np-cm-slide--canvas {
+    padding: 0;
+    background: transparent;
+}
+
+.np-cm-slide--score .cm-sat-score-canvas {
+    width: 100%;
+    min-height: min(78vh, 760px);
+    border-radius: 28px;
+}
+
+.np-cm-outline-item[data-cm-kind="score"] .np-cm-outline-num {
+    background: linear-gradient(145deg, #7c3aed, #4f46e5);
+    color: #fff;
+}
+
+.np-cm-outline-item[data-cm-kind="score"] .np-cm-outline-kind {
+    color: #6d28d9;
+}
+
+.cm-sat-score-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 55% at 50% -10%, rgba(167, 139, 250, 0.55), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 100% 80%, rgba(56, 189, 248, 0.22), transparent 50%),
+        radial-gradient(ellipse 45% 35% at 0% 90%, rgba(244, 114, 182, 0.18), transparent 50%),
+        linear-gradient(160deg, #1e1448 0%, #312e81 42%, #0f172a 100%);
+}
+
+.cm-sat-score-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(8px);
+    opacity: 0.55;
+    animation: cm-sat-float 9s ease-in-out infinite;
+}
+
+.cm-sat-score-orb--1 {
+    width: 220px;
+    height: 220px;
+    top: 12%;
+    left: -40px;
+    background: rgba(129, 140, 248, 0.45);
+}
+
+.cm-sat-score-orb--2 {
+    width: 280px;
+    height: 280px;
+    right: -60px;
+    bottom: 10%;
+    background: rgba(244, 114, 182, 0.28);
+    animation-delay: -3s;
+}
+
+.cm-sat-score-orb--3 {
+    width: 160px;
+    height: 160px;
+    left: 40%;
+    bottom: -30px;
+    background: rgba(56, 189, 248, 0.28);
+    animation-delay: -5s;
+}
+
+.cm-sat-score-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+}
+
+@keyframes cm-sat-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-18px) scale(1.04); }
+}
+
+.cm-sat-score-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(28px, 5vh, 56px) clamp(22px, 4vw, 48px);
+    color: #f8fafc;
+}
+
+.cm-sat-score-kicker {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+}
+
+.cm-sat-score-lesson {
+    margin: 8px 0 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.78);
+}
+
+.cm-sat-score-headline {
+    margin: 14px 0 0;
+    font-family: var(--cm-premium-serif, "Source Serif 4", Georgia, serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #fff 10%, #ddd6fe 45%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.cm-sat-score-orb-ring {
+    --sat-pct: 80;
+    margin-top: clamp(22px, 4vh, 36px);
+    width: min(240px, 56vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.2) 54%, transparent 55%),
+        conic-gradient(from 210deg, #a78bfa 0%, #818cf8 calc(var(--sat-pct) * 1%), rgba(255, 255, 255, 0.12) calc(var(--sat-pct) * 1%));
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 30px 80px rgba(79, 70, 229, 0.45);
+    animation: cm-sat-ring-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cm-sat-score-orb-core {
+    width: 78%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, rgba(30, 27, 75, 0.96), rgba(15, 23, 42, 0.96));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.cm-sat-score-num {
+    font-family: var(--cm-premium-serif, "Source Serif 4", Georgia, serif);
+    font-size: clamp(3.2rem, 8vw, 4.6rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    background: linear-gradient(180deg, #fff, #c4b5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.cm-sat-score-den {
+    margin-top: 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(196, 181, 253, 0.85);
+}
+
+.cm-sat-score-sub {
+    margin: 18px 0 0;
+    max-width: 34rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: rgba(226, 232, 240, 0.72);
+}
+
+.cm-sat-score-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 640px);
+    margin-top: 28px;
+}
+
+.cm-sat-score-metrics article {
+    padding: 14px 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+}
+
+.cm-sat-score-metrics em {
+    display: block;
+    font-style: normal;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+}
+
+.cm-sat-score-metrics strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.cm-sat-score-metrics strong span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.55);
+}
+
+.cm-sat-score-metrics small {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.78rem;
+    color: rgba(226, 232, 240, 0.62);
+}
+
+.cm-sat-score-continue {
+    margin-top: 28px;
+    min-width: 220px;
+    padding: 14px 28px;
+    border: 0;
+    border-radius: 999px;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #1e1b4b;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f5f3ff, #c4b5fd 55%, #a5b4fc);
+    box-shadow: 0 18px 40px rgba(167, 139, 250, 0.35);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cm-sat-score-continue:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px rgba(167, 139, 250, 0.45);
+}
+
+.cm-sat-score-foot {
+    margin: 18px 0 0;
+    font-size: 0.75rem;
+    color: rgba(226, 232, 240, 0.45);
+}
+
+@keyframes cm-sat-ring-in {
+    from {
+        opacity: 0;
+        transform: scale(0.84);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 720px) {
+    .cm-sat-score-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .cm-sat-score-reveal .cm-sat-score-canvas {
+        min-height: auto;
+        margin: 12px;
+        border-radius: 28px;
     }
 }
 

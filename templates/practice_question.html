@@ -670,9 +670,23 @@ if (isConstructedMode) {
     setAnswerState(false);
 }
 
+const lockPhase3Answers = {{ (lock_phase3_answers|default(false)) | tojson }};
+const phase3AnswerLocked = {{ (phase3_answer_locked|default(false)) | tojson }};
+let phase3ChoiceLocked = !!phase3AnswerLocked;
+
+function lockPhase3Choices(message) {
+    phase3ChoiceLocked = true;
+    document.querySelectorAll(".sat-choices-list .choice-card").forEach((c) => {
+        c.classList.add("is-locked");
+        c.setAttribute("aria-disabled", "true");
+    });
+    if (message) setAnswerState(true, message);
+}
+
 if (selectedInput) {
 document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
     const activate = () => {
+        if (phase3ChoiceLocked || card.classList.contains("is-locked")) return;
         document.querySelectorAll(".sat-choices-list .choice-card")
             .forEach(c => {
                 c.classList.remove("selected");
@@ -685,7 +699,11 @@ document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
         card.setAttribute("aria-pressed", "true");
         localStorage.setItem(storageKey, card.dataset.index);
         selectedInput.value = card.dataset.letter;
-        setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
+        if (lockPhase3Answers) {
+            lockPhase3Choices(`Selected ${card.dataset.letter}. Locked for this attempt — submit to continue.`);
+        } else {
+            setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
+        }
     };
     card.setAttribute("role", "button");
     card.setAttribute("aria-pressed", "false");
@@ -697,6 +715,9 @@ document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
         }
     });
 });
+if (phase3AnswerLocked) {
+    lockPhase3Choices("This answer is locked for the current classroom attempt.");
+}
 }
 
 function revealQuestionContent() {
@@ -788,7 +809,11 @@ window.addEventListener("load", () => {
             cards[saved].classList.add("is-selected");
             cards[saved].setAttribute("aria-pressed", "true");
             selectedInput.value = cards[saved].dataset.letter;
-            setAnswerState(true, `Selected ${cards[saved].dataset.letter}. Ready to submit.`);
+            if (lockPhase3Answers) {
+                lockPhase3Choices(`Selected ${cards[saved].dataset.letter}. Locked for this attempt — submit to continue.`);
+            } else {
+                setAnswerState(true, `Selected ${cards[saved].dataset.letter}. Ready to submit.`);
+            }
         }
     }
 

@@ -102,8 +102,8 @@
             data-range="{{ set.range_bucket }}"
             aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
           >
-            <strong>{% if set.topic == 'hard_20' %}WP{% elif set.topic == 'hard_21' %}T1{% else %}{{ set.roman }}{% endif %}</strong>
-            <span>{% if set.topic == 'hard_20' %}Word Problem Training{% elif set.topic == 'hard_21' %}Test 1{% else %}Practice {{ set.set_number }}{% endif %}</span>
+            <strong>{% if set.topic == 'hard_20' %}T2{% elif set.topic == 'hard_21' %}T1{% elif set.topic == 'hard_22' %}T3{% else %}{{ set.roman }}{% endif %}</strong>
+            <span>{% if set.topic == 'hard_20' %}Test II{% elif set.topic == 'hard_21' %}Test I{% elif set.topic == 'hard_22' %}Test III{% else %}Practice {{ set.set_number }}{% endif %}</span>
             <em>{{ set.answered }}/{{ set.total }} · {{ set.total }} Q</em>
           </button>
           {% endfor %}
@@ -146,8 +146,8 @@
               aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
               style="--tile-progress: {{ set.progress_pct }}%;"
             >
-              <span class="np-hard-picker-roman">{% if set.topic == 'hard_20' %}WP{% elif set.topic == 'hard_21' %}T1{% else %}{{ set.roman }}{% endif %}</span>
-              <span class="np-hard-picker-num">{% if set.topic == 'hard_20' %}Word Problem Training · {{ set.total }} Q{% elif set.topic == 'hard_21' %}Test 1 · {{ set.total }} Q{% else %}Practice {{ set.set_number }} · {{ set.total }} Q{% endif %}</span>
+              <span class="np-hard-picker-roman">{% if set.topic == 'hard_20' %}T2{% elif set.topic == 'hard_21' %}T1{% elif set.topic == 'hard_22' %}T3{% else %}{{ set.roman }}{% endif %}</span>
+              <span class="np-hard-picker-num">{% if set.topic == 'hard_20' %}Test II · {{ set.total }} Q{% elif set.topic == 'hard_21' %}Test I · {{ set.total }} Q{% elif set.topic == 'hard_22' %}Test III · {{ set.total }} Q{% else %}Practice {{ set.set_number }} · {{ set.total }} Q{% endif %}</span>
               <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
               <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
             </button>
@@ -349,8 +349,9 @@
     }
     var setTitle = tile.getAttribute("data-title") || ("Hard Practice " + roman);
     var topic = tile.getAttribute("data-topic") || "";
-    if (topic === "hard_20") badge.textContent = "WP";
+    if (topic === "hard_20") badge.textContent = "T2";
     else if (topic === "hard_21") badge.textContent = "T1";
+    else if (topic === "hard_22") badge.textContent = "T3";
     else badge.textContent = roman;
     kicker.textContent = setTitle;
     title.textContent = setTitle;

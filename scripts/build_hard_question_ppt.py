@@ -230,20 +230,25 @@ def build_set(set_num: int) -> str:
     count = len(questions)
     if set_num == 20:
         label = f"{count} word-problem training challenges"
-        short_title = "Word Problem Training"
-        intro_phase = "Phase 3 · Word Problem Training"
-        overview_title = "Word Problem Training"
+        short_title = "Test II"
+        intro_phase = "Phase 3 · Test II"
+        overview_title = "Test II"
     elif set_num == 21:
         label = f"{count} Module 2-style mock exam questions"
-        short_title = "Test 1"
+        short_title = "Test I"
         intro_phase = "Phase 3 · Mock Exam Training"
-        overview_title = "Test 1"
+        overview_title = "Test I"
+    elif set_num == 22:
+        label = f"{count} Module 2-style mock exam questions"
+        short_title = "Test III"
+        intro_phase = "Phase 3 · Mock Exam Training"
+        overview_title = "Test III"
     else:
         label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
         short_title = f"SAT Hard Question {set_num}"
         intro_phase = "Phase 2 · Hard Question Practice"
         overview_title = f"Hard Question Set {set_num}"
-    use_phase3_title = set_num in {20, 21}
+    use_phase3_title = set_num in {20, 21, 22}
     parts = [
         preamble(set_num, short_title)
         .replace("{QUESTION_COUNT_LABEL}", label)
@@ -273,16 +278,16 @@ def build_set(set_num: int) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-16,20,21)")
-    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-16, 20, and 21")
+    parser.add_argument("sets", nargs="*", type=int, help="Set numbers (default 4-16,20-22)")
+    parser.add_argument("--all", action="store_true", help="Regenerate sets 1-16 and 20-22")
     args = parser.parse_args()
 
     if args.all:
-        sets = list(range(1, 17)) + [20, 21]
+        sets = list(range(1, 17)) + [20, 21, 22]
     elif args.sets:
         sets = args.sets
     else:
-        sets = list(range(4, 17)) + [20, 21]
+        sets = list(range(4, 17)) + [20, 21, 22]
 
     for n in sets:
         tex = build_set(n)

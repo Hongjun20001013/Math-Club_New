@@ -4,6 +4,7 @@ from course_materials_progress import (
     build_coach_system_prompt,
     build_coach_user_message,
     mastery_pct_from_progress,
+    merge_answers,
     merge_progress,
     openai_chat_completion,
     strip_html,
@@ -249,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260720-test1-tikz-compact")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-cm-answer-lock")
 
 _DB_SCHEMA_READY = False
 
@@ -1767,15 +1768,119 @@ def _placement_timer_seconds(topic: str) -> int:
     }.get(topic, 115 * 60)
 
 
-# Phase 3 mock / word-problem sets: ~Digital SAT Module pace (≈35 min / 22 Q).
+# Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22"})
+PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
 def _phase3_pace_seconds(domain: str, topic: str) -> int | None:
     if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS:
         return PHASE3_PACE_SECONDS
     return None
+
+
+# Digital SAT Math section curve for classroom mocks (22+22 raw → 200–800).
+# Anchors match the Module-2 miss → Math score mapping used in class / Albert-style
+# combined-module conversion (https://www.albert.io/blog/sat-score-calculator/):
+# 0→800, 1→790, 2→770, 3→760, 4→740, 5→730, 6→710, 7→700, 8→680, 9→670,
+# 11→660, 13→640; missing slots are linearly interpolated to the nearest 10.
+_PHASE3_MATH_SCORE_BY_TOTAL_WRONG: dict[int, int] = {
+    0: 800,
+    1: 790,
+    2: 770,
+    3: 760,
+    4: 740,
+    5: 730,
+    6: 710,
+    7: 700,
+    8: 680,
+    9: 670,
+    10: 670,
+    11: 660,
+    12: 650,
+    13: 640,
+    14: 630,
+    15: 620,
+    16: 600,
+    17: 590,
+    18: 580,
+    19: 560,
+    20: 550,
+    21: 540,
+    22: 520,
+    23: 510,
+    24: 500,
+    25: 480,
+    26: 470,
+    27: 450,
+    28: 440,
+    29: 420,
+    30: 410,
+    31: 390,
+    32: 380,
+    33: 360,
+    34: 350,
+    35: 330,
+    36: 320,
+    37: 300,
+    38: 290,
+    39: 270,
+    40: 260,
+    41: 240,
+    42: 230,
+    43: 210,
+    44: 200,
+}
+
+
+def _phase3_math_scale_from_total_wrong(total_wrong: int) -> int:
+    tw = max(0, min(44, int(total_wrong)))
+    if tw in _PHASE3_MATH_SCORE_BY_TOTAL_WRONG:
+        return _PHASE3_MATH_SCORE_BY_TOTAL_WRONG[tw]
+    # Fallback interpolate between nearest known anchors.
+    keys = sorted(_PHASE3_MATH_SCORE_BY_TOTAL_WRONG)
+    lo = max(k for k in keys if k <= tw)
+    hi = min(k for k in keys if k >= tw)
+    if lo == hi:
+        return _PHASE3_MATH_SCORE_BY_TOTAL_WRONG[lo]
+    t = (tw - lo) / (hi - lo)
+    raw = _PHASE3_MATH_SCORE_BY_TOTAL_WRONG[lo] + t * (
+        _PHASE3_MATH_SCORE_BY_TOTAL_WRONG[hi] - _PHASE3_MATH_SCORE_BY_TOTAL_WRONG[lo]
+    )
+    return int(round(raw / 10.0) * 10)
+
+
+def _phase3_mock_sat_score(module2_wrong: int, *, module2_total: int = PHASE3_MOCK_MODULE2_TOTAL) -> dict[str, int]:
+    """Estimate SAT Math (200–800) from a 22-question Module 2 classroom set.
+
+    Like the Digital SAT, Module 1 + Module 2 raw correct are combined, then scaled.
+    Module 1 is treated as perfect when Module 2 has fewer than 5 wrong; at 5+ Module 2
+    wrongs Module 1 is treated as 2 wrong; at 10+ as 4 wrong. The scale table follows
+    the Module-2 miss curve used in class (1→790 … 7→700), applied to total wrongs.
+    """
+    m2_wrong = max(0, min(int(module2_total), int(module2_wrong)))
+    if m2_wrong >= 10:
+        m1_wrong = 4
+    elif m2_wrong >= 5:
+        m1_wrong = 2
+    else:
+        m1_wrong = 0
+    m1_correct = PHASE3_MOCK_MODULE2_TOTAL - m1_wrong
+    m2_correct = module2_total - m2_wrong
+    raw_correct = m1_correct + m2_correct
+    total_wrong = (PHASE3_MOCK_MODULE2_TOTAL - m1_correct) + (module2_total - m2_correct)
+    score = _phase3_math_scale_from_total_wrong(total_wrong)
+    return {
+        "sat_math_score": score,
+        "module1_wrong": m1_wrong,
+        "module2_wrong": m2_wrong,
+        "module1_correct": m1_correct,
+        "module2_correct": m2_correct,
+        "raw_correct": raw_correct,
+        "raw_total": PHASE3_MOCK_MODULE2_TOTAL + module2_total,
+        "total_wrong": total_wrong,
+    }
 
 
 def _clear_placement_section_flags(topic: str) -> None:
@@ -2535,6 +2640,18 @@ def _cm_progress_row(db: sqlite3.Connection, user_id: int, slug: str) -> dict[st
 
 
 def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress: dict[str, Any]) -> bool:
+    existing_row = _cm_progress_row(db, user_id, slug)
+    existing = (existing_row or {}).get("progress") or {}
+    if not isinstance(existing, dict):
+        existing = {}
+    if not isinstance(progress, dict):
+        progress = {}
+    # Preserve locked classroom / Check-answer records across stale client posts.
+    merged = merge_progress(progress, existing)
+    merged["answers"] = merge_answers(existing.get("answers"), progress.get("answers"))
+    for key in ("study_mode", "last_slide_index", "last_active_at", "checkpoint"):
+        if key in progress:
+            merged[key] = progress[key]
     db.execute(
         """
         INSERT INTO course_material_progress (user_id, lesson_slug, progress_json, updated_at)
@@ -2543,7 +2660,7 @@ def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress:
             progress_json = excluded.progress_json,
             updated_at = datetime('now')
         """,
-        (user_id, slug, json.dumps(progress, ensure_ascii=False)),
+        (user_id, slug, json.dumps(merged, ensure_ascii=False)),
     )
     return _safe_db_commit(db)
 
@@ -3226,10 +3343,34 @@ def practice_course_material_classroom_active_api(slug: str):
     slide_index = int(row["current_slide_index"] or 1)
     ink = _cm_slide_ink_payload(db, int(row["id"]), slide_index)
     laser = _cm_laser_payload(db, int(row["id"]), slide_index)
+    my_responses: list[dict[str, Any]] = []
+    try:
+        uid = int(session["user_id"])
+    except (KeyError, TypeError, ValueError):
+        uid = 0
+    if uid:
+        for resp in db.execute(
+            """
+            SELECT slide_index, selected_answer, correct_answer, is_correct, submitted_at
+            FROM course_class_responses
+            WHERE session_id = ? AND user_id = ?
+            """,
+            (int(row["id"]), uid),
+        ).fetchall():
+            my_responses.append(
+                {
+                    "slide_index": int(resp["slide_index"]),
+                    "selected_answer": resp["selected_answer"] or "",
+                    "correct_answer": resp["correct_answer"] or "",
+                    "is_correct": bool(resp["is_correct"]),
+                    "submitted_at": resp["submitted_at"],
+                }
+            )
     return jsonify(
         {
             "ok": True,
             "active": True,
+            "my_responses": my_responses,
             "session": {
                 "id": int(row["id"]),
                 "lesson_slug": slug,
@@ -3326,6 +3467,87 @@ def practice_course_material_classroom_ink_api(slug: str):
     )
 
 
+@app.route("/practice/materials/api/phase3-sat-score", methods=["POST"])
+def practice_phase3_sat_score_api():
+    """Return estimated SAT Math score for a Phase 3 22-question mock."""
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    data = request.get_json(silent=True) or {}
+    try:
+        module2_wrong = int(data.get("module2_wrong") or 0)
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "module2_wrong required"}), 400
+    module2_total = int(data.get("module2_total") or PHASE3_MOCK_MODULE2_TOTAL)
+    payload = _phase3_mock_sat_score(module2_wrong, module2_total=module2_total)
+    return jsonify({"ok": True, **payload})
+
+
+@app.route("/practice/materials/api/classroom/<slug>/my-sat-score")
+def practice_course_material_classroom_my_sat_score_api(slug: str):
+    """Build a student's Phase 3 SAT estimate from live classroom responses."""
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _course_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    db = get_db()
+    active = _cm_active_class_session(db, slug)
+    question_slides = [
+        s
+        for s in (material.get("slides") or [])
+        if str(s.get("kind") or "") == "question"
+    ]
+    q_total = len(question_slides)
+    if q_total != PHASE3_MOCK_MODULE2_TOTAL:
+        return jsonify(
+            {
+                "ok": False,
+                "error": "this lesson is not a 22-question Module 2 mock",
+                "question_total": q_total,
+            }
+        ), 400
+    uid = int(session["user_id"])
+    answered: dict[int, int] = {}
+    if active:
+        rows = db.execute(
+            """
+            SELECT slide_index, is_correct
+            FROM course_class_responses
+            WHERE session_id = ? AND user_id = ?
+            """,
+            (int(active["id"]), uid),
+        ).fetchall()
+        for row in rows:
+            try:
+                answered[int(row["slide_index"])] = int(row["is_correct"] or 0)
+            except (TypeError, ValueError):
+                continue
+    wrong = 0
+    graded = 0
+    for slide in question_slides:
+        try:
+            sidx = int(slide.get("index"))
+        except (TypeError, ValueError):
+            continue
+        if sidx in answered:
+            graded += 1
+            if not answered[sidx]:
+                wrong += 1
+        else:
+            wrong += 1  # unanswered counts as wrong for the classroom estimate
+    payload = _phase3_mock_sat_score(wrong, module2_total=q_total)
+    return jsonify(
+        {
+            "ok": True,
+            "lesson_slug": slug,
+            "graded": graded,
+            "question_total": q_total,
+            "from_classroom": bool(active),
+            **payload,
+        }
+    )
+
+
 @app.route("/practice/materials/api/classroom/<slug>/response", methods=["POST"])
 def practice_course_material_classroom_response_api(slug: str):
     if not require_login():
@@ -3366,6 +3588,28 @@ def practice_course_material_classroom_response_api(slug: str):
             (int(active["id"]), uid, username),
         )
     username = str(session.get("username") or f"student-{uid}")[:120]
+    existing = db.execute(
+        """
+        SELECT selected_answer, correct_answer, is_correct, submitted_at
+        FROM course_class_responses
+        WHERE session_id = ? AND slide_index = ? AND user_id = ?
+        """,
+        (int(active["id"]), slide_index, uid),
+    ).fetchone()
+    if existing:
+        # Once a student checks an answer in a live class, it is permanent.
+        return jsonify(
+            {
+                "ok": True,
+                "locked": True,
+                "already_submitted": True,
+                "session_id": int(active["id"]),
+                "is_correct": bool(existing["is_correct"]),
+                "selected_answer": existing["selected_answer"] or "",
+                "correct_answer": existing["correct_answer"] or "",
+                "submitted_at": existing["submitted_at"],
+            }
+        )
     try:
         db.execute(
             """
@@ -3374,13 +3618,6 @@ def practice_course_material_classroom_response_api(slug: str):
                 selected_answer, correct_answer, is_correct, submitted_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-            ON CONFLICT(session_id, slide_index, user_id) DO UPDATE SET
-                question_title = excluded.question_title,
-                username = excluded.username,
-                selected_answer = excluded.selected_answer,
-                correct_answer = excluded.correct_answer,
-                is_correct = excluded.is_correct,
-                submitted_at = datetime('now')
             """,
             (
                 int(active["id"]),
@@ -3399,7 +3636,15 @@ def practice_course_material_classroom_response_api(slug: str):
     except Exception:
         app.logger.exception("classroom response save failed slug=%s slide=%s", slug, slide_index)
         return jsonify({"ok": False, "error": "could not save response"}), 500
-    return jsonify({"ok": True, "session_id": int(active["id"]), "is_correct": bool(is_correct)})
+    return jsonify(
+        {
+            "ok": True,
+            "locked": True,
+            "already_submitted": False,
+            "session_id": int(active["id"]),
+            "is_correct": bool(is_correct),
+        }
+    )
 
 
 @app.route("/practice/materials/api/classroom/<slug>/start", methods=["POST"])
@@ -3694,6 +3939,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_16": "banks/hard/hard_16.tex",
         "hard_20": "banks/hard/hard_20.tex",
         "hard_21": "banks/hard/hard_21.tex",
+        "hard_22": "banks/hard/hard_22.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -3965,15 +4211,15 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
         "paper_pdf": {
             "path": "SAT_Hard_Question_Part_20.pdf",
             "label": "Student worksheet PDF",
-            "description": "Word Problem Training — printable student worksheet.",
-            "download_name": "NovelPrep-Word-Problem-Training-Worksheet.pdf",
+            "description": "Test II — printable student worksheet.",
+            "download_name": "NovelPrep-Test-II-Worksheet.pdf",
             "mimetype": "application/pdf",
         },
         "slides_pdf": {
             "path": "SAT_Hard_Question_Part_20_PPT.pdf",
             "label": "Teaching slides",
-            "description": "Word Problem Training — classroom slide deck.",
-            "download_name": "NovelPrep-Word-Problem-Training-Slides.pdf",
+            "description": "Test II — classroom slide deck.",
+            "download_name": "NovelPrep-Test-II-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -3981,15 +4227,31 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
         "paper_pdf": {
             "path": "SAT_Hard_Question_Part_21.pdf",
             "label": "Student worksheet PDF",
-            "description": "Test 1 — full Module 2-style mock set for classroom practice.",
-            "download_name": "NovelPrep-Test-1-Worksheet.pdf",
+            "description": "Test I — full Module 2-style mock set for classroom practice.",
+            "download_name": "NovelPrep-Test-I-Worksheet.pdf",
             "mimetype": "application/pdf",
         },
         "slides_pdf": {
             "path": "SAT_Hard_Question_Part_21_PPT.pdf",
             "label": "Teaching slides",
-            "description": "Test 1 — classroom slide deck with answers.",
-            "download_name": "NovelPrep-Test-1-Slides.pdf",
+            "description": "Test I — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-I-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_22": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_22.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test III — Module 2-style mock with applied stems.",
+            "download_name": "NovelPrep-Test-III-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_22_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test III — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-III-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4482,8 +4744,9 @@ TOPIC_TITLES = {
     "hard_14": "SAT Hard Question Set 14 (Practice XIV)",
     "hard_15": "SAT Hard Question Set 15 (Practice XV)",
     "hard_16": "SAT Hard Question Set 16 (Practice XVI)",
-    "hard_20": "Word Problem Training",
-    "hard_21": "Test 1",
+    "hard_20": "Test II",
+    "hard_21": "Test I",
+    "hard_22": "Test III",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -4867,6 +5130,30 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "A"},
         {"correct_answer": "-13"},
+        {"correct_answer": "C"},
+    ],
+    "hard_22": [
+        {"correct_answer": "7744"},
+        {"correct_answer": "1021"},
+        {"correct_answer": "17/2", "answer_alternates": ["8.5"]},
+        {"correct_answer": "14"},
+        {"correct_answer": "D"},
+        {"correct_answer": "62"},
+        {"correct_answer": "B"},
+        {"correct_answer": "750"},
+        {"correct_answer": "195"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "86.5", "answer_alternates": ["173/2", "86.50"]},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
         {"correct_answer": "C"},
     ],
 }
@@ -8771,7 +9058,7 @@ def practice_challenge():
         )
         display_title = (
             TOPIC_TITLES.get(topic)
-            if topic in {"hard_20", "hard_21"}
+            if topic in PHASE3_PACE_TOPICS
             else f"Hard Practice {set_roman}"
         )
         pace_secs = _phase3_pace_seconds("hard_problem", topic)
@@ -11566,6 +11853,10 @@ def practice_question(domain, topic, qnum):
         mistake_miss_anchor=miss_anchor_q,
         tracked_responses_hint=tracked_responses_hint,
         placement_clear_storage=placement_clear_storage,
+        lock_phase3_answers=bool(pace_seconds) and not mistake_redo_mode,
+        phase3_answer_locked=bool(pace_seconds)
+        and not mistake_redo_mode
+        and question_index in answered_qset,
     )
 
 
@@ -11682,10 +11973,31 @@ def submit_practice_answer():
             attempt_id = _insert_practice_attempt(db, user_id, domain, topic, q_index)
 
         graded_before = _attempt_graded_count(db, attempt_id)
-        db.execute(
-            "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
-            (attempt_id, q_index),
-        )
+        # Phase 3 mocks: once answered in this attempt, the choice is locked until restart.
+        if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS:
+            prior = db.execute(
+                """
+                SELECT id FROM practice_responses
+                WHERE attempt_id = ? AND question_index = ?
+                LIMIT 1
+                """,
+                (attempt_id, q_index),
+            ).fetchone()
+            if prior is not None:
+                flash("This answer is locked for the current classroom attempt. Finish the set or restart after class to try again.")
+                return _practice_redirect(
+                    domain,
+                    topic,
+                    qnum_for_redirect,
+                    mistake_redo=mistake_redo,
+                    analytics_part=analytics_part_f,
+                    miss_anchor=miss_anchor_f,
+                )
+        else:
+            db.execute(
+                "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+                (attempt_id, q_index),
+            )
         db.execute(
             """
             INSERT INTO practice_responses
@@ -12239,6 +12551,17 @@ def _practice_session_summary_payload(
         if flow_cfg and flow_cfg.get("mc_scored") and placement_mcq_total
         else correct_count
     )
+    phase3_sat: dict[str, Any] | None = None
+    if (
+        domain == "hard_problem"
+        and topic in PHASE3_PACE_TOPICS
+        and total_q == PHASE3_MOCK_MODULE2_TOTAL
+    ):
+        m2_wrong = sum(
+            1 for row in rows_out if row.get("status") in ("incorrect", "skipped")
+        )
+        phase3_sat = _phase3_mock_sat_score(m2_wrong, module2_total=total_q)
+
     render = {
         "domain": domain,
         "topic": topic,
@@ -12272,6 +12595,7 @@ def _practice_session_summary_payload(
         "miss_quiz_all_href": miss_quiz_all_href,
         "miss_quiz_all_count": miss_quiz_all_count,
         "miss_quiz_all_is_module": miss_quiz_all_is_module,
+        "phase3_sat": phase3_sat,
     }
     pdf_ctx = {
         "rows": rows_out,

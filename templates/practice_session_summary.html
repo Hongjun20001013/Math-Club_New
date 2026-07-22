@@ -71,6 +71,18 @@
           {% else %}
           <p class="np-summary-score-foot">{{ correct_count }} correct of {{ total_q }} questions in this set</p>
           {% endif %}
+          {% if phase3_sat %}
+          <div class="np-summary-sat-score" style="margin-top:1rem;padding:0.85rem 1rem;border-radius:16px;background:linear-gradient(135deg,rgba(91,77,255,0.12),rgba(255,255,255,0.9));border:1px solid rgba(91,77,255,0.18);">
+            <p style="margin:0;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#5f3df5;">Estimated SAT Math</p>
+            <p style="margin:0.35rem 0 0;font-size:1.85rem;font-weight:800;line-height:1;color:#2d2657;">{{ phase3_sat.sat_math_score }}<span style="font-size:0.95rem;font-weight:600;color:#6b6588;"> / 800</span></p>
+            <p style="margin:0.45rem 0 0;font-size:0.82rem;color:#5a5470;line-height:1.4;">
+              Module 2: {{ phase3_sat.module2_correct }}/{{ total_q }} correct
+              ({{ phase3_sat.module2_wrong }} wrong) ·
+              Module 1 assumed {{ phase3_sat.module1_correct }}/22
+              {% if phase3_sat.module1_wrong %}({{ phase3_sat.module1_wrong }} inferred wrong){% else %}(all correct){% endif %}
+            </p>
+          </div>
+          {% endif %}
         </div>
         </div>
       </div>

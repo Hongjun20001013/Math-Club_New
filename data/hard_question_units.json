@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against hard_1–hard_16 plus hard_20 Phase 3 word-problem training and hard_21 Test 1 (Jul 2026).",
+  "_notes": "Audited against hard_1–hard_16 plus hard_21 Phase 3 Test I and hard_20 Test II (Jul 2026).",
   "hard_1": [
     {"unit": "U2", "skill": "Polynomial factorization"},
     {"unit": "U2", "skill": "Polynomial factorization"},
@@ -260,5 +260,29 @@
     {"unit": "U3", "skill": "Scatterplot / line of best fit"},
     {"unit": "U2", "skill": "Quadratic discriminant"},
     {"unit": "U3", "skill": "Experimental design / random assignment"}
+  ],
+  "hard_22": [
+    {"unit": "U2", "skill": "Quadratic factoring / maximize product"},
+    {"unit": "U2", "skill": "Polynomial factoring / maximize middle"},
+    {"unit": "U2", "skill": "Biquadratic factoring"},
+    {"unit": "U2", "skill": "Polynomial factoring / minimize product"},
+    {"unit": "U2", "skill": "Parabola vertex / no real roots"},
+    {"unit": "U2", "skill": "Quadratic vertex / maximize coefficient"},
+    {"unit": "U3", "skill": "Unit conversion / acceleration"},
+    {"unit": "U2", "skill": "Exponential evaluation"},
+    {"unit": "U2", "skill": "Parabola transformation / intercepts"},
+    {"unit": "U2", "skill": "Quadratic from roots"},
+    {"unit": "U2", "skill": "Polynomial factor test"},
+    {"unit": "U4", "skill": "Triangle area / sine"},
+    {"unit": "U3", "skill": "Margin of error / sample size"},
+    {"unit": "U2", "skill": "Even function symmetry / evaluation"},
+    {"unit": "U2", "skill": "Exponential percent growth"},
+    {"unit": "U3", "skill": "Rate conversion / growth"},
+    {"unit": "U4", "skill": "Circle diameter / intersecting chords"},
+    {"unit": "U2", "skill": "Quadratic equation / sum of solutions"},
+    {"unit": "U2", "skill": "Exponential percent in terms of base"},
+    {"unit": "U2", "skill": "Quadratic sum and product"},
+    {"unit": "U3", "skill": "Coverage rate word problem"},
+    {"unit": "U2", "skill": "Parabola / horizontal tangent line"}
   ]
 }

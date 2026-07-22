@@ -587,12 +587,27 @@
       ]
     },
     {
+      "slug": "hard-question-21",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Mock Exam Training",
+      "section": "Test I",
+      "title": "Test I",
+      "tex_candidates": [
+        "SAT_Hard_Question_21_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_21_PPT.pdf",
+        "SAT_Hard_Question_Part_21.pdf"
+      ]
+    },
+    {
       "slug": "hard-question-20",
       "phase": 3,
       "unit": 1,
-      "unit_name": "Word Problem Training",
-      "section": "Lesson 1",
-      "title": "Word Problem Training",
+      "unit_name": "Mock Exam Training",
+      "section": "Test II",
+      "title": "Test II",
       "tex_candidates": [
         "SAT_Hard_Question_20_PPT.tex"
       ],
@@ -602,18 +617,18 @@
       ]
     },
     {
-      "slug": "hard-question-21",
+      "slug": "hard-question-22",
       "phase": 3,
-      "unit": 2,
+      "unit": 1,
       "unit_name": "Mock Exam Training",
-      "section": "Test 1",
-      "title": "Test 1",
+      "section": "Test III",
+      "title": "Test III",
       "tex_candidates": [
-        "SAT_Hard_Question_21_PPT.tex"
+        "SAT_Hard_Question_22_PPT.tex"
       ],
       "pdf_candidates": [
-        "SAT_Hard_Question_Part_21_PPT.pdf",
-        "SAT_Hard_Question_Part_21.pdf"
+        "SAT_Hard_Question_Part_22_PPT.pdf",
+        "SAT_Hard_Question_Part_22.pdf"
       ]
     }
   ]

@@ -26,6 +26,11 @@
   var classroomStartApi = root.getAttribute("data-cm-classroom-start-api") || "";
   var classroomSlideApi = root.getAttribute("data-cm-classroom-slide-api") || "";
   var classroomInkApi = root.getAttribute("data-cm-classroom-ink-api") || "";
+  var satScoreApi = root.getAttribute("data-cm-sat-score-api") || "";
+  var mySatScoreApi = root.getAttribute("data-cm-my-sat-score-api") || "";
+  var phase3ScoreSlideIndex = null;
+  var phase3ScoreRevealEl = null;
+  var phase3ScoreOverlayShown = false;
   var syncTimer = null;
   var globalVisitKey = "np-cm-last-visit";
   var resumeDismissKey = "np-cm-resume-dismiss-" + lessonSlug;
@@ -349,7 +354,8 @@
     section: "Lesson Section",
     intro: "Lesson Preview",
     content: "Lesson Path",
-    closing: "Wrap Up"
+    closing: "Wrap Up",
+    score: "SAT Score"
   };
 
   var progress = loadProgress();
@@ -377,11 +383,30 @@
       viewed: progress.viewed || [],
       done: progress.done || [],
       reflections: progress.reflections || {},
+      answers: progress.answers || {},
       checkpoint: loadCheckpointRecord(),
       study_mode: studyMode ? "on" : "off",
       last_slide_index: slide ? slide.index : (progress.last_slide_index || 1),
       last_active_at: Date.now(),
     };
+  }
+
+  function mergeAnswersFirstWins(a, b) {
+    var out = {};
+    [a || {}, b || {}].forEach(function (src) {
+      Object.keys(src).forEach(function (key) {
+        var v = src[key];
+        if (!v || typeof v !== "object") return;
+        var prev = out[key];
+        if (prev && prev.locked) return;
+        if (v.locked || !prev) {
+          out[key] = v;
+          return;
+        }
+        if ((v.at || 0) >= (prev.at || 0)) out[key] = v;
+      });
+    });
+    return out;
   }
 
   function applyRemoteProgress(remote) {
@@ -390,6 +415,7 @@
       viewed: progress.viewed || [],
       done: progress.done || [],
       reflections: progress.reflections || {},
+      answers: progress.answers || {},
       checkpoint: loadCheckpointRecord(),
       study_mode: studyMode ? "on" : "off",
     };
@@ -397,6 +423,7 @@
     progress.viewed = merged.viewed || [];
     progress.done = merged.done || [];
     progress.reflections = merged.reflections || {};
+    progress.answers = mergeAnswersFirstWins(remote.answers || {}, progress.answers || {});
     progress.last_slide_index = merged.last_slide_index || progress.last_slide_index || 1;
     progress.last_active_at = merged.last_active_at || progress.last_active_at || 0;
     if (merged.checkpoint) {
@@ -417,7 +444,7 @@
   }
 
   function mergeProgressObjects(local, remote) {
-    var out = { viewed: [], done: [], reflections: {}, checkpoint: {} };
+    var out = { viewed: [], done: [], reflections: {}, answers: {}, checkpoint: {} };
     ["viewed", "done"].forEach(function (key) {
       var set = {};
       (local[key] || []).concat(remote[key] || []).forEach(function (n) {
@@ -426,6 +453,8 @@
       out[key] = Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
     });
     out.reflections = Object.assign({}, remote.reflections || {}, local.reflections || {});
+    // First locked answer wins — Check answer cannot be overwritten later.
+    out.answers = mergeAnswersFirstWins(remote.answers || {}, local.answers || {});
     var cpL = local.checkpoint || {};
     var cpR = remote.checkpoint || {};
     out.checkpoint = {
@@ -448,6 +477,389 @@
       out.last_active_at = 0;
     }
     return out;
+  }
+
+  function phase3QuestionSlides() {
+    return slides.filter(function (s) {
+      return (s.kind || "") === "question" && s.kind !== "score";
+    });
+  }
+
+  function isPhase3SatMockLesson() {
+    if (!paceEnabled || !satScoreApi) return false;
+    return phase3QuestionSlides().length === 22;
+  }
+
+  function getLockedAnswer(slideIndex) {
+    if (!progress.answers || typeof progress.answers !== "object") return null;
+    var row = progress.answers[String(slideIndex)];
+    if (!row || !row.locked) return null;
+    return row;
+  }
+
+  function recordPhase3Answer(slideIndex, selected, correct, isCorrect) {
+    if (!progress.answers || typeof progress.answers !== "object") progress.answers = {};
+    var key = String(slideIndex);
+    // Once checked (especially during a live class), the record is permanent.
+    if (progress.answers[key] && progress.answers[key].locked) return false;
+    progress.answers[key] = {
+      selected: selected || "",
+      correct: correct || "",
+      is_correct: !!isCorrect,
+      locked: true,
+      at: Date.now(),
+      from_classroom: !!classroomSession,
+      session_id: classroomSession ? classroomSession.id : null,
+    };
+    saveProgress();
+    return true;
+  }
+
+  function applyLockedMcqState(mcq, row) {
+    if (!mcq || !row) return;
+    var choices = Array.prototype.slice.call(mcq.querySelectorAll(".cm-mcq-choice"));
+    var checkBtn = mcq.querySelector("[data-cm-check-mcq]");
+    var selected = String(row.selected || "");
+    var correct = String(row.correct || mcq.getAttribute("data-cm-correct") || "");
+    var isCorrect = !!row.is_correct;
+    choices.forEach(function (c) {
+      var letter = c.getAttribute("data-choice");
+      c.classList.remove("is-selected", "is-correct", "is-incorrect");
+      c.classList.add("is-locked");
+      if (letter === selected) c.classList.add("is-selected");
+      if (correct && letter === correct) c.classList.add("is-correct");
+      else if (letter === selected && !isCorrect) c.classList.add("is-incorrect");
+    });
+    if (checkBtn) {
+      checkBtn.disabled = true;
+      checkBtn.textContent = "Answer locked";
+    }
+    mcq.classList.add("is-checked", "is-answer-locked");
+    if (isCorrect) mcq.classList.add("is-correct-answer");
+    else if (correct) mcq.classList.add("is-wrong-answer");
+    var prompt = mcq.querySelector(".cm-mcq-prompt");
+    if (prompt) {
+      prompt.textContent = isCorrect
+        ? "Locked — correct. You can review, but this answer cannot be changed."
+        : (correct
+          ? "Locked — incorrect (correct: " + correct + "). This answer cannot be changed."
+          : "Locked — answer recorded. This answer cannot be changed.");
+    }
+  }
+
+  function applyLockedGridInState(widget, row) {
+    if (!widget || !row) return;
+    var input = widget.querySelector(".cm-grid-in-input");
+    var checkBtn = widget.querySelector("[data-cm-check-grid-in]");
+    var feedback = widget.querySelector(".cm-grid-in-feedback");
+    if (input) {
+      input.value = row.selected || "";
+      input.classList.add("is-locked");
+      input.readOnly = true;
+    }
+    if (checkBtn) {
+      checkBtn.disabled = true;
+      checkBtn.textContent = "Answer locked";
+    }
+    widget.classList.add("is-checked", "is-answer-locked");
+    if (row.is_correct) {
+      widget.classList.add("is-correct-answer");
+      if (feedback) feedback.textContent = "Locked — correct. This answer cannot be changed.";
+    } else {
+      widget.classList.add("is-wrong-answer");
+      if (feedback) feedback.textContent = "Locked — incorrect. This answer cannot be changed.";
+    }
+  }
+
+  function restoreLockedAnswerOnSlide(slide) {
+    if (!slide) return;
+    var row = getLockedAnswer(slide.index);
+    if (!row) return;
+    bodyEl.querySelectorAll("[data-cm-mcq]").forEach(function (mcq) {
+      applyLockedMcqState(mcq, row);
+    });
+    bodyEl.querySelectorAll("[data-cm-grid-in]").forEach(function (widget) {
+      applyLockedGridInState(widget, row);
+    });
+  }
+
+  function applyClassroomLockedResponses(rows) {
+    if (!rows || !rows.length) return;
+    if (!progress.answers || typeof progress.answers !== "object") progress.answers = {};
+    var changed = false;
+    rows.forEach(function (row) {
+      if (!row || row.slide_index == null) return;
+      var key = String(row.slide_index);
+      if (progress.answers[key] && progress.answers[key].locked) return;
+      progress.answers[key] = {
+        selected: row.selected_answer || "",
+        correct: row.correct_answer || "",
+        is_correct: !!row.is_correct,
+        locked: true,
+        at: Date.now(),
+        from_classroom: true,
+        session_id: classroomSession ? classroomSession.id : null,
+      };
+      changed = true;
+    });
+    if (changed) {
+      saveProgress();
+      if (slides[idx]) restoreLockedAnswerOnSlide(slides[idx]);
+    }
+  }
+
+  function countPhase3Module2Wrong() {
+    var qs = phase3QuestionSlides();
+    var answers = progress.answers || {};
+    var wrong = 0;
+    qs.forEach(function (s) {
+      var row = answers[String(s.index)];
+      if (!row) wrong += 1;
+      else if (!row.is_correct) wrong += 1;
+    });
+    return wrong;
+  }
+
+  function buildPhase3ScoreHtml(data, opts) {
+    opts = opts || {};
+    var score = data.sat_math_score != null ? data.sat_math_score : "—";
+    var m2c = data.module2_correct != null ? data.module2_correct : "—";
+    var m2w = data.module2_wrong != null ? data.module2_wrong : "—";
+    var m1c = data.module1_correct != null ? data.module1_correct : "—";
+    var m1w = data.module1_wrong != null ? data.module1_wrong : 0;
+    var title = (slides[0] && slides[0].section) || "Mock Exam";
+    var continueLabel = opts.continueLabel || "Continue to solution";
+    return (
+      '<div class="cm-sat-score-canvas" data-cm-sat-score-canvas>' +
+        '<div class="cm-sat-score-bg" aria-hidden="true">' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--1"></span>' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--2"></span>' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--3"></span>' +
+          '<span class="cm-sat-score-grid"></span>' +
+        '</div>' +
+        '<div class="cm-sat-score-inner">' +
+          '<p class="cm-sat-score-kicker">Novel Prep · Digital SAT Math</p>' +
+          '<p class="cm-sat-score-lesson">' + title + '</p>' +
+          '<h2 class="cm-sat-score-headline">Your estimated score</h2>' +
+          '<div class="cm-sat-score-orb-ring" style="--sat-pct:' + Math.max(0, Math.min(100, ((Number(score) - 200) / 600) * 100)) + ';">' +
+            '<div class="cm-sat-score-orb-core">' +
+              '<span class="cm-sat-score-num" data-cm-sat-score-num>' + score + '</span>' +
+              '<span class="cm-sat-score-den">/ 800</span>' +
+            '</div>' +
+          '</div>' +
+          '<p class="cm-sat-score-sub">Module 2 classroom estimate · Module 1 inferred from your Module 2 result</p>' +
+          '<div class="cm-sat-score-metrics">' +
+            '<article><em>Module 2</em><strong>' + m2c + '<span>/22</span></strong><small>' + m2w + ' wrong</small></article>' +
+            '<article><em>Module 1</em><strong>' + m1c + '<span>/22</span></strong><small>' +
+              (m1w ? (m1w + ' inferred wrong') : 'assumed all correct') +
+            '</small></article>' +
+            '<article><em>Raw</em><strong>' + (data.raw_correct != null ? data.raw_correct : "—") +
+              '<span>/44</span></strong><small>combined modules</small></article>' +
+          '</div>' +
+          (opts.showContinue
+            ? '<button type="button" class="cm-sat-score-continue" data-cm-sat-score-continue>' + continueLabel + '</button>'
+            : '') +
+          '<p class="cm-sat-score-foot">Estimate for classroom pacing — not an official College Board score.</p>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function ensurePhase3ScoreSlide() {
+    if (!isPhase3SatMockLesson()) return;
+    if (slides.some(function (s) { return s.kind === "score"; })) {
+      var existing = slides.find(function (s) { return s.kind === "score"; });
+      phase3ScoreSlideIndex = existing ? existing.index : null;
+      return;
+    }
+    var qs = phase3QuestionSlides();
+    if (!qs.length) return;
+    var lastQ = qs[qs.length - 1];
+    var insertAt = -1;
+    for (var i = 0; i < slides.length; i++) {
+      if (slides[i].index === lastQ.index) {
+        insertAt = i + 1;
+        break;
+      }
+    }
+    if (insertAt < 0) return;
+    var scoreIndex = Math.max.apply(null, slides.map(function (s) { return s.index || 0; })) + 1;
+    phase3ScoreSlideIndex = scoreIndex;
+    var scoreSlide = {
+      index: scoreIndex,
+      title: "Your SAT Score",
+      html: buildPhase3ScoreHtml({
+        sat_math_score: "—",
+        module2_correct: "—",
+        module2_wrong: "—",
+        module1_correct: "—",
+        module1_wrong: 0,
+        raw_correct: "—",
+      }, { showContinue: false }),
+      kind: "score",
+      interactive: false,
+      section: lastQ.section || "Mock Exam",
+      study_tip: "Your estimated Digital SAT Math score from this Module 2 set.",
+      strategy_hint: "",
+    };
+    slides.splice(insertAt, 0, scoreSlide);
+    injectPhase3ScoreOutlineItem(scoreIndex, insertAt);
+  }
+
+  function injectPhase3ScoreOutlineItem(scoreIndex, insertAt) {
+    var list = root.querySelector("[data-cm-outline]");
+    if (!list) return;
+    var next = slides[insertAt + 1];
+    var nextBtn = next ? root.querySelector("[data-cm-index='" + next.index + "']") : null;
+    var nextLi = nextBtn ? nextBtn.closest("li") : null;
+    var li = document.createElement("li");
+    li.className = "np-cm-outline-item";
+    li.setAttribute("data-cm-group", "practice");
+    li.setAttribute("data-cm-kind", "score");
+    li.innerHTML =
+      '<button type="button" class="np-cm-outline-btn" data-cm-index="' + scoreIndex + '">' +
+        '<span class="np-cm-outline-num">★</span>' +
+        '<span class="np-cm-outline-copy">' +
+          '<em class="np-cm-outline-kind">Score</em>' +
+          '<span class="np-cm-outline-title">Your SAT Score</span>' +
+        "</span>" +
+      "</button>";
+    if (nextLi && nextLi.parentNode === list) list.insertBefore(li, nextLi);
+    else list.appendChild(li);
+    var btn = li.querySelector("[data-cm-index]");
+    if (btn) {
+      btn.addEventListener("click", function () {
+        guardedGoToSlideNumber(scoreIndex);
+      });
+    }
+    outlineBtns = Array.prototype.slice.call(root.querySelectorAll("[data-cm-index]"));
+  }
+
+  function fetchPhase3SatScore(done) {
+    var localWrong = countPhase3Module2Wrong();
+    function finish(data) {
+      if (typeof done === "function") done(data);
+    }
+    function fromLocal() {
+      if (!satScoreApi) {
+        finish({
+          sat_math_score: Math.max(200, 800 - 20 * localWrong),
+          module2_wrong: localWrong,
+          module2_correct: 22 - localWrong,
+          module1_wrong: localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0,
+          module1_correct: 22 - (localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0),
+          raw_correct: 44 - localWrong - (localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0),
+        });
+        return;
+      }
+      fetch(satScoreApi, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ module2_wrong: localWrong, module2_total: 22 }),
+      })
+        .then(function (r) { return r.json().catch(function () { return null; }); })
+        .then(function (data) {
+          if (data && data.ok) finish(data);
+          else fromLocalFallback();
+        })
+        .catch(fromLocalFallback);
+    }
+    function fromLocalFallback() {
+      finish({
+        ok: true,
+        sat_math_score: Math.max(200, 800 - 20 * localWrong),
+        module2_wrong: localWrong,
+        module2_correct: Math.max(0, 22 - localWrong),
+        module1_wrong: localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0,
+        module1_correct: 22 - (localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0),
+        raw_correct: 44 - localWrong - (localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0),
+      });
+    }
+    if (mySatScoreApi && classroomSession) {
+      fetch(mySatScoreApi, { credentials: "same-origin" })
+        .then(function (r) { return r.json().catch(function () { return null; }); })
+        .then(function (data) {
+          if (data && data.ok) finish(data);
+          else fromLocal();
+        })
+        .catch(fromLocal);
+      return;
+    }
+    fromLocal();
+  }
+
+  function animatePhase3ScoreNumber(rootEl, target) {
+    var numEl = rootEl && rootEl.querySelector("[data-cm-sat-score-num]");
+    if (!numEl || target == null || isNaN(Number(target))) return;
+    var end = Math.round(Number(target));
+    var start = Math.max(200, end - 120);
+    var t0 = null;
+    var dur = 1100;
+    function tick(ts) {
+      if (t0 == null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      numEl.textContent = String(Math.round(start + (end - start) * eased));
+      if (p < 1) window.requestAnimationFrame(tick);
+      else numEl.textContent = String(end);
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  function showPhase3ScoreReveal(data) {
+    phase3ScoreOverlayShown = true;
+    var scoreSlide = slides.find(function (s) { return s.kind === "score"; });
+    if (scoreSlide) {
+      scoreSlide.html = buildPhase3ScoreHtml(data, { showContinue: false });
+    }
+    // Land on the dedicated Score page (Question 22 → next), then pop the reveal.
+    if (phase3ScoreSlideIndex && (!slides[idx] || slides[idx].kind !== "score")) {
+      goToSlideNumber(phase3ScoreSlideIndex);
+    }
+    if (!phase3ScoreRevealEl) {
+      phase3ScoreRevealEl = document.createElement("div");
+      phase3ScoreRevealEl.className = "cm-sat-score-reveal";
+      phase3ScoreRevealEl.setAttribute("data-cm-sat-score-reveal", "true");
+      root.appendChild(phase3ScoreRevealEl);
+    }
+    phase3ScoreRevealEl.innerHTML = buildPhase3ScoreHtml(data, {
+      showContinue: true,
+      continueLabel: "See score page",
+    });
+    phase3ScoreRevealEl.hidden = false;
+    root.classList.add("is-sat-score-reveal");
+    requestAnimationFrame(function () {
+      phase3ScoreRevealEl.classList.add("is-visible");
+      animatePhase3ScoreNumber(phase3ScoreRevealEl, data.sat_math_score);
+    });
+    var btn = phase3ScoreRevealEl.querySelector("[data-cm-sat-score-continue]");
+    if (btn) {
+      btn.onclick = function () {
+        hidePhase3ScoreReveal();
+        if (phase3ScoreSlideIndex) goToSlideNumber(phase3ScoreSlideIndex);
+      };
+    }
+  }
+
+  function hidePhase3ScoreReveal() {
+    if (!phase3ScoreRevealEl) return;
+    phase3ScoreRevealEl.classList.remove("is-visible");
+    root.classList.remove("is-sat-score-reveal");
+    window.setTimeout(function () {
+      if (phase3ScoreRevealEl) phase3ScoreRevealEl.hidden = true;
+    }, 420);
+  }
+
+  function maybeRevealPhase3ScoreAfterLastQuestion(slide) {
+    if (!isPhase3SatMockLesson() || !slide) return;
+    var qs = phase3QuestionSlides();
+    if (!qs.length) return;
+    var lastQ = qs[qs.length - 1];
+    if (slide.index !== lastQ.index) return;
+    fetchPhase3SatScore(function (data) {
+      showPhase3ScoreReveal(data);
+    });
   }
 
   function saveGlobalLastVisit() {
@@ -546,6 +958,13 @@
       clearLaserTrail(true);
       hideLaserPreview();
       publishLaserState(false);
+      if (currentId) {
+        // Fresh Start Class: clear prior locks, then rehydrate from this session.
+        progress.answers = {};
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(progress));
+        } catch (e) {}
+      }
     }
     root.classList.toggle("is-classroom-live", !!classroomSession);
     root.classList.toggle("is-classroom-controller", !!(classroomSession && classroomSlideApi));
@@ -2160,6 +2579,9 @@
         }
         classroomPollFailures = 0;
         setClassroomSession(data.active ? (data.session || null) : null);
+        if (data.active && data.my_responses) {
+          applyClassroomLockedResponses(data.my_responses);
+        }
       })
       .catch(function () {
         classroomPollFailures += 1;
@@ -2219,7 +2641,17 @@
           if (!r.ok || !data || !data.ok) {
             throw new Error((data && data.error) || "Live response was not saved.");
           }
-          showClassroomResponseNotice("Saved to live classroom.", false);
+          if (data.already_submitted) {
+            applyClassroomLockedResponses([{
+              slide_index: payload.slide_index,
+              selected_answer: data.selected_answer || payload.selected_answer,
+              correct_answer: data.correct_answer || payload.correct_answer,
+              is_correct: data.is_correct,
+            }]);
+            showClassroomResponseNotice("Answer already locked for this class.", false);
+            return;
+          }
+          showClassroomResponseNotice("Saved to live classroom — answer locked.", false);
         });
       })
       .catch(function (err) {
@@ -3069,7 +3501,7 @@
 
   function isCanvasSlide(slide) {
     var kind = slide.kind || "lesson";
-    return kind === "section" || kind === "closing" || kind === "intro" || kind === "content";
+    return kind === "section" || kind === "closing" || kind === "intro" || kind === "content" || kind === "score";
   }
 
   function updateCoach(slide) {
@@ -3203,6 +3635,12 @@
   }
 
   function initGridIn(widget) {
+    var slide = slides[idx];
+    var locked = slide ? getLockedAnswer(slide.index) : null;
+    if (locked) {
+      applyLockedGridInState(widget, locked);
+      return;
+    }
     var input = widget.querySelector(".cm-grid-in-input");
     var checkBtn = widget.querySelector("[data-cm-check-grid-in]");
     var feedback = widget.querySelector(".cm-grid-in-feedback");
@@ -3231,34 +3669,41 @@
     if (checkBtn) {
       checkBtn.onclick = function () {
         if (!input || widget.classList.contains("is-checked")) return;
-        var isCorrect = gridInMatches(input.value, accept);
-        widget.classList.add("is-checked");
-        input.classList.add("is-locked");
-        input.readOnly = true;
-        checkBtn.disabled = true;
-        if (isCorrect) {
-          widget.classList.add("is-correct-answer");
-          if (feedback) feedback.textContent = "Correct! Compare with the worked solution.";
-        } else {
-          widget.classList.add("is-wrong-answer");
-          if (feedback) {
-            feedback.textContent = "Not quite — open the worked solution to see the correct answer.";
-          }
+        if (getLockedAnswer(slides[idx].index)) {
+          applyLockedGridInState(widget, getLockedAnswer(slides[idx].index));
+          return;
         }
+        var isCorrect = gridInMatches(input.value, accept);
+        var selectedValue = input.value || "";
+        var correctValue = (accept && accept.length ? accept[0] : "");
         markDone(slides[idx].index);
+        recordPhase3Answer(slides[idx].index, selectedValue, correctValue, !!isCorrect);
+        applyLockedGridInState(widget, {
+          selected: selectedValue,
+          correct: correctValue,
+          is_correct: !!isCorrect,
+          locked: true,
+        });
         submitClassroomResponse({
           slide_index: slides[idx].index,
           question_title: slides[idx].title || "",
-          selected_answer: input.value || "",
-          correct_answer: (accept && accept.length ? accept[0] : ""),
+          selected_answer: selectedValue,
+          correct_answer: correctValue,
           is_correct: !!isCorrect,
         });
+        maybeRevealPhase3ScoreAfterLastQuestion(slides[idx]);
       };
     }
     refreshBtn();
   }
 
   function initMcq(mcq) {
+    var slide = slides[idx];
+    var locked = slide ? getLockedAnswer(slide.index) : null;
+    if (locked) {
+      applyLockedMcqState(mcq, locked);
+      return;
+    }
     var selected = null;
     var choices = Array.prototype.slice.call(mcq.querySelectorAll(".cm-mcq-choice"));
     var checkBtn = mcq.querySelector("[data-cm-check-mcq]");
@@ -3266,7 +3711,7 @@
 
     choices.forEach(function (btn) {
       btn.onclick = function () {
-        if (mcq.classList.contains("is-checked")) return;
+        if (mcq.classList.contains("is-checked") || getLockedAnswer(slides[idx].index)) return;
         choices.forEach(function (c) { c.classList.remove("is-selected"); });
         btn.classList.add("is-selected");
         selected = btn.getAttribute("data-choice");
@@ -3276,31 +3721,21 @@
 
     if (checkBtn) {
       checkBtn.onclick = function () {
-        if (!selected) return;
-        var correct = mcq.getAttribute("data-cm-correct");
-        var isCorrect = correct && selected === correct;
-        choices.forEach(function (c) {
-          c.classList.add("is-locked");
-          if (!correct) return;
-          var letter = c.getAttribute("data-choice");
-          if (letter === correct) c.classList.add("is-correct");
-          else if (letter === selected) c.classList.add("is-incorrect");
-        });
-        checkBtn.disabled = true;
-        mcq.classList.add("is-checked");
-        if (isCorrect) mcq.classList.add("is-correct-answer");
-        else if (correct) mcq.classList.add("is-wrong-answer");
-        markDone(slides[idx].index);
-        var prompt = mcq.querySelector(".cm-mcq-prompt");
-        if (prompt) {
-          if (correct) {
-            prompt.textContent = isCorrect
-              ? "Correct! Compare with the worked solution."
-              : "Not quite — the correct answer is " + correct + ". Review the solution.";
-          } else {
-            prompt.textContent = "Answer recorded — now compare with the worked solution.";
-          }
+        if (!selected || mcq.classList.contains("is-checked")) return;
+        if (getLockedAnswer(slides[idx].index)) {
+          applyLockedMcqState(mcq, getLockedAnswer(slides[idx].index));
+          return;
         }
+        var correct = mcq.getAttribute("data-cm-correct");
+        var isCorrect = !!(correct && selected === correct);
+        markDone(slides[idx].index);
+        recordPhase3Answer(slides[idx].index, selected, correct || "", isCorrect);
+        applyLockedMcqState(mcq, {
+          selected: selected,
+          correct: correct || "",
+          is_correct: isCorrect,
+          locked: true,
+        });
         submitClassroomResponse({
           slide_index: slides[idx].index,
           question_title: slides[idx].title || "",
@@ -3308,15 +3743,17 @@
           correct_answer: correct || "",
           is_correct: !!isCorrect,
         });
+        maybeRevealPhase3ScoreAfterLastQuestion(slides[idx]);
       };
     }
 
     if (skipBtn) {
       skipBtn.onclick = function () {
-        var slide = slides[idx];
-        if (slide.answer_index) {
-          markDone(slide.index);
-          goToSlideNumber(slide.answer_index);
+        var current = slides[idx];
+        if (current && getLockedAnswer(current.index)) return;
+        if (current && current.answer_index) {
+          markDone(current.index);
+          goToSlideNumber(current.answer_index);
         }
       };
     }
@@ -3359,8 +3796,9 @@
     if (stepsToolbar) initStepBlocks(stepsToolbar);
     bodyEl.querySelectorAll("[data-cm-mcq]").forEach(initMcq);
     bodyEl.querySelectorAll("[data-cm-grid-in]").forEach(initGridIn);
+    restoreLockedAnswerOnSlide(slide);
 
-    if ((slide.kind === "question" || slide.kind === "practice") && studyMode) {
+    if ((slide.kind === "question" || slide.kind === "practice") && studyMode && !getLockedAnswer(slide.index)) {
       var focusInput = bodyEl.querySelector(".cm-grid-in-input:not(.is-locked)");
       if (focusInput) {
         window.setTimeout(function () {
@@ -3438,6 +3876,19 @@
     }
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
+    if (kind === "score") {
+      fetchPhase3SatScore(function (data) {
+        if (!slides[idx] || slides[idx].kind !== "score") return;
+        var html = buildPhase3ScoreHtml(data, { showContinue: false });
+        slides[idx].html = html;
+        bodyEl.innerHTML = html;
+        animatePhase3ScoreNumber(bodyEl, data.sat_math_score);
+        // Teacher/student Next after Q22 also gets the cinematic pop once.
+        if (!phase3ScoreOverlayShown && !root.classList.contains("is-sat-score-reveal")) {
+          showPhase3ScoreReveal(data);
+        }
+      });
+    }
 
     if (window.MathJax) {
       if (window.MathJax.typesetClear) window.MathJax.typesetClear([bodyEl, titleEl]);
@@ -3743,11 +4194,14 @@
     updateInkDock();
   }
   setFocusMode(loadFocusMode(), { fullscreen: false });
+  ensurePhase3ScoreSlide();
+  if (!progress.answers) progress.answers = {};
   var initialSlide = parseInitialSlide();
   if (initialSlide > 0) {
     goToSlideNumber(initialSlide);
   }
   loadRemoteProgress().then(function () {
+    if (!progress.answers) progress.answers = {};
     if (initialSlide <= 0 && progress.last_slide_index > 1) {
       showResumeBanner();
     }
