@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-random-test-adaptive")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-random-test-module-labels")
 
 _DB_SCHEMA_READY = False
 
@@ -7203,9 +7203,27 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
 
     def _question_meta(domain: str, topic: str, q_index: int) -> dict:
         # Exam random-test / category exams store responses under exam_* domains
-        # with seed_/set_ topics — rebuild stems from the deterministic seed/set.
+        # with seed_/set_ topics — rebuild stems from frozen module_ids / seed.
         if str(domain).startswith("exam_"):
-            enrich = _exam_question_enrichment_map(str(domain), str(topic), {})
+            exam_meta: dict[str, Any] = {}
+            try:
+                meta_row = db.execute(
+                    """
+                    SELECT exam_meta_json FROM practice_attempts
+                    WHERE domain = ? AND topic = ? AND exam_meta_json IS NOT NULL
+                    ORDER BY id DESC LIMIT 1
+                    """,
+                    (str(domain), str(topic)),
+                ).fetchone()
+                if meta_row and meta_row["exam_meta_json"]:
+                    parsed = json.loads(meta_row["exam_meta_json"])
+                    if isinstance(parsed, dict):
+                        exam_meta = parsed
+            except (json.JSONDecodeError, TypeError, ValueError):
+                exam_meta = {}
+            if str(topic).startswith("seed_") and not exam_meta.get("seed"):
+                exam_meta["seed"] = str(topic)[5:]
+            enrich = _exam_question_enrichment_map(str(domain), str(topic), exam_meta)
             meta = enrich.get(int(q_index)) or {}
             if meta:
                 return {
@@ -9611,9 +9629,29 @@ def _select_random_test_module_items(
         if len(selected) < WORD_PROBLEM_SET_SIZE:
             _take(recycle_items, WORD_PROBLEM_SET_SIZE - len(selected), "recycle-fill")
 
+    # Keep unresolved wrongs at the front of the module; only shuffle the filler.
+    priority_selected = [item for item in selected if item["id"] in priority_ids]
+    filler_selected = [item for item in selected if item["id"] not in priority_ids]
     rng = random.Random(f"{seed}:module{module_id}:order")
-    rng.shuffle(selected)
-    return selected[:WORD_PROBLEM_SET_SIZE]
+    rng.shuffle(filler_selected)
+    ordered = (priority_selected + filler_selected)[:WORD_PROBLEM_SET_SIZE]
+    return ordered
+
+
+def _parse_exam_item_id(item_id: str) -> tuple[str, str, int] | None:
+    """Parse 'domain:topic:q_index' exam item ids."""
+    parts = str(item_id or "").split(":")
+    if len(parts) < 3:
+        return None
+    try:
+        q_index = int(parts[-1])
+    except (TypeError, ValueError):
+        return None
+    domain = parts[0]
+    topic = ":".join(parts[1:-1])
+    if not domain or not topic:
+        return None
+    return domain, topic, q_index
 
 
 def _record_random_test_item_outcome(
@@ -11456,7 +11494,7 @@ def practice_miss_quiz_from_session(attempt_id: int):
     db = get_db()
     uid = session.get("user_id")
     att = db.execute(
-        "SELECT id, domain, topic FROM practice_attempts WHERE id = ?",
+        "SELECT id, domain, topic, exam_meta_json FROM practice_attempts WHERE id = ?",
         (attempt_id,),
     ).fetchone()
     if att is None or not _attempt_user_matches(db, attempt_id, uid):
@@ -11464,11 +11502,47 @@ def practice_miss_quiz_from_session(attempt_id: int):
         return redirect(url_for("practice_analytics"))
     domain = str(att["domain"])
     topic = str(att["topic"])
-    if domain not in BANKS or topic not in BANKS.get(domain, {}):
-        return redirect(url_for("practice"))
     if domain == "placement":
         flash("Miss quiz is for SAT practice sets.")
         return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
+
+    # Random Test / exam sessions: redo wrongs in their source banks, not seed_ topics.
+    if str(domain).startswith("exam_"):
+        exam_meta: dict[str, Any] = {}
+        try:
+            parsed = json.loads(att["exam_meta_json"] or "{}")
+            if isinstance(parsed, dict):
+                exam_meta = parsed
+        except (json.JSONDecodeError, TypeError, ValueError):
+            exam_meta = {}
+        enrich = _exam_question_enrichment_map(domain, topic, exam_meta)
+        wrong_indices = set(_wrong_indices_from_attempt(db, attempt_id))
+        pack_items: list[dict[str, Any]] = []
+        seen_keys: set[str] = set()
+        for qi in sorted(wrong_indices):
+            meta = enrich.get(int(qi)) or {}
+            src_domain = str(meta.get("source_domain") or "")
+            src_topic = str(meta.get("source_topic") or "")
+            src_q = meta.get("source_q_index")
+            if not src_domain or not src_topic or src_q is None:
+                continue
+            if src_domain not in BANKS or src_topic not in (BANKS.get(src_domain) or {}):
+                continue
+            key = f"{src_domain}:{src_topic}:{int(src_q)}"
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            pack_items.append(
+                {"domain": src_domain, "topic": src_topic, "q_index": int(src_q)}
+            )
+        if not pack_items:
+            flash("Could not rebuild this session’s misses for a quiz.")
+            return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
+        label = f"This session's misses · {_exam_attempt_label(domain, topic, att['exam_meta_json'])}"
+        return _redirect_miss_quiz_items(pack_items, label, None)
+
+    if domain not in BANKS or topic not in BANKS.get(domain, {}):
+        return redirect(url_for("practice"))
     indices = _wrong_indices_from_attempt(db, attempt_id)
     label = f"This session's misses · {TOPIC_TITLES.get(topic, topic)}"
     return _redirect_miss_quiz_start(domain, topic, indices, label)
@@ -12454,6 +12528,29 @@ def _exam_question_enrichment_map(
                 if not isinstance(q, dict):
                     continue
                 qi = _random_test_question_index(int(module_id), idx)
+                item_id = str(item.get("id") or "")
+                parsed = _parse_exam_item_id(item_id)
+                source_domain = parsed[0] if parsed else str(item.get("domain") or "")
+                source_topic = parsed[1] if parsed else str(item.get("topic") or "")
+                source_q_index = parsed[2] if parsed else item.get("q_index")
+                try:
+                    source_q_index = int(source_q_index)
+                except (TypeError, ValueError):
+                    source_q_index = None
+                redo_href = None
+                if (
+                    source_domain
+                    and source_topic
+                    and source_q_index is not None
+                    and source_domain in BANKS
+                    and source_topic in (BANKS.get(source_domain) or {})
+                ):
+                    redo_href = url_for(
+                        "practice_miss_quiz_one",
+                        domain=source_domain,
+                        topic=source_topic,
+                        q_index=source_q_index,
+                    )
                 out[qi] = {
                     "stem_html": q.get("stem") or "",
                     "explanation_en": q.get("explanation_en") or "",
@@ -12471,11 +12568,15 @@ def _exam_question_enrichment_map(
                     ),
                     "topic_detail": q.get("topic_detail") or item.get("topic_title") or "",
                     "hard_skill": q.get("hard_skill") or "",
-                    "review_href": url_for(
-                        "practice_random_test_question",
-                        module_id=int(module_id),
-                        step=idx,
-                    ),
+                    "item_id": item_id,
+                    "module_id": int(module_id),
+                    "module_step": idx,
+                    "q_display": f"M{int(module_id)} · {idx + 1}",
+                    "source_domain": source_domain,
+                    "source_topic": source_topic,
+                    "source_q_index": source_q_index,
+                    "review_href": redo_href,
+                    "redo_href": redo_href,
                 }
         return out
 
@@ -12584,12 +12685,23 @@ def _exam_session_summary_payload(
         else:
             status = "nocheck"
         meta = enrich_map.get(qi) or {}
+        module_id = meta.get("module_id")
+        module_step = meta.get("module_step")
+        if module_id is None and domain == "exam_random_test":
+            module_id = 1 if qi < WORD_PROBLEM_SET_SIZE else 2
+            module_step = qi if qi < WORD_PROBLEM_SET_SIZE else qi - WORD_PROBLEM_SET_SIZE
+        if domain == "exam_random_test" and module_id is not None and module_step is not None:
+            q_display = f"M{int(module_id)} · {int(module_step) + 1}"
+        else:
+            q_display = meta.get("q_display") or str(qi + 1)
         rows_out.append(
             {
                 "q_index": qi,
-                "q_display": str(qi + 1),
+                "q_display": q_display,
                 "session_q": str(len(rows_out) + 1),
                 "row_id": f"summary-q-{qi}",
+                "module_id": module_id,
+                "module_step": module_step,
                 "knowledge_section": meta.get("knowledge_section") or "—",
                 "knowledge_title_en": meta.get("knowledge_title_en") or "",
                 "topic_detail": meta.get("topic_detail") or "",
@@ -12599,7 +12711,11 @@ def _exam_session_summary_payload(
                 "status": status,
                 "stem_html": meta.get("stem_html") or "",
                 "explanation_en": meta.get("explanation_en") or "",
-                "review_href": meta.get("review_href"),
+                "review_href": meta.get("review_href") or meta.get("redo_href"),
+                "redo_href": meta.get("redo_href") or meta.get("review_href"),
+                "redo_domain": meta.get("source_domain") or "",
+                "redo_topic": meta.get("source_topic") or "",
+                "redo_q_index": meta.get("source_q_index"),
             }
         )
 
@@ -12653,7 +12769,11 @@ def _exam_session_summary_payload(
         "celebrate_confetti": bool(score_pct >= 55),
         "mistake_focus": mistake_focus,
         "skipped_count": skipped_count,
-        "miss_quiz_session_href": None,
+        "miss_quiz_session_href": (
+            url_for("practice_miss_quiz_from_session", attempt_id=attempt_id)
+            if mistake_focus
+            else None
+        ),
         "miss_quiz_all_href": None,
         "miss_quiz_all_count": 0,
         "miss_quiz_all_is_module": False,

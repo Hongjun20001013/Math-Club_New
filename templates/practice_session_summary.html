@@ -274,10 +274,10 @@
       {% for m in mistake_focus %}
       <article class="np-mistake-card np-mistake-card--v3">
         <header class="np-mistake-card-top">
-          {% if m.review_href %}
-          <a href="{{ m.review_href }}" class="np-mistake-card-q np-mistake-card-q--link">Q {{ m.q_display }}</a>
+          {% if m.review_href or m.redo_href %}
+          <a href="{{ m.redo_href or m.review_href }}" class="np-mistake-card-q np-mistake-card-q--link">{{ m.q_display }}</a>
           {% else %}
-          <span class="np-mistake-card-q">Q {{ m.q_display }}</span>
+          <span class="np-mistake-card-q">{{ m.q_display }}</span>
           {% endif %}
           <span class="np-mistake-card-topic"><span class="np-topic-tag np-topic-tag--{{ m.knowledge_section|lower|replace(' ', '-') }}">{{ m.knowledge_section }}</span> {{ m.knowledge_title_en }}{% if m.topic_detail %} · {{ m.topic_detail }}{% elif m.hard_skill %} · {{ m.hard_skill }}{% endif %}</span>
         </header>
@@ -299,7 +299,13 @@
         {% endif %}
         <div class="np-mistake-card-actions">
           <a class="np-mistake-card-jump" href="#{{ m.row_id }}">In full sheet ↓</a>
+          {% if m.redo_href %}
+          <a class="np-mistake-card-quiz" href="{{ m.redo_href }}">Redo with instant check</a>
+          {% elif m.redo_domain and m.redo_topic and m.redo_q_index is not none %}
+          <a class="np-mistake-card-quiz" href="{{ url_for('practice_miss_quiz_one', domain=m.redo_domain, topic=m.redo_topic, q_index=m.redo_q_index) }}">Redo with instant check</a>
+          {% elif domain[:5] != 'exam_' %}
           <a class="np-mistake-card-quiz" href="{{ url_for('practice_miss_quiz_one', domain=domain, topic=topic, q_index=m.q_index) }}">Redo with instant check</a>
+          {% endif %}
         </div>
       </article>
       {% endfor %}
@@ -419,14 +425,16 @@
     <div id="{{ row.row_id }}" class="np-summary-block np-row-{{ row.status }}">
       <div class="np-summary-row np-summary-row-main">
         <span class="col-q">
-          {% if row.review_href %}
-          <a href="{{ row.review_href }}" class="np-q-link" title="Review question {{ row.q_display }}">
+          {% if row.redo_href or row.review_href %}
+          <a href="{{ row.redo_href or row.review_href }}" class="np-q-link" title="Review {{ row.q_display }}">
             <span class="np-q-main">{{ row.q_display }}</span>
           </a>
           {% else %}
           <span class="np-q-main">{{ row.q_display }}</span>
           {% endif %}
-          {% if row.session_q != row.q_display %}
+          {% if row.module_id %}
+          <span class="np-q-sub">Module {{ row.module_id }}</span>
+          {% elif row.session_q != row.q_display %}
           <span class="np-q-sub">set {{ row.session_q }}</span>
           {% endif %}
         </span>
