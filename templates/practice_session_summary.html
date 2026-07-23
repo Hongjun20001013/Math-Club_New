@@ -291,6 +291,26 @@
         {% else %}
         <div class="np-mistake-card-stem np-mistake-card-stem--empty question-panel"><p class="np-mistake-stem-missing">Question text unavailable for this item.</p></div>
         {% endif %}
+        {% if m.result_choices %}
+        <div class="np-mistake-card-choices choices-panel choices-stack sat-choices-list" aria-label="Answer choices">
+          {% for item in m.result_choices %}
+          <div class="choice-card{% if item.is_selected %} selected{% endif %}{% if item.is_correct %} np-choice-correct{% endif %}{% if item.is_selected and not item.is_correct %} np-choice-wrong{% endif %}">
+            <span class="choice-letter">{{ item.letter }}</span>
+            <div class="choice-content">
+              {{ item.html|safe }}
+              {% if item.is_selected %}<span class="np-choice-flag">Your pick</span>{% endif %}
+              {% if item.is_correct %}<span class="np-choice-flag np-choice-flag--key">Correct answer</span>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% elif m.choices %}
+        <ol class="np-mistake-choice-preview">
+          {% for choice in m.choices %}
+          <li><span>{{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[loop.index0] }}</span><div>{{ choice|safe }}</div></li>
+          {% endfor %}
+        </ol>
+        {% endif %}
         {% if m.explanation_en %}
         <details class="np-explain-details np-mistake-card-explain">
           <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>

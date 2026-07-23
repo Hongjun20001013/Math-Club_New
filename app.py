@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-random-test-module-labels")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-rt-keys-dashboard")
 
 _DB_SCHEMA_READY = False
 
@@ -1728,6 +1728,56 @@ def extract_correct_answer(question: dict) -> str | None:
         return None
     s = str(direct_key).strip()
     return s if s else None
+
+
+def _source_bank_question(
+    domain: str, topic: str, q_index: int | None
+) -> dict[str, Any] | None:
+    """Load a live bank question (with answer keys applied) by domain/topic/index."""
+    if not domain or not topic or q_index is None:
+        return None
+    try:
+        qi = int(q_index)
+    except (TypeError, ValueError):
+        return None
+    tex_file = (BANKS.get(domain) or {}).get(topic)
+    if not tex_file:
+        return None
+    questions = get_questions_for_topic(domain, topic, tex_file)
+    if qi < 0 or qi >= len(questions):
+        return None
+    q = questions[qi]
+    return q if isinstance(q, dict) else None
+
+
+def _mcq_result_choices(
+    choices: list[Any] | None,
+    yours_raw: str,
+    correct_key: str | None,
+    *,
+    question_kind: str = "mcq",
+) -> list[dict[str, Any]]:
+    """Build review choice cards (letter, html, selected/correct flags)."""
+    if not choices or question_kind not in ("mcq", "mcq5"):
+        return []
+    letters = ["A", "B", "C", "D", "E"]
+    max_letters = 5 if question_kind == "mcq5" else 4
+    yours = (yours_raw or "").strip().upper()[:1]
+    key = (correct_key or "").strip().upper()[:1] if correct_key else ""
+    out: list[dict[str, Any]] = []
+    for j, html in enumerate(choices):
+        if j >= max_letters:
+            break
+        letter = letters[j]
+        out.append(
+            {
+                "letter": letter,
+                "html": html,
+                "is_selected": bool(yours) and yours == letter,
+                "is_correct": bool(key) and key == letter,
+            }
+        )
+    return out
 
 
 def _placement_flow_config(topic: str) -> dict | None:
@@ -6854,7 +6904,7 @@ def _student_report_context(
     chapter_touched = sum(min(int(r["engaged"] or 0), int(r["cap"] or 0)) for r in chapter_only)
     weak_chapters = _student_weak_chapters(db, user_id)
     period_activity = _student_period_activity(db, user_id, days=period_days)
-    recent_sessions = _admin_attempt_rows(db, user_id)[:6]
+    recent_sessions = _admin_attempt_rows(db, user_id, tracked_only=True)[:20]
 
     if student is None:
         row = db.execute(
@@ -7228,13 +7278,18 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
             if meta:
                 return {
                     "stem": meta.get("stem_html") or "",
-                    "choices": [],
-                    "question_kind": "mcq",
+                    "choices": meta.get("choices") or [],
+                    "question_kind": meta.get("question_kind") or "mcq",
+                    "correct_answer": meta.get("correct_answer") or "",
                     "knowledge_section": meta.get("knowledge_section") or "",
                     "knowledge_section_title_en": meta.get("knowledge_title_en") or "",
                     "topic_detail": meta.get("topic_detail") or "",
                     "hard_skill": meta.get("hard_skill") or "",
                     "explanation_en": meta.get("explanation_en") or "",
+                    "source_domain": meta.get("source_domain") or "",
+                    "source_topic": meta.get("source_topic") or "",
+                    "source_q_index": meta.get("source_q_index"),
+                    "redo_href": meta.get("redo_href"),
                 }
         cache_key = (domain, topic)
         if cache_key not in question_meta_cache:
@@ -7275,20 +7330,51 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
         elif domain_name == "hard_problem":
             unit_label = str(meta.get("knowledge_section") or "Hard")
             unit_title = str(meta.get("knowledge_section_title_en") or "Hard Problem Drill")
+        elif str(domain_name).startswith("exam_"):
+            unit_label = "Exam"
+            unit_title = _exam_attempt_label(domain_name, str(r["topic"]), None)
         else:
             unit_label, unit_title = "SAT", TOPIC_TITLES.get(r["topic"], r["topic"])
+        live_key = str(meta.get("correct_answer") or "").strip() or str(r["correct_answer"] or "").strip()
+        topic_title = (
+            _exam_attempt_label(domain_name, str(r["topic"]), None)
+            if str(domain_name).startswith("exam_")
+            else TOPIC_TITLES.get(r["topic"], r["topic"])
+        )
+        source_domain = str(meta.get("source_domain") or "")
+        source_topic = str(meta.get("source_topic") or "")
+        source_q_index = meta.get("source_q_index")
+        if source_domain and source_topic and source_q_index is not None:
+            practice_href = url_for(
+                "practice_miss_quiz_one",
+                domain=source_domain,
+                topic=source_topic,
+                q_index=int(source_q_index),
+            )
+        elif meta.get("redo_href"):
+            practice_href = str(meta["redo_href"])
+        else:
+            practice_href = url_for(
+                "practice_question",
+                domain=r["domain"],
+                topic=r["topic"],
+                qnum=int(r["question_index"]),
+                mistake_redo=1,
+                analytics_part=MISS_PART_BY_DOMAIN.get(str(r["domain"]), ""),
+                miss_anchor=f"np-miss-pr-{r['pr_id']}",
+            )
         out.append(
             {
                 "pr_id": r["pr_id"],
                 "when": r["submitted_at"],
                 "domain": r["domain"],
                 "topic": r["topic"],
-                "topic_title": TOPIC_TITLES.get(r["topic"], r["topic"]),
+                "topic_title": topic_title,
                 "q_index": q_index,
                 "knowledge_section": meta.get("knowledge_section") or "",
                 "knowledge_title": (
                     meta.get("knowledge_section_title_en")
-                    or TOPIC_TITLES.get(r["topic"], r["topic"])
+                    or topic_title
                 ),
                 "analytics_unit_label": unit_label,
                 "analytics_unit_title": unit_title,
@@ -7296,19 +7382,11 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
                 "choices": meta.get("choices") or [],
                 "question_kind": meta.get("question_kind") or "mcq",
                 "yours": r["selected_answer"] or "—",
-                "key": r["correct_answer"] or "—",
+                "key": display_answer_plain(live_key) if live_key else "—",
                 "tag_labels": tag_labels,
                 "tag_ids": tag_ids,
                 "note": (r["mistake_note"] or "").strip(),
-                "practice_href": url_for(
-                    "practice_question",
-                    domain=r["domain"],
-                    topic=r["topic"],
-                    qnum=int(r["question_index"]),
-                    mistake_redo=1,
-                    analytics_part=MISS_PART_BY_DOMAIN.get(str(r["domain"]), ""),
-                    miss_anchor=f"np-miss-pr-{r['pr_id']}",
-                ),
+                "practice_href": practice_href,
             }
         )
     if not out:
@@ -12551,23 +12629,35 @@ def _exam_question_enrichment_map(
                         topic=source_topic,
                         q_index=source_q_index,
                     )
+                live_q = _source_bank_question(source_domain, source_topic, source_q_index) or q
+                live_key = extract_correct_answer(live_q)
+                live_choices = live_q.get("choices") if isinstance(live_q.get("choices"), list) else (
+                    q.get("choices") if isinstance(q.get("choices"), list) else []
+                )
                 out[qi] = {
-                    "stem_html": q.get("stem") or "",
-                    "explanation_en": q.get("explanation_en") or "",
+                    "stem_html": live_q.get("stem") or q.get("stem") or "",
+                    "explanation_en": live_q.get("explanation_en") or q.get("explanation_en") or "",
                     "knowledge_section": (
-                        q.get("knowledge_section")
+                        live_q.get("knowledge_section")
+                        or q.get("knowledge_section")
                         or item.get("unit_label")
                         or item.get("unit_key")
                         or ""
                     ),
                     "knowledge_title_en": (
-                        q.get("knowledge_section_title_en")
+                        live_q.get("knowledge_section_title_en")
+                        or q.get("knowledge_section_title_en")
                         or item.get("unit_title")
                         or item.get("topic_title")
                         or ""
                     ),
-                    "topic_detail": q.get("topic_detail") or item.get("topic_title") or "",
-                    "hard_skill": q.get("hard_skill") or "",
+                    "topic_detail": (
+                        live_q.get("topic_detail")
+                        or q.get("topic_detail")
+                        or item.get("topic_title")
+                        or ""
+                    ),
+                    "hard_skill": live_q.get("hard_skill") or q.get("hard_skill") or "",
                     "item_id": item_id,
                     "module_id": int(module_id),
                     "module_step": idx,
@@ -12577,6 +12667,10 @@ def _exam_question_enrichment_map(
                     "source_q_index": source_q_index,
                     "review_href": redo_href,
                     "redo_href": redo_href,
+                    "correct_answer": live_key or "",
+                    "choices": live_choices,
+                    "question_kind": live_q.get("question_kind") or q.get("question_kind") or "mcq",
+                    "answer_alternates": live_q.get("answer_alternates") or q.get("answer_alternates") or [],
                 }
         return out
 
@@ -12601,24 +12695,54 @@ def _exam_question_enrichment_map(
         q = item.get("q") if isinstance(item, dict) else None
         if not isinstance(q, dict):
             continue
+        source_domain = str(item.get("domain") or "")
+        source_topic = str(item.get("topic") or "")
+        source_q_index = item.get("q_index")
+        try:
+            source_q_index = int(source_q_index) if source_q_index is not None else None
+        except (TypeError, ValueError):
+            source_q_index = None
+        live_q = _source_bank_question(source_domain, source_topic, source_q_index) or q
+        live_key = extract_correct_answer(live_q)
+        live_choices = live_q.get("choices") if isinstance(live_q.get("choices"), list) else (
+            q.get("choices") if isinstance(q.get("choices"), list) else []
+        )
         out[idx] = {
-            "stem_html": q.get("stem") or "",
-            "explanation_en": q.get("explanation_en") or "",
-            "knowledge_section": q.get("knowledge_section") or item.get("unit_label") or "",
+            "stem_html": live_q.get("stem") or q.get("stem") or "",
+            "explanation_en": live_q.get("explanation_en") or q.get("explanation_en") or "",
+            "knowledge_section": (
+                live_q.get("knowledge_section")
+                or q.get("knowledge_section")
+                or item.get("unit_label")
+                or ""
+            ),
             "knowledge_title_en": (
-                q.get("knowledge_section_title_en")
+                live_q.get("knowledge_section_title_en")
+                or q.get("knowledge_section_title_en")
                 or item.get("unit_title")
                 or item.get("topic_title")
                 or ""
             ),
-            "topic_detail": q.get("topic_detail") or item.get("topic_title") or "",
-            "hard_skill": q.get("hard_skill") or "",
+            "topic_detail": (
+                live_q.get("topic_detail")
+                or q.get("topic_detail")
+                or item.get("topic_title")
+                or ""
+            ),
+            "hard_skill": live_q.get("hard_skill") or q.get("hard_skill") or "",
             "review_href": url_for(
                 "practice_exam_question",
                 category_slug=category_slug,
                 set_id=int(set_id),
                 step=idx,
             ),
+            "source_domain": source_domain,
+            "source_topic": source_topic,
+            "source_q_index": source_q_index,
+            "correct_answer": live_key or "",
+            "choices": live_choices,
+            "question_kind": live_q.get("question_kind") or q.get("question_kind") or "mcq",
+            "answer_alternates": live_q.get("answer_alternates") or q.get("answer_alternates") or [],
         }
     return out
 
@@ -12643,7 +12767,7 @@ def _exam_session_summary_payload(
 
     resp_rows = db.execute(
         """
-        SELECT question_index, selected_answer, correct_answer, is_correct
+        SELECT id, question_index, selected_answer, correct_answer, is_correct
         FROM practice_responses
         WHERE attempt_id = ? AND question_index IS NOT NULL
         ORDER BY question_index
@@ -12672,19 +12796,43 @@ def _exam_session_summary_payload(
     enrich_map = _exam_question_enrichment_map(domain, topic, exam_meta)
     rows_out: List[dict] = []
     correct_count = 0
+    stale_response_updates: list[tuple[Any, ...]] = []
     for r in resp_rows:
         qi = int(r["question_index"])
         yours_raw = (r["selected_answer"] or "").strip()
-        key_display = (r["correct_answer"] or "").strip() or "—"
-        is_correct = r["is_correct"]
-        if is_correct == 1:
-            status = "correct"
-            correct_count += 1
-        elif is_correct == 0:
-            status = "incorrect"
-        else:
-            status = "nocheck"
+        stored_key = (r["correct_answer"] or "").strip()
         meta = enrich_map.get(qi) or {}
+        live_key = str(meta.get("correct_answer") or "").strip() or stored_key
+        key_display = display_answer_plain(live_key) if live_key else "—"
+        q_grade = {
+            "correct_answer": live_key,
+            "question_kind": meta.get("question_kind") or "mcq",
+            "answer_alternates": meta.get("answer_alternates") or [],
+        }
+        if not yours_raw:
+            status = "skipped"
+            live_is_correct: int | None = None
+        elif not live_key:
+            status = "nocheck"
+            live_is_correct = None
+        else:
+            graded = response_is_correct(q_grade, yours_raw)
+            if graded is True:
+                status = "correct"
+                live_is_correct = 1
+                correct_count += 1
+            elif graded is False:
+                status = "incorrect"
+                live_is_correct = 0
+            else:
+                status = "nocheck"
+                live_is_correct = None
+        stored_is = r["is_correct"]
+        if live_key and (
+            stored_key != live_key
+            or (live_is_correct is not None and stored_is != live_is_correct)
+        ):
+            stale_response_updates.append((live_key, live_is_correct, int(r["id"])))
         module_id = meta.get("module_id")
         module_step = meta.get("module_step")
         if module_id is None and domain == "exam_random_test":
@@ -12694,6 +12842,12 @@ def _exam_session_summary_payload(
             q_display = f"M{int(module_id)} · {int(module_step) + 1}"
         else:
             q_display = meta.get("q_display") or str(qi + 1)
+        result_choices = _mcq_result_choices(
+            meta.get("choices"),
+            yours_raw,
+            live_key,
+            question_kind=str(meta.get("question_kind") or "mcq"),
+        )
         rows_out.append(
             {
                 "q_index": qi,
@@ -12711,6 +12865,8 @@ def _exam_session_summary_payload(
                 "status": status,
                 "stem_html": meta.get("stem_html") or "",
                 "explanation_en": meta.get("explanation_en") or "",
+                "choices": meta.get("choices") or [],
+                "result_choices": result_choices,
                 "review_href": meta.get("review_href") or meta.get("redo_href"),
                 "redo_href": meta.get("redo_href") or meta.get("review_href"),
                 "redo_domain": meta.get("source_domain") or "",
@@ -12719,31 +12875,77 @@ def _exam_session_summary_payload(
             }
         )
 
+    if stale_response_updates:
+        for live_key, live_is_correct, pr_id in stale_response_updates:
+            db.execute(
+                """
+                UPDATE practice_responses
+                SET correct_answer = ?, is_correct = ?
+                WHERE id = ?
+                """,
+                (live_key, live_is_correct, pr_id),
+            )
+        _safe_db_commit(db)
+
     total_q = len(rows_out)
     if exam_meta.get("total_questions") is not None:
         total_q = max(total_q, int(exam_meta["total_questions"]))
     elif exam_meta.get("total") is not None:
         total_q = max(total_q, int(exam_meta["total"]))
-    if exam_meta.get("total_correct") is not None:
+    # Prefer live re-grade counts so corrected keys refresh accuracy/score.
+    live_correct_count = correct_count
+    if exam_meta.get("total_correct") is not None and not stale_response_updates:
         correct_count = int(exam_meta["total_correct"])
-    elif exam_meta.get("correct") is not None:
+    elif exam_meta.get("correct") is not None and not stale_response_updates:
         correct_count = int(exam_meta["correct"])
-    if exam_meta.get("raw_accuracy") is not None:
+    else:
+        correct_count = live_correct_count
+    if exam_meta.get("raw_accuracy") is not None and not stale_response_updates:
         score_pct = int(exam_meta["raw_accuracy"])
-    elif exam_meta.get("accuracy") is not None:
+    elif exam_meta.get("accuracy") is not None and not stale_response_updates:
         score_pct = int(exam_meta["accuracy"])
     else:
         score_pct = round(100.0 * correct_count / total_q) if total_q else 0
-    topic_title = _exam_attempt_label(domain, topic, att["exam_meta_json"] if "exam_meta_json" in att.keys() else None)
-    skipped_count = sum(1 for row in rows_out if row["status"] == "skipped")
-    mistake_focus = [row for row in rows_out if row["status"] == "incorrect"]
 
     exam_sat_score = None
-    try:
-        if exam_meta.get("score") is not None:
-            exam_sat_score = int(exam_meta["score"])
-    except (TypeError, ValueError):
-        exam_sat_score = None
+    if domain == "exam_random_test":
+        exam_sat_score = _random_test_score(live_correct_count)
+        score_pct = round(100.0 * live_correct_count / total_q) if total_q else 0
+        correct_count = live_correct_count
+        score_band = (
+            "Advanced"
+            if exam_sat_score >= 700
+            else (
+                "On Track"
+                if exam_sat_score >= 600
+                else ("Building" if exam_sat_score >= 500 else "Needs Focus")
+            )
+        )
+        meta_changed = (
+            exam_meta.get("score") != exam_sat_score
+            or exam_meta.get("total_correct") != live_correct_count
+            or exam_meta.get("raw_accuracy") != score_pct
+        )
+        if meta_changed or stale_response_updates:
+            exam_meta = {
+                **exam_meta,
+                "score": exam_sat_score,
+                "total_correct": live_correct_count,
+                "total_questions": total_q,
+                "raw_accuracy": score_pct,
+                "score_band": score_band,
+            }
+            _finalize_exam_db_attempt(db, attempt_id, exam_meta)
+    else:
+        try:
+            if exam_meta.get("score") is not None:
+                exam_sat_score = int(exam_meta["score"])
+        except (TypeError, ValueError):
+            exam_sat_score = None
+
+    topic_title = _exam_attempt_label(domain, topic, json.dumps(exam_meta) if exam_meta else None)
+    skipped_count = sum(1 for row in rows_out if row["status"] == "skipped")
+    mistake_focus = [row for row in rows_out if row["status"] == "incorrect"]
 
     render = {
         "domain": domain,
@@ -13854,6 +14056,7 @@ def _learning_pulse_session_rows(
             pa.domain,
             pa.topic,
             pa.created_at,
+            pa.exam_meta_json,
             COUNT(pr.id) AS responses_total,
             SUM(CASE WHEN pr.is_correct = 1 THEN 1 ELSE 0 END) AS correct_total,
             SUM(CASE WHEN pr.is_correct IN (0, 1) THEN 1 ELSE 0 END) AS graded_total,
@@ -13862,7 +14065,6 @@ def _learning_pulse_session_rows(
         JOIN users u ON u.id = pa.user_id
         LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
         WHERE u.role = 'student' AND u.is_active = 1
-          AND pa.domain NOT LIKE 'exam_%'
           AND pa.domain != 'placement'
           {user_filter}
         GROUP BY pa.id
@@ -13882,25 +14084,41 @@ def _learning_pulse_session_rows(
             continue
         if _is_digest_demo_username(str(row["username"] or "")):
             continue
+        domain = str(row.get("domain") or "")
         graded = int(row.get("graded_total") or 0)
-        is_tracked = graded >= MIN_TRACKED_SAT_RESPONSES
+        is_exam = domain.startswith("exam_")
+        is_tracked = is_exam or graded >= MIN_TRACKED_SAT_RESPONSES
         if tracked_only and not is_tracked:
             continue
         responses = int(row.get("responses_total") or 0)
         correct = int(row.get("correct_total") or 0)
         topic = str(row.get("topic") or "")
+        label = _exam_attempt_label(domain, topic, row.get("exam_meta_json"))
+        topic_title = label if is_exam else TOPIC_TITLES.get(topic, topic)
+        sat_score = None
+        if domain == "exam_random_test" and row.get("exam_meta_json"):
+            try:
+                meta = json.loads(row["exam_meta_json"] or "{}")
+                if meta.get("score") is not None:
+                    sat_score = int(meta["score"])
+            except (json.JSONDecodeError, TypeError, ValueError):
+                sat_score = None
         out.append(
             {
                 "id": int(row["id"]),
                 "username": str(row["username"] or ""),
                 "user_id": uid,
-                "topic_title": TOPIC_TITLES.get(topic, topic),
+                "domain": domain,
+                "topic_title": topic_title,
+                "label": label,
+                "sat_score": sat_score,
                 "responses_total": responses,
                 "accuracy_pct": round(100 * correct / responses) if responses else None,
                 "created_at": row["created_at"],
                 "last_submitted_at": row["last_submitted_at"],
                 "tracking_label": "Counts" if is_tracked else f"Preview · need {max(0, MIN_TRACKED_SAT_RESPONSES - graded)} more",
                 "is_tracked": is_tracked,
+                "is_exam": is_exam,
                 "session_href": url_for("practice_session_summary", attempt_id=int(row["id"])),
                 "student_href": url_for("admin_student_detail", user_id=uid),
             }
@@ -15095,17 +15313,33 @@ def _admin_attempt_rows(
         responses = int(row.get("responses_total") or 0)
         correct = int(row.get("correct_total") or 0)
         row["accuracy_pct"] = round(100 * correct / responses) if responses else None
-        row["is_tracked"] = is_tracked
-        row["topic_title"] = TOPIC_TITLES.get(str(row.get("topic") or ""), str(row.get("topic") or ""))
-        row["tracking_label"] = (
-            "Counts"
-            if is_tracked or domain.startswith("exam_")
-            else f"Preview · need {max(0, MIN_TRACKED_SAT_RESPONSES - graded)} more"
-        )
-        row["label"] = _exam_attempt_label(
+        row["is_tracked"] = is_tracked or domain.startswith("exam_")
+        label = _exam_attempt_label(
             domain,
             str(row.get("topic") or ""),
             row.get("exam_meta_json"),
+        )
+        row["label"] = label
+        if domain.startswith("exam_"):
+            row["topic_title"] = label
+            sat_score = None
+            if domain == "exam_random_test" and row.get("exam_meta_json"):
+                try:
+                    meta = json.loads(row["exam_meta_json"] or "{}")
+                    if meta.get("score") is not None:
+                        sat_score = int(meta["score"])
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    sat_score = None
+            row["sat_score"] = sat_score
+        else:
+            row["topic_title"] = TOPIC_TITLES.get(
+                str(row.get("topic") or ""), str(row.get("topic") or "")
+            )
+            row["sat_score"] = None
+        row["tracking_label"] = (
+            "Counts"
+            if row["is_tracked"]
+            else f"Preview · need {max(0, MIN_TRACKED_SAT_RESPONSES - graded)} more"
         )
         out.append(row)
     return out

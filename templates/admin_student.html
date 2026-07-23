@@ -84,11 +84,12 @@
       </div>
       {% endif %}
 
-      <div class="np-admin-record-table" role="table" aria-label="Tracked practice sessions">
+      <div class="np-admin-record-table np-admin-record-table--with-sat" role="table" aria-label="Tracked practice sessions">
         <div class="np-admin-record-row np-admin-record-row--head" role="row">
           <span>Unit / set</span>
           <span>Responses</span>
           <span>Accuracy</span>
+          <span>SAT score</span>
           <span>Started</span>
           <span>Last activity</span>
           <span>Status</span>
@@ -96,9 +97,10 @@
         </div>
         {% for attempt in attempts %}
         <div class="np-admin-record-row" role="row">
-          <span>{{ attempt.topic_title|default(attempt.label|default(attempt.domain)) }}</span>
+          <span>{{ attempt.label if attempt.domain.startswith('exam_') else (attempt.topic_title|default(attempt.label|default(attempt.domain))) }}</span>
           <span>{{ attempt.responses_total or 0 }}</span>
           <span>{% if attempt.accuracy_pct is not none %}{{ attempt.accuracy_pct }}%{% else %}—{% endif %}</span>
+          <span>{% if attempt.sat_score is not none %}{{ attempt.sat_score }}/800{% else %}—{% endif %}</span>
           <span>{{ attempt.created_at }}</span>
           <span>{{ attempt.last_submitted_at or attempt.created_at }}</span>
           <span class="np-admin-session-badge np-admin-session-badge--tracked">{{ attempt.tracking_label }}</span>
@@ -130,7 +132,7 @@
         </div>
         {% for attempt in attempts_all %}
         <div class="np-admin-record-row{% if not attempt.is_tracked %} is-preview{% endif %}" role="row">
-          <span>{{ attempt.topic_title|default(attempt.label|default(attempt.domain)) }}</span>
+          <span>{{ attempt.label if attempt.domain.startswith('exam_') else (attempt.topic_title|default(attempt.label|default(attempt.domain))) }}</span>
           <span>{{ attempt.responses_total or 0 }}</span>
           <span>{% if attempt.accuracy_pct is not none %}{{ attempt.accuracy_pct }}%{% else %}—{% endif %}</span>
           <span>{{ attempt.last_submitted_at or attempt.created_at }}</span>

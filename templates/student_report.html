@@ -223,21 +223,37 @@
     </div>
   </details>
 
-  {% if viewer == 'admin' and recent_sessions %}
-  <details class="np-report-drawer glass-panel np-glass">
-    <summary>Recent sessions · last 6</summary>
+  <section class="np-report-zone glass-panel np-glass mp-animate-up" aria-label="Homework and Random Test history">
+    <header class="np-report-zone-head">
+      <h2>Homework &amp; Random Test log</h2>
+      <p>Each finished set and mock — open a report to see accuracy, score, and misses with the live answer key.</p>
+    </header>
+    {% if recent_sessions %}
     <div class="np-report-session-list">
       {% for attempt in recent_sessions %}
-      <a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-report-session-row" target="_blank" rel="noopener">
-        <strong>{{ attempt.label|default(attempt.domain) }}</strong>
-        <span>{{ attempt.responses_total or 0 }} responses{% if attempt.accuracy_pct is not none %} · {{ attempt.accuracy_pct }}%{% endif %}</span>
+      <a href="{{ url_for('practice_session_summary', attempt_id=attempt.id) }}" class="np-report-session-row"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>
+        <strong>{{ attempt.label if attempt.domain.startswith('exam_') else (attempt.topic_title|default(attempt.label|default(attempt.domain))) }}</strong>
+        <span>
+          {{ attempt.responses_total or 0 }} responses
+          {% if attempt.accuracy_pct is not none %} · {{ attempt.accuracy_pct }}%{% endif %}
+          {% if attempt.sat_score is not none %} · {{ attempt.sat_score }}/800{% endif %}
+        </span>
         <em>{{ attempt.last_submitted_at or attempt.created_at }}</em>
         <i>Open →</i>
       </a>
       {% endfor %}
     </div>
-  </details>
-  {% endif %}
+    {% else %}
+    <p class="np-report-empty">No tracked homework or Random Test yet. Finish a practice set or mock to see it here.</p>
+    {% endif %}
+    {% if viewer != 'admin' %}
+    <p class="np-report-foot" style="margin-top:0.85rem;">
+      <a href="{{ analytics_href }}">Mistake log →</a>
+      <span class="np-meta-sep">·</span>
+      <a href="{{ random_test_href }}">Take Random Test →</a>
+    </p>
+    {% endif %}
+  </section>
 
   <p class="np-report-foot">{% if viewer == 'admin' %}Confidential instructor report{% else %}Keep the loop: lesson → drill → mock → mistake redo{% endif %}</p>
 </div>

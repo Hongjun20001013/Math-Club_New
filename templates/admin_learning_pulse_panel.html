@@ -74,6 +74,7 @@
             <span>Unit / set</span>
             <span>Responses</span>
             <span>Accuracy</span>
+            <span>SAT score</span>
             <span>Started</span>
             <span>Last activity</span>
             <span>Status</span>
@@ -84,6 +85,7 @@
             <span>{{ row.topic_title }}</span>
             <span>{{ row.responses_total }}</span>
             <span>{% if row.accuracy_pct is not none %}{{ row.accuracy_pct }}%{% else %}—{% endif %}</span>
+            <span>{% if row.sat_score is not none %}{{ row.sat_score }}/800{% else %}—{% endif %}</span>
             <span>{{ row.created_at }}</span>
             <span>{{ row.last_submitted_at or row.created_at }}</span>
             <span class="np-admin-session-badge np-admin-session-badge--tracked">{{ row.tracking_label }}</span>

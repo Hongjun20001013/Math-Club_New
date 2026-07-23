@@ -9765,6 +9765,16 @@ html[data-exam-theme="dark"] .np-placement-student-missing strong {
     opacity: 0.45;
 }
 
+.np-mistake-card-choices {
+    margin: 0.65rem 0 0.35rem;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.np-mistake-card-choices .choice-card {
+    pointer-events: none;
+}
+
 .np-mistake-card-stem {
     max-height: 240px;
     overflow: auto;
@@ -21073,6 +21083,11 @@ html[data-exam-theme="dark"] .np-placement-pdf-doc-stack::after {
     padding: 13px 12px;
     border-bottom: 1px solid rgba(82, 64, 212, 0.1);
     color: #4d465f;
+}
+
+.np-admin-record-table--with-sat .np-admin-record-row {
+    grid-template-columns: 1.35fr 0.7fr 0.65fr 0.7fr 1fr 1fr 0.7fr 0.55fr;
+    min-width: 1120px;
 }
 
 .np-admin-record-row--head {
@@ -33182,8 +33197,8 @@ body.is-cm-projector .np-cm-slide-body mjx-container {
 }
 
 .np-admin-record-table--studio-detail .np-admin-record-row {
-    grid-template-columns: 1.5fr 0.55fr 0.55fr 1fr 1fr 0.65fr 0.5fr;
-    min-width: 720px;
+    grid-template-columns: 1.45fr 0.5fr 0.5fr 0.55fr 0.95fr 0.95fr 0.6fr 0.45fr;
+    min-width: 820px;
 }
 
 @media (max-width: 860px) {
