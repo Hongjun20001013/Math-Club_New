@@ -620,8 +620,198 @@
     return wrong;
   }
 
+  function classScoreReportHref() {
+    if (!lessonSlug) return "";
+    return "/practice/materials/" + encodeURIComponent(lessonSlug) + "/classroom/report";
+  }
+
+  function isSupervisorScoreView() {
+    // Staff slides get classroomSummaryApi; students never do.
+    return !!classroomSummaryApi;
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function satScorePct(score) {
+    var n = Number(score);
+    if (isNaN(n)) return 0;
+    return Math.max(0, Math.min(100, Math.round((100 * (n - 200)) / 600)));
+  }
+
+  function buildPhase3ScoreRingHtml(score, opts) {
+    opts = opts || {};
+    var label = score != null && score !== "" && !isNaN(Number(score)) ? String(Math.round(Number(score))) : "—";
+    var pct = satScorePct(score);
+    var numAttr = opts.animate ? ' data-cm-sat-score-num' : "";
+    return (
+      '<div class="cm-sat-score-orb-ring' + (opts.ringClass ? " " + opts.ringClass : "") + '" style="--sat-pct:' + pct + ';">' +
+        '<div class="cm-sat-score-orb-core">' +
+          '<span class="cm-sat-score-num"' + numAttr + ">" + label + "</span>" +
+          '<span class="cm-sat-score-den">/ 800</span>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function buildPhase3ClassScoreHtml(summary) {
+    var title = (slides[0] && slides[0].section) || "Mock Exam";
+    var report = (summary && summary.report) || {};
+    var students = report.student_breakdown || [];
+    var avg = report.class_avg_sat;
+    var responded = report.responded_count != null ? report.responded_count : 0;
+    var roster = summary && summary.roster_count != null ? summary.roster_count : students.length;
+    var qTotal = report.question_count || 22;
+    var reportHref = classScoreReportHref();
+    var live = summary && summary.session && summary.session.is_active;
+    var cards = students.map(function (s) {
+      var sat = s.sat_math_score;
+      var phase3 = s.phase3_sat || {};
+      var wrong = s.wrong_questions || [];
+      var missing = s.missing_items || [];
+      var missTotal = wrong.length + missing.length;
+      var m2c = phase3.module2_correct != null ? phase3.module2_correct : s.correct;
+      var acc =
+        m2c != null && qTotal
+          ? Math.round((100 * Number(m2c)) / qTotal)
+          : s.accuracy;
+      var status = !s.submitted
+        ? "Not started"
+        : acc != null && acc >= 80
+          ? "On track"
+          : acc != null && acc >= 50
+            ? "Needs review"
+            : "Needs help";
+      var missHtml;
+      if (!s.submitted) {
+        missHtml = '<p class="cm-sat-class-clean is-muted">No responses yet</p>';
+      } else if (!missTotal) {
+        missHtml = '<p class="cm-sat-class-clean">Clean sheet</p>';
+      } else {
+        missHtml =
+          '<ul class="cm-sat-class-misses">' +
+          wrong
+            .slice(0, 6)
+            .map(function (w) {
+              return (
+                '<li class="is-wrong"><strong>Q' +
+                escapeHtml(w.q_num || w.slide_index) +
+                "</strong><span>" +
+                escapeHtml(w.title || "") +
+                "</span><em>Yours " +
+                escapeHtml(w.selected || "—") +
+                " · Key " +
+                escapeHtml(w.correct_answer || "—") +
+                "</em></li>"
+              );
+            })
+            .join("") +
+          missing
+            .slice(0, 6)
+            .map(function (m) {
+              return (
+                '<li class="is-blank"><strong>Q' +
+                escapeHtml(m.q_num || m.slide_index) +
+                "</strong><span>" +
+                escapeHtml(m.title || "") +
+                "</span><em>Not answered</em></li>"
+              );
+            })
+            .join("") +
+          (missTotal > 12 ? "<li><em>+" + (missTotal - 12) + " more on full report</em></li>" : "") +
+          "</ul>";
+      }
+      return (
+        '<article class="cm-sat-class-card">' +
+          '<p class="cm-sat-class-card-name">' + escapeHtml(s.username || "Student") + "</p>" +
+          '<h3 class="cm-sat-class-card-headline">Estimated score</h3>' +
+          (sat != null
+            ? buildPhase3ScoreRingHtml(sat, { ringClass: "cm-sat-class-ring" })
+            : '<div class="cm-sat-class-ring-placeholder">—</div>') +
+          '<p class="cm-sat-class-card-sub">' +
+            escapeHtml(status) +
+            (s.submitted && m2c != null
+              ? " · " + escapeHtml(m2c) + "/" + qTotal + " correct" + (acc != null ? " · " + acc + "%" : "")
+              : "") +
+          "</p>" +
+          '<div class="cm-sat-class-card-miss">' +
+            '<div class="cm-sat-class-card-miss-head"><span>Misses &amp; blanks</span><strong>' +
+            missTotal +
+            "</strong></div>" +
+            missHtml +
+          "</div>" +
+        "</article>"
+      );
+    }).join("");
+
+    var emptyMsg = !summary || !summary.session
+      ? "Start a live class first — then every student’s estimated SAT score appears here."
+      : !students.length
+        ? "Select a roster on the classroom page, then collect answers."
+        : !responded
+          ? "Waiting for students to answer on the slides…"
+          : "";
+
+    return (
+      '<div class="cm-sat-score-canvas cm-sat-score-canvas--class" data-cm-sat-score-canvas data-cm-sat-class-board="true">' +
+        '<div class="cm-sat-score-bg" aria-hidden="true">' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--1"></span>' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--2"></span>' +
+          '<span class="cm-sat-score-orb cm-sat-score-orb--3"></span>' +
+          '<span class="cm-sat-score-grid"></span>' +
+        "</div>" +
+        '<div class="cm-sat-score-inner cm-sat-score-inner--class">' +
+          '<p class="cm-sat-score-kicker">Supervisor · Class SAT scores' +
+            (live ? ' <span class="cm-sat-class-live">Live</span>' : "") +
+          "</p>" +
+          '<p class="cm-sat-score-lesson">' + escapeHtml(title) + "</p>" +
+          '<h2 class="cm-sat-score-headline">Everyone’s estimated score</h2>' +
+          (avg != null
+            ? '<div class="cm-sat-class-avg">' +
+                buildPhase3ScoreRingHtml(avg, { animate: true, ringClass: "cm-sat-class-ring--avg" }) +
+                '<p class="cm-sat-class-avg-label">Class average</p>' +
+                '<p class="cm-sat-score-sub">' + responded + " responded · " + roster + " on roster</p>" +
+              "</div>"
+            : '<p class="cm-sat-score-sub">' + escapeHtml(emptyMsg || "No SAT estimates yet.") + "</p>") +
+          (cards
+            ? '<div class="cm-sat-class-grid" aria-label="Per-student scores">' + cards + "</div>"
+            : "") +
+          (reportHref
+            ? '<a class="cm-sat-score-continue cm-sat-score-class-report" href="' + reportHref + '">Open printable class report →</a>'
+            : "") +
+          '<p class="cm-sat-score-foot">Same Module 2 estimate students see — unanswered items count as wrong.</p>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderSupervisorScoreSlide(summary) {
+    if (!isSupervisorScoreView()) return false;
+    if (!slides[idx] || slides[idx].kind !== "score") return false;
+    var html = buildPhase3ClassScoreHtml(summary || classroomSummary);
+    slides[idx].html = html;
+    if (bodyEl) bodyEl.innerHTML = html;
+    var avg = summary && summary.report ? summary.report.class_avg_sat : null;
+    if (avg == null && classroomSummary && classroomSummary.report) {
+      avg = classroomSummary.report.class_avg_sat;
+    }
+    if (avg != null) animatePhase3ScoreNumber(bodyEl, avg);
+    hidePhase3ScoreReveal();
+    phase3ScoreOverlayShown = true; // block personal reveal for supervisors
+    return true;
+  }
+
   function buildPhase3ScoreHtml(data, opts) {
     opts = opts || {};
+    if (isSupervisorScoreView() && !opts.forcePersonal) {
+      return buildPhase3ClassScoreHtml(classroomSummary);
+    }
     var score = data.sat_math_score != null ? data.sat_math_score : "—";
     var m2c = data.module2_correct != null ? data.module2_correct : "—";
     var m2w = data.module2_wrong != null ? data.module2_wrong : "—";
@@ -641,12 +831,7 @@
           '<p class="cm-sat-score-kicker">Novel Prep · Digital SAT Math</p>' +
           '<p class="cm-sat-score-lesson">' + title + '</p>' +
           '<h2 class="cm-sat-score-headline">Your estimated score</h2>' +
-          '<div class="cm-sat-score-orb-ring" style="--sat-pct:' + Math.max(0, Math.min(100, ((Number(score) - 200) / 600) * 100)) + ';">' +
-            '<div class="cm-sat-score-orb-core">' +
-              '<span class="cm-sat-score-num" data-cm-sat-score-num>' + score + '</span>' +
-              '<span class="cm-sat-score-den">/ 800</span>' +
-            '</div>' +
-          '</div>' +
+          buildPhase3ScoreRingHtml(score, { animate: true }) +
           '<p class="cm-sat-score-sub">Module 2 classroom estimate · Module 1 inferred from your Module 2 result</p>' +
           '<div class="cm-sat-score-metrics">' +
             '<article><em>Module 2</em><strong>' + m2c + '<span>/22</span></strong><small>' + m2w + ' wrong</small></article>' +
@@ -687,19 +872,23 @@
     phase3ScoreSlideIndex = scoreIndex;
     var scoreSlide = {
       index: scoreIndex,
-      title: "Your SAT Score",
-      html: buildPhase3ScoreHtml({
-        sat_math_score: "—",
-        module2_correct: "—",
-        module2_wrong: "—",
-        module1_correct: "—",
-        module1_wrong: 0,
-        raw_correct: "—",
-      }, { showContinue: false }),
+      title: isSupervisorScoreView() ? "Class SAT Scores" : "Your SAT Score",
+      html: isSupervisorScoreView()
+        ? buildPhase3ClassScoreHtml(null)
+        : buildPhase3ScoreHtml({
+            sat_math_score: "—",
+            module2_correct: "—",
+            module2_wrong: "—",
+            module1_correct: "—",
+            module1_wrong: 0,
+            raw_correct: "—",
+          }, { showContinue: false, forcePersonal: true }),
       kind: "score",
       interactive: false,
       section: lastQ.section || "Mock Exam",
-      study_tip: "Your estimated Digital SAT Math score from this Module 2 set.",
+      study_tip: isSupervisorScoreView()
+        ? "Estimated Digital SAT Math for every student in this live class."
+        : "Your estimated Digital SAT Math score from this Module 2 set.",
       strategy_hint: "",
     };
     slides.splice(insertAt, 0, scoreSlide);
@@ -721,7 +910,9 @@
         '<span class="np-cm-outline-num">★</span>' +
         '<span class="np-cm-outline-copy">' +
           '<em class="np-cm-outline-kind">Score</em>' +
-          '<span class="np-cm-outline-title">Your SAT Score</span>' +
+          '<span class="np-cm-outline-title">' +
+            (isSupervisorScoreView() ? "Class SAT Scores" : "Your SAT Score") +
+          "</span>" +
         "</span>" +
       "</button>";
     if (nextLi && nextLi.parentNode === list) list.insertBefore(li, nextLi);
@@ -809,6 +1000,16 @@
 
   function showPhase3ScoreReveal(data) {
     phase3ScoreOverlayShown = true;
+    // Supervisors see the class board on the SCORE slide — not a personal overlay.
+    if (isSupervisorScoreView()) {
+      if (phase3ScoreSlideIndex && (!slides[idx] || slides[idx].kind !== "score")) {
+        goToSlideNumber(phase3ScoreSlideIndex);
+      } else {
+        renderSupervisorScoreSlide(classroomSummary);
+      }
+      hidePhase3ScoreReveal();
+      return;
+    }
     var scoreSlide = slides.find(function (s) { return s.kind === "score"; });
     if (scoreSlide) {
       scoreSlide.html = buildPhase3ScoreHtml(data, { showContinue: false });
@@ -826,6 +1027,7 @@
     phase3ScoreRevealEl.innerHTML = buildPhase3ScoreHtml(data, {
       showContinue: true,
       continueLabel: "See score page",
+      forcePersonal: true,
     });
     phase3ScoreRevealEl.hidden = false;
     root.classList.add("is-sat-score-reveal");
@@ -2876,6 +3078,9 @@
       .then(function (data) {
         classroomSummary = data && data.ok ? data : null;
         renderLiveResults(slides[idx]);
+        if (slides[idx] && slides[idx].kind === "score") {
+          renderSupervisorScoreSlide(classroomSummary);
+        }
       })
       .catch(function () {});
   }
@@ -3877,17 +4082,27 @@
     if (kind === "intro") injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
     if (kind === "score") {
-      fetchPhase3SatScore(function (data) {
-        if (!slides[idx] || slides[idx].kind !== "score") return;
-        var html = buildPhase3ScoreHtml(data, { showContinue: false });
-        slides[idx].html = html;
-        bodyEl.innerHTML = html;
-        animatePhase3ScoreNumber(bodyEl, data.sat_math_score);
-        // Teacher/student Next after Q22 also gets the cinematic pop once.
-        if (!phase3ScoreOverlayShown && !root.classList.contains("is-sat-score-reveal")) {
-          showPhase3ScoreReveal(data);
-        }
-      });
+      if (isSupervisorScoreView()) {
+        // Supervisor SCORE page = everyone, not the teacher's personal score.
+        var paintClass = function () {
+          if (!slides[idx] || slides[idx].kind !== "score") return;
+          renderSupervisorScoreSlide(classroomSummary);
+        };
+        paintClass();
+        loadClassroomSummary().then(paintClass);
+      } else {
+        fetchPhase3SatScore(function (data) {
+          if (!slides[idx] || slides[idx].kind !== "score") return;
+          var html = buildPhase3ScoreHtml(data, { showContinue: false, forcePersonal: true });
+          slides[idx].html = html;
+          bodyEl.innerHTML = html;
+          animatePhase3ScoreNumber(bodyEl, data.sat_math_score);
+          // Student Next after Q22 also gets the cinematic pop once.
+          if (!phase3ScoreOverlayShown && !root.classList.contains("is-sat-score-reveal")) {
+            showPhase3ScoreReveal(data);
+          }
+        });
+      }
     }
 
     if (window.MathJax) {

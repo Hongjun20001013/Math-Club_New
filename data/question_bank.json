@@ -3953,16 +3953,16 @@
         "question_kind": "free_response",
         "sat_unit_label": "Unit 2",
         "sat_unit_title": "Advanced Math",
-        "correct_answer": "20",
+        "correct_answer": "81/4",
         "answer_alternates": [
-          "25",
-          "81/4"
+          "20.25",
+          "20.250"
         ],
         "knowledge_section": "2.2",
         "knowledge_section_title_zh": "2.2 非线性方程与方程组",
         "knowledge_section_title_en": "2.2 Nonlinear equations and systems",
         "display_number": 31,
-        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">2.2</span></p><h3 class=\"np-sol-title\">2.2 Nonlinear equations and systems</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">20</code></div><div class=\"np-sol-alt-wrap\"><span class=\"np-sol-label\">Also accepted</span><ul class=\"np-sol-alt-list\"><li><code>25</code></li><li><code>81/4</code></li></ul></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the \\(xy\\)-plane, a line with equation \\(2y = c\\) intersects a parabola \\(y = -2x^2 + 9x\\) at exactly one point. What is the value of \\(c\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>20</strong>. Equivalent forms such as <strong>25, 81/4</strong> may also be accepted if they match the key. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">2.2</span></p><h3 class=\"np-sol-title\">2.2 Nonlinear equations and systems</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">81/4</code></div><div class=\"np-sol-alt-wrap\"><span class=\"np-sol-label\">Also accepted</span><ul class=\"np-sol-alt-list\"><li><code>20.25</code></li><li><code>20.250</code></li></ul></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the \\(xy\\)-plane, a line with equation \\(2y = c\\) intersects a parabola \\(y = -2x^2 + 9x\\) at exactly one point. What is the value of \\(c\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>81/4</strong>. Equivalent forms such as <strong>20.25, 20.250</strong> may also be accepted if they match the key. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
       },
       {
         "stem": "<p>What is the smallest solution to the equation</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt{(x - 2)^2} = \\sqrt{3x + 34}\n\\]</div>",
@@ -6024,16 +6024,16 @@
         "question_kind": "free_response",
         "sat_unit_label": "Unit 2",
         "sat_unit_title": "Advanced Math",
-        "correct_answer": "20",
+        "correct_answer": "81/4",
         "answer_alternates": [
-          "25",
-          "81/4"
+          "20.25",
+          "20.250"
         ],
         "knowledge_section": "2.2",
         "knowledge_section_title_zh": "2.2 非线性方程与方程组",
         "knowledge_section_title_en": "2.2 Nonlinear equations and systems",
         "display_number": 31,
-        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">2.2</span></p><h3 class=\"np-sol-title\">2.2 Nonlinear equations and systems</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">20</code></div><div class=\"np-sol-alt-wrap\"><span class=\"np-sol-label\">Also accepted</span><ul class=\"np-sol-alt-list\"><li><code>25</code></li><li><code>81/4</code></li></ul></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the \\(xy\\)-plane, a line with equation \\(2y = c\\) intersects a parabola \\(y = -2x^2 + 9x\\) at exactly one point. What is the value of \\(c\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>20</strong>. Equivalent forms such as <strong>25, 81/4</strong> may also be accepted if they match the key. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
+        "explanation_en": "<article class=\"np-solution-pro np-solution-pro--spr\" lang=\"en\"><header class=\"np-sol-head\"><p class=\"np-sol-eyebrow\">SAT Math · <span class=\"np-sol-sec-pill\">2.2</span></p><h3 class=\"np-sol-title\">2.2 Nonlinear equations and systems</h3></header><section class=\"np-sol-block np-sol-block--strategy\" aria-label=\"Strategy\"><span class=\"np-sol-label\">Expert approach</span><p class=\"np-sol-text\">Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p></section><section class=\"np-sol-block np-sol-block--key\" aria-label=\"Answer key\"><span class=\"np-sol-label\">Verified key</span><div class=\"np-sol-key-spr\" role=\"group\" aria-label=\"Student-produced response\"><code class=\"np-sol-numeric\">81/4</code></div><div class=\"np-sol-alt-wrap\"><span class=\"np-sol-label\">Also accepted</span><ul class=\"np-sol-alt-list\"><li><code>20.25</code></li><li><code>20.250</code></li></ul></div></section><section class=\"np-sol-block np-sol-block--walkthrough\" aria-label=\"SAT-style walkthrough\"><span class=\"np-sol-label np-sol-label--walk\">Full walkthrough</span><div class=\"np-sol-walk-body\"><p class=\"np-sol-walk-para\">Step 1: Reread the stem in your own words. Pull out what is fixed, what is unknown, and what you must output. Key givens: In the \\(xy\\)-plane, a line with equation \\(2y = c\\) intersects a parabola \\(y = -2x^2 + 9x\\) at exactly one point. What is the value of \\(c\\)?</p><p class=\"np-sol-walk-para\">Step 2: <strong>Expert angle —</strong> Use completing the square, the quadratic formula, and substitution; watch extraneous solutions.</p><p class=\"np-sol-walk-para\">Step 3: Build one clean model (equation, proportion, or expression) and simplify carefully—watch distribution, clearing denominators, and sign errors before you lock a value.</p><p class=\"np-sol-walk-para\">Step 4: The official answer is <strong>81/4</strong>. Equivalent forms such as <strong>20.25, 20.250</strong> may also be accepted if they match the key. Rework the algebra once without looking at the key to see where your line of reasoning diverged.</p></div><p class=\"np-sol-walk-footer\">SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. Close the tab and rework from the stem without the key when you review later.</p></section><footer class=\"np-sol-foot\"><p class=\"np-sol-text\">Recompute from a blank scratch line: watch signs, domain constraints, and whether your form matches an acceptable equivalent before you compare to the key.</p></footer></article>"
       },
       {
         "stem": "<p>What is the smallest solution to the equation</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt{(x - 2)^2} = \\sqrt{3x + 34}\n\\]</div>",
@@ -16784,6 +16784,289 @@
         "knowledge_section": "Unit 2",
         "knowledge_section_title_en": "Advanced Math",
         "hard_skill": "Parabola / horizontal tangent line"
+      }
+    ],
+    "hard_23": [
+      {
+        "stem": "<p>In the system of equations below, \\( c \\) is a constant. If the system has no solution, what is the value of \\( c \\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\ny &= \\frac{1}{2}x + 8 \\\\\ny &= cx + 10\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "1/2",
+        "answer_alternates": [
+          "0.5"
+        ],
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear systems / no solution"
+      },
+      {
+        "stem": "<p>To earn money for college, Avery works two part-time jobs: A and B. She earns &#36;10 per hour working at job A and &#36;20 per hour working at job B. In one week, Avery earned a total of \\( s \\) dollars for working at the two part-time jobs. The graph below represents all possible combinations of numbers of hours Avery could have worked at the two jobs to earn \\( s \\) dollars. What is the value of \\( s \\)?</p>\n<div class=\"stem-figure-wrap\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 480 300\" class=\"stem-tikz-svg\" role=\"img\" aria-label=\"Coordinate plane figure\"><defs><marker id=\"npM31\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#352875\"/></marker></defs><rect x=\"0\" y=\"0\" width=\"480\" height=\"300\" fill=\"none\"/><rect x=\"58.00\" y=\"36.00\" width=\"390.00\" height=\"206.00\" rx=\"4\" fill=\"#f7f5ff\" stroke=\"rgba(79,47,212,0.08)\" stroke-width=\"1\"/><line x1=\"73.00\" y1=\"36.00\" x2=\"73.00\" y2=\"242.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"166.75\" y1=\"36.00\" x2=\"166.75\" y2=\"242.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"260.50\" y1=\"36.00\" x2=\"260.50\" y2=\"242.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"373.00\" y1=\"36.00\" x2=\"373.00\" y2=\"242.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"448.00\" y1=\"36.00\" x2=\"448.00\" y2=\"242.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"234.08\" x2=\"448.00\" y2=\"234.08\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"194.46\" x2=\"448.00\" y2=\"194.46\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"154.85\" x2=\"448.00\" y2=\"154.85\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"115.23\" x2=\"448.00\" y2=\"115.23\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"75.62\" x2=\"448.00\" y2=\"75.62\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"36.00\" x2=\"448.00\" y2=\"36.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"234.08\" x2=\"448.00\" y2=\"234.08\" stroke=\"#352875\" stroke-width=\"2\" stroke-linecap=\"square\" marker-end=\"url(#npM31)\"/><line x1=\"73.00\" y1=\"242.00\" x2=\"73.00\" y2=\"36.00\" stroke=\"#352875\" stroke-width=\"2\" stroke-linecap=\"square\" marker-end=\"url(#npM31)\"/><line x1=\"73.00\" y1=\"234.08\" x2=\"73.00\" y2=\"239.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"166.75\" y1=\"234.08\" x2=\"166.75\" y2=\"239.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"260.50\" y1=\"234.08\" x2=\"260.50\" y2=\"239.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"373.00\" y1=\"234.08\" x2=\"373.00\" y2=\"239.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"448.00\" y1=\"234.08\" x2=\"448.00\" y2=\"239.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"234.08\" x2=\"73.00\" y2=\"234.08\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"194.46\" x2=\"73.00\" y2=\"194.46\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"154.85\" x2=\"73.00\" y2=\"154.85\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"115.23\" x2=\"73.00\" y2=\"115.23\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"75.62\" x2=\"73.00\" y2=\"75.62\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"68.00\" y1=\"36.00\" x2=\"73.00\" y2=\"36.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><circle cx=\"73.00\" cy=\"234.08\" r=\"2.2\" fill=\"#352875\" stroke=\"#fff\" stroke-width=\"1\" opacity=\"0.95\"/><path d=\"M 73.00,75.62 L 373.00,234.08\" fill=\"none\" stroke=\"#4f2fd4\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"73.00\" y=\"262.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">0</text><text x=\"166.75\" y=\"262.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">5</text><text x=\"260.50\" y=\"262.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">10</text><text x=\"373.00\" y=\"262.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">16</text><text x=\"448.00\" y=\"262.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">20</text><text x=\"46.00\" y=\"238.08\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">0</text><text x=\"46.00\" y=\"198.46\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">2</text><text x=\"46.00\" y=\"158.85\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">4</text><text x=\"46.00\" y=\"119.23\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">6</text><text x=\"46.00\" y=\"79.62\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">8</text><text x=\"46.00\" y=\"40.00\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">10</text><text x=\"253.00\" y=\"290.00\" text-anchor=\"middle\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">Number of hours at job A</text><text x=\"58.00\" y=\"28.00\" text-anchor=\"start\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">Number of hours at job B</text></svg></div>",
+        "choices": [
+          "128",
+          "160",
+          "200",
+          "320"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Two-job linear model / intercepts"
+      },
+      {
+        "stem": "<p>For each real number \\( r \\), which of the following points lies on the graph of each equation in the \\( xy \\)-plane for the given system?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n2x + 3y &= 7 \\\\\n10x + 15y &= 35\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(\\displaystyle \\left(\\frac{7}{5} + r, -\\frac{7}{5} + 35 \\right)\\)",
+          "\\(\\displaystyle \\left(-\\frac{3r}{2} + \\frac{7}{2}, r \\right)\\)",
+          "\\(\\displaystyle \\left(r, \\frac{2r}{3} + \\frac{7}{3} \\right)\\)",
+          "\\(\\displaystyle \\left(r, -\\frac{3r}{2} + \\frac{7}{2} \\right)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Dependent linear system / parametric point"
+      },
+      {
+        "stem": "<p>The triangle inequality theorem states that the sum of any two sides of a triangle must be greater than the length of the third side. If a triangle has side lengths of \\(\\displaystyle 6\\) and \\(\\displaystyle 12\\), which inequality represents the possible lengths, \\(\\displaystyle x\\), of the third side of the triangle?</p>",
+        "choices": [
+          "\\(\\displaystyle x \\lt  18\\)",
+          "\\(\\displaystyle x > 18\\)",
+          "\\(\\displaystyle 6 \\lt  x \\lt  18\\)",
+          "\\(\\displaystyle x \\lt  6 \\text{ or } x > 18\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Triangle inequality"
+      },
+      {
+        "stem": "<p>The expression \\(\\frac{x^{-2}y^{\\frac{1}{2}}}{x^{\\frac{1}{3}}y^{-1}}\\), where \\(x > 1\\) and \\(y > 1\\), is equivalent to which of the following?</p>",
+        "choices": [
+          "\\(\\frac{\\sqrt{y}}{\\sqrt[3]{x^2}}\\)",
+          "\\(\\frac{y\\sqrt{y}}{\\sqrt[3]{x^{2}}}\\)",
+          "\\(\\frac{y\\sqrt{y}}{x\\sqrt{x}}\\)",
+          "\\(\\frac{y\\sqrt{y}}{x^{2}\\sqrt[3]{x}}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponent / radical rewrite"
+      },
+      {
+        "stem": "<p>Which expression is equivalent to \\(\\frac{y + 12}{x - 8} + \\frac{y(x - 8)}{x^2 y - 8xy}\\) ?</p>",
+        "choices": [
+          "\\(\\frac{xy + y + 4}{x^2 y - 16x + 64xy}\\)",
+          "\\(\\frac{xy + 9 + 12}{x^2 y - 8xy + x - 8}\\)",
+          "\\(\\frac{xy^2 + 13xy - 8y}{x^2 y - 8xy}\\)",
+          "\\(\\frac{xy^2 + 13xy - 8y}{x^2 y - 16x^2 y + 64xy}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Rational expression sum"
+      },
+      {
+        "stem": "<p>Solve for \\(x\\): \\(\\sqrt{2x + 6} + 4 = x + 3\\) What is the solution set of the equation above?</p>",
+        "choices": [
+          "\\(\\{-1\\}\\)",
+          "\\(\\{5\\}\\)",
+          "\\(\\{-1, 5\\}\\)",
+          "\\(\\{0, -1, 5\\}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Radical equation / extraneous roots"
+      },
+      {
+        "stem": "<p>The formula</p>\n<div class=\"stem-math-block\">\\[\nD = T - \\frac{9}{25}(100 - H)\n\\]</div>\n<p>approximates the dew point \\(D\\) in Fahrenheit, given temperature \\(T\\) in Fahrenheit, and relative humidity \\(H\\%\\), where \\(H > 50\\). Which of the following expresses \\(H\\) in terms of \\(D\\) and \\(T\\)?</p>",
+        "choices": [
+          "\\(H = \\frac{25}{9}(D - T) + 100\\)",
+          "\\(H = \\frac{25}{9}(D - T) - 100\\)",
+          "\\(H = \\frac{25}{9}(D + T) + 100\\)",
+          "\\(H = \\frac{25}{9}(D + T) - 100\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Literal equation / dew point"
+      },
+      {
+        "stem": "<div class=\"stem-figure-wrap\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 420 420\" class=\"stem-tikz-svg\" role=\"img\" aria-label=\"Coordinate plane figure\"><defs><marker id=\"npM32\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#352875\"/></marker></defs><rect x=\"0\" y=\"0\" width=\"420\" height=\"420\" fill=\"none\"/><rect x=\"58.00\" y=\"36.00\" width=\"330.00\" height=\"326.00\" rx=\"4\" fill=\"#f7f5ff\" stroke=\"rgba(79,47,212,0.08)\" stroke-width=\"1\"/><line x1=\"73.00\" y1=\"36.00\" x2=\"73.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"103.00\" y1=\"36.00\" x2=\"103.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"133.00\" y1=\"36.00\" x2=\"133.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"163.00\" y1=\"36.00\" x2=\"163.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"193.00\" y1=\"36.00\" x2=\"193.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"223.00\" y1=\"36.00\" x2=\"223.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"253.00\" y1=\"36.00\" x2=\"253.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"283.00\" y1=\"36.00\" x2=\"283.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"313.00\" y1=\"36.00\" x2=\"313.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"343.00\" y1=\"36.00\" x2=\"343.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"373.00\" y1=\"36.00\" x2=\"373.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"362.00\" x2=\"388.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"333.96\" x2=\"388.00\" y2=\"333.96\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"305.91\" x2=\"388.00\" y2=\"305.91\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"277.87\" x2=\"388.00\" y2=\"277.87\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"249.83\" x2=\"388.00\" y2=\"249.83\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"221.78\" x2=\"388.00\" y2=\"221.78\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"193.74\" x2=\"388.00\" y2=\"193.74\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"165.70\" x2=\"388.00\" y2=\"165.70\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"137.66\" x2=\"388.00\" y2=\"137.66\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"109.61\" x2=\"388.00\" y2=\"109.61\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"81.57\" x2=\"388.00\" y2=\"81.57\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"81.57\" x2=\"388.00\" y2=\"81.57\" stroke=\"#352875\" stroke-width=\"2\" stroke-linecap=\"square\" marker-end=\"url(#npM32)\"/><line x1=\"373.00\" y1=\"362.00\" x2=\"373.00\" y2=\"36.00\" stroke=\"#352875\" stroke-width=\"2\" stroke-linecap=\"square\" marker-end=\"url(#npM32)\"/><line x1=\"73.00\" y1=\"81.57\" x2=\"73.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"103.00\" y1=\"81.57\" x2=\"103.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"133.00\" y1=\"81.57\" x2=\"133.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"163.00\" y1=\"81.57\" x2=\"163.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"193.00\" y1=\"81.57\" x2=\"193.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"223.00\" y1=\"81.57\" x2=\"223.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"253.00\" y1=\"81.57\" x2=\"253.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"283.00\" y1=\"81.57\" x2=\"283.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"313.00\" y1=\"81.57\" x2=\"313.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"343.00\" y1=\"81.57\" x2=\"343.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"373.00\" y1=\"81.57\" x2=\"373.00\" y2=\"86.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"362.00\" x2=\"373.00\" y2=\"362.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"333.96\" x2=\"373.00\" y2=\"333.96\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"305.91\" x2=\"373.00\" y2=\"305.91\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"277.87\" x2=\"373.00\" y2=\"277.87\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"249.83\" x2=\"373.00\" y2=\"249.83\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"221.78\" x2=\"373.00\" y2=\"221.78\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"193.74\" x2=\"373.00\" y2=\"193.74\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"165.70\" x2=\"373.00\" y2=\"165.70\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"137.66\" x2=\"373.00\" y2=\"137.66\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"109.61\" x2=\"373.00\" y2=\"109.61\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"368.00\" y1=\"81.57\" x2=\"373.00\" y2=\"81.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><circle cx=\"373.00\" cy=\"81.57\" r=\"2.2\" fill=\"#352875\" stroke=\"#fff\" stroke-width=\"1\" opacity=\"0.95\"/><path d=\"M 73.00,109.61 L 373.00,39.51\" fill=\"none\" stroke=\"#4f2fd4\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"73.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-10</text><text x=\"103.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-9</text><text x=\"133.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-8</text><text x=\"163.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-7</text><text x=\"193.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-6</text><text x=\"223.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-5</text><text x=\"253.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-4</text><text x=\"283.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-3</text><text x=\"313.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-2</text><text x=\"343.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-1</text><text x=\"373.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">0</text><text x=\"46.00\" y=\"366.00\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-10</text><text x=\"46.00\" y=\"337.96\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-9</text><text x=\"46.00\" y=\"309.91\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-8</text><text x=\"46.00\" y=\"281.87\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-7</text><text x=\"46.00\" y=\"253.83\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-6</text><text x=\"46.00\" y=\"225.78\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-5</text><text x=\"46.00\" y=\"197.74\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-4</text><text x=\"46.00\" y=\"169.70\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-3</text><text x=\"46.00\" y=\"141.66\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-2</text><text x=\"46.00\" y=\"113.61\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">-1</text><text x=\"46.00\" y=\"85.57\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">0</text><text x=\"223.00\" y=\"410.00\" text-anchor=\"middle\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">x</text><text x=\"58.00\" y=\"28.00\" text-anchor=\"start\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">y</text></svg></div>\n<p>The rational function \\(\\displaystyle f\\) is defined by an equation in the form \\(\\displaystyle f(x) = \\dfrac{a}{x + b}\\), where \\(\\displaystyle a\\) and \\(\\displaystyle b\\) are constants. The partial graph of \\(\\displaystyle y = f(x)\\) is shown. If \\(\\displaystyle g(x) = f(x + 4)\\), which equation could define function \\(\\displaystyle g\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle g(x) = \\dfrac{6}{x}\\)",
+          "\\(\\displaystyle g(x) = \\dfrac{6}{x + 4}\\)",
+          "\\(\\displaystyle g(x) = \\dfrac{6}{x + 8}\\)",
+          "\\(\\displaystyle g(x) = \\dfrac{6(x - 4)}{x + 4}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Rational function translation"
+      },
+      {
+        "stem": "<p>In the equation \\(x^2 - 34x + c = 0\\), \\(c\\) is a constant. The equation has no real solutions if \\(c > n\\). What is the least possible value of \\(n\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "289",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic discriminant threshold"
+      },
+      {
+        "stem": "<p>The number \\(\\displaystyle w\\) is 110% greater than the number \\(\\displaystyle z\\). The number \\(\\displaystyle z\\) is 55% less than 50. What is the value of \\(\\displaystyle w\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "47.25",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent greater / less chain"
+      },
+      {
+        "stem": "<p>The dot plot below shows the gas mileages, in miles per gallon, of 12 different cars.</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th></tr></thead><tbody><tr><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td></td><td></td><td>\\bullet</td></tr><tr><td></td><td></td><td>\\bullet</td><td>\\bullet</td><td>\\bullet</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td>\\bullet</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>\n<p>If the dot representing the car with the greatest gas mileage is removed from the dot plot, which of the following measures of the data set will decrease?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">The mean</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">The median</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">The standard deviation</span></li></ul>",
+        "choices": [
+          "I only",
+          "I and III only",
+          "II and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Dot plot mean median SD"
+      },
+      {
+        "stem": "<p>In a psychological study, 600 college gymnasts were randomly selected and put in high-stakes competitions to determine whether they performed better under pressure. Based on the results of this study, it is estimated that 65% of all college gymnasts perform better under pressure, with an associated margin of error of 4%.</p>\n<p>Which of the following inferences can appropriately be drawn based on the given margin of error?</p>",
+        "choices": [
+          "The percentage of all college gymnasts who perform better under pressure is between 65% and 69%.",
+          "Approximately 4% of the college gymnasts in the study who performed better under pressure do not actually perform better under pressure.",
+          "It is unlikely that the percentage of all college gymnasts who perform better under pressure is 60%.",
+          "It is not possible that the percentage of all college gymnasts who perform better under pressure is 70%."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Margin of error inference"
+      },
+      {
+        "stem": "<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_23_f13.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>In triangle \\(\\displaystyle RST\\) above, point \\(\\displaystyle W\\) (not shown) lies on \\(\\displaystyle \\overline{RT}\\). What is the value of \\(\\displaystyle \\cos(\\angle RSW) - \\sin(\\angle WST)\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "0",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Right triangle cos − sin identity"
+      },
+      {
+        "stem": "<p>A regular polygon has an interior angle that is 4 times the exterior angle plus 60 degrees. What is the number of sides of the polygon?</p>",
+        "choices": [
+          "9",
+          "10",
+          "12",
+          "15"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Regular polygon interior/exterior"
+      },
+      {
+        "stem": "<p>A circle in the \\(xy\\)-plane has equation</p>\n<div class=\"stem-math-block\">\\[\n(x - 2.5)^2 + (y - 3.5)^2 = 225.\n\\]</div>\n<p>Line \\(p\\) is tangent to the circle at point \\((-6.5, C)\\), where \\(C\\) is a constant. Which of the following could be the slope of line \\(p\\)?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(-\\frac{3}{4}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\frac{3}{4}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(4/3\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "I and II only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Circle tangent slope"
+      },
+      {
+        "stem": "<p>The function \\(f\\) is defined by \\(f(x) = a^x - b\\), where \\(a\\) and \\(b\\) are constants. In the \\(xy\\)-plane, the graph of \\(y = f(x)\\) passes through the points \\((c, 7)\\) and \\((2c, 117)\\), where \\(c\\) is a constant. Which of the following could be the value of \\(b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "4",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential through two points"
+      },
+      {
+        "stem": "<p>The given equation, where \\(t\\) is a positive constant, defines a circle in the \\(xy\\)-plane. The radius of this circle is \\(\\sqrt{41}\\). What is the value of \\(t\\)?</p>\n<div class=\"stem-math-block\">\\[\n2x^2 + 2y^2 + tx + ty - 78 = 0\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "4",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Circle equation / radius"
+      },
+      {
+        "stem": "<p>The table summarizes the distribution of heights, in inches (``in''), for 300 participants in a study. If a participant that is at most 71 inches tall is chosen at random, what is the probability that the participant was selected from Group 2?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th></th><th>48–59 in.</th><th>60–71 in.</th><th>72–83 in.</th><th>Total</th></tr></thead><tbody><tr><td>Group 1</td><td>20</td><td>60</td><td>20</td><td>100</td></tr><tr><td>Group 2</td><td>10</td><td>75</td><td>15</td><td>100</td></tr><tr><td>Group 3</td><td>30</td><td>45</td><td>25</td><td>100</td></tr><tr><td>Total</td><td>60</td><td>180</td><td>60</td><td>300</td></tr></tbody></table></div>",
+        "choices": [
+          "\\(\\dfrac{1}{4}\\)",
+          "\\(\\dfrac{17}{48}\\)",
+          "\\(\\dfrac{17}{60}\\)",
+          "\\(\\dfrac{17}{20}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Conditional probability from table"
+      },
+      {
+        "stem": "<p>The function \\(f\\) is defined as \\(f(x) = x^2 + ax + b\\), where \\(a\\) and \\(b\\) are positive integers. If the minimum value of \\(f(x)\\) is 7, which is a possible value of \\(b\\)?</p>",
+        "choices": [
+          "6",
+          "7",
+          "8",
+          "9"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic minimum / parameter"
+      },
+      {
+        "stem": "<p>The average annual energy cost for a certain home is &#36;4,334. The homeowner plans to spend &#36;25,000 to install a geothermal heating system. The homeowner estimates that the average annual energy cost will then be &#36;2,712. Which of the following inequalities can be solved to find \\(t\\), the number of years after installation at which the total amount of energy cost savings will exceed the installation cost?</p>",
+        "choices": [
+          "\\(25,000 > (4,334 - 2,712)t\\)",
+          "\\(25,000 \\lt  (4,334 - 2,712)t\\)",
+          "\\(25,000 - 4,334 - 2,712t\\)",
+          "\\(25000 > \\dfrac{4332}{2712}t\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Savings inequality model"
+      },
+      {
+        "stem": "<p>Given the quadratic function</p>\n<div class=\"stem-math-block\">\\[\ny = x^2 - 2ax + a \\quad (a \\ne 0)\n\\]</div>\n<p>passes through two points</p>\n<div class=\"stem-math-block\">\\[\nA\\left( \\frac{a}{2}, y_1 \\right), \\quad B(3a, y_2),\n\\]</div>\n<p>which of the following statements is correct?</p>",
+        "choices": [
+          "There exists a real number \\(a\\) such that \\(y_1 > a\\).",
+          "For all real numbers \\(a\\), \\(y_1 > a\\) is always true.",
+          "There exists a real number \\(a\\) such that \\(y_2 \\lt  0\\).",
+          "For all real numbers \\(a\\), \\(y_2 \\lt  0\\) is always true."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic point comparison"
       }
     ]
   },

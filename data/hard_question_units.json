@@ -284,5 +284,29 @@
     {"unit": "U2", "skill": "Quadratic sum and product"},
     {"unit": "U3", "skill": "Coverage rate word problem"},
     {"unit": "U2", "skill": "Parabola / horizontal tangent line"}
+  ],
+  "hard_23": [
+    {"unit": "U1", "skill": "Linear systems / no solution"},
+    {"unit": "U1", "skill": "Two-job linear model / intercepts"},
+    {"unit": "U1", "skill": "Dependent linear system / parametric point"},
+    {"unit": "U4", "skill": "Triangle inequality"},
+    {"unit": "U2", "skill": "Exponent / radical rewrite"},
+    {"unit": "U2", "skill": "Rational expression sum"},
+    {"unit": "U2", "skill": "Radical equation / extraneous roots"},
+    {"unit": "U1", "skill": "Literal equation / dew point"},
+    {"unit": "U2", "skill": "Rational function translation"},
+    {"unit": "U2", "skill": "Quadratic discriminant threshold"},
+    {"unit": "U3", "skill": "Percent greater / less chain"},
+    {"unit": "U3", "skill": "Dot plot mean median SD"},
+    {"unit": "U3", "skill": "Margin of error inference"},
+    {"unit": "U4", "skill": "Right triangle cos − sin identity"},
+    {"unit": "U4", "skill": "Regular polygon interior/exterior"},
+    {"unit": "U4", "skill": "Circle tangent slope"},
+    {"unit": "U2", "skill": "Exponential through two points"},
+    {"unit": "U4", "skill": "Circle equation / radius"},
+    {"unit": "U3", "skill": "Conditional probability from table"},
+    {"unit": "U2", "skill": "Quadratic minimum / parameter"},
+    {"unit": "U3", "skill": "Savings inequality model"},
+    {"unit": "U2", "skill": "Quadratic point comparison"}
   ]
 }

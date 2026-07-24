@@ -24,6 +24,9 @@
       <div class="np-classroom-actions">
         <button type="button" class="np-classroom-btn np-classroom-btn--primary" data-classroom-start>Start live class</button>
         <button type="button" class="np-classroom-btn" data-classroom-end>End class</button>
+        {% if report_href %}
+        <a class="np-classroom-btn np-classroom-btn--primary" href="{{ report_href }}">Class score report</a>
+        {% endif %}
         <a class="np-classroom-btn" href="{{ lesson_href }}">Open slides</a>
       </div>
     </div>

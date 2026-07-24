@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260722-rt-keys-dashboard")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260723-class-score-amethyst")
 
 _DB_SCHEMA_READY = False
 
@@ -1730,6 +1730,32 @@ def extract_correct_answer(question: dict) -> str | None:
     return s if s else None
 
 
+def _format_display_answer(raw: Any) -> str:
+    """Human-readable answer for reports (unwrap dict / JSON key blobs)."""
+    if raw is None:
+        return "—"
+    if isinstance(raw, dict):
+        nested = raw.get("correct_answer") or raw.get("answer") or raw.get("key")
+        if nested is not None:
+            return _format_display_answer(nested)
+        return "—"
+    text = str(raw).strip()
+    if not text:
+        return "—"
+    if text[:1] in "{[":
+        try:
+            parsed = json.loads(text.replace("'", '"'))
+        except (TypeError, ValueError, json.JSONDecodeError):
+            parsed = None
+        if isinstance(parsed, dict):
+            return _format_display_answer(parsed)
+        # Python dict repr fallback: {'correct_answer': '1/2', ...}
+        m = re.search(r"['\"]correct_answer['\"]\s*:\s*['\"]([^'\"]+)['\"]", text)
+        if m:
+            return m.group(1).strip() or "—"
+    return text
+
+
 def _source_bank_question(
     domain: str, topic: str, q_index: int | None
 ) -> dict[str, Any] | None:
@@ -1839,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -3217,8 +3243,8 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
                     {
                         "slide_index": slide_index,
                         "title": str(q.get("title") or f"Slide {slide_index}"),
-                        "selected": str(r["selected_answer"] or ""),
-                        "correct_answer": str(r["correct_answer"] or ""),
+                        "selected": _format_display_answer(r["selected_answer"]),
+                        "correct_answer": _format_display_answer(r["correct_answer"]),
                     }
                 )
             choice = str(r["selected_answer"] or "—").strip() or "—"
@@ -3256,14 +3282,63 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
             }
         )
     all_question_slides = [int(q["slide_index"]) for q in questions]
+    q_num_by_slide = {
+        int(q["slide_index"]): idx for idx, q in enumerate(questions, start=1)
+    }
+    title_by_slide = {
+        int(q["slide_index"]): str(q.get("title") or f"Slide {q['slide_index']}")
+        for q in questions
+    }
+    question_count = len(questions)
+    is_phase3_mock = question_count == PHASE3_MOCK_MODULE2_TOTAL
+    sat_scores_for_avg: list[int] = []
     for uid, stat in student_stats.items():
-        stat["accuracy"] = round(100 * stat["correct"] / stat["submitted"]) if stat["submitted"] else None
-        stat["completion"] = round(100 * stat["submitted"] / len(questions)) if questions else None
+        stat["accuracy"] = (
+            round(100 * stat["correct"] / stat["submitted"]) if stat["submitted"] else None
+        )
+        stat["completion"] = (
+            round(100 * stat["submitted"] / len(questions)) if questions else None
+        )
         answered = answered_by_student.get(uid, set())
         missing = [si for si in all_question_slides if si not in answered]
         stat["missing_slides"] = missing
         stat["missing_count"] = len(missing)
-    question_count = len(questions)
+        for wq in stat["wrong_questions"]:
+            si = int(wq["slide_index"])
+            wq["q_num"] = q_num_by_slide.get(si)
+            wq["title"] = title_by_slide.get(si, wq.get("title") or f"Slide {si}")
+        stat["missing_items"] = [
+            {
+                "slide_index": si,
+                "q_num": q_num_by_slide.get(si),
+                "title": title_by_slide.get(si, f"Slide {si}"),
+            }
+            for si in missing
+        ]
+        if is_phase3_mock:
+            module2_wrong = len(stat["wrong_questions"]) + len(missing)
+            phase3 = _phase3_mock_sat_score(module2_wrong, module2_total=question_count)
+            stat["phase3_sat"] = phase3
+            stat["sat_math_score"] = int(phase3["sat_math_score"])
+            stat["sat_pct"] = max(
+                0, min(100, round(100 * (stat["sat_math_score"] - 200) / 600))
+            )
+            if int(stat["submitted"] or 0) > 0:
+                sat_scores_for_avg.append(stat["sat_math_score"])
+        else:
+            stat["phase3_sat"] = None
+            stat["sat_math_score"] = None
+            stat["sat_pct"] = None
+    class_avg_sat = (
+        int(round(sum(sat_scores_for_avg) / len(sat_scores_for_avg)))
+        if sat_scores_for_avg
+        else None
+    )
+    class_avg_sat_pct = (
+        max(0, min(100, round(100 * (class_avg_sat - 200) / 600)))
+        if class_avg_sat is not None
+        else None
+    )
     total_submitted = sum(int(q["submitted"]) for q in questions)
     total_correct = sum(int(q["correct"]) for q in questions)
     total_expected = question_count * len(roster)
@@ -3273,6 +3348,10 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
     )[:5]
     report = {
         "question_count": question_count,
+        "is_phase3_mock": is_phase3_mock,
+        "class_avg_sat": class_avg_sat,
+        "class_avg_sat_pct": class_avg_sat_pct,
+        "responded_count": sum(1 for s in student_stats.values() if int(s["submitted"] or 0) > 0),
         "total_expected": total_expected,
         "total_submitted": total_submitted,
         "total_correct": total_correct,
@@ -3373,9 +3452,64 @@ def practice_course_material_classroom(slug: str):
         start_api=url_for("practice_course_material_classroom_start_api", slug=slug),
         end_api=url_for("practice_course_material_classroom_end_api", slug=slug),
         summary_api=url_for("practice_course_material_classroom_summary_api", slug=slug),
+        report_href=url_for("practice_course_material_classroom_report", slug=slug),
         lesson_href=url_for("practice_course_material_view", slug=slug),
         student_roster=_cm_available_classroom_students(db),
         student_cohorts=_student_cohorts_for_classroom(db),
+    )
+
+
+@app.route("/practice/materials/<slug>/classroom/report")
+def practice_course_material_classroom_report(slug: str):
+    """Staff SSR page: per-student SAT estimate + wrong/missing items for a class."""
+    staff_redirect = _require_staff_response()
+    if staff_redirect:
+        return staff_redirect
+    material = _course_material_by_slug(slug)
+    if not material:
+        abort(404)
+    db = get_db()
+    session_id = request.args.get("session_id", type=int)
+    if not session_id:
+        active = _cm_active_class_session(db, slug)
+        if active:
+            session_id = int(active["id"])
+        else:
+            row = db.execute(
+                "SELECT id FROM course_class_sessions WHERE lesson_slug = ? ORDER BY id DESC LIMIT 1",
+                (slug,),
+            ).fetchone()
+            session_id = int(row["id"]) if row else 0
+    summary: dict[str, Any] = {
+        "ok": False,
+        "session": None,
+        "report": {},
+        "lesson": {
+            "slug": slug,
+            "section": material.get("section"),
+            "title": material.get("title"),
+        },
+        "roster_count": 0,
+        "student_count": 0,
+    }
+    if session_id:
+        summary = _cm_classroom_summary(db, material, session_id)
+        if not summary.get("ok"):
+            abort(404)
+    report = summary.get("report") or {}
+    return render_template(
+        "course_material_classroom_report.html",
+        material=material,
+        summary=summary,
+        report=report,
+        students=report.get("student_breakdown") or [],
+        classroom_href=url_for("practice_course_material_classroom", slug=slug),
+        lesson_href=url_for("practice_course_material_view", slug=slug),
+        report_href=url_for(
+            "practice_course_material_classroom_report",
+            slug=slug,
+            session_id=session_id or None,
+        ),
     )
 
 
@@ -4009,6 +4143,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_20": "banks/hard/hard_20.tex",
         "hard_21": "banks/hard/hard_21.tex",
         "hard_22": "banks/hard/hard_22.tex",
+        "hard_23": "banks/hard/hard_23.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4321,6 +4456,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test III — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-III-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_23": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_23.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test IV — Module 2-style mock from Overleaf Test 3.",
+            "download_name": "NovelPrep-Test-IV-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_23_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test IV — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-IV-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4816,6 +4967,7 @@ TOPIC_TITLES = {
     "hard_20": "Test II",
     "hard_21": "Test I",
     "hard_22": "Test III",
+    "hard_23": "Test IV",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5223,6 +5375,31 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "D"},
         {"correct_answer": "D"},
+        {"correct_answer": "C"},
+    ],
+    # Verified against stems (Overleaf key had Q6/Q12/Q14 wrong).
+    "hard_23": [
+        {"correct_answer": "1/2", "answer_alternates": ["0.5"]},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},  # was D in Overleaf key
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "289"},
+        {"correct_answer": "47.25"},
+        {"correct_answer": "B"},  # was D in Overleaf key
+        {"correct_answer": "C"},
+        {"correct_answer": "0"},  # was D in Overleaf key (FR)
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "4"},
+        {"correct_answer": "4"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},  # choice value 8
+        {"correct_answer": "B"},
         {"correct_answer": "C"},
     ],
 }

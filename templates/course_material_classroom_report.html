@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% block title %}Class score report · {{ material.section }} · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_dark.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+{% set sess = summary.session %}
+{% set is_live = sess and sess.is_active %}
+{% set is_mock = report.is_phase3_mock %}
+{% set avg = report.class_avg_sat %}
+{% set avg_pct = report.class_avg_sat_pct if report.class_avg_sat_pct is not none else 0 %}
+{% set q_total = report.question_count or 0 %}
+{% set roster_n = summary.roster_count or students|length %}
+
+<div class="np-class-score-report" data-class-score-report>
+  <div class="np-class-score-report-bg" aria-hidden="true">
+    <span class="np-class-score-orb np-class-score-orb--1"></span>
+    <span class="np-class-score-orb np-class-score-orb--2"></span>
+    <span class="np-class-score-orb np-class-score-orb--3"></span>
+    <span class="np-class-score-bg-grid"></span>
+  </div>
+
+  <header class="np-class-score-report-head">
+    <nav class="np-class-score-report-rail" aria-label="Report navigation">
+      <a href="{{ classroom_href }}">← Classroom</a>
+      <span aria-hidden="true">·</span>
+      <a href="{{ lesson_href }}">{{ material.section }} slides</a>
+    </nav>
+
+    <div class="np-class-score-report-hero">
+      <div class="np-class-score-report-copy">
+        <p class="np-class-score-kicker">
+          <span class="np-class-score-pill">SAT SCORE</span>
+          {% if is_live %}<span class="np-class-score-live">Live</span>{% elif sess %}<span class="np-class-score-ended">Ended</span>{% else %}<span class="np-class-score-ended">No session</span>{% endif %}
+        </p>
+        <h1>{{ material.section or material.title }}</h1>
+        <p class="np-class-score-lead">
+          Class roster of estimated Digital SAT Math scores
+          {% if sess %} · Session #{{ sess.id }}{% endif %}
+        </p>
+        <div class="np-class-score-actions">
+          <a class="np-class-score-btn np-class-score-btn--primary" href="{{ report_href }}">Refresh</a>
+          <button type="button" class="np-class-score-btn" onclick="window.print()">Print</button>
+          <a class="np-class-score-btn" href="{{ classroom_href }}">Back to classroom</a>
+        </div>
+      </div>
+
+      <div class="np-class-score-report-avg" aria-label="Class average SAT score">
+        {% if is_mock and avg is not none %}
+        <p class="np-class-score-avg-kicker">Class average</p>
+        <div class="cm-sat-score-orb-ring np-class-score-ring--hero" style="--sat-pct: {{ avg_pct }};">
+          <div class="cm-sat-score-orb-core">
+            <span class="cm-sat-score-num">{{ avg }}</span>
+            <span class="cm-sat-score-den">/ 800</span>
+          </div>
+        </div>
+        <p class="np-class-score-avg-meta">
+          {{ report.responded_count or 0 }}/{{ roster_n }} responded
+          {% if report.overall_accuracy is not none %} · {{ report.overall_accuracy }}% accuracy{% endif %}
+        </p>
+        {% else %}
+        <div class="np-class-score-avg-empty">
+          <strong>{% if not sess %}No class yet{% elif not is_mock %}Not a 22Q mock{% else %}—{% endif %}</strong>
+          <span>{% if not sess %}Start a live class, then open this report.{% elif not is_mock %}SAT estimate is for 22-question Module 2 mocks.{% else %}Waiting for responses.{% endif %}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if not sess %}
+  <section class="np-class-score-empty">
+    <h2>No classroom session</h2>
+    <p>Start a live class from the classroom dashboard, have students answer on the slides, then return here for the full score report.</p>
+    <a class="np-class-score-btn np-class-score-btn--primary" href="{{ classroom_href }}">Open classroom →</a>
+  </section>
+  {% elif not students %}
+  <section class="np-class-score-empty">
+    <h2>Roster is empty</h2>
+    <p>Select students on the classroom page, start the class, and collect responses.</p>
+    <a class="np-class-score-btn np-class-score-btn--primary" href="{{ classroom_href }}">Set roster →</a>
+  </section>
+  {% else %}
+  <section class="np-class-score-board" data-class-score-board aria-label="Per-student scores">
+    <div class="np-class-score-toolbar">
+      <div class="np-class-score-toolbar-copy">
+        <h2>{{ roster_n }} students</h2>
+        <p>Compact roster — expand a row for misses. Sorted lowest score first.</p>
+      </div>
+      <div class="np-class-score-toolbar-controls">
+        <label class="np-class-score-search">
+          <span class="sr-only">Search students</span>
+          <input type="search" data-class-score-search placeholder="Search name…" autocomplete="off">
+        </label>
+        <label class="np-class-score-sort">
+          <span class="sr-only">Sort</span>
+          <select data-class-score-sort>
+            <option value="score-asc" selected>Score ↑ (needs help first)</option>
+            <option value="score-desc">Score ↓</option>
+            <option value="name">Name A–Z</option>
+            <option value="misses">Most misses</option>
+          </select>
+        </label>
+        <div class="np-class-score-view-toggle" role="group" aria-label="View density">
+          <button type="button" class="is-active" data-class-score-view="roster">Roster</button>
+          <button type="button" data-class-score-view="cards">Cards</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="np-class-score-roster" data-class-score-list>
+      {% for s in students %}
+      {% set sat = s.sat_math_score %}
+      {% set sat_pct = s.sat_pct if s.sat_pct is not none else 0 %}
+      {% set phase3 = s.phase3_sat or {} %}
+      {% set wrong = s.wrong_questions or [] %}
+      {% set missing = s.missing_items or [] %}
+      {% set miss_total = wrong|length + missing|length %}
+      {% set m2_correct = phase3.module2_correct if phase3.module2_correct is defined else s.correct %}
+      {% set acc_pct = ((100 * m2_correct / q_total)|round|int) if is_mock and q_total and m2_correct is not none else s.accuracy %}
+      {% set sort_sat = sat if sat is not none else -1 %}
+      {% set status = 'idle' if not s.submitted else ('risk' if acc_pct is not none and acc_pct < 50 else ('warn' if acc_pct is not none and acc_pct < 80 else 'good')) %}
+      <article
+        class="np-class-score-row is-{{ status }}"
+        data-class-score-row
+        data-name="{{ s.username|lower }}"
+        data-sat="{{ sort_sat }}"
+        data-misses="{{ miss_total }}"
+      >
+        <button type="button" class="np-class-score-row-main" data-class-score-toggle aria-expanded="false">
+          <div class="np-class-score-row-ring">
+            {% if is_mock and sat is not none %}
+            <div class="cm-sat-score-orb-ring np-class-score-ring--row" style="--sat-pct: {{ sat_pct }};" aria-hidden="true">
+              <div class="cm-sat-score-orb-core">
+                <span class="cm-sat-score-num">{{ sat }}</span>
+              </div>
+            </div>
+            {% else %}
+            <div class="np-class-score-ring--row-empty">—</div>
+            {% endif %}
+          </div>
+          <div class="np-class-score-row-meta">
+            <strong>{{ s.username }}</strong>
+            <span>
+              {% if not s.submitted %}Not started
+              {% elif is_mock %}{{ m2_correct }}/{{ q_total }} correct · {{ acc_pct }}%
+              {% else %}{{ s.correct or 0 }}/{{ q_total }}{% if s.accuracy is not none %} · {{ s.accuracy }}%{% endif %}
+              {% endif %}
+            </span>
+          </div>
+          <div class="np-class-score-row-stats">
+            <span class="np-class-score-chip{% if miss_total %} is-miss{% else %} is-clean{% endif %}">
+              {% if not s.submitted %}—{% elif miss_total == 0 %}Clean{% else %}{{ miss_total }} miss{% if miss_total != 1 %}es{% endif %}{% endif %}
+            </span>
+            {% if is_mock and sat is not none %}
+            <span class="np-class-score-chip is-sat">{{ sat }}</span>
+            {% endif %}
+          </div>
+          <span class="np-class-score-row-chevron" aria-hidden="true"></span>
+        </button>
+
+        <div class="np-class-score-row-detail" hidden>
+          {% if is_mock and phase3 and s.submitted %}
+          <div class="np-class-score-card-metrics">
+            <div><em>Module 2</em><strong>{{ phase3.module2_correct }}/{{ q_total }}</strong><small>{{ phase3.module2_wrong }} wrong</small></div>
+            <div><em>Module 1</em><strong>{{ phase3.module1_correct }}/22</strong><small>{% if phase3.module1_wrong %}{{ phase3.module1_wrong }} inferred{% else %}assumed clean{% endif %}</small></div>
+            <div><em>Raw</em><strong>{{ phase3.raw_correct }}/44</strong><small>combined</small></div>
+          </div>
+          {% endif %}
+
+          <div class="np-class-score-misses">
+            <div class="np-class-score-misses-head">
+              <h3>Misses &amp; blanks</h3>
+              <span>{{ miss_total }}</span>
+            </div>
+            {% if miss_total == 0 and s.submitted %}
+            <p class="np-class-score-clean">Clean sheet</p>
+            {% elif not s.submitted %}
+            <p class="np-class-score-clean np-class-score-clean--muted">No responses yet.</p>
+            {% else %}
+            <ul class="np-class-score-miss-list">
+              {% for w in wrong %}
+              <li class="is-wrong">
+                <strong>Q{{ w.q_num or w.slide_index }}</strong>
+                <span>{{ w.title }}</span>
+                <em>Yours {{ w.selected or "—" }} · Key {{ w.correct_answer or "—" }}</em>
+              </li>
+              {% endfor %}
+              {% for m in missing %}
+              <li class="is-blank">
+                <strong>Q{{ m.q_num or m.slide_index }}</strong>
+                <span>{{ m.title }}</span>
+                <em>Not answered</em>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <p class="np-class-score-empty-filter" data-class-score-empty-filter hidden>No students match that search.</p>
+  </section>
+  {% endif %}
+
+  <footer class="np-class-score-report-foot">
+    Estimate for classroom pacing — not an official College Board score.
+    {% if is_mock %} Unanswered Module 2 items count as wrong for the estimate.{% endif %}
+  </footer>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector("[data-class-score-report]");
+  if (!root) return;
+  var board = root.querySelector("[data-class-score-board]");
+  if (!board) return;
+  var list = board.querySelector("[data-class-score-list]");
+  var search = board.querySelector("[data-class-score-search]");
+  var sort = board.querySelector("[data-class-score-sort]");
+  var empty = board.querySelector("[data-class-score-empty-filter]");
+  var viewBtns = board.querySelectorAll("[data-class-score-view]");
+
+  function rows() {
+    return Array.prototype.slice.call(list.querySelectorAll("[data-class-score-row]"));
+  }
+
+  function applyFilter() {
+    var q = (search && search.value || "").trim().toLowerCase();
+    var visible = 0;
+    rows().forEach(function (row) {
+      var name = row.getAttribute("data-name") || "";
+      var ok = !q || name.indexOf(q) !== -1;
+      row.hidden = !ok;
+      if (ok) visible += 1;
+    });
+    if (empty) empty.hidden = visible > 0;
+  }
+
+  function applySort() {
+    var mode = sort ? sort.value : "score-asc";
+    var items = rows();
+    items.sort(function (a, b) {
+      var sa = Number(a.getAttribute("data-sat"));
+      var sb = Number(b.getAttribute("data-sat"));
+      var ma = Number(a.getAttribute("data-misses"));
+      var mb = Number(b.getAttribute("data-misses"));
+      var na = a.getAttribute("data-name") || "";
+      var nb = b.getAttribute("data-name") || "";
+      if (mode === "score-desc") return sb - sa || na.localeCompare(nb);
+      if (mode === "name") return na.localeCompare(nb);
+      if (mode === "misses") return mb - ma || sa - sb || na.localeCompare(nb);
+      // score-asc: unanswered (-1) last
+      var aa = sa < 0 ? 9999 : sa;
+      var bb = sb < 0 ? 9999 : sb;
+      return aa - bb || na.localeCompare(nb);
+    });
+    items.forEach(function (row) { list.appendChild(row); });
+  }
+
+  board.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-class-score-toggle]");
+    if (btn) {
+      var row = btn.closest("[data-class-score-row]");
+      if (!row) return;
+      var detail = row.querySelector(".np-class-score-row-detail");
+      var open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+      row.classList.toggle("is-open", !open);
+      if (detail) detail.hidden = open;
+      return;
+    }
+    var viewBtn = e.target.closest("[data-class-score-view]");
+    if (viewBtn) {
+      var mode = viewBtn.getAttribute("data-class-score-view") || "roster";
+      board.setAttribute("data-view", mode);
+      viewBtns.forEach(function (b) {
+        b.classList.toggle("is-active", b === viewBtn);
+      });
+    }
+  });
+
+  if (search) search.addEventListener("input", applyFilter);
+  if (sort) sort.addEventListener("change", function () { applySort(); applyFilter(); });
+  board.setAttribute("data-view", "roster");
+  applySort();
+})();
+</script>
+{% endblock %}
