@@ -308,5 +308,29 @@
     {"unit": "U2", "skill": "Quadratic minimum / parameter"},
     {"unit": "U3", "skill": "Savings inequality model"},
     {"unit": "U2", "skill": "Quadratic point comparison"}
+  ],
+  "hard_24": [
+    {"unit": "U3", "skill": "Scatterplot line of best fit"},
+    {"unit": "U1", "skill": "Temperature conversion / rate"},
+    {"unit": "U1", "skill": "Linear function translation"},
+    {"unit": "U3", "skill": "Sampling / generalization"},
+    {"unit": "U3", "skill": "Poll proportion / expected margin"},
+    {"unit": "U2", "skill": "Quadratic vertex interpretation"},
+    {"unit": "U2", "skill": "Quadratic-linear system / one solution"},
+    {"unit": "U2", "skill": "Polynomial translation / intercepts"},
+    {"unit": "U2", "skill": "Exponential decay model"},
+    {"unit": "U4", "skill": "Circle diameter / center"},
+    {"unit": "U1", "skill": "Linear systems / no solution"},
+    {"unit": "U4", "skill": "3D distance / escalator path"},
+    {"unit": "U2", "skill": "Loan payment exponential model"},
+    {"unit": "U4", "skill": "Similar solids surface/volume scale"},
+    {"unit": "U4", "skill": "Prism surface area after cut"},
+    {"unit": "U2", "skill": "Radical / root equation"},
+    {"unit": "U3", "skill": "Percent decrease factor"},
+    {"unit": "U3", "skill": "Percent composition"},
+    {"unit": "U2", "skill": "Quadratic roots / coefficient sum"},
+    {"unit": "U2", "skill": "Polynomial intercept multiplicity"},
+    {"unit": "U2", "skill": "Exponential growth model"},
+    {"unit": "U4", "skill": "Unit circle coordinates"}
   ]
 }

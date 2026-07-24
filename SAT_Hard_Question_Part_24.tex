@@ -1,0 +1,510 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+
+\definecolor{novelblue}{RGB}{70,60,150}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{Novel Prep}}
+\fancyhead[C]{\color{novelblue}\textbf{SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+\newcommand{\markforreview}{
+  \stepcounter{questionnum}
+  \begin{tikzpicture}[scale=1.05]
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+}
+
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=novelblue,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+\graphicspath{{static/hard/}{./}{_import_test4/}}
+
+\begin{document}
+\section*{SAT Math Test V}
+
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Temperature (°C)},
+    ylabel={Sales (dollars)},
+    ytick={300,400,...,1000},
+    xmin=10, xmax=26,
+    ymin=300, ymax=1000,
+    grid=major,
+    width=10cm, height=6cm,
+    title={Ice Cream Sales}
+]
+\addplot[
+    only marks,
+    mark=*,
+]
+coordinates {
+    (12, 490)
+    (14, 510)
+    (16, 600)
+    (17, 650)
+    (18, 700)
+    (19, 730)
+    (20, 770)
+    (21, 810)
+    (22, 750)
+    (23, 800)
+    (24, 850)
+    (25, 880)
+};
+\addplot[domain=10:26, thick] {33*x + 84};
+\end{axis}
+\end{tikzpicture}
+
+\end{center}
+
+The scatterplot above shows a company’s ice cream sales $d$, in dollars, and the high temperature $t$, in degrees Celsius (°C), on 12 different days.  
+A line of best fit for the data is also shown.  
+Which of the following could be an equation of the line of best fit?
+
+\vspace{0.75em}
+
+\choicebox{A}{$d = 0.03t + 402$}  
+\choicebox{B}{$d = 10t + 402$}  
+\choicebox{C}{$d = 33t + 300$}  
+\choicebox{D}{$d = 33t + 84$}
+
+
+\vspace{2em}
+\noindent\markforreview
+
+\vspace{1em}
+
+The function \( F \) gives the temperature, in degrees Fahrenheit, that corresponds to a temperature of \( x \) kelvins. If a temperature increased by 10 kelvins, by how much did the temperature increase, in degrees Fahrenheit?
+
+\[
+F(x) = \frac{9}{5}(x - 273.15) + 32
+\]
+
+\newpage
+
+
+\noindent\markforreview
+
+\vspace{1em}
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[
+    axis lines=middle,
+    % 紫蓝色刻度线
+    xmin=-10, xmax=10,
+    ymin=-10, ymax=10,
+    xtick={-10,-8,...,10},
+    ytick={-10,-8,...,10},
+    grid=both,
+    width=10cm,
+    height=10cm,
+    enlargelimits=false,
+    xlabel={$x$}, ylabel={$y$},
+    every axis x label/.style={
+      at={(ticklabel* cs:1.05)}, anchor=west, color=purple!30!blue, font=\bfseries
+    },
+    every axis y label/.style={
+      at={(ticklabel* cs:1.05)}, anchor=south, color=purple!30!blue, font=\bfseries
+    },
+    domain=-10:10,
+    samples=2,
+    thick
+  ]
+    \addplot [purple!30!blue, very thick] {-0.25*x + 2};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+\vspace{0.75em}
+
+The graph of \( y = f(x) + 14 \) is shown. Which equation defines function \( f \)?
+
+\vspace{0.75em}
+
+\choicebox{A}{$f(x) = -\frac{1}{4}x - 12$}
+\choicebox{B}{$f(x) = -\frac{1}{4}x + 16$}
+\choicebox{C}{$f(x) = -\frac{1}{4}x + 2$}
+\choicebox{D}{$f(x) = -\frac{1}{4}x - 14$}
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+A psychologist designed and conducted a study to determine whether playing a certain educational game  
+increases middle school students’ accuracy in adding fractions.  
+For the study, the psychologist chose a random sample of 35 students from all of the students  
+at one of the middle schools in a large city. The psychologist found that students who played the game  
+showed significant improvement in accuracy when adding fractions.  
+What is the largest group to which the results of the study can be generalized?
+
+\vspace{0.75em}
+
+\choicebox{A}{The 35 students in the sample}  
+\choicebox{B}{All students at the school}  
+\choicebox{C}{All middle school students in the city}  
+\choicebox{D}{All students in the city}
+
+
+\vspace{2em}
+\noindent\markforreview
+
+\begin{center}
+\textbf{Poll Results}
+
+\vspace{0.4em}
+\begin{tabular}{|l|c|}
+\hline
+Candidate & Votes \\
+\hline
+Jordan Lee & 552 \\
+Maria Gomez & 451 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+The table shows the results of a poll. A total of 1,003 voters selected at random were asked which candidate they would vote for in the upcoming election.  
+According to the poll, if 8,240 people vote in the election, by how many votes would Jordan Lee be expected to win?
+
+\vspace{0.75em}
+
+\choicebox{A}{884}  
+\choicebox{B}{1,091}  
+\choicebox{C}{4,537}  
+\choicebox{D}{7,356}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+The function $f(x) = \frac{1}{9}(x - 7)^2 + 3$ gives a metal ball's height above the ground $f(x)$, in inches, $x$ seconds after it started moving, where $0 \leq x \leq 10$.  
+What is the best interpretation of the vertex of the graph $y = f(x)$?
+
+\vspace{0.75em}
+
+\choicebox{A}{The metal ball's minimum height was 3 inches above the ground.}
+\choicebox{B}{The metal ball's minimum height was 7 inches above the ground.}
+\choicebox{C}{The metal ball’s height was 3 inches above the ground when it started moving.}
+\choicebox{D}{The metal ball’s height was 7 inches above the ground when it started moving.}
+
+\vspace{2em}
+\noindent\markforreview
+\vspace{1em}
+
+Given the system:  
+\[
+\begin{cases}
+y = 2x^2 - 21x + 64 \\
+y = 3x + a
+\end{cases}
+\]  
+In the system of the equations, a is a constant. The graphs intersect at exactly one point \((x, y)\). What is the value of \(x\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{-8}
+\choicebox{B}{-6}
+\choicebox{C}{6}
+\choicebox{D}{8}
+
+\newpage
+
+
+\noindent\markforreview
+\vspace{1em}
+
+Function $f$ is defined by $f(x) = (x + 6)(x + 5)(x + 1)$.  
+Function $g$ is defined by $g(x) = f(x - 1)$.  
+The graph of $y = g(x)$ in the $xy$-plane has $x$-intercepts at $(a, 0)$, $(b, 0)$, and $(c, 0)$, where $a$, $b$, and $c$ are distinct constants.  
+What is the value of $a + b + c$?
+
+\vspace{0.75em}
+
+\choicebox{A}{$-15$}
+\choicebox{B}{$-9$}
+\choicebox{C}{$11$}
+\choicebox{D}{$15$}
+
+
+
+
+
+
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+For an online trivia game, 490 points are awarded for a correct answer if a question is answered in less than 5 seconds from the time the question is asked.  
+Each 5 seconds after the question is asked, the number of points awarded for a correct answer decreases by 20\% of the number of points awarded for a correct answer in the previous 5 seconds.  
+
+Which function gives the number of points awarded for a correct answer \(x\) seconds from the time the question is asked, where \(x\) is a multiple of 5?
+
+\vspace{0.75em}
+
+\choicebox{A}{$f(x) = 490(0.80)^{\frac{x}{5}}$}
+\choicebox{B}{$f(x) = 490(0.80)^{5x}$}
+\choicebox{C}{$f(x) = 490(0.20)^{\frac{x}{5}}$}
+\choicebox{D}{$f(x) = 490(0.20)^{5x}$}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A circle in the \(xy\)-plane has a diameter with endpoints \((a,11)\) and \((a,d)\), where \(a\) and \(d\) are constants.  
+
+An equation of this circle is:  
+\[
+(x - a)^2 + (y - 17)^2 = r^2
+\]  
+where \(r\) is a positive constant.
+
+What is the value of \(d\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{5}
+\choicebox{B}{12}
+\choicebox{C}{17}
+\choicebox{D}{23}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+One of the equations in a system of two linear equations is given:  
+\[
+31(x - n) = 31y + 31n
+\]  
+where \(n\) is a positive constant.  
+The system has no solution. Which equation could be the second equation in this system?
+
+\vspace{0.75em}
+
+\choicebox{A}{$3x - 3y = 6n$}
+\choicebox{B}{$3x + 3y = 3n$}
+\choicebox{C}{$3x + 3y = 6n$}
+\choicebox{D}{$3x - 3y = 3n$}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In a mall, a person rides down an escalator, turns directly left at the base, and walks 16 feet (ft) to a kiosk.  
+The escalator has a vertical rise of 18 ft and a horizontal run of 24 ft.  
+If the person could have traveled in a straight line from the top of the escalator to the kiosk, what would the distance be, in feet?
+
+\vspace{0.75em}
+
+\choicebox{A}{24 ft}
+\choicebox{B}{30 ft}
+\choicebox{C}{34 ft}
+\choicebox{D}{46 ft}
+
+
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+The amount of money owed on a certain type of loan has two components: the principal balance of the loan and the amount of interest accrued on the loan.  
+For a loan of this type, each payment was \$298.00 and there were 60 payments total. Part of each payment was applied to the principal balance of the loan, and the rest was applied to the amount of interest accrued on the loan.  
+The amount of the 1st payment that was applied to the principal balance was \$220.93.  
+For each additional payment, the amount that was applied to the principal balance was approximately 0.5\% greater than the amount that was applied to the principal balance for the previous payment.  
+
+Which function best approximates the amount of the \(x\)th payment, in dollars, that was applied to the amount of interest accrued, where \(x \leq 60\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{$f(x) = 298.00 - 220.93(1.005)^{x-1}$}
+\choicebox{B}{$f(x) = 298.00 - 220.93(1.005)^{x}$}
+\choicebox{C}{$f(x) = (298.00 - 220.93)(0.995)^{x-1}$}
+\choicebox{D}{$f(x) = (298.00 - 220.93)(0.995)^x$}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Right rectangular prism \(X\) is similar to right rectangular prism \(Y\).  
+The surface area of right rectangular prism \(X\) is 52 square centimeters \((\text{cm}^2)\), and the surface area of right rectangular prism \(Y\) is 3,328 \(\text{cm}^2\).  
+The volume of right rectangular prism \(X\) is 10.5 cubic centimeters \((\text{cm}^3)\).  
+
+What is the volume, in \(\text{cm}^3\), of right rectangular prism \(Y\)?
+
+\vspace{0.75em}
+
+\choicebox{A}{1344}
+\choicebox{B}{3328}
+\choicebox{C}{5376}
+\choicebox{D}{6656}
+
+
+
+\noindent\markforreview
+\vspace{1em}
+
+A rectangular prism has a height of 50 centimeters (cm). The base of the prism is a square and the surface area of the prism is \( S \) cm\(^2\).  
+If the prism is divided into two identical rectangular prisms by making a cut parallel to the square base, each resulting prism has a surface area of \(\frac{31}{50} S\) cm\(^2\).  
+
+What is the side length, in cm, of each square base?
+
+\vspace{0.75em}
+
+\choicebox{A}{5}
+\choicebox{B}{6}
+\choicebox{C}{12}
+\choicebox{D}{32}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Two numbers, \( a \) and \( b \), are each greater than zero, and 4 times the square root of \( a \) is equal to 9 times the cube root of \( b \).  
+If \( a = \left(\frac{2}{3}\right)^2 \), for what value of x that \( a^x \) is equal to \( b \)?
+
+\vspace{0.75em}
+
+\vspace{2em}
+\noindent\markforreview
+
+\vspace{1em}
+
+The expression \( kx \) represents the result of decreasing a positive force, \( x \), acting on an object by \( 0.34\% \). What is the value of \( k \)?
+
+\vspace{0.75em}
+
+\choicebox{A}{\( 0.0034 \)}
+\choicebox{B}{\( 0.9966 \)}
+\choicebox{C}{\( 1.0034 \)}
+\choicebox{D}{\( 0.034 \)}
+\newpage
+
+
+
+\noindent\markforreview
+
+\vspace{1em}
+
+A scientist studied the composition of one young swamp buffalo and determined the buffalo had 133 kilograms of muscle, which made up approximately 65.9\% of its composition. Of the remaining composition of this buffalo, approximately 46.2\% was bone, and the rest was fat.  
+
+Based on these approximations, to the nearest tenth, how many kilograms of this buffalo’s composition was bone?
+
+\vspace{0.75em}
+\vspace{2em}
+
+\noindent\markforreview
+
+\vspace{1em}
+
+The function \( f \) is defined by \( f(x) = ax^2 + bx + c \), where \( a, b, \) and \( c \) are constants. The graph of \( y = f(x) \) in the \( xy \)-plane passes through the points \( (10, 0) \) and \( (-5, 0) \).  
+If \( a \) is an integer greater than 1, which of the following could be the value of \( a + b \)?
+
+\vspace{0.75em}
+
+\choicebox{A}{-8}
+\choicebox{B}{-4}
+\choicebox{C}{5}
+\choicebox{D}{6}
+
+\vspace{1em}
+
+\newpage
+\noindent\markforreview
+
+\vspace{1em}
+
+In the equation \( y = bx(x - a)(x - a)(x + b)(x - b) \),  
+\( a \) and \( b \) are positive constants and \( a \ne b \).  
+How many distinct \( x \)-intercepts does the graph of the equation in the \( xy \)-plane have?
+
+\vspace{0.75em}
+
+\choicebox{A}{Two}
+\choicebox{B}{Three}
+\choicebox{C}{Four}
+\choicebox{D}{Five}
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+At different times on a certain day, a manager at a theme park recorded the number of visitors.  
+An exponential model gives the estimated number of visitors, $V$, at the theme park $t$ hours after the theme park opened, where $t \leq 3$.  
+Based on the model, 80 visitors were estimated to be at the theme park when it opened,  
+and every 30 minutes the estimated number of visitors increased by 150\% of the number 30 minutes earlier.  
+Which of the following equations best represents this model?
+
+\choicebox{A}{$V = 80(2.5)^{2t}$}
+\choicebox{B}{$V = 80(2.5)^{\frac{t}{30}}$}
+\choicebox{C}{$V = 80(1.5)^{2t}$}
+\choicebox{D}{$V = 80(1.5)^{\frac{t}{30}}$}
+
+\newpage
+\noindent\markforreview
+\vspace{1em}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{hard_24_f11.png}
+\end{center}
+\textbf{As shown in the figure, \(O\) is the center of a circle with radius 1, and the circle intersects the coordinate axes at points \(A\) and \(B\).  
+Point \(P\) lies on arc \(\overset{\frown}{AB}\) (not overlapping with \(A\) or \(B\)). Connect \(OP\), and let \(\angle POB = \alpha\).  
+What are the coordinates of point \(P\)?}
+
+
+
+
+\choicebox{A}{$(\sin\alpha, \sin\alpha)$}
+\choicebox{B}{$(\cos\alpha, \cos\alpha)$}
+\choicebox{C}{$(\cos\alpha, \sin\alpha)$}
+\choicebox{D}{$(\sin\alpha, \cos\alpha)$}
+
+\end{document}

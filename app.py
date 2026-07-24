@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -4144,6 +4144,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_21": "banks/hard/hard_21.tex",
         "hard_22": "banks/hard/hard_22.tex",
         "hard_23": "banks/hard/hard_23.tex",
+        "hard_24": "banks/hard/hard_24.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4472,6 +4473,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test IV — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-IV-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_24": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_24.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test V — Module 2-style mock from Overleaf Test 4.",
+            "download_name": "NovelPrep-Test-V-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_24_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test V — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-V-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4968,6 +4985,7 @@ TOPIC_TITLES = {
     "hard_21": "Test I",
     "hard_22": "Test III",
     "hard_23": "Test IV",
+    "hard_24": "Test V",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5395,11 +5413,37 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "0"},  # was D in Overleaf key (FR)
         {"correct_answer": "D"},
         {"correct_answer": "B"},
-        {"correct_answer": "4"},
+        # a^c = 11 → b=4; a^c = -10 → b=-17 (both satisfy the two points)
+        {"correct_answer": "4", "answer_alternates": ["-17"]},
         {"correct_answer": "4"},
         {"correct_answer": "B"},
         {"correct_answer": "C"},  # choice value 8
         {"correct_answer": "B"},
+        {"correct_answer": "C"},
+    ],
+    # Overleaf Test_4_Module_2 — verified against stems.
+    "hard_24": [
+        {"correct_answer": "D"},
+        {"correct_answer": "18"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},  # win-by margin: (552-451)/1003*8240 ≈ 829.75 → 830
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "600/19", "answer_alternates": ["31.6", "31.58", "31.579", "31.5789"]},
+        {"correct_answer": "9/2", "answer_alternates": ["4.5", "4.50"]},
+        {"correct_answer": "B"},
+        {"correct_answer": "31.8"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "A"},
         {"correct_answer": "C"},
     ],
 }

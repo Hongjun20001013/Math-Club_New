@@ -357,26 +357,27 @@ def _svg_axes_plot(
             f'stroke="{_AXIS}" stroke-width="2" stroke-linecap="square" marker-end="url(#{mid})"/>'
         )
 
-    if show_x_axis:
-        tick_h = 5
-        for gx in xtick_vals:
-            if gx < xmin - 1e-6 or gx > xmax + 1e-6:
-                continue
-            x_ = tx(gx)
-            parts.append(
-                f'<line x1="{x_:.2f}" y1="{y0:.2f}" x2="{x_:.2f}" y2="{y0 + tick_h:.2f}" '
-                f'stroke="{_TICK}" stroke-width="1.2"/>'
-            )
-    if show_y_axis:
-        tick_w = 5
-        for gy in ytick_vals:
-            if gy < ymin - 1e-6 or gy > ymax + 1e-6:
-                continue
-            y_ = ty(gy)
-            parts.append(
-                f'<line x1="{x0 - tick_w:.2f}" y1="{y_:.2f}" x2="{x0:.2f}" y2="{y_:.2f}" '
-                f'stroke="{_TICK}" stroke-width="1.2"/>'
-            )
+    # Tick marks: on the drawn axis when origin is in view; otherwise on the plot frame.
+    x_tick_y = y0 if show_x_axis else (h - pad_b)
+    y_tick_x = x0 if show_y_axis else pad_l
+    tick_h = 5
+    for gx in xtick_vals:
+        if gx < xmin - 1e-6 or gx > xmax + 1e-6:
+            continue
+        x_ = tx(gx)
+        parts.append(
+            f'<line x1="{x_:.2f}" y1="{x_tick_y:.2f}" x2="{x_:.2f}" y2="{x_tick_y + tick_h:.2f}" '
+            f'stroke="{_TICK}" stroke-width="1.2"/>'
+        )
+    tick_w = 5
+    for gy in ytick_vals:
+        if gy < ymin - 1e-6 or gy > ymax + 1e-6:
+            continue
+        y_ = ty(gy)
+        parts.append(
+            f'<line x1="{y_tick_x - tick_w:.2f}" y1="{y_:.2f}" x2="{y_tick_x:.2f}" y2="{y_:.2f}" '
+            f'stroke="{_TICK}" stroke-width="1.2"/>'
+        )
 
     if show_x_axis and show_y_axis:
         parts.append(
@@ -400,26 +401,38 @@ def _svg_axes_plot(
             'stroke="#ffffff" stroke-width="2"/>'
         )
 
-    if show_x_axis:
-        for gx in xtick_vals:
-            if gx < xmin - 1e-6 or gx > xmax + 1e-6:
-                continue
-            x_ = tx(gx)
-            parts.append(
-                f'<text x="{x_:.2f}" y="{h - pad_b + 20:.2f}" text-anchor="middle" '
-                f'font-size="11.5" font-weight="600" fill="{_TICK}" {font}>'
-                f"{_escape(_fmt_tick_num(gx))}</text>"
-            )
-    if show_y_axis:
-        for gy in ytick_vals:
-            if gy < ymin - 1e-6 or gy > ymax + 1e-6:
-                continue
-            y_ = ty(gy)
-            parts.append(
-                f'<text x="{pad_l - 12:.2f}" y="{y_ + 4:.2f}" text-anchor="end" '
-                f'font-size="11.5" font-weight="600" fill="{_TICK}" {font}>'
-                f"{_escape(_fmt_tick_num(gy))}</text>"
-            )
+    # Always render numeric tick labels (not only when the origin is in view).
+    # Place them beside the actual axis when it sits on a plot edge; otherwise use the frame.
+    x_label_on_top = show_x_axis and y0 <= pad_t + 8
+    y_label_on_right = show_y_axis and x0 >= w - pad_r - 8
+    for gx in xtick_vals:
+        if gx < xmin - 1e-6 or gx > xmax + 1e-6:
+            continue
+        x_ = tx(gx)
+        if x_label_on_top:
+            ty_lbl = max(14.0, y0 - 8)
+        else:
+            ty_lbl = h - pad_b + 20
+        parts.append(
+            f'<text x="{x_:.2f}" y="{ty_lbl:.2f}" text-anchor="middle" '
+            f'font-size="11.5" font-weight="600" fill="{_TICK}" {font}>'
+            f"{_escape(_fmt_tick_num(gx))}</text>"
+        )
+    for gy in ytick_vals:
+        if gy < ymin - 1e-6 or gy > ymax + 1e-6:
+            continue
+        y_ = ty(gy)
+        if y_label_on_right:
+            tx_lbl = min(w - 4.0, x0 + 14)
+            anchor = "start"
+        else:
+            tx_lbl = pad_l - 12
+            anchor = "end"
+        parts.append(
+            f'<text x="{tx_lbl:.2f}" y="{y_ + 4:.2f}" text-anchor="{anchor}" '
+            f'font-size="11.5" font-weight="600" fill="{_TICK}" {font}>'
+            f"{_escape(_fmt_tick_num(gy))}</text>"
+        )
 
     if xlabel:
         parts.append(

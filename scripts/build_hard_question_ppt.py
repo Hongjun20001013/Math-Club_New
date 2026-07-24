@@ -32,6 +32,36 @@ CLOSING_FRAME = r"""
 \end{frame}
 """.strip()
 
+# Optional longer explanations appended on Answer frames after the key.
+# Keyed by (set_num, question_number_1_based).
+ANSWER_EXPLAINS: dict[tuple[int, int], str] = {
+    (24, 22): r"""
+\vspace{0.15em}
+\begin{columns}[T]
+\begin{column}{0.38\textwidth}
+\centering
+\includegraphics[width=\linewidth]{hard_24_f11.png}
+\end{column}
+\begin{column}{0.58\textwidth}
+\footnotesize
+Place $O$ at the origin with radius $1$: $A=(0,1)$, $B=(1,0)$.
+$\angle POB=\alpha$ is measured from ray $\overrightarrow{OB}$
+(the positive $x$-axis) to $\overrightarrow{OP}$.
+
+On the unit circle,
+\[
+P=(\cos\alpha,\ \sin\alpha).
+\]
+Check: $\alpha=0\Rightarrow P=B=(1,0)$;
+as $\alpha\to 90^\circ$, $P\to A=(0,1)$.
+
+\textbf{Trap:} measuring from $\overrightarrow{OA}$ gives
+$(\sin\alpha,\cos\alpha)$ (choice~D) --- wrong for this figure.
+\end{column}
+\end{columns}
+""".strip(),
+}
+
 
 def read_braced_content(text: str, start: int) -> tuple[str, int] | None:
     if start >= len(text) or text[start] != "{":
@@ -248,12 +278,17 @@ def build_set(set_num: int) -> str:
         short_title = "Test IV"
         intro_phase = "Phase 3 · Mock Exam Training"
         overview_title = "Test IV"
+    elif set_num == 24:
+        label = f"{count} Module 2-style mock exam questions"
+        short_title = "Test V"
+        intro_phase = "Phase 3 · Mock Exam Training"
+        overview_title = "Test V"
     else:
         label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
         short_title = f"SAT Hard Question {set_num}"
         intro_phase = "Phase 2 · Hard Question Practice"
         overview_title = f"Hard Question Set {set_num}"
-    use_phase3_title = set_num in {20, 21, 22, 23}
+    use_phase3_title = set_num in {20, 21, 22, 23, 24}
     parts = [
         preamble(set_num, short_title)
         .replace("{QUESTION_COUNT_LABEL}", label)
@@ -271,6 +306,9 @@ def build_set(set_num: int) -> str:
         parts.append(f"\\begin{{frame}}{{Question {i}}}\n\\small\n{body}\n\\end{{frame}}\n")
         meta = keys[i - 1] if i - 1 < len(keys) else {}
         answer_tex = format_answer(meta) if meta else "\\textbf{Answer pending}"
+        explain = ANSWER_EXPLAINS.get((set_num, i), "").strip()
+        if explain:
+            answer_tex = f"{answer_tex}\n{explain}"
         parts.append(
             f"\\begin{{frame}}{{Answer {i}}}\n\\small\n{answer_tex}\n\\end{{frame}}\n"
         )
