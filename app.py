@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -4145,6 +4145,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_22": "banks/hard/hard_22.tex",
         "hard_23": "banks/hard/hard_23.tex",
         "hard_24": "banks/hard/hard_24.tex",
+        "hard_25": "banks/hard/hard_25.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4489,6 +4490,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test V — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-V-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_25": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_25.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test VI — error-prone question set from Overleaf 易错题归纳.",
+            "download_name": "NovelPrep-Test-VI-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_25_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test VI — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-VI-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -4986,6 +5003,7 @@ TOPIC_TITLES = {
     "hard_22": "Test III",
     "hard_23": "Test IV",
     "hard_24": "Test V",
+    "hard_25": "Test VI",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5437,13 +5455,39 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "C"},
         {"correct_answer": "A"},
         {"correct_answer": "C"},
-        {"correct_answer": "600/19", "answer_alternates": ["31.6", "31.58", "31.579", "31.5789"]},
+        {"correct_answer": "600/19", "answer_alternates": [
+            "31.6", "31.58", "31.57", "31.578", "31.579", "31.5789",
+            "31.57895", "31.578947", "31.5789474",
+        ]},
         {"correct_answer": "9/2", "answer_alternates": ["4.5", "4.50"]},
         {"correct_answer": "B"},
         {"correct_answer": "31.8"},
         {"correct_answer": "A"},
         {"correct_answer": "C"},
         {"correct_answer": "A"},
+        {"correct_answer": "C"},
+    ],
+    # Overleaf 易错题归纳 — verified independently (20Q).
+    "hard_25": [
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "-3", "answer_alternates": ["-3.0"]},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},  # Angel Cruz win-by margin 1304
+        {"correct_answer": "C"},
+        {"correct_answer": "C"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "-2", "answer_alternates": ["-2.0"]},
+        {"correct_answer": "B"},
         {"correct_answer": "C"},
     ],
 }

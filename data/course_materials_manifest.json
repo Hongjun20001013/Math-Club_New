@@ -660,6 +660,21 @@
         "SAT_Hard_Question_Part_24_PPT.pdf",
         "SAT_Hard_Question_Part_24.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-25",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Mock Exam Training",
+      "section": "Test VI",
+      "title": "Test VI",
+      "tex_candidates": [
+        "SAT_Hard_Question_25_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_25_PPT.pdf",
+        "SAT_Hard_Question_Part_25.pdf"
+      ]
     }
   ]
 }

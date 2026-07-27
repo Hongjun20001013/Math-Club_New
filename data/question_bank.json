@@ -17272,8 +17272,13 @@
         "answer_alternates": [
           "31.6",
           "31.58",
+          "31.57",
+          "31.578",
           "31.579",
-          "31.5789"
+          "31.5789",
+          "31.57895",
+          "31.578947",
+          "31.5789474"
         ],
         "knowledge_section": "Unit 4",
         "knowledge_section_title_en": "Geometry",
@@ -17370,6 +17375,284 @@
         "knowledge_section": "Unit 4",
         "knowledge_section_title_en": "Geometry",
         "hard_skill": "Unit circle coordinates"
+      }
+    ],
+    "hard_25": [
+      {
+        "stem": "<p>Hector used a tool called an auger to remove corn from a storage bin at a constant rate. The bin contained 24,000 bushels of corn when Hector began to use the auger. After 5 hours of using the auger, 19,350 bushels of corn remained in the bin. If the auger continues to remove corn at this rate, what is the total number of hours Hector will have been using the auger when 12,840 bushels of corn remain in the bin?</p>",
+        "choices": [
+          "3",
+          "7",
+          "8",
+          "12"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Constant rate word problem"
+      },
+      {
+        "stem": "<p>Townsend Realty Group Investments</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Property address</th><th>Purchase price (dollars)</th><th>Monthly rental price (dollars)</th></tr></thead><tbody><tr><td>Clearwater Lane</td><td>128,000</td><td>950</td></tr><tr><td>Driftwood Drive</td><td>176,000</td><td>1,310</td></tr><tr><td>Edgemont Street</td><td>70,000</td><td>515</td></tr><tr><td>Glenview Street</td><td>140,000</td><td>1,040</td></tr><tr><td>Hamilton Circle</td><td>450,000</td><td>3,365</td></tr></tbody></table></div>\n<p>The Townsend Realty Group invested in the five different properties listed in the table above. The table shows the amount, in dollars, the company paid for each property and the corresponding monthly rental price, in dollars, the company charges for the property at each of the five locations.</p>\n<p>Townsend Realty purchased the Glenview Street property and received a 40% discount off the original price along with an additional 20% off the discounted price for purchasing the property in cash. Which of the following best approximates the original price, in dollars, of the Glenview Street property?</p>",
+        "choices": [
+          "&#36;350,000",
+          "&#36;291,700",
+          "&#36;233,300",
+          "&#36;175,000"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent discount / original price"
+      },
+      {
+        "stem": "<p>Each side of a 30-sided polygon has one of three lengths. The number of sides with length 8 centimeters (cm) is 5 times the number of sides \\( n \\) with length 3 cm. There are 6 sides with length 4 cm. Which equation must be true for the value of \\( n \\)?</p>",
+        "choices": [
+          "\\(\\displaystyle 5n + 6 = 30\\)",
+          "\\(\\displaystyle 6n + 6 = 30\\)",
+          "\\(\\displaystyle 8n + 3n + 4n = 30\\)",
+          "\\(\\displaystyle 8(5n) + 3n + 4(6) = 30\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Polygon side-count equation"
+      },
+      {
+        "stem": "<p>A window repair specialist charges &#36;220 for the first two hours of repair plus an hourly fee for each additional hour. The total cost for 5 hours of repair is &#36;400. Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours of repair, where \\( x \\geq 2 \\)?</p>",
+        "choices": [
+          "\\(\\displaystyle f(x) = 60x + 100\\)",
+          "\\(\\displaystyle f(x) = 60x + 220\\)",
+          "\\(\\displaystyle f(x) = 80x\\)",
+          "\\(\\displaystyle f(x) = 80x + 220\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Piecewise linear cost model"
+      },
+      {
+        "stem": "<p>One gallon of paint will cover 220 square feet of a surface. A room has a total wall area of \\( w \\) square feet. Which equation represents the total amount of paint \\( P \\), in gallons, needed to paint the walls of the room twice?</p>",
+        "choices": [
+          "\\(\\displaystyle P = \\frac{w}{110}\\)",
+          "\\(\\displaystyle P = 440w\\)",
+          "\\(\\displaystyle P = \\frac{w}{220}\\)",
+          "\\(\\displaystyle P = 220w\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Coverage rate equation"
+      },
+      {
+        "stem": "<p>A laundry service is buying detergent and fabric softener from its supplier. The supplier will deliver no more than 300 pounds in a shipment. Each container of detergent weighs 7.35 pounds, and each container of fabric softener weighs 6.2 pounds. The service wants to buy at least twice as many containers of detergent as containers of fabric softener. Let \\( d \\) represent the number of containers of detergent, and let \\( s \\) represent the number of containers of fabric softener, where \\( d \\) and \\( s \\) are nonnegative integers. Which of the following systems of inequalities best represents this situation?</p>",
+        "choices": [
+          "\\(\\displaystyle 7.35d + 6.2s \\leq 300\\),\n    \\(\\displaystyle d \\geq 2s\\)",
+          "\\(\\displaystyle 7.35d + 6.2s \\leq 300\\),\n    \\(\\displaystyle 2d \\geq s\\)",
+          "\\(\\displaystyle 14.7d + 6.2s \\leq 300\\),\n    \\(\\displaystyle d \\geq 2s\\)",
+          "\\(\\displaystyle 14.7d + 6.2s \\leq 300\\),\n    \\(\\displaystyle 2d \\geq s\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear inequality system"
+      },
+      {
+        "stem": "<p>The triangle inequality theorem states that the sum of any two sides of a triangle must be greater than the length of the third side. If a triangle has side lengths of \\(\\displaystyle 6\\) and \\(\\displaystyle 12\\), which inequality represents the possible lengths, \\(\\displaystyle x\\), of the third side of the triangle?</p>",
+        "choices": [
+          "\\(\\displaystyle x \\lt  18\\)",
+          "\\(\\displaystyle x > 18\\)",
+          "\\(\\displaystyle 6 \\lt  x \\lt  18\\)",
+          "\\(\\displaystyle x \\lt  6 \\text{ or } x > 18\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Triangle inequality"
+      },
+      {
+        "stem": "<p>What is the smallest solution to the equation</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt{(x - 2)^2} = \\sqrt{3x + 34}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "-3",
+        "answer_alternates": [
+          "-3.0"
+        ],
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic equation / smallest root"
+      },
+      {
+        "stem": "<p>The population \\(\\displaystyle P\\) of a certain city \\(\\displaystyle y\\) years after the last census is modeled by the equation \\(\\displaystyle P = P_0(1 + r)^y\\), where \\(\\displaystyle r\\) is a constant and \\(\\displaystyle P_0\\) is the population when \\(\\displaystyle y = 0\\). If the population decreases each year by a fixed percent, which of the following must be true?</p>",
+        "choices": [
+          "\\(\\displaystyle r \\lt  -1\\)",
+          "\\(\\displaystyle -1 \\lt  r \\lt  0\\)",
+          "\\(\\displaystyle 0 \\lt  r \\lt  1\\)",
+          "\\(\\displaystyle r > 1\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential percent change"
+      },
+      {
+        "stem": "<div class=\"stem-figure-wrap\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 420 420\" class=\"stem-tikz-svg\" role=\"img\" aria-label=\"Coordinate plane figure\"><defs><marker id=\"npM34\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#352875\"/></marker></defs><rect x=\"0\" y=\"0\" width=\"420\" height=\"420\" fill=\"none\"/><rect x=\"58.00\" y=\"36.00\" width=\"330.00\" height=\"326.00\" rx=\"4\" fill=\"#f7f5ff\" stroke=\"rgba(79,47,212,0.08)\" stroke-width=\"1\"/><line x1=\"73.00\" y1=\"36.00\" x2=\"73.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"91.75\" y1=\"36.00\" x2=\"91.75\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"110.50\" y1=\"36.00\" x2=\"110.50\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"129.25\" y1=\"36.00\" x2=\"129.25\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"148.00\" y1=\"36.00\" x2=\"148.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"166.75\" y1=\"36.00\" x2=\"166.75\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"185.50\" y1=\"36.00\" x2=\"185.50\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"204.25\" y1=\"36.00\" x2=\"204.25\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"223.00\" y1=\"36.00\" x2=\"223.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"241.75\" y1=\"36.00\" x2=\"241.75\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"260.50\" y1=\"36.00\" x2=\"260.50\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"279.25\" y1=\"36.00\" x2=\"279.25\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"298.00\" y1=\"36.00\" x2=\"298.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"316.75\" y1=\"36.00\" x2=\"316.75\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"335.50\" y1=\"36.00\" x2=\"335.50\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"354.25\" y1=\"36.00\" x2=\"354.25\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"373.00\" y1=\"36.00\" x2=\"373.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"362.00\" x2=\"388.00\" y2=\"362.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"315.43\" x2=\"388.00\" y2=\"315.43\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"268.86\" x2=\"388.00\" y2=\"268.86\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"222.29\" x2=\"388.00\" y2=\"222.29\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"175.71\" x2=\"388.00\" y2=\"175.71\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"129.14\" x2=\"388.00\" y2=\"129.14\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"82.57\" x2=\"388.00\" y2=\"82.57\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"58.00\" y1=\"36.00\" x2=\"388.00\" y2=\"36.00\" stroke=\"rgba(79, 47, 212, 0.14)\" stroke-width=\"1\"/><line x1=\"73.00\" y1=\"362.00\" x2=\"73.00\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"91.75\" y1=\"362.00\" x2=\"91.75\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"110.50\" y1=\"362.00\" x2=\"110.50\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"129.25\" y1=\"362.00\" x2=\"129.25\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"148.00\" y1=\"362.00\" x2=\"148.00\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"166.75\" y1=\"362.00\" x2=\"166.75\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"185.50\" y1=\"362.00\" x2=\"185.50\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"204.25\" y1=\"362.00\" x2=\"204.25\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"223.00\" y1=\"362.00\" x2=\"223.00\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"241.75\" y1=\"362.00\" x2=\"241.75\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"260.50\" y1=\"362.00\" x2=\"260.50\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"279.25\" y1=\"362.00\" x2=\"279.25\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"298.00\" y1=\"362.00\" x2=\"298.00\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"316.75\" y1=\"362.00\" x2=\"316.75\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"335.50\" y1=\"362.00\" x2=\"335.50\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"354.25\" y1=\"362.00\" x2=\"354.25\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"373.00\" y1=\"362.00\" x2=\"373.00\" y2=\"367.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"362.00\" x2=\"58.00\" y2=\"362.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"315.43\" x2=\"58.00\" y2=\"315.43\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"268.86\" x2=\"58.00\" y2=\"268.86\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"222.29\" x2=\"58.00\" y2=\"222.29\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"175.71\" x2=\"58.00\" y2=\"175.71\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"129.14\" x2=\"58.00\" y2=\"129.14\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"82.57\" x2=\"58.00\" y2=\"82.57\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><line x1=\"53.00\" y1=\"36.00\" x2=\"58.00\" y2=\"36.00\" stroke=\"#2d2657\" stroke-width=\"1.2\"/><path d=\"M 73.00,308.91 L 373.00,63.01\" fill=\"none\" stroke=\"#4f2fd4\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"110.50\" cy=\"273.51\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"148.00\" cy=\"264.20\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"185.50\" cy=\"222.29\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"204.25\" cy=\"199.00\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"223.00\" cy=\"175.71\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"241.75\" cy=\"161.74\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"260.50\" cy=\"143.11\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"279.25\" cy=\"124.49\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"298.00\" cy=\"152.43\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"316.75\" cy=\"129.14\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"335.50\" cy=\"105.86\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><circle cx=\"354.25\" cy=\"91.89\" r=\"5\" fill=\"#4f2fd4\" stroke=\"#ffffff\" stroke-width=\"2\"/><text x=\"73.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">10</text><text x=\"91.75\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">11</text><text x=\"110.50\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">12</text><text x=\"129.25\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">13</text><text x=\"148.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">14</text><text x=\"166.75\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">15</text><text x=\"185.50\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">16</text><text x=\"204.25\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">17</text><text x=\"223.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">18</text><text x=\"241.75\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">19</text><text x=\"260.50\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">20</text><text x=\"279.25\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">21</text><text x=\"298.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">22</text><text x=\"316.75\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">23</text><text x=\"335.50\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">24</text><text x=\"354.25\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">25</text><text x=\"373.00\" y=\"382.00\" text-anchor=\"middle\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">26</text><text x=\"46.00\" y=\"366.00\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">300</text><text x=\"46.00\" y=\"319.43\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">400</text><text x=\"46.00\" y=\"272.86\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">500</text><text x=\"46.00\" y=\"226.29\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">600</text><text x=\"46.00\" y=\"179.71\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">700</text><text x=\"46.00\" y=\"133.14\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">800</text><text x=\"46.00\" y=\"86.57\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">900</text><text x=\"46.00\" y=\"40.00\" text-anchor=\"end\" font-size=\"11.5\" font-weight=\"600\" fill=\"#2d2657\" font-family=\"DM Sans,system-ui,sans-serif\">1000</text><text x=\"223.00\" y=\"410.00\" text-anchor=\"middle\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">Temperature (°C)</text><text x=\"58.00\" y=\"28.00\" text-anchor=\"start\" font-size=\"12.5\" font-weight=\"600\" fill=\"#352875\" font-family=\"DM Sans,system-ui,sans-serif\">Sales (dollars)</text></svg></div>\n<p>The scatterplot above shows a company’s ice cream sales \\(\\displaystyle d\\), in dollars, and the high temperature \\(\\displaystyle t\\), in degrees Celsius (°C), on 12 different days. A line of best fit for the data is also shown. Which of the following could be an equation of the line of best fit?</p>",
+        "choices": [
+          "\\(\\displaystyle d = 0.03t + 402\\)",
+          "\\(\\displaystyle d = 10t + 402\\)",
+          "\\(\\displaystyle d = 33t + 300\\)",
+          "\\(\\displaystyle d = 33t + 84\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Scatterplot line of best fit"
+      },
+      {
+        "stem": "<p>For \\(\\displaystyle x > 0\\), the function \\(\\displaystyle f\\) is defined as follows:</p>\n<p>\\(\\displaystyle f(x)\\) equals \\(\\displaystyle 201\\%\\) of \\(\\displaystyle x\\).</p>\n<p>Which of the following could describe this function?</p>",
+        "choices": [
+          "Decreasing exponential",
+          "Decreasing linear",
+          "Increasing exponential",
+          "Increasing linear"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Percent of x / linear growth"
+      },
+      {
+        "stem": "<p>Poll Results</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Candidate</th><th>Votes</th></tr></thead><tbody><tr><td>Angel Cruz</td><td>483</td></tr><tr><td>Terry Smith</td><td>320</td></tr></tbody></table></div>\n<p>The table shows the results of a poll. A total of 803 voters selected at random were asked which candidate they would vote for in the upcoming election. According to the poll, if 6,424 people vote in the election, by how many votes would Angel Cruz be expected to win?</p>",
+        "choices": [
+          "163",
+          "1,304",
+          "3,864",
+          "5,621"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Poll proportion / expected margin"
+      },
+      {
+        "stem": "<p>The given equation is one equation in a system of two linear equations. If the system of equations has at least one solution, which of the following equations could be the other equation in the system?</p>\n<div class=\"stem-math-block\">\\[\n7x + 5y = 2\n\\]</div>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(10.5x + 7.5y = 3\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(10.5x - 7.5y = 3\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "II only",
+          "I and II",
+          "Neither I nor II"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear systems / number of solutions"
+      },
+      {
+        "stem": "<p>In a set of four consecutive odd integers, where the integers are ordered from least to greatest, the first integer is represented by \\(\\displaystyle x\\). The product of 28 and the third odd integer in the set is at most the value of 50 less than the sum of the first and fourth odd integers in the set. What is the greatest possible value of \\(\\displaystyle x\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle -5\\)",
+          "\\(\\displaystyle -6\\)",
+          "\\(\\displaystyle -7\\)",
+          "\\(\\displaystyle -8\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Inequality with consecutive odds"
+      },
+      {
+        "stem": "<p>The functions \\(f\\) and \\(g\\) are defined by the equations shown, where \\(a\\) and \\(b\\) are integer constants, \\(a \\lt  b\\), and \\(b \\lt  0\\). If \\(y = f(x)\\) and \\(y = g(x)\\) are graphed in the \\(xy\\)-plane, which of the following equations displays, as a constant or coefficient, the \\(y\\)-coordinate of the \\(y\\)-intercept of the graph of the corresponding function?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(f(x) = a(2.1)^{x + b}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(g(x) = a(2.1)^x + b\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "II only",
+          "I and II",
+          "Neither I nor II"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential y-intercept form"
+      },
+      {
+        "stem": "<p>The positive number \\(a\\) is 2,106% of the sum of the positive numbers \\(b\\) and \\(c\\), and \\(b\\) is 81% of \\(c\\).</p>\n<p>What percent of \\(b\\) is \\(a\\)?</p>",
+        "choices": [
+          "4,706%",
+          "47.06%",
+          "470600%",
+          "47060%"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent of percent chain"
+      },
+      {
+        "stem": "<p>In one hour, the distance, \\(d(s)\\), in kilometers that a ferry can travel up and down a river flowing with a constant speed \\(s\\), in meters per second, is:</p>\n<div class=\"stem-math-block\">\\[\nd(s) = 10.7 - 1.2s^2\n\\]</div>\n<p>where \\(s\\) and \\(d(s)\\) are positive.</p>\n<p>Which of the following equivalent expressions for \\(d(s)\\) contains the speed of the river in meters per second, as a constant or coefficient, for which the ferry can travel a distance of 8 kilometers in one hour?</p>",
+        "choices": [
+          "\\(8 - 1.2(s - 1.5)(s + 1.5)\\)",
+          "\\(8 + 1.2(2.25 - s^2)\\)",
+          "\\(8(1 - 0.15s^2) + 2.7\\)",
+          "\\(11.9 - 1.2(s - 1)^2 - 2.4s\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Equivalent quadratic factors"
+      },
+      {
+        "stem": "<p>Given the quadratic equation:</p>\n<div class=\"stem-math-block\">\\[\n7rx^2 - 28sx + 7r\n\\]</div>\n<p>In the equation:</p>\n<ul class=\"stem-itemize\"><li>\\(r\\) is a positive constant</li><li>\\(s\\) is a negative constant</li><li>The equation has two solutions</li></ul>\n<p>If \\( \\frac{r}{s} > k \\), what is the minimum value of \\(k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "-2",
+        "answer_alternates": [
+          "-2.0"
+        ],
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Discriminant threshold"
+      },
+      {
+        "stem": "<p>The speed of a vehicle is increasing at a rate of \\(\\displaystyle 7.3\\) meters per second squared. What is this rate, in miles per minute squared, rounded to the nearest tenth? (Use \\(\\displaystyle 1\\) mile \\(\\displaystyle = 1,609\\) meters.)</p>",
+        "choices": [
+          "\\(\\displaystyle 0.3\\)",
+          "\\(\\displaystyle 16.3\\)",
+          "\\(\\displaystyle 195.8\\)",
+          "\\(\\displaystyle 220.4\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Unit conversion acceleration"
+      },
+      {
+        "stem": "<p>A sociologist chose 300 students at random from each of two schools and asked each student how many siblings he or she has. The results are shown in the table below:</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Number of siblings</th><th>Lincoln School</th><th>Washington School</th></tr></thead><tbody><tr><td>0</td><td>120</td><td>140</td></tr><tr><td>1</td><td>80</td><td>110</td></tr><tr><td>2</td><td>60</td><td>30</td></tr><tr><td>3</td><td>30</td><td>10</td></tr><tr><td>4</td><td>10</td><td>10</td></tr></tbody></table></div>\n<p>There are a total of 2,400 students at Lincoln School and 3,300 students at Washington School. Based on the survey data, which of the following most accurately compares the expected total number of students with 4 siblings at the two schools?</p>",
+        "choices": [
+          "The total number of students with 4 siblings is expected to be equal at the two schools.",
+          "The total number of students with 4 siblings at Lincoln School is expected to be 30 more than at Washington School.",
+          "The total number of students with 4 siblings at Washington School is expected to be 30 more than at Lincoln School.",
+          "The total number of students with 4 siblings at Washington School is expected to be 900 more than at Lincoln School."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Sample proportion / expected count"
       }
     ]
   },

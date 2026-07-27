@@ -182,7 +182,16 @@ def display_answer_plain(s: str, *, max_len: int = 48) -> str:
 
 
 def numeric_match(a: float, b: float, tol: float = 0.002) -> bool:
-    return abs(a - b) <= tol
+    if abs(a - b) <= tol:
+        return True
+    # Accept common student rounding of larger-magnitude decimals
+    # (e.g. 600/19 ≈ 31.5789 entered as 31.58 or 31.6).
+    if abs(b) >= 10:
+        if round(a, 1) == round(b, 1) and abs(a - b) < 0.06:
+            return True
+        if round(a, 2) == round(b, 2) and abs(a - b) < 0.006:
+            return True
+    return False
 
 
 def free_response_matches(student: str, canonical: str, alternates: List[str], tol: float = 0.002) -> bool:

@@ -332,5 +332,27 @@
     {"unit": "U2", "skill": "Polynomial intercept multiplicity"},
     {"unit": "U2", "skill": "Exponential growth model"},
     {"unit": "U4", "skill": "Unit circle coordinates"}
+  ],
+  "hard_25": [
+    {"unit": "U3", "skill": "Constant rate word problem"},
+    {"unit": "U3", "skill": "Percent discount / original price"},
+    {"unit": "U4", "skill": "Polygon side-count equation"},
+    {"unit": "U1", "skill": "Piecewise linear cost model"},
+    {"unit": "U1", "skill": "Coverage rate equation"},
+    {"unit": "U1", "skill": "Linear inequality system"},
+    {"unit": "U4", "skill": "Triangle inequality"},
+    {"unit": "U2", "skill": "Quadratic equation / smallest root"},
+    {"unit": "U2", "skill": "Exponential percent change"},
+    {"unit": "U3", "skill": "Scatterplot line of best fit"},
+    {"unit": "U1", "skill": "Percent of x / linear growth"},
+    {"unit": "U3", "skill": "Poll proportion / expected margin"},
+    {"unit": "U1", "skill": "Linear systems / number of solutions"},
+    {"unit": "U1", "skill": "Inequality with consecutive odds"},
+    {"unit": "U2", "skill": "Exponential y-intercept form"},
+    {"unit": "U3", "skill": "Percent of percent chain"},
+    {"unit": "U2", "skill": "Equivalent quadratic factors"},
+    {"unit": "U2", "skill": "Discriminant threshold"},
+    {"unit": "U3", "skill": "Unit conversion acceleration"},
+    {"unit": "U3", "skill": "Sample proportion / expected count"}
   ]
 }
