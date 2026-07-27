@@ -494,6 +494,10 @@
     if (!progress.answers || typeof progress.answers !== "object") return null;
     var row = progress.answers[String(slideIndex)];
     if (!row || !row.locked) return null;
+    // During a live class, ignore locks from a previous classroom session.
+    if (classroomSession && row.session_id != null && row.session_id !== classroomSession.id) {
+      return null;
+    }
     return row;
   }
 
@@ -1166,6 +1170,18 @@
         try {
           localStorage.setItem(storageKey, JSON.stringify(progress));
         } catch (e) {}
+        if (syncEnabled && progressApi) {
+          var payload = progressPayload();
+          payload.answers = {};
+          payload.reset_answers = true;
+          fetch(progressApi, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ progress: payload }),
+          }).catch(function () {});
+        }
+        refreshSlideAnswerWidgets();
       }
     }
     root.classList.toggle("is-classroom-live", !!classroomSession);
@@ -1195,6 +1211,19 @@
       }
       if (remoteUpdated) lastKnownSlideUpdatedAt = remoteUpdated;
       if (remoteSlide > 0) lastFollowedClassroomSlide = remoteSlide;
+    }
+  }
+
+  function refreshSlideAnswerWidgets() {
+    var slide = slides[idx];
+    if (!slide || !bodyEl) return;
+    var kind = slide.kind || "";
+    if (kind !== "question" && kind !== "practice" && kind !== "example") return;
+    bodyEl.innerHTML = slide.html || "";
+    bindInteractivity(slide);
+    renderLiveResults(slide);
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([bodyEl]).catch(function () {});
     }
   }
 

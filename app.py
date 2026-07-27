@@ -2743,7 +2743,13 @@ def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress:
         progress = {}
     # Preserve locked classroom / Check-answer records across stale client posts.
     merged = merge_progress(progress, existing)
-    merged["answers"] = merge_answers(existing.get("answers"), progress.get("answers"))
+    if progress.get("reset_answers"):
+        # Start Class / explicit reset: drop prior locked answers for a fresh attempt.
+        merged["answers"] = (
+            progress.get("answers") if isinstance(progress.get("answers"), dict) else {}
+        )
+    else:
+        merged["answers"] = merge_answers(existing.get("answers"), progress.get("answers"))
     for key in ("study_mode", "last_slide_index", "last_active_at", "checkpoint"):
         if key in progress:
             merged[key] = progress[key]
@@ -2758,6 +2764,36 @@ def _cm_progress_save(db: sqlite3.Connection, user_id: int, slug: str, progress:
         (user_id, slug, json.dumps(merged, ensure_ascii=False)),
     )
     return _safe_db_commit(db)
+
+
+def _cm_clear_lesson_locked_answers(db: sqlite3.Connection, slug: str) -> int:
+    """Wipe stored Check-answer / classroom locks for a lesson (used on Start Class)."""
+    rows = db.execute(
+        "SELECT user_id, progress_json FROM course_material_progress WHERE lesson_slug = ?",
+        (slug,),
+    ).fetchall()
+    cleared = 0
+    for row in rows:
+        try:
+            data = json.loads(row["progress_json"] or "{}")
+        except json.JSONDecodeError:
+            data = {}
+        if not isinstance(data, dict):
+            continue
+        answers = data.get("answers")
+        if not isinstance(answers, dict) or not answers:
+            continue
+        data["answers"] = {}
+        db.execute(
+            """
+            UPDATE course_material_progress
+            SET progress_json = ?, updated_at = datetime('now')
+            WHERE user_id = ? AND lesson_slug = ?
+            """,
+            (json.dumps(data, ensure_ascii=False), int(row["user_id"]), slug),
+        )
+        cleared += 1
+    return cleared
 
 
 def _cm_classroom_question_slides(material: dict[str, Any]) -> list[dict[str, Any]]:
@@ -3901,8 +3937,17 @@ def practice_course_material_classroom_start_api(slug: str):
             for student_id in selected_ids
         ],
     )
+    # Fresh class: do not keep prior lesson Check-answer / locked choices.
+    cleared = _cm_clear_lesson_locked_answers(db, slug)
     db.commit()
-    return jsonify({"ok": True, "session_id": session_id, "roster_count": len(selected_ids)})
+    return jsonify(
+        {
+            "ok": True,
+            "session_id": session_id,
+            "roster_count": len(selected_ids),
+            "answers_cleared": cleared,
+        }
+    )
 
 
 @app.route("/practice/materials/api/classroom/<slug>/slide", methods=["POST"])
