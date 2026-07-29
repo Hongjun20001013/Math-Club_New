@@ -675,6 +675,21 @@
         "SAT_Hard_Question_Part_25_PPT.pdf",
         "SAT_Hard_Question_Part_25.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-26",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Mock Exam Training",
+      "section": "Test VII",
+      "title": "Test VII",
+      "tex_candidates": [
+        "SAT_Hard_Question_26_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_26_PPT.pdf",
+        "SAT_Hard_Question_Part_26.pdf"
+      ]
     }
   ]
 }

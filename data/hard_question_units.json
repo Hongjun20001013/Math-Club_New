@@ -354,5 +354,29 @@
     {"unit": "U2", "skill": "Discriminant threshold"},
     {"unit": "U3", "skill": "Unit conversion acceleration"},
     {"unit": "U3", "skill": "Sample proportion / expected count"}
+  ],
+  "hard_26": [
+    {"unit": "U1", "skill": "Mixture percent equation"},
+    {"unit": "U1", "skill": "Piecewise linear cost model"},
+    {"unit": "U1", "skill": "Linear function properties"},
+    {"unit": "U2", "skill": "Quadratic product of roots"},
+    {"unit": "U2", "skill": "Absolute value unique solution"},
+    {"unit": "U3", "skill": "Conditional probability"},
+    {"unit": "U3", "skill": "Experimental design / random assignment"},
+    {"unit": "U3", "skill": "Survey bias / sampling"},
+    {"unit": "U1", "skill": "Linear model evaluation"},
+    {"unit": "U1", "skill": "Dependent linear system"},
+    {"unit": "U3", "skill": "Unit conversion rate"},
+    {"unit": "U1", "skill": "No-solution linear system"},
+    {"unit": "U2", "skill": "Exponential growth model"},
+    {"unit": "U2", "skill": "Difference of squares factoring"},
+    {"unit": "U4", "skill": "Tetrahedron volume / unit conversion"},
+    {"unit": "U4", "skill": "Cone inscribed in sphere"},
+    {"unit": "U2", "skill": "Quadratic symmetry / no real roots"},
+    {"unit": "U2", "skill": "Tangent line and parabola"},
+    {"unit": "U2", "skill": "Ordering quadratic values"},
+    {"unit": "U4", "skill": "Rectangle and circle geometry"},
+    {"unit": "U2", "skill": "Rational exponents"},
+    {"unit": "U2", "skill": "Quadratic discriminant / integer constants"}
   ]
 }

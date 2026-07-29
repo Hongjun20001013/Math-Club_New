@@ -1,0 +1,420 @@
+\documentclass[12pt]{article}
+\everymath{\displaystyle}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\newcounter{questionnum}
+\setcounter{questionnum}{0}
+
+\definecolor{novelblue}{RGB}{70,60,150}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\color{novelblue}\textbf{Novel Prep}}
+\fancyhead[C]{\color{novelblue}\textbf{SAT Preparation}}
+\fancyhead[R]{\color{novelblue}\textbf{Jack Zeng}}
+
+\newcommand{\markforreview}{
+  \stepcounter{questionnum}
+  \begin{tikzpicture}[scale=1.05]
+    \fill[black] (0,0) rectangle (0.8,0.6);
+    \node[white, font=\bfseries\large] at (0.4,0.3) {\thequestionnum};
+    \fill[gray!10] (0.8,0) rectangle (14.5,0.6);
+    \node[anchor=west, font=\small] at (1.2,0.3) {\ding{72} \hspace{2pt}Mark for Review};
+    \draw[thick, rounded corners=3pt] (13.5,0.12) rectangle (14.5,0.48);
+    \node[font=\bfseries\normalsize] at (14.0,0.3) {ABC};
+  \end{tikzpicture}
+}
+
+\newcommand{\choicebox}[2]{%
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=novelblue,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    width=\linewidth
+  ]
+  \textbf{#1.} \ #2
+  \end{tcolorbox}
+}
+
+\graphicspath{{static/hard/}{./}{_import_test7/}}
+
+\begin{document}
+\section*{SAT Math Test VII --- Easy to Hard}
+
+\noindent\markforreview
+\vspace{1em}
+
+A chemist mixed \(x\) liters of a \(6\%\) saline solution with \(y\) liters of a
+\(9\%\) saline solution to produce a \(7\%\) saline solution. Which equation best
+represents this situation? (Assume the volumes of the solutions are additive.)
+\choicebox{A}{\(0.06x+0.09y=7(x+y)\)}
+\choicebox{B}{\(0.06x+0.09y=0.07(x+y)\)}
+\choicebox{C}{\(0.6x+0.9y=7(x+y)\)}
+\choicebox{D}{\(0.6x+0.9y=0.7(x+y)\)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A window repair specialist charges \(\$220\) for the first two hours of repair
+plus an hourly fee for each additional hour. The total cost for \(5\) hours of
+repair is \(\$400\). Which function \(f\) gives the total cost, in dollars, for
+\(x\) hours of repair, where \(x\ge 2\)?
+\choicebox{A}{\(f(x)=60x+100\)}
+\choicebox{B}{\(f(x)=60x+220\)}
+\choicebox{C}{\(f(x)=80x\)}
+\choicebox{D}{\(f(x)=80x+220\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+In the \(xy\)-plane, the graph of the linear function \(f\) has a negative slope
+and a \(y\)-intercept at \((0,k)\), where \(k\) is a positive constant. Which of
+the following must be true?
+\[
+\begin{array}{ll}
+\text{I.} & \text{If }a>b,\text{ then }f(a)<f(b).\\
+\text{II.} & \text{If }a<0,\text{ then }f(a)>k.\\
+\text{III.} & \text{If }a>0,\text{ then }f(a)>0.
+\end{array}
+\]
+\choicebox{A}{I and II only}
+\choicebox{B}{I and III only}
+\choicebox{C}{II and III only}
+\choicebox{D}{I, II, and III}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given equation, \(k\) is a positive constant. What is the product of the
+solutions to the given equation?
+\[
+x^2-8kx-(k-4)=0
+\]
+\choicebox{A}{\(4-k\)}
+\choicebox{B}{\(k-4\)}
+\choicebox{C}{\(-8k\)}
+\choicebox{D}{\(8k\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The equation \(2|x-5|=k\), where \(k\) is a constant, has exactly one solution.
+Which of the following could be the value of \(\frac{k}{2}\)?
+\choicebox{A}{\(-5\) only}
+\choicebox{B}{\(-5\) or \(5\)}
+\choicebox{C}{\(0\) only}
+\choicebox{D}{\(5\) only}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A manufacturer uses two assembly lines to produce refrigerator units. The table
+summarizes the results of a quality-control test used to check for defective
+units. If a refrigerator unit that was checked during this test is selected at
+random, what is the probability that the unit was produced by assembly line A,
+given that the unit is defective?
+\[
+\begin{array}{c|ccc}
+&\text{Defective}&\text{Not defective}&\text{Total}\\ \hline
+\text{Assembly line A}&300&5700&6000\\
+\text{Assembly line B}&500&3500&4000\\ \hline
+\text{Total}&800&9200&10000
+\end{array}
+\]
+\choicebox{A}{\(\frac1{20}\)}
+\choicebox{B}{\(\frac38\)}
+\choicebox{C}{\(\frac35\)}
+\choicebox{D}{\(\frac58\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A researcher wanted to determine whether studying at a library is more effective
+than studying at home. He selected a random sample of \(200\) students and gave
+them three days to study for the same test. The \(100\) students who lived closest
+to a library were asked to study at a library, and the remaining \(100\) students
+were asked to study at home. After the students took the test, the scores of those
+who studied at a library were compared to the scores of those who studied at
+home. How should this experiment be changed so that the researcher can conclude
+whether studying at a library is more effective than studying at home?
+\choicebox{A}{The students assigned to study at a library should study at the same library.}
+\choicebox{B}{The students should be randomly assigned to study either at a library or at home.}
+\choicebox{C}{The students assigned to study at a library should take a more difficult test than the students assigned to study at home.}
+\choicebox{D}{No changes to the experiment are necessary.}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+All the residents of a town were mailed a survey about proposed renovations to
+the town's high school. Approximately \(10\%\) of the residents completed the
+survey and mailed it back. Based on the responses, it was estimated that \(72\%\)
+of the residents support the proposed renovations, with an associated margin of
+error of \(12\%\). Which of the following best explains why these survey results
+are unlikely to represent the opinions of all the town's residents?
+\choicebox{A}{The survey included residents who do not attend the high school.}
+\choicebox{B}{Not all residents were aware of the proposed renovations before the survey.}
+\choicebox{C}{Responses to the survey were not obtained from a random sample of the town's residents.}
+\choicebox{D}{The margin of error is greater than the percentage of residents who responded to the survey.}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The estimated total pressure a diver experiences below the surface of the water
+is equal to the sum of the estimated water pressure and the estimated atmospheric
+pressure. At a depth of \(h\) meters below the surface, the estimated total
+pressure \(P_1\), in kilopascals (kPa), is given by
+\[
+P_1=10h+101.
+\]
+After maintaining a depth of \(h\) meters, the diver descended \(d\) additional
+meters. The estimated total pressure \(P_2\), in kPa, after descending these
+\(d\) additional meters is given by
+\[
+P_2=10d+341.
+\]
+What is the estimated total pressure, in kPa, the diver experienced at a depth
+of \(h\) meters below the surface?
+\choicebox{A}{442}
+\choicebox{B}{341}
+\choicebox{C}{101}
+\choicebox{D}{10}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+For each real number \(r\), which of the following points lies on the graph of
+each equation in the \(xy\)-plane for the given system?
+\[
+\begin{aligned}
+8x+7y&=9\\
+24x+21y&=27
+\end{aligned}
+\]
+\choicebox{A}{\(\left(r,\frac{-8r+9}{7}\right)\)}
+\choicebox{B}{\(\left(\frac{-8r+9}{7},r\right)\)}
+\choicebox{C}{\(\left(\frac{-8r+63}{7},\frac{9r+189}{7}\right)\)}
+\choicebox{D}{\(\left(\frac r3+9,-\frac r3+27\right)\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+An object's speed, in meters per hour, is increasing at a rate of \(1{,}490\)
+meters per hour per second. Which of the following is closest to this rate in
+feet per second squared? (Use \(1\) meter \(=3.28\) feet.)
+\choicebox{A}{0.126}
+\choicebox{B}{1.36}
+\choicebox{C}{7.57}
+\choicebox{D}{81.5}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given system of equations, \(b\) is a constant. If the system has no
+solution, what is the value of \(b\)?
+\[
+\begin{aligned}
+\frac3{10}y+\frac b3x&=\frac34-\frac15y\\
+\frac38x+\frac35&=-\frac14y+\frac85
+\end{aligned}
+\]
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+A computer program models the population of a certain insect in an environment
+where the insect has no natural predators. According to the model, the estimated
+total mass of the population of insects at the end of every \(5\)-week period is
+\(158\%\) greater than the estimated total mass at the end of the previous
+\(5\)-week period. The estimated total mass at the end of \(15\) weeks is
+\(627.7\) grams. Which equation best represents this model, where \(M\) is the
+estimated total mass, in grams, at the end of \(t\) weeks?
+\choicebox{A}{\(M=538.92(1.58)^{t/5}\)}
+\choicebox{B}{\(M=457.66(2.58)^{t/5}\)}
+\choicebox{C}{\(M=159.14(1.58)^{t/5}\)}
+\choicebox{D}{\(M=36.55(2.58)^{t/5}\)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+Which expression is a factor of
+\[
+x^4+14ax^2+49a^2-64,
+\]
+where \(a\) is a positive constant?
+\choicebox{A}{\(x^2+7a+8\)}
+\choicebox{B}{\(x^2-7a-8\)}
+\choicebox{C}{\(x^2+14a\)}
+\choicebox{D}{\(x^2-8a\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The figure shown is a trirectangular tetrahedron, a three-dimensional figure
+with four triangular faces, three of which are right triangles. The base is an
+isosceles right triangle whose legs each have length \(12\) inches. The height
+of the tetrahedron is \(24\) inches. Which of the following is closest to the
+volume of this tetrahedron, in pints?
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{hard_26_f15.png}
+
+\vspace{0.35em}
+Note: Figure not drawn to scale.
+\end{center}
+\noindent Use \(1\) quart \(=57.75\text{ in}^3\), \(1\) pint \(=0.5\) quart, and
+\(V=\frac13Sh\), where \(S\) is the area of the base and \(h\) is the height.
+\choicebox{A}{19.95}
+\choicebox{B}{119.69}
+\choicebox{C}{576.00}
+\choicebox{D}{16,632.00}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+A right circular cone is inscribed in a sphere. The vertex of the cone is at the
+top of the sphere, and the center of the cone's circular base is \(6\) inches
+below the center of the sphere. The radius of the cone's base is \(8\) inches.
+What is the volume, in cubic inches, of the cone?
+\choicebox{A}{\(\frac{512\pi}{3}\)}
+\choicebox{B}{\(\frac{1024\pi}{3}\)}
+\choicebox{C}{\(384\pi\)}
+\choicebox{D}{\(\frac{1280\pi}{3}\)}
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given quadratic function, \(b\) and \(c\) are constants. The graph of
+\(y=f(x)\) in the \(xy\)-plane does not intersect the \(x\)-axis. If
+\(f(-7)=f(9)\), which of the following could be the value of \(b+c\)?
+\[
+f(x)=3x^2+bx+c
+\]
+\choicebox{A}{\(-1\)}
+\choicebox{B}{\(-3\)}
+\choicebox{C}{\(-5\)}
+\choicebox{D}{\(-7\)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given system of equations, \(p\) is a constant. The system has exactly one
+distinct real solution \((x,y)\). What is the value of \(y\)?
+\[
+\begin{aligned}
+y&=2x^2+15x+57\\
+y&=-9x+p
+\end{aligned}
+\]
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+The graph of the quadratic function \(y=|a|x^2+bx+c\) passes through the
+following five points:
+\[
+A(m,n),\quad B(0,y_1),\quad C(3-m,n),\quad
+D(\sqrt2,y_2),\quad E(2,y_3).
+\]
+What is the correct order of \(y_1,y_2,y_3\)?
+\choicebox{A}{\(y_1<y_2<y_3\)}
+\choicebox{B}{\(y_1<y_3<y_2\)}
+\choicebox{C}{\(y_3<y_2<y_1\)}
+\choicebox{D}{\(y_2<y_3<y_1\)}
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In rectangle \(ABCD\), point \(B\) is the center of a circle with radius \(BC\).
+The circle intersects \(\overline{AB}\) at point \(F\). Point \(E\) lies on
+\(\overline{AD}\), and segment \(CE\) is rotated about \(E\) to form \(EG\) such
+that point \(G\) lies on the circle, where \(\angle GEC=90^\circ\). Point \(F\)
+is the midpoint of \(\overline{EG}\). Given that \(AF=1\) and \(AE=3\), find the
+length of \(CD\).
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{hard_26_f20.png}
+\end{center}
+
+
+\newpage
+
+\noindent\markforreview
+\vspace{1em}
+
+For what value of \(x\) is the given expression equivalent to
+\((41k)^{25x}\), where \(k>1\)?
+\[
+\sqrt[8]{41k}\left(\sqrt[9]{41k}\right)^{12}
+\]
+
+
+\vspace{2em}
+
+\noindent\markforreview
+\vspace{1em}
+
+In the given equation, \(p\) and \(w\) are integer constants. The equation has
+exactly one real solution. Which is \textbf{NOT} a possible value of \(w\)?
+\[
+4x^2-px+w=-85
+\]
+\choicebox{A}{\(-21\)}
+\choicebox{B}{\(15\)}
+\choicebox{C}{\(64\)}
+\choicebox{D}{\(315\)}
+
+\end{document}

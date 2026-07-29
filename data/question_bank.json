@@ -17654,6 +17654,305 @@
         "knowledge_section_title_en": "Problem Solving & Data",
         "hard_skill": "Sample proportion / expected count"
       }
+    ],
+    "hard_26": [
+      {
+        "stem": "<p>A chemist mixed \\(x\\) liters of a \\(6\\%\\) saline solution with \\(y\\) liters of a \\(9\\%\\) saline solution to produce a \\(7\\%\\) saline solution. Which equation best represents this situation? (Assume the volumes of the solutions are additive.)</p>",
+        "choices": [
+          "\\(0.06x+0.09y=7(x+y)\\)",
+          "\\(0.06x+0.09y=0.07(x+y)\\)",
+          "\\(0.6x+0.9y=7(x+y)\\)",
+          "\\(0.6x+0.9y=0.7(x+y)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Mixture percent equation"
+      },
+      {
+        "stem": "<p>A window repair specialist charges \\(&#36;220\\) for the first two hours of repair plus an hourly fee for each additional hour. The total cost for \\(5\\) hours of repair is \\(&#36;400\\). Which function \\(f\\) gives the total cost, in dollars, for \\(x\\) hours of repair, where \\(x\\ge 2\\)?</p>",
+        "choices": [
+          "\\(f(x)=60x+100\\)",
+          "\\(f(x)=60x+220\\)",
+          "\\(f(x)=80x\\)",
+          "\\(f(x)=80x+220\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Piecewise linear cost model"
+      },
+      {
+        "stem": "<p>In the \\(xy\\)-plane, the graph of the linear function \\(f\\) has a negative slope and a \\(y\\)-intercept at \\((0,k)\\), where \\(k\\) is a positive constant. Which of the following must be true?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>I.</th><th>If a>b, then f(a)<f(b).</th></tr></thead><tbody><tr><td>II.</td><td>If a<0, then f(a)>k.</td></tr><tr><td>III.</td><td>If a>0, then f(a)>0.</td></tr></tbody></table></div>",
+        "choices": [
+          "I and II only",
+          "I and III only",
+          "II and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear function properties"
+      },
+      {
+        "stem": "<p>In the given equation, \\(k\\) is a positive constant. What is the product of the solutions to the given equation?</p>\n<div class=\"stem-math-block\">\\[\nx^2-8kx-(k-4)=0\n\\]</div>",
+        "choices": [
+          "\\(4-k\\)",
+          "\\(k-4\\)",
+          "\\(-8k\\)",
+          "\\(8k\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic product of roots"
+      },
+      {
+        "stem": "<p>The equation \\(2|x-5|=k\\), where \\(k\\) is a constant, has exactly one solution.</p>\n<p>Which of the following could be the value of \\(\\frac{k}{2}\\)?</p>",
+        "choices": [
+          "\\(-5\\) only",
+          "\\(-5\\) or \\(5\\)",
+          "\\(0\\) only",
+          "\\(5\\) only"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Absolute value unique solution"
+      },
+      {
+        "stem": "<p>A manufacturer uses two assembly lines to produce refrigerator units. The table summarizes the results of a quality-control test used to check for defective units. If a refrigerator unit that was checked during this test is selected at random, what is the probability that the unit was produced by assembly line A, given that the unit is defective?</p>\n<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th></th><th>Defective</th><th>Not defective</th><th>Total</th></tr></thead><tbody><tr><td>Assembly line A</td><td>300</td><td>5700</td><td>6000</td></tr><tr><td>Assembly line B</td><td>500</td><td>3500</td><td>4000</td></tr><tr><td>Total</td><td>800</td><td>9200</td><td>10000</td></tr></tbody></table></div>",
+        "choices": [
+          "\\(\\frac1{20}\\)",
+          "\\(\\frac38\\)",
+          "\\(\\frac35\\)",
+          "\\(\\frac58\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Conditional probability"
+      },
+      {
+        "stem": "<p>A researcher wanted to determine whether studying at a library is more effective than studying at home. He selected a random sample of \\(200\\) students and gave them three days to study for the same test. The \\(100\\) students who lived closest to a library were asked to study at a library, and the remaining \\(100\\) students were asked to study at home. After the students took the test, the scores of those who studied at a library were compared to the scores of those who studied at home. How should this experiment be changed so that the researcher can conclude whether studying at a library is more effective than studying at home?</p>",
+        "choices": [
+          "The students assigned to study at a library should study at the same library.",
+          "The students should be randomly assigned to study either at a library or at home.",
+          "The students assigned to study at a library should take a more difficult test than the students assigned to study at home.",
+          "No changes to the experiment are necessary."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Experimental design / random assignment"
+      },
+      {
+        "stem": "<p>All the residents of a town were mailed a survey about proposed renovations to the town's high school. Approximately \\(10\\%\\) of the residents completed the survey and mailed it back. Based on the responses, it was estimated that \\(72\\%\\) of the residents support the proposed renovations, with an associated margin of error of \\(12\\%\\). Which of the following best explains why these survey results are unlikely to represent the opinions of all the town's residents?</p>",
+        "choices": [
+          "The survey included residents who do not attend the high school.",
+          "Not all residents were aware of the proposed renovations before the survey.",
+          "Responses to the survey were not obtained from a random sample of the town's residents.",
+          "The margin of error is greater than the percentage of residents who responded to the survey."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Survey bias / sampling"
+      },
+      {
+        "stem": "<p>The estimated total pressure a diver experiences below the surface of the water is equal to the sum of the estimated water pressure and the estimated atmospheric pressure. At a depth of \\(h\\) meters below the surface, the estimated total pressure \\(P_1\\), in kilopascals (kPa), is given by</p>\n<div class=\"stem-math-block\">\\[\nP_1=10h+101.\n\\]</div>\n<p>After maintaining a depth of \\(h\\) meters, the diver descended \\(d\\) additional meters. The estimated total pressure \\(P_2\\), in kPa, after descending these \\(d\\) additional meters is given by</p>\n<div class=\"stem-math-block\">\\[\nP_2=10d+341.\n\\]</div>\n<p>What is the estimated total pressure, in kPa, the diver experienced at a depth of \\(h\\) meters below the surface?</p>",
+        "choices": [
+          "442",
+          "341",
+          "101",
+          "10"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Linear model evaluation"
+      },
+      {
+        "stem": "<p>For each real number \\(r\\), which of the following points lies on the graph of each equation in the \\(xy\\)-plane for the given system?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n8x+7y&=9\\\\\n24x+21y&=27\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(\\left(r,\\frac{-8r+9}{7}\\right)\\)",
+          "\\(\\left(\\frac{-8r+9}{7},r\\right)\\)",
+          "\\(\\left(\\frac{-8r+63}{7},\\frac{9r+189}{7}\\right)\\)",
+          "\\(\\left(\\frac r3+9,-\\frac r3+27\\right)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Dependent linear system"
+      },
+      {
+        "stem": "<p>An object's speed, in meters per hour, is increasing at a rate of \\(1,490\\) meters per hour per second. Which of the following is closest to this rate in feet per second squared? (Use \\(1\\) meter \\(=3.28\\) feet.)</p>",
+        "choices": [
+          "0.126",
+          "1.36",
+          "7.57",
+          "81.5"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Unit conversion rate"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(b\\) is a constant. If the system has no solution, what is the value of \\(b\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\n\\frac3{10}y+\\frac b3x&=\\frac34-\\frac15y\\\\\n\\frac38x+\\frac35&=-\\frac14y+\\frac85\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "9/4",
+        "answer_alternates": [
+          "2.25",
+          "2.250"
+        ],
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "No-solution linear system"
+      },
+      {
+        "stem": "<p>A computer program models the population of a certain insect in an environment where the insect has no natural predators. According to the model, the estimated total mass of the population of insects at the end of every \\(5\\)-week period is \\(158\\%\\) greater than the estimated total mass at the end of the previous \\(5\\)-week period. The estimated total mass at the end of \\(15\\) weeks is \\(627.7\\) grams. Which equation best represents this model, where \\(M\\) is the estimated total mass, in grams, at the end of \\(t\\) weeks?</p>",
+        "choices": [
+          "\\(M=538.92(1.58)^{t/5}\\)",
+          "\\(M=457.66(2.58)^{t/5}\\)",
+          "\\(M=159.14(1.58)^{t/5}\\)",
+          "\\(M=36.55(2.58)^{t/5}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential growth model"
+      },
+      {
+        "stem": "<p>Which expression is a factor of</p>\n<div class=\"stem-math-block\">\\[\nx^4+14ax^2+49a^2-64,\n\\]</div>\n<p>where \\(a\\) is a positive constant?</p>",
+        "choices": [
+          "\\(x^2+7a+8\\)",
+          "\\(x^2-7a-8\\)",
+          "\\(x^2+14a\\)",
+          "\\(x^2-8a\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Difference of squares factoring"
+      },
+      {
+        "stem": "<p>The figure shown is a trirectangular tetrahedron, a three-dimensional figure with four triangular faces, three of which are right triangles. The base is an isosceles right triangle whose legs each have length \\(12\\) inches. The height of the tetrahedron is \\(24\\) inches. Which of the following is closest to the volume of this tetrahedron, in pints?</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_26_f15.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>Note: Figure not drawn to scale.</p>\n<p>Use \\(1\\) quart \\(=57.75\\text{ in}^3\\), \\(1\\) pint \\(=0.5\\) quart, and \\(V=\\frac13Sh\\), where \\(S\\) is the area of the base and \\(h\\) is the height.</p>",
+        "choices": [
+          "19.95",
+          "119.69",
+          "576.00",
+          "16,632.00"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Tetrahedron volume / unit conversion"
+      },
+      {
+        "stem": "<p>A right circular cone is inscribed in a sphere. The vertex of the cone is at the top of the sphere, and the center of the cone's circular base is \\(6\\) inches below the center of the sphere. The radius of the cone's base is \\(8\\) inches. What is the volume, in cubic inches, of the cone?</p>",
+        "choices": [
+          "\\(\\frac{512\\pi}{3}\\)",
+          "\\(\\frac{1024\\pi}{3}\\)",
+          "\\(384\\pi\\)",
+          "\\(\\frac{1280\\pi}{3}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Cone inscribed in sphere"
+      },
+      {
+        "stem": "<p>In the given quadratic function, \\(b\\) and \\(c\\) are constants. The graph of \\(y=f(x)\\) in the \\(xy\\)-plane does not intersect the \\(x\\)-axis. If \\(f(-7)=f(9)\\), which of the following could be the value of \\(b+c\\)?</p>\n<div class=\"stem-math-block\">\\[\nf(x)=3x^2+bx+c\n\\]</div>",
+        "choices": [
+          "\\(-1\\)",
+          "\\(-3\\)",
+          "\\(-5\\)",
+          "\\(-7\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic symmetry / no real roots"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(p\\) is a constant. The system has exactly one distinct real solution \\((x,y)\\). What is the value of \\(y\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\ny&=2x^2+15x+57\\\\\ny&=-9x+p\n\\end{aligned}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "39",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Tangent line and parabola"
+      },
+      {
+        "stem": "<p>The graph of the quadratic function \\(y=|a|x^2+bx+c\\) passes through the</p>\n<p>following five points:</p>\n<div class=\"stem-math-block\">\\[\nA(m,n),\\quad B(0,y_1),\\quad C(3-m,n),\\quad\nD(\\sqrt2,y_2),\\quad E(2,y_3).\n\\]</div>\n<p>What is the correct order of \\(y_1,y_2,y_3\\)?</p>",
+        "choices": [
+          "\\(y_1\\lt y_2\\lt y_3\\)",
+          "\\(y_1\\lt y_3\\lt y_2\\)",
+          "\\(y_3\\lt y_2\\lt y_1\\)",
+          "\\(y_2\\lt y_3\\lt y_1\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Ordering quadratic values"
+      },
+      {
+        "stem": "<p>In rectangle \\(ABCD\\), point \\(B\\) is the center of a circle with radius \\(BC\\). The circle intersects \\(\\overline{AB}\\) at point \\(F\\). Point \\(E\\) lies on \\(\\overline{AD}\\), and segment \\(CE\\) is rotated about \\(E\\) to form \\(EG\\) such that point \\(G\\) lies on the circle, where \\(\\angle GEC=90^\\circ\\). Point \\(F\\) is the midpoint of \\(\\overline{EG}\\). Given that \\(AF=1\\) and \\(AE=3\\), find the length of \\(CD\\).</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_26_f20.png\" alt=\"\" loading=\"lazy\" /></p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "6",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Rectangle and circle geometry"
+      },
+      {
+        "stem": "<p>For what value of \\(x\\) is the given expression equivalent to \\((41k)^{25x}\\), where \\(k>1\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\sqrt[8]{41k}\\left(\\sqrt[9]{41k}\\right)^{12}\n\\]</div>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "7/120",
+        "answer_alternates": [
+          "0.0583",
+          "0.05833",
+          "0.058333"
+        ],
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Rational exponents"
+      },
+      {
+        "stem": "<p>In the given equation, \\(p\\) and \\(w\\) are integer constants. The equation has exactly one real solution. Which is NOT a possible value of \\(w\\)?</p>\n<div class=\"stem-math-block\">\\[\n4x^2-px+w=-85\n\\]</div>",
+        "choices": [
+          "\\(-21\\)",
+          "\\(15\\)",
+          "\\(64\\)",
+          "\\(315\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic discriminant / integer constants"
+      }
     ]
   },
   "placement": {

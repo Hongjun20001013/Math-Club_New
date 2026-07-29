@@ -288,12 +288,17 @@ def build_set(set_num: int) -> str:
         short_title = "Test VI"
         intro_phase = "Phase 3 · Mock Exam Training"
         overview_title = "Test VI"
+    elif set_num == 26:
+        label = f"{count} easy-to-hard Module 2-style practice questions"
+        short_title = "Test VII"
+        intro_phase = "Phase 3 · Mock Exam Training"
+        overview_title = "Test VII"
     else:
         label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
         short_title = f"SAT Hard Question {set_num}"
         intro_phase = "Phase 2 · Hard Question Practice"
         overview_title = f"Hard Question Set {set_num}"
-    use_phase3_title = set_num in {20, 21, 22, 23, 24, 25}
+    use_phase3_title = set_num in {20, 21, 22, 23, 24, 25, 26}
     parts = [
         preamble(set_num, short_title)
         .replace("{QUESTION_COUNT_LABEL}", label)

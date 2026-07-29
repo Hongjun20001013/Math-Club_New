@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -4191,6 +4191,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_23": "banks/hard/hard_23.tex",
         "hard_24": "banks/hard/hard_24.tex",
         "hard_25": "banks/hard/hard_25.tex",
+        "hard_26": "banks/hard/hard_26.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4551,6 +4552,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test VI — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-VI-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_26": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_26.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test VII — 22 questions easy-to-hard practice set.",
+            "download_name": "NovelPrep-Test-VII-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_26_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test VII — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-VII-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -5049,6 +5066,7 @@ TOPIC_TITLES = {
     "hard_23": "Test IV",
     "hard_24": "Test V",
     "hard_25": "Test VI",
+    "hard_26": "Test VII",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5533,6 +5551,31 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "A"},
         {"correct_answer": "-2", "answer_alternates": ["-2.0"]},
         {"correct_answer": "B"},
+        {"correct_answer": "C"},
+    ],
+    # SAT_22_Questions_Easy_to_Hard — verified against answer key + solutions (22Q).
+    "hard_26": [
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "9/4", "answer_alternates": ["2.25", "2.250"]},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "A"},
+        {"correct_answer": "39"},
+        {"correct_answer": "D"},
+        {"correct_answer": "6"},
+        {"correct_answer": "7/120", "answer_alternates": ["0.0583", "0.05833", "0.058333"]},
         {"correct_answer": "C"},
     ],
 }
