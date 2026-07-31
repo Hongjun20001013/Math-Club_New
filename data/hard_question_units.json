@@ -378,5 +378,32 @@
     {"unit": "U4", "skill": "Rectangle and circle geometry"},
     {"unit": "U2", "skill": "Rational exponents"},
     {"unit": "U2", "skill": "Quadratic discriminant / integer constants"}
+  ],
+  "hard_27": [
+    {"unit": "U2", "skill": "Radical function domain / parameters"},
+    {"unit": "U1", "skill": "Reciprocal / harmonic relation"},
+    {"unit": "U2", "skill": "Partial fractions / polynomial identity"},
+    {"unit": "U1", "skill": "Piecewise cost comparison"},
+    {"unit": "U1", "skill": "Infinite solutions linear system"},
+    {"unit": "U3", "skill": "Percent of percent chain"},
+    {"unit": "U2", "skill": "Exponential growth time"},
+    {"unit": "U2", "skill": "Exponential function properties"},
+    {"unit": "U2", "skill": "Factorable polynomial / max coefficient"},
+    {"unit": "U2", "skill": "Integer factor constraints"},
+    {"unit": "U2", "skill": "Quadratic symmetry statements"},
+    {"unit": "U2", "skill": "Projectile quadratic model"},
+    {"unit": "U2", "skill": "Discriminant one real root"},
+    {"unit": "U2", "skill": "Polynomial sign analysis"},
+    {"unit": "U1", "skill": "Consecutive even integers inequality"},
+    {"unit": "U3", "skill": "Unit conversion acceleration"},
+    {"unit": "U4", "skill": "Right triangle trig statements"},
+    {"unit": "U4", "skill": "Altitude to hypotenuse"},
+    {"unit": "U4", "skill": "Circle arc length"},
+    {"unit": "U4", "skill": "Tangent line to circle"},
+    {"unit": "U4", "skill": "Similar prisms volume scale"},
+    {"unit": "U4", "skill": "Square pyramid surface area"},
+    {"unit": "U3", "skill": "Means of related data sets"},
+    {"unit": "U3", "skill": "Frequency table / scaled data"},
+    {"unit": "U3", "skill": "Margin of error conclusions"}
   ]
 }

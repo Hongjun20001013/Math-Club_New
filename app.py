@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -4192,6 +4192,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_24": "banks/hard/hard_24.tex",
         "hard_25": "banks/hard/hard_25.tex",
         "hard_26": "banks/hard/hard_26.tex",
+        "hard_27": "banks/hard/hard_27.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4568,6 +4569,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test VII — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-VII-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_27": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_27.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test VIII — Module 2-style mock from Overleaf Test 5.",
+            "download_name": "NovelPrep-Test-VIII-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_27_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test VIII — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-VIII-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -5067,6 +5084,7 @@ TOPIC_TITLES = {
     "hard_24": "Test V",
     "hard_25": "Test VI",
     "hard_26": "Test VII",
+    "hard_27": "Test VIII",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5576,6 +5594,34 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "D"},
         {"correct_answer": "6"},
         {"correct_answer": "7/120", "answer_alternates": ["0.0583", "0.05833", "0.058333"]},
+        {"correct_answer": "C"},
+    ],
+    # Overleaf Test_5_Module_2 + Test_5_Answer — independently verified (25Q).
+    "hard_27": [
+        {"correct_answer": "D"},  # a+b could be -4
+        {"correct_answer": "B"},
+        {"correct_answer": "72"},
+        {"correct_answer": "80"},
+        {"correct_answer": "50/33", "answer_alternates": ["1.515", "1.52", "1.5152", "1.51515"]},
+        {"correct_answer": "0.128", "answer_alternates": [".128", "0.1280"]},
+        {"correct_answer": "198"},
+        {"correct_answer": "D"},
+        {"correct_answer": "361"},
+        {"correct_answer": "D"},
+        {"correct_answer": "C"},
+        {"correct_answer": "128"},
+        {"correct_answer": "26"},
+        {"correct_answer": "A"},
+        {"correct_answer": "8"},
+        {"correct_answer": "30"},
+        {"correct_answer": "A"},
+        {"correct_answer": "15"},
+        {"correct_answer": "35"},
+        {"correct_answer": "-5", "answer_alternates": ["-5.0"]},
+        {"correct_answer": "3125"},
+        {"correct_answer": "360"},
+        {"correct_answer": "2"},
+        {"correct_answer": "C"},
         {"correct_answer": "C"},
     ],
 }

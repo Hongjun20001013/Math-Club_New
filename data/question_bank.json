@@ -17953,6 +17953,291 @@
         "knowledge_section_title_en": "Advanced Math",
         "hard_skill": "Quadratic discriminant / integer constants"
       }
+    ],
+    "hard_27": [
+      {
+        "stem": "<p>For the function</p>\n<div class=\"stem-math-block\">\\[\nf(x) = a\\sqrt{x-b} + 12\\sqrt{x-b},\n\\]</div>\n<p>\\(\\displaystyle a\\) and \\(\\displaystyle b\\) are constants, and \\(\\displaystyle f(4)=0\\). If \\(\\displaystyle f(5) > 0\\), which of the following could be a value for \\(\\displaystyle a+b\\)?</p>",
+        "choices": [
+          "-20",
+          "-12",
+          "-8",
+          "-4"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Radical function domain / parameters"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{16}{a}=\\frac{16}{b}+\\frac{16}{c}\n\\]</div>\n<p>Which of the following expresses \\(\\displaystyle a\\) in terms of \\(\\displaystyle b\\) and \\(\\displaystyle c\\)?</p>",
+        "choices": [
+          "\\(\\displaystyle a=\\dfrac{b+c}{bc}\\)",
+          "\\(\\displaystyle a=\\dfrac{bc}{b+c}\\)",
+          "\\(\\displaystyle a=bc(b+c)\\)",
+          "\\(\\displaystyle a=16bc(b+c)\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "B",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Reciprocal / harmonic relation"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{ax^{3}+bx^{2}+cx+d}{(x^{2}-9)(x+2)}\n\\;=\\;\n\\frac{5}{x+3}+\\frac{6x}{x-3}\n\\]</div>\n<p>What is the value of \\(\\displaystyle a+b+c\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "72",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Partial fractions / polynomial identity"
+      },
+      {
+        "stem": "<p>There are two lawn mowing companies. Company A charges a flat fee of &#36;80 for the first hour, then an hourly rate of &#36;60 for each additional hour. Company B charges no flat fee, but an hourly rate of &#36;75 per hour. After how many \\textit{minutes} will company B's total cost exceed company A's?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "80",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Piecewise cost comparison"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\frac{5}{6}x + ay = b\n\\]</div>\n<div class=\"stem-math-block\">\\[\n\\frac{11}{10}x + cy = 2d\n\\]</div>\n<p>If the system of equations above has infinite solutions, what must be the value of \\(\\displaystyle \\dfrac{b}{d}\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "50/33",
+        "answer_alternates": [
+          "1.515",
+          "1.52",
+          "1.5152",
+          "1.51515"
+        ],
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Infinite solutions linear system"
+      },
+      {
+        "stem": "<p>\\(\\displaystyle a\\) is \\(\\displaystyle 540\\%\\) more than \\(\\displaystyle b\\) and \\(\\displaystyle b\\) is \\(\\displaystyle 0.02\\%\\) of \\(\\displaystyle c\\) If \\(\\displaystyle a\\) is \\(\\displaystyle k\\%\\) of \\(\\displaystyle c\\), then what must \\(\\displaystyle k\\) equal?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "0.128",
+        "answer_alternates": [
+          ".128",
+          "0.1280"
+        ],
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent of percent chain"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\nf(t)=a\\cdot 2^{\\frac{2t}{11}}\n\\]</div>\n<p>The given function \\(\\displaystyle f(t)\\) models the amount of money in an investment account \\(\\displaystyle t\\) years after the account is opened, where \\(\\displaystyle a\\) is a constant. How many months will it take for the initial investment to increase by \\(\\displaystyle 700\\%\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "198",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential growth time"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\nf(x)=k^{3}(k^{x})+b\n\\]</div>\n<p>The function \\(\\displaystyle f\\) is defined by the equation above for \\(\\displaystyle x\\ge 0\\). \\(\\displaystyle k\\) and \\(\\displaystyle b\\) are positive constants and \\(\\displaystyle k\\lt 1\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">The maximum value of the function is displayed as a constant or coefficient of the function.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\displaystyle f(1)=f(0)\\cdot k\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(\\displaystyle f(a)\\lt b\\) for some \\(\\displaystyle a>0\\)</span></li></ul>",
+        "choices": [
+          "I only",
+          "II and III only",
+          "I and III only",
+          "Neither I, II, nor III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Exponential function properties"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n15x^{18} + kx^{9} + 24\n\\]</div>\n<p>The expression above has factors \\(\\displaystyle ax^{9}+b\\) and \\(\\displaystyle cx^{9}+d\\), where \\(\\displaystyle a\\), \\(\\displaystyle b\\), \\(\\displaystyle c\\), and \\(\\displaystyle d\\) are all integer constants. What is the maximum value of \\(\\displaystyle k\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "361",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Factorable polynomial / max coefficient"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n(hx+k)(qx+z) = ax^{2} + bx + 35\n\\]</div>\n<p>For the expression above, \\(\\displaystyle h, k, q,\\) and \\(\\displaystyle z\\) are all integer constants. Which of the following must be an integer?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(\\displaystyle \\dfrac{35}{k}\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\displaystyle b\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(\\displaystyle -\\dfrac{a}{q}\\)</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Integer factor constraints"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\nf(x)=-3x^{2}+bx+c\n\\]</div>\n<p>In the given quadratic function, \\(\\displaystyle b\\) and \\(\\displaystyle c\\) are constants. The graph of \\(\\displaystyle y=f(x)\\) in the xy-plane is a parabola that has a vertex at the point \\(\\displaystyle (h,k)\\), where \\(\\displaystyle h\\) and \\(\\displaystyle k\\) are constants. If \\(\\displaystyle f(-4)=f(8)\\), and the quadratic function has x-intercepts at \\(\\displaystyle (r,0)\\) and \\(\\displaystyle (s,0)\\), which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(\\displaystyle r+s=4\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\displaystyle b\\lt 0\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(\\displaystyle c\\lt k\\)</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic symmetry statements"
+      },
+      {
+        "stem": "<p>A quadratic function models a rock's height, in feet, above the ground in terms of the time, in seconds, after it is thrown. The rock was thrown from an initial height of \\(\\displaystyle c\\) feet above the ground and reached a maximum height of 200 feet above the ground 3 seconds after it was thrown. Then it hit the ground 8 seconds after being thrown. At what initial height \\(\\displaystyle c\\) was the rock thrown?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "128",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Projectile quadratic model"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n2rx^{2}-5sx+8r=0\n\\]</div>\n<p>If the quadratic equation above has one real solution and \\(\\displaystyle rs=160\\), what is \\(\\displaystyle \\lvert r+s\\rvert\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "26",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Discriminant one real root"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\nf(x)=-(x+a)^{2}(x-b)(x-c)\n\\]</div>\n<p>For the polynomial function above, \\(\\displaystyle a\\), \\(\\displaystyle b\\), and \\(\\displaystyle c\\) are positive constants. Let \\(\\displaystyle b\\lt k\\lt c\\) for some constant \\(\\displaystyle k\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(\\displaystyle k>0\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\displaystyle f(k)>0\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(\\displaystyle f(0)>0\\)</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Polynomial sign analysis"
+      },
+      {
+        "stem": "<p>3 consecutive even integers are ordered from smallest to largest. 5 times the first integer is at least 9 more than the sum of the second and third integers. What is the minimum possible value for the second integer?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "8",
+        "knowledge_section": "Unit 1",
+        "knowledge_section_title_en": "Algebra",
+        "hard_skill": "Consecutive even integers inequality"
+      },
+      {
+        "stem": "<p>If a car accelerates at \\(\\displaystyle 108\\) kilometers per hour squared, what is its acceleration in meters per minute squared? \\;(1 kilometer \\(\\displaystyle = 1000\\) meters)</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "30",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Unit conversion acceleration"
+      },
+      {
+        "stem": "<p>In triangle \\(\\displaystyle \\triangle ABC\\), the measure of \\(\\displaystyle \\angle B\\) is \\(\\displaystyle 90^\\circ\\), \\(\\displaystyle \\overline{AB}\\) is a leg with a length of \\(\\displaystyle 12\\), and point \\(\\displaystyle D\\) lies on segment \\(\\displaystyle \\overline{AC},\\) and finally connect \\(\\displaystyle BD\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">\\(\\displaystyle \\overline{BC}=12\\,\\tan(\\angle CAB)\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">\\(\\displaystyle \\cos(\\angle ABD)-\\sin(\\angle DBC)=0\\)</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">\\(\\displaystyle \\angle ABD=\\angle BDC\\)</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Right triangle trig statements"
+      },
+      {
+        "stem": "<p>In triangle \\(\\displaystyle \\triangle ABC\\), the measure of \\(\\displaystyle \\angle B\\) is \\(\\displaystyle 90^\\circ\\), and \\(\\displaystyle \\overline{BD}\\) is an altitude of the triangle. The length of \\(\\displaystyle \\overline{BC}\\) is \\(\\displaystyle 10\\) and \\(\\displaystyle \\angle ABD=60^\\circ\\). What is the length of \\(\\displaystyle \\overline{AD}\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "15",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Altitude to hypotenuse"
+      },
+      {
+        "stem": "<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_27_f16.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>In the circle above, the angle at point \\(\\displaystyle C\\) measures \\(\\displaystyle 20^\\circ\\) and \\(\\displaystyle \\overline{AC}\\) is a diameter (as shown). If the circumference of the circle is \\(\\displaystyle 90\\) inches, what is the length of arc \\(\\displaystyle BC\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "35",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Circle arc length"
+      },
+      {
+        "stem": "<p>In the xy-plane, the graph of \\(\\displaystyle x^{2}+6x+y^{2}+2y=15\\) is a circle. Line \\(\\displaystyle k\\) has a slope of \\(\\displaystyle \\tfrac{3}{4}\\) and is tangent to this circle at the point \\(\\displaystyle (a,b)\\), where \\(\\displaystyle b\\) is negative. What is the value of \\(\\displaystyle b\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "-5",
+        "answer_alternates": [
+          "-5.0"
+        ],
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Tangent line to circle"
+      },
+      {
+        "stem": "<p>Rectangular prism A and rectangular prism B are similar. The height of rectangular prism A is \\(\\displaystyle 4\\) inches and the height of rectangular prism B is \\(\\displaystyle 10\\) inches. If the volume of prism A is \\(\\displaystyle 200\\) cubic inches, then what is the volume of prism B?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "3125",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Similar prisms volume scale"
+      },
+      {
+        "stem": "<p>Consider a square right pyramid with a volume of \\(\\displaystyle 400\\) cubic inches and a slant height of \\(\\displaystyle 13\\) inches. The pyramid's length, width, and height (in inches) are all integers. What is the surface area of the pyramid in cubic inches?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "360",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Square pyramid surface area"
+      },
+      {
+        "stem": "<p>Data set A consists of \\(\\displaystyle 4\\) integers greater than or equal to \\(\\displaystyle 10\\) but less than or equal to \\(\\displaystyle 20\\). Data set B consists of the same four integers and adds one more integer, which must also be between \\(\\displaystyle 10\\) and \\(\\displaystyle 20\\). What is the largest possible difference between the mean of data set A and the mean of data set B?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "2",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Means of related data sets"
+      },
+      {
+        "stem": "<div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>Data</th><th>Frequency</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>5</td></tr><tr><td>3</td><td>6</td></tr><tr><td>4</td><td>5</td></tr><tr><td>5</td><td>2</td></tr></tbody></table></div>\n<p>The frequency table above summarizes data set A. Data set B is created by multiplying all of the values in data set A by \\(\\displaystyle 2\\). Which of the following must be true?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">The difference between the mean and median of data set B is \\(\\displaystyle 0\\).</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">The standard deviation of data set B is equal to the standard deviation of data set A.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">The range of data set B is double the range of data set A.</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "I and III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Frequency table / scaled data"
+      },
+      {
+        "stem": "<p>A sample of students was selected at random from all 11th graders in at a school. Based on the sample, it is estimated that the proportion of 11th graders in at least one AP class is \\(\\displaystyle 60\\%\\) with a margin of error of \\(\\displaystyle 5\\%\\). Which of the following conclusions are appropriate?</p>\n<ul class=\"stem-itemize\"><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">I.</span> <span class=\"stem-li-body\">It is not possible for just \\(\\displaystyle 40\\%\\) of the 11th graders in the school to be in at least one AP class.</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">II.</span> <span class=\"stem-li-body\">It is plausible that the proportion of \\emph{all students at the school} in at least one AP class is between \\(\\displaystyle 45\\%\\) and \\(\\displaystyle 55\\%\\).</span></li><li class=\"stem-li-labeled\"><span class=\"stem-li-marker\">III.</span> <span class=\"stem-li-body\">If the sample size is increased, the margin of error will drop below \\(\\displaystyle 5\\%\\).</span></li></ul>",
+        "choices": [
+          "I and II only",
+          "II and III only",
+          "III only",
+          "I, II, and III"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Margin of error conclusions"
+      }
     ]
   },
   "placement": {
