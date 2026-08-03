@@ -485,9 +485,119 @@
     });
   }
 
+  function isPhase3FullDualModuleLesson() {
+    if (!paceEnabled || !satScoreApi) return false;
+    return phase3QuestionSlides().length === 44;
+  }
+
   function isPhase3SatMockLesson() {
     if (!paceEnabled || !satScoreApi) return false;
-    return phase3QuestionSlides().length === 22;
+    var n = phase3QuestionSlides().length;
+    return n === 22 || n === 44;
+  }
+
+  function phase3ModuleLabel(slide) {
+    var sec = String((slide && slide.section) || "").toLowerCase();
+    if (sec.indexOf("module ii") >= 0 || sec.indexOf("module 2") >= 0) return 2;
+    if (sec.indexOf("module i") >= 0 || sec.indexOf("module 1") >= 0) return 1;
+    return 0;
+  }
+
+  function phase3QuestionsByModule() {
+    var qs = phase3QuestionSlides();
+    var m1 = [];
+    var m2 = [];
+    qs.forEach(function (s, i) {
+      var mod = phase3ModuleLabel(s);
+      if (mod === 1) m1.push(s);
+      else if (mod === 2) m2.push(s);
+      else if (i < 22) m1.push(s);
+      else m2.push(s);
+    });
+    return { module1: m1, module2: m2 };
+  }
+
+  function phase3DefaultOmits(moduleSlides) {
+    var answers = progress.answers || {};
+    var wrong = [];
+    var right = [];
+    moduleSlides.forEach(function (s) {
+      var row = answers[String(s.index)];
+      if (!row || !row.is_correct) wrong.push(s.index);
+      else right.push(s.index);
+    });
+    var picks = wrong.slice(0, 2);
+    right.forEach(function (idx) {
+      if (picks.length >= 2) return;
+      picks.push(idx);
+    });
+    moduleSlides.forEach(function (s) {
+      if (picks.length >= 2) return;
+      if (picks.indexOf(s.index) < 0) picks.push(s.index);
+    });
+    return picks.slice(0, 2);
+  }
+
+  function computePhase3Dual44ScoreLocal() {
+    var parts = phase3QuestionsByModule();
+    var answers = progress.answers || {};
+    var omit1 = {};
+    var omit2 = {};
+    phase3DefaultOmits(parts.module1).forEach(function (idx) { omit1[idx] = true; });
+    phase3DefaultOmits(parts.module2).forEach(function (idx) { omit2[idx] = true; });
+
+    function tally(moduleSlides, omitMap) {
+      var correct = 0;
+      var wrong = 0;
+      var scoredCorrect = 0;
+      var scoredTotal = 0;
+      moduleSlides.forEach(function (s) {
+        var row = answers[String(s.index)];
+        var ok = !!(row && row.is_correct);
+        if (ok) correct += 1;
+        else wrong += 1;
+        if (!omitMap[s.index]) {
+          scoredTotal += 1;
+          if (ok) scoredCorrect += 1;
+        }
+      });
+      return {
+        correct: correct,
+        wrong: wrong,
+        scored_correct: scoredCorrect,
+        scored_total: scoredTotal,
+      };
+    }
+
+    var t1 = tally(parts.module1, omit1);
+    var t2 = tally(parts.module2, omit2);
+    var scoredCorrect = t1.scored_correct + t2.scored_correct;
+    var scoredTotal = t1.scored_total + t2.scored_total || 40;
+    var scoredWrong = Math.max(0, scoredTotal - scoredCorrect);
+    // Match app._PHASE3_MATH_SCORE_BY_TOTAL_WRONG anchors for classroom pacing.
+    var table = {
+      0: 800, 1: 790, 2: 770, 3: 760, 4: 740, 5: 730, 6: 710, 7: 700,
+      8: 680, 9: 670, 10: 670, 11: 660, 12: 650, 13: 640, 14: 630, 15: 620,
+      16: 600, 17: 590, 18: 580, 19: 560, 20: 550, 21: 540, 22: 520, 23: 510,
+      24: 500, 25: 480, 26: 470, 27: 450, 28: 440, 29: 420, 30: 410, 31: 390,
+      32: 380, 33: 360, 34: 350, 35: 330, 36: 320, 37: 300, 38: 290, 39: 270,
+      40: 260, 41: 240, 42: 230, 43: 210, 44: 200,
+    };
+    var sat = table[scoredWrong] != null ? table[scoredWrong] : Math.max(200, 800 - 15 * scoredWrong);
+    return {
+      mode: "dual44",
+      sat_math_score: sat,
+      scored_correct: scoredCorrect,
+      scored_total: scoredTotal,
+      scored_accuracy: scoredTotal ? Math.round((1000 * scoredCorrect) / scoredTotal) / 10 : 0,
+      module1_correct: t1.correct,
+      module1_wrong: t1.wrong,
+      module2_correct: t2.correct,
+      module2_wrong: t2.wrong,
+      raw_correct: t1.correct + t2.correct,
+      raw_total: 44,
+      omit_total: 4,
+    };
   }
 
   function getLockedAnswer(slideIndex) {
@@ -816,6 +926,7 @@
     if (isSupervisorScoreView() && !opts.forcePersonal) {
       return buildPhase3ClassScoreHtml(classroomSummary);
     }
+    var dual = isPhase3FullDualModuleLesson() || data.mode === "dual44";
     var score = data.sat_math_score != null ? data.sat_math_score : "—";
     var m2c = data.module2_correct != null ? data.module2_correct : "—";
     var m2w = data.module2_wrong != null ? data.module2_wrong : "—";
@@ -823,6 +934,23 @@
     var m1w = data.module1_wrong != null ? data.module1_wrong : 0;
     var title = (slides[0] && slides[0].section) || "Mock Exam";
     var continueLabel = opts.continueLabel || "Continue to solution";
+    var sub = dual
+      ? "Full Module I + Module II · 4 unscored (2 per module) · wrong answers do not deduct"
+      : "Module 2 classroom estimate · Module 1 inferred from your Module 2 result";
+    var scoredLine = dual
+      ? '<article><em>Scored</em><strong>' +
+        (data.scored_correct != null ? data.scored_correct : "—") +
+        '<span>/' + (data.scored_total != null ? data.scored_total : 40) + "</span></strong>" +
+        "<small>" +
+        (data.scored_accuracy != null ? data.scored_accuracy + "% accuracy" : "40 counted") +
+        "</small></article>"
+      : '<article><em>Raw</em><strong>' + (data.raw_correct != null ? data.raw_correct : "—") +
+        '<span>/44</span></strong><small>combined modules</small></article>';
+    var m1note = dual
+      ? m1w + " wrong"
+      : m1w
+        ? m1w + " inferred wrong"
+        : "assumed all correct";
     return (
       '<div class="cm-sat-score-canvas" data-cm-sat-score-canvas>' +
         '<div class="cm-sat-score-bg" aria-hidden="true">' +
@@ -836,14 +964,11 @@
           '<p class="cm-sat-score-lesson">' + title + '</p>' +
           '<h2 class="cm-sat-score-headline">Your estimated score</h2>' +
           buildPhase3ScoreRingHtml(score, { animate: true }) +
-          '<p class="cm-sat-score-sub">Module 2 classroom estimate · Module 1 inferred from your Module 2 result</p>' +
+          '<p class="cm-sat-score-sub">' + sub + '</p>' +
           '<div class="cm-sat-score-metrics">' +
-            '<article><em>Module 2</em><strong>' + m2c + '<span>/22</span></strong><small>' + m2w + ' wrong</small></article>' +
-            '<article><em>Module 1</em><strong>' + m1c + '<span>/22</span></strong><small>' +
-              (m1w ? (m1w + ' inferred wrong') : 'assumed all correct') +
-            '</small></article>' +
-            '<article><em>Raw</em><strong>' + (data.raw_correct != null ? data.raw_correct : "—") +
-              '<span>/44</span></strong><small>combined modules</small></article>' +
+            '<article><em>Module I</em><strong>' + m1c + '<span>/22</span></strong><small>' + m1note + '</small></article>' +
+            '<article><em>Module II</em><strong>' + m2c + '<span>/22</span></strong><small>' + m2w + ' wrong</small></article>' +
+            scoredLine +
           '</div>' +
           (opts.showContinue
             ? '<button type="button" class="cm-sat-score-continue" data-cm-sat-score-continue>' + continueLabel + '</button>'
@@ -892,7 +1017,9 @@
       section: lastQ.section || "Mock Exam",
       study_tip: isSupervisorScoreView()
         ? "Estimated Digital SAT Math for every student in this live class."
-        : "Your estimated Digital SAT Math score from this Module 2 set.",
+        : (isPhase3FullDualModuleLesson()
+          ? "Your estimated Digital SAT Math score from Module I + Module II (44 questions, 40 scored)."
+          : "Your estimated Digital SAT Math score from this Module 2 set."),
       strategy_hint: "",
     };
     slides.splice(insertAt, 0, scoreSlide);
@@ -931,11 +1058,43 @@
   }
 
   function fetchPhase3SatScore(done) {
+    var dual = isPhase3FullDualModuleLesson();
     var localWrong = countPhase3Module2Wrong();
     function finish(data) {
       if (typeof done === "function") done(data);
     }
+    function dualLocal() {
+      finish(computePhase3Dual44ScoreLocal());
+    }
     function fromLocal() {
+      if (dual) {
+        if (!satScoreApi) {
+          dualLocal();
+          return;
+        }
+        var local = computePhase3Dual44ScoreLocal();
+        fetch(satScoreApi, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            mode: "dual44",
+            scored_correct: local.scored_correct,
+            scored_total: local.scored_total,
+            module1_correct: local.module1_correct,
+            module1_wrong: local.module1_wrong,
+            module2_correct: local.module2_correct,
+            module2_wrong: local.module2_wrong,
+          }),
+        })
+          .then(function (r) { return r.json().catch(function () { return null; }); })
+          .then(function (data) {
+            if (data && data.ok) finish(data);
+            else dualLocal();
+          })
+          .catch(dualLocal);
+        return;
+      }
       if (!satScoreApi) {
         finish({
           sat_math_score: Math.max(200, 800 - 20 * localWrong),
@@ -961,6 +1120,10 @@
         .catch(fromLocalFallback);
     }
     function fromLocalFallback() {
+      if (dual) {
+        dualLocal();
+        return;
+      }
       finish({
         ok: true,
         sat_math_score: Math.max(200, 800 - 20 * localWrong),
@@ -971,7 +1134,7 @@
         raw_correct: 44 - localWrong - (localWrong >= 10 ? 4 : localWrong >= 5 ? 2 : 0),
       });
     }
-    if (mySatScoreApi && classroomSession) {
+    if (mySatScoreApi && classroomSession && !dual) {
       fetch(mySatScoreApi, { credentials: "same-origin" })
         .then(function (r) { return r.json().catch(function () { return null; }); })
         .then(function (data) {

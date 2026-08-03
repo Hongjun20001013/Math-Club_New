@@ -1,409 +1,1570 @@
 {
-  "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against hard_1–hard_16 plus hard_21 Phase 3 Test I and hard_20 Test II (Jul 2026).",
+  "_schema": "SAT Hard Practice unit tags \u2014 U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
+  "_notes": "Audited against hard_1\u2013hard_16 plus hard_21 Phase 3 Test I and hard_20 Test II (Jul 2026). Test IX (hard_28) Module II bank stays 22Q; full dual-module 44Q deck is SAT_Hard_Question_28_PPT.tex (Module I specialized + Module II). Future Test X / hard_29 must ship as Module I + Module II from first import.",
   "hard_1": [
-    {"unit": "U2", "skill": "Polynomial factorization"},
-    {"unit": "U2", "skill": "Polynomial factorization"},
-    {"unit": "U2", "skill": "Quadratic factoring"},
-    {"unit": "U2", "skill": "Quadratic factors"},
-    {"unit": "U2", "skill": "Parabola / vertex form"},
-    {"unit": "U2", "skill": "Quadratic maximum"},
-    {"unit": "U3", "skill": "Unit conversion / rates"},
-    {"unit": "U2", "skill": "Exponential function"},
-    {"unit": "U2", "skill": "Quadratic graph"},
-    {"unit": "U2", "skill": "Quadratic roots"},
-    {"unit": "U2", "skill": "Polynomial factors"}
+    {
+      "unit": "U2",
+      "skill": "Polynomial factorization"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factorization"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic factoring"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic factors"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola / vertex form"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic maximum"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion / rates"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential function"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic graph"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factors"
+    }
   ],
   "hard_2": [
-    {"unit": "U4", "skill": "Triangle area (trigonometry)"},
-    {"unit": "U3", "skill": "Margin of error / sampling"},
-    {"unit": "U2", "skill": "Polynomial function"},
-    {"unit": "U2", "skill": "Exponential percent change"},
-    {"unit": "U3", "skill": "Rates / proportional expressions"},
-    {"unit": "U4", "skill": "Circle geometry"},
-    {"unit": "U2", "skill": "Quadratic sum of roots"},
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U2", "skill": "Quadratic sum and product of roots"}
+    {
+      "unit": "U4",
+      "skill": "Triangle area (trigonometry)"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error / sampling"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial function"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent change"
+    },
+    {
+      "unit": "U3",
+      "skill": "Rates / proportional expressions"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle geometry"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic sum of roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic sum and product of roots"
+    }
   ],
   "hard_3": [
-    {"unit": "U3", "skill": "Statistical sampling / margin of error"},
-    {"unit": "U4", "skill": "Triangle area (sine)"},
-    {"unit": "U4", "skill": "Semicircle / right triangle"},
-    {"unit": "U2", "skill": "Parabola–circle intersection"},
-    {"unit": "U2", "skill": "Radical equation"}
+    {
+      "unit": "U3",
+      "skill": "Statistical sampling / margin of error"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle area (sine)"
+    },
+    {
+      "unit": "U4",
+      "skill": "Semicircle / right triangle"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola\u2013circle intersection"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical equation"
+    }
   ],
   "hard_4": [
-    {"unit": "U3", "skill": "Two-way table / probability"},
-    {"unit": "U3", "skill": "Rate × time modeling"},
-    {"unit": "U3", "skill": "Scatterplot / study design"},
-    {"unit": "U4", "skill": "Circle tangent (coordinate)"},
-    {"unit": "U4", "skill": "Surface area / prisms"},
-    {"unit": "U4", "skill": "Right triangle area"},
-    {"unit": "U4", "skill": "Circle diameter / coordinates"}
+    {
+      "unit": "U3",
+      "skill": "Two-way table / probability"
+    },
+    {
+      "unit": "U3",
+      "skill": "Rate \u00d7 time modeling"
+    },
+    {
+      "unit": "U3",
+      "skill": "Scatterplot / study design"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle tangent (coordinate)"
+    },
+    {
+      "unit": "U4",
+      "skill": "Surface area / prisms"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle area"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle diameter / coordinates"
+    }
   ],
   "hard_5": [
-    {"unit": "U2", "skill": "Quadratic expression rewrite"},
-    {"unit": "U2", "skill": "Exponential percent change"},
-    {"unit": "U4", "skill": "Trigonometric identity"},
-    {"unit": "U2", "skill": "Quadratic vertex"},
-    {"unit": "U3", "skill": "Percent / mass relationships"},
-    {"unit": "U2", "skill": "Rational equation (one solution)"},
-    {"unit": "U2", "skill": "Rational equation (parallel resistors)"},
-    {"unit": "U2", "skill": "Quadratic discriminant"},
-    {"unit": "U2", "skill": "Exponential function"},
-    {"unit": "U4", "skill": "Rectangle inscribed in circle"},
-    {"unit": "U4", "skill": "Triangle exterior angles"},
-    {"unit": "U3", "skill": "Random sample / survey"},
-    {"unit": "U2", "skill": "Radical / rational exponents"},
-    {"unit": "U3", "skill": "Percent / mass relationships"},
-    {"unit": "U4", "skill": "Triangle congruence"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic expression rewrite"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent change"
+    },
+    {
+      "unit": "U4",
+      "skill": "Trigonometric identity"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent / mass relationships"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational equation (one solution)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational equation (parallel resistors)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential function"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangle inscribed in circle"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle exterior angles"
+    },
+    {
+      "unit": "U3",
+      "skill": "Random sample / survey"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical / rational exponents"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent / mass relationships"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle congruence"
+    }
   ],
   "hard_6": [
-    {"unit": "U2", "skill": "Radical / rational exponents"},
-    {"unit": "U2", "skill": "Quadratic factoring"},
-    {"unit": "U2", "skill": "Radical / exponent simplification"},
-    {"unit": "U2", "skill": "Rational equation with radical"},
-    {"unit": "U2", "skill": "Quadratic vertex"},
-    {"unit": "U2", "skill": "Exponential minimum value"},
-    {"unit": "U3", "skill": "Standard deviation / frequency table"},
-    {"unit": "U4", "skill": "Triangle area"},
-    {"unit": "U3", "skill": "Conditional probability / table"},
-    {"unit": "U2", "skill": "Quadratic minimum"},
-    {"unit": "U3", "skill": "Percent payback / word problem"},
-    {"unit": "U1", "skill": "Linear equation (parametric points)"},
-    {"unit": "U4", "skill": "Circle tangent slope"},
-    {"unit": "U2", "skill": "Exponential from points"},
-    {"unit": "U4", "skill": "Circle radius from equation"}
+    {
+      "unit": "U2",
+      "skill": "Radical / rational exponents"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic factoring"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical / exponent simplification"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational equation with radical"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential minimum value"
+    },
+    {
+      "unit": "U3",
+      "skill": "Standard deviation / frequency table"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Conditional probability / table"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic minimum"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent payback / word problem"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear equation (parametric points)"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle tangent slope"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential from points"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle radius from equation"
+    }
   ],
   "hard_7": [
-    {"unit": "U4", "skill": "Area / geometric word problem"},
-    {"unit": "U1", "skill": "Perpendicular linear systems"},
-    {"unit": "U3", "skill": "Percent chain (webinar attendance)"},
-    {"unit": "U2", "skill": "Exponential minimum value"},
-    {"unit": "U4", "skill": "Circle translation"},
-    {"unit": "U2", "skill": "Absolute-value quadratic"},
-    {"unit": "U2", "skill": "Radical equation"},
-    {"unit": "U4", "skill": "Rectangular prism volume"},
-    {"unit": "U2", "skill": "Exponent expression"},
-    {"unit": "U2", "skill": "Exponential decay"},
-    {"unit": "U2", "skill": "Quadratic expression rewrite"},
-    {"unit": "U1", "skill": "Parallel lines / no-solution system"}
+    {
+      "unit": "U4",
+      "skill": "Area / geometric word problem"
+    },
+    {
+      "unit": "U1",
+      "skill": "Perpendicular linear systems"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent chain (webinar attendance)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential minimum value"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle translation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Absolute-value quadratic"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical equation"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangular prism volume"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponent expression"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential decay"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic expression rewrite"
+    },
+    {
+      "unit": "U1",
+      "skill": "Parallel lines / no-solution system"
+    }
   ],
   "hard_8": [
-    {"unit": "U2", "skill": "Quadratic roots / coefficients"},
-    {"unit": "U1", "skill": "Linear system consistency"},
-    {"unit": "U3", "skill": "Standard deviation / frequency table"},
-    {"unit": "U3", "skill": "Median / outlier effect"},
-    {"unit": "U3", "skill": "Box plot comparison"},
-    {"unit": "U1", "skill": "Consecutive integers (linear)"},
-    {"unit": "U2", "skill": "Radical equation"},
-    {"unit": "U2", "skill": "Square-root function"},
-    {"unit": "U2", "skill": "Exponential graphs"},
-    {"unit": "U4", "skill": "Similar solids / surface area"},
-    {"unit": "U3", "skill": "Experimental design"},
-    {"unit": "U2", "skill": "Exponential equivalent form"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic roots / coefficients"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear system consistency"
+    },
+    {
+      "unit": "U3",
+      "skill": "Standard deviation / frequency table"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median / outlier effect"
+    },
+    {
+      "unit": "U3",
+      "skill": "Box plot comparison"
+    },
+    {
+      "unit": "U1",
+      "skill": "Consecutive integers (linear)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical equation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Square-root function"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential graphs"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar solids / surface area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Experimental design"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential equivalent form"
+    }
   ],
   "hard_9": [
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U1", "skill": "Linear function / word problem"},
-    {"unit": "U2", "skill": "Quadratic sign analysis"},
-    {"unit": "U3", "skill": "Percent relationships"},
-    {"unit": "U2", "skill": "Exponential equivalent form"},
-    {"unit": "U3", "skill": "Experimental design"},
-    {"unit": "U4", "skill": "Circle tangent (coordinate)"},
-    {"unit": "U2", "skill": "Rational function / asymptote"},
-    {"unit": "U1", "skill": "Linear inequality graph"}
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function / word problem"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic sign analysis"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent relationships"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential equivalent form"
+    },
+    {
+      "unit": "U3",
+      "skill": "Experimental design"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle tangent (coordinate)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function / asymptote"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear inequality graph"
+    }
   ],
   "hard_10": [
-    {"unit": "U4", "skill": "Parallel lines / transversal angles"},
-    {"unit": "U2", "skill": "Exponential minimum value"},
-    {"unit": "U1", "skill": "Linear function from table"},
-    {"unit": "U3", "skill": "Percent relationships"},
-    {"unit": "U2", "skill": "Polynomial roots / sum"},
-    {"unit": "U2", "skill": "Quadratic equation"},
-    {"unit": "U4", "skill": "Parallel lines / angle sums"},
-    {"unit": "U4", "skill": "Triangle inequality"}
+    {
+      "unit": "U4",
+      "skill": "Parallel lines / transversal angles"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential minimum value"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function from table"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent relationships"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial roots / sum"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic equation"
+    },
+    {
+      "unit": "U4",
+      "skill": "Parallel lines / angle sums"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle inequality"
+    }
   ],
   "hard_11": [
-    {"unit": "U2", "skill": "Quadratic sum of roots"},
-    {"unit": "U3", "skill": "Percent relationships"},
-    {"unit": "U2", "skill": "Quadratic vertex / intercepts"},
-    {"unit": "U2", "skill": "Quadratic equivalent form"},
-    {"unit": "U2", "skill": "Quadratic revenue model"},
-    {"unit": "U2", "skill": "Polynomial factorization"},
-    {"unit": "U4", "skill": "Unit circle / trigonometry"},
-    {"unit": "U3", "skill": "Ratio / proportional reasoning"},
-    {"unit": "U4", "skill": "Circle geometry (coordinate)"},
-    {"unit": "U2", "skill": "Exponential x-intercepts"},
-    {"unit": "U4", "skill": "Intersecting lines / angle sums"},
-    {"unit": "U2", "skill": "Exponential y-intercept form"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic sum of roots"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent relationships"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex / intercepts"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic equivalent form"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic revenue model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factorization"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle / trigonometry"
+    },
+    {
+      "unit": "U3",
+      "skill": "Ratio / proportional reasoning"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle geometry (coordinate)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential x-intercepts"
+    },
+    {
+      "unit": "U4",
+      "skill": "Intersecting lines / angle sums"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential y-intercept form"
+    }
   ],
   "hard_12": [
-    {"unit": "U2", "skill": "Quadratic equation / roots"},
-    {"unit": "U1", "skill": "Linear equation (infinitely many solutions)"},
-    {"unit": "U2", "skill": "Quadratic intercepts / coefficients"},
-    {"unit": "U4", "skill": "Right triangle / altitude"},
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U4", "skill": "Unit conversion (area rate)"},
-    {"unit": "U2", "skill": "Exponential decay / growth factor"},
-    {"unit": "U2", "skill": "Exponential equivalent form"},
-    {"unit": "U4", "skill": "Square pyramid surface area"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic equation / roots"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear equation (infinitely many solutions)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic intercepts / coefficients"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle / altitude"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit conversion (area rate)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential decay / growth factor"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential equivalent form"
+    },
+    {
+      "unit": "U4",
+      "skill": "Square pyramid surface area"
+    }
   ],
   "hard_13": [
-    {"unit": "U4", "skill": "Circle arc / circumference"},
-    {"unit": "U2", "skill": "Rational function / x-intercepts"},
-    {"unit": "U3", "skill": "Percent growth / word problem"},
-    {"unit": "U2", "skill": "Exponential growth factor"},
-    {"unit": "U1", "skill": "Linear function / word problem"},
-    {"unit": "U2", "skill": "Quadratic discriminant"},
-    {"unit": "U4", "skill": "Map scale / proportional reasoning"},
-    {"unit": "U4", "skill": "Similar triangles / geometry"},
-    {"unit": "U2", "skill": "Radical / exponent simplification"},
-    {"unit": "U1", "skill": "Linear equation from table"},
-    {"unit": "U1", "skill": "Linear function / piecewise cost"},
-    {"unit": "U4", "skill": "Unit conversion (acceleration)"},
-    {"unit": "U1", "skill": "Linear function from rational table"}
+    {
+      "unit": "U4",
+      "skill": "Circle arc / circumference"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function / x-intercepts"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent growth / word problem"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth factor"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function / word problem"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant"
+    },
+    {
+      "unit": "U4",
+      "skill": "Map scale / proportional reasoning"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar triangles / geometry"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical / exponent simplification"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear equation from table"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function / piecewise cost"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit conversion (acceleration)"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function from rational table"
+    }
   ],
   "hard_14": [
-    {"unit": "U4", "skill": "Trigonometric identity"},
-    {"unit": "U2", "skill": "Rational exponents / roots"},
-    {"unit": "U4", "skill": "Circle circumference / rate of change"},
-    {"unit": "U1", "skill": "Linear system / parametric point"},
-    {"unit": "U3", "skill": "Proportional reasoning"},
-    {"unit": "U2", "skill": "Rational equation (one solution)"},
-    {"unit": "U1", "skill": "Linear system consistency"},
-    {"unit": "U2", "skill": "Exponential function from points"},
-    {"unit": "U4", "skill": "Rectangular prism surface area"},
-    {"unit": "U3", "skill": "Percent chain / masses"},
-    {"unit": "U2", "skill": "Quadratic factoring"},
-    {"unit": "U1", "skill": "Linear function from graph"},
-    {"unit": "U3", "skill": "Percent decrease factor"},
-    {"unit": "U4", "skill": "Polygon interior angles"},
-    {"unit": "U2", "skill": "Exponential sequence / percent increase"},
-    {"unit": "U4", "skill": "Square pyramid height"},
-    {"unit": "U2", "skill": "Radical equation (one solution)"}
+    {
+      "unit": "U4",
+      "skill": "Trigonometric identity"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational exponents / roots"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle circumference / rate of change"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear system / parametric point"
+    },
+    {
+      "unit": "U3",
+      "skill": "Proportional reasoning"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational equation (one solution)"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear system consistency"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential function from points"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangular prism surface area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent chain / masses"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic factoring"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function from graph"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent decrease factor"
+    },
+    {
+      "unit": "U4",
+      "skill": "Polygon interior angles"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential sequence / percent increase"
+    },
+    {
+      "unit": "U4",
+      "skill": "Square pyramid height"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical equation (one solution)"
+    }
   ],
   "hard_15": [
-    {"unit": "U2", "skill": "Quadratic discriminant / real roots"},
-    {"unit": "U4", "skill": "Unit circle coordinates"},
-    {"unit": "U3", "skill": "Frequency table — mode & median"},
-    {"unit": "U1", "skill": "Line through two points / slope range"},
-    {"unit": "U2", "skill": "Parabola symmetry / value order"},
-    {"unit": "U4", "skill": "Rhombus grid / tan of angle"},
-    {"unit": "U2", "skill": "Quadratic reasoning / exists vs always"},
-    {"unit": "U4", "skill": "Circle diameter / length ratio"},
-    {"unit": "U4", "skill": "Rectangle + rotation geometry"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant / real roots"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle coordinates"
+    },
+    {
+      "unit": "U3",
+      "skill": "Frequency table \u2014 mode & median"
+    },
+    {
+      "unit": "U1",
+      "skill": "Line through two points / slope range"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola symmetry / value order"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rhombus grid / tan of angle"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic reasoning / exists vs always"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle diameter / length ratio"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangle + rotation geometry"
+    }
   ],
   "hard_16": [
-    {"unit": "U2", "skill": "Projectile / quadratic model"},
-    {"unit": "U1", "skill": "Consecutive integers"},
-    {"unit": "U3", "skill": "Percent relationships / survey"},
-    {"unit": "U1", "skill": "Linear system (no solution)"},
-    {"unit": "U3", "skill": "Unit conversion (area density)"},
-    {"unit": "U2", "skill": "Quadratic roots / product"},
-    {"unit": "U4", "skill": "Rectangular prism surface area"},
-    {"unit": "U4", "skill": "Unit circle / trigonometry"},
-    {"unit": "U2", "skill": "Radical quadratic function"},
-    {"unit": "U3", "skill": "Linear cost model"},
-    {"unit": "U3", "skill": "Promotion pricing model"},
-    {"unit": "U2", "skill": "Quadratic vertex form"},
-    {"unit": "U3", "skill": "Percent composition / word problem"}
+    {
+      "unit": "U2",
+      "skill": "Projectile / quadratic model"
+    },
+    {
+      "unit": "U1",
+      "skill": "Consecutive integers"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent relationships / survey"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear system (no solution)"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion (area density)"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic roots / product"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangular prism surface area"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle / trigonometry"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical quadratic function"
+    },
+    {
+      "unit": "U3",
+      "skill": "Linear cost model"
+    },
+    {
+      "unit": "U3",
+      "skill": "Promotion pricing model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex form"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent composition / word problem"
+    }
   ],
   "hard_20": [
-    {"unit": "U2", "skill": "Exponential growth model / percent greater"},
-    {"unit": "U4", "skill": "Cofunction identity / acute angles"},
-    {"unit": "U4", "skill": "Parallel lines / angle expressions"},
-    {"unit": "U2", "skill": "Exponential rewrite / quarter years"},
-    {"unit": "U2", "skill": "Quadratic product of roots"},
-    {"unit": "U2", "skill": "Quadratic scaling / breaking strength"},
-    {"unit": "U4", "skill": "Cylinder wall volume"},
-    {"unit": "U4", "skill": "Similar figures / corresponding angles"},
-    {"unit": "U4", "skill": "Radian–degree conversion"},
-    {"unit": "U1", "skill": "Linear relationship from table"},
-    {"unit": "U1", "skill": "Linear depreciation model"},
-    {"unit": "U1", "skill": "Linear inequality word problem"},
-    {"unit": "U3", "skill": "Percent composition / totals"},
-    {"unit": "U3", "skill": "Margin of error interval"},
-    {"unit": "U4", "skill": "Perimeter modeling"},
-    {"unit": "U3", "skill": "Sampling / generalizability"},
-    {"unit": "U3", "skill": "Weighted mean"},
-    {"unit": "U3", "skill": "Median after outlier removal"},
-    {"unit": "U4", "skill": "Similar solids / surface area"},
-    {"unit": "U2", "skill": "Exponential growth / compound interest model"},
-    {"unit": "U4", "skill": "Triangle angles / sine-cosine comparison"},
-    {"unit": "U2", "skill": "Rational function composition / evaluation"}
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model / percent greater"
+    },
+    {
+      "unit": "U4",
+      "skill": "Cofunction identity / acute angles"
+    },
+    {
+      "unit": "U4",
+      "skill": "Parallel lines / angle expressions"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential rewrite / quarter years"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic product of roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic scaling / breaking strength"
+    },
+    {
+      "unit": "U4",
+      "skill": "Cylinder wall volume"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar figures / corresponding angles"
+    },
+    {
+      "unit": "U4",
+      "skill": "Radian\u2013degree conversion"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear relationship from table"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear depreciation model"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear inequality word problem"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent composition / totals"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error interval"
+    },
+    {
+      "unit": "U4",
+      "skill": "Perimeter modeling"
+    },
+    {
+      "unit": "U3",
+      "skill": "Sampling / generalizability"
+    },
+    {
+      "unit": "U3",
+      "skill": "Weighted mean"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median after outlier removal"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar solids / surface area"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth / compound interest model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle angles / sine-cosine comparison"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function composition / evaluation"
+    }
   ],
   "hard_21": [
-    {"unit": "U2", "skill": "Exponential form / growth factor"},
-    {"unit": "U3", "skill": "Percent composition"},
-    {"unit": "U2", "skill": "Cubic sign analysis"},
-    {"unit": "U4", "skill": "Similar triangles / isosceles"},
-    {"unit": "U2", "skill": "Quadratic vertex form"},
-    {"unit": "U1", "skill": "Linear equation infinite solutions"},
-    {"unit": "U2", "skill": "Exponential vs linear graphs"},
-    {"unit": "U4", "skill": "Circle equation / expanded form"},
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U2", "skill": "Function interpretation"},
-    {"unit": "U3", "skill": "Percent increase"},
-    {"unit": "U3", "skill": "Median comparison"},
-    {"unit": "U4", "skill": "Right triangle trigonometry"},
-    {"unit": "U4", "skill": "Tetrahedron surface area"},
-    {"unit": "U3", "skill": "Percent relationships"},
-    {"unit": "U4", "skill": "Cone slant height"},
-    {"unit": "U2", "skill": "Quadratic projectile model"},
-    {"unit": "U3", "skill": "Weighted mean"},
-    {"unit": "U1", "skill": "Linear cost model"},
-    {"unit": "U3", "skill": "Percent of land / buildings"},
-    {"unit": "U2", "skill": "Revenue quadratic model"},
-    {"unit": "U4", "skill": "Tangent line to circle"},
-    {"unit": "U1", "skill": "Linear graph interpretation"},
-    {"unit": "U3", "skill": "Scatterplot / line of best fit"},
-    {"unit": "U2", "skill": "Quadratic discriminant"},
-    {"unit": "U3", "skill": "Experimental design / random assignment"}
+    {
+      "unit": "U2",
+      "skill": "Exponential form / growth factor"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent composition"
+    },
+    {
+      "unit": "U2",
+      "skill": "Cubic sign analysis"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar triangles / isosceles"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex form"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear equation infinite solutions"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential vs linear graphs"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle equation / expanded form"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Function interpretation"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent increase"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median comparison"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle trigonometry"
+    },
+    {
+      "unit": "U4",
+      "skill": "Tetrahedron surface area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent relationships"
+    },
+    {
+      "unit": "U4",
+      "skill": "Cone slant height"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic projectile model"
+    },
+    {
+      "unit": "U3",
+      "skill": "Weighted mean"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear cost model"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent of land / buildings"
+    },
+    {
+      "unit": "U2",
+      "skill": "Revenue quadratic model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Tangent line to circle"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear graph interpretation"
+    },
+    {
+      "unit": "U3",
+      "skill": "Scatterplot / line of best fit"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant"
+    },
+    {
+      "unit": "U3",
+      "skill": "Experimental design / random assignment"
+    }
   ],
   "hard_22": [
-    {"unit": "U2", "skill": "Quadratic factoring / maximize product"},
-    {"unit": "U2", "skill": "Polynomial factoring / maximize middle"},
-    {"unit": "U2", "skill": "Biquadratic factoring"},
-    {"unit": "U2", "skill": "Polynomial factoring / minimize product"},
-    {"unit": "U2", "skill": "Parabola vertex / no real roots"},
-    {"unit": "U2", "skill": "Quadratic vertex / maximize coefficient"},
-    {"unit": "U3", "skill": "Unit conversion / acceleration"},
-    {"unit": "U2", "skill": "Exponential evaluation"},
-    {"unit": "U2", "skill": "Parabola transformation / intercepts"},
-    {"unit": "U2", "skill": "Quadratic from roots"},
-    {"unit": "U2", "skill": "Polynomial factor test"},
-    {"unit": "U4", "skill": "Triangle area / sine"},
-    {"unit": "U3", "skill": "Margin of error / sample size"},
-    {"unit": "U2", "skill": "Even function symmetry / evaluation"},
-    {"unit": "U2", "skill": "Exponential percent growth"},
-    {"unit": "U3", "skill": "Rate conversion / growth"},
-    {"unit": "U4", "skill": "Circle diameter / intersecting chords"},
-    {"unit": "U2", "skill": "Quadratic equation / sum of solutions"},
-    {"unit": "U2", "skill": "Exponential percent in terms of base"},
-    {"unit": "U2", "skill": "Quadratic sum and product"},
-    {"unit": "U3", "skill": "Coverage rate word problem"},
-    {"unit": "U2", "skill": "Parabola / horizontal tangent line"}
+    {
+      "unit": "U2",
+      "skill": "Quadratic factoring / maximize product"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factoring / maximize middle"
+    },
+    {
+      "unit": "U2",
+      "skill": "Biquadratic factoring"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factoring / minimize product"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola vertex / no real roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex / maximize coefficient"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion / acceleration"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential evaluation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola transformation / intercepts"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic from roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factor test"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle area / sine"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error / sample size"
+    },
+    {
+      "unit": "U2",
+      "skill": "Even function symmetry / evaluation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent growth"
+    },
+    {
+      "unit": "U3",
+      "skill": "Rate conversion / growth"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle diameter / intersecting chords"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic equation / sum of solutions"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent in terms of base"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic sum and product"
+    },
+    {
+      "unit": "U3",
+      "skill": "Coverage rate word problem"
+    },
+    {
+      "unit": "U2",
+      "skill": "Parabola / horizontal tangent line"
+    }
   ],
   "hard_23": [
-    {"unit": "U1", "skill": "Linear systems / no solution"},
-    {"unit": "U1", "skill": "Two-job linear model / intercepts"},
-    {"unit": "U1", "skill": "Dependent linear system / parametric point"},
-    {"unit": "U4", "skill": "Triangle inequality"},
-    {"unit": "U2", "skill": "Exponent / radical rewrite"},
-    {"unit": "U2", "skill": "Rational expression sum"},
-    {"unit": "U2", "skill": "Radical equation / extraneous roots"},
-    {"unit": "U1", "skill": "Literal equation / dew point"},
-    {"unit": "U2", "skill": "Rational function translation"},
-    {"unit": "U2", "skill": "Quadratic discriminant threshold"},
-    {"unit": "U3", "skill": "Percent greater / less chain"},
-    {"unit": "U3", "skill": "Dot plot mean median SD"},
-    {"unit": "U3", "skill": "Margin of error inference"},
-    {"unit": "U4", "skill": "Right triangle cos − sin identity"},
-    {"unit": "U4", "skill": "Regular polygon interior/exterior"},
-    {"unit": "U4", "skill": "Circle tangent slope"},
-    {"unit": "U2", "skill": "Exponential through two points"},
-    {"unit": "U4", "skill": "Circle equation / radius"},
-    {"unit": "U3", "skill": "Conditional probability from table"},
-    {"unit": "U2", "skill": "Quadratic minimum / parameter"},
-    {"unit": "U3", "skill": "Savings inequality model"},
-    {"unit": "U2", "skill": "Quadratic point comparison"}
+    {
+      "unit": "U1",
+      "skill": "Linear systems / no solution"
+    },
+    {
+      "unit": "U1",
+      "skill": "Two-job linear model / intercepts"
+    },
+    {
+      "unit": "U1",
+      "skill": "Dependent linear system / parametric point"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle inequality"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponent / radical rewrite"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational expression sum"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical equation / extraneous roots"
+    },
+    {
+      "unit": "U1",
+      "skill": "Literal equation / dew point"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function translation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant threshold"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent greater / less chain"
+    },
+    {
+      "unit": "U3",
+      "skill": "Dot plot mean median SD"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error inference"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle cos \u2212 sin identity"
+    },
+    {
+      "unit": "U4",
+      "skill": "Regular polygon interior/exterior"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle tangent slope"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential through two points"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle equation / radius"
+    },
+    {
+      "unit": "U3",
+      "skill": "Conditional probability from table"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic minimum / parameter"
+    },
+    {
+      "unit": "U3",
+      "skill": "Savings inequality model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic point comparison"
+    }
   ],
   "hard_24": [
-    {"unit": "U3", "skill": "Scatterplot line of best fit"},
-    {"unit": "U1", "skill": "Temperature conversion / rate"},
-    {"unit": "U1", "skill": "Linear function translation"},
-    {"unit": "U3", "skill": "Sampling / generalization"},
-    {"unit": "U3", "skill": "Poll proportion / expected margin"},
-    {"unit": "U2", "skill": "Quadratic vertex interpretation"},
-    {"unit": "U2", "skill": "Quadratic-linear system / one solution"},
-    {"unit": "U2", "skill": "Polynomial translation / intercepts"},
-    {"unit": "U2", "skill": "Exponential decay model"},
-    {"unit": "U4", "skill": "Circle diameter / center"},
-    {"unit": "U1", "skill": "Linear systems / no solution"},
-    {"unit": "U4", "skill": "3D distance / escalator path"},
-    {"unit": "U2", "skill": "Loan payment exponential model"},
-    {"unit": "U4", "skill": "Similar solids surface/volume scale"},
-    {"unit": "U4", "skill": "Prism surface area after cut"},
-    {"unit": "U2", "skill": "Radical / root equation"},
-    {"unit": "U3", "skill": "Percent decrease factor"},
-    {"unit": "U3", "skill": "Percent composition"},
-    {"unit": "U2", "skill": "Quadratic roots / coefficient sum"},
-    {"unit": "U2", "skill": "Polynomial intercept multiplicity"},
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U4", "skill": "Unit circle coordinates"}
+    {
+      "unit": "U3",
+      "skill": "Scatterplot line of best fit"
+    },
+    {
+      "unit": "U1",
+      "skill": "Temperature conversion / rate"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function translation"
+    },
+    {
+      "unit": "U3",
+      "skill": "Sampling / generalization"
+    },
+    {
+      "unit": "U3",
+      "skill": "Poll proportion / expected margin"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex interpretation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic-linear system / one solution"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial translation / intercepts"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential decay model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle diameter / center"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear systems / no solution"
+    },
+    {
+      "unit": "U4",
+      "skill": "3D distance / escalator path"
+    },
+    {
+      "unit": "U2",
+      "skill": "Loan payment exponential model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar solids surface/volume scale"
+    },
+    {
+      "unit": "U4",
+      "skill": "Prism surface area after cut"
+    },
+    {
+      "unit": "U2",
+      "skill": "Radical / root equation"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent decrease factor"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent composition"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic roots / coefficient sum"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial intercept multiplicity"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle coordinates"
+    }
   ],
   "hard_25": [
-    {"unit": "U3", "skill": "Constant rate word problem"},
-    {"unit": "U3", "skill": "Percent discount / original price"},
-    {"unit": "U4", "skill": "Polygon side-count equation"},
-    {"unit": "U1", "skill": "Piecewise linear cost model"},
-    {"unit": "U1", "skill": "Coverage rate equation"},
-    {"unit": "U1", "skill": "Linear inequality system"},
-    {"unit": "U4", "skill": "Triangle inequality"},
-    {"unit": "U2", "skill": "Quadratic equation / smallest root"},
-    {"unit": "U2", "skill": "Exponential percent change"},
-    {"unit": "U3", "skill": "Scatterplot line of best fit"},
-    {"unit": "U1", "skill": "Percent of x / linear growth"},
-    {"unit": "U3", "skill": "Poll proportion / expected margin"},
-    {"unit": "U1", "skill": "Linear systems / number of solutions"},
-    {"unit": "U1", "skill": "Inequality with consecutive odds"},
-    {"unit": "U2", "skill": "Exponential y-intercept form"},
-    {"unit": "U3", "skill": "Percent of percent chain"},
-    {"unit": "U2", "skill": "Equivalent quadratic factors"},
-    {"unit": "U2", "skill": "Discriminant threshold"},
-    {"unit": "U3", "skill": "Unit conversion acceleration"},
-    {"unit": "U3", "skill": "Sample proportion / expected count"}
+    {
+      "unit": "U3",
+      "skill": "Constant rate word problem"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent discount / original price"
+    },
+    {
+      "unit": "U4",
+      "skill": "Polygon side-count equation"
+    },
+    {
+      "unit": "U1",
+      "skill": "Piecewise linear cost model"
+    },
+    {
+      "unit": "U1",
+      "skill": "Coverage rate equation"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear inequality system"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle inequality"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic equation / smallest root"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent change"
+    },
+    {
+      "unit": "U3",
+      "skill": "Scatterplot line of best fit"
+    },
+    {
+      "unit": "U1",
+      "skill": "Percent of x / linear growth"
+    },
+    {
+      "unit": "U3",
+      "skill": "Poll proportion / expected margin"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear systems / number of solutions"
+    },
+    {
+      "unit": "U1",
+      "skill": "Inequality with consecutive odds"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential y-intercept form"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent of percent chain"
+    },
+    {
+      "unit": "U2",
+      "skill": "Equivalent quadratic factors"
+    },
+    {
+      "unit": "U2",
+      "skill": "Discriminant threshold"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion acceleration"
+    },
+    {
+      "unit": "U3",
+      "skill": "Sample proportion / expected count"
+    }
   ],
   "hard_26": [
-    {"unit": "U1", "skill": "Mixture percent equation"},
-    {"unit": "U1", "skill": "Piecewise linear cost model"},
-    {"unit": "U1", "skill": "Linear function properties"},
-    {"unit": "U2", "skill": "Quadratic product of roots"},
-    {"unit": "U2", "skill": "Absolute value unique solution"},
-    {"unit": "U3", "skill": "Conditional probability"},
-    {"unit": "U3", "skill": "Experimental design / random assignment"},
-    {"unit": "U3", "skill": "Survey bias / sampling"},
-    {"unit": "U1", "skill": "Linear model evaluation"},
-    {"unit": "U1", "skill": "Dependent linear system"},
-    {"unit": "U3", "skill": "Unit conversion rate"},
-    {"unit": "U1", "skill": "No-solution linear system"},
-    {"unit": "U2", "skill": "Exponential growth model"},
-    {"unit": "U2", "skill": "Difference of squares factoring"},
-    {"unit": "U4", "skill": "Tetrahedron volume / unit conversion"},
-    {"unit": "U4", "skill": "Cone inscribed in sphere"},
-    {"unit": "U2", "skill": "Quadratic symmetry / no real roots"},
-    {"unit": "U2", "skill": "Tangent line and parabola"},
-    {"unit": "U2", "skill": "Ordering quadratic values"},
-    {"unit": "U4", "skill": "Rectangle and circle geometry"},
-    {"unit": "U2", "skill": "Rational exponents"},
-    {"unit": "U2", "skill": "Quadratic discriminant / integer constants"}
+    {
+      "unit": "U1",
+      "skill": "Mixture percent equation"
+    },
+    {
+      "unit": "U1",
+      "skill": "Piecewise linear cost model"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function properties"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic product of roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Absolute value unique solution"
+    },
+    {
+      "unit": "U3",
+      "skill": "Conditional probability"
+    },
+    {
+      "unit": "U3",
+      "skill": "Experimental design / random assignment"
+    },
+    {
+      "unit": "U3",
+      "skill": "Survey bias / sampling"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear model evaluation"
+    },
+    {
+      "unit": "U1",
+      "skill": "Dependent linear system"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion rate"
+    },
+    {
+      "unit": "U1",
+      "skill": "No-solution linear system"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Difference of squares factoring"
+    },
+    {
+      "unit": "U4",
+      "skill": "Tetrahedron volume / unit conversion"
+    },
+    {
+      "unit": "U4",
+      "skill": "Cone inscribed in sphere"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic symmetry / no real roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Tangent line and parabola"
+    },
+    {
+      "unit": "U2",
+      "skill": "Ordering quadratic values"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangle and circle geometry"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational exponents"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic discriminant / integer constants"
+    }
   ],
   "hard_27": [
-    {"unit": "U2", "skill": "Radical function domain / parameters"},
-    {"unit": "U1", "skill": "Reciprocal / harmonic relation"},
-    {"unit": "U2", "skill": "Partial fractions / polynomial identity"},
-    {"unit": "U1", "skill": "Piecewise cost comparison"},
-    {"unit": "U1", "skill": "Infinite solutions linear system"},
-    {"unit": "U3", "skill": "Percent of percent chain"},
-    {"unit": "U2", "skill": "Exponential growth time"},
-    {"unit": "U2", "skill": "Exponential function properties"},
-    {"unit": "U2", "skill": "Factorable polynomial / max coefficient"},
-    {"unit": "U2", "skill": "Integer factor constraints"},
-    {"unit": "U2", "skill": "Quadratic symmetry statements"},
-    {"unit": "U2", "skill": "Projectile quadratic model"},
-    {"unit": "U2", "skill": "Discriminant one real root"},
-    {"unit": "U2", "skill": "Polynomial sign analysis"},
-    {"unit": "U1", "skill": "Consecutive even integers inequality"},
-    {"unit": "U3", "skill": "Unit conversion acceleration"},
-    {"unit": "U4", "skill": "Right triangle trig statements"},
-    {"unit": "U4", "skill": "Altitude to hypotenuse"},
-    {"unit": "U4", "skill": "Circle arc length"},
-    {"unit": "U4", "skill": "Tangent line to circle"},
-    {"unit": "U4", "skill": "Similar prisms volume scale"},
-    {"unit": "U4", "skill": "Square pyramid surface area"},
-    {"unit": "U3", "skill": "Means of related data sets"},
-    {"unit": "U3", "skill": "Frequency table / scaled data"},
-    {"unit": "U3", "skill": "Margin of error conclusions"}
+    {
+      "unit": "U2",
+      "skill": "Radical function domain / parameters"
+    },
+    {
+      "unit": "U1",
+      "skill": "Reciprocal / harmonic relation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Partial fractions / polynomial identity"
+    },
+    {
+      "unit": "U1",
+      "skill": "Piecewise cost comparison"
+    },
+    {
+      "unit": "U1",
+      "skill": "Infinite solutions linear system"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent of percent chain"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth time"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential function properties"
+    },
+    {
+      "unit": "U2",
+      "skill": "Factorable polynomial / max coefficient"
+    },
+    {
+      "unit": "U2",
+      "skill": "Integer factor constraints"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic symmetry statements"
+    },
+    {
+      "unit": "U2",
+      "skill": "Projectile quadratic model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Discriminant one real root"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial sign analysis"
+    },
+    {
+      "unit": "U1",
+      "skill": "Consecutive even integers inequality"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion acceleration"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle trig statements"
+    },
+    {
+      "unit": "U4",
+      "skill": "Altitude to hypotenuse"
+    },
+    {
+      "unit": "U4",
+      "skill": "Circle arc length"
+    },
+    {
+      "unit": "U4",
+      "skill": "Tangent line to circle"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar prisms volume scale"
+    },
+    {
+      "unit": "U4",
+      "skill": "Square pyramid surface area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Means of related data sets"
+    },
+    {
+      "unit": "U3",
+      "skill": "Frequency table / scaled data"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error conclusions"
+    }
+  ],
+  "hard_28": [
+    {
+      "unit": "U1",
+      "skill": "Infinite solutions linear equation"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear equation from percent savings"
+    },
+    {
+      "unit": "U4",
+      "skill": "Rectangle path area"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median after removing outlier"
+    },
+    {
+      "unit": "U1",
+      "skill": "Solve one-step linear equation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential y-intercept form"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear systems / no solution"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear systems / number of solutions"
+    },
+    {
+      "unit": "U1",
+      "skill": "Dependent linear system / parametric point"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear function properties"
+    },
+    {
+      "unit": "U1",
+      "skill": "Slope between two points"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic vertex form"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth model"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic from roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent growth"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth factor from successive values"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial division / equivalent form"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic shift / minimum"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median comparison"
+    },
+    {
+      "unit": "U3",
+      "skill": "Frequency table / scaled data"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar triangles / isosceles"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle trigonometry"
+    }
   ]
 }

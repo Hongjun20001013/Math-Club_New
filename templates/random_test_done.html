@@ -3,15 +3,23 @@
 {% block content %}
 <div class="np-random-report-shell">
   <nav class="np-random-report-nav" aria-label="SAT navigation">
-    <a href="{{ url_for('practice_random_test_intro') }}">Random Test</a>
+    <a href="{{ intro_href }}">{{ exam_label }}</a>
     <span>Score report</span>
   </nav>
 
   <header class="np-random-report-hero">
     <div class="np-random-report-copy">
-      <p class="np-report-kicker">SAT Math Random Test</p>
+      <p class="np-report-kicker">SAT Math · {{ exam_label }}</p>
       <h1>{{ score }}</h1>
-      <p>{{ total_correct }} / {{ total_questions }} correct · {{ raw_accuracy }}% raw accuracy · {{ score_band }}</p>
+      <p>
+        {{ scored_correct }} / {{ scored_total }} scored correct ·
+        {{ scored_accuracy }}% accuracy ·
+        {{ score_band }}
+      </p>
+      <p class="np-report-score-note">
+        44 questions · {{ omit_total }} unscored ({{ omits_per_module }} per module) ·
+        wrong answers do not deduct · Digital SAT Math scale (200–800)
+      </p>
       {% if weakest_unit %}
       <span class="np-report-insight">Primary focus: {{ weakest_unit.label }} · {{ weakest_unit.title }} at {{ weakest_unit.accuracy }}%</span>
       {% endif %}
@@ -21,8 +29,8 @@
         <strong>{{ score }}</strong>
         <span>out of 800</span>
       </div>
-      <form method="post" action="{{ url_for('practice_random_test_start') }}">
-        <button type="submit" class="np-report-primary-btn">New random test →</button>
+      <form method="post" action="{{ restart_action }}">
+        <button type="submit" class="np-report-primary-btn">{% if is_camp_test9 %}Retake Test IX →{% else %}New random test →{% endif %}</button>
       </form>
       {% if session_summary_href %}
       <a href="{{ session_summary_href }}" class="np-report-primary-btn np-report-primary-btn--ghost">Saved report →</a>
@@ -32,14 +40,14 @@
 
   <section class="np-report-metric-grid" aria-label="Score metrics">
     <article>
-      <span>Raw Score</span>
-      <strong>{{ total_correct }}/{{ total_questions }}</strong>
-      <em>{{ raw_accuracy }}% correct</em>
+      <span>Scored Raw</span>
+      <strong>{{ scored_correct }}/{{ scored_total }}</strong>
+      <em>{{ scored_accuracy }}% correct</em>
     </article>
     <article>
-      <span>Module Gap</span>
-      <strong>{{ module_gap }}</strong>
-      <em>question difference</em>
+      <span>All 44</span>
+      <strong>{{ total_correct }}/{{ total_questions }}</strong>
+      <em>{{ raw_accuracy }}% before omits</em>
     </article>
     <article>
       <span>To 600</span>
@@ -66,9 +74,9 @@
             <strong>Module {{ module.module_id }}</strong>
             <span>{{ module.source }}</span>
           </div>
-          <em>{{ module.correct }}/{{ module.total }}</em>
-          <div class="np-report-bar"><i style="width: {{ module.accuracy }}%;"></i></div>
-          <small>{{ module.accuracy }}% accuracy · {{ module.wrong }} wrong</small>
+          <em>{{ module.scored_correct }}/{{ module.scored_total }}</em>
+          <div class="np-report-bar"><i style="width: {{ module.scored_accuracy }}%;"></i></div>
+          <small>{{ module.scored_accuracy }}% scored · {{ module.omit_count }} unscored · {{ module.correct }}/{{ module.total }} raw</small>
         </article>
         {% endfor %}
       </div>
@@ -77,7 +85,7 @@
     <div class="np-report-panel">
       <div class="np-report-panel-head">
         <p class="np-report-kicker">Unit Breakdown</p>
-        <h2>Where points were lost</h2>
+        <h2>Where scored points were lost</h2>
       </div>
       <div class="np-unit-data-list">
         {% for unit in unit_results %}
@@ -97,20 +105,64 @@
 
   <section class="np-report-panel np-report-review">
     <div class="np-report-panel-head">
-      <p class="np-report-kicker">Question Review</p>
-      <h2>Every question, sorted by module order</h2>
+      <p class="np-report-kicker">Unscored picks · Question Review</p>
+      <h2>Mark {{ omits_per_module }} questions in each module as unscored ({{ omit_total }} total)</h2>
+      <p class="np-report-omit-help">
+        Like Digital SAT pretest items: those {{ omit_total }} do not count.
+        Defaults prefer misses; change the checkboxes and save to recalculate your 200–800 score and accuracy %.
+      </p>
     </div>
-    <div class="np-report-review-list">
-      {% for row in review %}
-      <article class="{% if row.is_correct %}is-correct{% else %}is-wrong{% endif %}">
-        <div>
-          <strong>M{{ row.module_id }} Q{{ row.index + 1 }} · {{ row.item.unit_label }} · {{ row.item.unit_title }}</strong>
-          <span>Your answer: {{ row.selected }} · Key: {{ row.key }}</span>
-        </div>
-        <a href="{{ row.href }}">Open question</a>
-      </article>
-      {% endfor %}
-    </div>
+    <form method="post" action="{{ url_for('practice_random_test_omits') }}" class="np-report-omit-form" id="np-omit-form">
+      <div class="np-report-omit-toolbar">
+        <p>
+          Module I selected: <strong id="np-omit-count-1">0</strong>/{{ omits_per_module }}
+          · Module II selected: <strong id="np-omit-count-2">0</strong>/{{ omits_per_module }}
+        </p>
+        <button type="submit" class="np-report-primary-btn">Save unscored picks →</button>
+      </div>
+      <div class="np-report-review-list">
+        {% for row in review %}
+        <article class="{% if row.is_omit %}is-omit{% elif row.is_correct %}is-correct{% else %}is-wrong{% endif %}">
+          <label class="np-report-omit-row">
+            <input
+              type="checkbox"
+              name="omit_{{ row.module_id }}"
+              value="{{ row.index }}"
+              data-module="{{ row.module_id }}"
+              {% if row.is_omit %}checked{% endif %}
+            >
+            <div>
+              <strong>M{{ row.module_id }} Q{{ row.index + 1 }} · {{ row.item.unit_label }} · {{ row.item.unit_title }}{% if row.is_omit %} · Unscored{% endif %}</strong>
+              <span>Your answer: {{ row.selected }} · Key: {{ row.key }}{% if row.is_correct %} · Correct{% else %} · Miss{% endif %}</span>
+            </div>
+          </label>
+          <a href="{{ row.href }}">Open question</a>
+        </article>
+        {% endfor %}
+      </div>
+    </form>
   </section>
 </div>
+<script>
+(function () {
+  var limit = {{ omits_per_module|int }};
+  var form = document.getElementById("np-omit-form");
+  if (!form) return;
+  function refresh() {
+    [1, 2].forEach(function (m) {
+      var boxes = form.querySelectorAll('input[data-module="' + m + '"]');
+      var checked = 0;
+      boxes.forEach(function (box) { if (box.checked) checked += 1; });
+      var label = document.getElementById("np-omit-count-" + m);
+      if (label) label.textContent = String(checked);
+      boxes.forEach(function (box) {
+        if (!box.checked && checked >= limit) box.disabled = true;
+        else box.disabled = false;
+      });
+    });
+  }
+  form.addEventListener("change", refresh);
+  refresh();
+})();
+</script>
 {% endblock %}

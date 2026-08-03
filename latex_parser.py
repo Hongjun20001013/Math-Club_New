@@ -114,13 +114,28 @@ def clean_math(text: str) -> str:
         _shield_text_block,
         text,
     )
-    # Protect escaped currency dollars first so they are never parsed as math delimiters.
+    # Currency amounts: never leave bare $ in HTML — browsers decode &#36; to $, and
+    # any $...$ pass (or MathJax dollar delimiters) will swallow the sentence.
+    # Emit \(\$220\) so the dollar is TeX-escaped inside MathJax.
+    currency_vault: list[str] = []
+
+    def _shield_currency(match: re.Match[str]) -> str:
+        amount = match.group(1)
+        idx = len(currency_vault)
+        currency_vault.append(rf"\(\${amount}\)")
+        return f"%%CMCURL{idx}%%"
+
+    text = re.sub(r"&#36;(\d[\d,]*)", _shield_currency, text)
+    text = re.sub(r"\\\$(\d[\d,]*)", _shield_currency, text)
+    # Remaining text-mode \$ (rare lone dollars).
     text = text.replace(r"\$", "&#36;")
     # Display math first to avoid being consumed by inline conversion.
     text = re.sub(r"(?<!\\)\$\$(.*?)(?<!\\)\$\$", r"\\[\1\\]", text, flags=re.S)
     # Inline math, skipping escaped currency dollars such as \$5.
     # Use \displaystyle for more "math-like" rendering (clearer fractions/radicals).
     text = re.sub(r"(?<!\\)\$(.+?)(?<!\\)\$", r"\\(\\displaystyle \1\\)", text, flags=re.S)
+    for idx, block in enumerate(currency_vault):
+        text = text.replace(f"%%CMCURL{idx}%%", block)
     for idx, block in enumerate(text_vault):
         text = text.replace(f"%%CMTEXT{idx}%%", block)
     return text
@@ -151,11 +166,19 @@ def _convert_latex_lists(text: str) -> str:
                 )
             else:
                 let_m = re.match(r"^([A-D])\.\s*(.*)$", chunk, re.S)
+                rom_m = re.match(r"^(I{1,3}|IV|VI{0,3}|IX)\.?\s+(.*)$", chunk, re.S)
                 if let_m:
                     lis.append(
                         '<li class="stem-li-labeled">'
                         f'<span class="stem-li-marker">{let_m.group(1)}</span> '
                         f'<span class="stem-li-body">{let_m.group(2).strip()}</span>'
+                        "</li>"
+                    )
+                elif rom_m:
+                    lis.append(
+                        '<li class="stem-li-labeled">'
+                        f'<span class="stem-li-marker">{rom_m.group(1)}.</span> '
+                        f'<span class="stem-li-body">{rom_m.group(2).strip()}</span>'
                         "</li>"
                     )
                 else:
@@ -181,11 +204,19 @@ def _convert_latex_lists(text: str) -> str:
                 )
             else:
                 let_m = re.match(r"^([A-D])\.\s*(.*)$", chunk, re.S)
+                rom_m = re.match(r"^(I{1,3}|IV|VI{0,3}|IX)\.?\s+(.*)$", chunk, re.S)
                 if let_m:
                     lis.append(
                         '<li class="stem-li-labeled">'
                         f'<span class="stem-li-marker">{let_m.group(1)}</span> '
                         f'<span class="stem-li-body">{let_m.group(2).strip()}</span>'
+                        "</li>"
+                    )
+                elif rom_m:
+                    lis.append(
+                        '<li class="stem-li-labeled">'
+                        f'<span class="stem-li-marker">{rom_m.group(1)}.</span> '
+                        f'<span class="stem-li-body">{rom_m.group(2).strip()}</span>'
                         "</li>"
                     )
                 else:
@@ -206,6 +237,22 @@ def _convert_latex_lists(text: str) -> str:
     )
     while inner_enumerate.search(text):
         text = inner_enumerate.sub(enumerate_repl, text, count=1)
+
+    # Orphan \item runs (missing \begin...\end) — never leave raw \item in HTML.
+    if r"\item" in text:
+        orphan_run = re.compile(
+            r"(?:\\item\s*(?:\[[^\]]*\])?\s*(?:[^\\]|\\(?!item\b))+)+",
+            re.S,
+        )
+
+        def orphan_repl(match: Any) -> str:
+            class _M:
+                def group(self, _n: int) -> str:
+                    return match.group(0)
+
+            return itemize_repl(_M())
+
+        text = orphan_run.sub(orphan_repl, text)
     return text
 
 
@@ -559,7 +606,8 @@ def clean_latex_junk(text: str) -> str:
     text = re.sub(r"\\begin\{multicols\}\{[^}]*\}", "", text)
     text = re.sub(r"\\end\{multicols\}", "", text)
     text = re.sub(r"\\hline", "", text)
-    text = re.sub(r"\\textbf\{([^{}]*)\}", r"\1", text)
+    text = re.sub(r"\\textbf\{([^{}]*)\}", r"<strong>\1</strong>", text)
+    text = re.sub(r"\\(?:textit|emph)\{([^{}]*)\}", r"<em>\1</em>", text)
     # Do not strip \\text{} here — it breaks MathJax inside \\(...\\) (e.g. ^\\circ\\text{C}, \\text{cm}).
     # Table cells are normalized earlier in _clean_table_cell().
     # Turn LaTeX table line breaks into readable line breaks (not inside amsmath).

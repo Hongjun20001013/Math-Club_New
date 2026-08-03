@@ -4,9 +4,9 @@
 {% block content %}
 <div class="np-bluebook-shell">
   <main class="np-bluebook-intro">
-    <p class="np-atelier-kicker" style="color:#6c4eff;font-weight:750;letter-spacing:0.14em;text-transform:uppercase;font-size:11px;margin:0 0 10px;">{{ site_brand_short }} · Random Test</p>
-    <h1>Practice Test</h1>
-    <p style="margin:0 0 22px;color:#3a3358;font-size:1.05rem;line-height:1.55;max-width:42ch;">Two timed math modules. Stay focused — your score out of 800 lands when Module 2 ends.</p>
+    <p class="np-atelier-kicker" style="color:#6c4eff;font-weight:750;letter-spacing:0.14em;text-transform:uppercase;font-size:11px;margin:0 0 10px;">{{ site_brand_short }} · {% if category.is_camp_test9 %}Test IX{% else %}Random Test{% endif %}</p>
+    <h1>{% if category.is_camp_test9 %}Test IX · SAT Camp{% else %}Practice Test{% endif %}</h1>
+    <p style="margin:0 0 22px;color:#3a3358;font-size:1.05rem;line-height:1.55;max-width:42ch;">{% if camp_test9_note %}{{ camp_test9_note }}{% else %}Two timed math modules. Stay focused — your score out of 800 lands when Module 2 ends.{% endif %}</p>
     <section class="np-bluebook-instruction-card" aria-label="Practice test instructions">
       <article>
         <span class="np-bluebook-icon">T</span>
@@ -19,7 +19,7 @@
         <span class="np-bluebook-icon">S</span>
         <div>
           <h2>Scores</h2>
-          <p>When you finish Module 2, you will receive an estimated SAT Math score out of 800 plus a full question review.</p>
+          <p>Finish both modules (44 questions) to get a full SAT Math score (200–800) and accuracy %. You choose 4 unscored items — 2 in Module I and 2 in Module II. Wrong answers do not deduct; scoring follows the Digital SAT Math scale on the remaining 40.</p>
         </div>
       </article>
       <article>
@@ -32,8 +32,8 @@
       <article>
         <span class="np-bluebook-icon">R</span>
         <div>
-          <h2>Adaptive Queue</h2>
-          <p>Questions you already answered correctly will not repeat next time. Misses come back first until they are resolved, then new unused items fill the rest.</p>
+          <h2>{% if category.is_camp_test9 %}Fixed Form{% else %}Adaptive Queue{% endif %}</h2>
+          <p>{% if category.is_camp_test9 %}This form is fixed for the camp cohort (Module I specialized + Module II hard drill). Everyone sees the same 44 questions.{% else %}Questions you already answered correctly will not repeat next time. Misses come back first until they are resolved, then new unused items fill the rest.{% endif %}</p>
         </div>
       </article>
       <article>
@@ -59,7 +59,7 @@
     {% if has_active_attempt and continue_href %}
     <a href="{{ continue_href }}" class="np-bluebook-btn np-bluebook-btn--primary">Continue →</a>
     {% else %}
-    <form method="post" action="{{ url_for('practice_random_test_start') }}">
+    <form method="post" action="{% if category.is_camp_test9 %}{{ url_for('practice_camp_test9_start') }}{% else %}{{ url_for('practice_random_test_start') }}{% endif %}">
       <button type="submit" class="np-bluebook-btn np-bluebook-btn--primary">Begin test →</button>
     </form>
     {% endif %}

@@ -1,0 +1,424 @@
+{
+  "title": "Test IX",
+  "slug": "camp-test-9",
+  "description": "SAT Camp Test 9 / Test IX: Module I + Module II (22+22), Digital SAT Math mock with 4 unscored picks.",
+  "note": "Module I from Chris/Amber specialized wrongs; Module II is hard_28. Classroom twin deck: SAT_Hard_Question_28_PPT.tex (build via scripts/build_test_ix_dual_ppt.py). Test X must use the same dual-module pattern.",
+  "unit_targets": {
+    "unit1": 8,
+    "unit2": 8,
+    "unit3": 3,
+    "unit4": 3
+  },
+  "module1": {
+    "source": "specialized",
+    "item_ids": [
+      "algebra:unit_1_all:21",
+      "advanced_math:unit_2_all:82",
+      "algebra:unit_1_all:19",
+      "advanced_math:unit_2_all:116",
+      "problem_solving:unit_3_all:9",
+      "algebra:unit_1_all:18",
+      "advanced_math:unit_2_all:115",
+      "geometry:unit_4_all:68",
+      "algebra:unit_1_all:10",
+      "advanced_math:unit_2_all:105",
+      "algebra:unit_1_all:82",
+      "advanced_math:unit_2_all:103",
+      "problem_solving:unit_3_all:28",
+      "algebra:unit_1_all:14",
+      "advanced_math:unit_2_all:99",
+      "geometry:unit_4_all:60",
+      "algebra:unit_1_all:13",
+      "advanced_math:unit_2_all:93",
+      "algebra:unit_1_all:26",
+      "advanced_math:unit_2_all:90",
+      "problem_solving:unit_3_all:30",
+      "geometry:unit_4_all:1"
+    ],
+    "unit_keys": [
+      "unit1",
+      "unit2",
+      "unit1",
+      "unit2",
+      "unit3",
+      "unit1",
+      "unit2",
+      "unit4",
+      "unit1",
+      "unit2",
+      "unit1",
+      "unit2",
+      "unit3",
+      "unit1",
+      "unit2",
+      "unit4",
+      "unit1",
+      "unit2",
+      "unit1",
+      "unit2",
+      "unit3",
+      "unit4"
+    ],
+    "items": [
+      {
+        "id": "algebra:unit_1_all:21",
+        "correct_answer": "A",
+        "unit_key": "unit1",
+        "excerpt": "One gallon of paint will cover 220 square feet of a surface. A room has a total wall area of \\( w \\) square fe",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:82",
+        "correct_answer": "C",
+        "unit_key": "unit2",
+        "excerpt": "The function \\(\\displaystyle f(x) = 5,470(0.64)^{\\frac{x}{12}}\\) gives the value, in dollars, of a certain pie",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:19",
+        "correct_answer": "D",
+        "unit_key": "unit1",
+        "excerpt": "For the linear function \\( f \\), the table shows three values of \\( x \\) and their corresponding values of \\( ",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:116",
+        "correct_answer": "D",
+        "unit_key": "unit2",
+        "excerpt": "Let the function \\(\\displaystyle p\\) be defined as \\(\\displaystyle p(x) = \\dfrac{(x - c)^2 + 160}{2c}\\), where",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "problem_solving:unit_3_all:9",
+        "correct_answer": "B",
+        "unit_key": "unit3",
+        "excerpt": "Jennifer bought a box of Crunchy Grain cereal. The nutrition facts on the box state that a serving size of the",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:18",
+        "correct_answer": "D",
+        "unit_key": "unit1",
+        "excerpt": "According to data provided by the US Department of Energy, the average price per gallon of regular gasoline in",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:115",
+        "correct_answer": "A",
+        "unit_key": "unit2",
+        "excerpt": "What is the minimum value of the function \\(\\displaystyle f\\) defined by \\(\\displaystyle f(x) = (x - 2)^2 - 4\\",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "geometry:unit_4_all:68",
+        "correct_answer": "A",
+        "unit_key": "unit4",
+        "excerpt": "The equation \\(\\displaystyle x^2 + (y - 2)^2 = 36\\) represents circle \\(\\displaystyle A\\). Circle \\(\\displayst",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:10",
+        "correct_answer": "B",
+        "unit_key": "unit1",
+        "excerpt": "If \\( \\frac{x + 6}{3} = \\frac{x + 6}{13} \\), the value of \\( x + 6 \\) is between which of the following pairs ",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:105",
+        "correct_answer": "D",
+        "unit_key": "unit2",
+        "excerpt": "Kao measured the temperature of a cup of hot chocolate placed in a room with a constant temperature of 70 degr",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:82",
+        "correct_answer": "A",
+        "unit_key": "unit1",
+        "excerpt": "A shipping service restricts the dimensions of the boxes it will ship for a certain type of service. The restr",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:103",
+        "correct_answer": "B",
+        "unit_key": "unit2",
+        "excerpt": "\\[f(x) = 9(4)^x\\] The function \\(\\displaystyle f\\) is defined by the given equation. If \\(\\displaystyle g(x) =",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "problem_solving:unit_3_all:28",
+        "correct_answer": "D",
+        "unit_key": "unit3",
+        "excerpt": "A data set of 27 different numbers has a mean of 33 and a median of 33. A new data set is created by adding 7 ",
+        "from": [
+          "fill"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:14",
+        "correct_answer": "A",
+        "unit_key": "unit1",
+        "excerpt": "An economist modeled the demand \\( Q \\) for a certain product as a linear function of the selling price \\( P \\",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:99",
+        "correct_answer": "B",
+        "unit_key": "unit2",
+        "excerpt": "Function \\(\\displaystyle f\\) is defined by \\(\\displaystyle f(x) = (x + 6)(x + 5)(x + 1)\\). Function \\(\\display",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "geometry:unit_4_all:60",
+        "correct_answer": "A",
+        "unit_key": "unit4",
+        "excerpt": "A circle in the \\(\\displaystyle xy\\)-plane has its center at \\(\\displaystyle (-4, -6)\\). Line \\(\\displaystyle ",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:13",
+        "correct_answer": "A",
+        "unit_key": "unit1",
+        "excerpt": "A window repair specialist charges &#36;220 for the first two hours of repair plus an hourly fee for each addi",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:93",
+        "correct_answer": "B",
+        "unit_key": "unit2",
+        "excerpt": "The functions f and g are defined by the given equation, where \\(\\displaystyle x \\geq0\\). Which function shows",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "algebra:unit_1_all:26",
+        "correct_answer": "B",
+        "unit_key": "unit1",
+        "excerpt": "For the function \\( f \\), if \\( f(3x) = x - 6 \\) for all values of \\( x \\), what is the value of \\( f(6) \\)?",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "advanced_math:unit_2_all:90",
+        "correct_answer": "C",
+        "unit_key": "unit2",
+        "excerpt": "\\(\\displaystyle P(t) = 290(1.04)^{\\frac{4}{6}t}\\) models the population, in thousands, of a certain city \\(\\di",
+        "from": [
+          "Chris"
+        ]
+      },
+      {
+        "id": "problem_solving:unit_3_all:30",
+        "correct_answer": "B",
+        "unit_key": "unit3",
+        "excerpt": "Two data sets of 23 integers each are summarized in the histograms shown. For each of the histograms, the firs",
+        "from": [
+          "Amber",
+          "Chris"
+        ]
+      },
+      {
+        "id": "geometry:unit_4_all:1",
+        "correct_answer": "A",
+        "unit_key": "unit4",
+        "excerpt": "A cube has an edge length of 68 inches. A solid sphere with a radius of 34 inches is inside the cube, such tha",
+        "from": [
+          "fill"
+        ]
+      }
+    ],
+    "counts": {
+      "unit1": 8,
+      "unit2": 8,
+      "unit3": 3,
+      "unit4": 3
+    }
+  },
+  "module2": {
+    "source": "hard_problem:hard_28",
+    "item_ids": [
+      "hard_problem:hard_28:0",
+      "hard_problem:hard_28:1",
+      "hard_problem:hard_28:2",
+      "hard_problem:hard_28:3",
+      "hard_problem:hard_28:4",
+      "hard_problem:hard_28:5",
+      "hard_problem:hard_28:6",
+      "hard_problem:hard_28:7",
+      "hard_problem:hard_28:8",
+      "hard_problem:hard_28:9",
+      "hard_problem:hard_28:10",
+      "hard_problem:hard_28:11",
+      "hard_problem:hard_28:12",
+      "hard_problem:hard_28:13",
+      "hard_problem:hard_28:14",
+      "hard_problem:hard_28:15",
+      "hard_problem:hard_28:16",
+      "hard_problem:hard_28:17",
+      "hard_problem:hard_28:18",
+      "hard_problem:hard_28:19",
+      "hard_problem:hard_28:20",
+      "hard_problem:hard_28:21"
+    ],
+    "unit_keys": [
+      "unit1",
+      "unit1",
+      "unit4",
+      "unit3",
+      "unit1",
+      "unit2",
+      "unit1",
+      "unit1",
+      "unit1",
+      "unit1",
+      "unit1",
+      "unit2",
+      "unit2",
+      "unit2",
+      "unit2",
+      "unit2",
+      "unit2",
+      "unit2",
+      "unit3",
+      "unit3",
+      "unit4",
+      "unit4"
+    ],
+    "seed_count": 6,
+    "fill_sources": [
+      "hard_problem:hard_24:10",
+      "hard_problem:hard_25:12",
+      "hard_problem:hard_23:2",
+      "hard_problem:hard_26:2",
+      "hard_problem:hard_26:9",
+      "hard_problem:hard_21:4",
+      "hard_problem:hard_21:8",
+      "hard_problem:hard_22:9",
+      "hard_problem:hard_22:14",
+      "hard_problem:hard_22:18",
+      "hard_problem:hard_23:21",
+      "hard_problem:hard_26:16",
+      "hard_problem:hard_21:11",
+      "hard_problem:hard_27:23",
+      "hard_problem:hard_21:3",
+      "hard_problem:hard_21:12"
+    ],
+    "counts": {
+      "unit1": 8,
+      "unit4": 3,
+      "unit3": 3,
+      "unit2": 8
+    },
+    "keys": [
+      {
+        "correct_answer": "B"
+      },
+      {
+        "correct_answer": "D"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "B"
+      },
+      {
+        "correct_answer": "D"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "D"
+      },
+      {
+        "correct_answer": "C"
+      },
+      {
+        "correct_answer": "B"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "B"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "D"
+      },
+      {
+        "correct_answer": "D"
+      },
+      {
+        "correct_answer": "B"
+      },
+      {
+        "correct_answer": "C"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "C"
+      },
+      {
+        "correct_answer": "C"
+      },
+      {
+        "correct_answer": "A"
+      },
+      {
+        "correct_answer": "C"
+      }
+    ]
+  }
+}

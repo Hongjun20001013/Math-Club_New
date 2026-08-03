@@ -35291,6 +35291,53 @@ html[data-exam-theme="dark"] .np-mistake-question-head span {
     background: rgba(255, 184, 77, 0.14);
 }
 
+.np-report-review-list article.is-omit {
+    background: rgba(108, 78, 255, 0.10);
+    outline: 1px solid rgba(108, 78, 255, 0.22);
+}
+
+.np-report-score-note,
+.np-report-omit-help {
+    margin: 0.55rem 0 0;
+    color: rgba(39, 31, 91, 0.72);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    font-weight: 650;
+    max-width: 52ch;
+}
+
+.np-report-omit-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    margin: 0 0 1rem;
+}
+
+.np-report-omit-toolbar p {
+    margin: 0;
+    color: rgba(39, 31, 91, 0.78);
+    font-weight: 760;
+}
+
+.np-report-omit-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.np-report-omit-row input {
+    margin-top: 0.35rem;
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: #6c4eff;
+    flex: 0 0 auto;
+}
+
 .np-report-review-list strong {
     color: #17113f;
     font-weight: 920;

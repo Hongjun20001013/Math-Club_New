@@ -509,8 +509,11 @@ def _scrub_latex_remnants(text: str) -> str:
         text,
         flags=re.I,
     )
+    # Full commands first — bare \\textit strip below would leave "{not}" visible.
+    text = re.sub(r"\\textbf\{([^{}]*)\}", r"<strong>\1</strong>", text)
+    text = re.sub(r"\\(?:textit|emph)\{([^{}]*)\}", r"<em>\1</em>", text)
     text = re.sub(
-        r"\\(?:textrm|textsf|textit|textbf|textit|emph|bfseries|itshape)\b\s*",
+        r"\\(?:textrm|textsf|textit|textbf|emph|bfseries|itshape)\b\s*",
         "",
         text,
     )

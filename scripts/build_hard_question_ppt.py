@@ -298,12 +298,20 @@ def build_set(set_num: int) -> str:
         short_title = "Test VIII"
         intro_phase = "Phase 3 · Mock Exam Training"
         overview_title = "Test VIII"
+    elif set_num == 28:
+        # Dual-module Test IX is built by scripts/build_test_ix_dual_ppt.py
+        # (Module I specialized + Module II hard_28). Keep this branch for
+        # legacy single-module rebuilds only.
+        label = f"{count} SAT Camp Test 9 Module II questions"
+        short_title = "Test IX"
+        intro_phase = "Phase 3 · Mock Exam Training"
+        overview_title = "Test IX"
     else:
         label = f"{count} SAT-style challenge problem{'s' if count != 1 else ''}"
         short_title = f"SAT Hard Question {set_num}"
         intro_phase = "Phase 2 · Hard Question Practice"
         overview_title = f"Hard Question Set {set_num}"
-    use_phase3_title = set_num in {20, 21, 22, 23, 24, 25, 26, 27}
+    use_phase3_title = set_num in {20, 21, 22, 23, 24, 25, 26, 27, 28}
     parts = [
         preamble(set_num, short_title)
         .replace("{QUESTION_COUNT_LABEL}", label)

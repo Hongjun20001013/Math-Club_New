@@ -1221,6 +1221,91 @@ def _coord_plane_grid_filldraw_svg(tikz_block: str) -> Optional[str]:
     return "".join(parts)
 
 
+def _pool_path_rectangle_svg(tikz_block: str) -> Optional[str]:
+    """Nested rectangle diagrams (outer path + inner pool) with optional x-labels."""
+    if "rectangle" not in tikz_block:
+        return None
+    if "pool" not in tikz_block.lower() and "gray!" not in tikz_block:
+        # Keep this converter narrow so unrelated rectangle figures stay untouched.
+        if not re.search(r"\\fill\[gray", tikz_block):
+            return None
+    outer = re.search(
+        r"\\draw\[thick\]\s*\(([-\d.]+),([-\d.]+)\)\s*rectangle\s*\(([-\d.]+),([-\d.]+)\)",
+        tikz_block,
+    )
+    inner = re.search(
+        r"\\(?:fill|draw)(?:\[[^\]]*\])?\s*\(([-\d.]+),([-\d.]+)\)\s*rectangle\s*\(([-\d.]+),([-\d.]+)\)",
+        tikz_block,
+    )
+    # Prefer the filled inner pool rectangle when present.
+    fill_inner = re.search(
+        r"\\fill\[[^\]]*\]\s*\(([-\d.]+),([-\d.]+)\)\s*rectangle\s*\(([-\d.]+),([-\d.]+)\)",
+        tikz_block,
+    )
+    if not outer:
+        return None
+    ox1, oy1, ox2, oy2 = map(float, outer.groups())
+    if fill_inner:
+        ix1, iy1, ix2, iy2 = map(float, fill_inner.groups())
+    elif inner:
+        ix1, iy1, ix2, iy2 = map(float, inner.groups())
+    else:
+        return None
+
+    # TikZ cm → SVG px
+    scale = 28.0
+    pad = 36.0
+
+    def tx(x: float) -> float:
+        return pad + x * scale
+
+    def ty(y: float) -> float:
+        # Flip y for SVG
+        return pad + (max(oy1, oy2) - y) * scale
+
+    w = pad * 2 + abs(ox2 - ox1) * scale
+    h = pad * 2 + abs(oy2 - oy1) * scale + 18
+    left, right = min(ox1, ox2), max(ox1, ox2)
+    bottom, top = min(oy1, oy2), max(oy1, oy2)
+    il, ir = min(ix1, ix2), max(ix1, ix2)
+    ib, it = min(iy1, iy2), max(iy1, iy2)
+
+    parts: List[str] = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w:.1f} {h:.1f}" '
+        'class="stem-tikz-svg stem-tikz-svg--pool" role="img" '
+        'aria-label="Rectangular pool with surrounding path">'
+    ]
+    # Outer path border
+    parts.append(
+        f'<rect x="{tx(left):.1f}" y="{ty(top):.1f}" '
+        f'width="{(right - left) * scale:.1f}" height="{(top - bottom) * scale:.1f}" '
+        'fill="#f4f1ff" stroke="#17113f" stroke-width="2.2"/>'
+    )
+    # Inner pool
+    parts.append(
+        f'<rect x="{tx(il):.1f}" y="{ty(it):.1f}" '
+        f'width="{(ir - il) * scale:.1f}" height="{(it - ib) * scale:.1f}" '
+        'fill="#c8c2e6" stroke="#17113f" stroke-width="2"/>'
+    )
+    parts.append(
+        f'<text x="{(tx(il) + tx(ir)) / 2:.1f}" y="{(ty(ib) + ty(it)) / 2 + 5:.1f}" '
+        'text-anchor="middle" font-size="15" font-family="Georgia, serif" fill="#17113f">pool</text>'
+    )
+    # Dimension labels for path width x
+    if "x" in tikz_block and "ft" in tikz_block:
+        lx = (tx(left) + tx(il)) / 2
+        parts.append(
+            f'<text x="{lx:.1f}" y="{ty(bottom) + 14:.1f}" text-anchor="middle" '
+            'font-size="13" font-family="Georgia, serif" fill="#5b3df4">x ft</text>'
+        )
+        parts.append(
+            f'<text x="{lx:.1f}" y="{ty(top) - 8:.1f}" text-anchor="middle" '
+            'font-size="13" font-family="Georgia, serif" fill="#5b3df4">x ft</text>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 def _tikz_block_to_figure_html(block: str) -> Optional[str]:
     block = block.strip()
     if r"\begin{axis}" in block:
@@ -1236,6 +1321,9 @@ def _tikz_block_to_figure_html(block: str) -> Optional[str]:
     prism = _placement_prism_wireframe_svg(block)
     if prism:
         return f'<div class="stem-figure-wrap stem-figure-wrap--prism">{prism}</div>'
+    pool = _pool_path_rectangle_svg(block)
+    if pool:
+        return f'<div class="stem-figure-wrap stem-figure-wrap--pool">{pool}</div>'
     np_svg = _novel_prep_placement_graph_svg(block)
     if np_svg:
         return f'<div class="stem-figure-wrap stem-figure-wrap--choice">{np_svg}</div>'

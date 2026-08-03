@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27", "hard_28"})
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -2455,6 +2455,41 @@ def _sync_course_materials_with_disk(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _sanitize_course_slide_html(html: str) -> str:
+    """Convert common LaTeX leftovers that otherwise show as raw text in the viewer."""
+    if not html or "\\" not in html:
+        return html
+    import re
+
+    html = re.sub(r"\\textbf\{([^{}]*)\}", r"<strong>\1</strong>", html)
+    html = re.sub(r"\\(?:textit|emph)\{([^{}]*)\}", r"<em>\1</em>", html)
+    html = re.sub(r"&#36;(\d[\d,]*)", r"\\(\\$\1\\)", html)
+    # Bare currency dollars outside math (pair as $220…$400 and swallow prose).
+    html = re.sub(
+        r"(?<![\\$])\$(\d[\d,]*)",
+        r"\\(\\$\1\\)",
+        html,
+    )
+    if "\\item" in html:
+        try:
+            from latex_parser import _convert_latex_lists
+
+            html = _convert_latex_lists(html)
+        except Exception:
+            pass
+    return html
+
+
+def _sanitize_course_materials_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    for material in payload.get("materials") or []:
+        for slide in material.get("slides") or []:
+            before = slide.get("html") or ""
+            after = _sanitize_course_slide_html(before)
+            if after != before:
+                slide["html"] = after
+    return payload
+
+
 def load_course_materials() -> dict[str, Any]:
     global COURSE_MATERIALS_CACHE, COURSE_MATERIALS_CACHE_MTIME
     json_mtime: float | None = None
@@ -2478,7 +2513,10 @@ def load_course_materials() -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         payload = {"materials": [], "total": 0, "available": 0}
 
-    COURSE_MATERIALS_CACHE = _sync_course_materials_with_disk(payload)
+    payload = _sanitize_course_materials_payload(
+        _sync_course_materials_with_disk(payload)
+    )
+    COURSE_MATERIALS_CACHE = payload
     COURSE_MATERIALS_CACHE_MTIME = json_mtime
     return COURSE_MATERIALS_CACHE
 
@@ -3326,7 +3364,10 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
         for q in questions
     }
     question_count = len(questions)
-    is_phase3_mock = question_count == PHASE3_MOCK_MODULE2_TOTAL
+    is_phase3_dual44 = question_count == RANDOM_TEST_TOTAL_QUESTIONS
+    is_phase3_mock = (
+        question_count == PHASE3_MOCK_MODULE2_TOTAL or is_phase3_dual44
+    )
     sat_scores_for_avg: list[int] = []
     for uid, stat in student_stats.items():
         stat["accuracy"] = (
@@ -3351,7 +3392,46 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
             }
             for si in missing
         ]
-        if is_phase3_mock:
+        if is_phase3_dual44:
+            # Prefer misses/blanks as the 2 unscored picks per module (same as deck/exam).
+            wrong_set = {int(wq["slide_index"]) for wq in stat["wrong_questions"]}
+            miss_set = set(missing)
+            m1_slides = all_question_slides[:22]
+            m2_slides = all_question_slides[22:44]
+
+            def _omit_two(slide_ids: list[int]) -> set[int]:
+                wrong_first = [si for si in slide_ids if si in wrong_set or si in miss_set]
+                rest = [si for si in slide_ids if si not in wrong_first]
+                return set((wrong_first + rest)[:RANDOM_TEST_OMITS_PER_MODULE])
+
+            omit = _omit_two(m1_slides) | _omit_two(m2_slides)
+            scored_ids = [si for si in all_question_slides if si not in omit]
+            scored_wrong = sum(1 for si in scored_ids if si in wrong_set or si in miss_set)
+            scored_correct = len(scored_ids) - scored_wrong
+            sat = _random_test_sat_math_score(
+                scored_correct=scored_correct, scored_total=len(scored_ids) or 40
+            )
+            m1_wrong = sum(1 for si in m1_slides if si in wrong_set or si in miss_set)
+            m2_wrong = sum(1 for si in m2_slides if si in wrong_set or si in miss_set)
+            phase3 = {
+                "sat_math_score": sat,
+                "mode": "dual44",
+                "module1_wrong": m1_wrong,
+                "module2_wrong": m2_wrong,
+                "module1_correct": 22 - m1_wrong,
+                "module2_correct": 22 - m2_wrong,
+                "scored_correct": scored_correct,
+                "scored_total": len(scored_ids),
+                "raw_correct": (22 - m1_wrong) + (22 - m2_wrong),
+            }
+            stat["phase3_sat"] = phase3
+            stat["sat_math_score"] = int(sat)
+            stat["sat_pct"] = max(
+                0, min(100, round(100 * (stat["sat_math_score"] - 200) / 600))
+            )
+            if int(stat["submitted"] or 0) > 0:
+                sat_scores_for_avg.append(stat["sat_math_score"])
+        elif is_phase3_mock:
             module2_wrong = len(stat["wrong_questions"]) + len(missing)
             phase3 = _phase3_mock_sat_score(module2_wrong, module2_total=question_count)
             stat["phase3_sat"] = phase3
@@ -3385,6 +3465,7 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
     report = {
         "question_count": question_count,
         "is_phase3_mock": is_phase3_mock,
+        "is_phase3_dual44": is_phase3_dual44,
         "class_avg_sat": class_avg_sat,
         "class_avg_sat_pct": class_avg_sat_pct,
         "responded_count": sum(1 for s in student_stats.values() if int(s["submitted"] or 0) > 0),
@@ -3708,10 +3789,44 @@ def practice_course_material_classroom_ink_api(slug: str):
 
 @app.route("/practice/materials/api/phase3-sat-score", methods=["POST"])
 def practice_phase3_sat_score_api():
-    """Return estimated SAT Math score for a Phase 3 22-question mock."""
+    """Return estimated SAT Math score for Phase 3 mocks (22 Module-2 or full 44)."""
     if not require_login():
         return jsonify({"ok": False, "error": "login required"}), 401
     data = request.get_json(silent=True) or {}
+    mode = str(data.get("mode") or "").strip().lower()
+    if mode in {"dual44", "full44", "dual"} or data.get("scored_correct") is not None:
+        try:
+            scored_correct = int(data.get("scored_correct"))
+        except (TypeError, ValueError):
+            return jsonify({"ok": False, "error": "scored_correct required"}), 400
+        scored_total = int(data.get("scored_total") or RANDOM_TEST_SCORED_QUESTIONS)
+        m1_correct = int(data.get("module1_correct") or 0)
+        m1_wrong = int(data.get("module1_wrong") or 0)
+        m2_correct = int(data.get("module2_correct") or 0)
+        m2_wrong = int(data.get("module2_wrong") or 0)
+        score = _random_test_sat_math_score(
+            scored_correct=scored_correct, scored_total=scored_total
+        )
+        scored_accuracy = (
+            round(100 * scored_correct / scored_total, 1) if scored_total else 0.0
+        )
+        return jsonify(
+            {
+                "ok": True,
+                "mode": "dual44",
+                "sat_math_score": score,
+                "scored_correct": max(0, min(scored_total, scored_correct)),
+                "scored_total": scored_total,
+                "scored_accuracy": scored_accuracy,
+                "module1_correct": m1_correct,
+                "module1_wrong": m1_wrong,
+                "module2_correct": m2_correct,
+                "module2_wrong": m2_wrong,
+                "raw_correct": m1_correct + m2_correct,
+                "raw_total": 44,
+                "omit_total": 4,
+            }
+        )
     try:
         module2_wrong = int(data.get("module2_wrong") or 0)
     except (TypeError, ValueError):
@@ -4193,6 +4308,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_25": "banks/hard/hard_25.tex",
         "hard_26": "banks/hard/hard_26.tex",
         "hard_27": "banks/hard/hard_27.tex",
+        "hard_28": "banks/hard/hard_28.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4585,6 +4701,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test VIII — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-VIII-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_28": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_28.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test IX — Module I + Module II (44-question Digital SAT Math mock).",
+            "download_name": "NovelPrep-Test-IX-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_28_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test IX — dual-module classroom deck (Module I + Module II) with answers.",
+            "download_name": "NovelPrep-Test-IX-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -5085,6 +5217,7 @@ TOPIC_TITLES = {
     "hard_25": "Test VI",
     "hard_26": "Test VII",
     "hard_27": "Test VIII",
+    "hard_28": "Test IX · Module I + II",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5623,6 +5756,31 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "2"},
         {"correct_answer": "C"},
         {"correct_answer": "C"},
+    ],
+    # SAT Camp Test IX Module II — seeded review Q1-6 + hard-drill fill (22Q).
+    "hard_28": [
+        {"correct_answer": "B"},  # Q1
+        {"correct_answer": "D"},  # Q2
+        {"correct_answer": "A"},  # Q3
+        {"correct_answer": "B"},  # Q4
+        {"correct_answer": "C"},  # Q5
+        {"correct_answer": "A"},  # Q6
+        {"correct_answer": "D"},  # Q7
+        {"correct_answer": "C"},  # Q8
+        {"correct_answer": "B"},  # Q9
+        {"correct_answer": "A"},  # Q10
+        {"correct_answer": "B"},  # Q11
+        {"correct_answer": "B"},  # Q12
+        {"correct_answer": "A"},  # Q13
+        {"correct_answer": "D"},  # Q14
+        {"correct_answer": "D"},  # Q15
+        {"correct_answer": "A"},  # Q16
+        {"correct_answer": "D"},  # Q17
+        {"correct_answer": "A"},  # Q18
+        {"correct_answer": "C"},  # Q19
+        {"correct_answer": "C"},  # Q20
+        {"correct_answer": "A"},  # Q21
+        {"correct_answer": "C"},  # Q22
     ],
 }
 
@@ -9572,18 +9730,25 @@ def practice_challenge():
                     "is_slides": "slide" in kind,
                 }
             )
-        if total and answered >= total:
+        # Test IX ships as a full Digital SAT Math mock (Module I + II = 44).
+        # Challenge "Start" opens the fixed camp exam; the hard_28 bank remains
+        # Module II (22) for exam item ids / worksheet Module II.
+        is_test_ix_dual = topic == "hard_28"
+        display_total = 44 if is_test_ix_dual else total
+        if display_total and answered >= (total if not is_test_ix_dual else display_total):
             progress_state = "done"
         elif answered:
             progress_state = "progress"
         else:
             progress_state = "new"
-        practice_href = url_for(
-            "practice_question", domain="hard_problem", topic=topic, qnum=0
+        practice_href = (
+            url_for("practice_camp_test9_intro")
+            if is_test_ix_dual
+            else url_for("practice_question", domain="hard_problem", topic=topic, qnum=0)
         )
         report_href = (
             _practice_report_href(db, uid, "hard_problem", topic, total)
-            if progress_state == "done"
+            if progress_state == "done" and not is_test_ix_dual
             else None
         )
         display_title = (
@@ -9599,21 +9764,32 @@ def practice_challenge():
                 "roman": set_roman,
                 "topic": topic,
                 "title": display_title,
-                "subtitle": TOPIC_TITLES.get(topic, f"SAT Hard Question Set {idx}"),
-                "total": total,
-                "answered": answered,
-                "progress_pct": min(100, round(100 * answered / total)) if total else 0,
+                "subtitle": (
+                    "Module I + Module II · 44-question Digital SAT Math mock"
+                    if is_test_ix_dual
+                    else TOPIC_TITLES.get(topic, f"SAT Hard Question Set {idx}")
+                ),
+                "total": display_total,
+                "answered": min(answered, display_total),
+                "progress_pct": (
+                    min(100, round(100 * answered / display_total)) if display_total else 0
+                ),
                 "href": report_href or practice_href,
                 "practice_href": practice_href,
                 "report_href": report_href,
-                "restart_href": url_for("practice_new_session", domain="hard_problem", topic=topic),
+                "restart_href": (
+                    url_for("practice_camp_test9_start")
+                    if is_test_ix_dual
+                    else url_for("practice_new_session", domain="hard_problem", topic=topic)
+                ),
                 "status": "Continue" if answered else "Start",
                 "progress_state": progress_state,
                 "range_bucket": (set_number - 1) // 10 + 1,
-                "is_live": total > 0,
+                "is_live": display_total > 0,
                 "materials": materials,
                 "pace_training": bool(pace_secs),
                 "pace_seconds": int(pace_secs or 0),
+                "is_dual_module_mock": is_test_ix_dual,
             }
         )
     total_questions = sum(s["total"] for s in hard_sets)
@@ -9689,6 +9865,8 @@ WORD_PROBLEM_SESSION_KEY = "sat_word_problem_answers"
 UNIT_BANK_EXAM_SESSION_KEY = "sat_unit_bank_exam_answers"
 RANDOM_TEST_SESSION_KEY = "sat_random_test_attempt"
 RANDOM_TEST_UNIT_TARGETS = (("unit1", 8), ("unit2", 8), ("unit3", 3), ("unit4", 3))
+CAMP_TEST9_PATH = os.path.join(APP_DIR, "data", "sat_camp_test9.json")
+CAMP_TEST9_SEED = "camp-test9-fixed"
 
 
 WORD_PROBLEM_CONTEXT_WORDS = frozenset(
@@ -9738,9 +9916,16 @@ def _is_word_problem_question(q: dict) -> bool:
 
 
 def _word_problem_unit_key(item: dict) -> str:
-    label = str(item.get("unit_label") or "")
-    m = re.search(r"Unit\s+([1-4])", label)
-    return f"unit{m.group(1)}" if m else "hard"
+    label = str(item.get("unit_label") or item.get("unit_key") or "")
+    m = re.search(r"Unit\s+([1-4])", label, flags=re.I)
+    if m:
+        return f"unit{m.group(1)}"
+    m = re.search(r"\bU([1-4])\b", label, flags=re.I)
+    if m:
+        return f"unit{m.group(1)}"
+    if label in {"unit1", "unit2", "unit3", "unit4"}:
+        return label
+    return "hard"
 
 
 def _unit_bank_sources() -> list[tuple[str, str]]:
@@ -9963,6 +10148,21 @@ def _random_test_item_lookup() -> dict[str, dict]:
     return lookup
 
 
+def _exam_item_from_id(item_id: str) -> dict | None:
+    """Resolve an exam item id even when fingerprint-deduped out of the pooled bank."""
+    parsed = _parse_exam_item_id(item_id)
+    if not parsed:
+        return None
+    domain, topic, q_index = parsed
+    tex_file = (BANKS.get(domain) or {}).get(topic)
+    if not tex_file:
+        return None
+    questions = get_questions_for_topic(domain, topic, tex_file)
+    if q_index < 0 or q_index >= len(questions):
+        return None
+    return _exam_question_item(domain, topic, q_index, questions[q_index])
+
+
 def _random_test_modules_from_ids(module_ids: dict[str, Any] | None) -> dict[int, list[dict]]:
     lookup = _random_test_item_lookup()
     out: dict[int, list[dict]] = {1: [], 2: []}
@@ -9973,7 +10173,7 @@ def _random_test_modules_from_ids(module_ids: dict[str, Any] | None) -> dict[int
         if not isinstance(raw, list):
             continue
         for item_id in raw:
-            src = lookup.get(str(item_id))
+            src = lookup.get(str(item_id)) or _exam_item_from_id(str(item_id))
             if not src:
                 continue
             copy_item = dict(src)
@@ -10261,9 +10461,121 @@ def _random_test_modules(
     }
 
 
+RANDOM_TEST_TOTAL_QUESTIONS = 44
+RANDOM_TEST_OMITS_PER_MODULE = 2
+RANDOM_TEST_SCORED_QUESTIONS = (
+    RANDOM_TEST_TOTAL_QUESTIONS - (2 * RANDOM_TEST_OMITS_PER_MODULE)
+)  # 40 scored, like Digital SAT pretest items
+
+
 def _random_test_score(raw_correct: int) -> int:
-    raw_correct = max(0, min(44, raw_correct))
-    return int(round((200 + (raw_correct / 44) * 600) / 10) * 10)
+    """Legacy linear map over all 44 items (kept for older saved reports)."""
+    raw_correct = max(0, min(RANDOM_TEST_TOTAL_QUESTIONS, raw_correct))
+    return int(
+        round(
+            (200 + (raw_correct / RANDOM_TEST_TOTAL_QUESTIONS) * 600) / 10
+        )
+        * 10
+    )
+
+
+def _random_test_sat_math_score(*, scored_correct: int, scored_total: int = RANDOM_TEST_SCORED_QUESTIONS) -> int:
+    """Digital SAT Math estimate from counted items only (wrong answers do not deduct)."""
+    scored_total = max(1, int(scored_total))
+    scored_correct = max(0, min(scored_total, int(scored_correct)))
+    scored_wrong = scored_total - scored_correct
+    return _phase3_math_scale_from_total_wrong(scored_wrong)
+
+
+def _random_test_default_omits(
+    modules: dict[int, list[dict]],
+    answers: dict[str, Any] | None,
+) -> dict[str, list[int]]:
+    """Pick 2 unscored items per module, preferring misses/blanks (student can change)."""
+    answers = answers if isinstance(answers, dict) else {}
+    out: dict[str, list[int]] = {}
+    for module_id in (1, 2):
+        module_answers = answers.get(str(module_id), {})
+        if not isinstance(module_answers, dict):
+            module_answers = {}
+        items = modules.get(module_id) or []
+        wrong_idxs: list[int] = []
+        right_idxs: list[int] = []
+        for idx, item in enumerate(items):
+            selected = str(module_answers.get(str(idx)) or "")
+            ok = response_is_correct(item.get("q") or {}, selected) is True if selected else False
+            (right_idxs if ok else wrong_idxs).append(idx)
+        picks = list(wrong_idxs[:RANDOM_TEST_OMITS_PER_MODULE])
+        for idx in right_idxs:
+            if len(picks) >= RANDOM_TEST_OMITS_PER_MODULE:
+                break
+            picks.append(idx)
+        for idx in range(len(items)):
+            if len(picks) >= RANDOM_TEST_OMITS_PER_MODULE:
+                break
+            if idx not in picks:
+                picks.append(idx)
+        out[str(module_id)] = sorted(picks[:RANDOM_TEST_OMITS_PER_MODULE])
+    return out
+
+
+def _random_test_normalize_omits(
+    raw_omits: Any,
+    modules: dict[int, list[dict]],
+    *,
+    answers: dict[str, Any] | None = None,
+) -> dict[str, list[int]]:
+    """Ensure exactly 2 valid omits per module; fall back to smart defaults."""
+    defaults = _random_test_default_omits(modules, answers)
+    raw = raw_omits if isinstance(raw_omits, dict) else {}
+    out: dict[str, list[int]] = {}
+    for module_id in (1, 2):
+        n = len(modules.get(module_id) or [])
+        vals: list[int] = []
+        seen: set[int] = set()
+        for piece in raw.get(str(module_id), []) if isinstance(raw.get(str(module_id)), list) else []:
+            try:
+                idx = int(piece)
+            except (TypeError, ValueError):
+                continue
+            if 0 <= idx < n and idx not in seen:
+                seen.add(idx)
+                vals.append(idx)
+            if len(vals) >= RANDOM_TEST_OMITS_PER_MODULE:
+                break
+        if len(vals) < RANDOM_TEST_OMITS_PER_MODULE:
+            for idx in defaults.get(str(module_id), []):
+                if idx not in seen and 0 <= idx < n:
+                    seen.add(idx)
+                    vals.append(idx)
+                if len(vals) >= RANDOM_TEST_OMITS_PER_MODULE:
+                    break
+        out[str(module_id)] = sorted(vals[:RANDOM_TEST_OMITS_PER_MODULE])
+    return out
+
+
+def _random_test_omits_from_form(
+    form: Any,
+    modules: dict[int, list[dict]],
+) -> dict[str, list[int]] | None:
+    """Parse omit checkboxes; return None if either module is not exactly 2."""
+    parsed: dict[str, list[int]] = {}
+    for module_id in (1, 2):
+        n = len(modules.get(module_id) or [])
+        vals: list[int] = []
+        seen: set[int] = set()
+        for piece in form.getlist(f"omit_{module_id}"):
+            try:
+                idx = int(piece)
+            except (TypeError, ValueError):
+                continue
+            if 0 <= idx < n and idx not in seen:
+                seen.add(idx)
+                vals.append(idx)
+        if len(vals) != RANDOM_TEST_OMITS_PER_MODULE:
+            return None
+        parsed[str(module_id)] = sorted(vals)
+    return parsed
 
 
 def _random_test_answered_set(module_id: int) -> set[int]:
@@ -10395,8 +10707,26 @@ def _practice_exam_categories() -> list[dict[str, Any]]:
             "is_random_test": True,
         },
         {
-            "slug": "practice-test",
+            "slug": "camp-test-9",
             "number": "04",
+            "label": "Test IX",
+            "title": "Test IX · SAT Camp",
+            "kicker": "Category · Fixed Camp Mock",
+            "short_label": "Test IX",
+            "item_label": "SAT Camp Test 9 item",
+            "question_kind_label": "Fixed 44-question Module I + Module II mock.",
+            "description": "Test IX · SAT Camp: Module I (Specialized) + Module II (Hard Drill), 22+22. After finishing, pick 2 unscored questions per module; score uses the Digital SAT Math scale on the remaining 40 plus accuracy %.",
+            "sets_fn": _empty_exam_sets,
+            "bank_fn": _empty_exam_bank,
+            "session_key": RANDOM_TEST_SESSION_KEY,
+            "is_live": True,
+            "status_label": "Live",
+            "is_random_test": True,
+            "is_camp_test9": True,
+        },
+        {
+            "slug": "practice-test",
+            "number": "05",
             "label": "Practice Test",
             "title": "Practice Test",
             "kicker": "Category · Practice Test",
@@ -10515,8 +10845,28 @@ def _practice_exam_category_context(category: dict[str, Any]) -> dict[str, Any]:
             "time_limit_minutes": WORD_PROBLEM_SECONDS // 60,
             "domain_counts": sorted(domain_counts.items()),
             "unit_counts": sorted(unit_counts.items(), key=lambda kv: _exam_unit_sort_key(kv[0])),
-            "start_href": url_for("practice_exam_question", category_slug=category["slug"], set_id=1, step=0) if sets else "#",
-            "category_href": url_for("practice_random_test_intro") if category.get("is_random_test") else (url_for("practice_exam_category", category_slug=category["slug"]) if category.get("is_live") else "#"),
+            "start_href": (
+                url_for("practice_camp_test9_start")
+                if category.get("is_camp_test9")
+                else (
+                    url_for("practice_exam_question", category_slug=category["slug"], set_id=1, step=0)
+                    if sets
+                    else "#"
+                )
+            ),
+            "category_href": (
+                url_for("practice_camp_test9_intro")
+                if category.get("is_camp_test9")
+                else (
+                    url_for("practice_random_test_intro")
+                    if category.get("is_random_test")
+                    else (
+                        url_for("practice_exam_category", category_slug=category["slug"])
+                        if category.get("is_live")
+                        else "#"
+                    )
+                )
+            ),
             "status_label": category.get("status_label") or ("Live" if sets else "Empty"),
         }
     )
@@ -10550,11 +10900,29 @@ def _word_problem_exam_context() -> dict[str, Any]:
     }
 
 
+def _camp_test9_snapshot() -> dict[str, Any]:
+    with open(CAMP_TEST9_PATH, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+    if not isinstance(data, dict):
+        raise RuntimeError("Invalid sat_camp_test9.json")
+    return data
+
+
+def _camp_test9_module_ids() -> dict[str, list[str]]:
+    snap = _camp_test9_snapshot()
+    return {
+        "1": list((snap.get("module1") or {}).get("item_ids") or []),
+        "2": list((snap.get("module2") or {}).get("item_ids") or []),
+    }
+
+
 @app.route("/practice/exams/<category_slug>")
 def practice_exam_category(category_slug: str):
     session["active_track_label"] = "SAT Math"
     if category_slug == "random-test":
         return redirect(url_for("practice_random_test_intro"))
+    if category_slug == "camp-test-9":
+        return redirect(url_for("practice_camp_test9_intro"))
     category = _practice_exam_category_context(_practice_exam_category_or_404(category_slug))
     return render_template(
         "word_problem_exams.html",
@@ -10587,6 +10955,49 @@ def practice_random_test_intro():
         has_active_attempt=has_active_attempt,
         continue_href=_random_test_continue_href() if has_active_attempt else None,
     )
+
+
+@app.route("/practice/exams/camp-test-9")
+def practice_camp_test9_intro():
+    session["active_track_label"] = "SAT Math"
+    category = _practice_exam_category_context(_practice_exam_category_or_404("camp-test-9"))
+    raw_attempt = session.get(RANDOM_TEST_SESSION_KEY)
+    has_active_attempt = (
+        isinstance(raw_attempt, dict)
+        and str(raw_attempt.get("seed") or "") == CAMP_TEST9_SEED
+        and bool((raw_attempt.get("module_ids") or {}).get("1"))
+    )
+    return render_template(
+        "random_test_intro.html",
+        category=category,
+        module_targets=RANDOM_TEST_UNIT_TARGETS,
+        module_minutes=WORD_PROBLEM_SECONDS // 60,
+        has_active_attempt=has_active_attempt,
+        continue_href=_random_test_continue_href() if has_active_attempt else None,
+        camp_test9_note=(
+            "Fixed Test IX: Module I + Module II like the Digital SAT (22+22). "
+            "After finishing, pick 2 unscored questions per module (4 total), "
+            "then get a 200–800 SAT Math score and accuracy % on the other 40."
+        ),
+    )
+
+
+@app.route("/practice/exams/camp-test-9/start", methods=["GET", "POST"])
+def practice_camp_test9_start():
+    session["active_track_label"] = "SAT Math"
+    module_ids = _camp_test9_module_ids()
+    if len(module_ids.get("1") or []) != WORD_PROBLEM_SET_SIZE or len(module_ids.get("2") or []) != WORD_PROBLEM_SET_SIZE:
+        abort(500, description="Test IX snapshot is incomplete.")
+    session[RANDOM_TEST_SESSION_KEY] = {
+        "seed": CAMP_TEST9_SEED,
+        "answers": {},
+        "deadlines": {},
+        "module_ids": module_ids,
+        "label": "Test IX",
+        "is_camp_test9": True,
+    }
+    session.modified = True
+    return redirect(url_for("practice_random_test_question", module_id=1, step=0))
 
 
 @app.route("/practice/exams/random-test/start", methods=["POST"])
@@ -10672,11 +11083,38 @@ def practice_random_test_submit(module_id: int):
     return redirect(url_for("practice_random_test_question", module_id=module_id, step=step + 1))
 
 
+@app.route("/practice/exams/random-test/omits", methods=["POST"])
+def practice_random_test_omits():
+    """Save the 2+2 unscored picks used for the SAT Math estimate."""
+    attempt = _random_test_ensure_module_snapshot(_random_test_attempt())
+    modules = _random_test_modules(str(attempt["seed"]))
+    parsed = _random_test_omits_from_form(request.form, modules)
+    if parsed is None:
+        flash(
+            f"Choose exactly {RANDOM_TEST_OMITS_PER_MODULE} unscored questions in Module I "
+            f"and {RANDOM_TEST_OMITS_PER_MODULE} in Module II (4 total)."
+        )
+        return redirect(url_for("practice_random_test_done"))
+    attempt["omits"] = parsed
+    session[RANDOM_TEST_SESSION_KEY] = attempt
+    session.modified = True
+    flash("Unscored picks saved. Your SAT Math score updated.")
+    return redirect(url_for("practice_random_test_done"))
+
+
 @app.route("/practice/exams/random-test/done")
 def practice_random_test_done():
     attempt = _random_test_ensure_module_snapshot(_random_test_attempt())
     modules = _random_test_modules(str(attempt["seed"]))
-    answers = attempt.get("answers", {})
+    answers = attempt.get("answers", {}) if isinstance(attempt.get("answers"), dict) else {}
+    omits = _random_test_normalize_omits(attempt.get("omits"), modules, answers=answers)
+    if attempt.get("omits") != omits:
+        attempt["omits"] = omits
+        session[RANDOM_TEST_SESSION_KEY] = attempt
+        session.modified = True
+    omit_sets = {1: set(omits.get("1") or []), 2: set(omits.get("2") or [])}
+    is_camp = bool(attempt.get("is_camp_test9"))
+    exam_label = "Test IX · SAT Camp" if is_camp else "Random Test"
     review: list[dict[str, Any]] = []
     module_results: list[dict[str, Any]] = []
     unit_stats: dict[str, dict[str, Any]] = {
@@ -10687,18 +11125,23 @@ def practice_random_test_done():
     }
     total_correct = 0
     total_questions = 0
+    scored_correct = 0
+    scored_total = 0
     for module_id in (1, 2):
-        module_answers = answers.get(str(module_id), {}) if isinstance(answers, dict) else {}
+        module_answers = answers.get(str(module_id), {})
         if not isinstance(module_answers, dict):
             module_answers = {}
         module_correct = 0
+        module_scored_correct = 0
+        module_scored_total = 0
         for idx, item in enumerate(modules[module_id]):
             q = item["q"]
             selected = str(module_answers.get(str(idx)) or "")
             key = str(q.get("correct_answer") or "")
             is_correct = response_is_correct(q, selected) is True if selected else False
+            is_omit = idx in omit_sets[module_id]
             unit_key = str(item.get("unit_key") or _word_problem_unit_key(item))
-            if unit_key in unit_stats:
+            if not is_omit and unit_key in unit_stats:
                 unit_stats[unit_key]["total"] += 1
                 if is_correct:
                     unit_stats[unit_key]["correct"] += 1
@@ -10706,6 +11149,12 @@ def practice_random_test_done():
                 module_correct += 1
                 total_correct += 1
             total_questions += 1
+            if not is_omit:
+                module_scored_total += 1
+                scored_total += 1
+                if is_correct:
+                    module_scored_correct += 1
+                    scored_correct += 1
             review.append(
                 {
                     "module_id": module_id,
@@ -10714,6 +11163,7 @@ def practice_random_test_done():
                     "selected": selected or "—",
                     "key": key or "—",
                     "is_correct": is_correct,
+                    "is_omit": is_omit,
                     "href": url_for("practice_random_test_question", module_id=module_id, step=idx),
                 }
             )
@@ -10725,6 +11175,12 @@ def practice_random_test_done():
                 "total": len(modules[module_id]),
                 "accuracy": round(100 * module_correct / len(modules[module_id])) if modules[module_id] else 0,
                 "wrong": len(modules[module_id]) - module_correct,
+                "scored_correct": module_scored_correct,
+                "scored_total": module_scored_total,
+                "scored_accuracy": (
+                    round(100 * module_scored_correct / module_scored_total) if module_scored_total else 0
+                ),
+                "omit_count": len(omit_sets[module_id]),
             }
         )
     unit_results: list[dict[str, Any]] = []
@@ -10739,24 +11195,40 @@ def practice_random_test_done():
         key=lambda unit: (unit["accuracy"], -unit["wrong"]),
         default=None,
     )
-    score = _random_test_score(total_correct)
+    if scored_total <= 0:
+        scored_total = RANDOM_TEST_SCORED_QUESTIONS
+    score = _random_test_sat_math_score(scored_correct=scored_correct, scored_total=scored_total)
     raw_accuracy = round(100 * total_correct / total_questions) if total_questions else 0
+    scored_accuracy = round(100 * scored_correct / scored_total, 1) if scored_total else 0.0
     score_pct = round(100 * (score - 200) / 600) if score >= 200 else 0
-    module_gap = abs(int(module_results[0]["correct"]) - int(module_results[1]["correct"])) if len(module_results) == 2 else 0
-    score_band = "Advanced" if score >= 700 else ("On Track" if score >= 600 else ("Building" if score >= 500 else "Needs Focus"))
+    module_gap = (
+        abs(int(module_results[0]["scored_correct"]) - int(module_results[1]["scored_correct"]))
+        if len(module_results) == 2
+        else 0
+    )
+    score_band = (
+        "Advanced"
+        if score >= 700
+        else ("On Track" if score >= 600 else ("Building" if score >= 500 else "Needs Focus"))
+    )
     module_ids = attempt.get("module_ids") if isinstance(attempt.get("module_ids"), dict) else {
         "1": [item.get("id") for item in modules.get(1) or []],
         "2": [item.get("id") for item in modules.get(2) or []],
     }
     exam_meta = {
-        "category_slug": "random-test",
+        "category_slug": "camp-test-9" if is_camp else "random-test",
         "seed": str(attempt.get("seed") or ""),
         "module_ids": module_ids,
+        "omits": omits,
         "score": score,
         "total_correct": total_correct,
         "total_questions": total_questions,
+        "scored_correct": scored_correct,
+        "scored_total": scored_total,
         "raw_accuracy": raw_accuracy,
+        "scored_accuracy": scored_accuracy,
         "score_band": score_band,
+        "is_camp_test9": is_camp,
     }
     try:
         _record_random_test_session_history(_learner_key(), modules, answers)
@@ -10783,7 +11255,12 @@ def practice_random_test_done():
         score_band=score_band,
         total_correct=total_correct,
         total_questions=total_questions,
+        scored_correct=scored_correct,
+        scored_total=scored_total,
         raw_accuracy=raw_accuracy,
+        scored_accuracy=scored_accuracy,
+        omits_per_module=RANDOM_TEST_OMITS_PER_MODULE,
+        omit_total=2 * RANDOM_TEST_OMITS_PER_MODULE,
         module_results=module_results,
         module_gap=module_gap,
         unit_results=unit_results,
@@ -10792,6 +11269,18 @@ def practice_random_test_done():
         target_700=max(0, 700 - score),
         review=review,
         session_summary_href=session_summary_href,
+        is_camp_test9=is_camp,
+        exam_label=exam_label,
+        intro_href=(
+            url_for("practice_camp_test9_intro")
+            if is_camp
+            else url_for("practice_random_test_intro")
+        ),
+        restart_action=(
+            url_for("practice_camp_test9_start")
+            if is_camp
+            else url_for("practice_random_test_start")
+        ),
     )
 
 
