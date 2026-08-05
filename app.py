@@ -3364,9 +3364,11 @@ def _cm_classroom_summary(db: sqlite3.Connection, material: dict[str, Any], sess
         for q in questions
     }
     question_count = len(questions)
+    material_phase = int(material.get("phase") or 0)
     is_phase3_dual44 = question_count == RANDOM_TEST_TOTAL_QUESTIONS
-    is_phase3_mock = (
-        question_count == PHASE3_MOCK_MODULE2_TOTAL or is_phase3_dual44
+    # Phase 3 mocks vary: classic 22Q Module 2, plus 20–26Q classroom sets (Tests I–II, VI–VIII).
+    is_phase3_mock = is_phase3_dual44 or (
+        material_phase == 3 and 18 <= question_count <= 30
     )
     sat_scores_for_avg: list[int] = []
     for uid, stat in student_stats.items():
@@ -3852,11 +3854,12 @@ def practice_course_material_classroom_my_sat_score_api(slug: str):
         if str(s.get("kind") or "") == "question"
     ]
     q_total = len(question_slides)
-    if q_total != PHASE3_MOCK_MODULE2_TOTAL:
+    material_phase = int(material.get("phase") or 0)
+    if material_phase != 3 or not (18 <= q_total <= 30):
         return jsonify(
             {
                 "ok": False,
-                "error": "this lesson is not a 22-question Module 2 mock",
+                "error": "this lesson is not a Phase 3 Module 2-style mock",
                 "question_total": q_total,
             }
         ), 400
@@ -5551,29 +5554,44 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "31.8"},
     ],
+    # Test II — 24Q import from Aug 2026 Bluebook screenshots (verified).
     "hard_20": [
-        {"correct_answer": "C"},
-        {"correct_answer": "B"},
-        {"correct_answer": "1360"},
-        {"correct_answer": "A"},
-        {"correct_answer": "12"},
-        {"correct_answer": "15435", "answer_alternates": ["15,435", "15435.0"]},
-        {"correct_answer": "D"},
-        {"correct_answer": "B"},
-        {"correct_answer": "2"},
-        {"correct_answer": "A"},
-        {"correct_answer": "B"},
-        {"correct_answer": "D"},
-        {"correct_answer": "93"},
-        {"correct_answer": "C"},
-        {"correct_answer": "D"},
-        {"correct_answer": "D"},
-        {"correct_answer": "B"},
-        {"correct_answer": "B"},
-        {"correct_answer": "C"},
-        {"correct_answer": "A"},
-        {"correct_answer": "D"},
-        {"correct_answer": "A"},
+        {"correct_answer": "C"},  # Q1 c=6
+        {"correct_answer": "630"},  # Q2
+        {
+            "correct_answer": "188.5",
+            "answer_alternates": ["188.50", "377/2", "188.5"],
+        },  # Q3
+        {"correct_answer": "D"},  # Q4 ~31.3%
+        {"correct_answer": "A"},  # Q5 t=-360 not possible
+        {"correct_answer": "C"},  # Q6 m=179
+        {"correct_answer": "D"},  # Q7 neither
+        {"correct_answer": "B"},  # Q8 a+b+c=11
+        {"correct_answer": "A"},  # Q9 4706%
+        {"correct_answer": "C"},  # Q10 cos=-1/2
+        {"correct_answer": "A"},  # Q11 k=1/12
+        {"correct_answer": "D"},  # Q12 38/15
+        {"correct_answer": "A"},  # Q13 ~209
+        {"correct_answer": "C"},  # Q14 p=900
+        {"correct_answer": "C"},  # Q15 1620-180w
+        {"correct_answer": "B"},  # Q16 16.3
+        {"correct_answer": "D"},  # Q17 factor x+2b
+        {"correct_answer": "13"},  # Q18 t=13
+        {
+            "correct_answer": "6.2",
+            "answer_alternates": ["31/5", "6.20"],
+        },  # Q19
+        {
+            "correct_answer": "-5/3",
+            "answer_alternates": ["-1.666", "-1.67", "-1.6667"],
+        },  # Q20
+        {"correct_answer": "22"},  # Q21 height
+        {"correct_answer": "A"},  # Q22 cylinder SA
+        {
+            "correct_answer": "1.5",
+            "answer_alternates": ["3/2", "1.50"],
+        },  # Q23 k
+        {"correct_answer": "C"},  # Q24 gear C = 200
     ],
     "hard_21": [
         {"correct_answer": "B"},
@@ -14190,11 +14208,7 @@ def _practice_session_summary_payload(
         else correct_count
     )
     phase3_sat: dict[str, Any] | None = None
-    if (
-        domain == "hard_problem"
-        and topic in PHASE3_PACE_TOPICS
-        and total_q == PHASE3_MOCK_MODULE2_TOTAL
-    ):
+    if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS and 18 <= total_q <= 30:
         m2_wrong = sum(
             1 for row in rows_out if row.get("status") in ("incorrect", "skipped")
         )

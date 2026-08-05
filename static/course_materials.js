@@ -493,7 +493,8 @@
   function isPhase3SatMockLesson() {
     if (!paceEnabled || !satScoreApi) return false;
     var n = phase3QuestionSlides().length;
-    return n === 22 || n === 44;
+    // Classic 22Q Module 2, variable 18–30Q Phase 3 sets, or full dual 44Q.
+    return (n >= 18 && n <= 30) || n === 44;
   }
 
   function phase3ModuleLabel(slide) {

@@ -167,7 +167,7 @@
           <div class="np-class-score-card-metrics">
             <div><em>Module 2</em><strong>{{ phase3.module2_correct }}/{{ q_total }}</strong><small>{{ phase3.module2_wrong }} wrong</small></div>
             <div><em>Module 1</em><strong>{{ phase3.module1_correct }}/22</strong><small>{% if phase3.module1_wrong %}{{ phase3.module1_wrong }} inferred{% else %}assumed clean{% endif %}</small></div>
-            <div><em>Raw</em><strong>{{ phase3.raw_correct }}/44</strong><small>combined</small></div>
+            <div><em>Raw</em><strong>{{ phase3.raw_correct }}/{{ phase3.raw_total if phase3.raw_total is defined else 44 }}</strong><small>combined</small></div>
           </div>
           {% endif %}
 
