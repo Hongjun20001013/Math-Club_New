@@ -1865,7 +1865,20 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27", "hard_28"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27", "hard_28", "hard_29"})
+# Display order for Phase 3 mock cards (Test I … Test X), independent of hard_N ids.
+PHASE3_TEST_ORDER: dict[str, int] = {
+    "hard_21": 1,
+    "hard_20": 2,
+    "hard_22": 3,
+    "hard_23": 4,
+    "hard_24": 5,
+    "hard_25": 6,
+    "hard_26": 7,
+    "hard_27": 8,
+    "hard_28": 9,
+    "hard_29": 10,
+}
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
 
@@ -4312,6 +4325,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_26": "banks/hard/hard_26.tex",
         "hard_27": "banks/hard/hard_27.tex",
         "hard_28": "banks/hard/hard_28.tex",
+        "hard_29": "banks/hard/hard_29.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4723,6 +4737,23 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "mimetype": "application/pdf",
         },
     },
+    "hard_29": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_29.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Test X — 24-question Bluebook-style mock.",
+            "download_name": "NovelPrep-Test-X-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_29_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Test X — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Test-X-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+
 }
 
 UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
@@ -5221,6 +5252,7 @@ TOPIC_TITLES = {
     "hard_26": "Test VII",
     "hard_27": "Test VIII",
     "hard_28": "Test IX · Module I + II",
+    "hard_29": "Test X",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5554,8 +5586,33 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "B"},
         {"correct_answer": "31.8"},
     ],
-    # Test II — 24Q import from Aug 2026 Bluebook screenshots (verified).
+        # Original Test II (22Q word-problem training).
     "hard_20": [
+        {"correct_answer": "C"},
+        {"correct_answer": "B"},
+        {"correct_answer": "1360"},
+        {"correct_answer": "A"},
+        {"correct_answer": "12"},
+        {"correct_answer": "15435", "answer_alternates": ["15,435", "15435.0"]},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "2"},
+        {"correct_answer": "A"},
+        {"correct_answer": "B"},
+        {"correct_answer": "D"},
+        {"correct_answer": "93"},
+        {"correct_answer": "C"},
+        {"correct_answer": "D"},
+        {"correct_answer": "D"},
+        {"correct_answer": "B"},
+        {"correct_answer": "B"},
+        {"correct_answer": "C"},
+        {"correct_answer": "A"},
+        {"correct_answer": "D"},
+        {"correct_answer": "A"},
+    ],
+    # Test X — 24Q Bluebook import (Aug 2026), formerly staged under hard_20.
+    "hard_29": [
         {"correct_answer": "C"},  # Q1 c=6
         {"correct_answer": "630"},  # Q2
         {
@@ -5592,8 +5649,7 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
             "answer_alternates": ["3/2", "1.50"],
         },  # Q23 k
         {"correct_answer": "C"},  # Q24 gear C = 200
-    ],
-    "hard_21": [
+    ],    "hard_21": [
         {"correct_answer": "B"},
         {"correct_answer": "31.8"},
         {"correct_answer": "B"},
@@ -9775,6 +9831,18 @@ def practice_challenge():
             else f"Hard Practice {set_roman}"
         )
         pace_secs = _phase3_pace_seconds("hard_problem", topic)
+        is_phase3_test = topic in PHASE3_PACE_TOPICS
+        test_order = PHASE3_TEST_ORDER.get(topic)
+        if is_phase3_test and test_order is not None:
+            badge = f"T{test_order}"
+            tile_label = f"{display_title} · {display_total} Q"
+            group = "test"
+            range_bucket = 2
+        else:
+            badge = set_roman
+            tile_label = f"Practice {set_number} · {display_total} Q"
+            group = "practice"
+            range_bucket = 1
         hard_sets.append(
             {
                 "index": idx,
@@ -9802,14 +9870,24 @@ def practice_challenge():
                 ),
                 "status": "Continue" if answered else "Start",
                 "progress_state": progress_state,
-                "range_bucket": (set_number - 1) // 10 + 1,
+                "range_bucket": range_bucket,
+                "group": group,
+                "badge": badge,
+                "tile_label": tile_label,
+                "test_order": test_order or 0,
                 "is_live": display_total > 0,
                 "materials": materials,
                 "pace_training": bool(pace_secs),
                 "pace_seconds": int(pace_secs or 0),
                 "is_dual_module_mock": is_test_ix_dual,
+                "is_phase3_test": is_phase3_test,
             }
         )
+    practice_sets = [s for s in hard_sets if s.get("group") == "practice"]
+    test_sets = sorted(
+        [s for s in hard_sets if s.get("group") == "test"],
+        key=lambda s: (s.get("test_order") or 99, s.get("set_number") or 0),
+    )
     total_questions = sum(s["total"] for s in hard_sets)
     total_answered = sum(s["answered"] for s in hard_sets)
     hard_stats = {
@@ -9841,6 +9919,8 @@ def practice_challenge():
     return render_template(
         "practice_challenge.html",
         hard_sets=hard_sets,
+        practice_sets=practice_sets,
+        test_sets=test_sets,
         hard_stats=hard_stats,
         hard_drill_meta=_hard_drill_display_meta(),
         continue_set=continue_set,

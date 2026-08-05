@@ -720,6 +720,21 @@
         "SAT_Hard_Question_Part_28_PPT.pdf",
         "SAT_Hard_Question_Part_28.pdf"
       ]
+    },
+    {
+      "slug": "hard-question-29",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Mock Exam Training",
+      "section": "Test X",
+      "title": "Test X",
+      "tex_candidates": [
+        "SAT_Hard_Question_29_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_29_PPT.pdf",
+        "SAT_Hard_Question_Part_29.pdf"
+      ]
     }
   ]
 }

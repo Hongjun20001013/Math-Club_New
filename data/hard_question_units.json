@@ -1,6 +1,6 @@
 {
   "_schema": "SAT Hard Practice unit tags — U1 Algebra, U2 Advanced Math, U3 Problem Solving & Data, U4 Geometry",
-  "_notes": "Audited against hard_1–hard_16 plus hard_21 Phase 3 Test I and hard_20 Test II 24Q Bluebook import (Aug 2026). Test IX (hard_28) Module II bank stays 22Q; full dual-module 44Q deck is SAT_Hard_Question_28_PPT.tex (Module I specialized + Module II). Future Test X / hard_29 must ship as Module I + Module II from first import.",
+  "_notes": "Audited against hard_1–hard_16 plus hard_21 Phase 3 Test I and hard_20 original Test II (22Q); hard_29 Test X 24Q Bluebook import (Aug 2026). Test IX (hard_28) Module II bank stays 22Q; full dual-module 44Q deck is SAT_Hard_Question_28_PPT.tex (Module I specialized + Module II). Future Test X / hard_29 must ship as Module I + Module II from first import.",
   "hard_1": [
     {
       "unit": "U2",
@@ -739,100 +739,92 @@
   ],
   "hard_20": [
     {
-      "unit": "U1",
-      "skill": "Parametric point on a line"
-    },
-    {
       "unit": "U2",
-      "skill": "Absolute-value symmetry / evaluation"
-    },
-    {
-      "unit": "U2",
-      "skill": "Factoring / solve for parameter"
-    },
-    {
-      "unit": "U2",
-      "skill": "Exponential percent decrease"
-    },
-    {
-      "unit": "U1",
-      "skill": "Parallel lines / no solution"
-    },
-    {
-      "unit": "U2",
-      "skill": "Square-root function zeros"
-    },
-    {
-      "unit": "U2",
-      "skill": "Y-intercept form recognition"
-    },
-    {
-      "unit": "U2",
-      "skill": "Rational function asymptote and zeros"
-    },
-    {
-      "unit": "U3",
-      "skill": "Percent of a percent"
+      "skill": "Exponential growth model / percent greater"
     },
     {
       "unit": "U4",
-      "skill": "Unit circle coterminal angle"
+      "skill": "Cofunction identity / acute angles"
+    },
+    {
+      "unit": "U4",
+      "skill": "Parallel lines / angle expressions"
     },
     {
       "unit": "U2",
-      "skill": "Sum of roots / parameter k"
+      "skill": "Exponential rewrite / quarter years"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic product of roots"
+    },
+    {
+      "unit": "U2",
+      "skill": "Quadratic scaling / breaking strength"
     },
     {
       "unit": "U4",
-      "skill": "Right triangle altitude similarity"
+      "skill": "Cylinder wall volume"
     },
     {
       "unit": "U4",
-      "skill": "Pyramid surface area difference"
+      "skill": "Similar figures / corresponding angles"
     },
     {
-      "unit": "U3",
-      "skill": "Percent greater comparison"
+      "unit": "U4",
+      "skill": "Radian–degree conversion"
     },
     {
       "unit": "U1",
-      "skill": "Piecewise linear population model"
-    },
-    {
-      "unit": "U3",
-      "skill": "Unit conversion rates"
-    },
-    {
-      "unit": "U2",
-      "skill": "Polynomial factor theorem"
+      "skill": "Linear relationship from table"
     },
     {
       "unit": "U1",
-      "skill": "Linear system no solution"
+      "skill": "Linear depreciation model"
     },
     {
-      "unit": "U2",
-      "skill": "Product of roots with radical"
-    },
-    {
-      "unit": "U4",
-      "skill": "Unit circle cotangent"
-    },
-    {
-      "unit": "U4",
-      "skill": "Pyramid height from surface area"
-    },
-    {
-      "unit": "U4",
-      "skill": "Cylinder total surface area"
-    },
-    {
-      "unit": "U4",
-      "skill": "Similar triangles / parallel segment"
+      "unit": "U1",
+      "skill": "Linear inequality word problem"
     },
     {
       "unit": "U3",
-      "skill": "Gear ratio / rpm"
+      "skill": "Percent composition / totals"
+    },
+    {
+      "unit": "U3",
+      "skill": "Margin of error interval"
+    },
+    {
+      "unit": "U4",
+      "skill": "Perimeter modeling"
+    },
+    {
+      "unit": "U3",
+      "skill": "Sampling / generalizability"
+    },
+    {
+      "unit": "U3",
+      "skill": "Weighted mean"
+    },
+    {
+      "unit": "U3",
+      "skill": "Median after outlier removal"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar solids / surface area"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential growth / compound interest model"
+    },
+    {
+      "unit": "U4",
+      "skill": "Triangle angles / sine-cosine comparison"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function composition / evaluation"
     }
   ],
   "hard_21": [
@@ -1573,6 +1565,104 @@
     {
       "unit": "U4",
       "skill": "Right triangle trigonometry"
+    }
+  ],
+  "hard_29": [
+    {
+      "unit": "U1",
+      "skill": "Parametric point on a line"
+    },
+    {
+      "unit": "U2",
+      "skill": "Absolute-value symmetry / evaluation"
+    },
+    {
+      "unit": "U2",
+      "skill": "Factoring / solve for parameter"
+    },
+    {
+      "unit": "U2",
+      "skill": "Exponential percent decrease"
+    },
+    {
+      "unit": "U1",
+      "skill": "Parallel lines / no solution"
+    },
+    {
+      "unit": "U2",
+      "skill": "Square-root function zeros"
+    },
+    {
+      "unit": "U2",
+      "skill": "Y-intercept form recognition"
+    },
+    {
+      "unit": "U2",
+      "skill": "Rational function asymptote and zeros"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent of a percent"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle coterminal angle"
+    },
+    {
+      "unit": "U2",
+      "skill": "Sum of roots / parameter k"
+    },
+    {
+      "unit": "U4",
+      "skill": "Right triangle altitude similarity"
+    },
+    {
+      "unit": "U4",
+      "skill": "Pyramid surface area difference"
+    },
+    {
+      "unit": "U3",
+      "skill": "Percent greater comparison"
+    },
+    {
+      "unit": "U1",
+      "skill": "Piecewise linear population model"
+    },
+    {
+      "unit": "U3",
+      "skill": "Unit conversion rates"
+    },
+    {
+      "unit": "U2",
+      "skill": "Polynomial factor theorem"
+    },
+    {
+      "unit": "U1",
+      "skill": "Linear system no solution"
+    },
+    {
+      "unit": "U2",
+      "skill": "Product of roots with radical"
+    },
+    {
+      "unit": "U4",
+      "skill": "Unit circle cotangent"
+    },
+    {
+      "unit": "U4",
+      "skill": "Pyramid height from surface area"
+    },
+    {
+      "unit": "U4",
+      "skill": "Cylinder total surface area"
+    },
+    {
+      "unit": "U4",
+      "skill": "Similar triangles / parallel segment"
+    },
+    {
+      "unit": "U3",
+      "skill": "Gear ratio / rpm"
     }
   ]
 }

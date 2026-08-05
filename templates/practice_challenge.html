@@ -73,27 +73,15 @@
       </header>
 
       <div class="np-hard-studio-meta">
-        {% if hard_sets|length > 10 %}
-        <div class="np-hard-studio-ranges" role="group" aria-label="Practice range">
-          <button type="button" class="is-active" data-hard-range="all">All sets</button>
-          <button type="button" data-hard-range="1">I–X</button>
-          <button type="button" data-hard-range="2">XI–{{ hard_sets[-1].roman if hard_sets else 'X' }}</button>
-          {% if hard_sets|length > 20 %}
-          <button type="button" data-hard-range="3">21+</button>
-          {% endif %}
+        <div class="np-hard-studio-ranges" role="group" aria-label="Set type">
+          <button type="button" class="is-active" data-hard-range="all">All</button>
+          <button type="button" data-hard-range="1">Practice</button>
+          <button type="button" data-hard-range="2">Tests</button>
         </div>
-        {% endif %}
-        <nav class="np-hard-quick-nav np-hard-quick-nav--sets" aria-label="Jump to a practice set">
-          {% if hard_sets|length > 10 %}
-          <div class="np-hard-quick-nav-divider"><span>I – X</span></div>
-          {% endif %}
-          {% for set in hard_sets %}
-          {% if set.set_number == 11 and hard_sets|length > 10 %}
-          <div class="np-hard-quick-nav-divider"><span>XI – {{ hard_sets[-1].roman if hard_sets else 'X' }}</span></div>
-          {% endif %}
-          {% if set.set_number == 16 %}
-          <div class="np-hard-quick-nav-divider"><span>XVI</span></div>
-          {% endif %}
+        <nav class="np-hard-quick-nav np-hard-quick-nav--sets" aria-label="Jump to a set">
+          {% if practice_sets %}
+          <div class="np-hard-quick-nav-divider"><span>Practice I–XVI</span></div>
+          {% for set in practice_sets %}
           <button
             type="button"
             class="np-hard-quick-nav-btn np-hard-quick-nav-btn--{{ set.progress_state }}"
@@ -102,11 +90,29 @@
             data-range="{{ set.range_bucket }}"
             aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
           >
-            <strong>{% if set.topic == 'hard_20' %}T2{% elif set.topic == 'hard_21' %}T1{% elif set.topic == 'hard_22' %}T3{% elif set.topic == 'hard_23' %}T4{% elif set.topic == 'hard_24' %}T5{% elif set.topic == 'hard_25' %}T6{% elif set.topic == 'hard_26' %}T7{% elif set.topic == 'hard_27' %}T8{% elif set.topic == 'hard_28' %}T9{% else %}{{ set.roman }}{% endif %}</strong>
-            <span>{% if set.topic == 'hard_20' %}Test II{% elif set.topic == 'hard_21' %}Test I{% elif set.topic == 'hard_22' %}Test III{% elif set.topic == 'hard_23' %}Test IV{% elif set.topic == 'hard_24' %}Test V{% elif set.topic == 'hard_25' %}Test VI{% elif set.topic == 'hard_26' %}Test VII{% elif set.topic == 'hard_27' %}Test VIII{% elif set.topic == 'hard_28' %}Test IX · I+II{% else %}Practice {{ set.set_number }}{% endif %}</span>
+            <strong>{{ set.badge }}</strong>
+            <span>Practice {{ set.set_number }}</span>
             <em>{{ set.answered }}/{{ set.total }} · {{ set.total }} Q</em>
           </button>
           {% endfor %}
+          {% endif %}
+          {% if test_sets %}
+          <div class="np-hard-quick-nav-divider"><span>Mock Tests T1–T{{ test_sets|length }}</span></div>
+          {% for set in test_sets %}
+          <button
+            type="button"
+            class="np-hard-quick-nav-btn np-hard-quick-nav-btn--{{ set.progress_state }}"
+            data-quick-index="{{ set.index }}"
+            data-set-number="{{ set.set_number }}"
+            data-range="{{ set.range_bucket }}"
+            aria-label="Jump to {{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+          >
+            <strong>{{ set.badge }}</strong>
+            <span>{{ set.title }}</span>
+            <em>{{ set.answered }}/{{ set.total }} · {{ set.total }} Q</em>
+          </button>
+          {% endfor %}
+          {% endif %}
         </nav>
         <div class="np-hard-studio-meta-row">
         <div class="np-hard-studio-legend" aria-hidden="true">
@@ -119,39 +125,96 @@
 
       <div class="np-hard-studio-layout">
         <div class="np-hard-studio-picker">
-          <div class="np-hard-picker-grid" data-hard-picker role="listbox" aria-label="Choose a practice set">
-            {% for set in hard_sets %}
-            <button
-              type="button"
-              class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.set_number >= 15 %} np-hard-picker-tile--featured{% endif %}"
-              data-hard-tile
-              data-index="{{ set.index }}"
-              data-set-number="{{ set.set_number }}"
-              data-roman="{{ set.roman }}"
-              data-title="{{ set.title }}"
-              data-topic="{{ set.topic }}"
-              data-state="{{ set.progress_state }}"
-              data-range="{{ set.range_bucket }}"
-              data-href="{{ set.href }}"
-              data-restart="{{ set.restart_href }}"
-              data-status="{{ set.status if set.progress_state != 'done' else 'Review' }}"
-              data-subtitle="{{ set.subtitle }}"
-              data-answered="{{ set.answered }}"
-              data-total="{{ set.total }}"
-              data-progress="{{ set.progress_pct }}"
-              data-pace="{% if set.pace_training %}1:35 / question{% endif %}"
-              {% if set.materials %}data-materials='{{ set.materials|tojson }}'{% endif %}
-              role="option"
-              aria-selected="false"
-              aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
-              style="--tile-progress: {{ set.progress_pct }}%;"
-            >
-              <span class="np-hard-picker-roman">{% if set.topic == 'hard_20' %}T2{% elif set.topic == 'hard_21' %}T1{% elif set.topic == 'hard_22' %}T3{% elif set.topic == 'hard_23' %}T4{% elif set.topic == 'hard_24' %}T5{% elif set.topic == 'hard_25' %}T6{% elif set.topic == 'hard_26' %}T7{% elif set.topic == 'hard_27' %}T8{% elif set.topic == 'hard_28' %}T9{% else %}{{ set.roman }}{% endif %}</span>
-              <span class="np-hard-picker-num">{% if set.topic == 'hard_20' %}Test II · {{ set.total }} Q{% elif set.topic == 'hard_21' %}Test I · {{ set.total }} Q{% elif set.topic == 'hard_22' %}Test III · {{ set.total }} Q{% elif set.topic == 'hard_23' %}Test IV · {{ set.total }} Q{% elif set.topic == 'hard_24' %}Test V · {{ set.total }} Q{% elif set.topic == 'hard_25' %}Test VI · {{ set.total }} Q{% elif set.topic == 'hard_26' %}Test VII · {{ set.total }} Q{% elif set.topic == 'hard_27' %}Test VIII · {{ set.total }} Q{% elif set.topic == 'hard_28' %}Test IX · Module I+II · {{ set.total }} Q{% else %}Practice {{ set.set_number }} · {{ set.total }} Q{% endif %}</span>
-              <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
-              <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
-            </button>
-            {% endfor %}
+          <div class="np-hard-picker-stack" data-hard-picker role="listbox" aria-label="Choose a practice or mock test set">
+            {% if practice_sets %}
+            <div class="np-hard-picker-section" data-hard-section="practice">
+              <div class="np-hard-picker-section-head">
+                <h3>Practice sets</h3>
+                <p>Hard drills I–XVI · skill building</p>
+              </div>
+              <div class="np-hard-picker-grid">
+                {% for set in practice_sets %}
+                <button
+                  type="button"
+                  class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }}{% if set.set_number >= 15 %} np-hard-picker-tile--featured{% endif %}"
+                  data-hard-tile
+                  data-index="{{ set.index }}"
+                  data-set-number="{{ set.set_number }}"
+                  data-roman="{{ set.roman }}"
+                  data-badge="{{ set.badge }}"
+                  data-title="{{ set.title }}"
+                  data-topic="{{ set.topic }}"
+                  data-state="{{ set.progress_state }}"
+                  data-range="{{ set.range_bucket }}"
+                  data-group="{{ set.group }}"
+                  data-href="{{ set.href }}"
+                  data-restart="{{ set.restart_href }}"
+                  data-status="{{ set.status if set.progress_state != 'done' else 'Review' }}"
+                  data-subtitle="{{ set.subtitle }}"
+                  data-answered="{{ set.answered }}"
+                  data-total="{{ set.total }}"
+                  data-progress="{{ set.progress_pct }}"
+                  data-pace="{% if set.pace_training %}1:35 / question{% endif %}"
+                  {% if set.materials %}data-materials='{{ set.materials|tojson }}'{% endif %}
+                  role="option"
+                  aria-selected="false"
+                  aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+                  style="--tile-progress: {{ set.progress_pct }}%;"
+                >
+                  <span class="np-hard-picker-roman">{{ set.badge }}</span>
+                  <span class="np-hard-picker-num">{{ set.tile_label }}</span>
+                  <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
+                  <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            {% if test_sets %}
+            <div class="np-hard-picker-section np-hard-picker-section--tests" data-hard-section="tests">
+              <div class="np-hard-picker-section-head">
+                <h3>Mock tests</h3>
+                <p>Phase 3 classroom mocks · paced like Digital SAT Module 2</p>
+              </div>
+              <div class="np-hard-picker-grid">
+                {% for set in test_sets %}
+                <button
+                  type="button"
+                  class="np-hard-picker-tile np-hard-picker-tile--{{ set.progress_state }} np-hard-picker-tile--test{% if set.is_dual_module_mock %} np-hard-picker-tile--featured{% endif %}"
+                  data-hard-tile
+                  data-index="{{ set.index }}"
+                  data-set-number="{{ set.set_number }}"
+                  data-roman="{{ set.roman }}"
+                  data-badge="{{ set.badge }}"
+                  data-title="{{ set.title }}"
+                  data-topic="{{ set.topic }}"
+                  data-state="{{ set.progress_state }}"
+                  data-range="{{ set.range_bucket }}"
+                  data-group="{{ set.group }}"
+                  data-href="{{ set.href }}"
+                  data-restart="{{ set.restart_href }}"
+                  data-status="{{ set.status if set.progress_state != 'done' else 'Review' }}"
+                  data-subtitle="{{ set.subtitle }}"
+                  data-answered="{{ set.answered }}"
+                  data-total="{{ set.total }}"
+                  data-progress="{{ set.progress_pct }}"
+                  data-pace="{% if set.pace_training %}1:35 / question{% endif %}"
+                  {% if set.materials %}data-materials='{{ set.materials|tojson }}'{% endif %}
+                  role="option"
+                  aria-selected="false"
+                  aria-label="{{ set.title }}, {{ set.answered }} of {{ set.total }} answered"
+                  style="--tile-progress: {{ set.progress_pct }}%;"
+                >
+                  <span class="np-hard-picker-roman">{{ set.badge }}</span>
+                  <span class="np-hard-picker-num">{{ set.tile_label }}</span>
+                  <span class="np-hard-picker-bar" aria-hidden="true"><i></i></span>
+                  <span class="np-hard-picker-meta">{{ set.answered }}/{{ set.total }}</span>
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
           </div>
           <p class="np-hard-picker-empty" data-hard-empty hidden>No sets in this filter.</p>
           <p class="np-hard-picker-tip">Tip: use arrow keys to move between sets, Enter to begin.</p>
@@ -348,17 +411,7 @@
       }, 220);
     }
     var setTitle = tile.getAttribute("data-title") || ("Hard Practice " + roman);
-    var topic = tile.getAttribute("data-topic") || "";
-    if (topic === "hard_20") badge.textContent = "T2";
-    else if (topic === "hard_21") badge.textContent = "T1";
-    else if (topic === "hard_22") badge.textContent = "T3";
-    else if (topic === "hard_23") badge.textContent = "T4";
-    else if (topic === "hard_24") badge.textContent = "T5";
-    else if (topic === "hard_25") badge.textContent = "T6";
-    else if (topic === "hard_26") badge.textContent = "T7";
-    else if (topic === "hard_27") badge.textContent = "T8";
-    else if (topic === "hard_28") badge.textContent = "T9";
-    else badge.textContent = roman;
+    badge.textContent = tile.getAttribute("data-badge") || roman;
     kicker.textContent = setTitle;
     title.textContent = setTitle;
     subtitle.textContent = tile.getAttribute("data-subtitle") || "";
@@ -391,6 +444,10 @@
       var show = tileMatches(tile);
       tile.hidden = !show;
       if (show) visible.push(tile);
+    });
+    library.querySelectorAll("[data-hard-section]").forEach(function (section) {
+      var any = section.querySelector("[data-hard-tile]:not([hidden])");
+      section.hidden = !any;
     });
     if (emptyEl) emptyEl.hidden = visible.length !== 0;
     if (!activeTile || activeTile.hidden) {

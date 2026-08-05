@@ -23149,6 +23149,40 @@ html[data-exam-theme="dark"] .np-admin-page .np-admin-record-row--head {
     min-width: 0;
 }
 
+.np-hard-picker-stack {
+    display: grid;
+    gap: 28px;
+}
+
+.np-hard-picker-section-head {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.np-hard-picker-section-head h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+    color: #2c2548;
+}
+
+.np-hard-picker-section-head p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #7a7396;
+}
+
+.np-hard-picker-section--tests .np-hard-picker-section-head h3 {
+    color: #4f32f0;
+}
+
+.np-hard-picker-tile--test {
+    border-color: rgba(79, 50, 240, 0.2);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 241, 255, 0.94));
+}
+
 .np-hard-picker-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
