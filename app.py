@@ -2471,12 +2471,24 @@ def _sync_course_materials_with_disk(payload: dict[str, Any]) -> dict[str, Any]:
 
 def _sanitize_course_slide_html(html: str) -> str:
     """Convert common LaTeX leftovers that otherwise show as raw text in the viewer."""
-    if not html or "\\" not in html:
+    if not html or ("\\" not in html and "$" not in html and "&#36;" not in html):
         return html
     import re
 
     html = re.sub(r"\\textbf\{([^{}]*)\}", r"<strong>\1</strong>", html)
     html = re.sub(r"\\(?:textit|emph)\{([^{}]*)\}", r"<em>\1</em>", html)
+    # Collapse accidental double wraps: \(\(\$9\)\) / \(\(\$1,170\)\).
+    html = re.sub(
+        r"\\\(\\\(\\?\\\$([\d,.]+)\\\)\\\)",
+        r"\\(\\$\1\\)",
+        html,
+    )
+    # Repair split amounts: \(\$1\),170 or \(\$1\){,}170 → \(\$1,170\).
+    html = re.sub(
+        r"\\\(\\?\\\$(\d+)\\\)(?:\{,\}|,)(\d{3})",
+        r"\\(\\$\1,\2\\)",
+        html,
+    )
     html = re.sub(r"&#36;(\d[\d,]*)", r"\\(\\$\1\\)", html)
     # Bare currency dollars outside math (pair as $220…$400 and swallow prose).
     html = re.sub(

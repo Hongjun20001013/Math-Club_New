@@ -117,16 +117,27 @@ def clean_math(text: str) -> str:
     # Currency amounts: never leave bare $ in HTML — browsers decode &#36; to $, and
     # any $...$ pass (or MathJax dollar delimiters) will swallow the sentence.
     # Emit \(\$220\) so the dollar is TeX-escaped inside MathJax.
+    # Support \$1{,}170 and already-wrapped \(\$1{,}170\) without double-wrapping.
     currency_vault: list[str] = []
+    _currency_amount = r"(?:\d+(?:\{,\}\d{3})+(?:\.\d+)?|\d[\d,]*(?:\.\d+)?)"
 
-    def _shield_currency(match: re.Match[str]) -> str:
-        amount = match.group(1)
+    def _store_currency(amount: str) -> str:
+        amount = amount.replace("{,}", ",")
         idx = len(currency_vault)
         currency_vault.append(rf"\(\${amount}\)")
         return f"%%CMCURL{idx}%%"
 
-    text = re.sub(r"&#36;(\d[\d,]*)", _shield_currency, text)
-    text = re.sub(r"\\\$(\d[\d,]*)", _shield_currency, text)
+    def _shield_currency(match: re.Match[str]) -> str:
+        return _store_currency(match.group(1))
+
+    # Already in math: \(\$750\) / \(\$1{,}170\) — shield the whole span first.
+    text = re.sub(
+        rf"\\\(\\?\\\$({_currency_amount})\\\)",
+        _shield_currency,
+        text,
+    )
+    text = re.sub(rf"&#36;({_currency_amount})", _shield_currency, text)
+    text = re.sub(rf"\\\$({_currency_amount})", _shield_currency, text)
     # Remaining text-mode \$ (rare lone dollars).
     text = text.replace(r"\$", "&#36;")
     # Display math first to avoid being consumed by inline conversion.
