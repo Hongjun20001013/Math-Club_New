@@ -488,7 +488,7 @@
       "unit_name": "Hard Question Drills",
       "section": "Set 10",
       "title": "SAT Hard Question 10",
-        "tex_candidates": [
+      "tex_candidates": [
         "SAT_Hard_Question_10_PPT.tex"
       ],
       "pdf_candidates": [
@@ -734,6 +734,21 @@
       "pdf_candidates": [
         "SAT_Hard_Question_Part_29_PPT.pdf",
         "SAT_Hard_Question_Part_29.pdf"
+      ]
+    },
+    {
+      "slug": "hard-question-30",
+      "phase": 3,
+      "unit": 1,
+      "unit_name": "Mock Exam Training",
+      "section": "Final Review",
+      "title": "Final Review",
+      "tex_candidates": [
+        "SAT_Hard_Question_30_PPT.tex"
+      ],
+      "pdf_candidates": [
+        "SAT_Hard_Question_Part_30_PPT.pdf",
+        "SAT_Hard_Question_Part_30.pdf"
       ]
     }
   ]

@@ -1865,7 +1865,7 @@ def _placement_timer_seconds(topic: str) -> int:
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
 PHASE3_PACE_SECONDS = 95  # 1 minute 35 seconds per question
-PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27", "hard_28", "hard_29"})
+PHASE3_PACE_TOPICS = frozenset({"hard_20", "hard_21", "hard_22", "hard_23", "hard_24", "hard_25", "hard_26", "hard_27", "hard_28", "hard_29", "hard_30"})
 # Display order for Phase 3 mock cards (Test I … Test X), independent of hard_N ids.
 PHASE3_TEST_ORDER: dict[str, int] = {
     "hard_21": 1,
@@ -1878,6 +1878,7 @@ PHASE3_TEST_ORDER: dict[str, int] = {
     "hard_27": 8,
     "hard_28": 9,
     "hard_29": 10,
+    "hard_30": 11,
 }
 PHASE3_MOCK_MODULE2_TOTAL = 22
 
@@ -4326,6 +4327,7 @@ BANKS: Dict[str, Dict[str, str]] = {
         "hard_27": "banks/hard/hard_27.tex",
         "hard_28": "banks/hard/hard_28.tex",
         "hard_29": "banks/hard/hard_29.tex",
+        "hard_30": "banks/hard/hard_30.tex",
     },
     # Course placement (Algebra I/II vs Precalculus vs Calc AB) — see /placement and data/placement_meta.json
     "placement": {
@@ -4750,6 +4752,22 @@ HARD_PRACTICE_MATERIALS: Dict[str, Dict[str, Dict[str, str]]] = {
             "label": "Teaching slides",
             "description": "Test X — classroom slide deck with answers.",
             "download_name": "NovelPrep-Test-X-Slides.pdf",
+            "mimetype": "application/pdf",
+        },
+    },
+    "hard_30": {
+        "paper_pdf": {
+            "path": "SAT_Hard_Question_Part_30.pdf",
+            "label": "Student worksheet PDF",
+            "description": "Phase 3 Final Review — 11 full-SAT review questions.",
+            "download_name": "NovelPrep-Phase3-Final-Review-Worksheet.pdf",
+            "mimetype": "application/pdf",
+        },
+        "slides_pdf": {
+            "path": "SAT_Hard_Question_Part_30_PPT.pdf",
+            "label": "Teaching slides",
+            "description": "Phase 3 Final Review — classroom slide deck with answers.",
+            "download_name": "NovelPrep-Phase3-Final-Review-Slides.pdf",
             "mimetype": "application/pdf",
         },
     },
@@ -5253,6 +5271,7 @@ TOPIC_TITLES = {
     "hard_27": "Test VIII",
     "hard_28": "Test IX · Module I + II",
     "hard_29": "Test X",
+    "hard_30": "Final Review",
     "psd_all": "Unit 3 – Problem Solving & Data (full bank)",
     "placement_full": "Upper school placement (Five-Gate Hybrid, Algebra–Calculus)",
     "enhanced_math_1": "Enhanced Math 1 / Math I placement",
@@ -5676,6 +5695,21 @@ HARD_ANSWER_KEYS: Dict[str, List[dict]] = {
         {"correct_answer": "A"},
         {"correct_answer": "-13"},
         {"correct_answer": "C"},
+    ],
+
+    # Phase 3 Final Review — 11Q Full SAT review set (Aug 2026).
+    "hard_30": [
+        {"correct_answer": "A"},  # Q1 k=171
+        {"correct_answer": "D"},  # Q2 b=20m-4√11
+        {"correct_answer": "C"},  # Q3 60 g
+        {"correct_answer": "A"},  # Q4 q=-6
+        {"correct_answer": "D"},  # Q5 4/45
+        {"correct_answer": "D"},  # Q6 37/sin Q
+        {"correct_answer": "C"},  # Q7 slope 60 per 100
+        {"correct_answer": "D"},  # Q8 4608
+        {"correct_answer": "60000", "answer_alternates": ["60,000", "60000.0"]},  # Q9 p
+        {"correct_answer": "C"},  # Q10 y≈0.8499
+        {"correct_answer": "D"},  # Q11 35π
     ],
     "hard_22": [
         {"correct_answer": "7744"},

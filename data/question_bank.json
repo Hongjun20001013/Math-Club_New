@@ -18869,6 +18869,161 @@
         "knowledge_section_title_en": "Problem Solving & Data",
         "hard_skill": "Gear ratio / rpm"
       }
+    ],
+    "hard_30": [
+      {
+        "stem": "<p>In the given equation, \\(k\\) is a constant. The equation has exactly one real solution. What is the value of \\(k\\)?</p>\n<div class=\"stem-math-block\">\\[\nx^{2} + \\bigl(\\sqrt{k - 3}\\bigr)x + 42 = 0\n\\]</div>",
+        "choices": [
+          "\\(171\\)",
+          "\\(168\\)",
+          "\\(165\\)",
+          "\\(45\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Quadratic discriminant / one real root"
+      },
+      {
+        "stem": "<p>In the given system of equations, \\(m\\) and \\(b\\) are negative constants. In the \\(xy\\)-plane, the graphs of the equations in the given system intersect at the point \\((-5, y)\\), where \\(y \\lt  0\\). Which expression represents the value of \\(b\\)?</p>\n<div class=\"stem-math-block\">\\[\n\\begin{aligned}\nx^{2} + y^{2} &= 36 \\\\\ny &= mx + \\dfrac{b}{4}\n\\end{aligned}\n\\]</div>",
+        "choices": [
+          "\\(-\\dfrac{5m}{4} + \\dfrac{\\sqrt{11}}{4}\\)",
+          "\\(\\dfrac{5m}{4} - \\dfrac{\\sqrt{11}}{4}\\)",
+          "\\(-20m + 4\\sqrt{11}\\)",
+          "\\(20m - 4\\sqrt{11}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Circle–line system / parameter"
+      },
+      {
+        "stem": "<p>A biologist mixed a solution that is \\(0.3\\%\\) sodium chloride by mass with a solution that is \\(0.15\\%\\) sodium chloride by mass to obtain a new solution, which has a mass of \\(80\\) grams and contains \\(0.21\\) grams of sodium chloride. How many grams of \\(0.3\\%\\) sodium chloride solution did the biologist use?</p>",
+        "choices": [
+          "\\(0.14\\)",
+          "\\(20\\)",
+          "\\(60\\)",
+          "\\(79.86\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Mixture / percent by mass"
+      },
+      {
+        "stem": "<p>The function \\(v\\) is defined by the equation</p>\n<div class=\"stem-math-block\">\\[\nv(x) = \\dfrac{x^{2} + bx + c}{(x + 5)(x - 19)},\n\\]</div>\n<p>where \\(b\\) and \\(c\\) are constants. In the \\(xy\\)-plane, the graph of \\(y = v(x)\\) passes through the points \\(\\bigl(0, \\dfrac{66}{95}\\bigr)\\) and \\((11, 0)\\). If \\(v(q) = 0\\), which of the following could be the value of \\(q\\)?</p>",
+        "choices": [
+          "\\(-6\\)",
+          "\\(-5\\)",
+          "\\(5\\)",
+          "\\(6\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "A",
+        "knowledge_section": "Unit 2",
+        "knowledge_section_title_en": "Advanced Math",
+        "hard_skill": "Rational function zeros"
+      },
+      {
+        "stem": "<div class=\"stem-math-block\">\\[\n\\dfrac{x}{5} + \\dfrac{y}{9} = \\dfrac{47}{45}\n\\]</div>\n<p>An engineer connects resistors in series, where the resistors in the series have a total resistance of \\(\\dfrac{47}{45}\\) ohms. In this series, there are \\(x\\) resistors of type A, which each have a resistance of \\(a\\) ohms, and \\(y\\) resistors of type B, which each have a resistance of \\(b\\) ohms. The given equation represents this situation. According to this equation, what is the positive difference between the value of \\(a\\) and the value of \\(b\\)?</p>",
+        "choices": [
+          "\\(47\\)",
+          "\\(4\\)",
+          "\\(\\dfrac{47}{45}\\)",
+          "\\(\\dfrac{4}{45}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Linear models / series resistance"
+      },
+      {
+        "stem": "<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p>",
+        "choices": [
+          "\\(37\\cos Q\\)",
+          "\\(37\\sin Q\\)",
+          "\\(\\dfrac{37}{\\cos Q}\\)",
+          "\\(\\dfrac{37}{\\sin Q}\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Right triangle trig"
+      },
+      {
+        "stem": "<p>A group of \\(10\\) gardeners recorded data on the germination rates of their tomato crop for one growing season. The scatterplot shows the relationship between the number of tomato seeds planted, \\(x\\), and the number of tomato seeds that germinated, \\(y\\), for each of the gardeners. A line of best fit is also shown.</p>\n<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f07_scatter.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>Which of the following is the best interpretation of the slope of the line of best fit in this context?</p>",
+        "choices": [
+          "The number of tomato seeds planted is predicted to increase by \\(60\\) seeds every \\(100\\) days.",
+          "The number of tomato seeds planted is predicted to increase by \\(300\\) seeds every \\(100\\) days.",
+          "The number of tomato seeds that germinate is predicted to increase by \\(60\\) seeds for every additional \\(100\\) tomato seeds that are planted.",
+          "The number of tomato seeds that germinate is predicted to increase by \\(300\\) seeds for every additional \\(100\\) tomato seeds that are planted."
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Scatterplot slope interpretation"
+      },
+      {
+        "stem": "<p>A rectangular banner has an area of \\(3,200\\) square inches. A copy of the banner is made in which the length and width of the original banner are each increased by \\(20\\%\\). What is the area of the copy, in square inches?</p>",
+        "choices": [
+          "\\(3,220\\)",
+          "\\(3,240\\)",
+          "\\(3,840\\)",
+          "\\(4,608\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent increase / area scale"
+      },
+      {
+        "stem": "<p>The mass of object A is \\(444\\%\\) of the mass of object B, and the mass of object A is \\(0.740\\%\\) of the mass of object C. If the mass of object C is \\(p\\%\\) of the mass of object B, what is the value of \\(p\\)?</p>",
+        "choices": [],
+        "question_kind": "free_response",
+        "correct_answer": "60000",
+        "answer_alternates": [
+          "60,000",
+          "60000.0"
+        ],
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Percent of a percent"
+      },
+      {
+        "stem": "<p>In \\(2013\\), Chloe earned \\(11\\%\\) more than in \\(2012\\), and in \\(2014\\) Chloe earned \\(6\\%\\) more than in \\(2013\\). If Chloe earned \\(y\\) times as much in \\(2012\\) as in \\(2014\\), which of the following is closest to the value of \\(y\\)?</p>",
+        "choices": [
+          "\\(0.5455\\)",
+          "\\(0.6600\\)",
+          "\\(0.8499\\)",
+          "\\(1.1766\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "C",
+        "knowledge_section": "Unit 3",
+        "knowledge_section_title_en": "Problem Solving & Data",
+        "hard_skill": "Compound percent change"
+      },
+      {
+        "stem": "<p>Point \\(F\\) lies on a unit circle in the \\(xy\\)-plane and has coordinates \\((1, 0)\\). Point \\(G\\) is the center of the circle and has coordinates \\((0, 0)\\). Point \\(H\\) also lies on the circle and has coordinates \\((-1, y)\\), where \\(y\\) is a constant. Which of the following could be the positive measure of angle \\(FGH\\), in radians?</p>",
+        "choices": [
+          "\\(\\dfrac{37\\pi}{2}\\)",
+          "\\(\\dfrac{39\\pi}{2}\\)",
+          "\\(34\\pi\\)",
+          "\\(35\\pi\\)"
+        ],
+        "question_kind": "mcq",
+        "correct_answer": "D",
+        "knowledge_section": "Unit 4",
+        "knowledge_section_title_en": "Geometry",
+        "hard_skill": "Unit circle coterminal angles"
+      }
     ]
   },
   "placement": {
