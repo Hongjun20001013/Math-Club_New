@@ -18942,7 +18942,7 @@
         "hard_skill": "Linear models / series resistance"
       },
       {
-        "stem": "<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p>",
+        "stem": "<p><img class=\"stem-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" /></p>\n<p>{\\footnotesize Note: Figure not drawn to scale.}</p>\n<p>In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p>",
         "choices": [
           "\\(37\\cos Q\\)",
           "\\(37\\sin Q\\)",

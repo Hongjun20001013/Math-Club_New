@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T00:32:45.762968Z",
+  "generated_at": "2026-08-07T00:50:38.890013Z",
   "total": 48,
   "available": 48,
   "materials": [
@@ -43757,7 +43757,7 @@
         {
           "index": 14,
           "title": "Question 6",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div>\n<div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 420px; max-height: 302px; object-fit: contain;\" /></div>\n<p>In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(37\\cos Q\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(37\\sin Q\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\dfrac{37}{\\cos Q}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\dfrac{37}{\\sin Q}\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div>\n<div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 420px; max-height: 302px; object-fit: contain;\" /></div>\n<p>Note: Figure not drawn to scale. In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(37\\cos Q\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(37\\sin Q\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\dfrac{37}{\\cos Q}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\dfrac{37}{\\sin Q}\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
           "interactive": true,
           "answer_index": 15,
@@ -43910,9 +43910,9 @@
       "prev_lesson_slug": "hard-question-29",
       "next_lesson_slug": null,
       "tex_available": true,
-      "pdf_available": false,
+      "pdf_available": true,
       "tex_file": "SAT_Hard_Question_30_PPT.tex",
-      "pdf_file": null,
+      "pdf_file": "SAT_Hard_Question_Part_30_PPT.pdf",
       "interactive_count": 11,
       "learn_count": 0,
       "practice_slide_count": 22,
@@ -44065,7 +44065,7 @@
           "kind": "question",
           "correct": "D",
           "answer_index": 15,
-          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div>\n<div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 420px; max-height: 302px; object-fit: contain;\" /></div>\n<p>In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p></div><div class=\"cm-question-interact\">",
+          "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Mark known angles and side relationships first, then use triangle or parallel-line facts.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div>\n<div class=\"cm-slide-figure\"><img class=\"stem-figure-img cm-slide-figure-img stem-figure-img--hard\" src=\"/static/hard/hard_30_f06_triangle.png\" alt=\"\" loading=\"lazy\" style=\"max-width: 420px; max-height: 302px; object-fit: contain;\" /></div>\n<p>Note: Figure not drawn to scale. In triangle \\(QRS\\) shown, \\(QR \\lt  RS\\). Which expression represents the length of \\(\\overline{QS}\\)?</p></div><div class=\"cm-question-interact\">",
           "choices": [
             {
               "letter": "A",
