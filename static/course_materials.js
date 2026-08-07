@@ -354,6 +354,7 @@
     section: "Lesson Section",
     intro: "Lesson Preview",
     content: "Lesson Path",
+    advice: "Final Advice",
     closing: "Wrap Up",
     score: "SAT Score"
   };
@@ -3899,7 +3900,7 @@
 
   function isCanvasSlide(slide) {
     var kind = slide.kind || "lesson";
-    return kind === "section" || kind === "closing" || kind === "intro" || kind === "content" || kind === "score";
+    return kind === "section" || kind === "closing" || kind === "intro" || kind === "content" || kind === "advice" || kind === "score";
   }
 
   function updateCoach(slide) {

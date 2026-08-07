@@ -1301,6 +1301,33 @@ button.cm-intro-chip:focus-visible {
         linear-gradient(175deg, #f5f3ff 0%, #ffffff 42%, #eef2ff 100%);
 }
 
+.cm-advice-canvas {
+    background:
+        radial-gradient(ellipse 78% 55% at 50% 0%, rgba(14, 165, 233, 0.18), transparent 58%),
+        radial-gradient(ellipse 48% 40% at 92% 88%, rgba(91, 77, 255, 0.14), transparent 56%),
+        linear-gradient(168deg, #f0f9ff 0%, #ffffff 40%, #f5f3ff 100%);
+}
+
+.cm-advice-title {
+    font-family: var(--cm-premium-serif);
+    background: linear-gradient(135deg, #0c4a6e 0%, #4338ca 55%, #1e1b4b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.cm-advice-kicker {
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.12);
+}
+
+.cm-advice-card {
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(14, 165, 233, 0.14);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
 /* ── Interactive blocks ── */
 .cm-mcq-choice {
     border-radius: 18px;

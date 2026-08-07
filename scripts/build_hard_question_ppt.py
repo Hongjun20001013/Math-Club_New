@@ -32,6 +32,108 @@ CLOSING_FRAME = r"""
 \end{frame}
 """.strip()
 
+# Last Phase 3 lesson (Final Review / hard_30): student advice before Thank You.
+PHASE3_FINAL_ADVICE_FRAMES = r"""
+\newcommand{\AdviceTip}[3]{%
+\noindent\begin{minipage}{\linewidth}
+\begin{tikzpicture}
+\node[
+  rounded corners=8pt,
+  fill=white,
+  draw=novelPurple!22,
+  line width=0.6pt,
+  inner xsep=10pt,
+  inner ysep=7pt,
+  text width=\dimexpr\linewidth-22pt\relax,
+  align=flush left
+] (card) {%
+  {\color{novelPurple}\bfseries\small #1~~#2}\\[0.15em]
+  {\scriptsize\textcolor{lightText}{#3}}%
+};
+\fill[novelPurple] (card.south west) rectangle ([xshift=3pt]card.north west);
+\end{tikzpicture}%
+\end{minipage}\vspace{0.22em}%
+}
+
+\begin{frame}[plain]{Final Advice · Phase 3}
+\begin{tikzpicture}[remember picture, overlay]
+  \shade[top color=softPurple!85, bottom color=white]
+    (current page.north west) rectangle (current page.south east);
+  \fill[novelPurple, opacity=0.08] ([yshift=-0.6cm]current page.north west)
+    rectangle ([yshift=-2.35cm]current page.north east);
+\end{tikzpicture}
+\vspace{0.15em}
+{\scriptsize\bfseries\textcolor{novelPurple}{PHASE 3 · LAST CLASS}}\\[0.2em]
+{\LARGE\bfseries\textcolor{purpleblue}{Final Advice}}\\[0.12em]
+{\footnotesize\textcolor{lightText}{Keep these habits with you after today.}}
+\vspace{0.55em}
+
+\AdviceTip{01}{Desmos is a tool, not a crutch}{%
+Use Desmos for graphs, points, or quick arithmetic --- not for every question.
+Many items are faster and safer with algebra or a short written setup.
+Solve by hand when you can; use Desmos to verify when unsure.}
+
+\AdviceTip{02}{Read the ask first, then harvest the stem}{%
+Start with the last line: what is the question asking?
+Then go line by line and ask, ``What math idea is this pointing to?''
+Each line often hints at a formula, ratio, or constraint.
+Capture the hints, choose a method, then compute.}
+
+\AdviceTip{03}{Build speed without giving up accuracy}{%
+Spend less time stuck on one item. Recognize the type and skill quickly.
+If you are spinning, mark it, move on, and return later.
+Accuracy first --- then faster recognition.}
+\end{frame}
+
+\begin{frame}[plain]{How to Prep From Here}
+\begin{tikzpicture}[remember picture, overlay]
+  \shade[top color=softPurple!85, bottom color=white]
+    (current page.north west) rectangle (current page.south east);
+  \fill[novelPurple, opacity=0.08] ([yshift=-0.6cm]current page.north west)
+    rectangle ([yshift=-2.35cm]current page.north east);
+\end{tikzpicture}
+\vspace{0.15em}
+{\scriptsize\bfseries\textcolor{novelPurple}{FROM HERE}}\\[0.2em]
+{\LARGE\bfseries\textcolor{purpleblue}{How to Prep}}\\[0.12em]
+{\footnotesize\textcolor{lightText}{Short, focused practice beats a long vague season.}}
+\vspace{0.45em}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\AdviceTip{04}{Keep prep focused}{%
+Use a short, concentrated block: drills, mocks, and review of misses.
+You already have enough Novel Prep questions for SAT Math --- find gaps and fix them.}
+\vspace{0.15em}
+\AdviceTip{05}{Close the loop}{%
+After each set, write 2--3 skills you missed.
+Drill those next --- not the whole book again.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\AdviceTip{06}{Manage the clock}{%
+Skip and return. Do not burn four minutes early on one hard problem.
+Easy and medium points first.}
+\vspace{0.15em}
+\AdviceTip{07}{Trust your method}{%
+Restate the ask, underline givens, eliminate choices, or plug in a number.
+The habits from class are enough --- use them calmly.}
+\end{column}
+\end{columns}
+
+\vspace{0.35em}
+\centering
+\begin{tikzpicture}
+\node[
+  rounded corners=10pt,
+  fill=novelPurple!12,
+  draw=novelPurple!28,
+  inner xsep=14pt,
+  inner ysep=7pt,
+  font=\small\itshape
+] {\textcolor{purpleblue}{Short prep. Clear method. Smart use of tools. You've got this.}};
+\end{tikzpicture}
+\end{frame}
+""".strip()
+
 # Optional longer explanations appended on Answer frames after the key.
 # Keyed by (set_num, question_number_1_based).
 ANSWER_EXPLAINS: dict[tuple[int, int], str] = {
@@ -347,6 +449,10 @@ def build_set(set_num: int) -> str:
         )
 
     parts.append("\n")
+    if set_num == 30:
+        parts.append("% --- Phase 3 final student advice ---\n")
+        parts.append(PHASE3_FINAL_ADVICE_FRAMES)
+        parts.append("\n")
     parts.append(CLOSING_FRAME)
     parts.append("\n\n\\end{document}\n")
     return "".join(parts)

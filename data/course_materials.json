@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T18:23:35.723945Z",
+  "generated_at": "2026-08-07T19:03:00.790088Z",
   "total": 48,
   "available": 48,
   "materials": [
@@ -43610,7 +43610,7 @@
       "section": "Final Review",
       "title": "Final Review",
       "deck_title": "Final Review",
-      "slide_count": 26,
+      "slide_count": 28,
       "slides": [
         {
           "index": 1,
@@ -43624,7 +43624,7 @@
         {
           "index": 2,
           "title": "Lesson outline",
-          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Course Material</p><h2 class=\"cm-content-title\">Final Review</h2><p class=\"cm-content-lede\">26 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Final Review</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
+          "html": "<div class=\"cm-content-canvas\"><div class=\"cm-content-bg\" aria-hidden=\"true\"><span class=\"cm-content-orb cm-content-orb--1\"></span><span class=\"cm-content-orb cm-content-orb--2\"></span><span class=\"cm-content-grid\"></span></div><div class=\"cm-content-inner\"><span class=\"cm-content-kicker\">Lesson outline</span><p class=\"cm-content-unit\">SAT Course Material</p><h2 class=\"cm-content-title\">Final Review</h2><p class=\"cm-content-lede\">28 slides · tap any section to jump there instantly.</p><ol class=\"cm-content-list\"><li><button type=\"button\" class=\"cm-content-item\" data-cm-jump-section=\"3\"><span class=\"cm-content-num\">01</span><span class=\"cm-content-copy\"><strong>Final Review</strong><span>Session 01 · jump to section start</span></span><span class=\"cm-content-arrow\" aria-hidden=\"true\">→</span></button></li></ol></div></div>",
           "kind": "content",
           "group": "divider",
           "section": "Introduction",
@@ -43899,8 +43899,26 @@
         },
         {
           "index": 26,
+          "title": "Final Advice · Phase 3",
+          "html": "<div class=\"cm-advice-canvas\"><div class=\"cm-advice-bg\" aria-hidden=\"true\"><span class=\"cm-advice-orb cm-advice-orb--1\"></span><span class=\"cm-advice-orb cm-advice-orb--2\"></span><span class=\"cm-advice-grid\"></span></div><div class=\"cm-advice-content\"><span class=\"cm-advice-kicker\">Phase 3 · Last class</span><h2 class=\"cm-advice-title\">Final Advice</h2><p class=\"cm-advice-lede\">Keep these habits with you after today.</p><div class=\"cm-advice-tips cm-advice-tips--stack\"><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">01</span><div class=\"cm-advice-copy\"><strong>Desmos is a tool, not a crutch</strong><p>Use Desmos for graphs, points, or quick arithmetic — not for every question. Many items are faster and safer with algebra. Solve by hand when you can; use Desmos to verify when unsure.</p></div></article><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">02</span><div class=\"cm-advice-copy\"><strong>Read the ask first, then harvest the stem</strong><p>Start with the last line: what is the question asking? Then go line by line and ask what math idea each sentence points to. Capture the hints, choose a method, then compute.</p></div></article><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">03</span><div class=\"cm-advice-copy\"><strong>Build speed without giving up accuracy</strong><p>Spend less time stuck on one item. Recognize the type and skill quickly. If you are spinning, mark it, move on, and return later. Accuracy first — then faster recognition.</p></div></article></div></div></div>",
+          "kind": "advice",
+          "group": "review",
+          "section": "Final Review",
+          "study_tip": "These are your takeaways from Phase 3 — save the habits that will matter on test day."
+        },
+        {
+          "index": 27,
+          "title": "How to Prep From Here",
+          "html": "<div class=\"cm-advice-canvas\"><div class=\"cm-advice-bg\" aria-hidden=\"true\"><span class=\"cm-advice-orb cm-advice-orb--1\"></span><span class=\"cm-advice-orb cm-advice-orb--2\"></span><span class=\"cm-advice-grid\"></span></div><div class=\"cm-advice-content\"><span class=\"cm-advice-kicker\">From here</span><h2 class=\"cm-advice-title\">How to Prep</h2><p class=\"cm-advice-lede\">Short, focused practice beats a long vague season.</p><div class=\"cm-advice-tips cm-advice-tips--grid\"><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">04</span><div class=\"cm-advice-copy\"><strong>Keep prep focused</strong><p>Use a short, concentrated block: drills, mocks, and review of misses. You already have enough Novel Prep questions — find gaps and fix them.</p></div></article><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">05</span><div class=\"cm-advice-copy\"><strong>Close the loop</strong><p>After each set, write 2–3 skills you missed. Drill those next — not the whole book again.</p></div></article><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">06</span><div class=\"cm-advice-copy\"><strong>Manage the clock</strong><p>Skip and return. Do not burn four minutes early on one hard problem. Easy and medium points first.</p></div></article><article class=\"cm-advice-card\"><span class=\"cm-advice-num\" aria-hidden=\"true\">07</span><div class=\"cm-advice-copy\"><strong>Trust your method</strong><p>Restate the ask, underline givens, eliminate choices, or plug in a number. The habits from class are enough — use them calmly.</p></div></article></div><p class=\"cm-advice-footer\"><em>Short prep. Clear method. Smart use of tools. You've got this.</em></p></div></div>",
+          "kind": "advice",
+          "group": "review",
+          "section": "Final Review",
+          "study_tip": "These are your takeaways from Phase 3 — save the habits that will matter on test day."
+        },
+        {
+          "index": 28,
           "title": "Thank You",
-          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 26 slides on <strong>Final Review</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Final Review</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
+          "html": "<div class=\"cm-closing-canvas\"><div class=\"cm-closing-bg\" aria-hidden=\"true\"><span class=\"cm-closing-orb cm-closing-orb--1\"></span><span class=\"cm-closing-orb cm-closing-orb--2\"></span><span class=\"cm-closing-orb cm-closing-orb--3\"></span><span class=\"cm-closing-shimmer\"></span></div><div class=\"cm-closing-content\"><div class=\"cm-closing-badge\" aria-hidden=\"true\"><svg class=\"cm-closing-ring\" viewBox=\"0 0 88 88\"><circle class=\"cm-closing-ring-track\" cx=\"44\" cy=\"44\" r=\"38\"></circle><circle class=\"cm-closing-ring-fill\" cx=\"44\" cy=\"44\" r=\"38\"></circle></svg><span class=\"cm-closing-check\">✓</span></div><p class=\"cm-closing-eyebrow\">Lesson complete</p><h2 class=\"cm-closing-title\">Outstanding work</h2><p class=\"cm-closing-sub\">You finished 28 slides on <strong>Final Review</strong>. We appreciate your time and focus.</p><div class=\"cm-closing-chips\"><span class=\"cm-closing-chip\">Final Review</span></div><footer class=\"cm-closing-footer\"><p class=\"cm-closing-thanks\">Thank you</p><div class=\"cm-closing-brand\"><span class=\"cm-closing-brand-mark\">N</span><div class=\"cm-closing-brand-copy\"><strong>Novel Prep</strong><span>Excellence in SAT Prep</span></div></div></footer></div></div>",
           "kind": "closing",
           "group": "review",
           "section": "Final Review",

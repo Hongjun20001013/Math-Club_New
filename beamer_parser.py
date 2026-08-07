@@ -966,6 +966,121 @@ def _format_beamer_html(text: str) -> str:
     return "\n".join(out)
 
 
+_ADVICE_DECKS: dict[str, dict[str, Any]] = {
+    "final advice": {
+        "kicker": "Phase 3 · Last class",
+        "title": "Final Advice",
+        "lede": "Keep these habits with you after today.",
+        "layout": "stack",
+        "tips": [
+            (
+                "01",
+                "Desmos is a tool, not a crutch",
+                "Use Desmos for graphs, points, or quick arithmetic — not for every question. "
+                "Many items are faster and safer with algebra. Solve by hand when you can; "
+                "use Desmos to verify when unsure.",
+            ),
+            (
+                "02",
+                "Read the ask first, then harvest the stem",
+                "Start with the last line: what is the question asking? Then go line by line "
+                "and ask what math idea each sentence points to. Capture the hints, choose a "
+                "method, then compute.",
+            ),
+            (
+                "03",
+                "Build speed without giving up accuracy",
+                "Spend less time stuck on one item. Recognize the type and skill quickly. "
+                "If you are spinning, mark it, move on, and return later. Accuracy first — "
+                "then faster recognition.",
+            ),
+        ],
+        "footer": "",
+    },
+    "how to prep": {
+        "kicker": "From here",
+        "title": "How to Prep",
+        "lede": "Short, focused practice beats a long vague season.",
+        "layout": "grid",
+        "tips": [
+            (
+                "04",
+                "Keep prep focused",
+                "Use a short, concentrated block: drills, mocks, and review of misses. "
+                "You already have enough Novel Prep questions — find gaps and fix them.",
+            ),
+            (
+                "05",
+                "Close the loop",
+                "After each set, write 2–3 skills you missed. Drill those next — "
+                "not the whole book again.",
+            ),
+            (
+                "06",
+                "Manage the clock",
+                "Skip and return. Do not burn four minutes early on one hard problem. "
+                "Easy and medium points first.",
+            ),
+            (
+                "07",
+                "Trust your method",
+                "Restate the ask, underline givens, eliminate choices, or plug in a number. "
+                "The habits from class are enough — use them calmly.",
+            ),
+        ],
+        "footer": "Short prep. Clear method. Smart use of tools. You've got this.",
+    },
+}
+
+
+def _advice_deck_key(title: str) -> str | None:
+    tl = (title or "").lower()
+    if "final advice" in tl:
+        return "final advice"
+    if "how to prep" in tl:
+        return "how to prep"
+    return None
+
+
+def _build_advice_html(title: str) -> str:
+    key = _advice_deck_key(title)
+    deck = _ADVICE_DECKS.get(key or "", _ADVICE_DECKS["final advice"])
+    layout = deck.get("layout") or "stack"
+    tips_html: list[str] = []
+    for num, tip_title, tip_body in deck["tips"]:
+        tips_html.append(
+            f'<article class="cm-advice-card">'
+            f'<span class="cm-advice-num" aria-hidden="true">{num}</span>'
+            f'<div class="cm-advice-copy">'
+            f"<strong>{tip_title}</strong>"
+            f"<p>{tip_body}</p>"
+            f"</div>"
+            f"</article>"
+        )
+    footer = deck.get("footer") or ""
+    footer_html = (
+        f'<p class="cm-advice-footer"><em>{footer}</em></p>' if footer else ""
+    )
+    return (
+        '<div class="cm-advice-canvas">'
+        '<div class="cm-advice-bg" aria-hidden="true">'
+        '<span class="cm-advice-orb cm-advice-orb--1"></span>'
+        '<span class="cm-advice-orb cm-advice-orb--2"></span>'
+        '<span class="cm-advice-grid"></span>'
+        "</div>"
+        '<div class="cm-advice-content">'
+        f'<span class="cm-advice-kicker">{deck["kicker"]}</span>'
+        f'<h2 class="cm-advice-title">{deck["title"]}</h2>'
+        f'<p class="cm-advice-lede">{deck["lede"]}</p>'
+        f'<div class="cm-advice-tips cm-advice-tips--{layout}">'
+        f'{"".join(tips_html)}'
+        "</div>"
+        f"{footer_html}"
+        "</div>"
+        "</div>"
+    )
+
+
 def _build_closing_html(
     body: str,
     *,
@@ -1986,6 +2101,8 @@ def _detect_slide_kind(title: str, plain: str, html: str) -> str:
         return "content"
     if "cm-section-divider" in html:
         return "section"
+    if "cm-advice-canvas" in html or _advice_deck_key(title):
+        return "advice"
     if "thank you" in t or "great work" in t or "cm-slide-closing" in html or "cm-closing-canvas" in html:
         return "closing"
     if (
@@ -2621,7 +2738,7 @@ def _slide_group(kind: str) -> str:
         return "learn"
     if kind in {"question", "practice", "answer", "solution"}:
         return "practice"
-    if kind == "closing":
+    if kind in {"closing", "advice"}:
         return "review"
     return "learn"
 
@@ -2632,6 +2749,8 @@ def _study_hint_for(kind: str, title: str, plain: str) -> str:
         return "This is your lesson overview — tap a section chip or press Next for the full outline."
     if kind == "content":
         return "Use this outline to jump straight to any section — great for review or picking up where you left off."
+    if kind == "advice":
+        return "These are your takeaways from Phase 3 — save the habits that will matter on test day."
     if kind == "concept":
         return "Focus on definitions and vocabulary — SAT questions often test whether you recognize the form of an equation."
     if kind == "example":
@@ -3227,11 +3346,12 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
     slides: list[dict[str, Any]] = []
 
     for ftitle, fbody in _split_frames(body):
-        html = _clean_frame_body(fbody)
-        if not html:
-            continue
-        plain = _plain_text_from_html(html)
         title = _clean_slide_title(ftitle or "")
+        is_advice = bool(_advice_deck_key(title))
+        html = _clean_frame_body(fbody)
+        if not html and not is_advice:
+            continue
+        plain = _plain_text_from_html(html) if html else title
         if not title and plain:
             title = plain[:72] + ("…" if len(plain) > 72 else "")
         if plain.lower() in {"novel prep", "excellence in sat prep"}:
@@ -3240,10 +3360,13 @@ def parse_beamer_file(path: str) -> dict[str, Any]:
             continue
         if not title:
             title = f"Slide {len(slides) + 1}"
-        kind = _detect_slide_kind(title, plain, html)
+        kind = "advice" if is_advice else _detect_slide_kind(title, plain, html)
         if kind == "closing":
             title = "Thank You"
-        html = _enrich_slide_html(html, kind, title)
+        if kind == "advice":
+            html = _build_advice_html(title)
+        else:
+            html = _enrich_slide_html(html, kind, title)
         slide_data: dict[str, Any] = {
             "index": len(slides) + 1,
             "title": title,
