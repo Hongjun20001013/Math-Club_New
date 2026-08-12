@@ -1,44 +1,50 @@
-/* Novel Prep Board v3 — clean classroom math board */
+/* Novel Prep Board v4 — premium classroom pad */
 
 .np-board-panel {
-    --ink: #0f172a;
-    --accent: #4f46e5;
-    --line: #e2e8f0;
+    --ink: #1c1917;
+    --muted: #78716c;
+    --line: rgba(28, 25, 23, 0.08);
+    --accent: #4338ca;
+    --paper: #fffcf7;
+    --panel: #f7f4ef;
     position: fixed;
-    top: 64px;
-    left: 24px;
-    width: min(700px, calc(100vw - 28px));
-    height: min(620px, calc(100vh - 88px));
-    min-width: 360px;
-    min-height: 360px;
+    top: 56px;
+    left: 20px;
+    width: min(720px, calc(100vw - 28px));
+    height: min(640px, calc(100vh - 80px));
+    min-width: 380px;
+    min-height: 380px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    border-radius: 20px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background: #fff;
+    border-radius: 26px;
+    border: 1px solid rgba(28, 25, 23, 0.1);
+    background:
+        linear-gradient(180deg, #faf8f4 0%, #f3efe8 100%);
     box-shadow:
-        0 24px 80px rgba(15, 23, 42, 0.18),
-        0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+        0 40px 100px rgba(28, 25, 23, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.55) inset;
     z-index: 3900;
     overflow: hidden;
     resize: both;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-    transition: opacity 0.18s ease, visibility 0.18s ease;
+    font-family: "Source Sans 3", "IBM Plex Sans", "Segoe UI", sans-serif;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    transform: translateY(8px) scale(0.985);
 }
 
 .np-board-panel.is-open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    transform: translateY(0) scale(1);
 }
 
 .np-board-panel.is-dragging {
     user-select: none;
-    box-shadow: 0 32px 96px rgba(15, 23, 42, 0.26);
+    box-shadow: 0 48px 120px rgba(28, 25, 23, 0.28);
 }
 
 .np-board-panel-head {
@@ -46,9 +52,9 @@
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-    padding: 11px 12px;
-    background: #fafafa;
-    border-bottom: 1px solid var(--line);
+    padding: 14px 16px 12px;
+    background: transparent;
+    border-bottom: 0;
     cursor: grab;
     touch-action: none;
 }
@@ -56,83 +62,90 @@
 .np-board-panel-head:active { cursor: grabbing; }
 
 .np-board-brand {
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
-    font-weight: 800;
-    font-size: 0.78rem;
     color: #fff;
-    background: #111827;
+    background: linear-gradient(145deg, #292524, #1c1917);
+    box-shadow: 0 10px 22px rgba(28, 25, 23, 0.22);
     flex: 0 0 auto;
 }
 
 .np-board-panel-title {
     display: grid;
-    gap: 1px;
+    gap: 2px;
     margin-right: auto;
     min-width: 0;
 }
 
 .np-board-panel-title strong {
-    color: #111827;
-    font-size: 0.92rem;
-    letter-spacing: -0.02em;
+    color: #1c1917;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.12rem;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
 }
 
 .np-board-panel-title span {
-    color: #94a3b8;
-    font-size: 0.62rem;
-    font-weight: 650;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
 .np-board-mode {
     display: inline-flex;
-    padding: 2px;
+    padding: 3px;
     border-radius: 999px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.72);
     border: 1px solid var(--line);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
 .np-board-mode-btn,
 .np-board-icon-btn,
 .np-board-tool-btn,
 .np-board-close {
-    border: 1px solid transparent;
+    border: 0;
     background: transparent;
-    color: #334155;
+    color: #57534e;
     border-radius: 999px;
-    height: 28px;
+    height: 30px;
     cursor: pointer;
-    font-size: 0.7rem;
-    font-weight: 750;
+    font-size: 0.72rem;
+    font-weight: 700;
 }
 
 .np-board-mode-btn {
-    padding: 0 12px;
-    color: #64748b;
+    padding: 0 14px;
 }
 
 .np-board-mode-btn.is-active {
-    background: #111827;
+    background: #1c1917;
     color: #fff;
+    box-shadow: 0 8px 18px rgba(28, 25, 23, 0.18);
 }
 
 .np-board-icon-btn {
-    padding: 0 10px;
-    border-color: var(--line);
+    padding: 0 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--line);
+}
+
+.np-board-icon-btn:hover,
+.np-board-close:hover {
     background: #fff;
+    color: #1c1917;
 }
 
 .np-board-close {
-    width: 28px;
-    border-color: var(--line);
-    background: #fff;
-    font-size: 1.1rem;
+    width: 30px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--line);
+    font-size: 1.15rem;
     line-height: 1;
 }
 
@@ -142,65 +155,75 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--line);
-    background: #fffbeb;
+    margin: 0 16px 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.65);
 }
 
 .np-board-panel.is-draw-mode .np-board-toolbar { display: flex; }
 
-.np-board-swatches { display: inline-flex; gap: 6px; }
+.np-board-swatches { display: inline-flex; gap: 7px; }
 
 .np-board-swatch {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 999px;
-    border: 2px solid #fff;
+    border: 2px solid rgba(255, 255, 255, 0.95);
     background: var(--swatch);
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 0 0 1px rgba(28, 25, 23, 0.16);
     cursor: pointer;
     padding: 0;
 }
 
-.np-board-swatch.is-active { box-shadow: 0 0 0 2px #111827; }
+.np-board-swatch.is-active { box-shadow: 0 0 0 2px #1c1917; }
 
 .np-board-size {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.66rem;
-    font-weight: 750;
-    color: #64748b;
+    font-weight: 700;
+    color: var(--muted);
 }
 
 .np-board-size input { width: 84px; }
 
 .np-board-tool-btn {
-    padding: 0 10px;
-    border-color: var(--line);
+    padding: 0 12px;
+    border: 1px solid var(--line);
     background: #fff;
 }
 
 .np-board-tool-btn.is-active,
 .np-board-tool-btn[aria-pressed="true"] {
-    background: #111827;
-    border-color: #111827;
+    background: #1c1917;
+    border-color: #1c1917;
     color: #fff;
 }
 
 .np-board-surface {
     position: relative;
     flex: 1 1 auto;
-    min-height: 180px;
+    min-height: 200px;
+    margin: 0 16px;
     overflow: auto;
-    background: #fff;
+    border-radius: 18px;
+    border: 1px solid rgba(28, 25, 23, 0.06);
+    background: var(--paper);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.85) inset,
+        0 18px 40px rgba(28, 25, 23, 0.04);
 }
 
 .np-board-paper {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: #fff;
+    background:
+        radial-gradient(ellipse 70% 45% at 50% 0%, rgba(67, 56, 202, 0.05), transparent 60%),
+        linear-gradient(180deg, #fffcf7 0%, #faf6f0 100%);
 }
 
 .np-board-canvas {
@@ -226,119 +249,150 @@
     z-index: 3;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 16px 14px 18px;
+    gap: 4px;
+    padding: 22px 20px 28px;
     min-height: 100%;
 }
 
 .np-board-panel.is-draw-mode .np-board-lines {
     pointer-events: none;
-    opacity: 0.9;
+    opacity: 0.88;
 }
 
+/* No boxed rows / no 01 badges — quiet writing lines */
 .np-board-line {
     display: grid;
-    grid-template-columns: 34px minmax(0, 1fr) 26px;
+    grid-template-columns: 14px minmax(0, 1fr) 28px;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 14px;
-    border: 1px solid #eef2f7;
-    background: #fff;
+    gap: 6px;
+    padding: 10px 4px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    position: relative;
 }
 
-.np-board-line.is-active,
-.np-board-line:focus-within {
-    border-color: rgba(79, 70, 229, 0.35);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+.np-board-line::after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    right: 36px;
+    bottom: 4px;
+    height: 1px;
+    background: transparent;
+    transition: background 0.15s ease;
+}
+
+.np-board-line.is-active::after,
+.np-board-line:focus-within::after {
+    background: rgba(67, 56, 202, 0.28);
 }
 
 .np-board-line-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: #f1f5f9;
-    color: #475569;
-    font-size: 0.68rem;
-    font-weight: 800;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: transparent;
+    color: transparent;
+    font-size: 0;
+    overflow: hidden;
+}
+
+.np-board-line.is-active .np-board-line-num,
+.np-board-line:focus-within .np-board-line-num {
+    background: #4338ca;
+    box-shadow: 0 0 0 4px rgba(67, 56, 202, 0.12);
 }
 
 .np-board-line-field {
     width: 100%;
-    min-height: 42px;
+    min-height: 48px;
     border: 0 !important;
     outline: none !important;
     background: transparent !important;
     box-shadow: none !important;
-    font-size: 1.45rem;
+    font-size: 1.55rem;
     color: var(--ink);
 }
 
 .np-board-line-del {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 999px;
-    border: 1px solid transparent;
+    border: 0;
     background: transparent;
-    color: #cbd5e1;
+    color: #a8a29e;
     cursor: pointer;
     opacity: 0;
+    font-size: 1.05rem;
 }
 
 .np-board-line:hover .np-board-line-del,
 .np-board-line:focus-within .np-board-line-del {
     opacity: 1;
-    color: #94a3b8;
+}
+
+.np-board-line-del:hover {
+    background: rgba(28, 25, 23, 0.06);
+    color: #1c1917;
 }
 
 .np-board-loading {
     position: absolute;
     left: 50%;
-    top: 40%;
+    top: 42%;
     transform: translate(-50%, -50%);
     z-index: 5;
     margin: 0;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    font-weight: 650;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
     pointer-events: none;
 }
 
 .np-board-symbols {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
     flex-shrink: 0;
-    padding: 10px 12px;
-    border-top: 1px solid var(--line);
-    background: #fbfbfc;
+    margin: 12px 16px 16px;
+    padding: 8px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
 }
 
 .np-board-symbols button {
-    min-width: 36px;
-    height: 34px;
-    padding: 0 10px;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: #0f172a;
-    font-size: 1rem;
-    font-weight: 650;
+    min-width: 40px;
+    height: 38px;
+    padding: 0 11px;
+    border-radius: 12px;
+    border: 0;
+    background: transparent;
+    color: #292524;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 600;
     cursor: pointer;
     line-height: 1;
+    transition: background 0.14s ease, color 0.14s ease, transform 0.14s ease;
 }
 
 .np-board-symbols button:hover {
-    border-color: #c7d2fe;
-    background: #f8faff;
-    color: #3730a3;
+    background: rgba(28, 25, 23, 0.06);
+    color: #1c1917;
+    transform: translateY(-1px);
+}
+
+.np-board-symbols button:active {
+    transform: translateY(0);
 }
 
 .np-board-panel.is-draw-mode .np-board-symbols {
-    opacity: 0.45;
+    opacity: 0.4;
     pointer-events: none;
 }
 
@@ -350,9 +404,19 @@
 @media (max-width: 720px) {
     .np-board-panel {
         left: 8px;
-        top: 48px;
+        top: 44px;
         width: calc(100vw - 16px);
-        height: min(72vh, 560px);
+        height: min(74vh, 580px);
+        border-radius: 20px;
     }
+
     .np-board-panel-title span { display: none; }
+
+    .np-board-surface {
+        margin: 0 10px;
+    }
+
+    .np-board-symbols {
+        margin: 10px;
+    }
 }

@@ -2,10 +2,15 @@
 
 <div class="np-board-panel is-type-mode" id="np-board-panel" aria-label="Math whiteboard" aria-hidden="true">
   <div class="np-board-panel-head" id="np-board-drag-handle">
-    <div class="np-board-brand" aria-hidden="true">B</div>
+    <div class="np-board-brand" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <rect x="3" y="4" width="18" height="14" rx="2"/>
+        <path d="M7 14h6M7 10h10"/>
+      </svg>
+    </div>
     <div class="np-board-panel-title">
       <strong>Board</strong>
-      <span>Type math on the board · drag to move · resize corner</span>
+      <span>Classroom math pad</span>
     </div>
     <div class="np-board-mode" role="group" aria-label="Board mode">
       <button type="button" class="np-board-mode-btn is-active" data-np-board-mode="type" aria-pressed="true">Type</button>
@@ -18,8 +23,8 @@
 
   <div class="np-board-toolbar" data-np-board-draw-tools>
     <div class="np-board-swatches" role="group" aria-label="Pen color">
-      <button type="button" class="np-board-swatch is-active" data-np-board-color="#111827" style="--swatch:#111827" aria-label="Ink"></button>
-      <button type="button" class="np-board-swatch" data-np-board-color="#4f32f0" style="--swatch:#4f32f0" aria-label="Purple"></button>
+      <button type="button" class="np-board-swatch is-active" data-np-board-color="#1c1917" style="--swatch:#1c1917" aria-label="Ink"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#4f46e5" style="--swatch:#4f46e5" aria-label="Indigo"></button>
       <button type="button" class="np-board-swatch" data-np-board-color="#dc2626" style="--swatch:#dc2626" aria-label="Red"></button>
       <button type="button" class="np-board-swatch" data-np-board-color="#059669" style="--swatch:#059669" aria-label="Green"></button>
       <button type="button" class="np-board-swatch" data-np-board-color="#d97706" style="--swatch:#d97706" aria-label="Amber"></button>
@@ -36,18 +41,18 @@
     <div class="np-board-paper" aria-hidden="true"></div>
     <canvas class="np-board-canvas" data-np-board-canvas></canvas>
     <div class="np-board-lines" data-np-board-lines></div>
-    <p class="np-board-loading" data-np-board-loading>Loading math…</p>
+    <p class="np-board-loading" data-np-board-loading hidden>Loading math…</p>
   </div>
 
   <div class="np-board-symbols" data-np-board-symbols aria-label="Insert symbol">
-    <button type="button" data-np-board-insert="sqrt" title="Square root (or type sqrt)">√</button>
-    <button type="button" data-np-board-insert="int" title="Integral (or type int)">∫</button>
+    <button type="button" data-np-board-insert="sqrt" title="Square root · type sqrt">√</button>
+    <button type="button" data-np-board-insert="int" title="Integral · type int">∫</button>
     <button type="button" data-np-board-insert="sum" title="Sum">Σ</button>
-    <button type="button" data-np-board-insert="pi" title="Pi (or type pi)">π</button>
+    <button type="button" data-np-board-insert="pi" title="Pi · type pi">π</button>
     <button type="button" data-np-board-insert="theta" title="Theta">θ</button>
-    <button type="button" data-np-board-insert="frac" title="Fraction">÷</button>
-    <button type="button" data-np-board-insert="pow" title="Power">x²</button>
-    <button type="button" data-np-board-insert="sub" title="Subscript">x₁</button>
+    <button type="button" data-np-board-insert="frac" title="Fraction">𝑎/𝑏</button>
+    <button type="button" data-np-board-insert="pow" title="Power">𝑥ⁿ</button>
+    <button type="button" data-np-board-insert="sub" title="Subscript">𝑥ₙ</button>
     <button type="button" data-np-board-insert="le" title="Less or equal">≤</button>
     <button type="button" data-np-board-insert="ge" title="Greater or equal">≥</button>
     <button type="button" data-np-board-insert="pm" title="Plus-minus">±</button>
@@ -57,7 +62,7 @@
 
 <script>
 window.__NP_BOARD__ = {
-  layoutKey: "np-board-panel-layout-v3",
+  layoutKey: "np-board-panel-layout-v4",
   enableShortcut: {{ np_board_shortcut|default(true)|tojson }},
   mathliveCss: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/mathlive-static.css",
   mathliveModule: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/+esm"

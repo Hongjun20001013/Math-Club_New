@@ -409,7 +409,12 @@
 
   function renumberLines() {
     lines.forEach(function (line, idx) {
-      if (line.num) line.num.textContent = String(idx + 1).padStart(2, "0");
+      if (line.num) {
+        line.num.textContent = "";
+        line.num.setAttribute("aria-hidden", "true");
+        line.num.title = "Line " + (idx + 1);
+      }
+      line.row.dataset.index = String(idx);
     });
   }
 
