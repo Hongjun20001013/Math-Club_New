@@ -4451,7 +4451,12 @@
 
   document.addEventListener("keydown", function (e) {
     var tag = (e.target && e.target.tagName) || "";
-    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "MATH-FIELD") return;
+    if (e.target && e.target.closest && e.target.closest("#np-board-panel, math-field")) return;
+    if (document.documentElement.classList.contains("np-board-is-open")) {
+      // Board owns keyboard while open (typing formulas / pen undo).
+      if (e.key !== "Escape") return;
+    }
     if (e.key === "Escape" && checkpointEl && checkpointEl.classList.contains("is-open")) {
       e.preventDefault();
       closeCheckpoint();

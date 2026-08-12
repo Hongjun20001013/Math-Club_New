@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260723-class-score-amethyst")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260811-math-board-v3")
 
 _DB_SCHEMA_READY = False
 
@@ -1218,11 +1218,14 @@ def inject_template_config():
     student_home_href = url_for("index") if grants is None else _student_home_url(grants)
 
     show_np_desmos = bool(p.startswith("/practice") and not p.startswith("/practice/analytics"))
+    show_np_board = show_np_desmos
 
     return {
         "desmos_api_key": DESMOS_API_KEY,
         "show_np_desmos": show_np_desmos,
         "np_desmos_shortcut": True,
+        "show_np_board": show_np_board,
+        "np_board_shortcut": True,
         "active_track_label": active_track,
         "nav_path": p,
         "learning_tracks": visible_tracks if grants is not None else LEARNING_TRACKS,

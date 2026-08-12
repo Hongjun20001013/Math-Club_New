@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='np_board.css') }}?v={{ style_css_revision }}">
+
+<div class="np-board-panel is-type-mode" id="np-board-panel" aria-label="Math whiteboard" aria-hidden="true">
+  <div class="np-board-panel-head" id="np-board-drag-handle">
+    <div class="np-board-brand" aria-hidden="true">B</div>
+    <div class="np-board-panel-title">
+      <strong>Board</strong>
+      <span>Type math on the board · drag to move · resize corner</span>
+    </div>
+    <div class="np-board-mode" role="group" aria-label="Board mode">
+      <button type="button" class="np-board-mode-btn is-active" data-np-board-mode="type" aria-pressed="true">Type</button>
+      <button type="button" class="np-board-mode-btn" data-np-board-mode="draw" aria-pressed="false">Pen</button>
+    </div>
+    <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo pen stroke">Undo</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-clear title="Clear board">Clear</button>
+    <button type="button" class="np-board-close" data-np-board-close aria-label="Close Board">×</button>
+  </div>
+
+  <div class="np-board-toolbar" data-np-board-draw-tools>
+    <div class="np-board-swatches" role="group" aria-label="Pen color">
+      <button type="button" class="np-board-swatch is-active" data-np-board-color="#111827" style="--swatch:#111827" aria-label="Ink"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#4f32f0" style="--swatch:#4f32f0" aria-label="Purple"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#dc2626" style="--swatch:#dc2626" aria-label="Red"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#059669" style="--swatch:#059669" aria-label="Green"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#d97706" style="--swatch:#d97706" aria-label="Amber"></button>
+    </div>
+    <label class="np-board-size">
+      <span>Size</span>
+      <input type="range" min="2" max="18" value="3" data-np-board-size>
+    </label>
+    <button type="button" class="np-board-tool-btn" data-np-board-tool="pen" aria-pressed="true">Pen</button>
+    <button type="button" class="np-board-tool-btn" data-np-board-tool="eraser" aria-pressed="false">Eraser</button>
+  </div>
+
+  <div class="np-board-surface" data-np-board-surface>
+    <div class="np-board-paper" aria-hidden="true"></div>
+    <canvas class="np-board-canvas" data-np-board-canvas></canvas>
+    <div class="np-board-lines" data-np-board-lines></div>
+    <p class="np-board-loading" data-np-board-loading>Loading math…</p>
+  </div>
+
+  <div class="np-board-symbols" data-np-board-symbols aria-label="Insert symbol">
+    <button type="button" data-np-board-insert="\sqrt{#?}" title="Square root (or type sqrt)">√</button>
+    <button type="button" data-np-board-insert="\int" title="Integral (or type int)">∫</button>
+    <button type="button" data-np-board-insert="\sum" title="Sum">Σ</button>
+    <button type="button" data-np-board-insert="\pi" title="Pi (or type pi)">π</button>
+    <button type="button" data-np-board-insert="\theta" title="Theta">θ</button>
+    <button type="button" data-np-board-insert="\frac{#?}{#?}" title="Fraction">÷</button>
+    <button type="button" data-np-board-insert="^{#?}" title="Power">x²</button>
+    <button type="button" data-np-board-insert="_{#?}" title="Subscript">x₁</button>
+    <button type="button" data-np-board-insert="\le" title="Less or equal">≤</button>
+    <button type="button" data-np-board-insert="\ge" title="Greater or equal">≥</button>
+    <button type="button" data-np-board-insert="\pm" title="Plus-minus">±</button>
+    <button type="button" data-np-board-insert="\infty" title="Infinity">∞</button>
+  </div>
+</div>
+
+<script>
+window.__NP_BOARD__ = {
+  layoutKey: "np-board-panel-layout-v3",
+  enableShortcut: {{ np_board_shortcut|default(true)|tojson }},
+  mathliveCss: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/mathlive-static.css",
+  mathliveModule: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/+esm"
+};
+</script>
+<script defer src="{{ url_for('static', filename='np_board.js') }}?v={{ style_css_revision }}"></script>

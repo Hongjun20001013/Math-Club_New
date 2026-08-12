@@ -254,7 +254,9 @@
 
   document.addEventListener("keydown", function (e) {
     var tag = (e.target && e.target.tagName) || "";
-    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "MATH-FIELD") return;
+    if (e.target && e.target.closest && e.target.closest("#np-board-panel, math-field")) return;
+    if (document.documentElement.classList.contains("np-board-is-open")) return;
     if (config.enableShortcut === false) return;
     if (e.key === "d" || e.key === "D") {
       e.preventDefault();

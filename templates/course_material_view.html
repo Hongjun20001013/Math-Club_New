@@ -27,6 +27,13 @@
         <span>{{ material.section }}</span>
       </nav>
       <div class="np-cm-hero-actions">
+        <button type="button" class="np-cm-btn np-cm-btn--board" data-np-board-toggle aria-pressed="false" title="Open Board: type formulas with keyboard (B). Pen optional.">
+          <svg class="np-cm-board-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
+            <rect x="3" y="4" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/>
+            <path d="M6 13c1.2-2.2 2.2-3.2 3.5-3.2S12 11.2 14 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="np-cm-btn-label">Board</span>
+        </button>
         <button type="button" class="np-cm-btn np-cm-btn--desmos" data-np-desmos-toggle aria-pressed="false" title="Open Desmos graphing calculator (D)">
           <svg class="np-cm-desmos-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M3 14c2.5-5 4.5-7 7-7s4.5 2 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
@@ -158,6 +165,13 @@
             <div class="np-cm-pace-slot" data-cm-pace-slot aria-hidden="true"></div>
             {% endif %}
             <div class="np-cm-ink-compact-slot" data-cm-ink-compact-slot hidden></div>
+            <button type="button" class="np-cm-board-quick" data-np-board-toggle aria-pressed="false" aria-label="Open Board">
+              <svg class="np-cm-board-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
+                <rect x="3" y="4" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/>
+                <path d="M6 13c1.2-2.2 2.2-3.2 3.5-3.2S12 11.2 14 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span>Board</span>
+            </button>
             <button type="button" class="np-cm-desmos-quick" data-np-desmos-toggle aria-pressed="false" aria-label="Open Desmos">
               <svg class="np-cm-desmos-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M3 14c2.5-5 4.5-7 7-7s4.5 2 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>

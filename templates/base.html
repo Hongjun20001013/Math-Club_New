@@ -213,6 +213,10 @@
 {% include "partials/np_desmos.html" %}
 {% endif %}
 
+{% if show_np_board %}
+{% include "partials/np_board.html" %}
+{% endif %}
+
 <script>
 (function () {
   var meta = document.querySelector('meta[name="csrf-token"]');
