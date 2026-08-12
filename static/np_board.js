@@ -77,6 +77,22 @@
     return b.length - a.length;
   });
 
+  // Token → LaTeX for bottom symbol bar (tokens avoid Jinja `{#` comment traps).
+  var INSERT_LATEX = {
+    sqrt: "\\sqrt{#?}",
+    int: "\\int",
+    sum: "\\sum",
+    pi: "\\pi",
+    theta: "\\theta",
+    frac: "\\frac{#?}{#?}",
+    pow: "^{#?}",
+    sub: "_{#?}",
+    le: "\\le",
+    ge: "\\ge",
+    pm: "\\pm",
+    infty: "\\infty"
+  };
+
   function isOpen() {
     return panel.classList.contains("is-open");
   }
@@ -636,7 +652,9 @@
         if (!btn) return;
         event.preventDefault();
         setMode("type");
-        var latex = btn.getAttribute("data-np-board-insert") || "";
+        var token = btn.getAttribute("data-np-board-insert") || "";
+        var latex = INSERT_LATEX[token] || TYPED_SHORTCUTS[token] || "";
+        if (!latex) return;
         ensureMathLive().then(function (ok) {
           if (!ok) return;
           if (!activeField || !lines.length) addLine(true);

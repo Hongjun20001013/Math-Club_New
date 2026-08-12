@@ -250,7 +250,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260811-math-board-v3")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260811-math-board-v3b")
 
 _DB_SCHEMA_READY = False
 
