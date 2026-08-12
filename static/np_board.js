@@ -19,20 +19,110 @@
     document.querySelectorAll("[data-np-board-toggle], [data-cm-board-toggle]")
   );
 
-  var LAYOUT_KEY = config.layoutKey || "np-board-panel-layout-v3";
+  var LAYOUT_KEY = config.layoutKey || "np-board-panel-layout-v5";
+  var PREFS_KEY = config.prefsKey || "np-board-teach-prefs-v5";
+  var emptyHint = panel.querySelector("[data-np-board-empty-hint]");
+  var themeBtn = panel.querySelector("[data-np-board-theme]");
   var ctx = canvas ? canvas.getContext("2d") : null;
   var strokes = [];
   var drawing = null;
   var mode = "type";
   var tool = "pen";
-  var color = "#111827";
-  var size = 3;
+  var color = "#f8fafc";
+  var size = 4;
   var MathfieldElementCtor = null;
   var mathLiveReady = null;
   var lines = [];
   var activeField = null;
   var dpr = Math.max(1, window.devicePixelRatio || 1);
   var lineSeq = 0;
+  var prefs = { theme: "slate", dock: "right", fontStep: 0 };
+
+  function loadPrefs() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(PREFS_KEY) || "null");
+      if (raw && typeof raw === "object") {
+        prefs.theme = raw.theme === "paper" ? "paper" : "slate";
+        prefs.dock = ["left", "right", "wide", "present"].indexOf(raw.dock) >= 0 ? raw.dock : "right";
+        prefs.fontStep = Math.max(-2, Math.min(4, Number(raw.fontStep) || 0));
+      }
+    } catch (e) {}
+  }
+
+  function savePrefs() {
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+  }
+
+  function chalkColor() {
+    return prefs.theme === "paper" ? "#1c1917" : "#f8fafc";
+  }
+
+  function syncChalkSwatch() {
+    var chalk = panel.querySelector('[data-np-board-color="#f8fafc"], [data-np-board-color="#1c1917"], [data-np-board-color="#111827"]');
+    if (!chalk) return;
+    var next = chalkColor();
+    chalk.setAttribute("data-np-board-color", next);
+    chalk.style.setProperty("--swatch", next);
+  }
+
+  function applyTheme() {
+    panel.classList.toggle("theme-paper", prefs.theme === "paper");
+    panel.classList.toggle("theme-slate", prefs.theme !== "paper");
+    syncChalkSwatch();
+    // Keep the default marker on chalk when switching boards.
+    if (color === "#f8fafc" || color === "#ffffff" || color === "#1c1917" || color === "#111827") {
+      setColor(chalkColor());
+    }
+  }
+
+  function applyDock(dock, skipSave) {
+    prefs.dock = dock || prefs.dock || "right";
+    panel.classList.remove("dock-left", "dock-right", "dock-wide", "dock-present");
+    panel.classList.add("dock-" + prefs.dock);
+    panel.querySelectorAll("[data-np-board-dock]").forEach(function (btn) {
+      btn.classList.toggle("is-active", btn.getAttribute("data-np-board-dock") === prefs.dock);
+    });
+    if (prefs.dock === "present") {
+      panel.style.left = "";
+      panel.style.top = "";
+      panel.style.width = "";
+      panel.style.height = "";
+    } else if (prefs.dock === "wide") {
+      panel.style.left = "";
+      panel.style.top = Math.max(40, Math.round(window.innerHeight * 0.08)) + "px";
+      panel.style.width = "";
+      panel.style.height = "";
+    } else if (prefs.dock === "left" || prefs.dock === "right") {
+      var w = Math.min(520, Math.max(380, Math.round(window.innerWidth * 0.34)));
+      var h = Math.min(Math.round(window.innerHeight * 0.78), window.innerHeight - 64);
+      panel.style.top = "48px";
+      panel.style.width = w + "px";
+      panel.style.height = h + "px";
+      panel.style.left = "";
+      panel.style.right = "";
+    }
+    if (!skipSave) {
+      savePrefs();
+      saveLayout();
+    }
+    window.setTimeout(resizeCanvas, 40);
+  }
+
+  function applyFontStep() {
+    var base = 1.7;
+    var sizeRem = Math.max(1.25, Math.min(2.45, base + prefs.fontStep * 0.18));
+    panel.style.setProperty("--math-size", sizeRem + "rem");
+    lines.forEach(function (line) {
+      try { line.field.style.fontSize = sizeRem + "rem"; } catch (e) {}
+    });
+  }
+
+  function syncContentState() {
+    var hasMath = lines.some(function (line) { return line.field && !fieldIsEmpty(line.field); });
+    var hasInk = strokes.length > 0;
+    panel.classList.toggle("has-content", hasMath || hasInk || lines.length > 1);
+    if (emptyHint) emptyHint.hidden = hasMath || hasInk || lines.length > 1;
+  }
 
   // Exact typed words → LaTeX inserted via MathLive command (Desmos-like).
   var TYPED_SHORTCUTS = {
@@ -111,12 +201,16 @@
     });
     if (open) {
       initPanelControls();
+      applyTheme();
+      applyDock(prefs.dock, true);
+      applyFontStep();
       resizeCanvas();
       setMode("type");
       ensureMathLive().then(function (ok) {
         if (!ok) return;
         if (!lines.length) addLine(true);
         else focusLine(lines[lines.length - 1]);
+        syncContentState();
       });
     } else {
       drawing = null;
@@ -125,11 +219,11 @@
   }
 
   function defaultLayout() {
-    var width = Math.min(700, Math.max(420, window.innerWidth - 48));
-    var height = Math.min(620, Math.max(400, window.innerHeight - 100));
+    var width = Math.min(520, Math.max(380, Math.round(window.innerWidth * 0.34)));
+    var height = Math.min(Math.round(window.innerHeight * 0.78), window.innerHeight - 64);
     return {
-      left: 24,
-      top: Math.max(48, Math.min(68, window.innerHeight - height - 20)),
+      left: Math.max(16, window.innerWidth - width - 16),
+      top: 48,
       width: width,
       height: height
     };
@@ -168,6 +262,10 @@
   }
 
   function restoreLayout() {
+    if (prefs.dock === "present" || prefs.dock === "wide") {
+      applyDock(prefs.dock, true);
+      return;
+    }
     var layout = null;
     try {
       layout = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
@@ -175,6 +273,7 @@
       layout = null;
     }
     applyLayout(layout || defaultLayout());
+    applyDock(prefs.dock, true);
   }
 
   function resizeCanvas() {
@@ -326,7 +425,10 @@
       try { mf.inlineShortcuts = TYPED_SHORTCUTS; } catch (e2) {}
     }
     try { mf.menuItems = []; } catch (e) {}
-    try { mf.style.fontSize = "1.45rem"; } catch (e) {}
+    try {
+      var rem = 1.7 + prefs.fontStep * 0.18;
+      mf.style.fontSize = Math.max(1.25, Math.min(2.45, rem)) + "rem";
+    } catch (e) {}
   }
 
   function insertLatex(field, latex) {
@@ -516,7 +618,10 @@
       }
     });
 
+    field.addEventListener("input", syncContentState);
+
     if (focus) focusLine(line);
+    syncContentState();
     return line;
   }
 
@@ -530,6 +635,7 @@
     lines = [];
     activeField = null;
     if (mode === "type" && MathfieldElementCtor) addLine(true);
+    syncContentState();
   }
 
   function undoStroke() {
@@ -569,6 +675,7 @@
       if (drawing.points.length > 1) strokes.push(drawing);
       drawing = null;
       redraw();
+      syncContentState();
     }
 
     canvas.addEventListener("pointerup", endStroke);
@@ -581,13 +688,17 @@
       return;
     }
     panel.dataset.controlsReady = "1";
+    loadPrefs();
+    applyTheme();
     restoreLayout();
+    applyFontStep();
     initDrawing();
 
     var dragging = null;
     if (handle) {
       handle.addEventListener("pointerdown", function (event) {
         if (event.target.closest("button")) return;
+        if (prefs.dock === "present" || prefs.dock === "wide") return;
         event.preventDefault();
         var rect = panel.getBoundingClientRect();
         dragging = {
@@ -618,6 +729,34 @@
       }
       handle.addEventListener("pointerup", stopDrag);
       handle.addEventListener("pointercancel", stopDrag);
+    }
+
+    panel.querySelectorAll("[data-np-board-dock]").forEach(function (btn) {
+      btn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        applyDock(btn.getAttribute("data-np-board-dock"));
+      });
+    });
+
+    panel.querySelectorAll("[data-np-board-font]").forEach(function (btn) {
+      btn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        prefs.fontStep = Math.max(-2, Math.min(4, prefs.fontStep + (Number(btn.getAttribute("data-np-board-font")) || 0)));
+        savePrefs();
+        applyFontStep();
+      });
+    });
+
+    if (themeBtn) {
+      themeBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        prefs.theme = prefs.theme === "paper" ? "slate" : "paper";
+        savePrefs();
+        applyTheme();
+      });
     }
 
     if (window.ResizeObserver) {
@@ -746,12 +885,22 @@
     true
   );
 
+  loadPrefs();
+  applyTheme();
+  applyFontStep();
+
   window.NpBoard = {
     toggle: toggle,
     open: function () { if (!isOpen()) setOpen(true); },
     close: function () { setOpen(false); },
     clear: clearBoard,
     setMode: setMode,
-    isOpen: isOpen
+    isOpen: isOpen,
+    dock: applyDock,
+    setTheme: function (theme) {
+      prefs.theme = theme === "paper" ? "paper" : "slate";
+      savePrefs();
+      applyTheme();
+    }
   };
 })();

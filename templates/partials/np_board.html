@@ -1,68 +1,89 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='np_board.css') }}?v={{ style_css_revision }}">
 
-<div class="np-board-panel is-type-mode" id="np-board-panel" aria-label="Math whiteboard" aria-hidden="true">
+<div class="np-board-panel is-type-mode theme-slate dock-right" id="np-board-panel" aria-label="Teaching board" aria-hidden="true">
   <div class="np-board-panel-head" id="np-board-drag-handle">
     <div class="np-board-brand" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <rect x="3" y="4" width="18" height="14" rx="2"/>
-        <path d="M7 14h6M7 10h10"/>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/>
+        <path d="M8 6V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1"/>
+        <path d="M8 11h5M8 14h8"/>
       </svg>
     </div>
     <div class="np-board-panel-title">
-      <strong>Board</strong>
-      <span>Classroom math pad</span>
+      <strong>Teaching Board</strong>
+      <span>Write · mark · explain</span>
     </div>
+
+    <div class="np-board-teach-tools" aria-label="Teaching controls">
+      <div class="np-board-dock" role="group" aria-label="Board position">
+        <button type="button" class="np-board-chip" data-np-board-dock="left" title="Dock left — slides stay visible">L</button>
+        <button type="button" class="np-board-chip" data-np-board-dock="right" title="Dock right">R</button>
+        <button type="button" class="np-board-chip" data-np-board-dock="wide" title="Wide teaching board">Wide</button>
+        <button type="button" class="np-board-chip" data-np-board-dock="present" title="Present — fill the screen">Present</button>
+      </div>
+      <div class="np-board-font" role="group" aria-label="Math size">
+        <button type="button" class="np-board-chip" data-np-board-font="-1" title="Smaller math">A−</button>
+        <button type="button" class="np-board-chip" data-np-board-font="1" title="Larger math for the room">A+</button>
+      </div>
+      <button type="button" class="np-board-chip" data-np-board-theme title="Toggle paper / slate board">Theme</button>
+    </div>
+
     <div class="np-board-mode" role="group" aria-label="Board mode">
       <button type="button" class="np-board-mode-btn is-active" data-np-board-mode="type" aria-pressed="true">Type</button>
-      <button type="button" class="np-board-mode-btn" data-np-board-mode="draw" aria-pressed="false">Pen</button>
+      <button type="button" class="np-board-mode-btn" data-np-board-mode="draw" aria-pressed="false">Mark</button>
     </div>
-    <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo pen stroke">Undo</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo mark">Undo</button>
     <button type="button" class="np-board-icon-btn" data-np-board-clear title="Clear board">Clear</button>
     <button type="button" class="np-board-close" data-np-board-close aria-label="Close Board">×</button>
   </div>
 
   <div class="np-board-toolbar" data-np-board-draw-tools>
-    <div class="np-board-swatches" role="group" aria-label="Pen color">
-      <button type="button" class="np-board-swatch is-active" data-np-board-color="#1c1917" style="--swatch:#1c1917" aria-label="Ink"></button>
-      <button type="button" class="np-board-swatch" data-np-board-color="#4f46e5" style="--swatch:#4f46e5" aria-label="Indigo"></button>
-      <button type="button" class="np-board-swatch" data-np-board-color="#dc2626" style="--swatch:#dc2626" aria-label="Red"></button>
-      <button type="button" class="np-board-swatch" data-np-board-color="#059669" style="--swatch:#059669" aria-label="Green"></button>
-      <button type="button" class="np-board-swatch" data-np-board-color="#d97706" style="--swatch:#d97706" aria-label="Amber"></button>
+    <span class="np-board-toolbar-label">Marker</span>
+    <div class="np-board-swatches" role="group" aria-label="Marker color">
+      <button type="button" class="np-board-swatch is-active" data-np-board-color="#f8fafc" style="--swatch:#f8fafc" aria-label="Chalk" title="Chalk"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#fbbf24" style="--swatch:#fbbf24" aria-label="Highlight" title="Highlight"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#f87171" style="--swatch:#f87171" aria-label="Emphasize" title="Emphasize"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#34d399" style="--swatch:#34d399" aria-label="Answer" title="Answer / correct"></button>
+      <button type="button" class="np-board-swatch" data-np-board-color="#60a5fa" style="--swatch:#60a5fa" aria-label="Note" title="Note"></button>
     </div>
     <label class="np-board-size">
-      <span>Size</span>
-      <input type="range" min="2" max="18" value="3" data-np-board-size>
+      <span>Width</span>
+      <input type="range" min="2" max="22" value="4" data-np-board-size>
     </label>
     <button type="button" class="np-board-tool-btn" data-np-board-tool="pen" aria-pressed="true">Pen</button>
     <button type="button" class="np-board-tool-btn" data-np-board-tool="eraser" aria-pressed="false">Eraser</button>
   </div>
 
-  <div class="np-board-surface" data-np-board-surface>
-    <div class="np-board-paper" aria-hidden="true"></div>
-    <canvas class="np-board-canvas" data-np-board-canvas></canvas>
-    <div class="np-board-lines" data-np-board-lines></div>
-    <p class="np-board-loading" data-np-board-loading hidden>Loading math…</p>
+  <div class="np-board-stage">
+    <div class="np-board-surface" data-np-board-surface>
+      <div class="np-board-paper" aria-hidden="true"></div>
+      <canvas class="np-board-canvas" data-np-board-canvas></canvas>
+      <div class="np-board-lines" data-np-board-lines></div>
+      <p class="np-board-loading" data-np-board-loading hidden>Loading math…</p>
+      <p class="np-board-empty-hint" data-np-board-empty-hint>Type the next step · Enter for a new line · Mark to circle key parts</p>
+    </div>
   </div>
 
   <div class="np-board-symbols" data-np-board-symbols aria-label="Insert symbol">
-    <button type="button" data-np-board-insert="sqrt" title="Square root · type sqrt">√</button>
-    <button type="button" data-np-board-insert="int" title="Integral · type int">∫</button>
-    <button type="button" data-np-board-insert="sum" title="Sum">Σ</button>
-    <button type="button" data-np-board-insert="pi" title="Pi · type pi">π</button>
-    <button type="button" data-np-board-insert="theta" title="Theta">θ</button>
-    <button type="button" data-np-board-insert="frac" title="Fraction">𝑎/𝑏</button>
-    <button type="button" data-np-board-insert="pow" title="Power">𝑥ⁿ</button>
-    <button type="button" data-np-board-insert="sub" title="Subscript">𝑥ₙ</button>
-    <button type="button" data-np-board-insert="le" title="Less or equal">≤</button>
-    <button type="button" data-np-board-insert="ge" title="Greater or equal">≥</button>
-    <button type="button" data-np-board-insert="pm" title="Plus-minus">±</button>
-    <button type="button" data-np-board-insert="infty" title="Infinity">∞</button>
+    <button type="button" data-np-board-insert="sqrt" title="sqrt">√</button>
+    <button type="button" data-np-board-insert="int" title="int">∫</button>
+    <button type="button" data-np-board-insert="sum" title="sum">Σ</button>
+    <button type="button" data-np-board-insert="pi" title="pi">π</button>
+    <button type="button" data-np-board-insert="theta" title="theta">θ</button>
+    <button type="button" data-np-board-insert="frac" title="fraction">𝑎/𝑏</button>
+    <button type="button" data-np-board-insert="pow" title="power">𝑥ⁿ</button>
+    <button type="button" data-np-board-insert="sub" title="subscript">𝑥ₙ</button>
+    <button type="button" data-np-board-insert="le" title="≤">≤</button>
+    <button type="button" data-np-board-insert="ge" title="≥">≥</button>
+    <button type="button" data-np-board-insert="pm" title="±">±</button>
+    <button type="button" data-np-board-insert="infty" title="∞">∞</button>
   </div>
 </div>
 
 <script>
 window.__NP_BOARD__ = {
-  layoutKey: "np-board-panel-layout-v4",
+  layoutKey: "np-board-panel-layout-v5",
+  prefsKey: "np-board-teach-prefs-v5",
   enableShortcut: {{ np_board_shortcut|default(true)|tojson }},
   mathliveCss: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/mathlive-static.css",
   mathliveModule: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/+esm"
