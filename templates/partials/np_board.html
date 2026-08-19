@@ -11,7 +11,7 @@
     </div>
     <div class="np-board-panel-title">
       <strong>Teaching Board</strong>
-      <span>Write · mark · explain</span>
+      <span>Abc for notes · fx for Desmos math</span>
     </div>
 
     <div class="np-board-teach-tools" aria-label="Teaching controls">
@@ -31,6 +31,10 @@
     <div class="np-board-mode" role="group" aria-label="Board mode">
       <button type="button" class="np-board-mode-btn is-active" data-np-board-mode="type" aria-pressed="true">Type</button>
       <button type="button" class="np-board-mode-btn" data-np-board-mode="draw" aria-pressed="false">Mark</button>
+    </div>
+    <div class="np-board-input" role="group" aria-label="Typing style">
+      <button type="button" class="np-board-mode-btn" data-np-board-input="text" title="Normal typing: spaces, words, arrows">Abc</button>
+      <button type="button" class="np-board-mode-btn is-active" data-np-board-input="math" title="Desmos math: sqrt, frac, ^, _">fx</button>
     </div>
     <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo mark">Undo</button>
     <button type="button" class="np-board-icon-btn" data-np-board-clear title="Clear board">Clear</button>
@@ -60,11 +64,12 @@
       <canvas class="np-board-canvas" data-np-board-canvas></canvas>
       <div class="np-board-lines" data-np-board-lines></div>
       <p class="np-board-loading" data-np-board-loading hidden>Loading math…</p>
-      <p class="np-board-empty-hint" data-np-board-empty-hint>Type the next step · Enter for a new line · Mark to circle key parts</p>
+      <p class="np-board-empty-hint" data-np-board-empty-hint>fx: type sqrt, frac, pi, ^ · Abc: normal words and spaces</p>
     </div>
   </div>
 
   <div class="np-board-symbols" data-np-board-symbols aria-label="Insert symbol">
+    <button type="button" data-np-board-insert="math" title="Insert math ($)">$</button>
     <button type="button" data-np-board-insert="sqrt" title="sqrt">√</button>
     <button type="button" data-np-board-insert="int" title="int">∫</button>
     <button type="button" data-np-board-insert="sum" title="sum">Σ</button>
@@ -75,7 +80,9 @@
     <button type="button" data-np-board-insert="sub" title="subscript">𝑥ₙ</button>
     <button type="button" data-np-board-insert="le" title="≤">≤</button>
     <button type="button" data-np-board-insert="ge" title="≥">≥</button>
-    <button type="button" data-np-board-insert="pm" title="±">±</button>
+    <button type="button" data-np-board-insert="times" title="times">×</button>
+    <button type="button" data-np-board-insert="neq" title="not equal">≠</button>
+    <button type="button" data-np-board-insert="to" title="arrow">→</button>
     <button type="button" data-np-board-insert="infty" title="∞">∞</button>
   </div>
 </div>

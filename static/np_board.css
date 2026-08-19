@@ -222,12 +222,16 @@
     color: #1c1917;
 }
 
-.np-board-mode {
+.np-board-input {
     display: inline-flex;
     padding: 3px;
     border-radius: 999px;
     background: var(--chip-bg);
     border: 1px solid var(--line);
+}
+
+.np-board-input .np-board-mode-btn {
+    min-width: 38px;
 }
 
 .np-board-mode-btn,
@@ -410,7 +414,7 @@
 .np-board-line {
     display: grid;
     grid-template-columns: 12px minmax(0, 1fr) 28px;
-    align-items: center;
+    align-items: start;
     gap: 8px;
     padding: 12px 2px 14px;
     border: 0;
@@ -442,6 +446,7 @@
 .np-board-line-num {
     width: 8px;
     height: 8px;
+    margin-top: 18px;
     border-radius: 999px;
     background: transparent;
     font-size: 0;
@@ -454,9 +459,50 @@
     box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.18);
 }
 
-.np-board-line-field {
-    width: 100%;
+.np-board-line-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 0 2px;
     min-height: 52px;
+    width: 100%;
+    padding: 4px 0;
+}
+
+.np-board-text {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0.2em;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
+    outline: none;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: "Source Sans 3", "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: var(--math-size);
+    font-weight: 500;
+    line-height: 1.45;
+    caret-color: var(--accent);
+}
+
+.np-board-text:empty::after {
+    content: "";
+    display: inline-block;
+    width: 1px;
+}
+
+.np-board-line-field {
+    display: inline-block !important;
+    vertical-align: baseline;
+    flex: 0 0 auto;
+    width: fit-content !important;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 1.5em;
+    padding: 0 1px;
     border: 0 !important;
     outline: none !important;
     background: transparent !important;
@@ -535,6 +581,12 @@
     cursor: pointer;
     line-height: 1;
     transition: background 0.14s ease, transform 0.14s ease;
+}
+
+.np-board-symbols button[data-np-board-insert="math"] {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 700;
+    color: var(--accent);
 }
 
 .np-board-symbols button:hover {

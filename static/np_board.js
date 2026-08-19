@@ -34,9 +34,10 @@
   var mathLiveReady = null;
   var lines = [];
   var activeField = null;
+  var activeText = null;
   var dpr = Math.max(1, window.devicePixelRatio || 1);
   var lineSeq = 0;
-  var prefs = { theme: "slate", dock: "right", fontStep: 0 };
+  var prefs = { theme: "slate", dock: "right", fontStep: 0, input: "math" };
 
   function loadPrefs() {
     try {
@@ -45,6 +46,7 @@
         prefs.theme = raw.theme === "paper" ? "paper" : "slate";
         prefs.dock = ["left", "right", "wide", "present"].indexOf(raw.dock) >= 0 ? raw.dock : "right";
         prefs.fontStep = Math.max(-2, Math.min(4, Number(raw.fontStep) || 0));
+        prefs.input = raw.input === "text" ? "text" : "math";
       }
     } catch (e) {}
   }
@@ -108,20 +110,72 @@
     window.setTimeout(resizeCanvas, 40);
   }
 
+  function applyInputKind(kind, skipSave, skipEnter) {
+    if (kind) prefs.input = kind === "text" ? "text" : "math";
+    panel.classList.toggle("is-fx-input", prefs.input !== "text");
+    panel.classList.toggle("is-abc-input", prefs.input === "text");
+    panel.querySelectorAll("[data-np-board-input]").forEach(function (btn) {
+      var on = btn.getAttribute("data-np-board-input") === prefs.input;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    if (!skipSave) savePrefs();
+    if (skipEnter || !isOpen() || mode !== "type") return;
+    if (prefs.input === "math") enterMathInput();
+    else enterTextInput();
+  }
+
+  function enterMathInput() {
+    if (activeField) {
+      try { activeField.focus(); } catch (e) {}
+      return;
+    }
+    var textEl = activeText;
+    if (!textEl && lines.length) {
+      var segs = lineSegs(lines[lines.length - 1]);
+      textEl = segs.filter(function (el) { return el.classList.contains("np-board-text"); }).pop() || segs[0];
+    }
+    if (textEl && textEl.classList.contains("np-board-text")) insertMathInText(textEl, "");
+    else if (!lines.length) addLine(true);
+  }
+
+  function enterTextInput() {
+    if (activeText) {
+      focusText(activeText, "end");
+      return;
+    }
+    if (activeField) {
+      var after = neighborSeg(activeField, 1);
+      if (after && after.classList.contains("np-board-text")) {
+        focusText(after, "start");
+        return;
+      }
+      var text = createTextSeg("");
+      activeField.after(text);
+      focusText(text, "start");
+      return;
+    }
+    if (lines.length) focusLine(lines[lines.length - 1], "end");
+  }
+
   function applyFontStep() {
     var base = 1.7;
     var sizeRem = Math.max(1.25, Math.min(2.45, base + prefs.fontStep * 0.18));
     panel.style.setProperty("--math-size", sizeRem + "rem");
     lines.forEach(function (line) {
-      try { line.field.style.fontSize = sizeRem + "rem"; } catch (e) {}
+      lineSegs(line).forEach(function (el) {
+        if (el.tagName === "MATH-FIELD") {
+          try { el.style.fontSize = sizeRem + "rem"; } catch (e) {}
+        }
+      });
     });
   }
 
   function syncContentState() {
-    var hasMath = lines.some(function (line) { return line.field && !fieldIsEmpty(line.field); });
+    var hasWrite = lines.some(function (line) { return !lineIsEmpty(line); });
     var hasInk = strokes.length > 0;
-    panel.classList.toggle("has-content", hasMath || hasInk || lines.length > 1);
-    if (emptyHint) emptyHint.hidden = hasMath || hasInk || lines.length > 1;
+    panel.classList.toggle("has-content", hasWrite || hasInk || lines.length > 1);
+    if (emptyHint) emptyHint.hidden = hasWrite || hasInk || lines.length > 1;
   }
 
   // Exact typed words → LaTeX inserted via MathLive command (Desmos-like).
@@ -163,6 +217,40 @@
     binom: "\\binom{#?}{#?}"
   };
 
+  // In Abc/text, only convert tokens that are rarely English words.
+  var TEXT_SHORTCUTS = {
+    sqrt: "\\sqrt{#?}",
+    cbrt: "\\sqrt[3]{#?}",
+    frac: "\\frac{#?}{#?}",
+    binom: "\\binom{#?}{#?}",
+    pi: "\\pi",
+    theta: "\\theta",
+    alpha: "\\alpha",
+    beta: "\\beta",
+    gamma: "\\gamma",
+    delta: "\\delta",
+    sigma: "\\sigma",
+    omega: "\\omega",
+    lambda: "\\lambda",
+    inf: "\\infty",
+    infinity: "\\infty",
+    leq: "\\leq",
+    geq: "\\geq",
+    neq: "\\neq",
+    approx: "\\approx",
+    times: "\\times",
+    cdot: "\\cdot",
+    pm: "\\pm",
+    abs: "\\left|#?\\right|",
+    lim: "\\lim",
+    prod: "\\prod",
+    iint: "\\iint"
+  };
+
+  var TEXT_SHORTCUT_WORDS = Object.keys(TEXT_SHORTCUTS).sort(function (a, b) {
+    return b.length - a.length;
+  });
+
   var SHORTCUT_WORDS = Object.keys(TYPED_SHORTCUTS).sort(function (a, b) {
     return b.length - a.length;
   });
@@ -180,6 +268,9 @@
     le: "\\le",
     ge: "\\ge",
     pm: "\\pm",
+    times: "\\times",
+    neq: "\\neq",
+    to: "\\to",
     infty: "\\infty"
   };
 
@@ -204,17 +295,16 @@
       applyTheme();
       applyDock(prefs.dock, true);
       applyFontStep();
+      applyInputKind(null, true, true);
       resizeCanvas();
       setMode("type");
-      ensureMathLive().then(function (ok) {
-        if (!ok) return;
-        if (!lines.length) addLine(true);
-        else focusLine(lines[lines.length - 1]);
-        syncContentState();
-      });
+      if (prefs.input === "math" && lines.length && !activeField) enterMathInput();
+      syncContentState();
+      ensureMathLive();
     } else {
       drawing = null;
       activeField = null;
+      activeText = null;
     }
   }
 
@@ -337,8 +427,8 @@
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
     if (mode === "type") {
-      if (lines.length) focusLine(lines[lines.length - 1]);
-      else ensureMathLive().then(function (ok) { if (ok) addLine(true); });
+      if (lines.length) focusLine(lines[lines.length - 1], "end");
+      else addLine(true);
     } else {
       drawing = null;
     }
@@ -415,6 +505,7 @@
     try { mf.smartFence = true; } catch (e) {}
     try { mf.smartSuperscript = true; } catch (e) {}
     try { mf.inlineShortcutTimeout = 0; } catch (e) {}
+    try { mf.mathModeSpace = "\\:"; } catch (e) {}
     try {
       var defaults = (MathfieldElementCtor && MathfieldElementCtor.defaultInlineShortcuts) || {};
       var merged = {};
@@ -453,46 +544,195 @@
     }
   }
 
-  /** Convert typed word buffer into a math symbol as soon as it matches. */
+  function lineSegs(line) {
+    if (!line || !line.body) return [];
+    return Array.prototype.slice.call(line.body.children);
+  }
+
+  function lineFromEl(el) {
+    var row = el && el.closest ? el.closest(".np-board-line") : null;
+    if (!row) return null;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].row === row) return lines[i];
+    }
+    return null;
+  }
+
+  function fieldIsEmpty(field) {
+    try {
+      return !String(field.getValue("latex") || "").replace(/\s+/g, "");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function lineIsEmpty(line) {
+    return lineSegs(line).every(function (el) {
+      if (el.classList.contains("np-board-text")) {
+        return el.textContent === "";
+      }
+      if (el.tagName === "MATH-FIELD") return fieldIsEmpty(el);
+      return true;
+    });
+  }
+
+  function getCaretOffset(el) {
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return (el.textContent || "").length;
+    var range = sel.getRangeAt(0);
+    if (!el.contains(range.startContainer) && el !== range.startContainer) {
+      return (el.textContent || "").length;
+    }
+    var pre = range.cloneRange();
+    pre.selectNodeContents(el);
+    pre.setEnd(range.startContainer, range.startOffset);
+    return pre.toString().length;
+  }
+
+  function setCaretOffset(el, offset) {
+    el.focus();
+    var text = el.firstChild;
+    if (!text || text.nodeType !== 3) {
+      if (!(el.textContent || "") && offset === 0) return;
+      el.textContent = el.textContent || "";
+      text = el.firstChild;
+    }
+    var len = (el.textContent || "").length;
+    var pos = Math.max(0, Math.min(offset, len));
+    var range = document.createRange();
+    var sel = window.getSelection();
+    if (text && text.nodeType === 3) {
+      range.setStart(text, pos);
+      range.collapse(true);
+    } else {
+      range.selectNodeContents(el);
+      range.collapse(pos > 0 ? false : true);
+    }
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function focusText(el, where) {
+    if (!el) return;
+    activeText = el;
+    activeField = null;
+    window.requestAnimationFrame(function () {
+      try {
+        el.focus();
+        if (where === "start") setCaretOffset(el, 0);
+        else if (where === "end") setCaretOffset(el, (el.textContent || "").length);
+      } catch (e) {}
+    });
+  }
+
+  function focusMath(field, where) {
+    if (!field) return;
+    activeField = field;
+    activeText = null;
+    window.requestAnimationFrame(function () {
+      try {
+        field.focus();
+        if (where === "start" && field.executeCommand) field.executeCommand("moveToMathfieldStart");
+        if (where === "end" && field.executeCommand) field.executeCommand("moveToMathfieldEnd");
+      } catch (e) {}
+    });
+  }
+
+  function focusLine(line, where) {
+    if (!line) return;
+    var segs = lineSegs(line);
+    if (!segs.length) return;
+    var el = where === "start" ? segs[0] : segs[segs.length - 1];
+    if (el.classList.contains("np-board-text")) focusText(el, where || "end");
+    else focusMath(el, where || "end");
+  }
+
+  function neighborSeg(el, dir) {
+    var line = lineFromEl(el);
+    if (!line) return null;
+    var segs = lineSegs(line);
+    var idx = segs.indexOf(el);
+    if (idx < 0) return null;
+    return segs[idx + dir] || null;
+  }
+
+  function moveToNeighbor(el, dir, edge) {
+    var next = neighborSeg(el, dir);
+    if (next) {
+      if (next.classList.contains("np-board-text")) focusText(next, edge);
+      else focusMath(next, edge);
+      return true;
+    }
+    var line = lineFromEl(el);
+    var lineIdx = lines.indexOf(line);
+    if (dir < 0 && lineIdx > 0) {
+      focusLine(lines[lineIdx - 1], "end");
+      return true;
+    }
+    if (dir > 0 && lineIdx >= 0 && lineIdx < lines.length - 1) {
+      focusLine(lines[lineIdx + 1], "start");
+      return true;
+    }
+    return false;
+  }
+
   function bindTypedShortcuts(field) {
     var buf = "";
-
     field.addEventListener("keydown", function (event) {
-      event.stopPropagation();
       if (event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
-
       if (event.key === "Backspace") {
         buf = buf.slice(0, -1);
         return;
       }
-
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         buf = "";
         var created = addLine(true);
-        if (created) focusLine(created);
+        if (created) focusLine(created, "start");
         return;
       }
-
+      if (event.key === "$") {
+        event.preventDefault();
+        buf = "";
+        applyInputKind("text", false, true);
+        var after = neighborSeg(field, 1);
+        if (after && after.classList.contains("np-board-text")) focusText(after, "start");
+        else {
+          var text = createTextSeg("");
+          field.after(text);
+          focusText(text, "start");
+        }
+        return;
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        buf = "";
+        applyInputKind("text", false, true);
+        var nextText = neighborSeg(field, 1);
+        if (nextText && nextText.classList.contains("np-board-text")) focusText(nextText, "start");
+        else {
+          var follow = createTextSeg("");
+          field.after(follow);
+          focusText(follow, "start");
+        }
+        return;
+      }
       if (event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
         var trial = buf + event.key.toLowerCase();
         var hit = null;
         for (var i = 0; i < SHORTCUT_WORDS.length; i++) {
-          var word = SHORTCUT_WORDS[i];
-          if (trial === word) {
-            hit = word;
+          if (trial === SHORTCUT_WORDS[i]) {
+            hit = SHORTCUT_WORDS[i];
             break;
           }
         }
         if (hit) {
           event.preventDefault();
-          // Remove already-typed prefix letters (all but the current key, which we blocked).
           deleteBackward(field, buf.length);
           insertLatex(field, TYPED_SHORTCUTS[hit]);
           buf = "";
           return;
         }
-        // Keep buffer only for possible prefixes of a shortcut.
         var maybe = false;
         for (var j = 0; j < SHORTCUT_WORDS.length; j++) {
           if (SHORTCUT_WORDS[j].indexOf(trial) === 0) {
@@ -503,10 +743,280 @@
         buf = maybe ? trial : "";
         return;
       }
-
-      // Non-letter ends the word buffer.
       buf = "";
     });
+  }
+
+  function bindMathNav(field) {
+    field.addEventListener("move-out", function (event) {
+      var dir = (event.detail && event.detail.direction) || "";
+      if (dir === "backward" || dir === "left") moveToNeighbor(field, -1, "end");
+      else if (dir === "forward" || dir === "right") moveToNeighbor(field, 1, "start");
+      else if (dir === "upward" || dir === "up") {
+        var line = lineFromEl(field);
+        var idx = lines.indexOf(line);
+        if (idx > 0) focusLine(lines[idx - 1], "end");
+      } else if (dir === "downward" || dir === "down") {
+        var lineDown = lineFromEl(field);
+        var idxDown = lines.indexOf(lineDown);
+        if (idxDown >= 0 && idxDown < lines.length - 1) focusLine(lines[idxDown + 1], "start");
+      }
+    });
+    field.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowLeft" && !event.shiftKey && fieldIsEmpty(field)) {
+        if (moveToNeighbor(field, -1, "end")) event.preventDefault();
+      }
+      if (event.key === "ArrowRight" && !event.shiftKey && fieldIsEmpty(field)) {
+        if (moveToNeighbor(field, 1, "start")) event.preventDefault();
+      }
+      if (event.key === "Backspace" && !event.isComposing && fieldIsEmpty(field)) {
+        event.preventDefault();
+        var line = lineFromEl(field);
+        var prev = neighborSeg(field, -1);
+        if (field.parentNode) field.parentNode.removeChild(field);
+        if (prev && prev.classList.contains("np-board-text")) focusText(prev, "end");
+        else if (line && lineIsEmpty(line)) removeLine(line);
+        syncContentState();
+      }
+    });
+  }
+
+  function createMathField(latex) {
+    var field = new MathfieldElementCtor();
+    field.className = "np-board-line-field";
+    field.setAttribute("aria-label", "Board math");
+    configureField(field);
+    try { field.placeholder = ""; } catch (e) {}
+    if (latex) {
+      try { field.setValue(latex); } catch (e) {}
+    }
+    field.addEventListener("focus", function () {
+      var line = lineFromEl(field);
+      if (line) line.row.classList.add("is-active");
+      activeField = field;
+      activeText = null;
+    });
+    field.addEventListener("blur", function () {
+      var line = lineFromEl(field);
+      if (line) line.row.classList.remove("is-active");
+    });
+    field.addEventListener("input", syncContentState);
+    bindTypedShortcuts(field);
+    bindMathNav(field);
+    return field;
+  }
+
+  function createTextSeg(text) {
+    var el = document.createElement("span");
+    el.className = "np-board-text";
+    el.contentEditable = "true";
+    el.spellcheck = false;
+    el.setAttribute("role", "textbox");
+    el.setAttribute("aria-label", "Board text");
+    el.tabIndex = 0;
+    el.textContent = text || "";
+
+    el.addEventListener("focus", function () {
+      var line = lineFromEl(el);
+      if (line) line.row.classList.add("is-active");
+      activeText = el;
+      activeField = null;
+    });
+    el.addEventListener("blur", function () {
+      var line = lineFromEl(el);
+      if (line) line.row.classList.remove("is-active");
+    });
+    el.addEventListener("input", syncContentState);
+    el.addEventListener("paste", function (event) {
+      event.preventDefault();
+      var pasted = (event.clipboardData || window.clipboardData).getData("text/plain") || "";
+      document.execCommand("insertText", false, pasted.replace(/\r\n/g, "\n"));
+    });
+    var textBuf = "";
+    el.addEventListener("keydown", function (event) {
+      if (event.isComposing) return;
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        textBuf = "";
+        splitLineFromText(el);
+        return;
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        textBuf = "";
+        insertMathInText(el, "");
+        applyInputKind("math", false, true);
+        return;
+      }
+      if (event.key === "$" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        textBuf = "";
+        insertMathInText(el, "");
+        applyInputKind("math", false, true);
+        return;
+      }
+      if ((event.key === "^" || event.key === "_") && !event.metaKey && !event.ctrlKey) {
+        event.preventDefault();
+        var offset = getCaretOffset(el);
+        var before = (el.textContent || "").slice(0, offset);
+        var atom = (before.match(/([A-Za-z0-9]+)$/) || [null, ""])[1];
+        var latex = (atom || "") + (event.key === "^" ? "^{#?}" : "_{#?}");
+        insertMathInText(el, latex, atom.length);
+        applyInputKind("math", false, true);
+        textBuf = "";
+        return;
+      }
+      if (event.key.length === 1 && /[a-zA-Z]/.test(event.key) && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        var trial = textBuf + event.key.toLowerCase();
+        var hit = null;
+        for (var s = 0; s < TEXT_SHORTCUT_WORDS.length; s++) {
+          if (trial === TEXT_SHORTCUT_WORDS[s]) {
+            hit = TEXT_SHORTCUT_WORDS[s];
+            break;
+          }
+        }
+        if (hit) {
+          event.preventDefault();
+          insertMathInText(el, TEXT_SHORTCUTS[hit], textBuf.length);
+          applyInputKind("math", false, true);
+          textBuf = "";
+          return;
+        }
+        var maybe = false;
+        for (var t = 0; t < TEXT_SHORTCUT_WORDS.length; t++) {
+          if (TEXT_SHORTCUT_WORDS[t].indexOf(trial) === 0) {
+            maybe = true;
+            break;
+          }
+        }
+        textBuf = maybe ? trial : "";
+      } else if (event.key === "Backspace") {
+        textBuf = textBuf.slice(0, -1);
+      } else if (event.key.length === 1) {
+        textBuf = "";
+      }
+      if (event.key === "ArrowLeft" && !event.shiftKey && getCaretOffset(el) === 0) {
+        if (moveToNeighbor(el, -1, "end")) event.preventDefault();
+        return;
+      }
+      if (event.key === "ArrowRight" && !event.shiftKey && getCaretOffset(el) >= (el.textContent || "").length) {
+        if (moveToNeighbor(el, 1, "start")) event.preventDefault();
+        return;
+      }
+      if (event.key === "ArrowUp" && !event.shiftKey && getCaretOffset(el) === 0 && !neighborSeg(el, -1)) {
+        var line = lineFromEl(el);
+        var idx = lines.indexOf(line);
+        if (idx > 0) {
+          event.preventDefault();
+          focusLine(lines[idx - 1], "end");
+        }
+        return;
+      }
+      if (event.key === "ArrowDown" && !event.shiftKey && getCaretOffset(el) >= (el.textContent || "").length && !neighborSeg(el, 1)) {
+        var lineDown = lineFromEl(el);
+        var idxDown = lines.indexOf(lineDown);
+        if (idxDown >= 0 && idxDown < lines.length - 1) {
+          event.preventDefault();
+          focusLine(lines[idxDown + 1], "start");
+        }
+        return;
+      }
+      if (event.key === "Backspace" && getCaretOffset(el) === 0) {
+        var prev = neighborSeg(el, -1);
+        if (prev && prev.tagName === "MATH-FIELD") {
+          event.preventDefault();
+          if (fieldIsEmpty(prev)) {
+            prev.parentNode.removeChild(prev);
+            syncContentState();
+          } else {
+            focusMath(prev, "end");
+          }
+          return;
+        }
+        var line = lineFromEl(el);
+        if (line && lineIsEmpty(line)) {
+          event.preventDefault();
+          removeLine(line);
+        }
+      }
+    });
+    return el;
+  }
+
+  function insertMathInText(textEl, latex, eatPrefix) {
+    var offset = getCaretOffset(textEl);
+    var full = textEl.textContent || "";
+    eatPrefix = Math.max(0, eatPrefix || 0);
+    var cut = Math.max(0, offset - eatPrefix);
+    var before = full.slice(0, cut);
+    var after = full.slice(offset);
+    ensureMathLive().then(function (ok) {
+      if (!ok || !textEl || !textEl.parentNode) return;
+      textEl.textContent = before;
+      var field = createMathField(latex || "");
+      var afterEl = createTextSeg(after);
+      textEl.after(field, afterEl);
+      focusMath(field, "end");
+      syncContentState();
+    });
+  }
+
+  function insertMathAtActive(latex) {
+    setMode("type");
+    applyInputKind("math", false, true);
+    if (activeField) {
+      if (latex) insertLatex(activeField, latex);
+      try { activeField.focus(); } catch (e) {}
+      return;
+    }
+    var textEl = activeText;
+    if (!textEl) {
+      if (!lines.length) addLine(false);
+      var line = lines[lines.length - 1];
+      var segs = lineSegs(line);
+      textEl = segs.filter(function (el) { return el.classList.contains("np-board-text"); }).pop() || segs[0];
+    }
+    if (textEl && textEl.classList.contains("np-board-text")) {
+      insertMathInText(textEl, latex || "");
+    }
+  }
+
+  function splitLineFromText(textEl) {
+    var line = lineFromEl(textEl);
+    if (!line) return;
+    var offset = getCaretOffset(textEl);
+    var full = textEl.textContent || "";
+    var afterText = full.slice(offset);
+    textEl.textContent = full.slice(0, offset);
+    var segs = lineSegs(line);
+    var idx = segs.indexOf(textEl);
+    var moved = segs.slice(idx + 1);
+    var created = addLine(false);
+    if (!created) return;
+    created.body.innerHTML = "";
+    created.body.appendChild(createTextSeg(afterText));
+    moved.forEach(function (el) { created.body.appendChild(el); });
+    if (!created.body.lastChild || created.body.lastChild.tagName === "MATH-FIELD") {
+      created.body.appendChild(createTextSeg(""));
+    }
+    if (prefs.input === "math") {
+      var first = lineSegs(created)[0];
+      if (first && first.classList.contains("np-board-text") && !(first.textContent || "")) {
+        insertMathInText(first, "");
+      } else {
+        focusLine(created, "start");
+      }
+    } else {
+      focusLine(created, "start");
+    }
+    syncContentState();
+  }
+
+  function resetLineBody(line) {
+    line.body.innerHTML = "";
+    var text = createTextSeg("");
+    line.body.appendChild(text);
+    return text;
   }
 
   function renumberLines() {
@@ -520,26 +1030,11 @@
     });
   }
 
-  function focusLine(line) {
-    if (!line || !line.field) return;
-    activeField = line.field;
-    window.requestAnimationFrame(function () {
-      try { line.field.focus(); } catch (e) {}
-    });
-  }
-
-  function fieldIsEmpty(field) {
-    try {
-      return !String(field.getValue("latex") || "").replace(/\s+/g, "");
-    } catch (e) {
-      return false;
-    }
-  }
-
   function removeLine(line) {
     if (lines.length <= 1) {
-      try { line.field.setValue(""); } catch (e) {}
-      focusLine(line);
+      resetLineBody(line);
+      focusLine(line, "start");
+      syncContentState();
       return;
     }
     var idx = lines.indexOf(line);
@@ -547,11 +1042,12 @@
     lines.splice(idx, 1);
     if (line.row && line.row.parentNode) line.row.parentNode.removeChild(line.row);
     renumberLines();
-    focusLine(lines[Math.min(idx, lines.length - 1)] || lines[0]);
+    focusLine(lines[Math.min(idx, lines.length - 1)] || lines[0], "end");
+    syncContentState();
   }
 
   function addLine(focus) {
-    if (!MathfieldElementCtor || !linesEl) return null;
+    if (!linesEl) return null;
     var row = document.createElement("div");
     row.className = "np-board-line";
     row.dataset.lineId = String(++lineSeq);
@@ -559,11 +1055,9 @@
     var num = document.createElement("span");
     num.className = "np-board-line-num";
 
-    var field = new MathfieldElementCtor();
-    field.className = "np-board-line-field";
-    field.setAttribute("aria-label", "Board math line");
-    configureField(field);
-    try { field.placeholder = ""; } catch (e) {}
+    var body = document.createElement("div");
+    body.className = "np-board-line-body";
+    var text = createTextSeg("");
 
     var del = document.createElement("button");
     del.type = "button";
@@ -571,12 +1065,13 @@
     del.setAttribute("aria-label", "Delete line");
     del.textContent = "×";
 
+    body.appendChild(text);
     row.appendChild(num);
-    row.appendChild(field);
+    row.appendChild(body);
     row.appendChild(del);
     linesEl.appendChild(row);
 
-    var line = { row: row, num: num, field: field };
+    var line = { row: row, num: num, body: body };
     lines.push(line);
     renumberLines();
 
@@ -586,41 +1081,10 @@
       removeLine(line);
     });
 
-    field.addEventListener("focus", function () {
-      row.classList.add("is-active");
-      activeField = field;
-    });
-    field.addEventListener("blur", function () {
-      row.classList.remove("is-active");
-    });
-
-    bindTypedShortcuts(field);
-
-    field.addEventListener("keydown", function (event) {
-      if (event.key === "Backspace" && !event.isComposing && fieldIsEmpty(field)) {
-        event.preventDefault();
-        removeLine(line);
-        return;
-      }
-      if (event.key === "ArrowUp" && !event.shiftKey) {
-        var idxUp = lines.indexOf(line);
-        if (idxUp > 0) {
-          event.preventDefault();
-          focusLine(lines[idxUp - 1]);
-        }
-      }
-      if (event.key === "ArrowDown" && !event.shiftKey) {
-        var idxDown = lines.indexOf(line);
-        if (idxDown >= 0 && idxDown < lines.length - 1) {
-          event.preventDefault();
-          focusLine(lines[idxDown + 1]);
-        }
-      }
-    });
-
-    field.addEventListener("input", syncContentState);
-
-    if (focus) focusLine(line);
+    if (focus) {
+      if (prefs.input === "math") insertMathInText(text, "");
+      else focusText(text, "end");
+    }
     syncContentState();
     return line;
   }
@@ -634,7 +1098,8 @@
     });
     lines = [];
     activeField = null;
-    if (mode === "type" && MathfieldElementCtor) addLine(true);
+    activeText = null;
+    if (mode === "type") addLine(true);
     syncContentState();
   }
 
@@ -759,6 +1224,15 @@
       });
     }
 
+    panel.querySelectorAll("[data-np-board-input]").forEach(function (btn) {
+      btn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        setMode("type");
+        applyInputKind(btn.getAttribute("data-np-board-input"));
+      });
+    });
+
     if (window.ResizeObserver) {
       var ro = new ResizeObserver(function () {
         if (!isOpen()) return;
@@ -782,11 +1256,11 @@
 
     surface.addEventListener("pointerdown", function (event) {
       if (mode !== "type") return;
-      if (event.target.closest("math-field") || event.target.closest("button")) return;
+      if (event.target.closest("math-field, .np-board-text, button")) return;
       if (!lines.length) {
-        ensureMathLive().then(function (ok) { if (ok) addLine(true); });
+        addLine(true);
       } else {
-        focusLine(lines[lines.length - 1]);
+        focusLine(lines[lines.length - 1], "end");
       }
     });
 
@@ -795,21 +1269,9 @@
         var btn = event.target.closest("[data-np-board-insert]");
         if (!btn) return;
         event.preventDefault();
-        setMode("type");
         var token = btn.getAttribute("data-np-board-insert") || "";
-        var latex = INSERT_LATEX[token] || TYPED_SHORTCUTS[token] || "";
-        if (!latex) return;
-        ensureMathLive().then(function (ok) {
-          if (!ok) return;
-          if (!activeField || !lines.length) addLine(true);
-          var field = activeField || (lines[lines.length - 1] && lines[lines.length - 1].field);
-          if (!field) return;
-          focusLine(lines.find(function (l) { return l.field === field; }) || lines[lines.length - 1]);
-          window.setTimeout(function () {
-            insertLatex(field, latex);
-            try { field.focus(); } catch (e) {}
-          }, 30);
-        });
+        var latex = token === "math" ? "" : (INSERT_LATEX[token] || TYPED_SHORTCUTS[token] || "");
+        insertMathAtActive(latex);
       });
     }
   }
@@ -854,13 +1316,7 @@
   document.addEventListener(
     "keydown",
     function (e) {
-      if (eventInsideBoard(e.target) || (e.target && (e.target.tagName || "").toUpperCase() === "MATH-FIELD")) {
-        if (isOpen() && (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown")) {
-          e.stopPropagation();
-        }
-        if (isOpen() && (e.key === "d" || e.key === "D" || e.key === "b" || e.key === "B" || e.key === "p" || e.key === "P")) {
-          e.stopPropagation();
-        }
+      if (eventInsideBoard(e.target) || (e.target && e.target.isContentEditable) || (e.target && (e.target.tagName || "").toUpperCase() === "MATH-FIELD")) {
         return;
       }
       if (config.enableShortcut === false) return;
@@ -888,6 +1344,7 @@
   loadPrefs();
   applyTheme();
   applyFontStep();
+  applyInputKind(null, true, true);
 
   window.NpBoard = {
     toggle: toggle,
