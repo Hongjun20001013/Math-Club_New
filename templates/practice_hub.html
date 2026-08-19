@@ -104,6 +104,17 @@
     </div>
     {% endif %}
 
+    {% if skill_loop_pilot_enabled %}
+    <div class="np-launch-continue-card" data-skill-loop-entry>
+      <div>
+        <p class="np-atelier-kicker">Skill loop pilot</p>
+        <strong>Linear remaining-quantity cycle</strong>
+        <span>Usability check only — not an effectiveness claim</span>
+      </div>
+      <a href="{{ url_for('skill_loop.hub') }}" class="np-atelier-btn np-atelier-btn--primary">Open skill loop →</a>
+    </div>
+    {% endif %}
+
     <div class="np-launch-path-grid">
       <a href="{% if continue_material %}{{ url_for('practice_course_material_view', slug=continue_material.slug, slide=continue_material.continue_slide) }}{% else %}{{ url_for('practice_course_materials') }}{% endif %}">
         <strong>01</strong>

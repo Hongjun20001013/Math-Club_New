@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Repair {{ skill_title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap" data-skill-repair-phase="{{ phase }}">
+  <nav class="np-atelier-rail" aria-label="SAT navigation">
+    <a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">Repair this skill</span>
+  </nav>
+  <p class="np-atelier-kicker">{{ phase }} · repair cycle</p>
+  <h1>{{ skill_title }}</h1>
+  {% if show_mastered %}
+  <p class="sl-mastered" data-mastery="delayed_pass">Mastered after a delayed independent pass.</p>
+  {% else %}
+  <p class="sl-not-mastered">Original-item review is not mastery. Mastered appears only after a delayed new-item independent pass.</p>
+  {% endif %}
+  {% if remediation %}
+  <p class="sl-remediation">Wrong answers stay in remediation: re-read the worked example, then try a <strong>new</strong> item. Repeating the missed item cannot count as independent_pass.</p>
+  {% endif %}
+  <div class="sl-stem">{{ item.stem_html|safe }}</div>
+  {% if phase == 'worked' or item.question_kind == 'worked_example' %}
+  {% if item.worked_steps %}
+  <ol class="sl-steps">
+    {% for step in item.worked_steps %}
+    <li>
+      <strong>Step {{ step.step }}.</strong>
+      <span>{{ step.do }}</span>
+      {% if step.why %}<em class="sl-why">Why: {{ step.why }}</em>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+  {% if item.explanation_check %}
+  <p class="sl-check"><strong>Check:</strong> {{ item.explanation_check }}</p>
+  {% endif %}
+  {% if item.correct_answer %}
+  <p><strong>Answer:</strong> {{ item.correct_answer }}</p>
+  {% endif %}
+  <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="phase" value="worked">
+    <button type="submit" class="np-pw-btn np-pw-btn--primary">Continue to faded example</button>
+  </form>
+  {% else %}
+  {% if item.given_steps %}
+  <ul>
+    {% for step in item.given_steps %}
+    <li><strong>{{ step.label }}:</strong> {{ step.text }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}" id="sr-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="phase" value="{{ phase }}">
+    <input type="hidden" name="hint_level" id="sr-hint-level" value="none">
+    <input type="hidden" name="solution_viewed" id="sr-solution-viewed" value="0">
+    {% if item.choices %}
+    <div class="sl-choices" role="radiogroup">
+      {% for choice in item.choices %}
+      <label class="choice-card">
+        <input type="radio" name="selected_answer" value="{{ letters[loop.index0] }}">
+        <span>{{ letters[loop.index0] }}.</span>
+        <span>{{ choice|safe }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    {% else %}
+    <input name="selected_answer" autocomplete="off" placeholder="Enter your answer">
+    {% endif %}
+    <button type="submit" class="np-pw-btn np-pw-btn--primary">Submit</button>
+  </form>
+  <p class="sl-help-actions">
+    <button type="button" id="sr-hint-light">Light hint</button>
+    <button type="button" id="sr-hint-critical">Critical hint</button>
+    <button type="button" id="sr-solution">Show solution</button>
+  </p>
+  <aside id="sr-hint-panel" class="sl-panel" hidden></aside>
+  <aside id="sr-solution-panel" class="sl-panel sl-panel--solution" hidden></aside>
+  {% endif %}
+</div>
+<script>
+(function () {
+  const form = document.getElementById("sr-form");
+  if (!form) return;
+  const hintLevel = document.getElementById("sr-hint-level");
+  const solutionViewed = document.getElementById("sr-solution-viewed");
+  const hintPanel = document.getElementById("sr-hint-panel");
+  const solutionPanel = document.getElementById("sr-solution-panel");
+  function post(kind) {
+    const body = new URLSearchParams();
+    body.set("csrf_token", {{ csrf_token|tojson }});
+    body.set("kind", kind);
+    return fetch({{ url_for('skill_repair.track_event', skill_code=skill_code)|tojson }}, {
+      method: "POST",
+      headers: { "X-CSRF-Token": {{ csrf_token|tojson }}, "X-Requested-With": "XMLHttpRequest" },
+      body,
+      credentials: "same-origin"
+    }).then(function (r) { return r.json(); });
+  }
+  document.getElementById("sr-hint-light")?.addEventListener("click", function () {
+    if (hintLevel && hintLevel.value === "none") hintLevel.value = "light";
+    post("hint_light").then(function (j) {
+      if (!hintPanel) return;
+      hintPanel.hidden = false;
+      hintPanel.textContent = j.hint || "";
+    });
+  });
+  document.getElementById("sr-hint-critical")?.addEventListener("click", function () {
+    if (hintLevel) hintLevel.value = "critical";
+    if (solutionViewed) solutionViewed.value = "1";
+    post("hint_critical").then(function (j) {
+      if (!hintPanel) return;
+      hintPanel.hidden = false;
+      hintPanel.textContent = j.hint || "";
+    });
+  });
+  document.getElementById("sr-solution")?.addEventListener("click", function () {
+    if (solutionViewed) solutionViewed.value = "1";
+    post("solution").then(function (j) {
+      if (!solutionPanel) return;
+      solutionPanel.hidden = false;
+      solutionPanel.textContent = (j.answer ? "Answer: " + j.answer + "\n" : "") + (j.solution || "");
+    });
+  });
+})();
+</script>
+{% endblock %}

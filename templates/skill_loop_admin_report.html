@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Skill-loop report{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap" data-skill-loop-report>
+  <aside class="sl-disclaimer" data-disclaimer>
+    <p lang="en"><strong>Pilot only — usability and data-integrity evaluation. Not evidence of instructional effectiveness.</strong></p>
+    <p lang="zh">仅用于可用性和数据完整性试点，不构成教学有效性或提分证明。</p>
+  </aside>
+  <h1>Skill-loop usability report</h1>
+  <p>Sample size n={{ metrics.sample_n }} · completion rate {{ '%.0f'|format(metrics.completion_rate * 100) }}% · missing {{ metrics.missing_n }} · excluded {{ metrics.excluded_n }}</p>
+  {% if not metrics.allow_conclusion_labels %}
+  <p data-no-conclusion>n &lt; 30: effectiveness / improvement / significance labels are suppressed. Statistical significance and score-lift forecasts are not computed.</p>
+  {% endif %}
+  <p><a href="{{ export_href }}">Export report (plain text, disclaimer included)</a></p>
+
+  <h2>Immediate performance</h2>
+  <p>{{ metrics.immediate_n }} immediate_pass (not mastery)</p>
+
+  <h2>Transfer</h2>
+  <p>transfer_accuracy uses stage=transfer only: first unseen item, counts_as_independent=1, no solution, no critical hint. Independent practice and delayed items are excluded.</p>
+  <p>{{ metrics.incomplete_rule }}</p>
+  <ul>
+    <li>assigned denominator: {{ metrics.transfer_assigned_denominator }}</li>
+    <li>started denominator: {{ metrics.transfer_started_denominator }}</li>
+    <li>completed denominator: {{ metrics.transfer_completed_denominator }}</li>
+    <li>transfer_accuracy_started: {{ metrics.transfer_accuracy_started }}</li>
+    <li>transfer_accuracy_completed: {{ metrics.transfer_accuracy_completed }}</li>
+  </ul>
+
+  <h2>Delayed retention</h2>
+  <p>On-time delayed_pass: {{ metrics.delayed_pass_on_time }} (n={{ metrics.delayed_on_time_n }})</p>
+  <p>Overdue delayed_pass: {{ metrics.delayed_pass_overdue }} (n={{ metrics.delayed_overdue_n }}). Overdue completions are not labeled as on-time.</p>
+
+  <h2>Arm A exposure</h2>
+  <p data-arm-a-exposure lang="en">{{ metrics.arm_a_exposure_note_en }}</p>
+  <p data-arm-a-exposure-zh lang="zh">{{ metrics.arm_a_exposure_note_zh }}</p>
+</div>
+{% endblock %}

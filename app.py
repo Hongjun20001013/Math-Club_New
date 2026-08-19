@@ -211,7 +211,14 @@ app.config.update(
         or os.environ.get("FLASK_ENV", "").lower() == "production"
     ),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
+    SKILL_LOOP_PILOT=False,
 )
+
+from skill_loop import skill_loop_bp, skill_loop_enabled
+from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables
+
+app.register_blueprint(skill_loop_bp)
+app.register_blueprint(skill_repair_bp)
 
 LOGIN_ATTEMPTS: dict[str, List[float]] = {}
 
@@ -250,7 +257,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260819-math-board-v8")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260819-choice-restore-v1")
 
 _DB_SCHEMA_READY = False
 
@@ -1113,6 +1120,18 @@ def init_db():
     )
     db.execute(
         """
+        CREATE TABLE IF NOT EXISTS practice_answer_drafts (
+            attempt_id INTEGER NOT NULL,
+            question_index INTEGER NOT NULL,
+            selected_answer TEXT NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (attempt_id, question_index)
+        )
+        """
+    )
+    ensure_repair_tables(db)
+    db.execute(
+        """
         UPDATE users
         SET password = ''
         WHERE password_hash IS NOT NULL AND TRIM(password_hash) != ''
@@ -1246,6 +1265,7 @@ def inject_template_config():
         "style_css_revision": STYLE_CSS_REVISION,
         "hard_drill_meta": _hard_drill_display_meta(),
         "csrf_token": _csrf_token(),
+        "skill_loop_pilot_enabled": skill_loop_enabled(),
         **_site_branding_context(),
     }
 
@@ -1402,6 +1422,9 @@ def _practice_domain_from_path(path: str) -> str | None:
         "miss-quiz",
         "mistake-redo",
         "session",
+        "skill-loop",
+        "repair",
+        "draft-answer",
     ):
         return None
     return dom
@@ -1443,6 +1466,8 @@ def _path_allowed_for_grants(path: str, grants: set[str] | None, db: sqlite3.Con
         if dom:
             return _domain_allowed_by_grants(dom, grants)
         if p.startswith("/practice/analytics") or p.startswith("/practice/miss-quiz"):
+            return "sat" in grants
+        if p.startswith("/practice/repair") or p.startswith("/practice/draft-answer"):
             return "sat" in grants
         if p.startswith("/practice/materials"):
             return "sat" in grants
@@ -1680,6 +1705,8 @@ def _validate_csrf_on_mutations():
 
 @app.before_request
 def require_authenticated_user():
+    if (request.path or "").startswith("/practice/skill-loop") and not skill_loop_enabled():
+        abort(404)
     endpoint = request.endpoint or ""
     if endpoint in {
         "static",
@@ -6079,7 +6106,7 @@ def _apply_practice_mistake_progress(
 ) -> None:
     if domain == "placement" or mistake_redo:
         if is_correct == 1:
-            _mistake_progress_on_correct(db, learner_key, domain, topic, q_index)
+            _mistake_progress_mark_reviewed(db, learner_key, domain, topic, q_index)
         elif is_correct == 0:
             _mistake_progress_on_wrong(db, learner_key, domain, topic, q_index)
         return
@@ -6110,7 +6137,7 @@ def _resume_incomplete_attempt_id(
         """
         SELECT pa.id
         FROM practice_attempts pa
-        JOIN practice_responses pr ON pr.attempt_id = pa.id
+        LEFT JOIN practice_responses pr ON pr.attempt_id = pa.id
         WHERE pa.user_id = ? AND pa.domain = ? AND pa.topic = ?
           AND pa.created_at >= datetime('now', '-24 hours')
         GROUP BY pa.id
@@ -7688,6 +7715,7 @@ def _mistake_progress_on_wrong(
 def _mistake_progress_on_correct(
     db: sqlite3.Connection, learner_key: str, domain: str, topic: str, q_index: int
 ) -> None:
+    """Same-item success is review only. Verified mastery requires a delayed new item."""
     row = db.execute(
         """
         SELECT correct_after_last_wrong, status
@@ -7698,18 +7726,17 @@ def _mistake_progress_on_correct(
     ).fetchone()
     if row is None:
         return
+    st = str(row["status"] or "")
+    if st in ("mastered", "archived"):
+        return
     n = int(row["correct_after_last_wrong"] or 0) + 1
-    if n >= 2:
-        st = "mastered"
-    else:
-        st = "redo_correct"
     db.execute(
         """
         UPDATE mistake_learning_progress
-        SET correct_after_last_wrong = ?, status = ?, updated_at = datetime('now')
+        SET correct_after_last_wrong = ?, status = 'reviewed', updated_at = datetime('now')
         WHERE learner_key = ? AND domain = ? AND topic = ? AND question_index = ?
         """,
-        (n, st, learner_key, domain, topic, q_index),
+        (n, learner_key, domain, topic, q_index),
     )
 
 
@@ -7747,17 +7774,17 @@ def _mistake_progress_mark_reviewed(
     )
 
 
-def _mistake_progress_force_mastered(
+def _mistake_progress_archive(
     db: sqlite3.Connection, learner_key: str, domain: str, topic: str, q_index: int
 ) -> None:
+    """Remove from the active mistake list without claiming verified mastery."""
     db.execute(
         """
         INSERT INTO mistake_learning_progress
             (learner_key, domain, topic, question_index, status, correct_after_last_wrong, updated_at)
-        VALUES (?, ?, ?, ?, 'mastered', 2, datetime('now'))
+        VALUES (?, ?, ?, ?, 'archived', 0, datetime('now'))
         ON CONFLICT(learner_key, domain, topic, question_index) DO UPDATE SET
-            status = 'mastered',
-            correct_after_last_wrong = 2,
+            status = 'archived',
             updated_at = datetime('now')
         """,
         (learner_key, domain, topic, q_index),
@@ -7767,7 +7794,7 @@ def _mistake_progress_force_mastered(
 def _mistake_progress_revert_mastered(
     db: sqlite3.Connection, learner_key: str, domain: str, topic: str, q_index: int
 ) -> bool:
-    """Undo a mistaken 'mastered' mark; slot goes back to reviewed (redo ladder resets)."""
+    """Undo archive or a verified mastered mark; slot returns to reviewed."""
     row = db.execute(
         """
         SELECT status FROM mistake_learning_progress
@@ -7775,7 +7802,7 @@ def _mistake_progress_revert_mastered(
         """,
         (learner_key, domain, topic, q_index),
     ).fetchone()
-    if row is None or str(row["status"] or "") != "mastered":
+    if row is None or str(row["status"] or "") not in {"mastered", "archived"}:
         return False
     db.execute(
         """
@@ -8088,8 +8115,9 @@ def _analytics_wrong_rows(db: sqlite3.Connection, user_id: Any) -> List[dict]:
         }
     labels = {
         "unreviewed": "Unreviewed",
-        "reviewed": "Reviewed",
-        "redo_correct": "Redo correct",
+        "reviewed": "Reviewed—not verified mastery",
+        "redo_correct": "Reviewed—not verified mastery",
+        "archived": "Reviewed—not verified mastery",
         "mastered": "Mastered",
     }
     for item in out:
@@ -9170,7 +9198,7 @@ def _analytics_learning_loop_snapshot(
 ) -> Dict[str, Any]:
     """Per-dashboard stats for the 4-layer learning loop UI (mistake analytics)."""
     total = len(rows)
-    mastery_order = ("unreviewed", "reviewed", "redo_correct", "mastered")
+    mastery_order = ("unreviewed", "reviewed", "redo_correct", "archived", "mastered")
     mastery_counts: Dict[str, int] = {k: 0 for k in mastery_order}
     for r in rows:
         eff = str(r.get("mastery_effective") or "unreviewed")
@@ -9187,9 +9215,10 @@ def _analytics_learning_loop_snapshot(
 
     mastery_human = {
         "unreviewed": ("Unreviewed", "Captured in the log; add tags or notes to move forward."),
-        "reviewed": ("Reviewed", "You reflected after the miss."),
-        "redo_correct": ("Redo correct", "One solid correct since the mistake."),
-        "mastered": ("Mastered", "Two consecutive corrects, or manually marked mastered."),
+        "reviewed": ("Reviewed—not verified mastery", "Original-item redo or reflection. Not an independent pass."),
+        "redo_correct": ("Reviewed—not verified mastery", "Same-item correct still does not verify mastery."),
+        "archived": ("Archived from mistake list", "Removed from the active queue without a delayed independent pass."),
+        "mastered": ("Mastered", "Delayed new-item independent pass only."),
     }
     mastery_ladder = []
     for k in mastery_order:
@@ -11663,6 +11692,9 @@ def practice_analytics():
         visible_wrong_rows = [r for r in rows if r.get("pr_id") in visible_ids]
     for item in sat_unit_distribution:
         item["is_active"] = item["id"] == active_part_id
+    skill_clusters = cluster_wrong_rows(visible_wrong_rows)
+    next_repair_step = recommended_next_step(skill_clusters)
+    show_skill_clusters = active_part_id in unit_label_by_part
     return render_template(
         "practice_analytics.html",
         wrong_rows=rows,
@@ -11680,6 +11712,9 @@ def practice_analytics():
         viz_hero_conic=viz_hero_conic,
         risk_viz_max=risk_viz_max,
         learning_loop_snapshot=learning_loop_snapshot,
+        skill_clusters=skill_clusters,
+        next_repair_step=next_repair_step,
+        show_skill_clusters=show_skill_clusters,
     )
 
 
@@ -11750,15 +11785,15 @@ def practice_analytics_mastery():
         flash("Unknown topic.")
         return redirect(url_for("practice_analytics"))
     db = get_db()
-    _mistake_progress_force_mastered(db, _learner_key(), domain, topic, q_index)
+    _mistake_progress_archive(db, _learner_key(), domain, topic, q_index)
     db.commit()
-    flash("Marked as mastered. Use Cancel on the row or Undo in the toast if that was a mistake.")
+    flash("Archived from the mistake list. This is reviewed—not verified mastery.")
     return _redirect_practice_analytics(part, None)
 
 
 @app.route("/practice/analytics/api/mastery", methods=["POST"])
 def practice_analytics_api_mastery():
-    """JSON: mark a (domain, topic, bank index) slot mastered without a full-page redirect."""
+    """JSON: archive a (domain, topic, bank index) slot without claiming verified mastery."""
     data = request.get_json(silent=True) or {}
     domain = (data.get("domain") or "").strip()
     topic = (data.get("topic") or "").strip()
@@ -11769,13 +11804,13 @@ def practice_analytics_api_mastery():
     if domain not in BANKS or topic not in BANKS.get(domain, {}):
         return jsonify({"ok": False, "error": "unknown topic"}), 400
     db = get_db()
-    _mistake_progress_force_mastered(db, _learner_key(), domain, topic, q_index)
+    _mistake_progress_archive(db, _learner_key(), domain, topic, q_index)
     db.commit()
     return jsonify(
         {
             "ok": True,
-            "mastery_label": "Mastered",
-            "mastery_effective": "mastered",
+            "mastery_label": "Reviewed—not verified mastery",
+            "mastery_effective": "archived",
         }
     )
 
@@ -11800,7 +11835,7 @@ def practice_analytics_api_mastery_cancel():
     return jsonify(
         {
             "ok": True,
-            "mastery_label": "Reviewed",
+            "mastery_label": "Reviewed—not verified mastery",
             "mastery_effective": "reviewed",
             "mastery_db_status": "reviewed",
         }
@@ -12204,6 +12239,87 @@ def _insert_practice_attempt(
     )
     db.commit()
     return int(cur.lastrowid)
+
+
+PRACTICE_DRAFT_SESSION_KEY = "practice_answer_drafts"
+
+
+def _practice_draft_key(attempt_id: int, qnum: int) -> str:
+    return f"{int(attempt_id)}:{int(qnum)}"
+
+
+def _practice_draft_map() -> dict:
+    raw = session.get(PRACTICE_DRAFT_SESSION_KEY)
+    return raw if isinstance(raw, dict) else {}
+
+
+def _save_practice_draft(attempt_id: int | None, qnum: int, answer: str) -> None:
+    if attempt_id is None:
+        return
+    answer = (answer or "").strip()
+    drafts = _practice_draft_map()
+    key = _practice_draft_key(int(attempt_id), int(qnum))
+    if answer:
+        drafts[key] = answer
+    else:
+        drafts.pop(key, None)
+    session[PRACTICE_DRAFT_SESSION_KEY] = drafts
+    session.modified = True
+    db = get_db()
+    if answer:
+        db.execute(
+            """
+            INSERT INTO practice_answer_drafts (attempt_id, question_index, selected_answer, updated_at)
+            VALUES (?, ?, ?, datetime('now'))
+            ON CONFLICT(attempt_id, question_index) DO UPDATE SET
+                selected_answer = excluded.selected_answer,
+                updated_at = datetime('now')
+            """,
+            (int(attempt_id), int(qnum), answer),
+        )
+    else:
+        db.execute(
+            "DELETE FROM practice_answer_drafts WHERE attempt_id = ? AND question_index = ?",
+            (int(attempt_id), int(qnum)),
+        )
+    db.commit()
+
+
+def _load_practice_draft(attempt_id: int | None, qnum: int) -> str:
+    if attempt_id is None:
+        return ""
+    db = get_db()
+    row = db.execute(
+        """
+        SELECT selected_answer FROM practice_answer_drafts
+        WHERE attempt_id = ? AND question_index = ?
+        """,
+        (int(attempt_id), int(qnum)),
+    ).fetchone()
+    if row is not None and str(row["selected_answer"] or "").strip():
+        return str(row["selected_answer"]).strip()
+    return str(_practice_draft_map().get(_practice_draft_key(int(attempt_id), int(qnum)), "") or "")
+
+
+def _saved_selected_answer_for_question(
+    db: sqlite3.Connection, attempt_id: int | None, qnum: int
+) -> str:
+    """Restore the student's choice from DB first, then the in-session draft."""
+    if attempt_id is not None:
+        row = db.execute(
+            """
+            SELECT selected_answer FROM practice_responses
+            WHERE attempt_id = ? AND question_index = ?
+            ORDER BY id DESC LIMIT 1
+            """,
+            (int(attempt_id), int(qnum)),
+        ).fetchone()
+        if row is not None and str(row["selected_answer"] or "").strip():
+            raw = str(row["selected_answer"]).strip()
+            if len(raw) == 1:
+                return raw.upper()
+            return raw
+    return _load_practice_draft(attempt_id, qnum)
 
 
 def _visible_learning_tracks(grants: set[str] | None) -> list[dict[str, Any]]:
@@ -12860,7 +12976,7 @@ def practice_miss_quiz_submit():
     )
     lk = _learner_key()
     if is_correct == 1:
-        _mistake_progress_on_correct(db, lk, domain, topic, bank_q)
+        _mistake_progress_mark_reviewed(db, lk, domain, topic, bank_q)
     elif is_correct == 0:
         _mistake_progress_on_wrong(db, lk, domain, topic, bank_q)
     db.commit()
@@ -13218,8 +13334,10 @@ def practice_question(domain, topic, qnum):
                 session[sk] = attempt_id
                 session.modified = True
             else:
-                attempt_id = None
-                session.pop(sk, None)
+                attempt_id = _insert_practice_attempt(
+                    db, user_id, domain, topic, question_index
+                )
+                session[sk] = attempt_id
                 session.modified = True
         else:
             attempt_id = int(row["id"])
@@ -13321,6 +13439,10 @@ def practice_question(domain, topic, qnum):
         placement_mode and attempt_id is not None and answered_count == 0
     )
 
+    saved_selected_answer = _saved_selected_answer_for_question(
+        db, attempt_id, question_index
+    )
+
     return render_template(
         "practice_question.html",
         q=_sanitize_question_for_render(q),
@@ -13356,7 +13478,67 @@ def practice_question(domain, topic, qnum):
         phase3_answer_locked=bool(pace_seconds)
         and not mistake_redo_mode
         and question_index in answered_qset,
+        saved_selected_answer=saved_selected_answer,
     )
+
+
+@app.route("/practice/draft-answer", methods=["POST"])
+def practice_draft_answer():
+    """Save the current choice without grading, then jump to Previous/Next/picker."""
+    domain = (request.form.get("domain") or "").strip()
+    topic = (request.form.get("topic") or "").strip()
+    raw_answer = (request.form.get("selected_answer") or "").strip()
+    attempt_id_raw = (request.form.get("attempt_id") or "").strip()
+    qnum_raw = (request.form.get("qnum") or "0").strip()
+    goto_raw = (request.form.get("goto_qnum") or "").strip()
+    try:
+        current_q = int(qnum_raw or 0)
+    except ValueError:
+        current_q = 0
+    try:
+        goto_q = int(goto_raw)
+    except ValueError:
+        goto_q = current_q
+    try:
+        attempt_id = int(attempt_id_raw) if attempt_id_raw else None
+    except ValueError:
+        attempt_id = None
+
+    domain_data = BANKS.get(domain)
+    if not domain_data or topic not in domain_data:
+        return "Unknown topic", 404
+    questions = get_questions_for_topic(domain, topic, domain_data[topic]) or []
+    bank_total = len(questions)
+    if bank_total:
+        goto_q = max(0, min(bank_total - 1, goto_q))
+        current_q = max(0, min(bank_total - 1, current_q))
+
+    db = get_db()
+    user_id = session.get("user_id")
+    sk = _practice_session_key(domain, topic)
+    if attempt_id is not None and not _attempt_user_matches(db, attempt_id, user_id):
+        attempt_id = None
+    if attempt_id is None:
+        session_aid = session.get(sk)
+        try:
+            attempt_id = int(session_aid) if session_aid is not None else None
+        except (TypeError, ValueError):
+            attempt_id = None
+    if attempt_id is None:
+        attempt_id = _insert_practice_attempt(db, user_id, domain, topic, current_q)
+        session[sk] = attempt_id
+        session.modified = True
+    else:
+        session[sk] = attempt_id
+        session.modified = True
+
+    q_kind = ""
+    if questions:
+        q_kind = str(questions[current_q].get("question_kind") or "mcq")
+    if q_kind in ("mcq", "mcq5") and raw_answer:
+        raw_answer = raw_answer.strip().upper()[:1]
+    _save_practice_draft(attempt_id, current_q, raw_answer)
+    return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=goto_q))
 
 
 @app.route("/practice/submit", methods=["POST"])
@@ -13505,6 +13687,7 @@ def submit_practice_answer():
             """,
             (attempt_id, q_index, selected_answer, correct_answer, is_correct),
         )
+        _save_practice_draft(attempt_id, q_index, "")
         lk = _learner_key()
         _apply_practice_mistake_progress(
             db,

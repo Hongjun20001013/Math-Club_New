@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Control lesson{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap">
+  <h1>Existing lesson (arm A)</h1>
+  <p><a href="{{ lesson_href }}">Open 1.1 Linear Equations</a></p>
+  <p><a href="{{ practice_href }}">Open existing practice</a></p>
+  <p class="sl-self-report" data-arm-a-self-report>
+    The button below is a completion self-report only. The report cannot verify that you actually finished the existing lesson, so Arm A cannot support an instructional-effectiveness conclusion.
+  </p>
+  <form method="post" action="{{ url_for('skill_loop.complete_control', skill_code=skill_code) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">I finished the existing lesson (self-report)</button>
+  </form>
+</div>
+<script src="{{ url_for('static', filename='skill_loop.js') }}?v={{ style_css_revision }}"></script>
+{% endblock %}

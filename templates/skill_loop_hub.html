@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Skill loop · {{ skill_code }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap">
+  <p class="np-atelier-kicker">Skill loop usability pilot</p>
+  <h1>Linear remaining quantity</h1>
+  <p>This is a data-integrity / usability check. It is not an effectiveness conclusion.</p>
+  <p>Arm: <strong>{{ assignment.arm }}</strong> · Status: <strong>{{ status_label }}</strong></p>
+  {% if show_mastered %}
+  <p class="sl-mastered" data-mastery="delayed_pass">已掌握</p>
+  {% endif %}
+  {% if run %}
+  <p>Current phase: {{ run.current_phase }} · variant {{ run.current_variant }}</p>
+  {% endif %}
+  <p>
+    <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('skill_loop.phase_view', skill_code=skill_code, phase=(run.current_phase if run else 'precheck')) }}">Continue</a>
+  </p>
+</div>
+<script src="{{ url_for('static', filename='skill_loop.js') }}?v={{ style_css_revision }}"></script>
+{% endblock %}

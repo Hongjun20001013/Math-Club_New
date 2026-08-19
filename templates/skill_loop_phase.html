@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ phase }} · skill loop{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap" data-skill-loop-phase="{{ phase }}" data-item-id="{{ item.id }}" data-item-version="{{ item.version }}">
+  <p class="np-atelier-kicker">{{ phase }} · arm {{ arm }}</p>
+  <h1>Skill loop</h1>
+  <p data-mastery-label>{{ mastery_label }}</p>
+  {% if show_mastered %}
+  <p class="sl-mastered" data-mastery="delayed_pass">已掌握</p>
+  {% else %}
+  <p class="sl-not-mastered" data-mastery="{{ mastery_status }}">Immediate pass is not mastery</p>
+  {% endif %}
+  {% if review_example %}
+  <p class="sl-remediation" data-sl-remediation="faded_rework">Re-read this worked example, then try a new faded attempt. Repeating the missed faded item cannot count as independent mastery.</p>
+  {% endif %}
+  <div class="sl-stem">{{ item.stem_html|safe }}</div>
+  {% if phase == 'instruction' and item.worked_steps %}
+  <ol class="sl-steps" data-sl-instruction-steps>
+    {% for step in item.worked_steps %}
+    <li>
+      <strong>Step {{ step.step }}.</strong>
+      <span>{{ step.do }}</span>
+      <em class="sl-why">Why: {{ step.why }}</em>
+    </li>
+    {% endfor %}
+  </ol>
+  {% if item.explanation_check %}
+  <p class="sl-check" data-sl-explanation-check><strong>Check:</strong> {{ item.explanation_check }}</p>
+  {% endif %}
+  {% if item.correct_answer_display %}
+  <p><strong>Answer:</strong> {{ item.correct_answer_display }}</p>
+  {% endif %}
+  {% endif %}
+  {% if item.given_steps %}
+  <ul>
+    {% for step in item.given_steps %}
+    <li>{{ step.label }}: {{ step.text }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if review_example %}
+  <p><a class="np-atelier-btn np-atelier-btn--primary" href="{{ continue_href }}" data-sl-continue-faded>Continue to a new faded attempt</a></p>
+  {% else %}
+  <form method="post" action="{{ url_for('skill_loop.submit', skill_code=skill_code) }}" id="sl-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="phase" value="{{ phase }}">
+    <input type="hidden" name="item_id" value="{{ item.id }}">
+    <input type="hidden" name="variant" value="{{ item.variant_index }}">
+    <input type="hidden" name="hint_level" id="sl-hint-level" value="none">
+    <input type="hidden" name="solution_viewed" id="sl-solution-viewed" value="0">
+    {% if item.choices %}
+    <div class="sl-choices">
+      {% for choice in item.choices %}
+      <label><input type="radio" name="selected_answer" value="{{ 'ABCD'[loop.index0] }}"> {{ choice }}</label>
+      {% endfor %}
+    </div>
+    {% elif item.blanks %}
+      {% for blank in item.blanks %}
+      <label>{{ blank.prompt }} <input name="{{ blank.id }}" autocomplete="off"></label>
+      {% endfor %}
+    {% else %}
+    <input name="selected_answer" placeholder="Continue" autocomplete="off">
+    {% endif %}
+    <button type="submit">Submit</button>
+  </form>
+  {% endif %}
+  <p class="sl-help-actions">
+    <button type="button" id="sl-hint-light" data-level="light">Light hint</button>
+    <button type="button" id="sl-hint-critical" data-level="critical">Critical hint</button>
+    <button type="button" id="sl-solution">Show solution</button>
+  </p>
+  <aside id="sl-hint-panel" class="sl-panel" data-sl-hint-panel hidden></aside>
+  <aside id="sl-solution-panel" class="sl-panel sl-panel--solution" data-sl-solution-panel hidden></aside>
+</div>
+<script src="{{ url_for('static', filename='skill_loop.js') }}?v={{ style_css_revision }}"></script>
+{% endblock %}

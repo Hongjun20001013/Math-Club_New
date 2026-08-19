@@ -176,14 +176,14 @@
         {% else %}
         <div class="sat-subnav-group sat-subnav-group--primary">
         {% if qnum > 0 %}
-        <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum - 1) }}" class="nav-btn nav-btn-secondary">
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum - 1 }}">
             ← Previous
-        </a>
+        </button>
         {% endif %}
         {% if qnum < total - 1 %}
-        <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=qnum + 1) }}" class="nav-btn nav-btn-secondary">
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">
             Next →
-        </a>
+        </button>
         {% endif %}
         {% if not placement_mode and not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
         <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
@@ -222,7 +222,8 @@
         {% endif %}
     </div>
 
-      <form method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
+      <form id="practice-answer-form" method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         {% if tracked_responses_hint %}
         <p class="np-tracked-hint" role="note">{{ tracked_responses_hint }}</p>
         {% endif %}
@@ -241,7 +242,7 @@
         <input type="hidden" name="miss_anchor" value="{{ mistake_miss_anchor|default('') }}">
         {% endif %}
         {% if q.question_kind|default('mcq') in ['mcq', 'mcq5'] %}
-        <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
+        <input type="hidden" id="selected-answer-input" value="{{ saved_selected_answer|default('') }}">
         {% endif %}
     <div id="question-area" class="sat-split-card" aria-label="Question and answer area">
         <div class="sat-split">
@@ -297,15 +298,16 @@
                 </div>
                 </div>
                 {% else %}
-                <div class="choices-panel choices-stack sat-choices-list">
+                <div class="choices-panel choices-stack sat-choices-list" role="radiogroup" aria-label="Answer choices">
             {% for choice in q.choices %}
-            <div class="choice-card" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+            <label class="choice-card{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} selected is-selected{% endif %}" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+                <input type="radio" class="choice-radio-input" name="selected_answer" value="{{ choice_letters[loop.index0] }}"{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} checked{% endif %}{% if phase3_answer_locked|default(false) %} disabled{% endif %}>
                 <span class="choice-bubble" aria-hidden="true"></span>
                 <span class="choice-letter">{{ choice_letters[loop.index0] }}</span>
                 <div class="choice-content">
                     {{ choice|safe }}
                 </div>
-            </div>
+            </label>
             {% endfor %}
                 </div>
                 {% endif %}
@@ -369,7 +371,7 @@
                 {% for i in range(total) %}
                 {% set done = i in answered_qset %}
                 <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=i) }}"
-                   class="q-nav-btn{% if i == qnum %} is-current{% endif %}{% if done %} is-done{% endif %}"
+                   class="q-nav-btn js-practice-jump{% if i == qnum %} is-current{% endif %}{% if done %} is-done{% endif %}"
                    data-q-index="{{ i }}"
                    aria-label="Question {{ i + 1 }}{% if i == qnum %}, current{% endif %}{% if done %}, answered{% else %}, not answered yet{% endif %}">
                    {{ i + 1 }}
@@ -625,6 +627,20 @@ const storageKey = practiceStoragePrefix + "{{ qnum }}";
 const scratchKey = storageKey + "_scratch";
 const reviewFlagKey = storageKey + "_review_flag";
 const questionAlreadyAnswered = {{ (qnum in answered_qset) | tojson }};
+const serverSavedLetter = {{ (saved_selected_answer or '')|tojson }};
+
+function migrateLegacyDraftKey() {
+    if (!practiceAttemptId) return;
+    const current = localStorage.getItem(storageKey);
+    if (current !== null) return;
+    const legacyAtt0 = "{{ domain }}_{{ topic }}_att0_{{ qnum }}";
+    const legacyBare = "{{ domain }}_{{ topic }}_{{ qnum }}";
+    const fromAtt0 = localStorage.getItem(legacyAtt0);
+    const fromBare = localStorage.getItem(legacyBare);
+    if (fromAtt0 !== null) localStorage.setItem(storageKey, fromAtt0);
+    else if (fromBare !== null) localStorage.setItem(storageKey, fromBare);
+}
+migrateLegacyDraftKey();
 
 function clearLegacyPracticeDrafts() {
     if (!practiceAttemptId) return;
@@ -650,8 +666,9 @@ const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_res
 function setAnswerState(hasAnswer, label) {
     practiceForm?.classList.toggle("is-answered", hasAnswer);
     answerStatus?.classList.toggle("is-visible", hasAnswer || isConstructedMode);
+    const nativeChoice = document.querySelector(".choice-radio-input");
     submitButtons.forEach((btn) => {
-        if (isConstructedMode) {
+        if (isConstructedMode || nativeChoice) {
             btn.removeAttribute("disabled");
             btn.classList.remove("is-disabled");
             return;
@@ -681,34 +698,69 @@ function lockPhase3Choices(message) {
     document.querySelectorAll(".sat-choices-list .choice-card").forEach((c) => {
         c.classList.add("is-locked");
         c.setAttribute("aria-disabled", "true");
+        const radio = c.querySelector("input[type=radio]");
+        if (radio) radio.disabled = true;
     });
     if (message) setAnswerState(true, message);
 }
 
 if (selectedInput) {
-document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
-    const activate = () => {
-        if (phase3ChoiceLocked || card.classList.contains("is-locked")) return;
-        document.querySelectorAll(".sat-choices-list .choice-card")
-            .forEach(c => {
-                c.classList.remove("selected");
-                c.classList.remove("is-selected");
-                c.setAttribute("aria-pressed", "false");
-            });
+function applyChoiceCard(card, persist) {
+    if (!card || phase3ChoiceLocked || card.classList.contains("is-locked")) return;
+    document.querySelectorAll(".sat-choices-list .choice-card")
+        .forEach(c => {
+            c.classList.remove("selected");
+            c.classList.remove("is-selected");
+            c.setAttribute("aria-pressed", "false");
+        });
 
-        card.classList.add("selected");
-        card.classList.add("is-selected");
-        card.setAttribute("aria-pressed", "true");
-        localStorage.setItem(storageKey, card.dataset.index);
-        selectedInput.value = card.dataset.letter;
-        if (lockPhase3Answers) {
-            lockPhase3Choices(`Selected ${card.dataset.letter}. Locked for this attempt — submit to continue.`);
-        } else {
-            setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
-        }
-    };
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-pressed", "false");
+    card.classList.add("selected");
+    card.classList.add("is-selected");
+    card.setAttribute("aria-pressed", "true");
+    const radio = card.querySelector("input[type=radio]");
+    if (radio && !radio.disabled) radio.checked = true;
+    if (persist !== false) localStorage.setItem(storageKey, card.dataset.index);
+    selectedInput.value = card.dataset.letter || (radio && radio.value) || "";
+    if (lockPhase3Answers) {
+        lockPhase3Choices(`Selected ${card.dataset.letter}. Locked for this attempt — submit to continue.`);
+    } else {
+        setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
+    }
+}
+
+function restoreSavedChoice() {
+    const cards = Array.from(document.querySelectorAll(".sat-choices-list .choice-card"));
+    let card = null;
+    if (serverSavedLetter) {
+        card = cards.find((c) => (c.dataset.letter || "") === serverSavedLetter) || null;
+    }
+    const savedIndex = localStorage.getItem(storageKey);
+    if (!card && savedIndex !== null && cards[savedIndex]) {
+        card = cards[savedIndex];
+    }
+    const checked = document.querySelector(".choice-radio-input:checked");
+    if (!card && checked) card = checked.closest(".choice-card");
+    if (!card) return;
+    const letter = card.dataset.letter || "";
+    document.querySelectorAll(".sat-choices-list .choice-card")
+        .forEach(c => {
+            c.classList.remove("selected");
+            c.classList.remove("is-selected");
+            c.setAttribute("aria-pressed", "false");
+        });
+    card.classList.add("selected");
+    card.classList.add("is-selected");
+    card.setAttribute("aria-pressed", "true");
+    const radio = card.querySelector("input[type=radio]");
+    if (radio) radio.checked = true;
+    selectedInput.value = letter;
+    setAnswerState(true, `Selected ${letter}. Ready to submit.`);
+}
+
+document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
+    const activate = () => applyChoiceCard(card, true);
+    card.setAttribute("role", "radio");
+    card.setAttribute("aria-pressed", card.classList.contains("is-selected") ? "true" : "false");
     card.addEventListener("click", activate);
     card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -716,7 +768,12 @@ document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
             activate();
         }
     });
+    const radio = card.querySelector("input[type=radio]");
+    if (radio) {
+        radio.addEventListener("change", () => applyChoiceCard(card, true));
+    }
 });
+restoreSavedChoice();
 if (phase3AnswerLocked) {
     lockPhase3Choices("This answer is locked for the current classroom attempt.");
 }
@@ -797,25 +854,17 @@ window.addEventListener("load", () => {
         });
     }
 
-    const saved = questionAlreadyAnswered ? null : localStorage.getItem(storageKey);
+    const saved = localStorage.getItem(storageKey);
     if (constructedInput && saved !== null) {
         constructedInput.value = saved;
         setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
     } else if (sprInput && saved !== null) {
         sprInput.value = saved;
         setAnswerState(!!sprInput.value.trim(), "Answer entered. Ready to submit.");
-    } else if (selectedInput && saved !== null) {
-        const cards = document.querySelectorAll(".sat-choices-list .choice-card");
-        if (cards[saved]) {
-            cards[saved].classList.add("selected");
-            cards[saved].classList.add("is-selected");
-            cards[saved].setAttribute("aria-pressed", "true");
-            selectedInput.value = cards[saved].dataset.letter;
-            if (lockPhase3Answers) {
-                lockPhase3Choices(`Selected ${cards[saved].dataset.letter}. Locked for this attempt — submit to continue.`);
-            } else {
-                setAnswerState(true, `Selected ${cards[saved].dataset.letter}. Ready to submit.`);
-            }
+    } else if (selectedInput) {
+        restoreSavedChoice();
+        if (phase3AnswerLocked) {
+            lockPhase3Choices("This answer is locked for the current classroom attempt.");
         }
     }
 
@@ -870,7 +919,14 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
-document.querySelector("form").addEventListener("submit", (event) => {
+document.querySelector("#practice-answer-form")?.addEventListener("submit", (event) => {
+    const submitter = event.submitter;
+    const action = (submitter && submitter.getAttribute("formaction")) || "";
+    if (action.indexOf("draft") !== -1) {
+        const checked = document.querySelector(".choice-radio-input:checked");
+        if (checked && selectedInput) selectedInput.value = checked.value;
+        return;
+    }
     if (constructedInput) {
         if (!constructedInput.value.trim()) {
             event.preventDefault();
@@ -887,11 +943,36 @@ document.querySelector("form").addEventListener("submit", (event) => {
         }
         return;
     }
+    const checked = document.querySelector(".choice-radio-input:checked");
+    if (checked && selectedInput) selectedInput.value = checked.value;
     if (selectedInput && !selectedInput.value) {
         event.preventDefault();
         setAnswerState(false);
         document.querySelector(".choice-card")?.focus();
     }
+});
+
+document.querySelectorAll(".js-practice-jump").forEach((link) => {
+    link.addEventListener("click", (event) => {
+        if (missQuizMode || mistakeRedoMode) return;
+        const form = document.getElementById("practice-answer-form");
+        if (!form) return;
+        const qIndex = link.getAttribute("data-q-index");
+        if (qIndex === null || Number(qIndex) === practiceQnum) return;
+        event.preventDefault();
+        const checked = document.querySelector(".choice-radio-input:checked");
+        if (checked && selectedInput) selectedInput.value = checked.value;
+        let goto = form.querySelector('input[name="goto_qnum"]');
+        if (!goto) {
+            goto = document.createElement("input");
+            goto.type = "hidden";
+            goto.name = "goto_qnum";
+            form.appendChild(goto);
+        }
+        goto.value = qIndex;
+        form.setAttribute("action", {{ url_for('practice_draft_answer')|tojson }});
+        form.submit();
+    });
 });
 
 

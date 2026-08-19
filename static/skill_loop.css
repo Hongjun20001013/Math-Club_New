@@ -1,0 +1,22 @@
+.sl-wrap { max-width: 44rem; width: 100%; margin: 2rem auto; padding: 0 1rem; overflow-wrap: anywhere; overflow-x: auto; box-sizing: border-box; }
+.sl-wrap *, .sl-wrap *::before, .sl-wrap *::after { box-sizing: border-box; max-width: 100%; }
+.sl-choices label { display: block; margin: 0.4rem 0; }
+.sl-mastered { font-weight: 700; }
+.sl-panel { margin-top: 1rem; padding: 0.85rem 1rem; border: 1px solid currentColor; overflow-wrap: anywhere; }
+.sl-panel[hidden] { display: none; }
+.sl-steps { padding-left: 1.2rem; }
+.sl-steps li { margin: 0.6rem 0; }
+.sl-why { display: block; font-style: italic; margin-top: 0.2rem; }
+.sl-data-table { width: 100%; max-width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+.sl-data-table th, .sl-data-table td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid currentColor; white-space: nowrap; }
+.sl-feedback-grid { display: grid; grid-template-columns: 8rem 1fr; gap: 0.4rem 0.8rem; }
+.sl-feedback-grid dt { font-weight: 700; }
+.sl-feedback-grid dd { margin: 0; overflow-wrap: anywhere; }
+.sl-self-report, .sl-remediation, .sl-unknown-change, .sl-check { margin: 0.8rem 0; }
+.sl-help-actions button { margin: 0.3rem 0.3rem 0 0; }
+.sl-stem { overflow-x: auto; }
+@media (max-width: 640px) {
+  .sl-wrap { margin: 1rem auto; }
+  .sl-feedback-grid { grid-template-columns: 1fr; }
+  .sl-data-table th, .sl-data-table td { white-space: normal; }
+}

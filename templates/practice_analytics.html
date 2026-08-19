@@ -93,8 +93,8 @@
         <div class="np-mistake-library-head">
             <div>
                 <p class="np-analytics-card-kicker">All SAT mistakes</p>
-                <h2>{{ visible_wrong_total }} wrong question{% if visible_wrong_total != 1 %}s{% endif %}, classified by unit.</h2>
-                <p>Use the Unit shortcuts to jump straight to Unit 1, Unit 2, Unit 3, or Unit 4. Each card shows the exact question, your answer, the key, and the current classification.</p>
+                <h2>{{ visible_wrong_total }} wrong question{% if visible_wrong_total != 1 %}s{% endif %}, clustered by micro-skill.</h2>
+                <p>Session Report, Coach Walkthrough, Miss Quiz, and this Analytics page stay as they are. Repair this skill adds a teaching cycle on top: worked example → faded → new isomorphic item → transfer → delayed. Original-item redo is review only.</p>
             </div>
             <a href="{{ url_for('practice_sat_mistakes') }}" class="np-pw-btn np-pw-btn--primary">Generate mistake test</a>
         </div>
@@ -115,69 +115,61 @@
             {% endfor %}
         </div>
 
-        <div class="np-mistake-library-list">
-            {% for row in visible_wrong_rows %}
-            <article class="np-mistake-question-card np-analytics-mini-row" id="np-miss-pr-{{ row.pr_id }}">
-                <header class="np-mistake-question-head">
-                    <span class="np-mistake-question-num">Q{{ row.q_index + 1 }}</span>
+        {% if next_repair_step %}
+        <section class="np-repair-next glass-panel np-glass" aria-label="Recommended next step">
+            <p class="np-analytics-card-kicker">One next step</p>
+            <h2>Repair {{ next_repair_step.title }}</h2>
+            <p>{{ next_repair_step.miss_count }} miss{% if next_repair_step.miss_count != 1 %}es{% endif %} · {{ next_repair_step.priority }} priority · {{ next_repair_step.diagnosis_label }}</p>
+            <p><strong>Common stuck point:</strong> {{ next_repair_step.common_stuck }}</p>
+            <p><strong>Representative miss:</strong> Q{{ next_repair_step.representative.q_index + 1 }} · {{ next_repair_step.representative.knowledge_title or next_repair_step.representative.topic_title }}</p>
+            <p class="np-repair-next-actions">
+                <a class="np-pw-btn np-pw-btn--primary" href="{{ next_repair_step.repair_href }}">Repair this skill</a>
+                <a class="np-pw-btn np-pw-btn--ghost" href="{{ next_repair_step.representative.practice_href }}">Open original item (review only)</a>
+            </p>
+        </section>
+        {% endif %}
+
+        {% if show_skill_clusters and skill_clusters %}
+        <div class="np-skill-cluster-list" aria-label="Mistakes clustered by micro-skill">
+            {% for cluster in skill_clusters %}
+            <section class="np-skill-cluster glass-panel np-glass{% if next_repair_step and cluster.code == next_repair_step.code %} is-recommended{% endif %}">
+                <header class="np-skill-cluster-head">
                     <div>
-                        <p>{{ row.analytics_unit_label }} · {{ row.analytics_unit_title }}</p>
-                        <h3>{{ row.knowledge_title or row.topic_title }}</h3>
-                        <span>{{ row.topic_title }} · {{ row.when }} · {{ 'free response' if row.question_kind == 'free_response' else 'multiple choice' }}</span>
+                        <p class="np-analytics-card-kicker">{{ cluster.priority }} priority · {{ cluster.miss_count }} miss{% if cluster.miss_count != 1 %}es{% endif %}</p>
+                        <h3>{{ cluster.title }}</h3>
+                        <p><strong>Common stuck point:</strong> {{ cluster.common_stuck }}</p>
+                        <p><strong>Representative miss:</strong> Q{{ cluster.representative.q_index + 1 }} · yours {{ cluster.representative.yours }} · key {{ cluster.representative.key }}</p>
                     </div>
-                    <span class="np-analytics-mastery-badge np-analytics-mastery-badge--{{ row.mastery_effective }}" data-mastery-badge>{{ row.mastery_label }}</span>
+                    <a class="np-pw-btn np-pw-btn--primary" href="{{ cluster.repair_href }}">Repair this skill</a>
                 </header>
-
-                <div class="np-mistake-question-stem">
-                    {{ row.stem_html|safe }}
-                    {% if row.choices %}
-                    <ol class="np-mistake-choice-preview">
-                        {% for choice in row.choices %}
-                        <li><span>{{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[loop.index0] }}</span><div>{{ choice|safe }}</div></li>
-                        {% endfor %}
-                    </ol>
-                    {% endif %}
-                </div>
-
-                <div class="np-mistake-question-classification">
-                    <span>{{ row.diagnosis_label or 'Concept gap' }}</span>
-                    {% if row.tag_labels %}
-                    {% for tag in row.tag_labels %}<span>{{ tag }}</span>{% endfor %}
-                    {% endif %}
-                    {% if row.note %}<em>“{{ row.note }}”</em>{% endif %}
-                </div>
-
-                <div class="np-mistake-answer-row">
-                    <span>Your answer <strong>{{ row.yours }}</strong></span>
-                    <span>Correct answer <strong>{{ row.key }}</strong></span>
-                </div>
-
-                <div class="np-analytics-mini-actions np-mistake-question-actions">
-                    <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--primary">Open item</a>
-                    <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective == 'mastered' %} hidden{% endif %}>Mark mastered</button>
-                    <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-cancel-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective != 'mastered' %} hidden{% endif %}>Cancel mark mastered</button>
-                    <details class="np-analytics-edit np-analytics-mini-edit">
-                        <summary>Edit classification</summary>
-                        <form method="post" action="{{ url_for('practice_analytics_update', pr_id=row.pr_id) }}" class="np-analytics-edit-form">
-                            <input type="hidden" name="part" value="{{ request.args.get('part','sat') }}">
-                            <input type="hidden" name="anchor" value="np-miss-pr-{{ row.pr_id }}">
-                            <div class="np-reflect-tag-grid np-analytics-edit-tags">
-                                {% for o in mistake_tag_options %}
-                                <label class="np-reflect-tag">
-                                    <input type="checkbox" name="mistake_tag" value="{{ o.id }}"{% if o.id in row.tag_ids %} checked{% endif %}>
-                                    <span class="np-reflect-tag-label">{{ o.label }}</span>
-                                </label>
-                                {% endfor %}
+                <details class="np-skill-cluster-items">
+                    <summary>Show {{ cluster.miss_count }} original item{% if cluster.miss_count != 1 %}s{% endif %} (review only — not mastery)</summary>
+                    {% for row in cluster.rows %}
+                    <article class="np-analytics-mini-row" id="np-miss-pr-{{ row.pr_id }}">
+                        <div class="np-analytics-mini-main">
+                            <span class="np-analytics-mini-q">Q {{ row.q_index + 1 }}</span>
+                            <div>
+                                <p class="np-analytics-mini-title">{{ row.knowledge_title or row.topic_title }}</p>
+                                <p class="np-analytics-mini-meta">{{ row.when }} · {{ row.analytics_unit_label }}</p>
                             </div>
-                            <label class="np-reflect-note-label" for="note-clean-{{ row.pr_id }}">Note</label>
-                            <textarea id="note-clean-{{ row.pr_id }}" name="mistake_note" class="np-reflect-note" rows="3" maxlength="2000">{{ row.note }}</textarea>
-                            <button type="submit" class="np-pw-btn np-pw-btn--primary">Save</button>
-                        </form>
-                    </details>
-                </div>
-            </article>
+                            <span class="np-analytics-mastery-badge np-analytics-mastery-badge--{{ row.mastery_effective }}" data-mastery-badge title="Review status">{{ row.mastery_label }}</span>
+                        </div>
+                        <p class="np-analytics-mini-ans">
+                            <span>Yours <strong>{{ row.yours }}</strong></span>
+                            <span>Key <strong>{{ row.key }}</strong></span>
+                        </p>
+                        <div class="np-analytics-mini-actions">
+                            <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Open item (review)</a>
+                            <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective in ['mastered', 'archived'] %} hidden{% endif %}>Archive from mistake list</button>
+                            <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-cancel-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective not in ['mastered', 'archived'] %} hidden{% endif %}>Restore to mistake list</button>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </details>
+            </section>
             {% endfor %}
         </div>
+        {% endif %}
     </section>
 
     <section class="np-analytics-subject-picker" aria-label="Choose mistake category">
@@ -435,7 +427,7 @@
         <div>
             <p class="np-analytics-card-kicker">Mistake learning system</p>
             <h2>{{ selected_partition.label }} mistakes by unit</h2>
-            <p class="np-analytics-ladder-lead">Each miss has a <strong>status</strong> (unreviewed → reviewed → redo correct → mastered). <strong>Open item</strong> brings back that bank question only—after you submit once you’ll see the full walkthrough and return here. Expand <strong>Pattern &amp; pitfalls</strong> for similar links; use the unit <strong>miss quiz</strong> when you want a longer shuffled set.</p>
+            <p class="np-analytics-ladder-lead">Use the micro-skill clusters above first. Original-item redo is <strong>review only</strong> and cannot auto-master. Verified mastery appears only after a delayed new-item independent pass in Repair this skill. Miss Quiz, Coach Walkthrough, and Session Report are unchanged.</p>
         </div>
         <span>read top to bottom: unit → cause → skill → question</span>
     </div>
@@ -490,7 +482,8 @@
                             </div>
                             {% endif %}
 
-                            <div class="np-analytics-group-rows">
+                            <details class="np-analytics-group-rows">
+                                <summary>Show original items in this cause group (collapsed by default)</summary>
                                 {% for row in group.rows %}
                                 <article class="np-analytics-mini-row" id="np-miss-pr-{{ row.pr_id }}">
                                     <div class="np-analytics-mini-main">
@@ -541,9 +534,9 @@
                                     </details>
                                     {% endif %}
                                     <div class="np-analytics-mini-actions">
-                                        <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Open item</a>
-                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective == 'mastered' %} hidden{% endif %}>Mark mastered</button>
-                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-cancel-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective != 'mastered' %} hidden{% endif %}>Cancel mark mastered</button>
+                                        <a href="{{ row.practice_href }}" class="np-pw-btn np-pw-btn--ghost np-analytics-redo">Open item (review)</a>
+                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective in ['mastered', 'archived'] %} hidden{% endif %}>Archive from mistake list</button>
+                                        <button type="button" class="np-pw-btn np-pw-btn--ghost np-analytics-mastery-cancel-btn" data-domain="{{ row.domain }}" data-topic="{{ row.topic }}" data-q-index="{{ row.q_index }}"{% if row.mastery_effective not in ['mastered', 'archived'] %} hidden{% endif %}>Restore to mistake list</button>
                                         <details class="np-analytics-edit np-analytics-mini-edit">
                                             <summary>Edit tags</summary>
                                             <form method="post" action="{{ url_for('practice_analytics_update', pr_id=row.pr_id) }}" class="np-analytics-edit-form">
@@ -565,7 +558,7 @@
                                     </div>
                                 </article>
                                 {% endfor %}
-                            </div>
+                            </details>
                         </section>
                         {% endfor %}
                     </div>
@@ -642,7 +635,7 @@
     wrap.className = 'np-analytics-mastery-toast glass-panel np-glass';
     wrap.setAttribute('role', 'status');
     var p = document.createElement('p');
-    p.textContent = 'Marked as mastered.';
+    p.textContent = 'Archived from the mistake list. Reviewed—not verified mastery.';
     var u = document.createElement('button');
     u.type = 'button';
     u.className = 'np-pw-btn np-pw-btn--ghost';
@@ -679,7 +672,7 @@
     var mark = row.querySelector('.np-analytics-mastery-btn');
     var cancel = row.querySelector('.np-analytics-mastery-cancel-btn');
     if (!mark || !cancel) return;
-    if (effective === 'mastered') {
+    if (effective === 'mastered' || effective === 'archived') {
       mark.hidden = true;
       mark.disabled = false;
       cancel.hidden = false;

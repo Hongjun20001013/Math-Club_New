@@ -117,7 +117,7 @@
         <div class="np-login-options" role="group" aria-label="Sign-in options">
           <label class="np-login-check">
             <input type="checkbox" id="np-login-remember" name="remember" value="1">
-            <span>Remember password</span>
+            <span>Remember username</span>
           </label>
           <label class="np-login-check">
             <input type="checkbox" id="np-login-show-pass" aria-controls="np-login-pass">
@@ -160,34 +160,41 @@
   function setPasswordVisible(visible) {
     if (!pass) return;
     pass.type = visible ? "text" : "password";
-    if (showPass) showPass.checked = visible;
+    if (showPass) showPass.checked = !!visible;
   }
 
-  function loadSavedCredentials() {
+  function loadSavedUsername() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       var saved = JSON.parse(raw);
-      if (user && saved.username) user.value = saved.username;
-      if (pass && saved.password) pass.value = saved.password;
-      if (remember) remember.checked = true;
-    } catch (e) { /* ignore */ }
-  }
-
-  function persistCredentials() {
-    try {
-      if (remember && remember.checked) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          username: user ? user.value : "",
-          password: pass ? pass.value : ""
-        }));
+      if (saved && typeof saved === "object") {
+        Object.keys(saved).forEach(function (key) {
+          if (key !== "username") delete saved[key];
+        });
+      }
+      if (user && saved && saved.username) user.value = saved.username;
+      if (remember && saved && saved.username) remember.checked = true;
+      if (saved && saved.username) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ username: saved.username }));
       } else {
         localStorage.removeItem(STORAGE_KEY);
       }
     } catch (e) { /* ignore */ }
   }
 
-  loadSavedCredentials();
+  function persistUsername() {
+    try {
+      if (remember && remember.checked && user && user.value) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ username: user.value }));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  loadSavedUsername();
+  setPasswordVisible(false);
 
   if (showPass && pass) {
     showPass.addEventListener("change", function () {
@@ -197,7 +204,7 @@
 
   if (form && submit) {
     form.addEventListener("submit", function () {
-      persistCredentials();
+      persistUsername();
       submit.classList.add("is-busy");
       submit.disabled = true;
     });

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Feedback · skill loop{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap sl-feedback" data-skill-loop-feedback data-result="{{ result_label }}" data-remediation="{{ remediation or '' }}">
+  <p class="np-atelier-kicker">{{ phase }} feedback</p>
+  <h1 data-sl-result>{{ result_label }}</h1>
+  <p data-mastery-label>{{ mastery_label }}</p>
+  {% if self_report %}
+  <p class="sl-self-report" data-arm-a-self-report>This was a completion self-report. Arm A exposure cannot be fully verified.</p>
+  {% endif %}
+  <dl class="sl-feedback-grid">
+    <dt>Your answer</dt>
+    <dd data-sl-your-answer>{{ selected_display }}</dd>
+    {% if correct_display %}
+    <dt>Correct answer</dt>
+    <dd data-sl-correct-answer>{{ correct_display }}</dd>
+    {% endif %}
+    <dt>Core idea</dt>
+    <dd data-sl-core-idea>{{ core_idea }}</dd>
+  </dl>
+  {% if unknown_change %}
+  <p class="sl-unknown-change" data-sl-unknown-change><strong>What changed about the unknown:</strong> {{ unknown_change }}</p>
+  {% endif %}
+  {% if worked_steps %}
+  <h2>Step-by-step solution</h2>
+  <ol class="sl-steps" data-sl-feedback-steps>
+    {% for step in worked_steps %}
+    <li>
+      <strong>Step {{ step.step }}.</strong>
+      <span>{{ step.do }}</span>
+      <em class="sl-why">Why: {{ step.why }}</em>
+    </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+  {% if explanation_check %}
+  <p class="sl-check" data-sl-explanation-check><strong>Check:</strong> {{ explanation_check }}</p>
+  {% endif %}
+  {% if common_mistake %}
+  <p data-sl-common-mistake><strong>Common mistake:</strong> {{ common_mistake }}</p>
+  {% endif %}
+  <p data-sl-next-action><strong>Next recommended action:</strong> {{ next_action }}</p>
+  <p>
+    <a class="np-atelier-btn np-atelier-btn--primary" href="{{ continue_href }}" data-sl-feedback-continue>Continue</a>
+  </p>
+</div>
+{% endblock %}

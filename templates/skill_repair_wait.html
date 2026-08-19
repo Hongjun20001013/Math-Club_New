@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Delayed repair wait{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap">
+  <nav class="np-atelier-rail">
+    <a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a>
+  </nav>
+  <p class="np-atelier-kicker">delayed · locked</p>
+  <h1>{{ skill_title }}</h1>
+  <p>The delayed item unlocks after about 48 hours so the pass can count as independent. Come back after {{ due_at or "the wait window" }}{% if hours_left %} (about {{ hours_left }} hour{% if hours_left != 1 %}s{% endif %} left){% endif %}.</p>
+  <p>Until then this skill is <strong>not mastered</strong>. Original-item review still does not count as mastery.</p>
+  <p><a class="np-pw-btn np-pw-btn--ghost" href="{{ url_for('practice_analytics') }}">Return to Analytics</a></p>
+</div>
+{% endblock %}

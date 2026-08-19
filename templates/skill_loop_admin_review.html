@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Review skill-loop items{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+{% block content %}
+<div class="np-page-shell sl-wrap">
+  <h1>Teacher review</h1>
+  <p>Publishing writes reviewer, reviewed_at, and version on skill_loop_items only. It never modifies question_bank.json.</p>
+  <table>
+    <thead><tr><th>ID</th><th>Ver</th><th>Slot</th><th>Review</th><th>Publish</th><th>Reviewer</th><th>At</th><th></th></tr></thead>
+    <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.id }}</td>
+        <td>{{ it.version }}</td>
+        <td>{{ it.slot }}</td>
+        <td>{{ it.review_status }}</td>
+        <td>{{ it.publish_status }}</td>
+        <td>{{ it.reviewed_by }}</td>
+        <td>{{ it.reviewed_at }}</td>
+        <td>
+          {% if it.publish_status != 'published' %}
+          <form method="post" action="{{ url_for('skill_loop.admin_publish') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="item_id" value="{{ it.id }}">
+            <input type="hidden" name="version" value="{{ it.version }}">
+            <button type="submit">Publish</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,661 @@
+{
+  "skill_code": "sat.alg.linear_rate_remaining",
+  "title": "Linear remaining quantity at a constant rate",
+  "microskill_statement": "From two snapshots of a quantity changing at a constant rate, find the rate, then use Q(t) = Q0 − r t to solve for time or remaining amount.",
+  "status": "draft_pending_teacher_review",
+  "review_gate": "No item may enter a scored precheck, independent, transfer, or delayed slot until status is teacher_approved.",
+  "control_arm": {
+    "lesson_slug": "1-1-linear-equations",
+    "practice_url": "/practice/algebra/1_1/0"
+  },
+  "items": [
+    {
+      "id": "slq_lrr_precheck_01",
+      "slot": "precheck",
+      "variant_index": 1,
+      "role": "Untimed first attempt. Do not label the student as can/cannot. Record first answer, hint use, and time.",
+      "counts_toward": [
+        "precheck_accuracy"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A warehouse starts with 15,600 pounds of grain. A conveyor removes grain at a constant rate. After 4 hours, 13,000 pounds remain. If the conveyor continues at this rate, what is the total number of hours from the start until 7,800 pounds remain?</p>",
+      "choices": [
+        "8",
+        "10",
+        "12",
+        "16"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Grain removed in the first 4 hours: 15,600 − 13,000 = 2,600 pounds.",
+          "why": "At a snapshot, remaining = start − removed, so removed is the difference."
+        },
+        {
+          "step": 2,
+          "do": "Constant rate r = 2,600 ÷ 4 = 650 pounds per hour.",
+          "why": "Constant rate means the same amount is removed in every hour, so rate = removed ÷ elapsed time."
+        },
+        {
+          "step": 3,
+          "do": "To leave 7,800 pounds, the conveyor must remove 15,600 − 7,800 = 7,800 pounds from the original pile.",
+          "why": "The unknown is total time from the same start as the 4-hour snapshot, so the target remaining is measured from Q0, not from the 13,000-pound snapshot."
+        },
+        {
+          "step": 4,
+          "do": "Total hours t = 7,800 ÷ 650 = 12.",
+          "why": "Time = total amount removed from the start ÷ rate."
+        }
+      ],
+      "traps": [
+        "16 = 4 + 7,800/650 (adds the 4 hours twice)",
+        "24 = 15,600/650 (time to empty)",
+        "8 = (13,000 − 7,800)/650 without adding back the 4 hours if the question had asked additional hours — here the question asks total hours, and 4+8=12 still recovers C if done carefully"
+      ],
+      "explanation_check": "After 12 hours: remaining = 15,600 − 650×12 = 15,600 − 7,800 = 7,800.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "Identify the constant rate from the two snapshots (start and after 4 hours). Do not compute the final time yet.",
+      "critical_hint": "Grain dropped 2,600 pounds in 4 hours, so r = 650 per hour. The unknown is total time from the start until 7,800 remain, so set 15,600 − 650t = 7,800.",
+      "core_idea": "A constant-rate remaining quantity follows Q(t) = Q0 − r t, with r from a snapshot pair.",
+      "common_mistake": "Adding the opening 4 hours twice, or treating 7,800 as additional hours from the 13,000-pound snapshot without converting to total time.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "Teacher-approved complete worked example. Every step includes why. Not a scored mastery item. Viewing it does not count as independent success.",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>Maya pumps water from a tank at a constant rate. The tank held 8,400 gallons when she started. After 3 hours, 6,900 gallons remain. If she continues at this rate, how many total hours from the start will she have been pumping when 4,400 gallons remain?</p>",
+      "choices": [],
+      "correct_answer": "8",
+      "answer_alternates": [
+        "8 hours"
+      ],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Water pumped in 3 hours: 8,400 − 6,900 = 1,500 gallons.",
+          "why": "Remaining is what is still in the tank, so the decrease is the amount removed."
+        },
+        {
+          "step": 2,
+          "do": "Rate r = 1,500 ÷ 3 = 500 gallons per hour.",
+          "why": "The problem says the rate is constant, so this 3-hour average is the rate at every hour."
+        },
+        {
+          "step": 3,
+          "do": "To leave 4,400 gallons, Maya must pump 8,400 − 4,400 = 4,000 gallons in total from the start.",
+          "why": "Both snapshots are measured from the same starting amount, so the target is also from Q0."
+        },
+        {
+          "step": 4,
+          "do": "t = 4,000 ÷ 500 = 8 hours.",
+          "why": "Hours = gallons removed ÷ gallons per hour."
+        }
+      ],
+      "explanation_check": "After 8 hours: 8,400 − 500×8 = 8,400 − 4,000 = 4,400.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "The worked example already names each snapshot. Find rate first, then total time from the same starting amount.",
+      "critical_hint": "r = 1,500 ÷ 3 = 500 gal/h. Remaining 4,400 from 8,400 means 4,000 gallons must leave from the start.",
+      "core_idea": "Both snapshots and the target remaining are measured from the same Q0.",
+      "common_mistake": "Using 6,900 as a new starting amount instead of 8,400.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "Partially completed example. Student supplies the rate and the final time. A miss routes back to the worked example. Correct after viewing the example is not independent mastery.",
+      "counts_toward": [
+        "faded_completion"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A machine sands wood from a pile at a constant rate. The pile started at 2,400 kilograms. After 5 hours, 1,650 kilograms remain. How many total hours from the start until 600 kilograms remain?</p>",
+      "given_steps": [
+        {
+          "label": "Step 1 (already done)",
+          "text": "Wood sanded in 5 hours: 2,400 − 1,650 = 750 kilograms."
+        }
+      ],
+      "blanks": [
+        {
+          "id": "rate",
+          "prompt": "Rate in kilograms per hour",
+          "correct": "150",
+          "alternates": [
+            "150 kg/h",
+            "150 kilograms per hour"
+          ]
+        },
+        {
+          "id": "total_hours",
+          "prompt": "Total hours from the start",
+          "correct": "12",
+          "alternates": [
+            "12 hours"
+          ]
+        }
+      ],
+      "correct_answer": "12",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Sanded in 5 hours = 750 kg (given).",
+          "why": "Difference between start and the 5-hour remaining amount."
+        },
+        {
+          "step": 2,
+          "do": "r = 750 ÷ 5 = 150 kg per hour.",
+          "why": "Constant rate = amount changed ÷ time for that change."
+        },
+        {
+          "step": 3,
+          "do": "Need to sand 2,400 − 600 = 1,800 kg from the start.",
+          "why": "Target remaining is 600 from the original 2,400."
+        },
+        {
+          "step": 4,
+          "do": "t = 1,800 ÷ 150 = 12 hours.",
+          "why": "Time = total change from start ÷ rate."
+        }
+      ],
+      "explanation_check": "After 12 hours: 2,400 − 150×12 = 2,400 − 1,800 = 600.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "Step 1 already found how much was sanded in 5 hours. Your job is the rate, then total hours from the start.",
+      "critical_hint": "Rate = 750 ÷ 5. Then the pile must fall from 2,400 to 600, so total change from the start is 1,800 kilograms.",
+      "core_idea": "Finish the faded steps: r = ΔQ / Δt, then t = (Q0 − Q_target) / r.",
+      "common_mistake": "Reporting only the additional hours after hour 5 instead of total hours from the start.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "Unseen isomorphic item. Same unknown (total time to a remaining amount). Independent pass requires no hint and no solution view.",
+      "counts_toward": [
+        "immediate_pass"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A library starts a donation drive with 9,000 books. Books leave at a constant rate. After 6 hours, 7,500 books remain. If the rate does not change, what is the total number of hours from the start until 4,500 books remain?</p>",
+      "choices": [
+        "12",
+        "15",
+        "18",
+        "24"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Books gone in 6 hours: 9,000 − 7,500 = 1,500.",
+          "why": "Removed = start − remaining."
+        },
+        {
+          "step": 2,
+          "do": "r = 1,500 ÷ 6 = 250 books per hour.",
+          "why": "Constant rate from the given interval."
+        },
+        {
+          "step": 3,
+          "do": "To leave 4,500, remove 9,000 − 4,500 = 4,500 books from the start.",
+          "why": "Target is remaining from Q0."
+        },
+        {
+          "step": 4,
+          "do": "t = 4,500 ÷ 250 = 18 hours.",
+          "why": "Time = total removed ÷ rate."
+        }
+      ],
+      "explanation_check": "9,000 − 250×18 = 9,000 − 4,500 = 4,500.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "Same method as the example: rate from the 6-hour snapshot, then total time until 4,500 remain.",
+      "critical_hint": "Books fall 1,500 in 6 hours, so r = 250 per hour. Set 9,000 − 250t = 4,500.",
+      "core_idea": "Independent item uses the same unknown (total time to a remaining amount) with new numbers.",
+      "common_mistake": "Computing time to empty the library (9,000/250) instead of time to 4,500 remaining.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "Second unseen isomorphic item. Same structure, new story and numbers.",
+      "counts_toward": [
+        "immediate_pass"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A community pool holds 12,500 gallons. It is drained at a constant rate. After 2 hours, 11,100 gallons remain. If draining continues at this rate, how many total hours from the start will have passed when 6,900 gallons remain?</p>",
+      "choices": [
+        "6",
+        "8",
+        "10",
+        "14"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Drained in 2 hours: 12,500 − 11,100 = 1,400 gallons.",
+          "why": "Difference of the two snapshots."
+        },
+        {
+          "step": 2,
+          "do": "r = 1,400 ÷ 2 = 700 gallons per hour.",
+          "why": "Constant drain rate."
+        },
+        {
+          "step": 3,
+          "do": "Need to drain 12,500 − 6,900 = 5,600 gallons from the start.",
+          "why": "Remaining 6,900 is from the original 12,500."
+        },
+        {
+          "step": 4,
+          "do": "t = 5,600 ÷ 700 = 8 hours.",
+          "why": "Hours = gallons ÷ (gallons per hour)."
+        }
+      ],
+      "explanation_check": "12,500 − 700×8 = 12,500 − 5,600 = 6,900.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "Two snapshots give the drain rate. The question still asks for total hours from the start.",
+      "critical_hint": "1,400 gallons leave in 2 hours, so r = 700 gal/h. Remaining 6,900 from 12,500 means 5,600 gallons must drain from the start.",
+      "core_idea": "Q(t) = Q0 − r t with t unknown and a remaining target given.",
+      "common_mistake": "Using 11,100 as Q0.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "Transfer: same rate model, unknown is remaining amount after a given time, not time to a remaining amount. Not a number swap of an earlier item.",
+      "counts_toward": [
+        "transfer_accuracy"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A feed silo starts with 18,200 kilograms of grain. An unloader removes grain at a constant rate. After 5 hours, 15,450 kilograms remain. How many kilograms remain after the unloader has run for 12 hours from the start?</p>",
+      "choices": [
+        "9,900",
+        "11,000",
+        "11,600",
+        "13,200"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 5 hours: 18,200 − 15,450 = 2,750 kg.",
+          "why": "Same remaining-difference step as before."
+        },
+        {
+          "step": 2,
+          "do": "r = 2,750 ÷ 5 = 550 kg per hour.",
+          "why": "Constant rate."
+        },
+        {
+          "step": 3,
+          "do": "The question asks for remaining at t = 12, not for the time when remaining hits a target.",
+          "why": "The unknown changed from t to Q(t). The model is still Q(t) = Q0 − r t."
+        },
+        {
+          "step": 4,
+          "do": "Q(12) = 18,200 − 550×12 = 18,200 − 6,600 = 11,600 kg.",
+          "why": "Substitute the given time into the linear remaining formula."
+        }
+      ],
+      "explanation_check": "At t=5: 18,200 − 550×5 = 15,450, matching the given snapshot.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "The unknown is no longer a time. Ask what quantity the last sentence wants.",
+      "critical_hint": "Rate is still (18,200 − 15,450)/5. The question asks for remaining at t = 12, so compute Q(12) = 18,200 − r·12.",
+      "core_idea": "Same linear remaining model; the unknown switched from t to Q(t).",
+      "common_mistake": "Solving for the time when remaining hits 12, or subtracting 12 hours from the 5-hour snapshot without using Q0 − r t.",
+      "unknown_change": "The unknown changed from total time to a remaining amount after a given time."
+    },
+    {
+      "id": "slq_lrr_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "Transfer: asks for additional hours from the midpoint snapshot, not total hours from the start. Trap is 21 (total from start).",
+      "counts_toward": [
+        "transfer_accuracy"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A storage yard holds 20,000 tons of gravel. Trucks remove gravel at a constant rate. After 7 hours, 16,500 tons remain. How many additional hours from that moment are needed until 9,500 tons remain?</p>",
+      "choices": [
+        "7",
+        "14",
+        "21",
+        "28"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 7 hours: 20,000 − 16,500 = 3,500 tons.",
+          "why": "Find the constant rate from the opening interval."
+        },
+        {
+          "step": 2,
+          "do": "r = 3,500 ÷ 7 = 500 tons per hour.",
+          "why": "Constant rate."
+        },
+        {
+          "step": 3,
+          "do": "From the 16,500-ton snapshot down to 9,500 tons is 7,000 tons still to remove.",
+          "why": "The question asks for additional hours after hour 7, so the remaining drop starts at 16,500, not at 20,000."
+        },
+        {
+          "step": 4,
+          "do": "Additional hours = 7,000 ÷ 500 = 14.",
+          "why": "Δt = ΔQ ÷ r from the current amount. Total time from the start would be 21, which is a different question."
+        }
+      ],
+      "traps": [
+        "21 = (20,000 − 9,500)/500, which is total hours from the start, not additional hours"
+      ],
+      "explanation_check": "After 7+14=21 hours from start: 20,000 − 500×21 = 9,500, so 14 more hours after the snapshot is correct.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "Read whether the question wants additional hours after the snapshot, or total hours from the start.",
+      "critical_hint": "r = 3,500/7 = 500 tons/h. From 16,500 down to 9,500 is 7,000 tons still to remove after hour 7.",
+      "core_idea": "Additional time uses the current remaining amount, not Q0.",
+      "common_mistake": "21 = (20,000 − 9,500)/500, which is total hours from the start, not additional hours.",
+      "unknown_change": "The unknown changed from total time from the start to additional time after a midpoint snapshot."
+    },
+    {
+      "id": "slq_lrr_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "Delayed check 2–7 days later. New isomorphic item. Independent delayed pass requires no hint and no solution view, inside the 48h–168h window.",
+      "counts_toward": [
+        "delayed_independent_accuracy",
+        "delayed_pass"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A quarry stockpile starts at 22,400 tons. Trucks remove stone at a constant rate. After 9 hours, 18,800 tons remain. If the rate stays constant, what is the total number of hours from the start until 11,600 tons remain?</p>",
+      "choices": [
+        "18",
+        "21",
+        "24",
+        "27"
+      ],
+      "correct_answer": "D",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 9 hours: 22,400 − 18,800 = 3,600 tons.",
+          "why": "Snapshot difference."
+        },
+        {
+          "step": 2,
+          "do": "r = 3,600 ÷ 9 = 400 tons per hour.",
+          "why": "Constant rate."
+        },
+        {
+          "step": 3,
+          "do": "Need to remove 22,400 − 11,600 = 10,800 tons from the start.",
+          "why": "Target remaining from Q0."
+        },
+        {
+          "step": 4,
+          "do": "t = 10,800 ÷ 400 = 27 hours.",
+          "why": "Time = total removed ÷ rate."
+        }
+      ],
+      "explanation_check": "22,400 − 400×27 = 22,400 − 10,800 = 11,600.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "After a delay, restart from snapshots: find r, then total time to the remaining target.",
+      "critical_hint": "3,600 tons leave in 9 hours, so r = 400. Remaining 11,600 from 22,400 means 10,800 tons must leave from the start.",
+      "core_idea": "Delayed check uses a new cover story but the same Q(t) = Q0 − r t method.",
+      "common_mistake": "Starting the remaining drop from 18,800 instead of 22,400 when the question asks total hours from the start.",
+      "unknown_change": ""
+    },
+    {
+      "id": "slq_lrr_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "Second delayed item. Unknown is remaining after a given time (transfer-like), with a new cover story. Still the same micro-skill.",
+      "counts_toward": [
+        "delayed_independent_accuracy",
+        "delayed_pass"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A fuel tank starts with 6,300 gallons. A pump removes fuel at a constant rate. After 3 hours, 5,550 gallons remain. How many gallons remain after 10 hours from the start?</p>",
+      "choices": [
+        "3,050",
+        "3,800",
+        "4,200",
+        "4,550"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Pumped in 3 hours: 6,300 − 5,550 = 750 gallons.",
+          "why": "Difference of snapshots."
+        },
+        {
+          "step": 2,
+          "do": "r = 750 ÷ 3 = 250 gallons per hour.",
+          "why": "Constant rate."
+        },
+        {
+          "step": 3,
+          "do": "The unknown is remaining at t = 10, not the time to hit a remaining target.",
+          "why": "Q(t) = Q0 − r t with t given."
+        },
+        {
+          "step": 4,
+          "do": "Q(10) = 6,300 − 250×10 = 6,300 − 2,500 = 3,800 gallons.",
+          "why": "Substitute t = 10."
+        }
+      ],
+      "explanation_check": "At t=3: 6,300 − 250×3 = 5,550, matching the given snapshot.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original pilot item. Not copied from question_bank.json.",
+      "light_hint": "This delayed item asks for remaining after a given time, not time to a remaining amount.",
+      "critical_hint": "750 gallons leave in 3 hours, so r = 250. Remaining at t = 10 is 6,300 − 250×10.",
+      "core_idea": "Q(t) = Q0 − r t with t given.",
+      "common_mistake": "Solving for the time when 10 gallons remain.",
+      "unknown_change": "The unknown is remaining at a given time."
+    },
+    {
+      "id": "slq_lrr_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "Remediation faded attempt. New numbers. A miss does not reuse faded_01 as independent evidence.",
+      "counts_toward": [
+        "faded_completion"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A kiln dries clay at a constant rate. The rack started at 3,600 kilograms. After 6 hours, 2,400 kilograms remain. How many total hours from the start until 800 kilograms remain?</p>",
+      "given_steps": [
+        {
+          "label": "Step 1 (already done)",
+          "text": "Clay dried in 6 hours: 3,600 − 2,400 = 1,200 kilograms."
+        }
+      ],
+      "blanks": [
+        {
+          "id": "rate",
+          "prompt": "Rate in kilograms per hour",
+          "correct": "200",
+          "alternates": [
+            "200 kg/h",
+            "200 kilograms per hour"
+          ]
+        },
+        {
+          "id": "total_hours",
+          "prompt": "Total hours from the start",
+          "correct": "14",
+          "alternates": [
+            "14 hours"
+          ]
+        }
+      ],
+      "correct_answer": "14",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Dried in 6 hours = 1,200 kg (given).",
+          "why": "Snapshot difference."
+        },
+        {
+          "step": 2,
+          "do": "r = 1,200 ÷ 6 = 200 kg per hour.",
+          "why": "Constant rate = change ÷ time."
+        },
+        {
+          "step": 3,
+          "do": "Need to dry 3,600 − 800 = 2,800 kg from the start.",
+          "why": "Target remaining is from Q0."
+        },
+        {
+          "step": 4,
+          "do": "t = 2,800 ÷ 200 = 14 hours.",
+          "why": "Time = total change from start ÷ rate."
+        }
+      ],
+      "explanation_check": "After 14 hours: 3,600 − 200×14 = 3,600 − 2,800 = 800.",
+      "light_hint": "Step 1 already has the 6-hour change. Find kilograms per hour, then total hours from the original 3,600.",
+      "critical_hint": "Rate = 1,200 ÷ 6. Remaining 800 from 3,600 means 2,800 kilograms must dry from the start.",
+      "core_idea": "New faded attempt after a miss: still r = ΔQ/Δt, then t = (Q0 − Q_target)/r.",
+      "common_mistake": "Using 2,400 as the starting amount.",
+      "unknown_change": "",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original remediation faded item. Not copied from question_bank.json."
+    },
+    {
+      "id": "slq_lrr_ind_03",
+      "slot": "independent",
+      "variant_index": 3,
+      "role": "Remediation independent item. New story. Retaking a missed independent item cannot count as independent mastery.",
+      "counts_toward": [
+        "immediate_pass"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A paper mill starts a shift with 5,400 reams. Paper leaves at a constant rate. After 4 hours, 4,600 reams remain. If the rate does not change, what is the total number of hours from the start until 2,200 reams remain?</p>",
+      "choices": [
+        "12",
+        "14",
+        "16",
+        "18"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Reams gone in 4 hours: 5,400 − 4,600 = 800.",
+          "why": "Removed = start − remaining."
+        },
+        {
+          "step": 2,
+          "do": "r = 800 ÷ 4 = 200 reams per hour.",
+          "why": "Constant rate from the given interval."
+        },
+        {
+          "step": 3,
+          "do": "To leave 2,200, remove 5,400 − 2,200 = 3,200 reams from the start.",
+          "why": "Target remaining from Q0."
+        },
+        {
+          "step": 4,
+          "do": "t = 3,200 ÷ 200 = 16 hours.",
+          "why": "Time = total removed ÷ rate."
+        }
+      ],
+      "explanation_check": "5,400 − 200×16 = 5,400 − 3,200 = 2,200.",
+      "light_hint": "Find the constant rate from the 4-hour snapshot, then total time until 2,200 remain.",
+      "critical_hint": "800 reams leave in 4 hours, so r = 200. Set 5,400 − 200t = 2,200.",
+      "core_idea": "Another independent check of total time to a remaining amount.",
+      "common_mistake": "Computing 4,600 − 2,200 and dividing by 200 without adding back the first 4 hours, or using 5,400/200 to empty the mill.",
+      "unknown_change": "",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original remediation independent item. Not copied from question_bank.json."
+    },
+    {
+      "id": "slq_lrr_tr_03",
+      "slot": "transfer",
+      "variant_index": 3,
+      "role": "Transfer with a representation change: table of remaining vs time, unknown is the function R(t). Not a prose remaining-quantity clone. Draft until teacher review.",
+      "counts_toward": [
+        "transfer_accuracy"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A hopper loses material at a constant rate. Remaining mass is recorded in the table.</p><table class=\"sl-data-table\"><thead><tr><th>Hours <em>t</em></th><th>Remaining mass <em>R</em> (kg)</th></tr></thead><tbody><tr><td>0</td><td>9,600</td></tr><tr><td>4</td><td>8,000</td></tr></tbody></table><p>Which function gives the remaining mass after <em>t</em> hours?</p>",
+      "choices": [
+        "R(t) = 9,600 − 400t",
+        "R(t) = 8,000 − 400t",
+        "R(t) = 9,600 − 4t",
+        "R(t) = 400t − 9,600"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "From t = 0 to t = 4, remaining falls 9,600 − 8,000 = 1,600 kg.",
+          "why": "The table gives two snapshots of the same constant-rate process."
+        },
+        {
+          "step": 2,
+          "do": "r = 1,600 ÷ 4 = 400 kg per hour.",
+          "why": "Constant rate is the slope of remaining versus time."
+        },
+        {
+          "step": 3,
+          "do": "The unknown is the function R(t) from the t = 0 row, not a later remaining amount or a time.",
+          "why": "A table-to-function transfer keeps Q(t) = Q0 − r t but changes how the data is presented."
+        },
+        {
+          "step": 4,
+          "do": "R(t) = 9,600 − 400t. Check: R(4) = 9,600 − 1,600 = 8,000, matching the table.",
+          "why": "Q0 is the t = 0 remaining mass, not the t = 4 value."
+        }
+      ],
+      "traps": [
+        "R(t) = 8,000 − 400t uses the later snapshot as Q0",
+        "R(t) = 9,600 − 4t treats elapsed hours as the rate",
+        "R(t) = 400t − 9,600 has the wrong sign for remaining"
+      ],
+      "explanation_check": "R(4) = 9,600 − 400×4 = 8,000, which matches the table row for t = 4.",
+      "light_hint": "The table is two snapshots. Read the slope (change in remaining per hour) before writing a formula.",
+      "critical_hint": "Remaining drops 1,600 kg in 4 hours, so the slope is −400. The intercept must be the t = 0 remaining mass 9,600, not 8,000.",
+      "core_idea": "The same linear remaining model can be encoded as a table or as a function R(t) = R(0) − r t.",
+      "common_mistake": "Using the t = 4 remaining mass as the intercept, which gives R(t) = 8,000 − 400t.",
+      "unknown_change": "The representation changed from a prose remaining-quantity story to a table, and the unknown is the function R(t) rather than a single time or remaining amount.",
+      "skill_code": "sat.alg.linear_rate_remaining",
+      "review_status": "draft",
+      "source_note": "Original table-to-function transfer item. Not copied from question_bank.json."
+    }
+  ]
+}

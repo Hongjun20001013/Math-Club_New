@@ -7870,6 +7870,37 @@ html[data-exam-theme="dark"] .sat-choices-list::before {
     opacity: 0.22;
 }
 
+.np-repair-next,
+.np-skill-cluster {
+    margin: 16px 0 20px;
+    padding: 18px 20px;
+}
+.np-skill-cluster-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.np-skill-cluster-items {
+    margin-top: 12px;
+}
+.np-skill-cluster.is-recommended {
+    border: 1px solid rgba(108, 78, 255, 0.28);
+}
+.np-analytics-group-rows > summary,
+.np-skill-cluster-items > summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+.sat-choices-list .choice-radio-input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+}
 .sat-choices-list .choice-card {
     background: rgba(255, 255, 255, 0.96);
     border-radius: 14px;
@@ -7885,11 +7916,29 @@ html[data-exam-theme="dark"] .sat-choices-list::before {
         0 2px 8px rgba(49, 38, 130, 0.05);
     position: relative;
     z-index: 1;
+    cursor: pointer;
+    pointer-events: auto;
     transition:
         box-shadow 0.18s ease,
         border-color 0.18s ease,
         background 0.18s ease,
         transform 0.18s ease;
+}
+.sat-choices-list .choice-card .choice-content,
+.sat-choices-list .choice-card .choice-content * {
+    pointer-events: none;
+}
+.sat-choices-list .choice-card:has(.choice-radio-input:checked) {
+    border-color: rgba(108, 78, 255, 0.45);
+}
+.sat-practice-page-wrap--split-lock .sat-pane-choices > .choices-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
 }
 
 .sat-choices-list .choice-card:focus {
