@@ -11150,6 +11150,7 @@ def practice_camp_test9_intro():
         module_minutes=WORD_PROBLEM_SECONDS // 60,
         has_active_attempt=has_active_attempt,
         continue_href=_random_test_continue_href() if has_active_attempt else None,
+        restart_href=url_for("practice_camp_test9_start"),
         camp_test9_note=(
             "Fixed Test IX: Module I + Module II like the Digital SAT (22+22). "
             "After finishing, pick 2 unscored questions per module (4 total), "
@@ -11201,6 +11202,10 @@ def practice_random_test_question(module_id: int, step: int):
     category = _practice_exam_category_context(_practice_exam_category_or_404("random-test"))
     answered_qset = _random_test_answered_set(module_id)
     answered_count = len(answered_qset)
+    mod_answers = attempt.get("answers") if isinstance(attempt.get("answers"), dict) else {}
+    step_answers = mod_answers.get(str(module_id)) if isinstance(mod_answers.get(str(module_id)), dict) else {}
+    saved_selected_answer = _mcq_letter((step_answers or {}).get(str(step)))
+    is_camp = bool(attempt.get("is_camp_test9"))
     return render_template(
         "word_problem_exam_question.html",
         category=category,
@@ -11219,13 +11224,15 @@ def practice_random_test_question(module_id: int, step: int):
         deadline_ms=_random_test_deadline_ms(module_id),
         is_random_test=True,
         random_test_module=module_id,
-        back_href=url_for("practice_random_test_intro"),
-        back_label="SAT Math Test",
+        back_href=url_for("practice_camp_test9_intro") if is_camp else url_for("practice_random_test_intro"),
+        back_label="Test IX" if is_camp else "SAT Math Test",
         prev_href=url_for("practice_random_test_question", module_id=module_id, step=step - 1) if step > 0 else None,
         next_href=url_for("practice_random_test_question", module_id=module_id, step=step + 1) if step < len(items) - 1 else None,
         form_action=url_for("practice_random_test_submit", module_id=module_id),
         submit_final_label="Finish Module 1" if module_id == 1 else "Submit test",
         submit_next_label="Save & next",
+        saved_selected_answer=saved_selected_answer,
+        restart_href=url_for("practice_camp_test9_start") if is_camp else None,
     )
 
 
@@ -11473,6 +11480,10 @@ def practice_exam_question(category_slug: str, set_id: int, step: int):
     q = item["q"]
     answered_qset = _practice_exam_answered_set(category, set_id)
     answered_count = len(answered_qset)
+    set_answers = _practice_exam_answers(category).get(str(set_id), {})
+    saved_selected_answer = _mcq_letter(
+        set_answers.get(str(step)) if isinstance(set_answers, dict) else ""
+    )
     return render_template(
         "word_problem_exam_question.html",
         category=category,
@@ -11488,6 +11499,8 @@ def practice_exam_question(category_slug: str, set_id: int, step: int):
         answered_pct=min(100, round(100 * answered_count / len(items))) if items else 0,
         choice_letters=[chr(ord("A") + i) for i in range(len(q.get("choices") or []))],
         time_limit_seconds=WORD_PROBLEM_SECONDS,
+        saved_selected_answer=saved_selected_answer,
+        restart_href=None,
     )
 
 
@@ -12301,6 +12314,17 @@ def _load_practice_draft(attempt_id: int | None, qnum: int) -> str:
     return str(_practice_draft_map().get(_practice_draft_key(int(attempt_id), int(qnum)), "") or "")
 
 
+def _mcq_letter(raw: Any) -> str:
+    s = str(raw or "").strip().upper()
+    if s[:1] in "ABCDE":
+        return s[:1]
+    if s.isdigit():
+        idx = int(s)
+        if 0 <= idx <= 4:
+            return chr(ord("A") + idx)
+    return ""
+
+
 def _saved_selected_answer_for_question(
     db: sqlite3.Connection, attempt_id: int | None, qnum: int
 ) -> str:
@@ -12316,10 +12340,9 @@ def _saved_selected_answer_for_question(
         ).fetchone()
         if row is not None and str(row["selected_answer"] or "").strip():
             raw = str(row["selected_answer"]).strip()
-            if len(raw) == 1:
-                return raw.upper()
-            return raw
-    return _load_practice_draft(attempt_id, qnum)
+            return _mcq_letter(raw) or raw
+    draft = _load_practice_draft(attempt_id, qnum)
+    return _mcq_letter(draft) or draft
 
 
 def _visible_learning_tracks(grants: set[str] | None) -> list[dict[str, Any]]:
@@ -13326,9 +13349,12 @@ def practice_question(domain, topic, qnum):
                 flash("Please complete the student information before starting the diagnostic.")
                 slug = _placement_slug_for_topic(topic)
                 return redirect(url_for("placement_test_start", slug=slug))
-            resumed_id = _resume_incomplete_attempt_id(
-                db, user_id, domain, topic, len(questions)
-            )
+            resumed_id = None
+            force_new = session.pop(f"practice_force_new:{domain}:{topic}", None)
+            if not force_new:
+                resumed_id = _resume_incomplete_attempt_id(
+                    db, user_id, domain, topic, len(questions)
+                )
             if resumed_id is not None:
                 attempt_id = resumed_id
                 session[sk] = attempt_id
@@ -13353,8 +13379,9 @@ def practice_question(domain, topic, qnum):
     if attempt_id is not None:
         answered_rows = db.execute(
             """
-            SELECT DISTINCT question_index FROM practice_responses
+            SELECT question_index, selected_answer FROM practice_responses
             WHERE attempt_id = ? AND question_index IS NOT NULL
+              AND TRIM(COALESCE(selected_answer, '')) != ''
             """,
             (attempt_id,),
         ).fetchall()
@@ -13442,6 +13469,8 @@ def practice_question(domain, topic, qnum):
     saved_selected_answer = _saved_selected_answer_for_question(
         db, attempt_id, question_index
     )
+    if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
+        saved_selected_answer = _mcq_letter(saved_selected_answer)
 
     return render_template(
         "practice_question.html",
@@ -13474,11 +13503,15 @@ def practice_question(domain, topic, qnum):
         mistake_miss_anchor=miss_anchor_q,
         tracked_responses_hint=tracked_responses_hint,
         placement_clear_storage=placement_clear_storage,
-        lock_phase3_answers=bool(pace_seconds) and not mistake_redo_mode,
+        lock_phase3_answers=False,
         phase3_answer_locked=bool(pace_seconds)
         and not mistake_redo_mode
-        and question_index in answered_qset,
+        and question_index in answered_qset
+        and bool(saved_selected_answer),
         saved_selected_answer=saved_selected_answer,
+        restart_href=url_for("practice_new_session", domain=domain, topic=topic)
+        if pace_seconds and not mistake_redo_mode
+        else None,
     )
 
 
@@ -13660,6 +13693,7 @@ def submit_practice_answer():
                 """
                 SELECT id FROM practice_responses
                 WHERE attempt_id = ? AND question_index = ?
+                  AND TRIM(COALESCE(selected_answer, '')) != ''
                 LIMIT 1
                 """,
                 (attempt_id, q_index),
@@ -14777,7 +14811,7 @@ def practice_new_session(domain: str, topic: str):
             """,
             (user_id, domain, topic),
         ).fetchone()
-        if latest:
+        if latest and topic not in PHASE3_PACE_TOPICS:
             graded = int(latest["graded"] or 0)
             if 0 < graded < MIN_TRACKED_SAT_RESPONSES:
                 flash(
@@ -14786,6 +14820,8 @@ def practice_new_session(domain: str, topic: str):
                 )
                 return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=0))
     session.pop(_practice_session_key(domain, topic), None)
+    session[f"practice_force_new:{domain}:{topic}"] = 1
+    session.modified = True
     if domain == "placement":
         _clear_placement_profile_session()
         slug = _placement_slug_for_topic(topic)

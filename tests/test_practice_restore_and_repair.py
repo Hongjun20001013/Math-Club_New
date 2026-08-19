@@ -299,6 +299,157 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertIsNotNone(nxt)
         self.assertEqual(nxt["miss_count"], clusters[0]["miss_count"])
 
+    def _hard21_attempt_id(self, html: str) -> str:
+        import re
+
+        m = re.search(r'name="attempt_id" value="(\d+)"', html)
+        self.assertIsNotNone(m)
+        return m.group(1)
+
+    def test_mock_test1_fresh_attempt_is_clickable(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_21/new-session", follow_redirects=False)
+        rv = self.client.get("/practice/hard_problem/hard_21/0")
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn("const phase3AnswerLocked = false;", html)
+        self.assertIn("Start this mock over", html)
+        self.assertIn('class="choice-radio-input"', html)
+        self.assertNotIn("choice-radio-input\" name=\"selected_answer\" value=\"A\" checked", html)
+
+    def test_mock_test1_empty_response_does_not_lock(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_21/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_21/0")
+        self.assertEqual(first.status_code, 200)
+        aid = int(self._hard21_attempt_id(first.get_data(as_text=True)))
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                    (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, 0, '', 'A', 0)
+                """,
+                (aid,),
+            )
+            db.commit()
+        rv = self.client.get("/practice/hard_problem/hard_21/0")
+        html = rv.get_data(as_text=True)
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("const phase3AnswerLocked = false;", html)
+
+    def test_mock_test1_submitted_choice_locks_and_shows_letter(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_21/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_21/0")
+        self.assertEqual(first.status_code, 200)
+        aid = int(self._hard21_attempt_id(first.get_data(as_text=True)))
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                    (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, 0, 'B', 'A', 0)
+                """,
+                (aid,),
+            )
+            db.commit()
+        rv = self.client.get("/practice/hard_problem/hard_21/0")
+        html = rv.get_data(as_text=True)
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("const phase3AnswerLocked = true;", html)
+        self.assertRegex(html, r'value="B"[^>]*checked|checked[^>]*value="B"')
+        self.assertIn("Start this mock over", html)
+
+    def test_mock_test1_restart_creates_unlocked_attempt(self):
+        self.login()
+        first = self.client.get("/practice/hard_problem/hard_21/0")
+        aid = int(self._hard21_attempt_id(first.get_data(as_text=True)))
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                    (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, 0, 'C', 'A', 0)
+                """,
+                (aid,),
+            )
+            db.commit()
+        restart = self.client.get(
+            "/practice/hard_problem/hard_21/new-session", follow_redirects=False
+        )
+        self.assertEqual(restart.status_code, 302)
+        rv = self.client.get("/practice/hard_problem/hard_21/0")
+        html = rv.get_data(as_text=True)
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("const phase3AnswerLocked = false;", html)
+        new_aid = int(self._hard21_attempt_id(html))
+        self.assertNotEqual(new_aid, aid)
+
+    def test_all_classroom_mocks_fresh_are_clickable(self):
+        self.login()
+        order = self.app_mod.PHASE3_TEST_ORDER
+        self.assertEqual(len(order), 11)
+        for topic, test_n in sorted(order.items(), key=lambda kv: kv[1]):
+            with self.subTest(topic=topic, test=test_n):
+                tex = self.app_mod.BANKS["hard_problem"][topic]
+                questions = self.app_mod.get_questions_for_topic(
+                    "hard_problem", topic, tex
+                )
+                self.assertTrue(questions, topic)
+                self.client.get(
+                    f"/practice/hard_problem/{topic}/new-session",
+                    follow_redirects=False,
+                )
+                rv = self.client.get(f"/practice/hard_problem/{topic}/0")
+                self.assertEqual(rv.status_code, 200, topic)
+                html = rv.get_data(as_text=True)
+                self.assertIn("const phase3AnswerLocked = false;", html, topic)
+                self.assertIn("Start this mock over", html, topic)
+                q0_kind = str((questions[0] or {}).get("question_kind") or "mcq")
+                if q0_kind in ("mcq", "mcq5"):
+                    self.assertIn('class="choice-radio-input"', html, topic)
+                    self.assertIn('name="selected_answer"', html, topic)
+                else:
+                    self.assertTrue(
+                        'id="spr-answer-input"' in html
+                        or 'id="constructed-answer-input"' in html,
+                        topic,
+                    )
+                mcq_index = next(
+                    (
+                        i
+                        for i, q in enumerate(questions)
+                        if str(q.get("question_kind") or "mcq") in ("mcq", "mcq5")
+                    ),
+                    None,
+                )
+                if mcq_index:
+                    mcq = self.client.get(
+                        f"/practice/hard_problem/{topic}/{mcq_index}"
+                    )
+                    self.assertEqual(mcq.status_code, 200, topic)
+                    mcq_html = mcq.get_data(as_text=True)
+                    self.assertIn("const phase3AnswerLocked = false;", mcq_html, topic)
+                    self.assertIn('class="choice-radio-input"', mcq_html, topic)
+
+    def test_test_ix_camp_exam_uses_native_radios(self):
+        self.login()
+        start = self.client.get("/practice/exams/camp-test-9/start", follow_redirects=False)
+        self.assertEqual(start.status_code, 302)
+        loc = start.headers.get("Location", "")
+        self.assertIn("/practice/exams/random-test/module/1/0", loc)
+        rv = self.client.get("/practice/exams/random-test/module/1/0")
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn('class="choice-radio-input"', html)
+        self.assertIn('name="selected_answer"', html)
+        self.assertIn("Start this mock over", html)
+        self.assertNotIn('id="selected-answer-input" name="selected_answer"', html)
+
 
 if __name__ == "__main__":
     unittest.main()

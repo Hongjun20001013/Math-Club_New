@@ -188,6 +188,9 @@
         {% if not placement_mode and not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
         <a href="{{ url_for('practice') }}" class="nav-btn nav-btn-secondary">SAT home</a>
         <a href="{{ url_for('practice_analytics', part='sat') }}" class="nav-btn nav-btn-secondary">Mistake log</a>
+        {% if restart_href %}
+        <a href="{{ restart_href }}" class="nav-btn nav-btn-secondary">Start this mock over</a>
+        {% endif %}
         {% endif %}
         </div>
         {% if placement_mode and not miss_quiz_mode %}
@@ -243,6 +246,9 @@
         {% endif %}
         {% if q.question_kind|default('mcq') in ['mcq', 'mcq5'] %}
         <input type="hidden" id="selected-answer-input" value="{{ saved_selected_answer|default('') }}">
+        {% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %}
+        <input type="hidden" name="selected_answer" value="{{ saved_selected_answer }}">
+        {% endif %}
         {% endif %}
     <div id="question-area" class="sat-split-card" aria-label="Question and answer area">
         <div class="sat-split">
@@ -301,7 +307,7 @@
                 <div class="choices-panel choices-stack sat-choices-list" role="radiogroup" aria-label="Answer choices">
             {% for choice in q.choices %}
             <label class="choice-card{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} selected is-selected{% endif %}" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
-                <input type="radio" class="choice-radio-input" name="selected_answer" value="{{ choice_letters[loop.index0] }}"{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} checked{% endif %}{% if phase3_answer_locked|default(false) %} disabled{% endif %}>
+                <input type="radio" class="choice-radio-input" name="selected_answer" value="{{ choice_letters[loop.index0] }}"{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} checked{% endif %}{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} disabled{% endif %}>
                 <span class="choice-bubble" aria-hidden="true"></span>
                 <span class="choice-letter">{{ choice_letters[loop.index0] }}</span>
                 <div class="choice-content">
@@ -322,6 +328,13 @@
                     {% elif mistake_redo_mode|default(false) %}
                     <p class="sat-submit-hint">One submission opens the <strong>verified walkthrough</strong> and sends you back to your list.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit &amp; see review</button>
+                    {% elif phase3_answer_locked|default(false) and saved_selected_answer|default('') %}
+                    <p class="sat-submit-hint">This choice is locked for the current classroom attempt. Use Next, Jump, or start the mock over.</p>
+                    {% if is_last %}
+                    <a href="{{ url_for('practice_session_summary', attempt_id=attempt_id) }}" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">See results</a>
+                    {% else %}
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">Next question</button>
+                    {% endif %}
                     {% elif is_last %}
                     <p class="sat-submit-hint">Finish this question to see your score for all {{ total }} questions.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
@@ -691,7 +704,7 @@ if (isConstructedMode) {
 
 const lockPhase3Answers = {{ (lock_phase3_answers|default(false)) | tojson }};
 const phase3AnswerLocked = {{ (phase3_answer_locked|default(false)) | tojson }};
-let phase3ChoiceLocked = !!phase3AnswerLocked;
+let phase3ChoiceLocked = !!(phase3AnswerLocked && serverSavedLetter);
 
 function lockPhase3Choices(message) {
     phase3ChoiceLocked = true;
@@ -721,11 +734,7 @@ function applyChoiceCard(card, persist) {
     if (radio && !radio.disabled) radio.checked = true;
     if (persist !== false) localStorage.setItem(storageKey, card.dataset.index);
     selectedInput.value = card.dataset.letter || (radio && radio.value) || "";
-    if (lockPhase3Answers) {
-        lockPhase3Choices(`Selected ${card.dataset.letter}. Locked for this attempt — submit to continue.`);
-    } else {
-        setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
-    }
+    setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
 }
 
 function restoreSavedChoice() {
@@ -774,7 +783,7 @@ document.querySelectorAll(".sat-choices-list .choice-card").forEach(card => {
     }
 });
 restoreSavedChoice();
-if (phase3AnswerLocked) {
+if (phase3AnswerLocked && serverSavedLetter) {
     lockPhase3Choices("This answer is locked for the current classroom attempt.");
 }
 }
@@ -863,7 +872,7 @@ window.addEventListener("load", () => {
         setAnswerState(!!sprInput.value.trim(), "Answer entered. Ready to submit.");
     } else if (selectedInput) {
         restoreSavedChoice();
-        if (phase3AnswerLocked) {
+        if (phase3AnswerLocked && serverSavedLetter) {
             lockPhase3Choices("This answer is locked for the current classroom attempt.");
         }
     }

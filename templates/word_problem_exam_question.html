@@ -45,6 +45,9 @@
       {% if step < total - 1 %}
       <a href="{{ next_href if next_href is defined and next_href else url_for('practice_exam_question', category_slug=category_slug, set_id=set_id, step=step + 1) }}" class="nav-btn nav-btn-secondary">Next →</a>
       {% endif %}
+      {% if restart_href %}
+      <a href="{{ restart_href }}" class="nav-btn nav-btn-secondary">Start this mock over</a>
+      {% endif %}
     </div>
     <div class="sat-subnav-group sat-subnav-group--tools" aria-label="Question tools">
       <button type="button" id="sat-review-flag" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--review" aria-pressed="false"><span aria-hidden="true">☆</span> Mark</button>
@@ -57,7 +60,7 @@
 
   <form method="post" action="{{ form_action if form_action is defined else url_for('practice_exam_submit', category_slug=category_slug, set_id=set_id) }}" class="practice-form sat-practice-form">
     <input type="hidden" name="step" value="{{ step }}">
-    <input type="hidden" id="selected-answer-input" name="selected_answer" value="">
+    <input type="hidden" id="selected-answer-input" value="{{ saved_selected_answer|default('') }}">
     <div id="question-area" class="sat-split-card">
       <div class="sat-split">
         <section class="sat-pane sat-pane-stem">
@@ -75,13 +78,14 @@
             <span class="sat-pane-kicker">Answer choices</span>
             <span class="sat-pane-hint">Select one</span>
           </header>
-          <div class="choices-panel choices-stack sat-choices-list">
+          <div class="choices-panel choices-stack sat-choices-list" role="radiogroup" aria-label="Answer choices">
             {% for choice in q.choices %}
-            <div class="choice-card" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+            <label class="choice-card{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} selected is-selected{% endif %}" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
+              <input type="radio" class="choice-radio-input" name="selected_answer" value="{{ choice_letters[loop.index0] }}"{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} checked{% endif %}>
               <span class="choice-bubble" aria-hidden="true"></span>
               <span class="choice-letter">{{ choice_letters[loop.index0] }}</span>
               <div class="choice-content">{{ choice|safe }}</div>
-            </div>
+            </label>
             {% endfor %}
           </div>
           <details class="sat-scratchpad">
@@ -188,29 +192,51 @@ function setAnswerState(hasAnswer, label) {
   });
   if (answerStatus) answerStatus.textContent = hasAnswer ? (label || "Answer selected.") : "Choose an answer before continuing.";
 }
-setAnswerState(false);
-document.querySelectorAll(".sat-choices-list .choice-card").forEach((card) => {
-  card.addEventListener("click", () => {
-    document.querySelectorAll(".sat-choices-list .choice-card").forEach((c) => c.classList.remove("selected"));
-    card.classList.add("selected");
-    if (selectedInput) selectedInput.value = card.dataset.letter || "";
-    try { sessionStorage.setItem(storageKey + "_answer", card.dataset.letter || ""); } catch (e) {}
-    setAnswerState(true, "Selected " + (card.dataset.letter || "") + ".");
+const serverSavedLetter = {{ (saved_selected_answer or '')|tojson }};
+function applyChoiceCard(card) {
+  if (!card) return;
+  document.querySelectorAll(".sat-choices-list .choice-card").forEach((c) => {
+    c.classList.remove("selected");
+    c.classList.remove("is-selected");
   });
+  card.classList.add("selected");
+  card.classList.add("is-selected");
+  const radio = card.querySelector("input[type=radio]");
+  if (radio) radio.checked = true;
+  const letter = card.dataset.letter || (radio && radio.value) || "";
+  if (selectedInput) selectedInput.value = letter;
+  try { sessionStorage.setItem(storageKey + "_answer", letter); } catch (e) {}
+  setAnswerState(true, "Selected " + letter + ".");
+}
+document.querySelectorAll(".sat-choices-list .choice-card").forEach((card) => {
+  card.addEventListener("click", () => applyChoiceCard(card));
   card.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      card.click();
+      applyChoiceCard(card);
     }
   });
+  const radio = card.querySelector("input[type=radio]");
+  if (radio) radio.addEventListener("change", () => applyChoiceCard(card));
 });
-try {
-  const saved = sessionStorage.getItem(storageKey + "_answer");
-  if (saved) {
-    const card = document.querySelector('.sat-choices-list .choice-card[data-letter="' + saved + '"]');
-    if (card) card.click();
+function restoreSavedChoice() {
+  const cards = Array.from(document.querySelectorAll(".sat-choices-list .choice-card"));
+  let card = null;
+  if (serverSavedLetter) {
+    card = cards.find((c) => (c.dataset.letter || "") === serverSavedLetter) || null;
   }
-} catch (e) {}
+  if (!card) {
+    try {
+      const saved = sessionStorage.getItem(storageKey + "_answer");
+      if (saved) card = cards.find((c) => (c.dataset.letter || "") === saved) || null;
+    } catch (e) {}
+  }
+  const checked = document.querySelector(".choice-radio-input:checked");
+  if (!card && checked) card = checked.closest(".choice-card");
+  if (card) applyChoiceCard(card);
+  else setAnswerState(false);
+}
+restoreSavedChoice();
 
 const scratch = document.getElementById("sat-scratch-note");
 if (scratch) {

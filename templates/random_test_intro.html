@@ -58,8 +58,12 @@
     <a href="{{ url_for('practice_exams') }}" class="np-bluebook-btn np-bluebook-btn--ghost">Back</a>
     {% if has_active_attempt and continue_href %}
     <a href="{{ continue_href }}" class="np-bluebook-btn np-bluebook-btn--primary">Continue →</a>
+    {% if restart_href %}
+    <a href="{{ restart_href }}" class="np-bluebook-btn np-bluebook-btn--ghost">Start this mock over</a>
+    {% endif %}
     {% else %}
     <form method="post" action="{% if category.is_camp_test9 %}{{ url_for('practice_camp_test9_start') }}{% else %}{{ url_for('practice_random_test_start') }}{% endif %}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <button type="submit" class="np-bluebook-btn np-bluebook-btn--primary">Begin test →</button>
     </form>
     {% endif %}
