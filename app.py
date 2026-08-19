@@ -1425,6 +1425,7 @@ def _practice_domain_from_path(path: str) -> str | None:
         "skill-loop",
         "repair",
         "draft-answer",
+        "autosave-answer",
     ):
         return None
     return dom
@@ -1467,7 +1468,7 @@ def _path_allowed_for_grants(path: str, grants: set[str] | None, db: sqlite3.Con
             return _domain_allowed_by_grants(dom, grants)
         if p.startswith("/practice/analytics") or p.startswith("/practice/miss-quiz"):
             return "sat" in grants
-        if p.startswith("/practice/repair") or p.startswith("/practice/draft-answer"):
+        if p.startswith("/practice/repair") or p.startswith("/practice/draft-answer") or p.startswith("/practice/autosave-answer"):
             return "sat" in grants
         if p.startswith("/practice/materials"):
             return "sat" in grants
@@ -12266,18 +12267,13 @@ def _practice_draft_map() -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
-def _save_practice_draft(attempt_id: int | None, qnum: int, answer: str) -> None:
+def _save_practice_draft(
+    attempt_id: int | None, qnum: int, answer: str, *, clear_empty: bool = False
+) -> None:
+    """Persist a draft in SQLite only. Do not put answers in the cookie session."""
     if attempt_id is None:
         return
     answer = (answer or "").strip()
-    drafts = _practice_draft_map()
-    key = _practice_draft_key(int(attempt_id), int(qnum))
-    if answer:
-        drafts[key] = answer
-    else:
-        drafts.pop(key, None)
-    session[PRACTICE_DRAFT_SESSION_KEY] = drafts
-    session.modified = True
     db = get_db()
     if answer:
         db.execute(
@@ -12290,11 +12286,13 @@ def _save_practice_draft(attempt_id: int | None, qnum: int, answer: str) -> None
             """,
             (int(attempt_id), int(qnum), answer),
         )
-    else:
+    elif clear_empty:
         db.execute(
             "DELETE FROM practice_answer_drafts WHERE attempt_id = ? AND question_index = ?",
             (int(attempt_id), int(qnum)),
         )
+    else:
+        return
     db.commit()
 
 
@@ -13569,6 +13567,51 @@ def practice_draft_answer():
     return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=goto_q))
 
 
+@app.route("/practice/autosave-answer", methods=["POST"])
+def practice_autosave_answer():
+    """Quiet background save so fill-ins and choices survive Next/refresh."""
+    domain = (request.form.get("domain") or "").strip()
+    topic = (request.form.get("topic") or "").strip()
+    raw_answer = (request.form.get("selected_answer") or "").strip()
+    attempt_id_raw = (request.form.get("attempt_id") or "").strip()
+    qnum_raw = (request.form.get("qnum") or "0").strip()
+    try:
+        current_q = int(qnum_raw or 0)
+    except ValueError:
+        current_q = 0
+    try:
+        attempt_id = int(attempt_id_raw) if attempt_id_raw else None
+    except ValueError:
+        attempt_id = None
+    domain_data = BANKS.get(domain)
+    if not domain_data or topic not in domain_data:
+        return jsonify({"ok": False}), 404
+    db = get_db()
+    user_id = session.get("user_id")
+    sk = _practice_session_key(domain, topic)
+    if attempt_id is not None and not _attempt_user_matches(db, attempt_id, user_id):
+        attempt_id = None
+    if attempt_id is None:
+        session_aid = session.get(sk)
+        try:
+            attempt_id = int(session_aid) if session_aid is not None else None
+        except (TypeError, ValueError):
+            attempt_id = None
+    if attempt_id is None:
+        attempt_id = _insert_practice_attempt(db, user_id, domain, topic, current_q)
+        session[sk] = attempt_id
+        session.modified = True
+    q_kind = ""
+    questions = get_questions_for_topic(domain, topic, domain_data[topic]) or []
+    if questions:
+        current_q = max(0, min(len(questions) - 1, current_q))
+        q_kind = str(questions[current_q].get("question_kind") or "mcq")
+    if q_kind in ("mcq", "mcq5") and raw_answer:
+        raw_answer = raw_answer.strip().upper()[:1]
+    _save_practice_draft(attempt_id, current_q, raw_answer)
+    return jsonify({"ok": True, "attempt_id": attempt_id})
+
+
 @app.route("/practice/submit", methods=["POST"])
 def submit_practice_answer():
     domain = request.form.get("domain", "").strip()
@@ -13694,7 +13737,7 @@ def submit_practice_answer():
             """,
             (attempt_id, q_index, selected_answer, correct_answer, is_correct),
         )
-        _save_practice_draft(attempt_id, q_index, "")
+        _save_practice_draft(attempt_id, q_index, "", clear_empty=True)
         lk = _learner_key()
         _apply_practice_mistake_progress(
             db,

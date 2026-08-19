@@ -674,6 +674,48 @@ const constructedInput = document.getElementById("constructed-answer-input");
 const practiceForm = document.querySelector(".sat-practice-form");
 const answerStatus = document.getElementById("sat-answer-status");
 const submitButtons = document.querySelectorAll(".sat-submit-btn");
+const autosaveUrl = {{ url_for('practice_autosave_answer')|tojson }};
+const autosaveCsrf = {{ csrf_token|tojson }};
+let autosaveTimer = null;
+let lastAutosaved = "";
+
+function currentPracticeAnswer() {
+    if (constructedInput) return (constructedInput.value || "").trim();
+    if (sprInput) return (sprInput.value || "").trim();
+    const checked = document.querySelector(".choice-radio-input:checked");
+    if (checked) return (checked.value || "").trim();
+    return ((selectedInput && selectedInput.value) || "").trim();
+}
+
+function autosaveNow() {
+    const answer = currentPracticeAnswer();
+    if (!answer || !practiceAttemptId || answer === lastAutosaved) return;
+    const body = new FormData();
+    body.append("csrf_token", autosaveCsrf);
+    body.append("domain", "{{ domain }}");
+    body.append("topic", "{{ topic }}");
+    body.append("qnum", String(practiceQnum));
+    body.append("attempt_id", String(practiceAttemptId));
+    body.append("selected_answer", answer);
+    lastAutosaved = answer;
+    fetch(autosaveUrl, {
+        method: "POST",
+        body,
+        credentials: "same-origin",
+        keepalive: true,
+        headers: { "X-CSRF-Token": autosaveCsrf, "X-Requested-With": "XMLHttpRequest" },
+    }).catch(() => { lastAutosaved = ""; });
+}
+
+function scheduleAutosave() {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(autosaveNow, 450);
+}
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") autosaveNow();
+});
+window.addEventListener("pagehide", autosaveNow);
 
 const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response') | tojson }};
 
@@ -736,6 +778,7 @@ function applyChoiceCard(card, persist) {
     if (persist !== false) localStorage.setItem(storageKey, card.dataset.index);
     selectedInput.value = card.dataset.letter || (radio && radio.value) || "";
     setAnswerState(true, `Selected ${card.dataset.letter}. Ready to submit.`);
+    scheduleAutosave();
 }
 
 function restoreSavedChoice() {
@@ -882,6 +925,7 @@ window.addEventListener("load", () => {
             lockPhase3Choices("This answer is locked for the current classroom attempt.");
         }
     }
+    lastAutosaved = currentPracticeAnswer();
 
     if (constructedInput) {
         const syncConstructedStatus = () => {
@@ -892,6 +936,7 @@ window.addEventListener("load", () => {
         constructedInput.addEventListener("input", () => {
             localStorage.setItem(storageKey, constructedInput.value);
             syncConstructedStatus();
+            scheduleAutosave();
         });
     }
 
@@ -904,6 +949,7 @@ window.addEventListener("load", () => {
         sprInput.addEventListener("input", () => {
             localStorage.setItem(storageKey, sprInput.value);
             syncSprStatus();
+            scheduleAutosave();
         });
     }
 

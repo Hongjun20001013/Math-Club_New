@@ -494,6 +494,62 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertIn("Start this mock over", html)
         self.assertNotIn('id="selected-answer-input" name="selected_answer"', html)
 
+    def test_autosave_keeps_fill_in_without_next(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_22/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_22/0")
+        aid = self._hard21_attempt_id(first.get_data(as_text=True))
+        rv = self.client.post(
+            "/practice/autosave-answer",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_22",
+                "qnum": "0",
+                "attempt_id": aid,
+                "selected_answer": "15",
+            },
+            headers={"X-CSRF-Token": "test-csrf", "X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(rv.status_code, 200)
+        self.assertTrue(rv.get_json().get("ok"))
+        back = self.client.get("/practice/hard_problem/hard_22/0")
+        self.assertIn('value="15"', back.get_data(as_text=True))
+
+    def test_empty_next_does_not_erase_saved_draft(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_22/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_22/0")
+        aid = self._hard21_attempt_id(first.get_data(as_text=True))
+        self.client.post(
+            "/practice/autosave-answer",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_22",
+                "qnum": "0",
+                "attempt_id": aid,
+                "selected_answer": "9/2",
+            },
+            headers={"X-CSRF-Token": "test-csrf", "X-Requested-With": "XMLHttpRequest"},
+        )
+        self.client.post(
+            "/practice/draft-answer",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_22",
+                "qnum": "0",
+                "goto_qnum": "1",
+                "attempt_id": aid,
+                "selected_answer": "",
+            },
+            headers={"X-CSRF-Token": "test-csrf"},
+            follow_redirects=False,
+        )
+        back = self.client.get("/practice/hard_problem/hard_22/0")
+        self.assertIn('value="9/2"', back.get_data(as_text=True))
+
     def test_hard_spr_draft_restores_on_previous(self):
         self.login()
         self.client.get("/practice/hard_problem/hard_22/new-session", follow_redirects=False)
