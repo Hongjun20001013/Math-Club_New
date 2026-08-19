@@ -182,4 +182,5 @@
 
     input.addEventListener("input", renderMirror);
     renderMirror();
+    window.NPSprMath = { refresh: renderMirror };
 })();

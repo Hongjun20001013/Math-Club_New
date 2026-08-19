@@ -12339,10 +12339,8 @@ def _saved_selected_answer_for_question(
             (int(attempt_id), int(qnum)),
         ).fetchone()
         if row is not None and str(row["selected_answer"] or "").strip():
-            raw = str(row["selected_answer"]).strip()
-            return _mcq_letter(raw) or raw
-    draft = _load_practice_draft(attempt_id, qnum)
-    return _mcq_letter(draft) or draft
+            return str(row["selected_answer"]).strip()
+    return _load_practice_draft(attempt_id, qnum)
 
 
 def _visible_learning_tracks(grants: set[str] | None) -> list[dict[str, Any]]:
@@ -13510,7 +13508,7 @@ def practice_question(domain, topic, qnum):
         and bool(saved_selected_answer),
         saved_selected_answer=saved_selected_answer,
         restart_href=url_for("practice_new_session", domain=domain, topic=topic)
-        if pace_seconds and not mistake_redo_mode
+        if domain == "hard_problem" and not mistake_redo_mode
         else None,
     )
 
@@ -14811,7 +14809,7 @@ def practice_new_session(domain: str, topic: str):
             """,
             (user_id, domain, topic),
         ).fetchone()
-        if latest and topic not in PHASE3_PACE_TOPICS:
+        if latest and domain != "hard_problem":
             graded = int(latest["graded"] or 0)
             if 0 < graded < MIN_TRACKED_SAT_RESPONSES:
                 flash(

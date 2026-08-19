@@ -450,6 +450,45 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertIn("Start this mock over", html)
         self.assertNotIn('id="selected-answer-input" name="selected_answer"', html)
 
+    def test_hard_spr_draft_restores_on_previous(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_22/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_22/0")
+        self.assertEqual(first.status_code, 200)
+        html = first.get_data(as_text=True)
+        self.assertIn('id="spr-answer-input"', html)
+        aid = self._hard21_attempt_id(html)
+        rv = self.client.post(
+            "/practice/draft-answer",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_22",
+                "qnum": "0",
+                "goto_qnum": "1",
+                "attempt_id": aid,
+                "selected_answer": "27/4",
+            },
+            headers={"X-CSRF-Token": "test-csrf"},
+            follow_redirects=False,
+        )
+        self.assertEqual(rv.status_code, 302)
+        back = self.client.get("/practice/hard_problem/hard_22/0")
+        back_html = back.get_data(as_text=True)
+        self.assertIn('id="spr-answer-input"', back_html)
+        self.assertIn('value="27/4"', back_html)
+
+    def test_hard_practice_set_uses_native_radios(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_1/new-session", follow_redirects=False)
+        rv = self.client.get("/practice/hard_problem/hard_1/0")
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn("const phase3AnswerLocked = false;", html)
+        self.assertIn("Start this mock over", html)
+        if 'id="spr-answer-input"' not in html:
+            self.assertIn('class="choice-radio-input"', html)
+
 
 if __name__ == "__main__":
     unittest.main()

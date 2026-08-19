@@ -279,7 +279,7 @@
                             <span class="sat-response-studio__badge">Saved for review</span>
                         </div>
                         <div class="sat-response-studio__frame">
-                            <textarea class="sat-constructed-input sat-response-studio__input" name="selected_answer" id="constructed-answer-input" rows="10" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."></textarea>
+                            <textarea class="sat-constructed-input sat-response-studio__input" name="selected_answer" id="constructed-answer-input" rows="10" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} readonly{% endif %}>{{ saved_selected_answer|default('') }}</textarea>
                         </div>
                         <p class="sat-constructed-hint">{% if q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
                     </div>
@@ -290,7 +290,7 @@
                     <label class="sat-spr-label" for="spr-answer-input">Answer</label>
                     <div class="sat-spr-input-wrap">
                         <div class="sat-spr-input-math" id="spr-answer-math" aria-hidden="true"></div>
-                        <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. 3/4, x^2, sqrt(2), pi" aria-describedby="spr-hint">
+                        <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. 3/4, x^2, sqrt(2), pi" aria-describedby="spr-hint" value="{{ saved_selected_answer|default('') }}"{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} readonly{% endif %}>
                     </div>
                     <p id="spr-hint" class="sat-spr-hint">{% if placement_mode %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>2e-3</strong>, or <strong>pi</strong>.{% else %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>pi</strong>.{% endif %}</p>
                     <div class="sat-spr-assist" aria-label="Accepted response formats">
@@ -640,7 +640,8 @@ const storageKey = practiceStoragePrefix + "{{ qnum }}";
 const scratchKey = storageKey + "_scratch";
 const reviewFlagKey = storageKey + "_review_flag";
 const questionAlreadyAnswered = {{ (qnum in answered_qset) | tojson }};
-const serverSavedLetter = {{ (saved_selected_answer or '')|tojson }};
+const serverSavedAnswer = {{ (saved_selected_answer or '')|tojson }};
+const serverSavedLetter = serverSavedAnswer;
 
 function migrateLegacyDraftKey() {
     if (!practiceAttemptId) return;
@@ -681,7 +682,7 @@ function setAnswerState(hasAnswer, label) {
     answerStatus?.classList.toggle("is-visible", hasAnswer || isConstructedMode);
     const nativeChoice = document.querySelector(".choice-radio-input");
     submitButtons.forEach((btn) => {
-        if (isConstructedMode || nativeChoice) {
+        if (isConstructedMode || nativeChoice || sprInput) {
             btn.removeAttribute("disabled");
             btn.classList.remove("is-disabled");
             return;
@@ -864,12 +865,17 @@ window.addEventListener("load", () => {
     }
 
     const saved = localStorage.getItem(storageKey);
-    if (constructedInput && saved !== null) {
-        constructedInput.value = saved;
+    if (constructedInput) {
+        if (serverSavedAnswer) constructedInput.value = serverSavedAnswer;
+        else if (saved !== null && saved !== "") constructedInput.value = saved;
         setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
-    } else if (sprInput && saved !== null) {
-        sprInput.value = saved;
+    } else if (sprInput) {
+        if (serverSavedAnswer) sprInput.value = serverSavedAnswer;
+        else if (saved !== null && saved !== "") sprInput.value = saved;
         setAnswerState(!!sprInput.value.trim(), "Answer entered. Ready to submit.");
+        if (window.NPSprMath && typeof window.NPSprMath.refresh === "function") {
+            window.NPSprMath.refresh();
+        }
     } else if (selectedInput) {
         restoreSavedChoice();
         if (phase3AnswerLocked && serverSavedLetter) {
