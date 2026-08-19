@@ -339,7 +339,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
         self.assertIn("const phase3AnswerLocked = false;", html)
 
-    def test_mock_test1_submitted_choice_locks_and_shows_letter(self):
+    def test_mock_test1_submitted_choice_stays_editable(self):
         self.login()
         self.client.get("/practice/hard_problem/hard_21/new-session", follow_redirects=False)
         first = self.client.get("/practice/hard_problem/hard_21/0")
@@ -359,9 +359,53 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         rv = self.client.get("/practice/hard_problem/hard_21/0")
         html = rv.get_data(as_text=True)
         self.assertEqual(rv.status_code, 200)
-        self.assertIn("const phase3AnswerLocked = true;", html)
+        self.assertIn("const phase3AnswerLocked = false;", html)
         self.assertRegex(html, r'value="B"[^>]*checked|checked[^>]*value="B"')
-        self.assertIn("Start this mock over", html)
+        self.assertNotIn("disabled", html.split("choice-radio-input", 1)[-1][:180])
+
+    def test_hard_question_submit_can_change_answer(self):
+        self.login()
+        self.client.get("/practice/hard_problem/hard_21/new-session", follow_redirects=False)
+        first = self.client.get("/practice/hard_problem/hard_21/0")
+        aid = self._hard21_attempt_id(first.get_data(as_text=True))
+        self.client.post(
+            "/practice/submit",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_21",
+                "qnum": "0",
+                "attempt_id": aid,
+                "selected_answer": "A",
+            },
+            headers={"X-CSRF-Token": "test-csrf"},
+            follow_redirects=False,
+        )
+        again = self.client.post(
+            "/practice/submit",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "hard_problem",
+                "topic": "hard_21",
+                "qnum": "0",
+                "attempt_id": aid,
+                "selected_answer": "C",
+            },
+            headers={"X-CSRF-Token": "test-csrf"},
+            follow_redirects=False,
+        )
+        self.assertEqual(again.status_code, 302)
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            row = db.execute(
+                """
+                SELECT selected_answer FROM practice_responses
+                WHERE attempt_id = ? AND question_index = 0
+                ORDER BY id DESC LIMIT 1
+                """,
+                (int(aid),),
+            ).fetchone()
+            self.assertEqual(str(row["selected_answer"]), "C")
 
     def test_mock_test1_restart_creates_unlocked_attempt(self):
         self.login()

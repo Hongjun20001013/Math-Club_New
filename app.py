@@ -13502,10 +13502,7 @@ def practice_question(domain, topic, qnum):
         tracked_responses_hint=tracked_responses_hint,
         placement_clear_storage=placement_clear_storage,
         lock_phase3_answers=False,
-        phase3_answer_locked=bool(pace_seconds)
-        and not mistake_redo_mode
-        and question_index in answered_qset
-        and bool(saved_selected_answer),
+        phase3_answer_locked=False,
         saved_selected_answer=saved_selected_answer,
         restart_href=url_for("practice_new_session", domain=domain, topic=topic)
         if domain == "hard_problem" and not mistake_redo_mode
@@ -13685,32 +13682,10 @@ def submit_practice_answer():
             attempt_id = _insert_practice_attempt(db, user_id, domain, topic, q_index)
 
         graded_before = _attempt_graded_count(db, attempt_id)
-        # Phase 3 mocks: once answered in this attempt, the choice is locked until restart.
-        if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS:
-            prior = db.execute(
-                """
-                SELECT id FROM practice_responses
-                WHERE attempt_id = ? AND question_index = ?
-                  AND TRIM(COALESCE(selected_answer, '')) != ''
-                LIMIT 1
-                """,
-                (attempt_id, q_index),
-            ).fetchone()
-            if prior is not None:
-                flash("This answer is locked for the current classroom attempt. Finish the set or restart after class to try again.")
-                return _practice_redirect(
-                    domain,
-                    topic,
-                    qnum_for_redirect,
-                    mistake_redo=mistake_redo,
-                    analytics_part=analytics_part_f,
-                    miss_anchor=miss_anchor_f,
-                )
-        else:
-            db.execute(
-                "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
-                (attempt_id, q_index),
-            )
+        db.execute(
+            "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+            (attempt_id, q_index),
+        )
         db.execute(
             """
             INSERT INTO practice_responses
