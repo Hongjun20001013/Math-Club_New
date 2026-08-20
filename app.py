@@ -212,10 +212,11 @@ app.config.update(
     ),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
     SKILL_LOOP_PILOT=False,
+    SKILL_REPAIR=False,
 )
 
 from skill_loop import skill_loop_bp, skill_loop_enabled
-from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables, annotate_clusters_with_progress
+from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables, annotate_clusters_with_progress, skill_repair_enabled
 
 app.register_blueprint(skill_loop_bp)
 app.register_blueprint(skill_repair_bp)
@@ -1266,6 +1267,7 @@ def inject_template_config():
         "hard_drill_meta": _hard_drill_display_meta(),
         "csrf_token": _csrf_token(),
         "skill_loop_pilot_enabled": skill_loop_enabled(),
+        "skill_repair_enabled": skill_repair_enabled(),
         **_site_branding_context(),
     }
 
@@ -1707,6 +1709,8 @@ def _validate_csrf_on_mutations():
 @app.before_request
 def require_authenticated_user():
     if (request.path or "").startswith("/practice/skill-loop") and not skill_loop_enabled():
+        abort(404)
+    if (request.path or "").startswith("/practice/repair") and not skill_repair_enabled():
         abort(404)
     endpoint = request.endpoint or ""
     if endpoint in {
@@ -11707,8 +11711,11 @@ def practice_analytics():
     for item in sat_unit_distribution:
         item["is_active"] = item["id"] == active_part_id
     skill_clusters = cluster_wrong_rows(visible_wrong_rows)
-    annotate_clusters_with_progress(db, session.get("user_id"), skill_clusters)
-    next_repair_step = recommended_next_step(skill_clusters)
+    if skill_repair_enabled():
+        annotate_clusters_with_progress(db, session.get("user_id"), skill_clusters)
+        next_repair_step = recommended_next_step(skill_clusters)
+    else:
+        next_repair_step = None
     show_skill_clusters = active_part_id in unit_label_by_part
     return render_template(
         "practice_analytics.html",

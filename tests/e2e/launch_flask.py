@@ -13,6 +13,14 @@ port = int(os.environ.get("E2E_PORT", "8899"))
 from app import app  # noqa: E402
 
 flag = (os.environ.get("SKILL_LOOP_PILOT") or "").strip().lower() in ("1", "true", "yes", "on")
+repair = (os.environ.get("SKILL_REPAIR") or "").strip().lower()
+if repair in ("1", "true", "yes", "on"):
+    repair_on = True
+elif repair in ("0", "false", "no", "off"):
+    repair_on = False
+else:
+    repair_on = flag
 app.config["SKILL_LOOP_PILOT"] = flag
+app.config["SKILL_REPAIR"] = repair_on
 app.config["TESTING"] = False
 app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)

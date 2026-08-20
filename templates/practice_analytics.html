@@ -94,7 +94,11 @@
             <div>
                 <p class="np-analytics-card-kicker">All SAT mistakes</p>
                 <h2>{{ visible_wrong_total }} wrong question{% if visible_wrong_total != 1 %}s{% endif %}, clustered by micro-skill.</h2>
+                {% if skill_repair_enabled %}
                 <p>Session Report, Coach Walkthrough, Miss Quiz, and this Analytics page stay as they are. Repair this skill adds a teaching cycle on top: worked example → faded → new isomorphic item → transfer → delayed. Original-item redo is review only.</p>
+                {% else %}
+                <p>Session Report, Coach Walkthrough, Miss Quiz, and this Analytics page stay as they are. Original-item redo is review only.</p>
+                {% endif %}
             </div>
             <a href="{{ url_for('practice_sat_mistakes') }}" class="np-pw-btn np-pw-btn--primary">Generate mistake test</a>
         </div>
@@ -115,7 +119,7 @@
             {% endfor %}
         </div>
 
-        {% if next_repair_step %}
+        {% if skill_repair_enabled and next_repair_step %}
         <section class="np-repair-next glass-panel np-glass" aria-label="Recommended next step">
             <p class="np-analytics-card-kicker">One next step</p>
             <h2>Repair {{ next_repair_step.title }}</h2>
@@ -148,15 +152,15 @@
                         <h3>{{ cluster.title }}</h3>
                         <p><strong>{{ cluster.stuck_label or "Possible focus" }}:</strong> {{ cluster.common_stuck }}</p>
                         <p><strong>Representative miss:</strong> Q{{ cluster.representative.q_index + 1 }} · yours {{ cluster.representative.yours }} · key {{ cluster.representative.key }}</p>
-                        {% if cluster.repair_progress and cluster.repair_progress.immediate_complete %}
+                        {% if skill_repair_enabled and cluster.repair_progress and cluster.repair_progress.immediate_complete %}
                         <p data-repair-status="immediate_complete"><strong>Status:</strong> Immediate practice complete</p>
                         <p data-delayed-countdown><strong>Delayed check:</strong> unlocks in approximately {{ cluster.repair_progress.hours_left }} hours</p>
                         <p data-mastery="not_yet"><strong>Not mastered yet</strong></p>
                         {% endif %}
                     </div>
-                    {% if cluster.repair_progress and cluster.repair_progress.immediate_complete %}
+                    {% if skill_repair_enabled and cluster.repair_progress and cluster.repair_progress.immediate_complete %}
                     <a class="np-pw-btn np-pw-btn--primary" href="{{ cluster.repair_href }}">View delayed check</a>
-                    {% elif cluster.has_pack and cluster.repair_href %}
+                    {% elif skill_repair_enabled and cluster.has_pack and cluster.repair_href %}
                     <a class="np-pw-btn np-pw-btn--primary" href="{{ cluster.repair_href }}">Repair this skill</a>
                     {% endif %}
                 </header>
@@ -445,7 +449,11 @@
         <div>
             <p class="np-analytics-card-kicker">Mistake learning system</p>
             <h2>{{ selected_partition.label }} mistakes by unit</h2>
+            {% if skill_repair_enabled %}
             <p class="np-analytics-ladder-lead">Use the micro-skill clusters above first. Original-item redo is <strong>review only</strong> and cannot auto-master. Verified mastery appears only after a delayed new-item independent pass in Repair this skill. Miss Quiz, Coach Walkthrough, and Session Report are unchanged.</p>
+            {% else %}
+            <p class="np-analytics-ladder-lead">Original-item redo is <strong>review only</strong> and cannot auto-master. Miss Quiz, Coach Walkthrough, and Session Report are unchanged.</p>
+            {% endif %}
         </div>
         <span>read top to bottom: unit → cause → skill → question</span>
     </div>

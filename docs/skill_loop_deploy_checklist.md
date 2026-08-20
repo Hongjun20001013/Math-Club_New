@@ -5,6 +5,7 @@ Do not deploy until this list is complete and the owner has approved production 
 1. Confirm automated tests: `python3 -m unittest tests.test_skill_loop_gate -v`
 2. Confirm local browser E2E passed (desktop + mobile widths).
 3. Feature flag `SKILL_LOOP_PILOT` remains off until the go-live window.
+3b. Pack-backed `SKILL_REPAIR` remains off (default). If unset, `SKILL_LOOP_PILOT` can also enable Repair; `SKILL_REPAIR=false` wins.
 4. Set `SKILL_LOOP_ASSIGN_SALT` in the host secret store before enabling the flag.
    - Generate a high-entropy secret. Do not reuse the local dev salt.
    - Do not put the salt in git, logs, HTML, reports, or client JavaScript.

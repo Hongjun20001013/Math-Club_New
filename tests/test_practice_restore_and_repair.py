@@ -38,6 +38,9 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         app_mod._DB_SCHEMA_READY = False
         app_mod.app.config["TESTING"] = True
         app_mod.app.config["SKILL_LOOP_PILOT"] = False
+        app_mod.app.config["SKILL_REPAIR"] = True
+        os.environ.pop("SKILL_LOOP_PILOT", None)
+        os.environ.pop("SKILL_REPAIR", None)
         self.client = app_mod.app.test_client()
 
     def tearDown(self):
@@ -291,7 +294,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
                 "practice_href": "/y",
             },
         ]
-        clusters = sr.cluster_wrong_rows(rows)
+        clusters = sr.cluster_wrong_rows(rows, pack_backed=True)
         self.assertGreaterEqual(len(clusters), 1)
         codes = {c["code"] for c in clusters}
         self.assertIn("sat.alg.linear_rate_remaining", codes)
@@ -794,6 +797,218 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertIn("Start this mock over", html)
         if 'id="spr-answer-input"' not in html:
             self.assertIn('class="choice-radio-input"', html)
+
+
+class RepairFlagOffTests(unittest.TestCase):
+    """With SKILL_REPAIR off, pack-backed Repair must not change student Analytics."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="sat-repair-off-")
+        self.db = os.path.join(self.tmp, "sat.db")
+        copy_db(self.db)
+        import app as app_mod
+
+        self.app_mod = app_mod
+        self._orig_db = app_mod.DB_PATH
+        self._orig_ready = app_mod._DB_SCHEMA_READY
+        app_mod.DB_PATH = self.db
+        app_mod._DB_SCHEMA_READY = False
+        app_mod.app.config["TESTING"] = True
+        app_mod.app.config["SKILL_LOOP_PILOT"] = False
+        app_mod.app.config["SKILL_REPAIR"] = False
+        os.environ.pop("SKILL_LOOP_PILOT", None)
+        os.environ.pop("SKILL_REPAIR", None)
+        self.client = app_mod.app.test_client()
+
+    def tearDown(self):
+        os.environ.pop("SKILL_LOOP_PILOT", None)
+        os.environ.pop("SKILL_REPAIR", None)
+        self.app_mod.app.config["SKILL_REPAIR"] = False
+        self.app_mod.app.config["SKILL_LOOP_PILOT"] = False
+        self.app_mod.DB_PATH = self._orig_db
+        self.app_mod._DB_SCHEMA_READY = self._orig_ready
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def login(self, user_id=2, role="student", username="s1"):
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = user_id
+            sess["user_role"] = role
+            sess["username"] = username
+            sess["csrf_token"] = "test-csrf"
+
+    def _insert_algebra_misses(self, count=5):
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            aid = db.execute(
+                "INSERT INTO practice_attempts (user_id, domain, topic, qnum) VALUES (2, 'algebra', '1_1', 0)"
+            ).lastrowid
+            for i in range(count):
+                db.execute(
+                    """
+                    INSERT INTO practice_responses
+                        (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                    VALUES (?, ?, 'A', 'B', 0)
+                    """,
+                    (aid, i),
+                )
+            db.commit()
+            return db
+
+    def test_flag_defaults_off(self):
+        import skill_repair as sr
+
+        self.assertFalse(self.app_mod.app.config.get("SKILL_REPAIR"))
+        with self.app_mod.app.app_context():
+            self.assertFalse(sr.skill_repair_enabled())
+
+    def test_repair_routes_404_and_do_not_write_sessions(self):
+        self.login()
+        before = 0
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            try:
+                before = int(db.execute("SELECT COUNT(*) FROM skill_repair_sessions").fetchone()[0])
+            except sqlite3.Error:
+                before = 0
+        for path, method in (
+            ("/practice/repair/sat.alg.linear_rate_remaining/start", "get"),
+            ("/practice/repair/sat.alg.solve_linear_equation/worked", "get"),
+            ("/practice/repair/sat.alg.no_solution_parameter/feedback", "get"),
+        ):
+            rv = self.client.get(path, follow_redirects=False)
+            self.assertEqual(rv.status_code, 404, path)
+        posted = self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/submit",
+            data={"csrf_token": "test-csrf", "phase": "worked"},
+            follow_redirects=False,
+        )
+        self.assertEqual(posted.status_code, 404)
+        evented = self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/event",
+            data={"csrf_token": "test-csrf", "event": "view_solution", "phase": "worked"},
+            follow_redirects=False,
+        )
+        self.assertEqual(evented.status_code, 404)
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            try:
+                after = int(db.execute("SELECT COUNT(*) FROM skill_repair_sessions").fetchone()[0])
+            except sqlite3.Error:
+                after = 0
+        self.assertEqual(after, before)
+
+    def test_analytics_hides_repair_ctas_and_new_pack_skills(self):
+        self.login()
+        self._insert_algebra_misses()
+        rv = self.client.get("/practice/analytics")
+        html = rv.get_data(as_text=True)
+        self.assertEqual(rv.status_code, 200)
+        self.assertNotIn("Repair this skill", html)
+        self.assertNotIn("View delayed check", html)
+        self.assertNotIn("Immediate practice complete", html)
+        self.assertNotIn("/practice/repair/", html)
+        self.assertNotIn("sat.alg.solve_linear_equation", html)
+        self.assertNotIn("sat.alg.translate_words_to_equation", html)
+        self.assertNotIn("sat.alg.no_solution_parameter", html)
+        self.assertNotIn("sat.alg.identity_infinite_solutions", html)
+        self.assertNotIn("sat.alg.percent_cost_model", html)
+        self.assertNotIn("Needs further diagnosis", html)
+        unit = self.client.get("/practice/analytics?part=unit1")
+        unit_html = unit.get_data(as_text=True)
+        self.assertIn("Archive from mistake list", unit_html)
+        self.assertIn("review only", unit_html.lower())
+        self.assertNotIn("Repair this skill", unit_html)
+
+    def test_legacy_clustering_has_no_pack_hrefs(self):
+        import skill_repair as sr
+
+        rows = [
+            {
+                "stem_html": "<p>A tank starts with 8400 gallons. After 3 hours, 6900 remain at a constant rate.</p>",
+                "knowledge_title": "Linear remaining",
+                "knowledge_section": "1.1",
+                "domain": "algebra",
+                "topic": "1_1",
+                "q_index": 2,
+                "pr_id": 9,
+                "yours": "A",
+                "key": "C",
+                "when": "2026-08-01",
+                "mastery_effective": "unreviewed",
+                "diagnosis_label": "Setup / modeling",
+                "tag_labels": ["setup"],
+                "pattern_pack": {"pitfall": "Adding the opening hours twice."},
+                "practice_href": "/x",
+            },
+            {
+                "stem_html": "<p>Solve 2x+3=11.</p>",
+                "knowledge_title": "Solve linear equations",
+                "knowledge_section": "1.1",
+                "domain": "algebra",
+                "topic": "1_1",
+                "q_index": 3,
+                "pr_id": 10,
+                "yours": "B",
+                "key": "A",
+                "when": "2026-08-02",
+                "mastery_effective": "unreviewed",
+                "diagnosis_label": "Execution",
+                "tag_labels": [],
+                "pattern_pack": {},
+                "practice_href": "/y",
+            },
+        ]
+        clusters = sr.cluster_wrong_rows(rows, pack_backed=False)
+        codes = {c["code"] for c in clusters}
+        self.assertIn("sat.alg.linear_rate_remaining", codes)
+        self.assertTrue(any(str(c).startswith("bank.") for c in codes))
+        self.assertNotIn("sat.alg.solve_linear_equation", codes)
+        for cluster in clusters:
+            self.assertFalse(cluster["has_pack"])
+            self.assertEqual(cluster["repair_href"], "")
+            self.assertEqual(cluster["stuck_label"], "Common stuck point")
+
+    def test_old_practice_still_works_when_repair_off(self):
+        self.login()
+        rv = self.client.get("/practice/algebra/1_1/0")
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn('type="radio"', html)
+        self.assertIn('class="choice-radio-input"', html)
+
+    def test_pilot_env_enables_repair_when_repair_env_unset(self):
+        import skill_repair as sr
+
+        os.environ["SKILL_LOOP_PILOT"] = "1"
+        try:
+            with self.app_mod.app.app_context():
+                self.assertTrue(sr.skill_repair_enabled())
+            self.login()
+            rv = self.client.get(
+                "/practice/repair/sat.alg.linear_rate_remaining/start",
+                follow_redirects=False,
+            )
+            self.assertNotEqual(rv.status_code, 404)
+        finally:
+            os.environ.pop("SKILL_LOOP_PILOT", None)
+
+    def test_explicit_repair_off_wins_over_pilot(self):
+        import skill_repair as sr
+
+        os.environ["SKILL_REPAIR"] = "0"
+        os.environ["SKILL_LOOP_PILOT"] = "1"
+        try:
+            with self.app_mod.app.app_context():
+                self.assertFalse(sr.skill_repair_enabled())
+            self.login()
+            rv = self.client.get(
+                "/practice/repair/sat.alg.linear_rate_remaining/start",
+                follow_redirects=False,
+            )
+            self.assertEqual(rv.status_code, 404)
+        finally:
+            os.environ.pop("SKILL_REPAIR", None)
+            os.environ.pop("SKILL_LOOP_PILOT", None)
 
 
 if __name__ == "__main__":

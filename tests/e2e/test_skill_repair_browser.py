@@ -85,6 +85,7 @@ class _Server:
         env["DB_PATH"] = self.db
         env["E2E_PORT"] = str(self.port)
         env["SKILL_LOOP_PILOT"] = "0"
+        env["SKILL_REPAIR"] = "1"
         env.pop("RENDER", None)
         env.pop("FLASK_ENV", None)
         self.proc = subprocess.Popen(

@@ -1,7 +1,8 @@
 """Repair-this-skill layer on the existing mistake log.
 
 Does not replace Session Report, Coach Walkthrough, Miss Quiz, or Analytics.
-Independent of SKILL_LOOP_PILOT so students can repair while the A/B flag is off.
+Pack-backed Repair routes and Analytics CTAs are off unless SKILL_REPAIR is on
+(or SKILL_LOOP_PILOT is on and SKILL_REPAIR is unset). Assignment salt is not required.
 Original-item redo never counts as independent_pass or auto-mastery.
 """
 from __future__ import annotations
@@ -115,6 +116,38 @@ PACK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "ski
 
 skill_repair_bp = Blueprint("skill_repair", __name__, url_prefix="/practice/repair")
 
+
+def _tri_state_env(name: str) -> bool | None:
+    raw = (os.environ.get(name) or "").strip().lower()
+    if raw in ("0", "false", "no", "off"):
+        return False
+    if raw in ("1", "true", "yes", "on"):
+        return True
+    return None
+
+
+def skill_repair_enabled() -> bool:
+    """Pack-backed Repair this skill. Default off. Does not require assignment salt."""
+    repair = _tri_state_env("SKILL_REPAIR")
+    if repair is not None:
+        return repair
+    pilot = _tri_state_env("SKILL_LOOP_PILOT")
+    if pilot is not None:
+        return pilot
+    try:
+        if current_app.config.get("SKILL_REPAIR"):
+            return True
+        return bool(current_app.config.get("SKILL_LOOP_PILOT"))
+    except RuntimeError:
+        return False
+
+
+@skill_repair_bp.before_request
+def _require_repair_flag():
+    if not skill_repair_enabled():
+        abort(404)
+
+
 PACK_SLOT = {
     "worked": "worked_example",
     "faded": "faded",
@@ -182,6 +215,23 @@ def _blob_for_row(row: dict[str, Any]) -> str:
     stem = str(row.get("stem_html") or row.get("stem") or "").lower()
     title = str(row.get("knowledge_title") or row.get("topic_title") or "").lower()
     return f"{stem} {title}"
+
+
+def primary_micro_skill_legacy(row: dict[str, Any]) -> dict[str, Any]:
+    """Production clustering from before pack-backed Repair. No new micro-skill packs."""
+    blob = _blob_for_row(row)
+    if any(h in blob for h in LINEAR_RATE_HINTS) and ("rate" in blob or "remain" in blob):
+        return {
+            "code": LINEAR_RATE_CODE,
+            "title": ALLOWED_MICRO_SKILLS[LINEAR_RATE_CODE],
+            "has_pack": False,
+        }
+    sec = str(row.get("knowledge_section") or "").strip()
+    title_h = str(row.get("knowledge_title") or row.get("topic_title") or sec or "This skill")
+    domain = str(row.get("domain") or "sat")
+    topic = str(row.get("topic") or "misc")
+    code = f"bank.{domain}.{sec or topic}"
+    return {"code": code, "title": title_h, "has_pack": False}
 
 
 def primary_micro_skill(row: dict[str, Any]) -> dict[str, Any]:
@@ -263,14 +313,19 @@ def cluster_stuck_copy(bucket: dict[str, Any], skill_code: str) -> dict[str, str
     }
 
 
-def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def cluster_wrong_rows(
+    rows: list[dict[str, Any]],
+    *,
+    pack_backed: bool | None = None,
+) -> list[dict[str, Any]]:
     """Group active misses by primary micro-skill. Archived/mastered stay out of the queue."""
+    use_packs = skill_repair_enabled() if pack_backed is None else pack_backed
     buckets: dict[str, dict[str, Any]] = {}
     for row in rows:
         effective = str(row.get("mastery_effective") or "unreviewed")
         if effective in {"mastered", "archived"}:
             continue
-        skill = primary_micro_skill(row)
+        skill = primary_micro_skill(row) if use_packs else primary_micro_skill_legacy(row)
         row["primary_micro_skill"] = skill
         key = skill["code"]
         bucket = buckets.get(key)
@@ -278,14 +333,22 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             bucket = {
                 "code": key,
                 "title": skill["title"],
-                "has_pack": bool(skill["has_pack"]),
+                "has_pack": bool(skill["has_pack"]) if use_packs else False,
                 "rows": [],
                 "diagnoses": Counter(),
+                "tags": Counter(),
+                "pitfalls": Counter(),
             }
             buckets[key] = bucket
         bucket["rows"].append(row)
         diag = str(row.get("diagnosis_label") or row.get("diagnosis_id") or "Concept gap")
         bucket["diagnoses"][diag] += 1
+        for tag in row.get("tag_labels") or []:
+            bucket["tags"][str(tag)] += 1
+        pack = row.get("pattern_pack") or {}
+        pitfall = str(pack.get("pitfall") or "").strip()
+        if pitfall:
+            bucket["pitfalls"][pitfall] += 1
 
     clusters: list[dict[str, Any]] = []
     for key, bucket in buckets.items():
@@ -296,7 +359,23 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
         representative = rows_sorted[0]
         common_diag = bucket["diagnoses"].most_common(1)
-        stuck = cluster_stuck_copy(bucket, key)
+        if use_packs:
+            stuck = cluster_stuck_copy(bucket, key)
+        else:
+            common_pitfall = bucket["pitfalls"].most_common(1)
+            common_tag = bucket["tags"].most_common(1)
+            stuck_text = ""
+            if common_pitfall:
+                stuck_text = common_pitfall[0][0]
+            elif common_tag:
+                stuck_text = f"Often tagged: {common_tag[0][0]}"
+            elif common_diag:
+                stuck_text = common_diag[0][0]
+            stuck = {
+                "stuck_label": "Common stuck point",
+                "common_stuck": stuck_text or "Relearn the core move, then try a new item.",
+                "stuck_certainty": "legacy",
+            }
         level = str((representative.get("pattern_pack") or {}).get("level") or "")
         diag_level = "High" if bucket["diagnoses"] and common_diag and common_diag[0][1] >= 3 else (
             "Medium" if len(rows_sorted) >= 2 else "Low"
@@ -306,15 +385,18 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         priority = _priority_for_count(len(rows_sorted), diag_level)
         stem = str(representative.get("stem_html") or representative.get("stem") or "")
         stem_plain = html_to_plain(stem)
-        try:
-            repair_href = url_for("skill_repair.start", skill_code=key) if bucket["has_pack"] else ""
-        except RuntimeError:
-            repair_href = f"/practice/repair/{key}/start" if bucket["has_pack"] else ""
+        has_pack = bool(bucket["has_pack"]) if use_packs else False
+        repair_href = ""
+        if use_packs and has_pack:
+            try:
+                repair_href = url_for("skill_repair.start", skill_code=key)
+            except RuntimeError:
+                repair_href = f"/practice/repair/{key}/start"
         clusters.append(
             {
                 "code": key,
                 "title": bucket["title"],
-                "has_pack": bucket["has_pack"],
+                "has_pack": has_pack,
                 "miss_count": len(rows_sorted),
                 "priority": priority,
                 "stuck_label": stuck["stuck_label"],
