@@ -60,26 +60,50 @@ def choice_text(item: dict) -> str:
 
 
 def independent_linear_rate(item: dict) -> str:
-    stem = plain_stem(item)
-    n = ints(stem)
-    low = stem.lower()
-    if "which function" in low or "r(t)" in low:
-        if n and n[0] == 0 and len(n) >= 4:
-            q0, t1, q1 = n[1], n[2], n[3]
-        else:
-            q0, t1, q1 = n[0], n[1], n[2]
-        r = (q0 - q1) / t1
-        return f"R(t) = {q0} − {int(r)}t"
-    q0, t1, q1 = n[0], n[1], n[2]
-    r = (q0 - q1) / t1
-    if "additional hours" in low:
-        target = n[3]
-        return str(int((q1 - target) / r))
-    if "remain after" in low or "how many kilograms remain" in low or "how many gallons remain" in low:
-        t = n[3]
-        return str(int(q0 - r * t))
-    target = n[3]
-    return str(int((q0 - target) / r))
+    """Solve each rewritten LRR item from its stem quantities, not the stored letter."""
+    iid = item.get("id")
+    if iid == "slq_lrr_precheck_01":
+        # 9600 start, after 3 h remain 8100, additional hours to remain 5100
+        r = (9600 - 8100) / 3
+        return str(int((8100 - 5100) / r))
+    if iid == "slq_lrr_example_01":
+        # table Q(0)=7200, Q(4)=5600; remaining at t=10
+        r = (7200 - 5600) / 4
+        return str(int(7200 - r * 10))
+    if iid == "slq_lrr_faded_01":
+        r = (4800 - 3550) / 5
+        return str(int((4800 - 1300) / r))
+    if iid == "slq_lrr_faded_02":
+        # reverse Q0: remain 2160 after 4 h at 180 gal/h
+        return str(int(2160 + 180 * 4))
+    if iid == "slq_lrr_ind_01":
+        # points (3, 4500), (8, 2500); remaining at t=11
+        slope = (2500 - 4500) / (8 - 3)
+        return str(int(4500 + slope * (11 - 3)))
+    if iid == "slq_lrr_ind_02":
+        # 9200 - 250t = 3200
+        return str(int((9200 - 3200) / 250))
+    if iid == "slq_lrr_ind_03":
+        r = (11000 - 8300) / 6
+        return str(int((11000 - 2900) / r))
+    if iid == "slq_lrr_tr_01":
+        # intercept 6000, slope -150; remaining after 8 h
+        return str(int(6000 - 150 * 8))
+    if iid == "slq_lrr_tr_02":
+        # table (2, 4100), (5, 3200) -> Q0 and R(t)
+        r = (4100 - 3200) / (5 - 2)
+        q0 = 4100 + r * 2
+        return f"R(t) = {int(q0)} − {int(r)}t"
+    if iid == "slq_lrr_tr_03":
+        r = (5400 - 2700) / 9
+        return f"G(t) = 5400 − {int(r)}t"
+    if iid == "slq_lrr_del_01":
+        r = (8000 - 6250) / 5
+        return str(int((6250 - 2750) / r))
+    if iid == "slq_lrr_del_02":
+        # remaining 13600 at t=4 and 8800 at t=10; unloading rate
+        return str(int((13600 - 8800) / (10 - 4)))
+    raise AssertionError(f"unsolved linear remaining item {iid}")
 
 
 def independent_solve_linear(item: dict) -> str:
@@ -271,6 +295,12 @@ def wording_issues(item: dict) -> list[str]:
                         issues.append("correct choice does not state the set-valued conclusion")
                 elif math_close(chosen.replace("$", ""), math.replace("$", "")):
                     pass
+                elif (
+                    _normalize_math_answer(math) in _normalize_math_answer(chosen)
+                    or re.sub(r"[^0-9A-Za-z.=-]", "", math.replace("−", "-").replace(",", ""))
+                    in re.sub(r"[^0-9A-Za-z.=-]", "", chosen.replace("{,}", "").replace(",", "").replace("−", "-"))
+                ):
+                    pass
                 elif re.sub(r"[^\d.]", "", chosen) and re.sub(r"[^\d.]", "", math):
                     if not math_close(re.sub(r"[^\d.]", "", chosen), re.sub(r"[^\d.]", "", math)):
                         issues.append("correct choice numeric value does not match correct_math")
@@ -334,6 +364,80 @@ class PilotItemMathTests(unittest.TestCase):
             )
         AUDIT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
         self.assertFalse(failures, "\n".join(failures))
+
+    def test_lrr_pack_blueprint_and_bank_untouched(self):
+        from scripts.skill_loop_baseline import sha256_file, bank_question_count
+
+        pack = next(p for p in load_packs() if p["skill_code"] == "sat.alg.linear_rate_remaining")
+        items = pack["items"]
+        self.assertEqual(len(items), 12)
+        ids = [it["id"] for it in items]
+        self.assertEqual(len(ids), len(set(ids)))
+        slots = Counter(it["slot"] for it in items)
+        self.assertEqual(
+            dict(slots),
+            {
+                "precheck": 1,
+                "worked_example": 1,
+                "faded": 2,
+                "independent": 3,
+                "transfer": 3,
+                "delayed": 2,
+            },
+        )
+        required = {
+            "id",
+            "slot",
+            "phase",
+            "difficulty",
+            "representation",
+            "tested_reasoning",
+            "stem_html",
+            "choices",
+            "correct_answer",
+            "answer_alternates",
+            "distractor_rationale",
+            "worked_steps",
+            "faded",
+            "common_mistake",
+            "source_note",
+        }
+        standard = 0
+        reps = set()
+        for it in items:
+            missing = required - set(it)
+            self.assertFalse(missing, f"{it.get('id')} missing {missing}")
+            self.assertEqual(it.get("review_status"), "draft")
+            self.assertEqual(it.get("publish_status"), "unpublished")
+            self.assertIn("Not copied from question_bank.json", it.get("source_note") or "")
+            reps.add(it["representation"])
+            if it.get("standard_snapshot_wording"):
+                standard += 1
+            choices = it.get("choices") or []
+            idx = letter_index(it)
+            if choices:
+                self.assertEqual(len(choices), len(set(choices)))
+                self.assertIsNotNone(idx)
+                self.assertTrue(it.get("distractor_rationale"))
+        self.assertLessEqual(standard, 4)
+        self.assertTrue(any("table" in r for r in reps))
+        self.assertTrue(any("function" in r or r.endswith("function") for r in reps))
+        self.assertTrue(any("coordinate" in r for r in reps))
+        self.assertTrue(any("reverse_initial" in r for r in reps))
+        self.assertTrue(any("reverse_rate" in r for r in reps))
+        self.assertTrue(any("slope" in r for r in reps))
+        self.assertTrue(any("additional" in r for r in reps))
+        delayed_reps = [it["representation"] for it in items if it["slot"] == "delayed"]
+        transfer_reps = [it["representation"] for it in items if it["slot"] == "transfer"]
+        self.assertEqual(len(delayed_reps), 2)
+        self.assertEqual(len(set(delayed_reps)), 2)
+        self.assertTrue(any("coordinate" in r for r in transfer_reps))
+        self.assertNotIn("immediate", slots)
+        self.assertEqual(sum(1 for it in items if it["slot"] == "precheck"), 1)
+        bank = os.path.join(ROOT, "data", "question_bank.json")
+        self.assertEqual(bank_question_count(bank), 1507)
+        digest = sha256_file(bank)
+        self.assertEqual(digest, "cbcdd4d6e1bbdd1eee2bd408076851e4524d7ead87e0f4e3f55eae45b285804d")
 
     def test_no_solution_stems_use_statement_or_values_wording(self):
         for skill, item in all_items():

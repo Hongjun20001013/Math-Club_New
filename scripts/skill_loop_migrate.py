@@ -5,12 +5,17 @@ Usage:
   python3 scripts/skill_loop_migrate.py --dry-run
   python3 scripts/skill_loop_migrate.py --schema-only --db /abs/path/to/LOCAL-copy.db
   python3 scripts/skill_loop_migrate.py --schema-only --allow-render-production --db /var/data/sat.db
+  python3 scripts/skill_loop_migrate.py --seed-only --db /abs/path/to/LOCAL-copy.db
+  python3 scripts/skill_loop_migrate.py --seed-only --allow-render-production --db /var/data/sat.db
   python3 scripts/skill_loop_migrate.py --apply --db /abs/path/to/LOCAL-copy.db
 
 Dry-run prints SQL and does not connect.
 Schema-only runs the 15 CREATE TABLE/INDEX IF NOT EXISTS statements in one
-transaction and never seeds. --apply still refuses /var/data. Production path
-is allowed only with --schema-only --allow-render-production.
+transaction and never seeds.
+Seed-only inserts sat.alg.linear_rate_remaining drafts in one transaction and
+never CREATE/DROP. It never updates teacher-approved or published rows.
+--apply still refuses /var/data. Production path is allowed only with
+--schema-only or --seed-only plus --allow-render-production.
 """
 from __future__ import annotations
 
@@ -197,6 +202,8 @@ def is_forbidden_path(path: str) -> bool:
 def seed_pack(conn: sqlite3.Connection, pack_path: str = PACK_PATH) -> int:
     with open(pack_path, encoding="utf-8") as fh:
         pack = json.load(fh)
+    if pack.get("skill_code") != "sat.alg.linear_rate_remaining":
+        raise SystemExit("ERROR: seed-only only imports sat.alg.linear_rate_remaining")
     conn.execute(
         """
         INSERT OR IGNORE INTO skill_loop_skills
@@ -213,6 +220,8 @@ def seed_pack(conn: sqlite3.Connection, pack_path: str = PACK_PATH) -> int:
     )
     inserted = 0
     for it in pack.get("items") or []:
+        if (it.get("skill_code") or pack["skill_code"]) != "sat.alg.linear_rate_remaining":
+            raise SystemExit("ERROR: refusing item from another skill: " + str(it.get("id")))
         faded = json.dumps(
             {
                 "blanks": it.get("blanks") or [],
@@ -250,12 +259,15 @@ def seed_pack(conn: sqlite3.Connection, pack_path: str = PACK_PATH) -> int:
             ),
         )
         inserted += cur.rowcount or 0
+        # Draft/unpublished only. Never rewrite reviewed, teacher-approved, or published rows.
         conn.execute(
             """
             UPDATE skill_loop_items
             SET stem_html = ?, choices_json = ?, worked_steps_json = ?, faded_json = ?,
                 correct_answer = ?, answer_alternates_json = ?, source_note = ?
-            WHERE id = ? AND version = 1 AND review_status = 'draft'
+            WHERE id = ? AND version = 1
+              AND review_status = 'draft'
+              AND publish_status = 'unpublished'
             """,
             (
                 it["stem_html"],
@@ -287,6 +299,57 @@ def _print_schema_only_banner(db_path: str) -> None:
     print(f"statements={len(SQL_STATEMENTS)}")
 
 
+def _print_seed_only_banner(db_path: str) -> None:
+    print("SEED_ONLY")
+    print("db=" + os.path.abspath(db_path))
+    print("pack=sat.alg.linear_rate_remaining")
+    print("skill_is_active=0")
+    print("review_status=draft")
+    print("publish_status=unpublished")
+
+
+def _require_skill_loop_tables(conn: sqlite3.Connection) -> None:
+    have = {
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'skill_loop_%'"
+        )
+    }
+    missing = [name for name in SCHEMA_TABLES if name not in have]
+    if missing:
+        raise SystemExit("ERROR: seed-only requires existing skill_loop tables: " + ", ".join(missing))
+
+
+def print_seed_report(conn: sqlite3.Connection) -> None:
+    skills = list(
+        conn.execute(
+            "SELECT code, is_active FROM skill_loop_skills ORDER BY code"
+        )
+    )
+    items = list(
+        conn.execute(
+            """
+            SELECT id, slot, question_kind, correct_answer, review_status, publish_status
+            FROM skill_loop_items
+            ORDER BY slot, id
+            """
+        )
+    )
+    print("seed_report_skills=" + str([(r[0], r[1]) for r in skills]))
+    print(f"seed_report_item_count={len(items)}")
+    slots: dict[str, int] = {}
+    for row in items:
+        slots[row[1]] = slots.get(row[1], 0) + 1
+    print("seed_report_slots=" + json.dumps(slots, sort_keys=True))
+    statuses = {(r[4], r[5]) for r in items}
+    print("seed_report_item_statuses=" + json.dumps(sorted(statuses)))
+    for row in items:
+        print(
+            f"  {row[0]} slot={row[1]} kind={row[2]} answer={row[3]} "
+            f"review={row[4]} publish={row[5]}"
+        )
+
+
 def _run_sql_statements(db_path: str, *, seed: bool) -> None:
     assert_sql_is_additive()
     conn = sqlite3.connect(db_path)
@@ -312,6 +375,26 @@ def apply_schema(db_path: str, *, allow_render_production: bool = False) -> None
     _run_sql_statements(db_path, seed=False)
 
 
+def apply_seed(db_path: str, *, allow_render_production: bool = False) -> None:
+    """Insert draft unpublished linear-rate items. Never CREATE/DROP, never seeds other packs."""
+    if is_forbidden_path(db_path) and not allow_render_production:
+        raise SystemExit("ERROR: refusing to touch Render /var/data database")
+    _print_seed_only_banner(db_path)
+    assert_sql_is_additive()
+    conn = sqlite3.connect(db_path)
+    try:
+        _require_skill_loop_tables(conn)
+        conn.execute("BEGIN IMMEDIATE")
+        seed_pack(conn)
+        conn.commit()
+        print_seed_report(conn)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
 def apply(db_path: str) -> None:
     if is_forbidden_path(db_path):
         raise SystemExit("ERROR: refusing to touch Render /var/data database")
@@ -334,18 +417,33 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--schema-only", action="store_true")
+    parser.add_argument("--seed-only", action="store_true")
     parser.add_argument("--allow-render-production", action="store_true")
     parser.add_argument("--db")
     args = parser.parse_args()
     assert_sql_is_additive()
-    _print_sql_statements()
+    if not args.seed_only:
+        _print_sql_statements()
 
-    if args.allow_render_production and not args.schema_only:
-        print("ERROR: --allow-render-production is only valid with --schema-only.", file=sys.stderr)
-        return 4
-    if args.schema_only and args.apply:
-        print("ERROR: --schema-only and --apply are mutually exclusive.", file=sys.stderr)
+    modes = [args.apply, args.schema_only, args.seed_only]
+    if sum(bool(m) for m in modes) > 1:
+        print("ERROR: --schema-only, --seed-only, and --apply are mutually exclusive.", file=sys.stderr)
         return 2
+    if args.allow_render_production and not (args.schema_only or args.seed_only):
+        print("ERROR: --allow-render-production is only valid with --schema-only or --seed-only.", file=sys.stderr)
+        return 4
+
+    if args.seed_only:
+        if not args.db:
+            print("ERROR: --seed-only requires --db.", file=sys.stderr)
+            return 2
+        if args.dry_run:
+            _print_seed_only_banner(args.db)
+            print("DRY-RUN complete. No database connection or writes.")
+            return 0
+        apply_seed(args.db, allow_render_production=args.allow_render_production)
+        print("seed-only applied to", os.path.abspath(args.db))
+        return 0
 
     if args.schema_only:
         if not args.db:

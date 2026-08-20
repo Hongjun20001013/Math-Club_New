@@ -463,6 +463,166 @@ class TestSchemaOnlyMigration(unittest.TestCase):
             schema.assert_called_once_with("/var/data/sat.db", allow_render_production=True)
 
 
+class TestSeedOnlyMigration(unittest.TestCase):
+    def _seed_state(self, db):
+        conn = open_db(db)
+        skills = list(conn.execute("SELECT code, is_active FROM skill_loop_skills ORDER BY 1"))
+        items = list(
+            conn.execute(
+                """
+                SELECT id, slot, review_status, publish_status, skill_code
+                FROM skill_loop_items ORDER BY id
+                """
+            )
+        )
+        conn.close()
+        return skills, items
+
+    def test_seed_only_drafts_without_touching_old_tables_or_published_rows(self):
+        from scripts import skill_loop_migrate as migrate
+        from scripts.skill_loop_baseline import baseline
+
+        tmp = tempfile.mkdtemp(prefix="sl-seed-")
+        db = os.path.join(tmp, "copy.db")
+        copy_db(db)
+        try:
+            before = baseline(db)
+            migrate.apply_schema(db)
+            with mock.patch.object(migrate, "SQL_STATEMENTS", ["SHOULD NOT RUN"]) as _stmts:
+                migrate.apply_seed(db)
+            after = baseline(db)
+            self.assertEqual(before, after)
+            skills, items = self._seed_state(db)
+            self.assertEqual([(r["code"], r["is_active"]) for r in skills], [(SKILL, 0)])
+            self.assertEqual(len(items), 12)
+            self.assertTrue(all(r["review_status"] == "draft" for r in items))
+            self.assertTrue(all(r["publish_status"] == "unpublished" for r in items))
+            self.assertTrue(all(r["skill_code"] == SKILL for r in items))
+            slots = {}
+            for row in items:
+                slots[row["slot"]] = slots.get(row["slot"], 0) + 1
+            self.assertEqual(
+                slots,
+                {
+                    "precheck": 1,
+                    "worked_example": 1,
+                    "faded": 2,
+                    "independent": 3,
+                    "transfer": 3,
+                    "delayed": 2,
+                },
+            )
+            conn = open_db(db)
+            conn.execute(
+                """
+                UPDATE skill_loop_items
+                SET review_status='reviewed', publish_status='published', stem_html='LOCKED'
+                WHERE id='slq_lrr_precheck_01'
+                """
+            )
+            conn.commit()
+            conn.close()
+            migrate.apply_seed(db)
+            migrate.apply_seed(db)
+            conn = open_db(db)
+            locked = conn.execute(
+                "SELECT stem_html, review_status, publish_status FROM skill_loop_items WHERE id='slq_lrr_precheck_01'"
+            ).fetchone()
+            n = conn.execute("SELECT COUNT(*) FROM skill_loop_items").fetchone()[0]
+            other = conn.execute(
+                "SELECT COUNT(*) FROM skill_loop_skills WHERE code != ?", (SKILL,)
+            ).fetchone()[0]
+            conn.close()
+            self.assertEqual(locked["stem_html"], "LOCKED")
+            self.assertEqual(locked["review_status"], "reviewed")
+            self.assertEqual(locked["publish_status"], "published")
+            self.assertEqual(n, 12)
+            self.assertEqual(other, 0)
+            self.assertEqual(baseline(db), before)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                    "--seed-only",
+                    "--db",
+                    db,
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(proc.returncode, 0)
+            self.assertIn("SEED_ONLY", proc.stdout)
+            self.assertIn("pack=sat.alg.linear_rate_remaining", proc.stdout)
+            self.assertNotIn("CREATE TABLE", proc.stdout)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_seed_only_transaction_rollback_and_refuses_var_data(self):
+        from scripts import skill_loop_migrate as migrate
+        from scripts.skill_loop_baseline import baseline
+
+        tmp = tempfile.mkdtemp(prefix="sl-seed-fail-")
+        db = os.path.join(tmp, "copy.db")
+        copy_db(db)
+        try:
+            before = baseline(db)
+            migrate.apply_schema(db)
+            with mock.patch.object(migrate, "seed_pack", side_effect=RuntimeError("boom")):
+                with self.assertRaises(RuntimeError):
+                    migrate.apply_seed(db)
+            conn = open_db(db)
+            n_items = conn.execute("SELECT COUNT(*) FROM skill_loop_items").fetchone()[0]
+            n_skills = conn.execute("SELECT COUNT(*) FROM skill_loop_skills").fetchone()[0]
+            conn.close()
+            self.assertEqual(n_items, 0)
+            self.assertEqual(n_skills, 0)
+            self.assertEqual(baseline(db), before)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        with self.assertRaises(SystemExit):
+            migrate.apply_seed("/var/data/sat.db")
+        blocked = subprocess.run(
+            [
+                sys.executable,
+                os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                "--seed-only",
+                "--db",
+                "/var/data/sat.db",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(blocked.returncode, 0)
+        mixed = subprocess.run(
+            [
+                sys.executable,
+                os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                "--apply",
+                "--allow-render-production",
+                "--db",
+                "/var/data/sat.db",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(mixed.returncode, 4)
+        with mock.patch.object(migrate, "apply_seed") as seed:
+            argv = [
+                "skill_loop_migrate.py",
+                "--seed-only",
+                "--allow-render-production",
+                "--db",
+                "/var/data/sat.db",
+            ]
+            with mock.patch.object(sys, "argv", argv):
+                code = migrate.main()
+            self.assertEqual(code, 0)
+            seed.assert_called_once_with("/var/data/sat.db", allow_render_production=True)
+
+
 class _PilotCase(unittest.TestCase):
     flag_on = True
     publish = True
@@ -501,6 +661,7 @@ class _PilotCase(unittest.TestCase):
         self.app_mod.app.config["SKILL_LOOP_PILOT"] = False
         os.environ.pop("SKILL_LOOP_PILOT", None)
         os.environ.pop("SKILL_LOOP_ASSIGN_SALT", None)
+        os.environ.pop("SKILL_LOOP_ALLOWLIST_USERNAMES", None)
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def _set_clock(self, factory):
@@ -684,7 +845,7 @@ class TestPublishAndStudentVisibility(_PilotCase):
             ).fetchone()
         finally:
             conn.close()
-        self.assertIn("warehouse", v1["stem_html"])
+        self.assertIn("9,600", v1["stem_html"])
         self.assertEqual(v1["publish_status"], "published")
         self.assertEqual(v2["review_status"], "draft")
         self.assertEqual(int(step["item_version"]), 1)
@@ -710,7 +871,7 @@ class TestStateMachine(_PilotCase):
         steps = [
             ("precheck", "slq_lrr_precheck_01", "C", None),
             ("instruction", "slq_lrr_example_01", "ok", None),
-            ("faded", "slq_lrr_faded_01", "", {"rate": "150", "total_hours": "12"}),
+            ("faded", "slq_lrr_faded_01", "", {"rate": "250", "total_hours": "14"}),
             ("independent", "slq_lrr_ind_01", "C", None),
             ("independent", "slq_lrr_ind_02", "B", None),
             ("transfer", "slq_lrr_tr_01", "C", None),
@@ -751,6 +912,13 @@ class TestStateMachine(_PilotCase):
         rv = self.client.get(f"{PREFIX}/{SKILL}/delayed")
         self.assertEqual(rv.status_code, 200)
         self.post_submit(phase="delayed", item_id="slq_lrr_del_01", selected_answer="D")
+        conn = self.qdb()
+        try:
+            mid = conn.execute("SELECT mastery_status FROM skill_loop_runs WHERE user_id=2").fetchone()[0]
+        finally:
+            conn.close()
+        self.assertEqual(mid, "immediate_pass")
+        self.assertNotEqual(mid, "delayed_pass")
         self.client.get(f"{PREFIX}/{SKILL}/delayed")
         self.post_submit(phase="delayed", item_id="slq_lrr_del_02", selected_answer="B")
         conn = self.qdb()
@@ -1541,6 +1709,45 @@ class TestProductionSalt(_PilotCase):
         self.assertNotIn("super-secret-salt-value", js)
 
 
+class TestAllowlistGate(_PilotCase):
+    def test_production_empty_allowlist_is_fail_closed(self):
+        os.environ["RENDER"] = "true"
+        os.environ["SKILL_LOOP_ASSIGN_SALT"] = "unit-test-salt-not-for-prod"
+        os.environ["SKILL_LOOP_PILOT"] = "1"
+        os.environ.pop("SKILL_LOOP_ALLOWLIST_USERNAMES", None)
+        try:
+            self.assertTrue(self.sl.skill_loop_enabled())
+            self.assertFalse(self.sl.skill_loop_access_allowed("s1", role="student"))
+            self.login(user_id=2, role="student", username="s1")
+            self.assertEqual(self.client.get(PREFIX + "/").status_code, 404)
+        finally:
+            os.environ.pop("RENDER", None)
+            os.environ.pop("SKILL_LOOP_ASSIGN_SALT", None)
+            os.environ.pop("SKILL_LOOP_PILOT", None)
+
+    def test_only_named_username_enters_and_not_user_id_mod_two(self):
+        os.environ["SKILL_LOOP_ALLOWLIST_USERNAMES"] = "s1"
+        try:
+            self.assertFalse(self.sl.skill_loop_access_allowed("s2", role="student"))
+            self.assertTrue(self.sl.skill_loop_access_allowed("s1", role="student"))
+            self.assertFalse(self.sl.skill_loop_access_allowed("s2", role="student"))
+            self.login(user_id=3, role="student", username="s2")
+            self.assertEqual(self.client.get(PREFIX + "/").status_code, 404)
+            self.login(user_id=2, role="student", username="s1")
+            self.assertEqual(self.client.get(PREFIX + "/").status_code, 200)
+        finally:
+            os.environ.pop("SKILL_LOOP_ALLOWLIST_USERNAMES", None)
+
+    def test_staff_can_open_admin_review_only(self):
+        os.environ["SKILL_LOOP_ALLOWLIST_USERNAMES"] = "s1"
+        try:
+            self.login(user_id=1, role="admin", username="teacher")
+            self.assertEqual(self.client.get(PREFIX + "/").status_code, 404)
+            self.assertEqual(self.client.get(PREFIX + "/admin/review").status_code, 200)
+        finally:
+            os.environ.pop("SKILL_LOOP_ALLOWLIST_USERNAMES", None)
+
+
 class TestStaticJsSafety(unittest.TestCase):
     def test_static_js_has_no_secrets_or_answers(self):
         with open(os.path.join(ROOT, "static", "skill_loop.js"), encoding="utf-8") as handle:
@@ -1590,7 +1797,11 @@ class TestTeachingExperience(_PilotCase):
         )
         self.assertEqual(rv.status_code, 200)
         light = rv.get_json()
-        self.assertTrue("rate" in light["hint_text"].lower() or "snapshot" in light["hint_text"].lower())
+        self.assertTrue(
+            "slope" in light["hint_text"].lower()
+            or "point" in light["hint_text"].lower()
+            or "rate" in light["hint_text"].lower()
+        )
         self.assertNotIn("t = 18", light["hint_text"])
         rv = self.client.post(
             f"{PREFIX}/{SKILL}/event",
@@ -1598,7 +1809,7 @@ class TestTeachingExperience(_PilotCase):
             headers=self.headers(),
         )
         crit = rv.get_json()
-        self.assertIn("250", crit["hint_text"])
+        self.assertIn("400", crit["hint_text"])
         self.assertIn("4,500", crit["hint_text"])
         rv = self.client.post(
             f"{PREFIX}/{SKILL}/event",
@@ -1606,10 +1817,13 @@ class TestTeachingExperience(_PilotCase):
             headers=self.headers(),
         )
         sol = rv.get_json()["solution"]
-        self.assertIn("18", sol["answer_display"])
+        self.assertIn("1,300", sol["answer_display"])
         self.assertGreaterEqual(len(sol["worked_steps"]), 4)
         self.assertTrue(all(step.get("why") for step in sol["worked_steps"]))
-        self.assertIn("4,500", sol["explanation_check"])
+        self.assertTrue(
+            "4,500" in (sol.get("explanation_check") or "")
+            or any("4,500" in str(step) for step in sol["worked_steps"])
+        )
         self.post_submit(
             phase="independent",
             item_id="slq_lrr_ind_01",
@@ -1675,7 +1889,7 @@ class TestTeachingExperience(_PilotCase):
         self.assertIn("new faded attempt", inst)
         faded = self.client.get(f"{PREFIX}/{SKILL}/faded").get_data(as_text=True)
         self.assertIn("slq_lrr_faded_02", faded)
-        self.assertIn("3,600", faded)
+        self.assertIn("salt brine", faded)
 
     def test_independent_and_transfer_miss_do_not_pass(self):
         self.start_b()
@@ -1694,7 +1908,7 @@ class TestTeachingExperience(_PilotCase):
         self.assertEqual(int(row["is_correct"]), 0)
         self.assertEqual(int(row["counts_as_independent"]), 0)
         nxt = self.client.get(f"{PREFIX}/{SKILL}/independent").get_data(as_text=True)
-        self.assertNotIn("9,000 books", nxt)
+        self.assertNotIn("surveyor remaining-mass", nxt)
         self.post_submit(phase="independent", item_id="slq_lrr_ind_01", selected_answer="C")
         conn = self.qdb()
         try:
@@ -1778,22 +1992,30 @@ class TestTeachingExperience(_PilotCase):
             encoding="utf-8",
         ) as handle:
             pack = json.load(handle)
-        tr = next(item for item in pack["items"] if item["id"] == "slq_lrr_tr_03")
+        tr = next(item for item in pack["items"] if item["id"] == "slq_lrr_tr_02")
         self.assertEqual(tr["slot"], "transfer")
         self.assertEqual(tr["review_status"], "draft")
         self.assertIn("<table", tr["stem_html"])
         self.assertTrue(any("R(t)" in choice for choice in tr["choices"]))
-        self.assertIn("9,600", tr["stem_html"])
+        self.assertIn("4,100", tr["stem_html"])
         conn = self.qdb()
         try:
             row = conn.execute(
-                "SELECT stem_html, slot FROM skill_loop_items WHERE id='slq_lrr_tr_03'"
+                "SELECT stem_html, slot FROM skill_loop_items WHERE id='slq_lrr_tr_02'"
             ).fetchone()
         finally:
             conn.close()
         self.assertIsNotNone(row)
         self.assertEqual(row["slot"], "transfer")
         self.assertIn("<table", row["stem_html"])
+        tr3 = next(item for item in pack["items"] if item["id"] == "slq_lrr_tr_03")
+        self.assertEqual(tr3["slot"], "transfer")
+        self.assertEqual(tr3["variant_index"], 3)
+        self.assertTrue(any("G(t)" in choice for choice in tr3["choices"]))
+        ids = {item["id"] for item in pack["items"]}
+        self.assertNotIn("slq_lrr_imm_01", ids)
+        self.assertNotIn("slq_lrr_precheck_02", ids)
+        self.assertIn("slq_lrr_del_02", ids)
 
 
 class TestBankHashAfterSuite(unittest.TestCase):

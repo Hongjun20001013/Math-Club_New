@@ -110,6 +110,30 @@ def skill_loop_enabled() -> bool:
         return False
 
 
+def skill_loop_allowlist_usernames() -> set[str]:
+    raw = (os.environ.get("SKILL_LOOP_ALLOWLIST_USERNAMES") or "").strip()
+    return {part.strip().lower() for part in raw.split(",") if part.strip()}
+
+
+def skill_loop_access_allowed(
+    username: str | None,
+    *,
+    role: str | None = None,
+    admin_path: bool = False,
+) -> bool:
+    """Explicit username allowlist. Never user_id % 2. Empty list is fail-closed in production."""
+    names = skill_loop_allowlist_usernames()
+    role_l = (role or "").strip().lower()
+    staff = role_l in {"admin", "staff", "teacher", "supervisor"}
+    if names:
+        if admin_path and staff:
+            return True
+        return (username or "").strip().lower() in names
+    if production_runtime():
+        return False
+    return True
+
+
 def assign_salt() -> str:
     salt = (os.environ.get("SKILL_LOOP_ASSIGN_SALT") or "").strip()
     if salt:
@@ -1308,10 +1332,16 @@ def _request_payload() -> dict[str, Any]:
     if request.is_json:
         data = request.get_json(silent=True) or {}
         return dict(data)
-    faded = {
-        "rate": request.form.get("rate") or "",
-        "total_hours": request.form.get("total_hours") or "",
+    reserved = {
+        "csrf_token",
+        "phase",
+        "item_id",
+        "selected_answer",
+        "hint_level",
+        "solution_viewed",
+        "variant",
     }
+    faded = {key: (request.form.get(key) or "") for key in request.form if key not in reserved}
     return {
         "phase": request.form.get("phase") or "",
         "item_id": request.form.get("item_id") or "",
@@ -1326,6 +1356,13 @@ def _request_payload() -> dict[str, Any]:
 @skill_loop_bp.before_request
 def _gate():
     if not skill_loop_enabled():
+        abort(404)
+    admin_path = (request.path or "").startswith("/practice/skill-loop/admin")
+    if not skill_loop_access_allowed(
+        session.get("username"),
+        role=session.get("user_role"),
+        admin_path=admin_path,
+    ):
         abort(404)
     return None
 

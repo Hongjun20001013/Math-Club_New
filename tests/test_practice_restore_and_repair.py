@@ -335,7 +335,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         worked = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/worked")
         html = worked.get_data(as_text=True)
         self.assertEqual(worked.status_code, 200)
-        self.assertIn("Maya pumps", html)
+        self.assertIn("holding-tank log", html)
         self.assertIn("Strategy", html)
         self.assertIn("Verified key", html)
         self.assertIn("Full walkthrough", html)
@@ -350,7 +350,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         faded_html = faded.get_data(as_text=True)
         self.assertEqual(faded.status_code, 200)
         self.assertIn('data-sl-stem', faded_html)
-        self.assertIn("sands wood", faded_html)
+        self.assertIn("cooling vat", faded_html)
         self.assertIn("data-faded-blank", faded_html)
         faded_id = re.search(r'data-item-id="([^"]+)"', faded_html).group(1)
         faded_hash = re.search(r'data-stem-hash="([^"]+)"', faded_html).group(1)
@@ -372,14 +372,14 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         faded2_hash = re.search(r'data-stem-hash="([^"]+)"', faded2_html).group(1)
         self.assertNotEqual(faded_id, faded2_id)
         self.assertNotEqual(faded_hash, faded2_hash)
-        self.assertIn("kiln dries clay", faded2_html)
+        self.assertIn("salt brine", faded2_html)
         self.client.post(
             "/practice/repair/sat.alg.linear_rate_remaining/submit",
             data={
                 "csrf_token": "test-csrf",
                 "phase": "faded",
-                "rate": "200",
-                "total_hours": "14",
+                "removed_amount": "720",
+                "start_amount": "2880",
                 "hint_level": "none",
                 "solution_viewed": "0",
             },
@@ -392,7 +392,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertNotEqual(iso_id, faded_id)
         self.assertNotEqual(iso_id, faded2_id)
         self.assertNotEqual(iso_hash, faded_hash)
-        self.assertIn("donation drive", iso_html)
+        self.assertIn("surveyor remaining-mass", iso_html)
         event = self.client.post(
             "/practice/repair/sat.alg.linear_rate_remaining/event",
             data={"csrf_token": "test-csrf", "kind": "hint_light"},
