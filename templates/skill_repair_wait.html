@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Delayed repair wait{% endblock %}
 {% block content %}
-<div class="np-page-shell sl-wrap">
+<div class="np-page-shell sl-wrap" data-skill-repair-phase="delayed" data-delayed-locked="1" data-counts-as-independent="0" data-session-id="{{ session_id }}" data-delayed-available-at="{{ delayed_available_at }}">
   <nav class="np-atelier-rail">
     <a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a>
   </nav>

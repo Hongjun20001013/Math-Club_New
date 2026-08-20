@@ -1,0 +1,403 @@
+{
+  "skill_code": "sat.alg.solve_linear_equation",
+  "title": "Solve a linear equation in one variable",
+  "microskill_statement": "Use inverse operations to isolate a single variable in a linear equation.",
+  "status": "draft_pending_teacher_review",
+  "items": [
+    {
+      "id": "slq_sle_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "worked_example",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>Solve for x: 5x − 7 = 18.</p>",
+      "choices": [],
+      "correct_answer": "5",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Add 7 to both sides: 5x = 25.",
+          "why": "Undo the subtraction first so the variable term is alone."
+        },
+        {
+          "step": 2,
+          "do": "Divide both sides by 5: x = 5.",
+          "why": "The coefficient of x is 5."
+        }
+      ],
+      "explanation_check": "Divide both sides by 5: x = 5.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Name the operations that were applied to x. Do not compute yet.",
+      "critical_hint": "Undo subtraction of 7 first: 5x = 25. Then divide by 5. Do not stop at 25.",
+      "core_idea": "Isolate x with inverse operations in reverse order.",
+      "common_mistake": "Dividing by 5 before adding 7.",
+      "unknown_change": "",
+      "correct_math": "x = 5"
+    },
+    {
+      "id": "slq_sle_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>Solve for n: 4n + 9 = 29.</p>",
+      "choices": [],
+      "correct_answer": "5",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Subtract 9: 4n = 20.",
+          "why": "Undo addition first."
+        },
+        {
+          "step": 2,
+          "do": "Divide by 4: n = 5.",
+          "why": "Isolate n."
+        }
+      ],
+      "explanation_check": "Divide by 4: n = 5.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Name which side has the variable term and which number is added to it.",
+      "critical_hint": "Subtract 9 from both sides to get 4n = 20, then divide by 4.",
+      "core_idea": "Undo the constant, then undo the coefficient.",
+      "common_mistake": "Dividing 29 by 4 without subtracting 9.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "4n + 9 = 29"
+        }
+      ],
+      "asked": "Complete the faded inverse operations.",
+      "correct_math": "n = 5",
+      "blanks": [
+        {
+          "id": "undo_const",
+          "prompt": "4n = ___",
+          "correct": "20"
+        },
+        {
+          "id": "n",
+          "prompt": "n = ___",
+          "correct": "5"
+        }
+      ]
+    },
+    {
+      "id": "slq_sle_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>Solve for k: 7k − 11 = 24.</p>",
+      "choices": [],
+      "correct_answer": "5",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Add 11: 7k = 35.",
+          "why": "Undo subtraction."
+        },
+        {
+          "step": 2,
+          "do": "Divide by 7: k = 5.",
+          "why": "Isolate k."
+        }
+      ],
+      "explanation_check": "Divide by 7: k = 5.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Identify the constant that was subtracted from 7k.",
+      "critical_hint": "Add 11 to both sides first: 7k = 35. Then divide by 7.",
+      "core_idea": "Same inverse-operation order on a new equation.",
+      "common_mistake": "Computing 24 − 11 and stopping.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "7k − 11 = 24"
+        }
+      ],
+      "asked": "Complete the faded inverse operations.",
+      "correct_math": "k = 5",
+      "blanks": [
+        {
+          "id": "undo_const",
+          "prompt": "7k = ___",
+          "correct": "35"
+        },
+        {
+          "id": "k",
+          "prompt": "k = ___",
+          "correct": "5"
+        }
+      ]
+    },
+    {
+      "id": "slq_sle_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>What is the value of x if 3(x − 2) + 5 = 14?</p>",
+      "choices": [
+        "3",
+        "5",
+        "7",
+        "9"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Distribute: 3x − 6 + 5 = 14.",
+          "why": "Clear parentheses first."
+        },
+        {
+          "step": 2,
+          "do": "Combine: 3x − 1 = 14.",
+          "why": "Constants on the left."
+        },
+        {
+          "step": 3,
+          "do": "Add 1: 3x = 15, so x = 5.",
+          "why": "Isolate x."
+        }
+      ],
+      "explanation_check": "Add 1: 3x = 15, so x = 5.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Look at the structure: there is a distributed product before combining like terms.",
+      "critical_hint": "Expand 3(x − 2) to 3x − 6, then combine with +5 before isolating x.",
+      "core_idea": "Distribute, combine, isolate.",
+      "common_mistake": "Dividing 14 by 3 after ignoring the −2.",
+      "unknown_change": "",
+      "correct_math": "x = 5"
+    },
+    {
+      "id": "slq_sle_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Solve for y: 2y/3 + 4 = 10.</p>",
+      "choices": [
+        "6",
+        "9",
+        "12",
+        "18"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Subtract 4: 2y/3 = 6.",
+          "why": "Undo addition."
+        },
+        {
+          "step": 2,
+          "do": "Multiply by 3/2: y = 9.",
+          "why": "Undo the coefficient 2/3."
+        }
+      ],
+      "explanation_check": "Multiply by 3/2: y = 9.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The variable is multiplied by a fraction. Name the two operations on y.",
+      "critical_hint": "Subtract 4 to get 2y/3 = 6, then multiply both sides by 3/2.",
+      "core_idea": "Inverse operations still apply with a fractional coefficient.",
+      "common_mistake": "Multiplying 10 by 3/2 without subtracting 4.",
+      "unknown_change": "",
+      "correct_math": "y = 9"
+    },
+    {
+      "id": "slq_sle_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>If 4x − 3 = 9, what is the value of 2x + 1?</p>",
+      "choices": [
+        "4",
+        "5",
+        "7",
+        "9"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Add 3: 4x = 12, so x = 3.",
+          "why": "Solve the given equation first."
+        },
+        {
+          "step": 2,
+          "do": "Then 2x + 1 = 6 + 1 = 7.",
+          "why": "The unknown is 2x+1, not x."
+        }
+      ],
+      "explanation_check": "Then 2x + 1 = 6 + 1 = 7.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The question is not asking for x itself. Name the expression it wants.",
+      "critical_hint": "Solve 4x − 3 = 9 to get x = 3, then evaluate 2x + 1.",
+      "core_idea": "Same linear solving skill; the asked quantity changed from x to 2x+1.",
+      "common_mistake": "Reporting x = 3 as the final answer.",
+      "unknown_change": "Asked quantity changed from the variable to a linear expression in that variable.",
+      "correct_math": "2x + 1 = 7"
+    },
+    {
+      "id": "slq_sle_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation 6(w + 1) = 30 is solved for w. Which statement is true of 3w?</p>",
+      "choices": [
+        "3w = 8",
+        "3w = 12",
+        "3w = 15",
+        "3w = 18"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "6w + 6 = 30, so 6w = 24 and w = 4.",
+          "why": "Solve for w."
+        },
+        {
+          "step": 2,
+          "do": "3w = 12.",
+          "why": "Asked quantity is 3w."
+        }
+      ],
+      "explanation_check": "3w = 12.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "First isolate w, then look at what the choices report.",
+      "critical_hint": "w = 4 after dividing 24 by 6. The asked value is 3w = 12, not w.",
+      "core_idea": "Solve, then report a different multiple of the variable.",
+      "common_mistake": "Choosing 3w = 15 by taking half of 30.",
+      "unknown_change": "Asked quantity changed from w to 3w.",
+      "correct_math": "3w = 12"
+    },
+    {
+      "id": "slq_sle_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Solve for t: 8t + 17 = 41.</p>",
+      "choices": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Subtract 17: 8t = 24.",
+          "why": "Undo addition."
+        },
+        {
+          "step": 2,
+          "do": "Divide by 8: t = 3.",
+          "why": "Isolate t."
+        }
+      ],
+      "explanation_check": "Divide by 8: t = 3.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Name the constant added to 8t before computing.",
+      "critical_hint": "Subtract 17 to get 8t = 24, then divide by 8.",
+      "core_idea": "Delayed check of isolating a linear variable.",
+      "common_mistake": "Dividing 41 by 8.",
+      "unknown_change": "",
+      "correct_math": "t = 3"
+    },
+    {
+      "id": "slq_sle_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>What is the value of m if 5(m + 3) − 4 = 21?</p>",
+      "choices": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "5m + 15 − 4 = 21.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "5m + 11 = 21, so 5m = 10 and m = 2.",
+          "why": "Isolate m."
+        }
+      ],
+      "explanation_check": "5m + 11 = 21, so 5m = 10 and m = 2.",
+      "skill_code": "sat.alg.solve_linear_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "There is a product and then a subtraction. Name the first cleanup step.",
+      "critical_hint": "Expand 5(m+3) first. Then 5m + 11 = 21.",
+      "core_idea": "Distribute then isolate.",
+      "common_mistake": "Subtracting 3 from 21 and dividing by 5.",
+      "unknown_change": "",
+      "correct_math": "m = 2"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Repair feedback{% endblock %}
 {% block content %}
-<div class="np-page-shell sl-wrap">
+<div class="np-page-shell sl-wrap" data-skill-loop-feedback data-item-id="{{ feedback.item_id }}" data-stem-hash="{{ feedback.stem_hash }}" data-counts-as-independent="{{ feedback.counts_as_independent }}">
   <p class="np-atelier-kicker">{{ feedback.phase }} · feedback</p>
   <h1>{% if feedback.is_correct %}Correct{% else %}Incorrect — stay in remediation{% endif %}</h1>
   <p>Your answer: <strong>{{ feedback.yours or "—" }}</strong></p>
@@ -14,8 +14,15 @@
   {% if not feedback.is_correct %}
   <p>A wrong answer does not end the cycle. Next you re-enter remediation on a new item.</p>
   {% elif not feedback.independent %}
-  <p>This correct answer does not count as independent_pass (solution/hint was used, or this was a seen item).</p>
+  <p>This correct answer does not count as independent_pass.</p>
+  {% if feedback.block_reasons %}
+  <ul data-sl-block-reasons>
+    {% for reason in feedback.block_reasons %}
+    <li>{{ reason }}</li>
+    {% endfor %}
+  </ul>
   {% endif %}
-  <p><a class="np-pw-btn np-pw-btn--primary" href="{{ continue_href }}">Continue</a></p>
+  {% endif %}
+  <p><a class="np-pw-btn np-pw-btn--primary" data-sl-feedback-continue href="{{ continue_href }}">Continue</a></p>
 </div>
 {% endblock %}

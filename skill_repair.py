@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import os
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -25,8 +25,24 @@ from flask import (
     url_for,
 )
 
+from repair_html import (
+    content_fingerprint,
+    html_to_plain,
+    normalize_item_for_render,
+    stem_normalized_hash,
+)
+
 LINEAR_RATE_CODE = "sat.alg.linear_rate_remaining"
-LINEAR_RATE_TITLE = "Linear remaining quantity at a constant rate"
+ALLOWED_MICRO_SKILLS = {
+    "sat.alg.linear_rate_remaining": "Linear remaining quantity at a constant rate",
+    "sat.alg.translate_words_to_equation": "Translate a word problem into an equation",
+    "sat.alg.solve_linear_equation": "Solve a linear equation in one variable",
+    "sat.alg.no_solution_parameter": "Parameter that makes a linear equation have no solution",
+    "sat.alg.identity_infinite_solutions": "Identity: infinitely many solutions",
+    "sat.alg.percent_cost_model": "Percent, discount, tax, or cost model",
+}
+INEQUALITY_SKILLS = {"sat.alg.inequality_direction"}
+NEEDS_DIAGNOSIS_CODE = "sat.alg.needs_further_diagnosis"
 LINEAR_RATE_HINTS = (
     "remain",
     "remaining",
@@ -35,7 +51,65 @@ LINEAR_RATE_HINTS = (
     "pounds remain",
     "gallons remain",
 )
+NO_SOLUTION_HINTS = (
+    "no solution",
+    "has no solution",
+    "no value of",
+    "no values of",
+    "never true",
+    "no real solution",
+)
+IDENTITY_HINTS = (
+    "infinitely many",
+    "all real numbers",
+    "all values of",
+    "identity",
+    "infinitely many solutions",
+    "all real values",
+)
+PERCENT_HINTS = (
+    "percent",
+    "%",
+    "discount",
+    "markup",
+    "sale price",
+    "original price",
+    "tax",
+    "cost of the",
+)
+TRANSLATE_HINTS = (
+    "which equation",
+    "which of the following equations",
+    "which expression",
+    "can be modeled",
+    "models the",
+    "represents the",
+    "in terms of",
+    "which of the following is equivalent",
+)
+SOLVE_HINTS = (
+    "what is the value of",
+    "what value of",
+    "is the solution to",
+    "solve for",
+    "what is x",
+    "find the value",
+    "solve the equation",
+)
+INEQUALITY_HINTS = (
+    "inequality",
+    "greater than",
+    "less than",
+    "at least",
+    "at most",
+    "≥",
+    "≤",
+    "flip the inequality",
+)
 PHASES = ("worked", "faded", "isomorphic", "transfer", "delayed")
+INDEPENDENT_PHASES = {"isomorphic", "transfer", "delayed"}
+TEACHING_PHASES = {"worked", "faded"}
+RESUME_STATUSES = {"active", "delayed_wait", "needs_review"}
 DELAY_HOURS = 48
 PACK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "skill_loop_pilot")
 
@@ -84,6 +158,8 @@ def parse_iso(raw: str | None) -> datetime | None:
 
 
 def load_pack(skill_code: str) -> dict[str, Any] | None:
+    if skill_code not in ALLOWED_MICRO_SKILLS:
+        return None
     path = os.path.join(PACK_DIR, f"{skill_code}.json")
     if not os.path.isfile(path):
         return None
@@ -102,22 +178,40 @@ def pack_items_for_slot(pack: dict[str, Any], slot: str) -> list[dict[str, Any]]
     return out
 
 
+def _blob_for_row(row: dict[str, Any]) -> str:
+    stem = str(row.get("stem_html") or row.get("stem") or "").lower()
+    title = str(row.get("knowledge_title") or row.get("topic_title") or "").lower()
+    return f"{stem} {title}"
+
+
 def primary_micro_skill(row: dict[str, Any]) -> dict[str, Any]:
-    stem = str(row.get("stem_html") or "").lower()
-    title = str(row.get("knowledge_title") or "").lower()
-    blob = f"{stem} {title}"
-    if any(h in blob for h in LINEAR_RATE_HINTS) and ("rate" in blob or "remain" in blob):
+    blob = _blob_for_row(row)
+    code = ""
+    if any(h in blob for h in NO_SOLUTION_HINTS):
+        code = "sat.alg.no_solution_parameter"
+    elif any(h in blob for h in IDENTITY_HINTS):
+        code = "sat.alg.identity_infinite_solutions"
+    elif any(h in blob for h in LINEAR_RATE_HINTS) and ("rate" in blob or "remain" in blob):
+        code = "sat.alg.linear_rate_remaining"
+    elif any(h in blob for h in PERCENT_HINTS):
+        code = "sat.alg.percent_cost_model"
+    elif any(h in blob for h in TRANSLATE_HINTS):
+        code = "sat.alg.translate_words_to_equation"
+    elif any(h in blob for h in SOLVE_HINTS) or "solve " in blob:
+        code = "sat.alg.solve_linear_equation"
+    elif any(h in blob for h in INEQUALITY_HINTS):
+        code = "sat.alg.inequality_direction"
+    if code in ALLOWED_MICRO_SKILLS:
         return {
-            "code": LINEAR_RATE_CODE,
-            "title": LINEAR_RATE_TITLE,
-            "has_pack": True,
+            "code": code,
+            "title": ALLOWED_MICRO_SKILLS[code],
+            "has_pack": load_pack(code) is not None,
         }
-    sec = str(row.get("knowledge_section") or "").strip()
-    title_h = str(row.get("knowledge_title") or row.get("topic_title") or sec or "This skill")
-    domain = str(row.get("domain") or "sat")
-    topic = str(row.get("topic") or "misc")
-    code = f"bank.{domain}.{sec or topic}"
-    return {"code": code, "title": title_h, "has_pack": load_pack(code) is not None}
+    return {
+        "code": NEEDS_DIAGNOSIS_CODE,
+        "title": "Needs further diagnosis",
+        "has_pack": False,
+    }
 
 
 def _priority_for_count(count: int, diagnosis_level: str) -> str:
@@ -126,6 +220,47 @@ def _priority_for_count(count: int, diagnosis_level: str) -> str:
     if count >= 2 or diagnosis_level == "Medium":
         return "Medium"
     return "Watch"
+
+
+def _student_chosen_error(row: dict[str, Any]) -> str:
+    note = str(row.get("note") or row.get("mistake_note") or "").strip()
+    if note:
+        return note
+    tags = [str(t).strip() for t in (row.get("tag_labels") or []) if str(t).strip()]
+    if tags:
+        return "Student tagged: " + ", ".join(tags[:3])
+    return ""
+
+
+def cluster_stuck_copy(bucket: dict[str, Any], skill_code: str) -> dict[str, str]:
+    """Do not present template speculation as a confirmed stuck point."""
+    chosen = []
+    for row in bucket.get("rows") or []:
+        text = _student_chosen_error(row)
+        if text:
+            chosen.append(text)
+    if chosen:
+        return {
+            "stuck_label": "Possible focus",
+            "common_stuck": chosen[0][:240],
+            "stuck_certainty": "student_chosen",
+        }
+    if skill_code in INEQUALITY_SKILLS:
+        pack = load_pack(skill_code) if skill_code in ALLOWED_MICRO_SKILLS else None
+        pitfall = ""
+        if pack:
+            pitfall = str(pack.get("common_mistake") or "").strip()
+        if pitfall and "inequality" in pitfall.lower():
+            return {
+                "stuck_label": "Possible focus",
+                "common_stuck": pitfall,
+                "stuck_certainty": "skill_specific",
+            }
+    return {
+        "stuck_label": "Possible focus",
+        "common_stuck": "需要进一步诊断",
+        "stuck_certainty": "insufficient",
+    }
 
 
 def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -146,19 +281,11 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "has_pack": bool(skill["has_pack"]),
                 "rows": [],
                 "diagnoses": Counter(),
-                "tags": Counter(),
-                "pitfalls": Counter(),
             }
             buckets[key] = bucket
         bucket["rows"].append(row)
         diag = str(row.get("diagnosis_label") or row.get("diagnosis_id") or "Concept gap")
         bucket["diagnoses"][diag] += 1
-        for tag in row.get("tag_labels") or []:
-            bucket["tags"][str(tag)] += 1
-        pack = row.get("pattern_pack") or {}
-        pitfall = str(pack.get("pitfall") or "").strip()
-        if pitfall:
-            bucket["pitfalls"][pitfall] += 1
 
     clusters: list[dict[str, Any]] = []
     for key, bucket in buckets.items():
@@ -169,15 +296,7 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
         representative = rows_sorted[0]
         common_diag = bucket["diagnoses"].most_common(1)
-        common_pitfall = bucket["pitfalls"].most_common(1)
-        common_tag = bucket["tags"].most_common(1)
-        stuck = ""
-        if common_pitfall:
-            stuck = common_pitfall[0][0]
-        elif common_tag:
-            stuck = f"Often tagged: {common_tag[0][0]}"
-        elif common_diag:
-            stuck = common_diag[0][0]
+        stuck = cluster_stuck_copy(bucket, key)
         level = str((representative.get("pattern_pack") or {}).get("level") or "")
         diag_level = "High" if bucket["diagnoses"] and common_diag and common_diag[0][1] >= 3 else (
             "Medium" if len(rows_sorted) >= 2 else "Low"
@@ -185,17 +304,12 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if level:
             diag_level = level
         priority = _priority_for_count(len(rows_sorted), diag_level)
-        stem = str(representative.get("stem_html") or "")
-        stem_plain = (
-            stem.replace("<p>", " ")
-            .replace("</p>", " ")
-            .replace("<br>", " ")
-            .replace("<br/>", " ")
-        )
+        stem = str(representative.get("stem_html") or representative.get("stem") or "")
+        stem_plain = html_to_plain(stem)
         try:
-            repair_href = url_for("skill_repair.start", skill_code=key)
+            repair_href = url_for("skill_repair.start", skill_code=key) if bucket["has_pack"] else ""
         except RuntimeError:
-            repair_href = f"/practice/repair/{key}/start"
+            repair_href = f"/practice/repair/{key}/start" if bucket["has_pack"] else ""
         clusters.append(
             {
                 "code": key,
@@ -203,7 +317,9 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "has_pack": bucket["has_pack"],
                 "miss_count": len(rows_sorted),
                 "priority": priority,
-                "common_stuck": stuck or "Relearn the core move, then try a new item.",
+                "stuck_label": stuck["stuck_label"],
+                "common_stuck": stuck["common_stuck"],
+                "stuck_certainty": stuck["stuck_certainty"],
                 "representative": representative,
                 "representative_preview": " ".join(stem_plain.split())[:180],
                 "rows": rows_sorted,
@@ -217,6 +333,47 @@ def cluster_wrong_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def recommended_next_step(clusters: list[dict[str, Any]]) -> dict[str, Any] | None:
     return clusters[0] if clusters else None
+
+
+def repair_session_progress(db, user_id: Any, skill_code: str) -> dict[str, Any] | None:
+    if user_id is None:
+        return None
+    try:
+        uid = int(user_id)
+    except (TypeError, ValueError):
+        return None
+    ensure_repair_tables(db)
+    row = get_session_row(db, uid, skill_code)
+    if row is None:
+        return None
+    status = str(row["status"] or "")
+    phase = str(row["current_phase"] or "")
+    due = parse_iso(row["delayed_available_at"] if "delayed_available_at" in row.keys() else None)
+    hours_left = None
+    if due is not None:
+        hours_left = max(0, int((due - now_utc()).total_seconds() / 3600))
+    mastered = status == "mastered"
+    immediate = (status == "delayed_wait" or phase == "delayed") and not mastered
+    payload = _payload(row)
+    return {
+        "session_id": int(row["id"]),
+        "status": status,
+        "phase": phase,
+        "immediate_complete": immediate,
+        "not_mastered": not mastered,
+        "hours_left": hours_left,
+        "delayed_available_at": row["delayed_available_at"] if "delayed_available_at" in row.keys() else None,
+        "instruction_completed_at": payload.get("instruction_completed_at"),
+        "entry_label": "View delayed check" if immediate else "Repair this skill",
+        "hide_ordinary_repair": immediate,
+    }
+
+
+def annotate_clusters_with_progress(db, user_id: Any, clusters: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for cluster in clusters:
+        progress = repair_session_progress(db, user_id, str(cluster.get("code") or ""))
+        cluster["repair_progress"] = progress
+    return clusters
 
 
 def _user_id() -> int:
@@ -299,64 +456,44 @@ def _payload(row) -> dict[str, Any]:
         return {}
 
 
-def _bank_queue(app_mod, representative: dict[str, Any]) -> dict[str, Any]:
-    domain = str(representative.get("domain") or "")
-    topic = str(representative.get("topic") or "")
-    origin = int(representative.get("q_index") or 0)
-    section = str(representative.get("knowledge_section") or "")
-    tex = app_mod.BANKS.get(domain, {}).get(topic)
-    questions = app_mod.get_questions_for_topic(domain, topic, tex) if tex else []
-    same: list[int] = []
-    other: list[int] = []
-    for i, q in enumerate(questions):
-        if i == origin:
-            continue
-        if section and str(q.get("knowledge_section") or "") == section:
-            same.append(i)
-        else:
-            other.append(i)
-    pool = same + other
-    faded = pool[0] if pool else None
-    iso_item = pool[1] if len(pool) > 1 else (pool[0] if pool else None)
-    transfer = other[0] if other else (pool[2] if len(pool) > 2 else iso_item)
-    delayed = None
-    for idx in pool:
-        if idx not in {faded, iso_item, transfer}:
-            delayed = idx
-            break
-    if delayed is None:
-        delayed = iso_item or faded
+def _save_payload(db, row, payload: dict[str, Any]) -> None:
+    db.execute(
+        "UPDATE skill_repair_sessions SET payload_json = ?, updated_at = datetime('now') WHERE id = ?",
+        (json.dumps(payload), int(row["id"])),
+    )
+
+
+def _origin_meta(representative: dict[str, Any] | None) -> dict[str, Any]:
+    if not representative:
+        return {}
+    stem = str(representative.get("stem_html") or representative.get("stem") or "")
     return {
-        "origin": {"domain": domain, "topic": topic, "q_index": origin},
-        "faded": {"domain": domain, "topic": topic, "q_index": faded} if faded is not None else None,
-        "isomorphic": {"domain": domain, "topic": topic, "q_index": iso_item} if iso_item is not None else None,
-        "transfer": {"domain": domain, "topic": topic, "q_index": transfer} if transfer is not None else None,
-        "delayed": {"domain": domain, "topic": topic, "q_index": delayed} if delayed is not None else None,
-        "alts": {
-            "faded": [{"domain": domain, "topic": topic, "q_index": i} for i in pool[1:4]],
-            "isomorphic": [{"domain": domain, "topic": topic, "q_index": i} for i in pool[2:6]],
-            "transfer": [{"domain": domain, "topic": topic, "q_index": i} for i in other[1:5] or pool[3:7]],
-            "delayed": [{"domain": domain, "topic": topic, "q_index": i} for i in pool[3:8]],
-        },
+        "domain": representative.get("domain"),
+        "topic": representative.get("topic"),
+        "q_index": representative.get("q_index"),
+        "pr_id": representative.get("pr_id"),
+        "item_id": f"origin:{representative.get('domain')}:{representative.get('topic')}:{representative.get('q_index')}",
+        "stem_hash": stem_normalized_hash(stem),
+        "content_fingerprint": content_fingerprint({"stem_html": stem, "choices": representative.get("choices") or []}),
     }
 
 
 def start_repair_session(db, user_id: int, skill_code: str, representative: dict[str, Any] | None) -> Any:
-    import app as app_mod
-
     pack = load_pack(skill_code)
-    payload: dict[str, Any] = {"source": "pack" if pack else "bank"}
-    if representative:
-        payload["origin"] = {
-            "domain": representative.get("domain"),
-            "topic": representative.get("topic"),
-            "q_index": representative.get("q_index"),
-            "pr_id": representative.get("pr_id"),
-        }
-        if not pack:
-            payload.update(_bank_queue(app_mod, representative))
+    if pack is None:
+        return None
+    payload: dict[str, Any] = {
+        "source": "pack",
+        "primary_skill": skill_code,
+        "seen_item_ids": [],
+        "seen_stem_hashes": [],
+        "seen_fingerprints": [],
+        "teaching_item_ids": [],
+        "teaching_stem_hashes": [],
+        "origin": _origin_meta(representative),
+    }
     existing = get_session_row(db, user_id, skill_code)
-    if existing is not None and str(existing["status"] or "") in {"active", "delayed_wait", "needs_review"}:
+    if existing is not None and str(existing["status"] or "") in RESUME_STATUSES:
         return existing
     cur = db.execute(
         """
@@ -382,74 +519,209 @@ def _letter_for_index(i: int) -> str:
     return chr(ord("A") + i)
 
 
-def _bank_question(app_mod, ref: dict[str, Any] | None) -> dict[str, Any] | None:
-    if not ref or ref.get("q_index") is None:
-        return None
-    domain = str(ref.get("domain") or "")
-    topic = str(ref.get("topic") or "")
-    q_index = int(ref["q_index"])
-    tex = app_mod.BANKS.get(domain, {}).get(topic)
-    questions = app_mod.get_questions_for_topic(domain, topic, tex) if tex else []
-    if q_index < 0 or q_index >= len(questions):
-        return None
-    q = dict(questions[q_index])
-    q["_ref"] = f"bank:{domain}:{topic}:{q_index}"
-    q["_is_original"] = False
-    return q
+def _identity_tuple(item: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        str(item.get("item_id") or item.get("id") or ""),
+        str(item.get("stem_hash") or stem_normalized_hash(str(item.get("stem_html") or item.get("stem") or ""))),
+        str(item.get("content_fingerprint") or content_fingerprint(item)),
+    )
+
+
+def _seen_sets(payload: dict[str, Any]) -> dict[str, set[str]]:
+    origin = payload.get("origin") or {}
+    return {
+        "ids": set(str(x) for x in (payload.get("seen_item_ids") or []) if x)
+        | ({str(origin.get("item_id"))} if origin.get("item_id") else set()),
+        "hashes": set(str(x) for x in (payload.get("seen_stem_hashes") or []) if x)
+        | ({str(origin.get("stem_hash"))} if origin.get("stem_hash") else set()),
+        "fps": set(str(x) for x in (payload.get("seen_fingerprints") or []) if x)
+        | ({str(origin.get("content_fingerprint"))} if origin.get("content_fingerprint") else set()),
+        "teaching_ids": set(str(x) for x in (payload.get("teaching_item_ids") or []) if x),
+        "teaching_hashes": set(str(x) for x in (payload.get("teaching_stem_hashes") or []) if x),
+    }
+
+
+def item_is_unseen(item: dict[str, Any], payload: dict[str, Any]) -> bool:
+    seen = _seen_sets(payload)
+    item_id, stem_hash, fingerprint = _identity_tuple(item)
+    if item_id and item_id in seen["ids"]:
+        return False
+    if stem_hash and stem_hash in seen["hashes"]:
+        return False
+    if fingerprint and fingerprint in seen["fps"]:
+        return False
+    return True
+
+
+def _pick_unseen_pack_item(
+    items: list[dict[str, Any]],
+    payload: dict[str, Any],
+    *,
+    skill_code: str,
+    phase: str,
+    prefer_index: int,
+    allow_ids: set[str] | None = None,
+) -> dict[str, Any] | None:
+    ordered = list(items)
+    if 0 <= prefer_index < len(ordered):
+        ordered = ordered[prefer_index:] + ordered[:prefer_index]
+    allow_ids = allow_ids or set()
+    for raw in ordered:
+        item = dict(raw)
+        if str(item.get("skill_code") or skill_code) != skill_code:
+            continue
+        if phase == "transfer" and not str(item.get("unknown_change") or "").strip():
+            continue
+        item_id = str(item.get("id") or "")
+        if item_id and item_id in allow_ids:
+            return item
+        if not item_is_unseen(item, payload):
+            continue
+        return item
+    return None
+
+
+def _pinned_id(payload: dict[str, Any], phase: str, variant: int) -> str:
+    pinned = payload.get("pinned") or {}
+    slot = pinned.get(phase) or {}
+    return str(slot.get(str(variant)) or slot.get(variant) or "")
+
+
+def pin_item(payload: dict[str, Any], phase: str, variant: int, item_id: str) -> None:
+    pinned = dict(payload.get("pinned") or {})
+    slot = dict(pinned.get(phase) or {})
+    slot[str(variant)] = item_id
+    pinned[phase] = slot
+    payload["pinned"] = pinned
+
+
+def pin_current_item(db, row, phase: str, variant: int, item: dict[str, Any]) -> dict[str, Any]:
+    payload = _payload(row)
+    item_id, _stem_hash, _fp = _identity_tuple(item)
+    pin_item(payload, phase, variant, item_id)
+    payload["last_item"] = {
+        "item_id": item_id,
+        "stem_hash": str(item.get("stem_hash") or ""),
+        "content_fingerprint": str(item.get("content_fingerprint") or ""),
+        "phase": phase,
+    }
+    _save_payload(db, row, payload)
+    return payload
+
+
+def remember_shown_item(db, row, phase: str, item: dict[str, Any], variant: int | None = None) -> dict[str, Any]:
+    payload = _payload(row)
+    item_id, stem_hash, fingerprint = _identity_tuple(item)
+    if variant is None:
+        variant = int(row["current_variant"] or 1)
+    pin_item(payload, phase, variant, item_id)
+    def _add(key: str, value: str) -> None:
+        lst = [str(x) for x in (payload.get(key) or [])]
+        if value and value not in lst:
+            lst.append(value)
+        payload[key] = lst
+
+    _add("seen_item_ids", item_id)
+    _add("seen_stem_hashes", stem_hash)
+    _add("seen_fingerprints", fingerprint)
+    if phase in TEACHING_PHASES:
+        _add("teaching_item_ids", item_id)
+        _add("teaching_stem_hashes", stem_hash)
+    payload["last_item"] = {
+        "item_id": item_id,
+        "stem_hash": stem_hash,
+        "content_fingerprint": fingerprint,
+        "phase": phase,
+    }
+    _save_payload(db, row, payload)
+    return payload
+
+
+def appeared_in_teaching_or_original(item: dict[str, Any], payload: dict[str, Any]) -> bool:
+    seen = _seen_sets(payload)
+    item_id, stem_hash, _fp = _identity_tuple(item)
+    origin = payload.get("origin") or {}
+    if item_id and item_id in seen["teaching_ids"]:
+        return True
+    if stem_hash and stem_hash in seen["teaching_hashes"]:
+        return True
+    if origin.get("item_id") and item_id == str(origin.get("item_id")):
+        return True
+    if origin.get("stem_hash") and stem_hash == str(origin.get("stem_hash")):
+        return True
+    return False
 
 
 def current_item(db, row, phase: str, variant: int) -> dict[str, Any] | None:
-    import app as app_mod
-
     skill_code = str(row["skill_code"])
     pack = load_pack(skill_code)
-    if pack:
-        slot = PACK_SLOT[phase]
-        items = pack_items_for_slot(pack, slot)
-        if not items:
-            return None
-        idx = max(0, min(len(items) - 1, variant - 1))
-        item = dict(items[idx])
-        item["_ref"] = f"pack:{item.get('id')}"
-        item["_is_original"] = False
-        item["choices"] = item.get("choices") or []
-        return item
-    payload = _payload(row)
-    origin = payload.get("origin") or {}
-    if phase == "worked":
-        q = _bank_question(app_mod, origin)
-        if q is None:
-            return None
-        q["question_kind"] = "worked_example"
-        q["_is_original"] = True
-        q["_ref"] = f"bank:{origin.get('domain')}:{origin.get('topic')}:{origin.get('q_index')}:worked"
-        q["worked_steps"] = []
-        expl = str(q.get("explanation_en") or "").strip()
-        if expl:
-            q["worked_steps"] = [{"step": 1, "do": expl, "why": "This is the original missed item used only as a worked example."}]
-        q["core_idea"] = str(q.get("knowledge_section_title_en") or q.get("knowledge_section") or "")
-        return q
-    key = phase
-    ref = payload.get(key)
-    alts = (payload.get("alts") or {}).get(key) or []
-    chosen = ref
-    if variant > 1 and alts:
-        chosen = alts[min(len(alts) - 1, variant - 2)]
-    q = _bank_question(app_mod, chosen)
-    if q is None:
+    if not pack:
         return None
-    origin_idx = origin.get("q_index")
-    q["_is_original"] = (
-        str(chosen.get("domain")) == str(origin.get("domain"))
-        and str(chosen.get("topic")) == str(origin.get("topic"))
-        and int(chosen.get("q_index") or -1) == int(origin_idx if origin_idx is not None else -2)
+    slot = PACK_SLOT[phase]
+    items = pack_items_for_slot(pack, slot)
+    if not items:
+        return None
+    payload = _payload(row)
+    prefer = max(0, variant - 1)
+    allow = {_pinned_id(payload, phase, variant)} - {""}
+    picked = _pick_unseen_pack_item(
+        items,
+        payload,
+        skill_code=skill_code,
+        phase=phase,
+        prefer_index=prefer,
+        allow_ids=allow,
     )
-    if phase == "faded":
-        q["given_steps"] = [
-            {"label": "Given", "text": "Name the target quantity and the rate or relationship before computing."}
-        ]
-        q["light_hint"] = "Write the knowns, the unknown, and one equation. Do not jump to arithmetic."
-    return q
+    if picked is None and phase in TEACHING_PHASES:
+        # Worked/faded may re-show if the pool is exhausted; still never independent.
+        picked = dict(items[min(len(items) - 1, prefer)])
+    if picked is None:
+        return None
+    item = dict(picked)
+    item["_ref"] = f"pack:{item.get('id')}"
+    origin = payload.get("origin") or {}
+    item["_is_original"] = bool(
+        origin.get("stem_hash")
+        and stem_normalized_hash(str(item.get("stem_html") or item.get("stem") or "")) == str(origin.get("stem_hash"))
+    )
+    item["choices"] = item.get("choices") or []
+    item["skill_code"] = skill_code
+    return normalize_item_for_render(item)
+
+
+def _normalize_math_answer(raw: str) -> str:
+    text = (raw or "").strip().lower()
+    text = text.replace("−", "-").replace("–", "-")
+    text = text.replace("≠", "!=").replace("=/=", "!=").replace("=/ ", "!=").replace("=/", "!=")
+    text = text.replace("×", "*").replace("÷", "/")
+    text = text.replace("$", "").replace(",", "")
+    text = text.replace("hours", "").replace("hour", "")
+    text = text.replace("kg/h", "").replace("kilograms per hour", "")
+    text = "".join(text.split())
+    return text
+
+
+def _blank_matches(given: str, blank: dict[str, Any]) -> bool:
+    got = _normalize_math_answer(given)
+    if not got:
+        return False
+    options = [str(blank.get("correct") or "")] + [str(a) for a in (blank.get("alternates") or [])]
+    return any(got == _normalize_math_answer(opt) for opt in options if str(opt).strip())
+
+
+def _grade_blanks(item: dict[str, Any], form) -> tuple[bool, str]:
+    blanks = item.get("blanks") or []
+    bits = []
+    ok = True
+    for blank in blanks:
+        if not isinstance(blank, dict):
+            continue
+        bid = str(blank.get("id") or "")
+        given = str(form.get(bid) or form.get(f"blank_{bid}") or "").strip()
+        bits.append(f"{bid}={given}")
+        if not _blank_matches(given, blank):
+            ok = False
+    return ok, "; ".join(bits)
 
 
 def _grade(item: dict[str, Any], selected: str) -> bool:
@@ -458,7 +730,8 @@ def _grade(item: dict[str, Any], selected: str) -> bool:
         return False
     given = (selected or "").strip()
     if len(expected) == 1 and expected.upper() in "ABCDE":
-        return given[:1].upper() == expected.upper()
+        if given[:1].upper() == expected.upper():
+            return True
     alts = item.get("answer_alternates") or []
     compact = given.replace(" ", "").lower()
     if compact == expected.replace(" ", "").lower():
@@ -469,12 +742,32 @@ def _grade(item: dict[str, Any], selected: str) -> bool:
     return given[:1].upper() == expected[:1].upper()
 
 
-def _used_refs(db, session_id: int, phase: str) -> set[str]:
-    rows = db.execute(
-        "SELECT item_ref FROM skill_repair_events WHERE session_id = ? AND phase = ?",
-        (session_id, phase),
-    ).fetchall()
-    return {str(r["item_ref"]) for r in rows}
+def independent_block_reasons(
+    *,
+    phase: str,
+    is_correct: bool,
+    solution_viewed: bool,
+    hint_level: str,
+    is_original: bool,
+    saw_answer: bool,
+    previously_seen_item: bool = False,
+    previously_seen_stem: bool = False,
+    appeared_in_teaching: bool = False,
+) -> list[str]:
+    if not is_correct:
+        return []
+    reasons: list[str] = []
+    if phase not in INDEPENDENT_PHASES:
+        reasons.append("Not an independent stage")
+    if solution_viewed or saw_answer:
+        reasons.append("Viewed solution")
+    if hint_level == "critical":
+        reasons.append("Used critical hint")
+    if previously_seen_item or previously_seen_stem or appeared_in_teaching:
+        reasons.append("Previously seen item")
+    if is_original:
+        reasons.append("Repeated original question")
+    return reasons
 
 
 def counts_as_independent(
@@ -485,14 +778,24 @@ def counts_as_independent(
     hint_level: str,
     is_original: bool,
     saw_answer: bool,
+    previously_seen_item: bool = False,
+    previously_seen_stem: bool = False,
+    appeared_in_teaching: bool = False,
 ) -> int:
     if not is_correct:
         return 0
-    if phase not in {"isomorphic", "transfer", "delayed"}:
-        return 0
-    if is_original or saw_answer or solution_viewed or hint_level == "critical":
-        return 0
-    return 1
+    reasons = independent_block_reasons(
+        phase=phase,
+        is_correct=is_correct,
+        solution_viewed=solution_viewed,
+        hint_level=hint_level,
+        is_original=is_original,
+        saw_answer=saw_answer,
+        previously_seen_item=previously_seen_item,
+        previously_seen_stem=previously_seen_stem,
+        appeared_in_teaching=appeared_in_teaching,
+    )
+    return 0 if reasons else 1
 
 
 def delayed_locked(row) -> bool:
@@ -570,7 +873,7 @@ def _advance(db, row, phase: str, is_correct: bool, item: dict[str, Any]) -> str
             """
             UPDATE skill_repair_sessions
             SET current_phase = 'delayed', current_variant = 1, status = 'delayed_wait',
-                delayed_available_at = ?, updated_at = datetime('now')
+                delayed_available_at = COALESCE(delayed_available_at, ?), updated_at = datetime('now')
             WHERE id = ?
             """,
             (due, session_id),
@@ -594,6 +897,9 @@ def start(skill_code: str):
     import app as app_mod
 
     uid = _user_id()
+    if skill_code not in ALLOWED_MICRO_SKILLS or load_pack(skill_code) is None:
+        flash("This cluster needs further diagnosis before a Repair cycle. Open the original item for review only.")
+        return redirect(url_for("practice_analytics"))
     db = app_mod.get_db()
     ensure_repair_tables(db)
     all_rows = app_mod._analytics_wrong_rows(db, uid)
@@ -604,6 +910,9 @@ def start(skill_code: str):
     ]
     representative = match_rows[0] if match_rows else None
     row = start_repair_session(db, uid, skill_code, representative)
+    if row is None:
+        flash("This skill does not have a complete repair set yet.")
+        return redirect(url_for("practice_analytics"))
     phase = str(row["current_phase"] or "worked")
     return redirect(url_for("skill_repair.phase_view", skill_code=skill_code, phase=phase))
 
@@ -628,22 +937,38 @@ def phase_view(skill_code: str, phase: str):
         return render_template(
             "skill_repair_wait.html",
             skill_code=skill_code,
-            skill_title=load_pack(skill_code).get("title") if load_pack(skill_code) else skill_code,
+            skill_title=ALLOWED_MICRO_SKILLS.get(skill_code) or skill_code,
             due_at=row["delayed_available_at"],
             hours_left=max(0, int(((due - now_utc()).total_seconds() if due else 0) / 3600)),
             status=row["status"],
+            session_id=int(row["id"]),
+            delayed_available_at=row["delayed_available_at"],
         )
     item = current_item(db, row, phase, int(row["current_variant"] or 1))
     if item is None:
-        flash("This skill does not have a complete repair set yet. Use similar items from Analytics.")
+        flash("This skill does not have a complete unseen repair set yet. Use similar items from Analytics.")
         return redirect(url_for("practice_analytics"))
+    pin_current_item(db, row, phase, int(row["current_variant"] or 1), item)
+    db.commit()
     choices = item.get("choices") or []
     letters = [_letter_for_index(i) for i in range(len(choices))]
     mastered = str(row["status"] or "") == "mastered"
+    payload = _payload(row)
+    preview_independent = counts_as_independent(
+        phase=phase,
+        is_correct=True,
+        solution_viewed=False,
+        hint_level="none",
+        is_original=bool(item.get("_is_original")),
+        saw_answer=False,
+        previously_seen_item=appeared_in_teaching_or_original(item, payload),
+        previously_seen_stem=appeared_in_teaching_or_original(item, payload),
+        appeared_in_teaching=appeared_in_teaching_or_original(item, payload),
+    )
     return render_template(
         "skill_repair_phase.html",
         skill_code=skill_code,
-        skill_title=(load_pack(skill_code) or {}).get("title") or skill_code,
+        skill_title=ALLOWED_MICRO_SKILLS.get(skill_code) or (load_pack(skill_code) or {}).get("title") or skill_code,
         phase=phase,
         item=item,
         letters=letters,
@@ -652,6 +977,7 @@ def phase_view(skill_code: str, phase: str):
         mastered=mastered,
         show_mastered=mastered,
         remediation=str(row["status"] or "") == "needs_review" or int(row["current_variant"] or 1) > 1,
+        preview_independent=preview_independent,
     )
 
 
@@ -666,7 +992,7 @@ def track_event(skill_code: str):
         abort(404)
     payload = request.get_json(silent=True) or {}
     kind = str(request.form.get("kind") or payload.get("kind") or "")
-    if kind in {"solution", "hint_critical"}:
+    if kind == "solution":
         db.execute(
             "UPDATE skill_repair_sessions SET saw_answer = 1, updated_at = datetime('now') WHERE id = ?",
             (int(row["id"]),),
@@ -674,24 +1000,14 @@ def track_event(skill_code: str):
         db.commit()
     item = current_item(db, row, str(row["current_phase"]), int(row["current_variant"] or 1)) or {}
     if kind == "solution":
-        steps = item.get("worked_steps") or []
-        text = "\n".join(
-            f"Step {s.get('step')}: {s.get('do')} (Why: {s.get('why')})"
-            for s in steps
-            if isinstance(s, dict)
-        ) or str(item.get("explanation_en") or item.get("explanation_check") or "")
         return jsonify({
             "ok": True,
-            "solution": text,
+            "html": item.get("solution_html") or "",
             "answer": item.get("correct_answer") or item.get("correct_answer_display") or "",
         })
     if kind in {"hint_light", "hint_critical"}:
         hint = item.get("light_hint") if kind == "hint_light" else item.get("critical_hint")
-        if not hint and kind == "hint_light":
-            hint = "Name the target quantity and write one equation before computing."
-        if not hint:
-            hint = str(item.get("core_idea") or "Re-read the worked example, then try a new item.")
-        return jsonify({"ok": True, "hint": hint})
+        return jsonify({"ok": True, "hint": hint or ""})
     return jsonify({"ok": True})
 
 
@@ -715,25 +1031,46 @@ def submit(skill_code: str):
         flash("Repair item missing.")
         return redirect(url_for("practice_analytics"))
     if phase == "worked" or item.get("question_kind") == "worked_example":
+        payload = _payload(row)
+        payload.setdefault("instruction_completed_at", iso(now_utc()))
+        _save_payload(db, row, payload)
+        remember_shown_item(db, row, "worked", item)
         nxt = _advance(db, row, "worked", True, item)
         db.commit()
         return redirect(url_for("skill_repair.phase_view", skill_code=skill_code, phase=nxt))
     selected = (request.form.get("selected_answer") or "").strip()
-    if not selected:
+    blanks = item.get("blanks") or []
+    if phase == "faded" and blanks:
+        is_correct, selected = _grade_blanks(item, request.form)
+        if not selected:
+            flash("Complete the faded steps before submitting.")
+            return redirect(url_for("skill_repair.phase_view", skill_code=skill_code, phase=phase))
+    elif not selected:
         flash("Choose an answer before submitting.")
         return redirect(url_for("skill_repair.phase_view", skill_code=skill_code, phase=phase))
-    is_correct = _grade(item, selected)
-    solution_viewed = (request.form.get("solution_viewed") or "0") == "1" or int(row["saw_answer"] or 0) == 1
+    else:
+        is_correct = _grade(item, selected)
+    payload = _payload(row)
+    solution_viewed = (request.form.get("solution_viewed") or "0") == "1"
     hint_level = (request.form.get("hint_level") or "none").strip() or "none"
     is_original = bool(item.get("_is_original"))
-    independent = counts_as_independent(
+    seen_before_submit = appeared_in_teaching_or_original(item, payload)
+    previously_seen_item = seen_before_submit
+    previously_seen_stem = seen_before_submit
+    appeared_teaching = seen_before_submit
+    block_reasons = independent_block_reasons(
         phase=phase,
         is_correct=is_correct,
         solution_viewed=solution_viewed,
         hint_level=hint_level,
         is_original=is_original,
-        saw_answer=int(row["saw_answer"] or 0) == 1,
+        saw_answer=False,
+        previously_seen_item=previously_seen_item,
+        previously_seen_stem=previously_seen_stem,
+        appeared_in_teaching=appeared_teaching,
     )
+    independent = 0 if (not is_correct or block_reasons) else 1
+    remember_shown_item(db, row, phase, item)
     db.execute(
         """
         INSERT INTO skill_repair_events (
@@ -744,7 +1081,7 @@ def submit(skill_code: str):
         (
             int(row["id"]),
             phase,
-            str(item.get("_ref") or ""),
+            str(item.get("_ref") or item.get("item_id") or ""),
             selected,
             1 if is_correct else 0,
             independent,
@@ -785,6 +1122,11 @@ def submit(skill_code: str):
         "remediation": not is_correct,
         "independent": independent,
         "original": is_original,
+        "block_reasons": block_reasons,
+        "item_id": item.get("item_id") or "",
+        "stem_hash": item.get("stem_hash") or "",
+        "content_fingerprint": item.get("content_fingerprint") or "",
+        "counts_as_independent": independent,
     }
     session.modified = True
     return redirect(url_for("skill_repair.feedback", skill_code=skill_code))

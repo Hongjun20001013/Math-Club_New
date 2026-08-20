@@ -1,0 +1,392 @@
+{
+  "skill_code": "sat.alg.translate_words_to_equation",
+  "title": "Translate a word problem into an equation",
+  "microskill_statement": "Turn a sentence about a linear relationship into an equation, without necessarily solving it.",
+  "status": "draft_pending_teacher_review",
+  "items": [
+    {
+      "id": "slq_twe_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "worked_example",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>A plumber charges a $45 visit fee plus $30 per hour. After h hours the bill is $165. Which equation represents this situation?</p>",
+      "choices": [
+        "45h + 30 = 165",
+        "30h + 45 = 165",
+        "30h − 45 = 165",
+        "45h − 30 = 165"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "The constant fee is $45; the rate is $30 per hour.",
+          "why": "Separate the one-time part from the hourly part."
+        },
+        {
+          "step": 2,
+          "do": "Total = 30h + 45, and that total equals 165.",
+          "why": "The sentence 'the bill is $165' is the equation."
+        }
+      ],
+      "explanation_check": "Total = 30h + 45, and that total equals 165.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Mark the one-time fee and the per-hour rate. Do not solve for h yet.",
+      "critical_hint": "The equation is 30h + 45 = 165 because 30 is the hourly rate and 45 is the visit fee.",
+      "core_idea": "Translate each phrase into a term, then set the total equal to the given amount.",
+      "common_mistake": "Swapping the fee and the hourly rate.",
+      "unknown_change": "",
+      "correct_math": "30h + 45 = 165"
+    },
+    {
+      "id": "slq_twe_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A gym charges a $20 signup fee plus $15 per class. After c classes the total paid is $80.</p>",
+      "choices": [],
+      "correct_answer": "15c + 20 = 80",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Constant 20 plus 15c equals 80.",
+          "why": "Same structure as the example."
+        }
+      ],
+      "explanation_check": "Constant 20 plus 15c equals 80.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Circle the fee that does not depend on c.",
+      "critical_hint": "Write 15c + 20 = 80. Do not solve for c yet.",
+      "core_idea": "Fee + rate × count = total.",
+      "common_mistake": "Putting 20 next to c.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "Signup fee $20 (constant); $15 per class."
+        }
+      ],
+      "asked": "Complete the faded translation into an equation.",
+      "correct_math": "15c + 20 = 80",
+      "blanks": [
+        {
+          "id": "rate_term",
+          "prompt": "The class-cost term is ___ c",
+          "correct": "15",
+          "alternates": [
+            "15c"
+          ]
+        },
+        {
+          "id": "equation",
+          "prompt": "The equation is ___",
+          "correct": "15c + 20 = 80",
+          "alternates": [
+            "15c+20=80",
+            "20+15c=80"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slq_twe_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A printer uses 12 milliliters of ink to start a job, then 4 milliliters per page. After p pages, 52 milliliters have been used.</p>",
+      "choices": [],
+      "correct_answer": "4p + 12 = 52",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "4p + 12 = 52.",
+          "why": "Rate times pages plus startup."
+        }
+      ],
+      "explanation_check": "4p + 12 = 52.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Which quantity is used even if p = 0?",
+      "critical_hint": "Startup 12 plus 4 milliliters per page: 4p + 12 = 52.",
+      "core_idea": "Constant + rate × variable = total used.",
+      "common_mistake": "Treating 12 as the per-page amount.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "Startup ink 12 mL; 4 mL per page."
+        }
+      ],
+      "asked": "Complete the faded translation into an equation.",
+      "correct_math": "4p + 12 = 52",
+      "blanks": [
+        {
+          "id": "rate_term",
+          "prompt": "The per-page term is ___ p",
+          "correct": "4",
+          "alternates": [
+            "4p"
+          ]
+        },
+        {
+          "id": "equation",
+          "prompt": "The equation is ___",
+          "correct": "4p + 12 = 52",
+          "alternates": [
+            "4p+12=52",
+            "12+4p=52"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slq_twe_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Lena rents a bike for a $8 lock deposit plus $6 per hour. After t hours she pays $32. Which equation represents this?</p>",
+      "choices": [
+        "8t + 6 = 32",
+        "6t + 8 = 32",
+        "6t − 8 = 32",
+        "8 + t = 32"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Deposit 8 is constant; hourly cost is 6t.",
+          "why": "Translate then set equal to 32."
+        },
+        {
+          "step": 2,
+          "do": "6t + 8 = 32.",
+          "why": "Do not need t yet."
+        }
+      ],
+      "explanation_check": "6t + 8 = 32.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Separate the deposit from the hourly charge.",
+      "critical_hint": "Hourly 6t plus deposit 8 equals 32.",
+      "core_idea": "New cover story, same translation structure.",
+      "common_mistake": "Writing 8t + 6 = 32.",
+      "unknown_change": "",
+      "correct_math": "6t + 8 = 32"
+    },
+    {
+      "id": "slq_twe_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A tank already holds 40 liters. Water is added at 7 liters per minute. After m minutes the tank holds 89 liters. Which equation represents this?</p>",
+      "choices": [
+        "7m + 40 = 89",
+        "40m + 7 = 89",
+        "7m − 40 = 89",
+        "40 + m = 89"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Start 40 plus 7m equals 89.",
+          "why": "Added amount is rate times time."
+        }
+      ],
+      "explanation_check": "Start 40 plus 7m equals 89.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The 40 liters are already there before any minutes pass.",
+      "critical_hint": "Write 7m + 40 = 89 for remaining/total after m minutes.",
+      "core_idea": "Initial amount + rate × time = later amount.",
+      "common_mistake": "Using 40 as the rate.",
+      "unknown_change": "",
+      "correct_math": "7m + 40 = 89"
+    },
+    {
+      "id": "slq_twe_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A taxi charges $3.50 plus $2.25 per mile. Which expression represents the cost, in dollars, of a trip that is n miles long?</p>",
+      "choices": [
+        "3.50n + 2.25",
+        "2.25n + 3.50",
+        "2.25n − 3.50",
+        "3.50 + n"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "The asked object is an expression in n, not an equation set equal to a total.",
+          "why": "Representation changed: no given total."
+        },
+        {
+          "step": 2,
+          "do": "2.25n + 3.50.",
+          "why": "Rate times miles plus flag drop."
+        }
+      ],
+      "explanation_check": "2.25n + 3.50.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "There is no final bill in the stem. Ask whether you need an equation or an expression.",
+      "critical_hint": "Cost = 2.25n + 3.50. Do not set it equal to a number.",
+      "core_idea": "Same translation skill; the asked form changed from equation to expression.",
+      "common_mistake": "Writing 3.50n + 2.25.",
+      "unknown_change": "Asked quantity changed from an equation equal to a total to an open expression in n.",
+      "correct_math": "2.25n + 3.50"
+    },
+    {
+      "id": "slq_twe_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A bakery has 90 cookies. It sells them at a constant rate of 6 cookies per minute. Which equation gives the number of cookies left, C, after t minutes?</p>",
+      "choices": [
+        "C = 6t + 90",
+        "C = 90 − 6t",
+        "C = 90t − 6",
+        "C = 6 − 90t"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Left means start minus sold.",
+          "why": "The unknown is remaining cookies as a function of t."
+        },
+        {
+          "step": 2,
+          "do": "C = 90 − 6t.",
+          "why": "Rate 6 is subtracted."
+        }
+      ],
+      "explanation_check": "C = 90 − 6t.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The sentence asks for cookies left, not cookies sold.",
+      "critical_hint": "Remaining C equals 90 minus 6t.",
+      "core_idea": "Translation into a remaining-quantity function, still word-to-equation.",
+      "common_mistake": "Adding 6t to 90.",
+      "unknown_change": "Asked form changed to a remaining function C(t) rather than a one-time total bill.",
+      "correct_math": "C = 90 − 6t"
+    },
+    {
+      "id": "slq_twe_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A mover charges $120 plus $40 per hour. After h hours the charge is $280. Which equation represents this?</p>",
+      "choices": [
+        "40h + 120 = 280",
+        "120h + 40 = 280",
+        "40h − 120 = 280",
+        "120 + h = 280"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "40h + 120 = 280.",
+          "why": "Hourly plus base equals total."
+        }
+      ],
+      "explanation_check": "40h + 120 = 280.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Which number is charged even if h = 0?",
+      "critical_hint": "Base 120 plus 40 per hour: 40h + 120 = 280.",
+      "core_idea": "Delayed translation check.",
+      "common_mistake": "Swapping 120 and 40.",
+      "unknown_change": "",
+      "correct_math": "40h + 120 = 280"
+    },
+    {
+      "id": "slq_twe_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A phone plan costs $25 per month plus $0.10 per extra minute. After m extra minutes the bill is $31. Which equation represents this?</p>",
+      "choices": [
+        "0.10m + 25 = 31",
+        "25m + 0.10 = 31",
+        "0.10m − 25 = 31",
+        "25 + m = 31"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "0.10m + 25 = 31.",
+          "why": "Per-minute charge plus monthly fee."
+        }
+      ],
+      "explanation_check": "0.10m + 25 = 31.",
+      "skill_code": "sat.alg.translate_words_to_equation",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The $25 does not depend on extra minutes.",
+      "critical_hint": "Write 0.10m + 25 = 31.",
+      "core_idea": "Fee + rate × extra minutes = bill.",
+      "common_mistake": "Using 25 as the per-minute rate.",
+      "unknown_change": "",
+      "correct_math": "0.10m + 25 = 31"
+    }
+  ]
+}

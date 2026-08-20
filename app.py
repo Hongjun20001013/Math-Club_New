@@ -215,7 +215,7 @@ app.config.update(
 )
 
 from skill_loop import skill_loop_bp, skill_loop_enabled
-from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables
+from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables, annotate_clusters_with_progress
 
 app.register_blueprint(skill_loop_bp)
 app.register_blueprint(skill_repair_bp)
@@ -11707,6 +11707,7 @@ def practice_analytics():
     for item in sat_unit_distribution:
         item["is_active"] = item["id"] == active_part_id
     skill_clusters = cluster_wrong_rows(visible_wrong_rows)
+    annotate_clusters_with_progress(db, session.get("user_id"), skill_clusters)
     next_repair_step = recommended_next_step(skill_clusters)
     show_skill_clusters = active_part_id in unit_label_by_part
     return render_template(

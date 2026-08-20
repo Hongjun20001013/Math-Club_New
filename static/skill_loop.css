@@ -14,7 +14,13 @@
 .sl-feedback-grid dd { margin: 0; overflow-wrap: anywhere; }
 .sl-self-report, .sl-remediation, .sl-unknown-change, .sl-check { margin: 0.8rem 0; }
 .sl-help-actions button { margin: 0.3rem 0.3rem 0 0; }
-.sl-stem { overflow-x: auto; }
+.sl-stem { overflow-x: auto; display: block; margin: 1rem 0; font-size: 1.05rem; line-height: 1.55; }
+.sl-asked, .sl-strategy, .sl-verified-key, .sl-walkthrough, .sl-figure { margin: 1rem 0; }
+.sl-asked h2, .sl-strategy h2, .sl-verified-key h2, .sl-walkthrough h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+.sl-faded-scaffold { margin: 1rem 0; }
+.sl-faded-blank { margin: 0.7rem 0; }
+.sl-faded-blank input { display: block; margin-top: 0.3rem; width: min(20rem, 100%); padding: 0.4rem 0.5rem; }
+.sl-key-choices { padding-left: 1.2rem; }
 @media (max-width: 640px) {
   .sl-wrap { margin: 1rem auto; }
   .sl-feedback-grid { grid-template-columns: 1fr; }

@@ -120,10 +120,19 @@
             <p class="np-analytics-card-kicker">One next step</p>
             <h2>Repair {{ next_repair_step.title }}</h2>
             <p>{{ next_repair_step.miss_count }} miss{% if next_repair_step.miss_count != 1 %}es{% endif %} · {{ next_repair_step.priority }} priority · {{ next_repair_step.diagnosis_label }}</p>
-            <p><strong>Common stuck point:</strong> {{ next_repair_step.common_stuck }}</p>
+            <p><strong>{{ next_repair_step.stuck_label or "Possible focus" }}:</strong> {{ next_repair_step.common_stuck }}</p>
             <p><strong>Representative miss:</strong> Q{{ next_repair_step.representative.q_index + 1 }} · {{ next_repair_step.representative.knowledge_title or next_repair_step.representative.topic_title }}</p>
+            {% if next_repair_step.repair_progress and next_repair_step.repair_progress.immediate_complete %}
+            <p data-repair-status="immediate_complete"><strong>Status:</strong> Immediate practice complete</p>
+            <p data-delayed-countdown><strong>Delayed check:</strong> unlocks in approximately {{ next_repair_step.repair_progress.hours_left }} hours</p>
+            <p data-mastery="not_yet"><strong>Not mastered yet</strong></p>
+            {% endif %}
             <p class="np-repair-next-actions">
+                {% if next_repair_step.repair_progress and next_repair_step.repair_progress.immediate_complete %}
+                <a class="np-pw-btn np-pw-btn--primary" href="{{ next_repair_step.repair_href }}">View delayed check</a>
+                {% elif next_repair_step.has_pack and next_repair_step.repair_href %}
                 <a class="np-pw-btn np-pw-btn--primary" href="{{ next_repair_step.repair_href }}">Repair this skill</a>
+                {% endif %}
                 <a class="np-pw-btn np-pw-btn--ghost" href="{{ next_repair_step.representative.practice_href }}">Open original item (review only)</a>
             </p>
         </section>
@@ -137,10 +146,19 @@
                     <div>
                         <p class="np-analytics-card-kicker">{{ cluster.priority }} priority · {{ cluster.miss_count }} miss{% if cluster.miss_count != 1 %}es{% endif %}</p>
                         <h3>{{ cluster.title }}</h3>
-                        <p><strong>Common stuck point:</strong> {{ cluster.common_stuck }}</p>
+                        <p><strong>{{ cluster.stuck_label or "Possible focus" }}:</strong> {{ cluster.common_stuck }}</p>
                         <p><strong>Representative miss:</strong> Q{{ cluster.representative.q_index + 1 }} · yours {{ cluster.representative.yours }} · key {{ cluster.representative.key }}</p>
+                        {% if cluster.repair_progress and cluster.repair_progress.immediate_complete %}
+                        <p data-repair-status="immediate_complete"><strong>Status:</strong> Immediate practice complete</p>
+                        <p data-delayed-countdown><strong>Delayed check:</strong> unlocks in approximately {{ cluster.repair_progress.hours_left }} hours</p>
+                        <p data-mastery="not_yet"><strong>Not mastered yet</strong></p>
+                        {% endif %}
                     </div>
+                    {% if cluster.repair_progress and cluster.repair_progress.immediate_complete %}
+                    <a class="np-pw-btn np-pw-btn--primary" href="{{ cluster.repair_href }}">View delayed check</a>
+                    {% elif cluster.has_pack and cluster.repair_href %}
                     <a class="np-pw-btn np-pw-btn--primary" href="{{ cluster.repair_href }}">Repair this skill</a>
+                    {% endif %}
                 </header>
                 <details class="np-skill-cluster-items">
                     <summary>Show {{ cluster.miss_count }} original item{% if cluster.miss_count != 1 %}s{% endif %} (review only — not mastery)</summary>

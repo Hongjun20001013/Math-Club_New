@@ -1,0 +1,394 @@
+{
+  "skill_code": "sat.alg.percent_cost_model",
+  "title": "Percent, discount, tax, or cost model",
+  "microskill_statement": "Translate percent of a base into a linear cost model: new = original × (1 ± r).",
+  "status": "draft_pending_teacher_review",
+  "items": [
+    {
+      "id": "slq_pcm_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "worked_example",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>A jacket originally costs $80. During a sale it is 25% off. What is the sale price?</p>",
+      "choices": [
+        "$20",
+        "$55",
+        "$60",
+        "$75"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "The customer pays 75% of $80.",
+          "why": "25% off means multiply by 0.75, not subtract 25."
+        },
+        {
+          "step": 2,
+          "do": "0.75 × 80 = 60.",
+          "why": "Sale price = original × (1 − 0.25)."
+        }
+      ],
+      "explanation_check": "0.75 × 80 = 60.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Decide whether 25% is subtracted from 80 as $25 or used as a percent of 80.",
+      "critical_hint": "Sale price = 80 × 0.75. Do not treat 25% off as $25 off unless the original is $100.",
+      "core_idea": "Percent of a base: multiplier 1 − r.",
+      "common_mistake": "Subtracting 25 dollars.",
+      "unknown_change": "",
+      "correct_math": "60"
+    },
+    {
+      "id": "slq_pcm_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A lamp costs $40. Sales tax is 8%.</p>",
+      "choices": [],
+      "correct_answer": "43.20",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Tax = 0.08 × 40 = 3.20.",
+          "why": "Percent of the original."
+        },
+        {
+          "step": 2,
+          "do": "Total = 40 + 3.20 = 43.20.",
+          "why": "Or 40 × 1.08."
+        }
+      ],
+      "explanation_check": "Total = 40 + 3.20 = 43.20.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Tax is a percent of the original price, not 8 dollars.",
+      "critical_hint": "Total = 40 × 1.08 = 43.20.",
+      "core_idea": "Multiply by 1 + tax rate.",
+      "common_mistake": "Adding $8.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "Original price $40; tax rate 8%."
+        }
+      ],
+      "asked": "Complete the faded tax-and-total calculation.",
+      "correct_math": "43.20",
+      "blanks": [
+        {
+          "id": "multiplier",
+          "prompt": "Total = 40 × ___",
+          "correct": "1.08",
+          "alternates": [
+            "108%"
+          ]
+        },
+        {
+          "id": "total",
+          "prompt": "Total price = ___",
+          "correct": "43.20",
+          "alternates": [
+            "43.2",
+            "43.20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slq_pcm_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A store marks a $50 item up by 20%, then sells it.</p>",
+      "choices": [],
+      "correct_answer": "60",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "1.20 × 50 = 60.",
+          "why": "Markup multiplies by 1 + r."
+        }
+      ],
+      "explanation_check": "1.20 × 50 = 60.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Markup increases the original; it does not replace it.",
+      "critical_hint": "Selling price = 50 × 1.20 = 60.",
+      "core_idea": "Original × (1 + markup).",
+      "common_mistake": "Reporting only the $10 markup.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "Original $50; markup 20%."
+        }
+      ],
+      "asked": "Complete the faded markup calculation.",
+      "correct_math": "60",
+      "blanks": [
+        {
+          "id": "multiplier",
+          "prompt": "Selling price = 50 × ___",
+          "correct": "1.20",
+          "alternates": [
+            "1.2",
+            "120%"
+          ]
+        },
+        {
+          "id": "price",
+          "prompt": "Selling price = ___",
+          "correct": "60"
+        }
+      ]
+    },
+    {
+      "id": "slq_pcm_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A bicycle listed at $240 is discounted 15%. What is the sale price?</p>",
+      "choices": [
+        "$36",
+        "$204",
+        "$216",
+        "$225"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Pay 85% of 240.",
+          "why": "1 − 0.15 = 0.85."
+        },
+        {
+          "step": 2,
+          "do": "0.85 × 240 = 204.",
+          "why": "Sale price."
+        }
+      ],
+      "explanation_check": "0.85 × 240 = 204.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "15% off means the buyer pays the complementary percent of the original.",
+      "critical_hint": "Sale = 240 × 0.85 = 204.",
+      "core_idea": "Original × (1 − discount).",
+      "common_mistake": "Subtracting $15.",
+      "unknown_change": "",
+      "correct_math": "204"
+    },
+    {
+      "id": "slq_pcm_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A meal costs $25 before tax. After 6% tax, what is the total?</p>",
+      "choices": [
+        "$1.50",
+        "$26.50",
+        "$27.00",
+        "$31.00"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Total = 25 × 1.06 = 26.50.",
+          "why": "Add 6% of the base."
+        }
+      ],
+      "explanation_check": "Total = 25 × 1.06 = 26.50.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Tax is 6% of $25, then added.",
+      "critical_hint": "25 × 1.06 = 26.50.",
+      "core_idea": "Multiply by 1 + tax rate.",
+      "common_mistake": "Adding $6.",
+      "unknown_change": "",
+      "correct_math": "26.50"
+    },
+    {
+      "id": "slq_pcm_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>After a 20% discount, a coat costs $96. What was the original price?</p>",
+      "choices": [
+        "$76.80",
+        "$100",
+        "$116",
+        "$120"
+      ],
+      "correct_answer": "D",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Let original be p. Then 0.80p = 96.",
+          "why": "The unknown reversed: original from sale price."
+        },
+        {
+          "step": 2,
+          "do": "p = 96 / 0.80 = 120.",
+          "why": "Divide, do not add 20% of 96."
+        }
+      ],
+      "explanation_check": "p = 96 / 0.80 = 120.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "96 is already the discounted price. The unknown is the original.",
+      "critical_hint": "Set 0.80p = 96, so p = 120. Do not compute 96 × 1.20.",
+      "core_idea": "Same percent model; asked quantity reversed from sale price to original.",
+      "common_mistake": "Adding 20% of 96 to get 115.20, or 96 × 1.20 = 115.20 which is not a choice; students may pick 116.",
+      "unknown_change": "Asked quantity changed from sale price given original to original given sale price.",
+      "correct_math": "120"
+    },
+    {
+      "id": "slq_pcm_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A store adds 10% tax to a discounted price. An item originally $200 is 25% off, then tax is added. What is the final price?</p>",
+      "choices": [
+        "$150",
+        "$165",
+        "$175",
+        "$220"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Discounted: 200 × 0.75 = 150.",
+          "why": "Discount first."
+        },
+        {
+          "step": 2,
+          "do": "Then tax: 150 × 1.10 = 165.",
+          "why": "Tax applies to the discounted price."
+        }
+      ],
+      "explanation_check": "Then tax: 150 × 1.10 = 165.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "There are two percent steps. Decide the order the store uses.",
+      "critical_hint": "First 25% off: 150. Then 10% tax on 150: 165.",
+      "core_idea": "Two-step percent model; the asked quantity is the final charged price.",
+      "common_mistake": "Taxing the original $200 then discounting, or adding 10+25=35% once.",
+      "unknown_change": "Asked quantity is a two-step final price, not a single discount.",
+      "correct_math": "165"
+    },
+    {
+      "id": "slq_pcm_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A chair costs $90. It is 30% off. What is the sale price?</p>",
+      "choices": [
+        "$27",
+        "$60",
+        "$63",
+        "$87"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "0.70 × 90 = 63.",
+          "why": "Pay 70%."
+        }
+      ],
+      "explanation_check": "0.70 × 90 = 63.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "30% off means paying 70% of the original.",
+      "critical_hint": "Sale = 90 × 0.70 = 63.",
+      "core_idea": "Delayed discount check.",
+      "common_mistake": "Subtracting $30.",
+      "unknown_change": "",
+      "correct_math": "63"
+    },
+    {
+      "id": "slq_pcm_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A book is $18 before tax. Tax is 5%. What is the total?</p>",
+      "choices": [
+        "$0.90",
+        "$18.05",
+        "$18.90",
+        "$23.00"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "18 × 1.05 = 18.90.",
+          "why": "Add 5% of 18."
+        }
+      ],
+      "explanation_check": "18 × 1.05 = 18.90.",
+      "skill_code": "sat.alg.percent_cost_model",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Tax is a percent of $18.",
+      "critical_hint": "Total = 18 × 1.05 = 18.90.",
+      "core_idea": "Delayed tax check.",
+      "common_mistake": "Adding $5.",
+      "unknown_change": "",
+      "correct_math": "18.90"
+    }
+  ]
+}

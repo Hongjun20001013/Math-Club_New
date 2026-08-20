@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 {% block content %}
-<div class="np-page-shell sl-wrap" data-skill-repair-phase="{{ phase }}">
+<div class="np-page-shell sl-wrap" data-skill-repair-phase="{{ phase }}" data-item-id="{{ item.item_id }}" data-stem-hash="{{ item.stem_hash }}" data-content-fingerprint="{{ item.content_fingerprint }}" data-counts-as-independent="{{ preview_independent }}" data-skill-code="{{ skill_code }}">
   <nav class="np-atelier-rail" aria-label="SAT navigation">
     <a href="{{ url_for('practice_analytics') }}">← Mistake analytics</a>
     <span class="np-atelier-rail-sep">·</span>
@@ -20,66 +20,81 @@
   {% if remediation %}
   <p class="sl-remediation">Wrong answers stay in remediation: re-read the worked example, then try a <strong>new</strong> item. Repeating the missed item cannot count as independent_pass.</p>
   {% endif %}
-  <div class="sl-stem">{{ item.stem_html|safe }}</div>
-  {% if phase == 'worked' or item.question_kind == 'worked_example' %}
-  {% if item.worked_steps %}
-  <ol class="sl-steps">
-    {% for step in item.worked_steps %}
-    <li>
-      <strong>Step {{ step.step }}.</strong>
-      <span>{{ step.do }}</span>
-      {% if step.why %}<em class="sl-why">Why: {{ step.why }}</em>{% endif %}
-    </li>
-    {% endfor %}
-  </ol>
-  {% endif %}
-  {% if item.explanation_check %}
-  <p class="sl-check"><strong>Check:</strong> {{ item.explanation_check }}</p>
-  {% endif %}
-  {% if item.correct_answer %}
-  <p><strong>Answer:</strong> {{ item.correct_answer }}</p>
-  {% endif %}
-  <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" name="phase" value="worked">
-    <button type="submit" class="np-pw-btn np-pw-btn--primary">Continue to faded example</button>
-  </form>
-  {% else %}
-  {% if item.given_steps %}
-  <ul>
-    {% for step in item.given_steps %}
-    <li><strong>{{ step.label }}:</strong> {{ step.text }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-  <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}" id="sr-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" name="phase" value="{{ phase }}">
-    <input type="hidden" name="hint_level" id="sr-hint-level" value="none">
-    <input type="hidden" name="solution_viewed" id="sr-solution-viewed" value="0">
-    {% if item.choices %}
-    <div class="sl-choices" role="radiogroup">
-      {% for choice in item.choices %}
-      <label class="choice-card">
-        <input type="radio" name="selected_answer" value="{{ letters[loop.index0] }}">
-        <span>{{ letters[loop.index0] }}.</span>
-        <span>{{ choice|safe }}</span>
-      </label>
-      {% endfor %}
-    </div>
-    {% else %}
-    <input name="selected_answer" autocomplete="off" placeholder="Enter your answer">
+  <article class="sl-item">
+    <div class="sl-stem" data-sl-stem>{{ item.stem_html|safe }}</div>
+    {% if item.figure_html %}
+    <div class="sl-figure" data-sl-figure>{{ item.figure_html|safe }}</div>
     {% endif %}
-    <button type="submit" class="np-pw-btn np-pw-btn--primary">Submit</button>
-  </form>
-  <p class="sl-help-actions">
-    <button type="button" id="sr-hint-light">Light hint</button>
-    <button type="button" id="sr-hint-critical">Critical hint</button>
-    <button type="button" id="sr-solution">Show solution</button>
-  </p>
-  <aside id="sr-hint-panel" class="sl-panel" hidden></aside>
-  <aside id="sr-solution-panel" class="sl-panel sl-panel--solution" hidden></aside>
-  {% endif %}
+    <section class="sl-asked" data-sl-asked>
+      <h2>What to find</h2>
+      {{ item.asked_html|safe }}
+    </section>
+    {% if phase == 'worked' or item.question_kind == 'worked_example' %}
+    <section class="sl-strategy" data-sl-strategy>
+      <h2>Strategy</h2>
+      {{ item.strategy_html|safe }}
+    </section>
+    <section class="sl-verified-key" data-sl-verified-key>
+      <h2>Verified key</h2>
+      {{ item.verified_key_html|safe }}
+    </section>
+    <section class="sl-walkthrough" data-sl-walkthrough>
+      <h2>Full walkthrough</h2>
+      {{ item.walkthrough_html|safe }}
+    </section>
+    <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="phase" value="worked">
+      <button type="submit" class="np-pw-btn np-pw-btn--primary">Continue to faded example</button>
+    </form>
+    {% else %}
+    {% if item.given_steps %}
+    <ul class="sl-given-steps">
+      {% for step in item.given_steps %}
+      <li><strong>{{ step.label }}:</strong> {{ step.text }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <form method="post" action="{{ url_for('skill_repair.submit', skill_code=skill_code) }}" id="sr-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="phase" value="{{ phase }}">
+      <input type="hidden" name="hint_level" id="sr-hint-level" value="none">
+      <input type="hidden" name="solution_viewed" id="sr-solution-viewed" value="0">
+      {% if phase == 'faded' and item.blanks %}
+      <div class="sl-faded-scaffold" data-sl-faded-scaffold>
+        {% for blank in item.blanks %}
+        <p class="sl-faded-blank">
+          <label>
+            <span>{{ blank.prompt }}</span>
+            <input name="{{ blank.id }}" data-faded-blank="{{ blank.id }}" autocomplete="off">
+          </label>
+        </p>
+        {% endfor %}
+      </div>
+      {% elif item.choices %}
+      <div class="sl-choices" role="radiogroup">
+        {% for choice in item.choices %}
+        <label class="choice-card">
+          <input type="radio" name="selected_answer" value="{{ letters[loop.index0] }}">
+          <span>{{ letters[loop.index0] }}.</span>
+          <span>{{ choice|safe }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% else %}
+      <input name="selected_answer" autocomplete="off" placeholder="Enter your answer">
+      {% endif %}
+      <button type="submit" class="np-pw-btn np-pw-btn--primary">Submit</button>
+    </form>
+    <p class="sl-help-actions">
+      <button type="button" id="sr-hint-light">Light hint</button>
+      <button type="button" id="sr-hint-critical">Critical hint</button>
+      <button type="button" id="sr-solution">Show solution</button>
+    </p>
+    <aside id="sr-hint-panel" class="sl-panel" data-sl-hint-text hidden></aside>
+    <aside id="sr-solution-panel" class="sl-panel sl-panel--solution" data-sl-solution-panel hidden></aside>
+    {% endif %}
+  </article>
 </div>
 <script>
 (function () {
@@ -110,7 +125,6 @@
   });
   document.getElementById("sr-hint-critical")?.addEventListener("click", function () {
     if (hintLevel) hintLevel.value = "critical";
-    if (solutionViewed) solutionViewed.value = "1";
     post("hint_critical").then(function (j) {
       if (!hintPanel) return;
       hintPanel.hidden = false;
@@ -122,7 +136,7 @@
     post("solution").then(function (j) {
       if (!solutionPanel) return;
       solutionPanel.hidden = false;
-      solutionPanel.textContent = (j.answer ? "Answer: " + j.answer + "\n" : "") + (j.solution || "");
+      solutionPanel.innerHTML = j.html || "";
     });
   });
 })();

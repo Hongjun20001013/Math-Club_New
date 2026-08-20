@@ -295,9 +295,215 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
         self.assertGreaterEqual(len(clusters), 1)
         codes = {c["code"] for c in clusters}
         self.assertIn("sat.alg.linear_rate_remaining", codes)
+        self.assertIn("sat.alg.solve_linear_equation", codes)
+        self.assertTrue(all(not str(c["code"]).startswith("bank.") for c in clusters))
         nxt = sr.recommended_next_step(clusters)
         self.assertIsNotNone(nxt)
         self.assertEqual(nxt["miss_count"], clusters[0]["miss_count"])
+        for cluster in clusters:
+            blob = f"{cluster.get('stuck_label')} {cluster.get('common_stuck')}".lower()
+            self.assertNotIn("inequality", blob)
+            self.assertNotIn("flip the inequality", blob)
+            self.assertEqual(cluster["stuck_label"], "Possible focus")
+            if cluster["code"] == "sat.alg.solve_linear_equation":
+                self.assertIn("需要进一步诊断", cluster["common_stuck"])
+            if cluster["code"] == "sat.alg.linear_rate_remaining":
+                self.assertIn("Student tagged", cluster["common_stuck"])
+
+    def test_repair_stem_solution_html_and_unseen_items(self):
+        import re
+        import skill_repair as sr
+        from repair_html import sanitize_repair_html
+
+        dirty = '<article class="np-solution-pro"><section class="np-sol-block">Safe</section><script>alert(1)</script><img src="javascript:alert(1)"><a href="https://ok.example">ok</a></article>'
+        clean = sanitize_repair_html(dirty)
+        self.assertIn("Safe", clean)
+        self.assertNotIn("<script", clean.lower())
+        self.assertNotIn("javascript:", clean.lower())
+        self.assertIn("https://ok.example", clean)
+
+        self.login()
+        blocked = self.client.get("/practice/repair/bank.algebra.1.1/start", follow_redirects=False)
+        self.assertEqual(blocked.status_code, 302)
+        self.assertIn("/practice/analytics", blocked.headers.get("Location", ""))
+
+        start = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/start", follow_redirects=False)
+        self.assertEqual(start.status_code, 302)
+        worked = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/worked")
+        html = worked.get_data(as_text=True)
+        self.assertEqual(worked.status_code, 200)
+        self.assertIn("Maya pumps", html)
+        self.assertIn("Strategy", html)
+        self.assertIn("Verified key", html)
+        self.assertIn("Full walkthrough", html)
+        self.assertNotIn("&lt;article class=", html)
+        self.assertIn('data-sl-stem', html)
+        self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/submit",
+            data={"csrf_token": "test-csrf", "phase": "worked"},
+            follow_redirects=False,
+        )
+        faded = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/faded")
+        faded_html = faded.get_data(as_text=True)
+        self.assertEqual(faded.status_code, 200)
+        self.assertIn('data-sl-stem', faded_html)
+        self.assertIn("sands wood", faded_html)
+        self.assertIn("data-faded-blank", faded_html)
+        faded_id = re.search(r'data-item-id="([^"]+)"', faded_html).group(1)
+        faded_hash = re.search(r'data-stem-hash="([^"]+)"', faded_html).group(1)
+        self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/submit",
+            data={
+                "csrf_token": "test-csrf",
+                "phase": "faded",
+                "rate": "1",
+                "total_hours": "1",
+                "hint_level": "none",
+                "solution_viewed": "0",
+            },
+            follow_redirects=True,
+        )
+        faded2 = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/faded")
+        faded2_html = faded2.get_data(as_text=True)
+        faded2_id = re.search(r'data-item-id="([^"]+)"', faded2_html).group(1)
+        faded2_hash = re.search(r'data-stem-hash="([^"]+)"', faded2_html).group(1)
+        self.assertNotEqual(faded_id, faded2_id)
+        self.assertNotEqual(faded_hash, faded2_hash)
+        self.assertIn("kiln dries clay", faded2_html)
+        self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/submit",
+            data={
+                "csrf_token": "test-csrf",
+                "phase": "faded",
+                "rate": "200",
+                "total_hours": "14",
+                "hint_level": "none",
+                "solution_viewed": "0",
+            },
+            follow_redirects=True,
+        )
+        iso = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/isomorphic")
+        iso_html = iso.get_data(as_text=True)
+        iso_id = re.search(r'data-item-id="([^"]+)"', iso_html).group(1)
+        iso_hash = re.search(r'data-stem-hash="([^"]+)"', iso_html).group(1)
+        self.assertNotEqual(iso_id, faded_id)
+        self.assertNotEqual(iso_id, faded2_id)
+        self.assertNotEqual(iso_hash, faded_hash)
+        self.assertIn("donation drive", iso_html)
+        event = self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/event",
+            data={"csrf_token": "test-csrf", "kind": "hint_light"},
+        )
+        light = event.get_json()["hint"]
+        event2 = self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/event",
+            data={"csrf_token": "test-csrf", "kind": "hint_critical"},
+        )
+        critical = event2.get_json()["hint"]
+        self.assertTrue(light)
+        self.assertTrue(critical)
+        self.assertNotEqual(light, critical)
+        sol = self.client.post(
+            "/practice/repair/sat.alg.linear_rate_remaining/event",
+            data={"csrf_token": "test-csrf", "kind": "solution"},
+        ).get_json()
+        self.assertIn("Strategy", sol["html"])
+        self.assertIn("Verified key", sol["html"])
+        self.assertIn("Full walkthrough", sol["html"])
+        self.assertNotIn("<script", sol["html"].lower())
+        self.assertEqual(
+            sr.counts_as_independent(
+                phase="isomorphic",
+                is_correct=True,
+                solution_viewed=False,
+                hint_level="none",
+                is_original=False,
+                saw_answer=False,
+                appeared_in_teaching=True,
+            ),
+            0,
+        )
+        reasons = sr.independent_block_reasons(
+            phase="faded",
+            is_correct=True,
+            solution_viewed=False,
+            hint_level="none",
+            is_original=False,
+            saw_answer=False,
+        )
+        self.assertIn("Not an independent stage", reasons)
+        self.assertNotIn("solution/hint was used, or this was a seen item", " ".join(reasons))
+
+    def test_no_solution_worked_example_shows_full_key(self):
+        self.login()
+        self.client.get("/practice/repair/sat.alg.no_solution_parameter/start")
+        html = self.client.get("/practice/repair/sat.alg.no_solution_parameter/worked").get_data(as_text=True)
+        self.assertIn("Which statement must be true about k", html)
+        self.assertIn("k ≠ 5", html)
+        self.assertIn("k = 2", html)
+        self.assertIn("k = 5", html)
+        self.assertIn("Mathematical conclusion", html)
+        self.client.post(
+            "/practice/repair/sat.alg.no_solution_parameter/submit",
+            data={"csrf_token": "test-csrf", "phase": "worked"},
+        )
+        faded = self.client.get("/practice/repair/sat.alg.no_solution_parameter/faded").get_data(as_text=True)
+        self.assertIn("3(y + 1) = 3y + m", faded)
+        self.assertIn("data-faded-blank", faded)
+        self.assertIn("For no solution, m must satisfy", faded)
+
+    def test_start_resumes_same_delayed_run_without_resetting_clock(self):
+        import json
+        import skill_repair as sr
+
+        self.login()
+        due = "2026-08-22T17:30:29Z"
+        payload = {
+            "source": "pack",
+            "instruction_completed_at": "2026-08-20T10:00:00Z",
+            "seen_item_ids": ["slq_lrr_example_01"],
+        }
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            sr.ensure_repair_tables(db)
+            db.execute(
+                """
+                INSERT INTO skill_repair_sessions (
+                    user_id, skill_code, current_phase, current_variant, status,
+                    delayed_available_at, payload_json, updated_at
+                ) VALUES (2, 'sat.alg.linear_rate_remaining', 'delayed', 1, 'delayed_wait', ?, ?, datetime('now'))
+                """,
+                (due, json.dumps(payload)),
+            )
+            db.commit()
+            before = db.execute(
+                "SELECT id, delayed_available_at, payload_json, status FROM skill_repair_sessions WHERE user_id=2 AND skill_code=?",
+                ("sat.alg.linear_rate_remaining",),
+            ).fetchall()
+            self.assertEqual(len(before), 1)
+            sid = before[0]["id"]
+        first = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/start", follow_redirects=False)
+        self.assertEqual(first.status_code, 302)
+        self.assertIn("/delayed", first.headers.get("Location", ""))
+        wait = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/delayed")
+        wait_html = wait.get_data(as_text=True)
+        self.assertIn(due, wait_html)
+        self.assertIn("not mastered", wait_html.lower())
+        second = self.client.get("/practice/repair/sat.alg.linear_rate_remaining/start", follow_redirects=False)
+        self.assertIn("/delayed", second.headers.get("Location", ""))
+        with self.app_mod.app.app_context():
+            db = self.app_mod.get_db()
+            after = db.execute(
+                "SELECT id, delayed_available_at, payload_json, status FROM skill_repair_sessions WHERE user_id=2 AND skill_code=?",
+                ("sat.alg.linear_rate_remaining",),
+            ).fetchall()
+            self.assertEqual(len(after), 1)
+            self.assertEqual(after[0]["id"], sid)
+            self.assertEqual(after[0]["delayed_available_at"], due)
+            self.assertEqual(after[0]["status"], "delayed_wait")
+            loaded = json.loads(after[0]["payload_json"])
+            self.assertEqual(loaded.get("instruction_completed_at"), "2026-08-20T10:00:00Z")
+            self.assertEqual(loaded.get("seen_item_ids"), ["slq_lrr_example_01"])
 
     def _hard21_attempt_id(self, html: str) -> str:
         import re

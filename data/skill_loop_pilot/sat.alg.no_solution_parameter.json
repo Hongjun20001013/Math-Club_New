@@ -1,0 +1,407 @@
+{
+  "skill_code": "sat.alg.no_solution_parameter",
+  "title": "Parameter that makes a linear equation have no solution",
+  "microskill_statement": "A linear equation has no solution when the variable terms cancel and the remaining constants contradict.",
+  "status": "draft_pending_teacher_review",
+  "items": [
+    {
+      "id": "slq_nsp_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "worked_example",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>The equation 2x + 5 = 2x + k has no solution. Which statement must be true about k?</p>",
+      "choices": [
+        "k = 2",
+        "k = 5",
+        "k ≠ 5",
+        "There is no such k"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Subtract 2x: 5 = k.",
+          "why": "Variable terms cancel."
+        },
+        {
+          "step": 2,
+          "do": "If k = 5 the equation is 5 = 5, an identity. If k ≠ 5 it is a contradiction, so no solution.",
+          "why": "No solution needs a false constant statement."
+        }
+      ],
+      "explanation_check": "If k = 5 the equation is 5 = 5, an identity. If k ≠ 5 it is a contradiction, so no solution.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Watch what happens to the x terms. Do not pick a single number yet.",
+      "critical_hint": "After 2x cancels you get 5 = k. No solution when this is false, so k ≠ 5.",
+      "core_idea": "No solution: variable cancels and constants disagree.",
+      "common_mistake": "Choosing k = 5, which actually makes infinitely many solutions.",
+      "unknown_change": "",
+      "asked": "Which statement must be true about k?",
+      "correct_math": "k ≠ 5"
+    },
+    {
+      "id": "slq_nsp_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>The equation 3(y + 1) = 3y + m has no solution.</p>",
+      "choices": [],
+      "correct_answer": "m ≠ 3",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "3y + 3 = 3y + m.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "3 = m would be identity; no solution when m ≠ 3.",
+          "why": "Contradiction of constants."
+        }
+      ],
+      "explanation_check": "3 = m would be identity; no solution when m ≠ 3.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "After expanding, compare the coefficients of y.",
+      "critical_hint": "Left side is 3y + 3. No solution when m ≠ 3.",
+      "core_idea": "Same coefficients of y and unequal constants.",
+      "common_mistake": "Choosing m = 3.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "3(y + 1) = 3y + m"
+        }
+      ],
+      "asked": "Complete the faded expansion, then the no-solution condition on m.",
+      "correct_math": "m ≠ 3",
+      "blanks": [
+        {
+          "id": "expand",
+          "prompt": "3y + ___ = 3y + m",
+          "correct": "3",
+          "alternates": [
+            "+3"
+          ]
+        },
+        {
+          "id": "condition",
+          "prompt": "For no solution, m must satisfy ___",
+          "correct": "m ≠ 3",
+          "alternates": [
+            "m!=3",
+            "m =/= 3",
+            "m=/3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slq_nsp_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>The equation 4x − 1 = 4x + c has no solution.</p>",
+      "choices": [],
+      "correct_answer": "c ≠ −1",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "−1 = c is required for identity.",
+          "why": "No solution when c ≠ −1."
+        }
+      ],
+      "explanation_check": "−1 = c is required for identity.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "If the x terms match, only the constants decide solution type.",
+      "critical_hint": "Subtract 4x to get −1 = c. No solution when c ≠ −1.",
+      "core_idea": "Contradiction of constants.",
+      "common_mistake": "Picking the identity value c = −1.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "4x − 1 = 4x + c"
+        }
+      ],
+      "asked": "Complete the faded comparison, then the no-solution condition on c.",
+      "correct_math": "c ≠ −1",
+      "blanks": [
+        {
+          "id": "constants",
+          "prompt": "After the x terms cancel: ___ = c",
+          "correct": "−1",
+          "alternates": [
+            "-1"
+          ]
+        },
+        {
+          "id": "condition",
+          "prompt": "For no solution, c must satisfy ___",
+          "correct": "c ≠ −1",
+          "alternates": [
+            "c!=-1",
+            "c ≠ -1",
+            "c!=−1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slq_nsp_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation 5(x − 2) = 5x + n has no solution. Which is true of n?</p>",
+      "choices": [
+        "n = −10",
+        "n ≠ −10",
+        "n = 5",
+        "n ≠ 2"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "5x − 10 = 5x + n.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "−10 = n is identity; no solution when n ≠ −10.",
+          "why": "Constants must disagree."
+        }
+      ],
+      "explanation_check": "−10 = n is identity; no solution when n ≠ −10.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Expand, then see whether the x terms match.",
+      "critical_hint": "Left becomes 5x − 10. No solution when n ≠ −10.",
+      "core_idea": "Matching x coefficients, unequal constants.",
+      "common_mistake": "Choosing n = −10.",
+      "unknown_change": "",
+      "correct_math": "n ≠ −10"
+    },
+    {
+      "id": "slq_nsp_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>For which values of p does the equation 6w + p = 6w − 4 have no solution?</p>",
+      "choices": [
+        "p = −4",
+        "p ≠ −4",
+        "p = 6",
+        "p = 4"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "p = −4 is identity.",
+          "why": "No solution for every other p."
+        }
+      ],
+      "explanation_check": "p = −4 is identity.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The w terms already match.",
+      "critical_hint": "No solution when p ≠ −4.",
+      "core_idea": "All values except the identity constant.",
+      "common_mistake": "Choosing p = −4.",
+      "unknown_change": "",
+      "asked": "For which values of p does the equation have no solution?",
+      "correct_math": "p ≠ −4"
+    },
+    {
+      "id": "slq_nsp_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>For which values of k does the equation x + 2 = x + k have no solution?</p>",
+      "choices": [
+        "k = 2",
+        "k ≠ 2",
+        "k = 0 only",
+        "all real k"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Subtract x from both sides: 2 = k.",
+          "why": "The variable terms cancel because the coefficients of x already match."
+        },
+        {
+          "step": 2,
+          "do": "If k = 2 the statement 2 = 2 is always true (identity). If k ≠ 2 it is a contradiction, so there is no solution.",
+          "why": "No solution is the false constant equation, not the identity value."
+        }
+      ],
+      "explanation_check": "For k = 3, x+2=x+3 becomes 2=3, which is never true. For k=2 it is an identity.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Cancel x and compare the remaining constants. Decide which k make a contradiction.",
+      "critical_hint": "x cancels, so 2 = k is an identity. The equation has no solution when k ≠ 2.",
+      "core_idea": "Same no-solution test; the asked form is a set description.",
+      "common_mistake": "Saying the equation has no solution only when k = 2.",
+      "unknown_change": "The asked quantity is the set of parameter values, not a single k.",
+      "asked": "For which values of k does the equation have no solution?",
+      "correct_math": "k ≠ 2"
+    },
+    {
+      "id": "slq_nsp_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation (2k)x + 5 = 4x + 3 has no solution. What is the value of k?</p>",
+      "choices": [
+        "k = 2",
+        "k ≠ 2",
+        "k = 3",
+        "k = 0"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "For no solution, the x coefficients must be equal so x cancels, and the constants must disagree.",
+          "why": "Cancellation plus contradiction."
+        },
+        {
+          "step": 2,
+          "do": "Set 2k = 4, so k = 2. Then 5 = 3 is false, which is a contradiction.",
+          "why": "k = 2 forces no solution."
+        }
+      ],
+      "explanation_check": "If k=2: 4x+5=4x+3, so 5=3, no solution.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "No solution needs the variable to cancel. Compare coefficients of x.",
+      "critical_hint": "Force the x coefficients to match: 2k = 4, so k = 2. The constants 5 and 3 already disagree.",
+      "core_idea": "Force equal x coefficients while constants already differ.",
+      "common_mistake": "Choosing k ≠ 2.",
+      "unknown_change": "The unknown changed from 'which constants fail' to 'which coefficient parameter forces cancellation'.",
+      "correct_math": "k = 2"
+    },
+    {
+      "id": "slq_nsp_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation 9x + 4 = 9x + r has no solution. Which is true of r?</p>",
+      "choices": [
+        "r = 4",
+        "r ≠ 4",
+        "r = 9",
+        "r ≠ 9"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "4 = r is identity; no solution when r ≠ 4.",
+          "why": "Constants must disagree."
+        }
+      ],
+      "explanation_check": "4 = r is identity; no solution when r ≠ 4.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The x coefficients already match.",
+      "critical_hint": "No solution when r ≠ 4.",
+      "core_idea": "Delayed no-solution check.",
+      "common_mistake": "Choosing r = 4.",
+      "unknown_change": "",
+      "correct_math": "r ≠ 4"
+    },
+    {
+      "id": "slq_nsp_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>For which values of q does the equation 2(x + 7) = 2x + q have no solution?</p>",
+      "choices": [
+        "q = 14",
+        "q ≠ 14",
+        "q = 7",
+        "q ≠ 2"
+      ],
+      "correct_answer": "B",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "2x + 14 = 2x + q.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "No solution when q ≠ 14.",
+          "why": "Contradiction."
+        }
+      ],
+      "explanation_check": "No solution when q ≠ 14.",
+      "skill_code": "sat.alg.no_solution_parameter",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Expand the left side first.",
+      "critical_hint": "Left is 2x + 14. No solution when q ≠ 14.",
+      "core_idea": "Matching x, unequal constants.",
+      "common_mistake": "Choosing q = 14.",
+      "unknown_change": "",
+      "correct_math": "q ≠ 14"
+    }
+  ]
+}

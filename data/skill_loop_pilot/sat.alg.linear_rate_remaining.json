@@ -62,7 +62,8 @@
       "critical_hint": "Grain dropped 2,600 pounds in 4 hours, so r = 650 per hour. The unknown is total time from the start until 7,800 remain, so set 15,600 − 650t = 7,800.",
       "core_idea": "A constant-rate remaining quantity follows Q(t) = Q0 − r t, with r from a snapshot pair.",
       "common_mistake": "Adding the opening 4 hours twice, or treating 7,800 as additional hours from the 13,000-pound snapshot without converting to total time.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "12"
     },
     {
       "id": "slq_lrr_example_01",
@@ -107,7 +108,8 @@
       "critical_hint": "r = 1,500 ÷ 3 = 500 gal/h. Remaining 4,400 from 8,400 means 4,000 gallons must leave from the start.",
       "core_idea": "Both snapshots and the target remaining are measured from the same Q0.",
       "common_mistake": "Using 6,900 as a new starting amount instead of 8,400.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "8"
     },
     {
       "id": "slq_lrr_faded_01",
@@ -119,7 +121,12 @@
       ],
       "question_kind": "faded",
       "stem_html": "<p>A machine sands wood from a pile at a constant rate. The pile started at 2,400 kilograms. After 5 hours, 1,650 kilograms remain. How many total hours from the start until 600 kilograms remain?</p>",
+      "choices": [],
       "given_steps": [
+        {
+          "label": "Given",
+          "text": "A machine sands wood from a pile at a constant rate. Start 2,400 kg; after 5 hours, 1,650 kg remain."
+        },
         {
           "label": "Step 1 (already done)",
           "text": "Wood sanded in 5 hours: 2,400 − 1,650 = 750 kilograms."
@@ -128,7 +135,7 @@
       "blanks": [
         {
           "id": "rate",
-          "prompt": "Rate in kilograms per hour",
+          "prompt": "Rate r = 750 ÷ 5 = ___ kilograms per hour",
           "correct": "150",
           "alternates": [
             "150 kg/h",
@@ -137,7 +144,7 @@
         },
         {
           "id": "total_hours",
-          "prompt": "Total hours from the start",
+          "prompt": "Total hours from the start until 600 kg remain: t = ___",
           "correct": "12",
           "alternates": [
             "12 hours"
@@ -145,7 +152,10 @@
         }
       ],
       "correct_answer": "12",
-      "answer_alternates": [],
+      "answer_alternates": [
+        "12",
+        "12 hours"
+      ],
       "worked_steps": [
         {
           "step": 1,
@@ -176,7 +186,8 @@
       "critical_hint": "Rate = 750 ÷ 5. Then the pile must fall from 2,400 to 600, so total change from the start is 1,800 kilograms.",
       "core_idea": "Finish the faded steps: r = ΔQ / Δt, then t = (Q0 − Q_target) / r.",
       "common_mistake": "Reporting only the additional hours after hour 5 instead of total hours from the start.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "12"
     },
     {
       "id": "slq_lrr_ind_01",
@@ -226,7 +237,8 @@
       "critical_hint": "Books fall 1,500 in 6 hours, so r = 250 per hour. Set 9,000 − 250t = 4,500.",
       "core_idea": "Independent item uses the same unknown (total time to a remaining amount) with new numbers.",
       "common_mistake": "Computing time to empty the library (9,000/250) instead of time to 4,500 remaining.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "18"
     },
     {
       "id": "slq_lrr_ind_02",
@@ -276,7 +288,8 @@
       "critical_hint": "1,400 gallons leave in 2 hours, so r = 700 gal/h. Remaining 6,900 from 12,500 means 5,600 gallons must drain from the start.",
       "core_idea": "Q(t) = Q0 − r t with t unknown and a remaining target given.",
       "common_mistake": "Using 11,100 as Q0.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "8"
     },
     {
       "id": "slq_lrr_tr_01",
@@ -326,7 +339,8 @@
       "critical_hint": "Rate is still (18,200 − 15,450)/5. The question asks for remaining at t = 12, so compute Q(12) = 18,200 − r·12.",
       "core_idea": "Same linear remaining model; the unknown switched from t to Q(t).",
       "common_mistake": "Solving for the time when remaining hits 12, or subtracting 12 hours from the 5-hour snapshot without using Q0 − r t.",
-      "unknown_change": "The unknown changed from total time to a remaining amount after a given time."
+      "unknown_change": "The unknown changed from total time to a remaining amount after a given time.",
+      "correct_math": "11600"
     },
     {
       "id": "slq_lrr_tr_02",
@@ -379,7 +393,8 @@
       "critical_hint": "r = 3,500/7 = 500 tons/h. From 16,500 down to 9,500 is 7,000 tons still to remove after hour 7.",
       "core_idea": "Additional time uses the current remaining amount, not Q0.",
       "common_mistake": "21 = (20,000 − 9,500)/500, which is total hours from the start, not additional hours.",
-      "unknown_change": "The unknown changed from total time from the start to additional time after a midpoint snapshot."
+      "unknown_change": "The unknown changed from total time from the start to additional time after a midpoint snapshot.",
+      "correct_math": "14"
     },
     {
       "id": "slq_lrr_del_01",
@@ -430,7 +445,8 @@
       "critical_hint": "3,600 tons leave in 9 hours, so r = 400. Remaining 11,600 from 22,400 means 10,800 tons must leave from the start.",
       "core_idea": "Delayed check uses a new cover story but the same Q(t) = Q0 − r t method.",
       "common_mistake": "Starting the remaining drop from 18,800 instead of 22,400 when the question asks total hours from the start.",
-      "unknown_change": ""
+      "unknown_change": "",
+      "correct_math": "27"
     },
     {
       "id": "slq_lrr_del_02",
@@ -481,7 +497,8 @@
       "critical_hint": "750 gallons leave in 3 hours, so r = 250. Remaining at t = 10 is 6,300 − 250×10.",
       "core_idea": "Q(t) = Q0 − r t with t given.",
       "common_mistake": "Solving for the time when 10 gallons remain.",
-      "unknown_change": "The unknown is remaining at a given time."
+      "unknown_change": "The unknown is remaining at a given time.",
+      "correct_math": "3800"
     },
     {
       "id": "slq_lrr_faded_02",
@@ -493,7 +510,12 @@
       ],
       "question_kind": "faded",
       "stem_html": "<p>A kiln dries clay at a constant rate. The rack started at 3,600 kilograms. After 6 hours, 2,400 kilograms remain. How many total hours from the start until 800 kilograms remain?</p>",
+      "choices": [],
       "given_steps": [
+        {
+          "label": "Given",
+          "text": "A kiln dries clay at a constant rate. Start 3,600 kg; after 6 hours, 2,400 kg remain."
+        },
         {
           "label": "Step 1 (already done)",
           "text": "Clay dried in 6 hours: 3,600 − 2,400 = 1,200 kilograms."
@@ -502,7 +524,7 @@
       "blanks": [
         {
           "id": "rate",
-          "prompt": "Rate in kilograms per hour",
+          "prompt": "Rate r = 1,200 ÷ 6 = ___ kilograms per hour",
           "correct": "200",
           "alternates": [
             "200 kg/h",
@@ -511,7 +533,7 @@
         },
         {
           "id": "total_hours",
-          "prompt": "Total hours from the start",
+          "prompt": "Total hours from the start until 800 kg remain: t = ___",
           "correct": "14",
           "alternates": [
             "14 hours"
@@ -519,7 +541,10 @@
         }
       ],
       "correct_answer": "14",
-      "answer_alternates": [],
+      "answer_alternates": [
+        "14",
+        "14 hours"
+      ],
       "worked_steps": [
         {
           "step": 1,
@@ -550,7 +575,8 @@
       "unknown_change": "",
       "skill_code": "sat.alg.linear_rate_remaining",
       "review_status": "draft",
-      "source_note": "Original remediation faded item. Not copied from question_bank.json."
+      "source_note": "Original remediation faded item. Not copied from question_bank.json.",
+      "correct_math": "14"
     },
     {
       "id": "slq_lrr_ind_03",
@@ -600,7 +626,8 @@
       "unknown_change": "",
       "skill_code": "sat.alg.linear_rate_remaining",
       "review_status": "draft",
-      "source_note": "Original remediation independent item. Not copied from question_bank.json."
+      "source_note": "Original remediation independent item. Not copied from question_bank.json.",
+      "correct_math": "16"
     },
     {
       "id": "slq_lrr_tr_03",
@@ -655,7 +682,8 @@
       "unknown_change": "The representation changed from a prose remaining-quantity story to a table, and the unknown is the function R(t) rather than a single time or remaining amount.",
       "skill_code": "sat.alg.linear_rate_remaining",
       "review_status": "draft",
-      "source_note": "Original table-to-function transfer item. Not copied from question_bank.json."
+      "source_note": "Original table-to-function transfer item. Not copied from question_bank.json.",
+      "correct_math": "R(t) = 9600 − 400t"
     }
   ]
 }

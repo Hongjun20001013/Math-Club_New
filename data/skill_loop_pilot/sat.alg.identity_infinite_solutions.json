@@ -1,0 +1,401 @@
+{
+  "skill_code": "sat.alg.identity_infinite_solutions",
+  "title": "Identity: infinitely many solutions",
+  "microskill_statement": "A linear equation is an identity when both sides are the same for every value of the variable.",
+  "status": "draft_pending_teacher_review",
+  "items": [
+    {
+      "id": "slq_iis_example_01",
+      "slot": "worked_example",
+      "variant_index": 1,
+      "role": "worked_example",
+      "counts_toward": [],
+      "question_kind": "worked_example",
+      "stem_html": "<p>The equation 4(x − 1) + 6 = 4x + k is true for all real x. What is k?</p>",
+      "choices": [
+        "2",
+        "4",
+        "6",
+        "−4"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Left: 4x − 4 + 6 = 4x + 2.",
+          "why": "Distribute and combine."
+        },
+        {
+          "step": 2,
+          "do": "For this to match 4x + k for all x, k must be 2.",
+          "why": "Identity requires identical coefficients and constants."
+        }
+      ],
+      "explanation_check": "For this to match 4x + k for all x, k must be 2.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Expand the left side and compare it to the right side. Do not solve for a single x.",
+      "critical_hint": "Left simplifies to 4x + 2, so k = 2 makes an identity.",
+      "core_idea": "Infinitely many solutions when both sides are identical.",
+      "common_mistake": "Treating it as a one-solution equation and picking an x.",
+      "unknown_change": "",
+      "correct_math": "k = 2"
+    },
+    {
+      "id": "slq_iis_faded_01",
+      "slot": "faded",
+      "variant_index": 1,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>The equation 5x + 3 = 5(x + t) − 12 is true for all real x.</p>",
+      "choices": [],
+      "correct_answer": "3",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Right: 5x + 5t − 12.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "Match constants: 3 = 5t − 12, so 5t = 15 and t = 3.",
+          "why": "x coefficients already match."
+        }
+      ],
+      "explanation_check": "Match constants: 3 = 5t − 12, so 5t = 15 and t = 3.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "If it is true for all x, the two sides must be the same expression.",
+      "critical_hint": "Right side is 5x + 5t − 12. Set 3 = 5t − 12.",
+      "core_idea": "Match constants after expanding.",
+      "common_mistake": "Solving for x instead of t.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "5x + 3 = 5(x + t) − 12"
+        }
+      ],
+      "asked": "Complete the faded expansion, then the identity value of t.",
+      "correct_math": "t = 3",
+      "blanks": [
+        {
+          "id": "expand",
+          "prompt": "Right side: 5x + ___",
+          "correct": "5t − 12",
+          "alternates": [
+            "5t-12",
+            "−12 + 5t",
+            "-12+5t"
+          ]
+        },
+        {
+          "id": "t",
+          "prompt": "For an identity, t = ___",
+          "correct": "3"
+        }
+      ]
+    },
+    {
+      "id": "slq_iis_faded_02",
+      "slot": "faded",
+      "variant_index": 2,
+      "role": "faded",
+      "counts_toward": [
+        "faded"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>Find b so that 2(3x + b) = 6x + 10 has infinitely many solutions.</p>",
+      "choices": [],
+      "correct_answer": "5",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "6x + 2b = 6x + 10, so 2b = 10 and b = 5.",
+          "why": "x terms already match."
+        }
+      ],
+      "explanation_check": "6x + 2b = 6x + 10, so 2b = 10 and b = 5.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "The 6x terms already match. Only the constant must match.",
+      "critical_hint": "2b must equal 10, so b = 5.",
+      "core_idea": "Identity by matching constants.",
+      "common_mistake": "Choosing b = 10.",
+      "unknown_change": "",
+      "given_steps": [
+        {
+          "label": "Given",
+          "text": "2(3x + b) = 6x + 10"
+        }
+      ],
+      "asked": "Complete the faded identity setup.",
+      "correct_math": "b = 5",
+      "blanks": [
+        {
+          "id": "expand",
+          "prompt": "6x + ___ = 6x + 10",
+          "correct": "2b",
+          "alternates": [
+            "2b"
+          ]
+        },
+        {
+          "id": "b",
+          "prompt": "For infinitely many solutions, b = ___",
+          "correct": "5"
+        }
+      ]
+    },
+    {
+      "id": "slq_iis_ind_01",
+      "slot": "independent",
+      "variant_index": 1,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation 7(x + 2) − 4 = 7x + m is true for all x. What is m?</p>",
+      "choices": [
+        "10",
+        "14",
+        "18",
+        "24"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "7x + 14 − 4 = 7x + 10.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "m = 10.",
+          "why": "Identity."
+        }
+      ],
+      "explanation_check": "m = 10.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Simplify the left side completely before comparing.",
+      "critical_hint": "Left becomes 7x + 10, so m = 10.",
+      "core_idea": "Identical expressions.",
+      "common_mistake": "Forgetting to subtract 4 after 14.",
+      "unknown_change": "",
+      "correct_math": "m = 10"
+    },
+    {
+      "id": "slq_iis_ind_02",
+      "slot": "independent",
+      "variant_index": 2,
+      "role": "independent",
+      "counts_toward": [
+        "independent"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Which value of c makes 3x − c = 3(x − 4) + 8 an identity?</p>",
+      "choices": [
+        "4",
+        "8",
+        "12",
+        "20"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Right: 3x − 12 + 8 = 3x − 4.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "So −c = −4 and c = 4.",
+          "why": "Match constants."
+        }
+      ],
+      "explanation_check": "So −c = −4 and c = 4.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Expand the right side and compare constants.",
+      "critical_hint": "Right simplifies to 3x − 4, so c = 4.",
+      "core_idea": "Match the constant term.",
+      "common_mistake": "Choosing 12 from the 3×4 product.",
+      "unknown_change": "",
+      "correct_math": "c = 4"
+    },
+    {
+      "id": "slq_iis_tr_01",
+      "slot": "transfer",
+      "variant_index": 1,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Which of the following best describes the solutions of 2(x + 5) = 2x + 10?</p>",
+      "choices": [
+        "No solution",
+        "Exactly one solution",
+        "Infinitely many solutions",
+        "Two solutions"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Left: 2x + 10, which equals the right side for every x.",
+          "why": "This is an identity, not a constraint on x."
+        }
+      ],
+      "explanation_check": "Left: 2x + 10, which equals the right side for every x.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Simplify both sides before counting solutions.",
+      "critical_hint": "Both sides are 2x + 10, so every real x works.",
+      "core_idea": "Same identity skill; the asked quantity is the number of solutions, not a parameter.",
+      "common_mistake": "Saying there is one solution because it 'looks like' an equation to solve.",
+      "unknown_change": "Asked quantity changed from a parameter value to the number of solutions.",
+      "correct_math": "infinitely many solutions"
+    },
+    {
+      "id": "slq_iis_tr_02",
+      "slot": "transfer",
+      "variant_index": 2,
+      "role": "transfer",
+      "counts_toward": [
+        "transfer"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The graph of y = 3x + 1 and the graph of y = 3x + 1 are drawn in the same plane. How many intersection points are there?</p>",
+      "choices": [
+        "None",
+        "One",
+        "Infinitely many",
+        "Two"
+      ],
+      "correct_answer": "C",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "The two lines are the same line.",
+          "why": "Every point on the line is an intersection."
+        },
+        {
+          "step": 2,
+          "do": "Infinitely many intersection points.",
+          "why": "Graph form of an identity."
+        }
+      ],
+      "explanation_check": "Infinitely many intersection points.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Ask whether the two equations describe different lines or the same line.",
+      "critical_hint": "Same slope and same intercept, so the graphs coincide.",
+      "core_idea": "Identity presented as coincident graphs.",
+      "common_mistake": "Saying they never meet because they are parallel-looking.",
+      "unknown_change": "Representation changed from an algebraic identity to coincident graphs.",
+      "correct_math": "infinitely many intersection points"
+    },
+    {
+      "id": "slq_iis_del_01",
+      "slot": "delayed",
+      "variant_index": 1,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The equation 8x + 9 = 8(x + q) − 7 is true for all real x. What is q?</p>",
+      "choices": [
+        "2",
+        "7",
+        "9",
+        "16"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Right: 8x + 8q − 7.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "9 = 8q − 7, so 16 = 8q and q = 2.",
+          "why": "Match constants."
+        }
+      ],
+      "explanation_check": "9 = 8q − 7, so 16 = 8q and q = 2.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Expand and match constants. Do not solve for x.",
+      "critical_hint": "Set 9 = 8q − 7.",
+      "core_idea": "Delayed identity parameter.",
+      "common_mistake": "Solving for x.",
+      "unknown_change": "",
+      "correct_math": "q = 2"
+    },
+    {
+      "id": "slq_iis_del_02",
+      "slot": "delayed",
+      "variant_index": 2,
+      "role": "delayed",
+      "counts_toward": [
+        "delayed"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Find d so that 9(x − 1) + 4 = 9x + d has infinitely many solutions.</p>",
+      "choices": [
+        "−5",
+        "4",
+        "9",
+        "−9"
+      ],
+      "correct_answer": "A",
+      "answer_alternates": [],
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "9x − 9 + 4 = 9x − 5.",
+          "why": "Distribute."
+        },
+        {
+          "step": 2,
+          "do": "d = −5.",
+          "why": "Match constants."
+        }
+      ],
+      "explanation_check": "d = −5.",
+      "skill_code": "sat.alg.identity_infinite_solutions",
+      "review_status": "draft",
+      "source_note": "Original repair-pack item. Not copied from question_bank.json.",
+      "light_hint": "Simplify the left side to 9x plus a constant.",
+      "critical_hint": "Left is 9x − 5, so d = −5.",
+      "core_idea": "Identity constant match.",
+      "common_mistake": "Choosing d = 4.",
+      "unknown_change": "",
+      "correct_math": "d = −5"
+    }
+  ]
+}
