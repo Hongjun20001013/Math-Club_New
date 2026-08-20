@@ -11,8 +11,13 @@ Do not deploy until this list is complete and the owner has approved production 
    - Do not put the salt in git, logs, HTML, reports, or client JavaScript.
    - Missing salt in production disables the pilot and refuses assignment.
 5. Changing salt later must not rehash existing `skill_loop_assignments` rows.
-6. Migrate only after taking a backup of the production database. Apply additive SQL to a verified copy first.
-7. Never run migration against `/var/data/sat.db` from a laptop script without an explicit production change window.
+6. Schema-only migrate (CREATE IF NOT EXISTS only) requires a separate written approval.
+   `python3 scripts/skill_loop_migrate.py --schema-only --db <local-copy.db>`
+   Production path additionally requires `--allow-render-production` and is schema-only.
+   Failed schema-only runs roll back in one transaction. Successful empty tables stay;
+   do not DROP them unless the owner gives written rollback approval.
+7. Ordinary `--apply` (schema + seed) still refuses `/var/data`. Never run it on production.
+   Code rollback / Render rollback does not delete database tables.
 8. Do not modify `data/question_bank.json`.
 9. Teacher-publish remaining draft items before students are invited.
 10. Reports must keep the bilingual “pilot only / not instructional effectiveness” disclaimer.

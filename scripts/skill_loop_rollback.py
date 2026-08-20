@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """Rollback for skill-loop pilot tables only.
 
-Default: print the plan. Will not execute unless --confirm-rollback AND --db
-point at a local copy (never /var/data).
+Code rollback / Render redeploy does not drop database tables.
+A failed schema-only migrate rolls back inside its transaction; a successful
+empty schema is kept. Do not DROP the new objects unless the owner gives
+written approval, then:
+
+  python3 scripts/skill_loop_rollback.py                 # print plan only
+  python3 scripts/skill_loop_rollback.py --confirm-rollback --db /local/copy.db
+
+Never /var/data unless separately approved. This script still refuses /var/data.
 """
 from __future__ import annotations
 

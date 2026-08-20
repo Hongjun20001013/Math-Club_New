@@ -103,8 +103,11 @@ class TestMigrationSafety(unittest.TestCase):
         from scripts import skill_loop_migrate as migrate
 
         blob = "\n".join(migrate.SQL_STATEMENTS)
-        for word in ("DROP", "TRUNCATE", "DELETE", "ALTER"):
+        for word in ("DROP", "TRUNCATE", "DELETE", "ALTER", "INSERT", "UPDATE"):
             self.assertNotRegex(blob, rf"\b{word}\b")
+        self.assertEqual(len(migrate.SQL_STATEMENTS), 15)
+        self.assertEqual(len(migrate.SCHEMA_TABLES), 7)
+        self.assertEqual(len(migrate.SCHEMA_INDEXES), 8)
         migrate.assert_sql_is_additive()
 
     def test_dry_run_prints_sql_and_does_not_connect(self):
@@ -308,6 +311,156 @@ class TestMigrationSafety(unittest.TestCase):
             print(f"  question_bank.json SHA-256 after ={bank_after}")
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+class TestSchemaOnlyMigration(unittest.TestCase):
+    def _schema_state(self, db):
+        conn = open_db(db)
+        tables = {
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'skill_loop_%'"
+            )
+        }
+        indexes = {
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'idx_skill_loop_%'"
+            )
+        }
+        counts = {}
+        for name in sorted(tables):
+            counts[name] = int(conn.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0])
+        conn.close()
+        return tables, indexes, counts
+
+    def test_schema_only_creates_empty_objects_without_seed(self):
+        from scripts import skill_loop_migrate as migrate
+        from scripts.skill_loop_baseline import baseline
+
+        tmp = tempfile.mkdtemp(prefix="sl-schema-")
+        db = os.path.join(tmp, "copy.db")
+        copy_db(db)
+        try:
+            before = baseline(db)
+            with mock.patch.object(migrate, "seed_pack", wraps=migrate.seed_pack) as seed:
+                migrate.apply_schema(db)
+                seed.assert_not_called()
+            tables, indexes, counts = self._schema_state(db)
+            self.assertEqual(tables, set(migrate.SCHEMA_TABLES))
+            self.assertEqual(indexes, set(migrate.SCHEMA_INDEXES))
+            self.assertTrue(counts)
+            self.assertTrue(all(n == 0 for n in counts.values()), counts)
+            after = baseline(db)
+            self.assertEqual(before, after)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                    "--schema-only",
+                    "--db",
+                    db,
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(proc.returncode, 0)
+            self.assertIn("SCHEMA_ONLY", proc.stdout)
+            self.assertIn("statements=15", proc.stdout)
+            self.assertIn(os.path.abspath(db), proc.stdout)
+            self.assertNotIn("INSERT", proc.stdout)
+            tables2, indexes2, counts2 = self._schema_state(db)
+            self.assertEqual(tables, tables2)
+            self.assertEqual(indexes, indexes2)
+            self.assertEqual(counts, counts2)
+            self.assertEqual(baseline(db), before)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_schema_only_transaction_rollback_on_mid_failure(self):
+        from scripts import skill_loop_migrate as migrate
+        from scripts.skill_loop_baseline import baseline
+
+        tmp = tempfile.mkdtemp(prefix="sl-schema-fail-")
+        db = os.path.join(tmp, "copy.db")
+        copy_db(db)
+        try:
+            before = baseline(db)
+            broken = list(migrate.SQL_STATEMENTS)
+            broken.insert(4, "THIS IS NOT VALID SQL")
+            with mock.patch.object(migrate, "SQL_STATEMENTS", broken):
+                with self.assertRaises(sqlite3.OperationalError):
+                    migrate.apply_schema(db)
+            tables, indexes, _counts = self._schema_state(db)
+            self.assertEqual(tables, set())
+            self.assertEqual(indexes, set())
+            self.assertEqual(baseline(db), before)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_apply_still_refuses_var_data_and_allow_flag_is_schema_only(self):
+        from scripts.skill_loop_migrate import apply, apply_schema, is_forbidden_path
+
+        self.assertTrue(is_forbidden_path("/var/data/sat.db"))
+        with self.assertRaises(SystemExit):
+            apply("/var/data/sat.db")
+        with self.assertRaises(SystemExit):
+            apply_schema("/var/data/sat.db")
+        apply_proc = subprocess.run(
+            [
+                sys.executable,
+                os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                "--apply",
+                "--db",
+                "/var/data/sat.db",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(apply_proc.returncode, 3)
+        mixed = subprocess.run(
+            [
+                sys.executable,
+                os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                "--apply",
+                "--allow-render-production",
+                "--db",
+                "/var/data/sat.db",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(mixed.returncode, 4)
+        blocked = subprocess.run(
+            [
+                sys.executable,
+                os.path.join(ROOT, "scripts", "skill_loop_migrate.py"),
+                "--schema-only",
+                "--db",
+                "/var/data/sat.db",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(blocked.returncode, 0)
+        from scripts import skill_loop_migrate as migrate
+
+        with mock.patch.object(migrate, "apply_schema") as schema:
+            argv = [
+                "skill_loop_migrate.py",
+                "--schema-only",
+                "--allow-render-production",
+                "--db",
+                "/var/data/sat.db",
+            ]
+            with mock.patch.object(sys, "argv", argv):
+                code = migrate.main()
+            self.assertEqual(code, 0)
+            schema.assert_called_once_with("/var/data/sat.db", allow_render_production=True)
 
 
 class _PilotCase(unittest.TestCase):

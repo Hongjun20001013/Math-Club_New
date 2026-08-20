@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Additive skill-loop schema + draft seed. Never touches official banks.
+"""Additive skill-loop schema + optional draft seed. Never touches official banks.
 
 Usage:
   python3 scripts/skill_loop_migrate.py --dry-run
+  python3 scripts/skill_loop_migrate.py --schema-only --db /abs/path/to/LOCAL-copy.db
+  python3 scripts/skill_loop_migrate.py --schema-only --allow-render-production --db /var/data/sat.db
   python3 scripts/skill_loop_migrate.py --apply --db /abs/path/to/LOCAL-copy.db
 
-Refuses /var/data (Render). Dry-run prints SQL and does not connect.
-Apply runs in a single transaction. CREATE IF NOT EXISTS + INSERT OR IGNORE
-so a second run is idempotent.
+Dry-run prints SQL and does not connect.
+Schema-only runs the 15 CREATE TABLE/INDEX IF NOT EXISTS statements in one
+transaction and never seeds. --apply still refuses /var/data. Production path
+is allowed only with --schema-only --allow-render-production.
 """
 from __future__ import annotations
 
@@ -154,6 +157,26 @@ SQL_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_skill_loop_events_user ON skill_loop_events(user_id, created_at)",
 ]
 
+SCHEMA_TABLES = (
+    "skill_loop_skills",
+    "skill_loop_items",
+    "skill_loop_item_reviews",
+    "skill_loop_assignments",
+    "skill_loop_runs",
+    "skill_loop_step_results",
+    "skill_loop_events",
+)
+SCHEMA_INDEXES = (
+    "idx_skill_loop_items_skill_slot",
+    "idx_skill_loop_assignments_exp_user",
+    "idx_skill_loop_assignments_user",
+    "idx_skill_loop_assignments_exp",
+    "idx_skill_loop_runs_user_skill",
+    "idx_skill_loop_steps_run",
+    "idx_skill_loop_events_name",
+    "idx_skill_loop_events_user",
+)
+
 
 def assert_sql_is_additive() -> None:
     for sql in SQL_STATEMENTS:
@@ -248,6 +271,47 @@ def seed_pack(conn: sqlite3.Connection, pack_path: str = PACK_PATH) -> int:
     return inserted
 
 
+def _print_sql_statements() -> None:
+    print("skill_loop_migrate: additive CREATE TABLE IF NOT EXISTS only")
+    print("does not modify question_bank.json")
+    print()
+    for i, sql in enumerate(SQL_STATEMENTS, 1):
+        print(f"-- [{i}/{len(SQL_STATEMENTS)}]")
+        print(" ".join(sql.split()))
+        print()
+
+
+def _print_schema_only_banner(db_path: str) -> None:
+    print("SCHEMA_ONLY")
+    print("db=" + os.path.abspath(db_path))
+    print(f"statements={len(SQL_STATEMENTS)}")
+
+
+def _run_sql_statements(db_path: str, *, seed: bool) -> None:
+    assert_sql_is_additive()
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        for sql in SQL_STATEMENTS:
+            conn.execute(sql)
+        if seed:
+            seed_pack(conn)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def apply_schema(db_path: str, *, allow_render_production: bool = False) -> None:
+    """Run the 15 CREATE IF NOT EXISTS statements. Never seeds."""
+    if is_forbidden_path(db_path) and not allow_render_production:
+        raise SystemExit("ERROR: refusing to touch Render /var/data database")
+    _print_schema_only_banner(db_path)
+    _run_sql_statements(db_path, seed=False)
+
+
 def apply(db_path: str) -> None:
     if is_forbidden_path(db_path):
         raise SystemExit("ERROR: refusing to touch Render /var/data database")
@@ -269,17 +333,31 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--schema-only", action="store_true")
+    parser.add_argument("--allow-render-production", action="store_true")
     parser.add_argument("--db")
     args = parser.parse_args()
     assert_sql_is_additive()
+    _print_sql_statements()
 
-    print("skill_loop_migrate: additive CREATE TABLE IF NOT EXISTS only")
-    print("refuses Render /var/data; does not modify question_bank.json")
-    print()
-    for i, sql in enumerate(SQL_STATEMENTS, 1):
-        print(f"-- [{i}/{len(SQL_STATEMENTS)}]")
-        print(" ".join(sql.split()))
-        print()
+    if args.allow_render_production and not args.schema_only:
+        print("ERROR: --allow-render-production is only valid with --schema-only.", file=sys.stderr)
+        return 4
+    if args.schema_only and args.apply:
+        print("ERROR: --schema-only and --apply are mutually exclusive.", file=sys.stderr)
+        return 2
+
+    if args.schema_only:
+        if not args.db:
+            print("ERROR: --schema-only requires --db.", file=sys.stderr)
+            return 2
+        if args.dry_run:
+            _print_schema_only_banner(args.db)
+            print("DRY-RUN complete. No database connection or writes.")
+            return 0
+        apply_schema(args.db, allow_render_production=args.allow_render_production)
+        print("schema-only applied to", os.path.abspath(args.db))
+        return 0
 
     if args.dry_run or not args.apply:
         print("DRY-RUN complete. No database connection or writes.")
