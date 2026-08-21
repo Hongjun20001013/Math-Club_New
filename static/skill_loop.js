@@ -41,7 +41,7 @@
       postEvent("hint", { level: "light" }, function (data) {
         showPanel(
           hintPanel,
-          "<h2>Light hint</h2><p data-sl-hint-text data-level=\"light\">" +
+          "<h2>Small hint</h2><p data-sl-hint-text data-level=\"light\">" +
             escapeHtml(data && data.hint_text) +
             "</p>"
         );
@@ -55,7 +55,7 @@
       postEvent("hint", { level: "critical" }, function (data) {
         showPanel(
           hintPanel,
-          "<h2>Critical hint</h2><p data-sl-hint-text data-level=\"critical\">" +
+          "<h2>Stronger hint</h2><p data-sl-hint-text data-level=\"critical\">" +
             escapeHtml(data && data.hint_text) +
             "</p>"
         );
@@ -69,7 +69,7 @@
       postEvent("solution", {}, function (data) {
         var solution = (data && data.solution) || {};
         var steps = solution.worked_steps || [];
-        var html = "<h2>Full solution</h2>";
+        var html = "<h2>Walkthrough</h2>";
         html += "<p data-sl-solution-answer><strong>Correct answer:</strong> " +
           escapeHtml(solution.answer_display) + "</p>";
         html += "<ol data-sl-solution-steps>";

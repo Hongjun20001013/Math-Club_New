@@ -234,6 +234,58 @@ def independent_translate(item: dict) -> str:
     return mapping[iid]
 
 
+def independent_linear_relationships_v2(item: dict) -> str:
+    iid = item.get("id")
+    if iid == "slq_lrv2_diag_01":
+        r = (12000 - 9600) / 6
+        return str(int((9600 - 4800) / r))
+    if iid == "slq_lrv2_diag_02":
+        hourly = (340 - 180) / (7 - 3)
+        intercept = 180 - hourly * 3
+        return f"{int(hourly)}x+{int(intercept)}"
+    if iid == "slq_lrv2_diag_03":
+        return "value at the shift"
+    if iid == "slq_lrv2_ex_01":
+        r = (6400 - 5600) / 4
+        return str(int(6400 - r * 12))
+    if iid == "slq_lrv2_ex_02":
+        return "35h+50"
+    if iid == "slq_lrv2_faded_01":
+        r = (4500 - 3500) / 5
+        return str(int((4500 - 1500) / r))
+    if iid == "slq_lrv2_faded_02":
+        return str(int(1680 + 140 * 6))
+    if iid == "slq_lrv2_faded_03":
+        return str(int(15 * 20 + 9 * 7))
+    if iid == "slq_lrv2_ind_01":
+        r = (3600 - 2400) / (10 - 4)
+        return str(int(3600 - r * (13 - 4)))
+    if iid == "slq_lrv2_ind_02":
+        return str(int((7600 - 2000) / 400))
+    if iid == "slq_lrv2_ind_03":
+        slope = (6000 - 9000) / (50 - 30)
+        return str(int(9000 + slope * (40 - 30)))
+    if iid == "slq_lrv2_ind_04":
+        a = (14 - 8) / (3 - 1)
+        b = 8 - a * 1
+        return str(int(a - b))
+    if iid == "slq_lrv2_tr_01":
+        return "decreases each year"
+    if iid == "slq_lrv2_tr_02":
+        r = (4700 - 3800) / 3
+        return f"4700-{int(r)}t"
+    if iid == "slq_lrv2_tr_03":
+        return "value at the shift"
+    if iid == "slq_lrv2_tr_04":
+        return "additional hourly fee"
+    if iid == "slq_lrv2_del_01":
+        r = (14400 - 12000) / 4
+        return str(int((12000 - 6000) / r))
+    if iid == "slq_lrv2_del_02":
+        return "95x+225"
+    raise AssertionError(f"unsolved v2 item {iid}")
+
+
 SOLVERS = {
     "sat.alg.linear_rate_remaining": independent_linear_rate,
     "sat.alg.solve_linear_equation": independent_solve_linear,
@@ -241,6 +293,7 @@ SOLVERS = {
     "sat.alg.identity_infinite_solutions": independent_identity,
     "sat.alg.percent_cost_model": independent_percent,
     "sat.alg.translate_words_to_equation": independent_translate,
+    "sat.alg.linear_relationships_v2": independent_linear_relationships_v2,
 }
 
 

@@ -1,0 +1,1666 @@
+{
+  "skill_code": "sat.alg.linear_relationships_v2",
+  "title": "Linear relationships: rate, intercept, and first-plus-additional",
+  "microskill_statement": "Model a linear relationship from words, tables, coordinates, or a formula. Find rate, intercept, a later value or time, and interpret slope, including remaining quantity and first-block plus additional fees.",
+  "status": "draft_pending_teacher_review",
+  "review_gate": "No v2 item may be student-visible until review_status is reviewed and publish_status is published. This pack is not a replacement for sat.alg.linear_rate_remaining.",
+  "blueprint": {
+    "diagnostic": 3,
+    "worked_example": 2,
+    "faded": 3,
+    "independent": 4,
+    "transfer": 4,
+    "delayed": 2,
+    "total": 18
+  },
+  "engine_note": "Current PHASES_B still walks precheck→instruction→faded→independent→transfer→delayed with one skill code. v2 is a local draft family plus path ranking only. Do not seed over v1. Three diagnostic items need an additive precheck-variant loop before production serving; do not migrate the database for that.",
+  "control_arm": {
+    "lesson_slug": "1-2-linear-functions",
+    "practice_url": "/practice/algebra/1_2/0"
+  },
+  "items": [
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "12"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Find bushels per hour from the first 6 hours. Then ask how much still has to leave after that reading.",
+        "critical_hint": "r = 400 bushels/h. After 6 hours, 9,600 remain. To reach 4,800, 4,800 more bushels must leave: 4,800/400 = 12 additional hours, not 18 total hours.",
+        "core_idea": "Additional time uses the later remaining amount as the new starting remaining, not the original start.",
+        "common_mistake": "Reporting total hours from the start (18) when the question asked for additional hours after the snapshot (12).",
+        "explanation_check": "Additional hours = 4,800 ÷ 400 = 12.",
+        "unknown_change": "Unknown is extra hours after a snapshot, not total hours from t = 0."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Find bushels per hour from the first 6 hours. Then ask how much still has to leave after that reading.",
+      "critical_hint": "r = 400 bushels/h. After 6 hours, 9,600 remain. To reach 4,800, 4,800 more bushels must leave: 4,800/400 = 12 additional hours, not 18 total hours.",
+      "core_idea": "Additional time uses the later remaining amount as the new starting remaining, not the original start.",
+      "unknown_change": "Unknown is extra hours after a snapshot, not total hours from t = 0.",
+      "explanation_check": "Additional hours = 4,800 ÷ 400 = 12.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_diag_01",
+      "slot": "diagnostic",
+      "phase": "precheck",
+      "variant_index": 1,
+      "difficulty": "medium",
+      "subskill": "remaining_additional_vs_total",
+      "representation": "word_remaining_additional_hours",
+      "tested_reasoning": "From a start-and-snapshot pair, find the constant rate and the additional hours after the snapshot, not total hours from t=0.",
+      "misconception_tags": [
+        "total_hours_instead_of_additional",
+        "reuse_given_elapsed_time"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A grain silo starts with 12,000 bushels. A conveyor removes grain at a constant rate. After 6 hours, 9,600 bushels remain. How many <strong>additional</strong> hours after that 6-hour reading are needed until 4,800 bushels remain?</p>",
+      "choices": [
+        "6",
+        "9",
+        "12",
+        "18"
+      ],
+      "correct_answer": "C",
+      "correct_math": "12",
+      "distractor_rationale": {
+        "A": "6 is the given elapsed time, not the extra time still needed.",
+        "B": "9 treats the 2,400 bushels removed in 6 hours as if the rate were 800 bushels per hour: (12,000 − 4,800)/800 = 9.",
+        "C": "Correct. Rate is (12,000 − 9,600)/6 = 400 bushels/h. From 9,600 down to 4,800 is 4,800 bushels, so 4,800/400 = 12 additional hours.",
+        "D": "18 is the total hours from the start until 4,800 remain. The question asked for additional hours after hour 6."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Grain removed in 6 hours: 12,000 − 9,600 = 2,400 bushels.",
+          "why": "Remaining = start − removed."
+        },
+        {
+          "step": 2,
+          "do": "Rate r = 2,400 ÷ 6 = 400 bushels per hour.",
+          "why": "Constant rate = change ÷ elapsed time."
+        },
+        {
+          "step": 3,
+          "do": "Still need to remove 9,600 − 4,800 = 4,800 bushels after the snapshot.",
+          "why": "Additional hours start from the later remaining amount."
+        },
+        {
+          "step": 4,
+          "do": "Additional hours = 4,800 ÷ 400 = 12.",
+          "why": "Time = remaining change after the snapshot ÷ rate."
+        }
+      ],
+      "common_mistake": "Reporting total hours from the start (18) when the question asked for additional hours after the snapshot (12).",
+      "transformation_type": "change_context_numbers_keep_additional_vs_total",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "\\( f(x) = 40x + 60 \\)"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "The unknown rate is for hours after the first 3, not for all 7 hours.",
+        "critical_hint": "Extra 4 hours cost $160, so r = 40. Then 180 + 40(x − 3) = 40x + 60.",
+        "core_idea": "First-block + additional is still linear for x at or after the block; the intercept is not the first-block fee.",
+        "common_mistake": "Writing 40x + 180, which charges the opening $180 on top of $40 for every hour including the first three.",
+        "explanation_check": "f(7) = 40(7) + 60 = 340.",
+        "unknown_change": "Unknown is the function, not a single later cost."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "The unknown rate is for hours after the first 3, not for all 7 hours.",
+      "critical_hint": "Extra 4 hours cost $160, so r = 40. Then 180 + 40(x − 3) = 40x + 60.",
+      "core_idea": "First-block + additional is still linear for x at or after the block; the intercept is not the first-block fee.",
+      "unknown_change": "Unknown is the function, not a single later cost.",
+      "explanation_check": "f(7) = 40(7) + 60 = 340.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_diag_02",
+      "slot": "diagnostic",
+      "phase": "precheck",
+      "variant_index": 2,
+      "difficulty": "medium",
+      "subskill": "first_plus_additional",
+      "representation": "word_to_function_first_block",
+      "tested_reasoning": "Convert a first-block fee plus a later hourly fee into slope-intercept form for x at or after the first block.",
+      "misconception_tags": [
+        "use_first_block_as_intercept",
+        "average_rate_as_slope"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A plumber charges \\(\\$180\\) for the first 3 hours and a constant hourly fee for each additional hour. The total cost for 7 hours is \\(\\$340\\). Which function \\( f \\) gives the total cost, in dollars, for \\( x \\) hours, where \\( x \\geq 3 \\)?</p>",
+      "choices": [
+        "\\( f(x) = 40x + 60 \\)",
+        "\\( f(x) = 40x + 180 \\)",
+        "\\( f(x) = 40x \\)",
+        "\\( f(x) = 60x \\)"
+      ],
+      "correct_answer": "A",
+      "correct_math": "40x+60",
+      "distractor_rationale": {
+        "A": "Correct. Extra 4 hours cost 340 − 180 = 160, so the hourly fee is 40. Then f(x) = 180 + 40(x − 3) = 40x + 60.",
+        "B": "Keeps the first-block fee as the intercept without subtracting the 3 hours already paid: 40x + 180 overcharges those 3 hours.",
+        "C": "Uses the additional hourly fee as if there were no first-block surcharge.",
+        "D": "Uses 180/3 = 60 as if every hour cost the first-block average."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Additional hours in the 7-hour job: 7 − 3 = 4.",
+          "why": "The first 3 hours are the opening block, not extra hours."
+        },
+        {
+          "step": 2,
+          "do": "Cost of those 4 hours: 340 − 180 = 160, so the hourly fee is 160/4 = 40.",
+          "why": "Only the extra hours carry the unknown rate."
+        },
+        {
+          "step": 3,
+          "do": "f(x) = 180 + 40(x − 3) = 40x + 60.",
+          "why": "Rewrite so the slope applies to every hour after distributing the first-block adjustment."
+        },
+        {
+          "step": 4,
+          "do": "Check: f(3) = 180 and f(7) = 340.",
+          "why": "Both given points must lie on the model."
+        }
+      ],
+      "common_mistake": "Writing 40x + 180, which charges the opening $180 on top of $40 for every hour including the first three.",
+      "transformation_type": "change_context_numbers_keep_first_plus_additional",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 0,
+      "source_stem_hash": "8af6d2260e5292fb",
+      "source_display_number": 14
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "The average fare on July 1",
+        "value at the shift"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Ask what t makes the (t − 6) term disappear.",
+        "critical_hint": "t = 6 cancels the second term, so 8.60 is the July 1 fare, not January 1 and not the slope.",
+        "core_idea": "In a rewritten linear form, the displayed constant is the value at the shift point.",
+        "common_mistake": "Reading 8.60 as the January intercept H(0) instead of the shifted evaluation H(6).",
+        "explanation_check": "H(6) = 8.60 − 0.20(0) = 8.60.",
+        "unknown_change": "Unknown is the meaning of a constant, not a computed later value."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Ask what t makes the (t − 6) term disappear.",
+      "critical_hint": "t = 6 cancels the second term, so 8.60 is the July 1 fare, not January 1 and not the slope.",
+      "core_idea": "In a rewritten linear form, the displayed constant is the value at the shift point.",
+      "unknown_change": "Unknown is the meaning of a constant, not a computed later value.",
+      "explanation_check": "H(6) = 8.60 − 0.20(0) = 8.60.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_diag_03",
+      "slot": "diagnostic",
+      "phase": "precheck",
+      "variant_index": 3,
+      "difficulty": "hard",
+      "subskill": "read_rewritten_linear_form",
+      "representation": "function_shifted_form_constant",
+      "tested_reasoning": "In H(t) = a − b(t − k), the constant a is H(k), not H(0) and not the slope.",
+      "misconception_tags": [
+        "constant_is_intercept_at_zero",
+        "constant_is_slope"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The average fare, in dollars, \\( t \\) months after January 1 is modeled by</p><div class=\"stem-math-block\">\\[ H(t) = 8.60 - 0.20(t - 6) \\]</div><p>The constant 8.60 in this function estimates which of the following?</p>",
+      "choices": [
+        "The average monthly decrease in the fare",
+        "The average fare on January 1",
+        "The average fare on July 1",
+        "The total change in the fare from January 1 to July 1"
+      ],
+      "correct_answer": "C",
+      "correct_math": "value at the shift",
+      "distractor_rationale": {
+        "A": "The monthly decrease is the 0.20 coefficient, not the 8.60 constant.",
+        "B": "H(0) = 8.60 − 0.20(0 − 6) = 9.80, so 8.60 is not the January value.",
+        "C": "Correct. Substituting t = 6 (six months after January 1, i.e. July 1) leaves H(6) = 8.60.",
+        "D": "The six-month change is 0.20 × 6 = 1.20, not 8.60."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "The form a − b(t − k) is the point-slope idea: when t = k, the second term is 0.",
+          "why": "The constant is the function value at the shift point, not at t = 0."
+        },
+        {
+          "step": 2,
+          "do": "Here k = 6, so 8.60 = H(6).",
+          "why": "t is months after January 1, so t = 6 is July 1."
+        },
+        {
+          "step": 3,
+          "do": "H(0) = 8.60 + 1.20 = 9.80, which is a distractor.",
+          "why": "Rewriting does not make 8.60 the vertical intercept."
+        }
+      ],
+      "common_mistake": "Reading 8.60 as the January intercept H(0) instead of the shifted evaluation H(6).",
+      "transformation_type": "change_context_keep_shifted_form_interpretation",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 5,
+      "source_stem_hash": "ef70f1766e566cb3",
+      "source_display_number": 19
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "4,000"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "The table is remaining quantity. Subtract rate × 12 from the t = 0 remaining.",
+        "critical_hint": "r = 200 L/h. Remaining at 12 hours is 6,400 − 2,400 = 4,000, not 2,400 removed.",
+        "core_idea": "A remaining-quantity table still encodes Q(t) = Q0 − r t.",
+        "common_mistake": "Reporting the 2,400 liters that left instead of the 4,000 liters that remain.",
+        "explanation_check": "6,400 − 200×12 = 4,000.",
+        "unknown_change": "Unknown is remaining at a later time, from a table rather than a word snapshot."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "The table is remaining quantity. Subtract rate × 12 from the t = 0 remaining.",
+      "critical_hint": "r = 200 L/h. Remaining at 12 hours is 6,400 − 2,400 = 4,000, not 2,400 removed.",
+      "core_idea": "A remaining-quantity table still encodes Q(t) = Q0 − r t.",
+      "unknown_change": "Unknown is remaining at a later time, from a table rather than a word snapshot.",
+      "explanation_check": "6,400 − 200×12 = 4,000.",
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_ex_01",
+      "slot": "worked_example",
+      "phase": "instruction",
+      "variant_index": 1,
+      "difficulty": "easy",
+      "subskill": "remaining_from_table",
+      "representation": "table_remaining_to_later_value",
+      "tested_reasoning": "Read r from a remaining-quantity table, then evaluate remaining at a later time.",
+      "misconception_tags": [
+        "report_removed_instead_of_remaining"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A holding tank is drained at a constant rate. The table shows remaining liters after \\( t \\) hours.</p><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\( t \\)</th><th>0</th><th>4</th><th>8</th></tr></thead><tbody><tr><td>Remaining liters</td><td>6,400</td><td>5,600</td><td>4,800</td></tr></tbody></table></div><p>If the rate continues, how many liters remain at \\( t = 12 \\)?</p>",
+      "choices": [
+        "2,400",
+        "3,200",
+        "4,000",
+        "4,800"
+      ],
+      "correct_answer": "C",
+      "correct_math": "4000",
+      "distractor_rationale": {
+        "A": "2,400 is the amount removed in 12 hours, not the amount remaining.",
+        "B": "3,200 would be remaining at t = 16, or 6,400 − 200×16.",
+        "C": "Correct. Rate is (6,400 − 5,600)/4 = 200 L/h, so remaining at t = 12 is 6,400 − 200×12 = 4,000.",
+        "D": "4,800 is the table value at t = 8, not at t = 12."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "From t = 0 to t = 4, remaining falls 800 liters, so r = 200 L/h.",
+          "why": "A table of remaining quantity still gives slope as change ÷ time."
+        },
+        {
+          "step": 2,
+          "do": "Check the next interval: 5,600 to 4,800 in 4 hours is also 200 L/h.",
+          "why": "Constant rate must match every equal time step."
+        },
+        {
+          "step": 3,
+          "do": "Remaining at t = 12: 6,400 − 200×12 = 4,000.",
+          "why": "Q(t) = Q0 − r t."
+        }
+      ],
+      "common_mistake": "Reporting the 2,400 liters that left instead of the 4,000 liters that remain.",
+      "transformation_type": "table_representation_of_remaining_rate",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "\\( C(h) = 35h + 50 \\)"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Write opening fee plus $35 times the hours after hour 2, then expand.",
+        "critical_hint": "120 + 35(h − 2) = 35h + 50. C(2) must equal 120, which rules out 35h + 120.",
+        "core_idea": "First + additional rewrites to mh + b with b smaller than the opening fee.",
+        "common_mistake": "Writing 35h + 120, which double-counts the first two hours.",
+        "explanation_check": "C(2) = 70 + 50 = 120.",
+        "unknown_change": "Unknown is the cost function, not a single total."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Write opening fee plus $35 times the hours after hour 2, then expand.",
+      "critical_hint": "120 + 35(h − 2) = 35h + 50. C(2) must equal 120, which rules out 35h + 120.",
+      "core_idea": "First + additional rewrites to mh + b with b smaller than the opening fee.",
+      "unknown_change": "Unknown is the cost function, not a single total.",
+      "explanation_check": "C(2) = 70 + 50 = 120.",
+      "path_tags": [
+        "foundation"
+      ],
+      "id": "slq_lrv2_ex_02",
+      "slot": "worked_example",
+      "phase": "instruction",
+      "variant_index": 2,
+      "difficulty": "easy",
+      "subskill": "first_plus_additional",
+      "representation": "word_to_function_first_block",
+      "tested_reasoning": "Write C(h) = first fee + additional rate × extra hours, then rewrite in slope-intercept form.",
+      "misconception_tags": [
+        "use_first_block_as_intercept"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A recording studio charges \\(\\$120\\) for the first 2 hours and \\(\\$35\\) for each additional hour. Which function \\( C \\) gives the total cost, in dollars, for \\( h \\) hours, where \\( h \\geq 2 \\)?</p>",
+      "choices": [
+        "\\( C(h) = 35h + 50 \\)",
+        "\\( C(h) = 35h + 120 \\)",
+        "\\( C(h) = 60h \\)",
+        "\\( C(h) = 35h + 70 \\)"
+      ],
+      "correct_answer": "A",
+      "correct_math": "35h+50",
+      "distractor_rationale": {
+        "A": "Correct. C(h) = 120 + 35(h − 2) = 35h + 50. Check: C(2) = 120.",
+        "B": "Adds $35 to every hour including the first two, then still adds the $120 block.",
+        "C": "Uses 120/2 = 60 as if every hour cost the opening average.",
+        "D": "120 − 35× something leftover (120 − 50 = 70) without a consistent rewrite."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Extra hours after the opening block: h − 2.",
+          "why": "The $35 fee applies only after hour 2."
+        },
+        {
+          "step": 2,
+          "do": "C(h) = 120 + 35(h − 2).",
+          "why": "Opening fee plus additional rate times extra hours."
+        },
+        {
+          "step": 3,
+          "do": "Expand: 120 + 35h − 70 = 35h + 50.",
+          "why": "Slope-intercept form is easier to compare with choices."
+        }
+      ],
+      "common_mistake": "Writing 35h + 120, which double-counts the first two hours.",
+      "transformation_type": "change_context_numbers_keep_first_plus_additional",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 0,
+      "source_stem_hash": "8af6d2260e5292fb",
+      "source_display_number": 14
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [],
+      "faded": {
+        "blanks": [
+          {
+            "id": "rate",
+            "prompt": "Drain rate, in liters per hour",
+            "correct": "200",
+            "alternates": [
+              "200 L/h",
+              "200 liters per hour"
+            ]
+          },
+          {
+            "id": "total_hours",
+            "prompt": "Total hours from the start until 1,500 liters remain",
+            "correct": "15",
+            "alternates": [
+              "15 hours"
+            ]
+          }
+        ],
+        "given_steps": [
+          {
+            "label": "Start",
+            "text": "4,500 liters at t = 0"
+          },
+          {
+            "label": "Snapshot",
+            "text": "3,500 liters remain after 5 hours"
+          },
+          {
+            "label": "Target",
+            "text": "1,500 liters remaining"
+          }
+        ],
+        "light_hint": "First fill the liters-per-hour rate. Then ask how many liters must leave from 4,500 down to 1,500.",
+        "critical_hint": "Rate 200 L/h. From 4,500 to 1,500 is 3,000 liters, so 15 hours from the start, not 10 extra hours.",
+        "core_idea": "Total hours use Q0; additional hours would have used the snapshot remaining.",
+        "common_mistake": "Reporting 10 additional hours after the snapshot when the question asked for 15 total hours.",
+        "explanation_check": "3,000 ÷ 200 = 15.",
+        "unknown_change": "Unknown is total hours from t = 0, with rate filled first."
+      },
+      "blanks": [
+        {
+          "id": "rate",
+          "prompt": "Drain rate, in liters per hour",
+          "correct": "200",
+          "alternates": [
+            "200 L/h",
+            "200 liters per hour"
+          ]
+        },
+        {
+          "id": "total_hours",
+          "prompt": "Total hours from the start until 1,500 liters remain",
+          "correct": "15",
+          "alternates": [
+            "15 hours"
+          ]
+        }
+      ],
+      "given_steps": [
+        {
+          "label": "Start",
+          "text": "4,500 liters at t = 0"
+        },
+        {
+          "label": "Snapshot",
+          "text": "3,500 liters remain after 5 hours"
+        },
+        {
+          "label": "Target",
+          "text": "1,500 liters remaining"
+        }
+      ],
+      "light_hint": "First fill the liters-per-hour rate. Then ask how many liters must leave from 4,500 down to 1,500.",
+      "critical_hint": "Rate 200 L/h. From 4,500 to 1,500 is 3,000 liters, so 15 hours from the start, not 10 extra hours.",
+      "core_idea": "Total hours use Q0; additional hours would have used the snapshot remaining.",
+      "unknown_change": "Unknown is total hours from t = 0, with rate filled first.",
+      "explanation_check": "3,000 ÷ 200 = 15.",
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_faded_01",
+      "slot": "faded",
+      "phase": "faded",
+      "variant_index": 1,
+      "difficulty": "easy",
+      "subskill": "remaining_total_hours",
+      "representation": "word_remaining_total_hours",
+      "tested_reasoning": "Find the drain rate from a snapshot, then the total hours from the start until a later remaining amount.",
+      "misconception_tags": [
+        "additional_when_total_asked"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A cooling vat starts with 4,500 liters. After 5 hours, 3,500 liters remain. The drain rate stays constant. How many hours from the start will it take until 1,500 liters remain?</p>",
+      "choices": [],
+      "correct_answer": "",
+      "correct_math": "15",
+      "distractor_rationale": {},
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 5 hours: 4,500 − 3,500 = 1,000 liters.",
+          "why": "Rate needs the change, not the remaining amount."
+        },
+        {
+          "step": 2,
+          "do": "Rate = 1,000/5 = 200 L/h.",
+          "why": "Constant rate = change ÷ time."
+        },
+        {
+          "step": 3,
+          "do": "To reach 1,500 remaining, 4,500 − 1,500 = 3,000 liters must leave.",
+          "why": "Total hours are measured from the original start."
+        },
+        {
+          "step": 4,
+          "do": "Total hours = 3,000/200 = 15.",
+          "why": "Time = total change from Q0 ÷ rate."
+        }
+      ],
+      "common_mistake": "Reporting 10 additional hours after the snapshot when the question asked for 15 total hours.",
+      "transformation_type": "scaffold_remaining_total_hours_clean_numbers",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [],
+      "faded": {
+        "blanks": [
+          {
+            "id": "removed_amount",
+            "prompt": "Liters removed in 6 hours",
+            "correct": "840",
+            "alternates": [
+              "840 liters"
+            ]
+          },
+          {
+            "id": "start_amount",
+            "prompt": "Starting amount, in liters",
+            "correct": "2520",
+            "alternates": [
+              "2,520",
+              "2520 liters"
+            ]
+          }
+        ],
+        "given_steps": [
+          {
+            "label": "Rate",
+            "text": "140 L/h leaving"
+          },
+          {
+            "label": "Snapshot",
+            "text": "1,680 liters remain after 6 hours"
+          }
+        ],
+        "light_hint": "The tank lost a known amount each hour. Add that loss back to the remaining amount.",
+        "critical_hint": "Removed = 140 × 6 = 840. Start = 1,680 + 840 = 2,520.",
+        "core_idea": "Q0 = Q(t) + r t when remaining is given and rate is known.",
+        "common_mistake": "Subtracting 840 from 1,680 and reporting 840 as the start.",
+        "explanation_check": "2,520 − 140×6 = 1,680.",
+        "unknown_change": "Unknown is the initial amount, not a later remaining amount."
+      },
+      "blanks": [
+        {
+          "id": "removed_amount",
+          "prompt": "Liters removed in 6 hours",
+          "correct": "840",
+          "alternates": [
+            "840 liters"
+          ]
+        },
+        {
+          "id": "start_amount",
+          "prompt": "Starting amount, in liters",
+          "correct": "2520",
+          "alternates": [
+            "2,520",
+            "2520 liters"
+          ]
+        }
+      ],
+      "given_steps": [
+        {
+          "label": "Rate",
+          "text": "140 L/h leaving"
+        },
+        {
+          "label": "Snapshot",
+          "text": "1,680 liters remain after 6 hours"
+        }
+      ],
+      "light_hint": "The tank lost a known amount each hour. Add that loss back to the remaining amount.",
+      "critical_hint": "Removed = 140 × 6 = 840. Start = 1,680 + 840 = 2,520.",
+      "core_idea": "Q0 = Q(t) + r t when remaining is given and rate is known.",
+      "unknown_change": "Unknown is the initial amount, not a later remaining amount.",
+      "explanation_check": "2,520 − 140×6 = 1,680.",
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_faded_02",
+      "slot": "faded",
+      "phase": "faded",
+      "variant_index": 2,
+      "difficulty": "medium",
+      "subskill": "remaining_reverse_initial",
+      "representation": "word_reverse_start_amount",
+      "tested_reasoning": "Recover the starting amount from a later remaining amount and a known rate.",
+      "misconception_tags": [
+        "subtract_instead_of_add_back"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A brine tank is emptied at 140 liters per hour. After 6 hours, 1,680 liters remain. What was the starting amount, in liters?</p>",
+      "choices": [],
+      "correct_answer": "",
+      "correct_math": "2520",
+      "distractor_rationale": {},
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 6 hours: 140 × 6 = 840 liters.",
+          "why": "Removed = rate × time."
+        },
+        {
+          "step": 2,
+          "do": "Start = remaining + removed = 1,680 + 840 = 2,520.",
+          "why": "Remaining = start − removed, so add the removed amount back."
+        }
+      ],
+      "common_mistake": "Subtracting 840 from 1,680 and reporting 840 as the start.",
+      "transformation_type": "scaffold_reverse_initial_from_rate_and_snapshot",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [],
+      "faded": {
+        "blanks": [
+          {
+            "id": "extra_people",
+            "prompt": "Number of additional visitors after the first 20",
+            "correct": "7",
+            "alternates": [
+              "7 people"
+            ]
+          },
+          {
+            "id": "total_cost",
+            "prompt": "Total charge, in dollars",
+            "correct": "363",
+            "alternates": [
+              "$363"
+            ]
+          }
+        ],
+        "given_steps": [
+          {
+            "label": "First block",
+            "text": "$15 each for the first 20 visitors"
+          },
+          {
+            "label": "Additional",
+            "text": "$9 for each visitor after the 20th"
+          }
+        ],
+        "light_hint": [
+          "How many visitors come after the opening group of 20?"
+        ],
+        "critical_hint": [
+          "7 extra visitors. 300 + 63 = 363, not 15×27."
+        ],
+        "core_idea": "Additional fees start after the first block.",
+        "common_mistake": [
+          "Computing 15×27 = 405, which charges every visitor the first-block price."
+        ],
+        "explanation_check": [
+          "300 + 63 = 363."
+        ],
+        "unknown_change": "Unknown is a total cost from a first + additional rule."
+      },
+      "blanks": [
+        {
+          "id": "extra_people",
+          "prompt": "Number of additional visitors after the first 20",
+          "correct": "7",
+          "alternates": [
+            "7 people"
+          ]
+        },
+        {
+          "id": "total_cost",
+          "prompt": "Total charge, in dollars",
+          "correct": "363",
+          "alternates": [
+            "$363"
+          ]
+        }
+      ],
+      "given_steps": [
+        {
+          "label": "First block",
+          "text": "$15 each for the first 20 visitors"
+        },
+        {
+          "label": "Additional",
+          "text": "$9 for each visitor after the 20th"
+        }
+      ],
+      "light_hint": [
+        "How many visitors come after the opening group of 20?"
+      ],
+      "critical_hint": [
+        "7 extra visitors. 300 + 63 = 363, not 15×27."
+      ],
+      "core_idea": "Additional fees start after the first block.",
+      "unknown_change": "Unknown is a total cost from a first + additional rule.",
+      "explanation_check": [
+        "300 + 63 = 363."
+      ],
+      "path_tags": [
+        "foundation"
+      ],
+      "id": "slq_lrv2_faded_03",
+      "slot": "faded",
+      "phase": "faded",
+      "variant_index": 3,
+      "difficulty": "easy",
+      "subskill": "first_plus_additional",
+      "representation": "word_first_block_total_cost",
+      "tested_reasoning": "Count extra days after the first block, then add the additional fee.",
+      "misconception_tags": [
+        "charge_additional_for_first_block"
+      ],
+      "question_kind": "faded",
+      "stem_html": "<p>A community gallery charges \\(\\$15\\) per person for the first 20 visitors and \\(\\$9\\) for each additional visitor. What is the total charge, in dollars, for a group of 27 people?</p>",
+      "choices": [],
+      "correct_answer": "",
+      "correct_math": "363",
+      "distractor_rationale": {},
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Additional visitors: 27 − 20 = 7.",
+          "why": "The $9 fee applies only after the first 20."
+        },
+        {
+          "step": 2,
+          "do": "Total = 15×20 + 9×7 = 300 + 63 = 363.",
+          "why": "First-block total plus additional unit fee times extra people."
+        }
+      ],
+      "common_mistake": [
+        "Computing 15×27 = 405, which charges every visitor the first-block price."
+      ],
+      "transformation_type": "scaffold_first_plus_additional_total",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 14,
+      "source_stem_hash": "761c13f762e7b7b0",
+      "source_display_number": 28
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "1,800"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "The coordinates are (time, remaining). Slope between them is the drain rate.",
+        "critical_hint": "r = 200 kg/h. Nine hours after t = 4: 3,600 − 1,800 = 1,800 remaining.",
+        "core_idea": "Two remaining-quantity points fix r, then Q(t) = Q(t0) − r(t − t0).",
+        "common_mistake": "Using 13 − 10 = 3 hours from the later point but then subtracting 200×2, landing on 2,000.",
+        "explanation_check": "From t = 10: 2,400 − 200×3 = 1,800.",
+        "unknown_change": "Unknown is remaining at a new time, from coordinates rather than a table or opening snapshot."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "The coordinates are (time, remaining). Slope between them is the drain rate.",
+      "critical_hint": "r = 200 kg/h. Nine hours after t = 4: 3,600 − 1,800 = 1,800 remaining.",
+      "core_idea": "Two remaining-quantity points fix r, then Q(t) = Q(t0) − r(t − t0).",
+      "unknown_change": "Unknown is remaining at a new time, from coordinates rather than a table or opening snapshot.",
+      "explanation_check": "From t = 10: 2,400 − 200×3 = 1,800.",
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_ind_01",
+      "slot": "independent",
+      "phase": "independent",
+      "variant_index": 1,
+      "difficulty": "medium",
+      "subskill": "remaining_from_coordinates",
+      "representation": "coordinates_remaining_later_value",
+      "tested_reasoning": "From two remaining-quantity points, find the rate and remaining at a later time. Sentence order differs from the worked table example.",
+      "misconception_tags": [
+        "use_wrong_time_interval"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A surveyor records remaining mass, in kilograms, at two times: \\( (4, 3600) \\) and \\( (10, 2400) \\), where the first coordinate is hours from the start. If the decrease stays linear, what remaining mass, in kilograms, should the surveyor record at 13 hours?</p>",
+      "choices": [
+        "1,600",
+        "1,800",
+        "2,000",
+        "2,400"
+      ],
+      "correct_answer": "B",
+      "correct_math": "1800",
+      "distractor_rationale": {
+        "A": "1,600 uses a 10-hour gap from t = 4 instead of 9 hours: 3,600 − 200×10.",
+        "B": "Correct. Rate = (3,600 − 2,400)/(10 − 4) = 200 kg/h. From t = 4 to t = 13 is 9 hours, so 3,600 − 200×9 = 1,800.",
+        "C": "2,000 is remaining at t = 12, one hour early: 2,400 − 200×2.",
+        "D": "2,400 is the given remaining at t = 10."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Rate = (3,600 − 2,400)/(10 − 4) = 200 kg/h.",
+          "why": "Two remaining points determine the constant decrease."
+        },
+        {
+          "step": 2,
+          "do": "From t = 4 to t = 13 is 9 hours.",
+          "why": "Use the nearer given point to reduce arithmetic."
+        },
+        {
+          "step": 3,
+          "do": "3,600 − 200×9 = 1,800.",
+          "why": "Remaining decreases by the rate each hour."
+        }
+      ],
+      "common_mistake": "Using 13 − 10 = 3 hours from the later point but then subtracting 200×2, landing on 2,000.",
+      "transformation_type": "change_representation_to_coordinates",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "14"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Set the formula equal to 2,000 and solve for t.",
+        "critical_hint": "7,600 − 2,000 = 5,600 gallons must leave. 5,600/400 = 14 hours.",
+        "core_idea": "When remaining is given as R(t), a target remaining is an equation for t.",
+        "common_mistake": "Evaluating R(2000) or dividing 7,600 by 400 and reporting time-to-empty.",
+        "explanation_check": "R(14) = 7,600 − 5,600 = 2,000.",
+        "unknown_change": "Unknown is time, not remaining."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Set the formula equal to 2,000 and solve for t.",
+      "critical_hint": "7,600 − 2,000 = 5,600 gallons must leave. 5,600/400 = 14 hours.",
+      "core_idea": "When remaining is given as R(t), a target remaining is an equation for t.",
+      "unknown_change": "Unknown is time, not remaining.",
+      "explanation_check": "R(14) = 7,600 − 5,600 = 2,000.",
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_ind_02",
+      "slot": "independent",
+      "phase": "independent",
+      "variant_index": 2,
+      "difficulty": "medium",
+      "subskill": "remaining_solve_for_time",
+      "representation": "function_remaining_solve_time",
+      "tested_reasoning": "Given remaining as a closed-form function, solve for the time when remaining hits a target.",
+      "misconception_tags": [
+        "evaluate_function_instead_of_solving"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Remaining gallons in a cistern are modeled by \\( R(t) = 7{,}600 - 400t \\), where \\( t \\) is hours after pumping begins. After how many hours will 2,000 gallons remain?</p>",
+      "choices": [
+        "12",
+        "14",
+        "16",
+        "19"
+      ],
+      "correct_answer": "B",
+      "correct_math": "14",
+      "distractor_rationale": {
+        "A": "12 would be the time to reach 2,800 gallons: (7,600 − 2,800)/400.",
+        "B": "Correct. 7,600 − 400t = 2,000 → 400t = 5,600 → t = 14.",
+        "C": "16 would reach 1,200 gallons, or 7,600/400 − 3.",
+        "D": "19 is 7,600/400, the time to empty the cistern completely."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Set 7,600 − 400t = 2,000.",
+          "why": "The unknown is time, so solve the equation; do not plug in t = 2,000."
+        },
+        {
+          "step": 2,
+          "do": "400t = 5,600, so t = 14.",
+          "why": "Change in remaining ÷ rate."
+        }
+      ],
+      "common_mistake": "Evaluating R(2000) or dividing 7,600 by 400 and reporting time-to-empty.",
+      "transformation_type": "change_unknown_to_time_from_function",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "7,500"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Find tickets lost per dollar, then move $10 from the $30 point.",
+        "critical_hint": "m = −150. Ten dollars above $30 removes 1,500 tickets: 9,000 − 1,500 = 7,500.",
+        "core_idea": "Two points determine a linear model; a new input is not automatically the average of the outputs.",
+        "common_mistake": "Averaging the two given demands to 7,500's neighbor 7,000, or reversing the slope sign.",
+        "explanation_check": "From $50: 6,000 + 150×10 = 7,500.",
+        "unknown_change": "Unknown is demand at a new price, not a remaining-quantity time."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Find tickets lost per dollar, then move $10 from the $30 point.",
+      "critical_hint": "m = −150. Ten dollars above $30 removes 1,500 tickets: 9,000 − 1,500 = 7,500.",
+      "core_idea": "Two points determine a linear model; a new input is not automatically the average of the outputs.",
+      "unknown_change": "Unknown is demand at a new price, not a remaining-quantity time.",
+      "explanation_check": "From $50: 6,000 + 150×10 = 7,500.",
+      "path_tags": [
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_ind_03",
+      "slot": "independent",
+      "phase": "independent",
+      "variant_index": 3,
+      "difficulty": "medium",
+      "subskill": "linear_interpolation_two_points",
+      "representation": "word_two_points_evaluate",
+      "tested_reasoning": "Build a linear demand model from two (price, quantity) points and evaluate at a new price.",
+      "misconception_tags": [
+        "midpoint_instead_of_linear_model"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A box office models ticket demand \\( Q \\) as a linear function of price \\( P \\). Demand is 9,000 tickets when the price is \\(\\$30\\) and 6,000 tickets when the price is \\(\\$50\\). Based on the model, what is the demand when the price is \\(\\$40\\)?</p>",
+      "choices": [
+        "6,500",
+        "7,000",
+        "7,500",
+        "8,000"
+      ],
+      "correct_answer": "C",
+      "correct_math": "7500",
+      "distractor_rationale": {
+        "A": "6,500 under-subtracts as if the slope were −250 per dollar from $30.",
+        "B": "7,000 is the midpoint of 9,000 and 6,000, which would be correct only at the midpoint price $40 if the relationship were listed as an average of the two given demands without slope — here it happens to be the midpoint price, but 7,000 ignores that $40 is halfway and the drop from 9,000 to 6,000 is 3,000 over $20, so half is 1,500, giving 7,500 not 7,000.",
+        "C": "Correct. Slope = (6,000 − 9,000)/(50 − 30) = −150 tickets per dollar. From $30 to $40: 9,000 − 150×10 = 7,500.",
+        "D": "8,000 subtracts only 1,000, as if each $10 drop in price raised demand by 1,000 the wrong direction or used a slope of −100."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Slope m = (6,000 − 9,000)/(50 − 30) = −150.",
+          "why": "Demand falls as price rises."
+        },
+        {
+          "step": 2,
+          "do": "From P = 30 to P = 40 is +10 dollars: 9,000 − 150×10 = 7,500.",
+          "why": "Evaluate using a known point plus slope × change in P."
+        }
+      ],
+      "common_mistake": "Averaging the two given demands to 7,500's neighbor 7,000, or reversing the slope sign.",
+      "transformation_type": "change_context_to_price_demand_keep_two_point_line",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 1,
+      "source_stem_hash": "64eb851c2793baf8",
+      "source_display_number": 15
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "−2"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Find the slope from any two rows, then the intercept, then subtract.",
+        "critical_hint": "a = 3 and b = 5, so a − b = −2. 8 is f(1), not the answer.",
+        "core_idea": "A linear table gives both slope and intercept; read the question’s combination.",
+        "common_mistake": "Stopping after finding the slope 3 or the intercept 5.",
+        "explanation_check": "f(x) = 3x + 5; f(5) = 20 matches the table; 3 − 5 = −2.",
+        "unknown_change": "Unknown is a − b from a table, not a remaining amount."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Find the slope from any two rows, then the intercept, then subtract.",
+      "critical_hint": "a = 3 and b = 5, so a − b = −2. 8 is f(1), not the answer.",
+      "core_idea": "A linear table gives both slope and intercept; read the question’s combination.",
+      "unknown_change": "Unknown is a − b from a table, not a remaining amount.",
+      "explanation_check": "f(x) = 3x + 5; f(5) = 20 matches the table; 3 − 5 = −2.",
+      "path_tags": [
+        "advanced"
+      ],
+      "id": "slq_lrv2_ind_04",
+      "slot": "independent",
+      "phase": "independent",
+      "variant_index": 4,
+      "difficulty": "hard",
+      "subskill": "table_slope_and_intercept",
+      "representation": "table_compute_a_minus_b",
+      "tested_reasoning": "From a linear table, read slope a and intercept b, then compute a − b. Not a remaining-quantity story.",
+      "misconception_tags": [
+        "report_slope_or_intercept_instead_of_combination"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>For the linear function \\( f \\), the table shows three values of \\( x \\) and \\( f(x) \\). Function \\( f \\) is defined by \\( f(x) = ax + b \\). What is the value of \\( a - b \\)?</p><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\( x \\)</th><th>\\( f(x) \\)</th></tr></thead><tbody><tr><td>1</td><td>8</td></tr><tr><td>3</td><td>14</td></tr><tr><td>5</td><td>20</td></tr></tbody></table></div>",
+      "choices": [
+        "−2",
+        "3",
+        "5",
+        "8"
+      ],
+      "correct_answer": "A",
+      "correct_math": "-2",
+      "distractor_rationale": {
+        "A": "Correct. Slope a = (14 − 8)/(3 − 1) = 3. Then 8 = 3(1) + b so b = 5. a − b = 3 − 5 = −2.",
+        "B": "3 is the slope a, not a − b.",
+        "C": "5 is the intercept b, not a − b.",
+        "D": "8 is the table value f(1), not a − b."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "a = (14 − 8)/(3 − 1) = 3.",
+          "why": "Equal x-steps of 2 raise f by 6, confirming slope 3."
+        },
+        {
+          "step": 2,
+          "do": "f(1) = 3 + b = 8, so b = 5.",
+          "why": "Use one point to recover the intercept."
+        },
+        {
+          "step": 3,
+          "do": "a − b = 3 − 5 = −2.",
+          "why": "The question asked for the combination, not a or b alone."
+        }
+      ],
+      "common_mistake": "Stopping after finding the slope 3 or the intercept 5.",
+      "transformation_type": "change_unknown_to_slope_intercept_combination",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 6,
+      "source_stem_hash": "3c8f0c4a65fbba5f",
+      "source_display_number": 20
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "decreases 0.3 per year",
+        "The output decreases by 0.3 million barrels each year",
+        "decreases each year"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": [
+          "Which number is the starting output, and which number is the yearly change?"
+        ],
+        "critical_hint": [
+          "6.5 is 2008 output. −0.3 is the yearly decrease, not an increase and not a time."
+        ],
+        "core_idea": [
+          "A negative slope on a production model is decrease per unit time."
+        ],
+        "common_mistake": [
+          "Reading −0.3 as the 2008 starting output, which is 6.5."
+        ],
+        "explanation_check": [
+          "f(1) − f(0) = 6.2 − 6.5 = −0.3."
+        ],
+        "unknown_change": [
+          "Unknown is the meaning of the slope, from a function rather than a remaining-quantity calculation."
+        ]
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": [
+        "Which number is the starting output, and which number is the yearly change?"
+      ],
+      "critical_hint": [
+        "6.5 is 2008 output. −0.3 is the yearly decrease, not an increase and not a time."
+      ],
+      "core_idea": [
+        "A negative slope on a production model is decrease per unit time."
+      ],
+      "unknown_change": [
+        "Unknown is the meaning of the slope, from a function rather than a remaining-quantity calculation."
+      ],
+      "explanation_check": [
+        "f(1) − f(0) = 6.2 − 6.5 = −0.3."
+      ],
+      "path_tags": [
+        "foundation",
+        "standard"
+      ],
+      "id": "slq_lrv2_tr_01",
+      "slot": "transfer",
+      "phase": "transfer",
+      "variant_index": 1,
+      "difficulty": "medium",
+      "subskill": "negative_slope_meaning",
+      "representation": "function_negative_slope_meaning",
+      "tested_reasoning": "Interpret the negative coefficient in a decreasing linear production model as decrease per year, not intercept.",
+      "misconception_tags": [
+        "slope_is_intercept",
+        "drop_the_sign"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A region’s oil output, in millions of barrels, \\( t \\) years after 2008 is modeled by \\( f(t) = 6.5 - 0.3t \\). Which statement describes the \\( -0.3 \\) in this model?</p>",
+      "choices": [
+        "The output in 2008, in millions of barrels",
+        "The output increases by 0.3 million barrels each year",
+        "The number of years until output reaches 0.3 million barrels",
+        "The output decreases by 0.3 million barrels each year"
+      ],
+      "correct_answer": "D",
+      "correct_math": "decreases each year",
+      "distractor_rationale": {
+        "A": "6.5 is the 2008 intercept, not the −0.3 coefficient.",
+        "B": "Ignores the minus sign and treats the coefficient as growth.",
+        "C": "Reads 0.3 as a target output rather than a yearly rate.",
+        "D": "Correct. Slope is the signed yearly change: −0.3 means output falls 0.3 million barrels per year."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "In f(t) = 6.5 − 0.3t, 6.5 is f(0) and −0.3 is the slope.",
+          "why": "Slope is change in output per year."
+        },
+        {
+          "step": 2,
+          "do": "The minus sign means output falls 0.3 million barrels each year.",
+          "why": "Do not drop the sign or confuse slope with intercept."
+        }
+      ],
+      "common_mistake": [
+        "Reading −0.3 as the 2008 starting output, which is 6.5."
+      ],
+      "transformation_type": "change_context_numbers_keep_negative_slope_meaning",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 7,
+      "source_stem_hash": "a19ae5800a819ac9",
+      "source_display_number": 21
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "\\( R(t) = 4{,}700 - 300t \\)"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "The intercept is remaining at t = 0. The slope is negative.",
+        "critical_hint": "r = 300. R(t) = 4,700 − 300t, not 3,800 − 300t.",
+        "core_idea": "A two-row remaining table becomes Q0 − r t.",
+        "common_mistake": "Writing 3,800 − 300t, which fails at t = 0.",
+        "explanation_check": "R(3) = 3,800 matches the table.",
+        "unknown_change": "Unknown is the function, not a later remaining number."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "The intercept is remaining at t = 0. The slope is negative.",
+      "critical_hint": "r = 300. R(t) = 4,700 − 300t, not 3,800 − 300t.",
+      "core_idea": "A two-row remaining table becomes Q0 − r t.",
+      "unknown_change": "Unknown is the function, not a later remaining number.",
+      "explanation_check": "R(3) = 3,800 matches the table.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_tr_02",
+      "slot": "transfer",
+      "phase": "transfer",
+      "variant_index": 2,
+      "difficulty": "medium",
+      "subskill": "table_to_function",
+      "representation": "table_remaining_to_function",
+      "tested_reasoning": "Convert a remaining-quantity table into a closed-form function R(t) = Q0 − r t.",
+      "misconception_tags": [
+        "use_later_point_as_intercept",
+        "positive_slope"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A hopper is emptied at a constant rate. Remaining kilograms after \\( t \\) hours are shown.</p><div class=\"stem-table-wrap\"><table class=\"stem-table\"><thead><tr><th>\\( t \\)</th><th>0</th><th>3</th></tr></thead><tbody><tr><td>Remaining</td><td>4,700</td><td>3,800</td></tr></tbody></table></div><p>Which function gives the remaining kilograms after \\( t \\) hours?</p>",
+      "choices": [
+        "\\( R(t) = 4{,}700 - 300t \\)",
+        "\\( R(t) = 3{,}800 - 300t \\)",
+        "\\( R(t) = 4{,}700 + 300t \\)",
+        "\\( R(t) = 300t + 4{,}700 \\)"
+      ],
+      "correct_answer": "A",
+      "correct_math": "4700-300t",
+      "distractor_rationale": {
+        "A": "Correct. Rate = (4,700 − 3,800)/3 = 300, and Q0 = 4,700, so R(t) = 4,700 − 300t.",
+        "B": "Uses the later remaining amount as if it were Q0.",
+        "C": "Adds the rate, which would fill the hopper instead of emptying it.",
+        "D": "Same increasing model in a different order."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "r = (4,700 − 3,800)/3 = 300 kg/h.",
+          "why": "Remaining falls, so the formula subtracts r t."
+        },
+        {
+          "step": 2,
+          "do": "Q0 is the t = 0 remaining, 4,700.",
+          "why": "Do not use the later table value as the intercept."
+        },
+        {
+          "step": 3,
+          "do": "R(t) = 4,700 − 300t.",
+          "why": "Check R(3) = 4,700 − 900 = 3,800."
+        }
+      ],
+      "common_mistake": "Writing 3,800 − 300t, which fails at t = 0.",
+      "transformation_type": "change_unknown_to_function_from_table",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "The average output 8 weeks after March 1",
+        "value at the shift"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Which x makes the second term zero?",
+        "critical_hint": "x = 8. The constant is G(8), not G(0) and not the slope 0.4.",
+        "core_idea": "Shifted form displays the function value at the shift, not the y-intercept.",
+        "common_mistake": "Reading 12.5 as G(0).",
+        "explanation_check": "G(8) = 12.5 − 0 = 12.5.",
+        "unknown_change": "Unknown is the meaning of 12.5, after a remaining-quantity diagnostic used a different unknown."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Which x makes the second term zero?",
+      "critical_hint": "x = 8. The constant is G(8), not G(0) and not the slope 0.4.",
+      "core_idea": "Shifted form displays the function value at the shift, not the y-intercept.",
+      "unknown_change": "Unknown is the meaning of 12.5, after a remaining-quantity diagnostic used a different unknown.",
+      "explanation_check": "G(8) = 12.5 − 0 = 12.5.",
+      "path_tags": [
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_tr_03",
+      "slot": "transfer",
+      "phase": "transfer",
+      "variant_index": 3,
+      "difficulty": "hard",
+      "subskill": "read_rewritten_linear_form",
+      "representation": "function_shifted_form_constant",
+      "tested_reasoning": "Read the displayed constant in a shifted linear model as the value at the shift point.",
+      "misconception_tags": [
+        "constant_is_intercept_at_zero"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>Average output, in tons, \\( x \\) weeks after March 1 is modeled by</p><div class=\"stem-math-block\">\\[ G(x) = 12.5 - 0.4(x - 8) \\]</div><p>The constant 12.5 estimates which of the following?</p>",
+      "choices": [
+        "The average output 8 weeks after March 1",
+        "The average output on March 1",
+        "The weekly decrease in output",
+        "The output when G(x) = 12.5 weeks"
+      ],
+      "correct_answer": "A",
+      "correct_math": "value at the shift",
+      "distractor_rationale": {
+        "A": "Correct. G(8) = 12.5 because the (x − 8) term vanishes.",
+        "B": "G(0) = 12.5 − 0.4(−8) = 15.7, so 12.5 is not March 1.",
+        "C": "The weekly decrease is 0.4, not 12.5.",
+        "D": "Treats 12.5 as a time rather than an output value."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Set x = 8 to cancel (x − 8).",
+          "why": "The displayed constant is G at the shift."
+        },
+        {
+          "step": 2,
+          "do": "G(8) = 12.5.",
+          "why": "x is weeks after March 1, so this is late April."
+        }
+      ],
+      "common_mistake": "Reading 12.5 as G(0).",
+      "transformation_type": "change_context_keep_shifted_form_interpretation",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 5,
+      "source_stem_hash": "ef70f1766e566cb3",
+      "source_display_number": 19
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "The additional cost, in dollars, for each hour after the first 3 hours",
+        "additional hourly fee"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Rewrite the formula as opening cost plus extra hours times a rate.",
+        "critical_hint": "C(x) = 150 + 25(x − 3). The 25 is the additional hourly fee.",
+        "core_idea": "In a first + additional model, slope is the additional unit fee.",
+        "common_mistake": "Saying 25 is the first-block cost, which is actually $150.",
+        "explanation_check": "Each extra hour adds $25: C(4) − C(3) = 25.",
+        "unknown_change": "Unknown is the meaning of the slope, from a function rather than a word fee."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Rewrite the formula as opening cost plus extra hours times a rate.",
+      "critical_hint": "C(x) = 150 + 25(x − 3). The 25 is the additional hourly fee.",
+      "core_idea": "In a first + additional model, slope is the additional unit fee.",
+      "unknown_change": "Unknown is the meaning of the slope, from a function rather than a word fee.",
+      "explanation_check": "Each extra hour adds $25: C(4) − C(3) = 25.",
+      "path_tags": [
+        "advanced"
+      ],
+      "id": "slq_lrv2_tr_04",
+      "slot": "transfer",
+      "phase": "transfer",
+      "variant_index": 4,
+      "difficulty": "hard",
+      "subskill": "slope_meaning_first_additional",
+      "representation": "function_slope_meaning",
+      "tested_reasoning": "Given C(x) = 25x + 75 for hours x ≥ 3, interpret 25 as the additional hourly fee, not the first-block cost.",
+      "misconception_tags": [
+        "slope_is_first_block_fee",
+        "slope_is_intercept"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>For \\( x \\geq 3 \\), the cost in dollars of a repair visit lasting \\( x \\) hours is \\( C(x) = 25x + 75 \\). This formula comes from a first-block fee for the first 3 hours plus a constant fee for each additional hour. Which statement describes the 25 in this formula?</p>",
+      "choices": [
+        "The cost, in dollars, of the first 3 hours",
+        "The cost, in dollars, when no hours of repair occur",
+        "The number of additional hours that can be purchased for \\(\\$75\\)",
+        "The additional cost, in dollars, for each hour after the first 3 hours"
+      ],
+      "correct_answer": "D",
+      "correct_math": "additional hourly fee",
+      "distractor_rationale": {
+        "A": "The first 3 hours cost C(3) = 75 + 75 = 150, not 25.",
+        "B": "C(0) = 75 is an extrapolated intercept, not a real 0-hour visit, and it is not the 25.",
+        "C": "75/25 = 3 hours is a unit mix-up; 25 is dollars per hour, not hours per 75 dollars as the asked meaning.",
+        "D": "Correct. Slope is dollars per additional hour. Rewriting C(x) = 150 + 25(x − 3) shows the $25 additional fee after the first 3 hours."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "C(3) = 25×3 + 75 = 150, so the opening block costs $150.",
+          "why": "Evaluate at the start of the domain x ≥ 3."
+        },
+        {
+          "step": 2,
+          "do": "C(x) = 150 + 25(x − 3).",
+          "why": "The coefficient 25 is the fee for each hour after hour 3."
+        }
+      ],
+      "common_mistake": "Saying 25 is the first-block cost, which is actually $150.",
+      "transformation_type": "change_unknown_to_slope_meaning_from_function",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 12,
+      "source_stem_hash": "9004725c2df98678",
+      "source_display_number": 26
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "10"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Find tons per hour first, then the tons that still have to leave after hour 4.",
+        "critical_hint": "r = 600. After hour 4, 6,000 tons remain to be moved: 10 additional hours, not 14 total.",
+        "core_idea": "Additional versus total hours is the same decision as on the diagnostic, with new numbers.",
+        "common_mistake": "Reporting 14 total hours instead of 10 additional hours.",
+        "explanation_check": "12,000 − 600×10 = 6,000.",
+        "unknown_change": "Unknown is additional hours in an unseen quarry story."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Find tons per hour first, then the tons that still have to leave after hour 4.",
+      "critical_hint": "r = 600. After hour 4, 6,000 tons remain to be moved: 10 additional hours, not 14 total.",
+      "core_idea": "Additional versus total hours is the same decision as on the diagnostic, with new numbers.",
+      "unknown_change": "Unknown is additional hours in an unseen quarry story.",
+      "explanation_check": "12,000 − 600×10 = 6,000.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_del_01",
+      "slot": "delayed",
+      "phase": "delayed",
+      "variant_index": 1,
+      "difficulty": "medium",
+      "subskill": "remaining_additional_vs_total",
+      "representation": "word_remaining_additional_hours",
+      "tested_reasoning": "Unseen remaining-quantity story: additional hours after a snapshot, new numbers and setting.",
+      "misconception_tags": [
+        "total_hours_instead_of_additional",
+        "wrong_rate_from_snapshot_hours"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>A quarry stockpile starts at 14,400 tons. Trucks remove stone at a constant rate. After 4 hours, 12,000 tons remain. How many <strong>additional</strong> hours after that reading are needed until 6,000 tons remain?</p>",
+      "choices": [
+        "4",
+        "8",
+        "10",
+        "14"
+      ],
+      "correct_answer": "C",
+      "correct_math": "10",
+      "distractor_rationale": {
+        "A": "4 is the given elapsed time.",
+        "B": "8 uses the snapshot interval as if 3,000 tons left in 4 hours were 750 t/h: (12,000 − 6,000)/750 = 8.",
+        "C": "Correct. Rate = (14,400 − 12,000)/4 = 600 t/h. From 12,000 to 6,000 is 6,000 tons, so 6,000/600 = 10 additional hours.",
+        "D": "14 is the total hours from the start until 6,000 remain."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "Removed in 4 hours: 2,400 tons, so r = 600 t/h.",
+          "why": "Rate from the opening snapshot."
+        },
+        {
+          "step": 2,
+          "do": "Still need 12,000 − 6,000 = 6,000 tons after the snapshot.",
+          "why": "Additional hours ignore Q0."
+        },
+        {
+          "step": 3,
+          "do": "6,000/600 = 10 additional hours.",
+          "why": "Not 14 total hours."
+        }
+      ],
+      "common_mistake": "Reporting 14 total hours instead of 10 additional hours.",
+      "transformation_type": "unseen_remaining_additional_new_story_numbers",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_1",
+      "source_question_index": 0,
+      "source_stem_hash": "cbbb49cb08587e11",
+      "source_display_number": 1
+    },
+    {
+      "review_status": "draft",
+      "publish_status": "unpublished",
+      "skill_code": "sat.alg.linear_relationships_v2",
+      "source_note": "Teaching variant of an internal Specialized Training item. Not copied from College Board or a third-party file. Not copied verbatim from question_bank.json.",
+      "answer_alternates": [
+        "\\( y = 95x + 225 \\)"
+      ],
+      "faded": {
+        "blanks": [],
+        "given_steps": [],
+        "light_hint": "Write first-day fee plus $95 times the days after day 1.",
+        "critical_hint": "320 + 95(x − 1) = 95x + 225. Plug in x = 1 to eliminate 95x + 320.",
+        "core_idea": "First day + additional days rewrites with intercept 225, not 320.",
+        "common_mistake": "Writing 95x + 320, which fails on day 1.",
+        "explanation_check": "For x = 3: 320 + 95×2 = 510 and 95×3 + 225 = 510.",
+        "unknown_change": "Unknown is the cost equation in an unseen crane story."
+      },
+      "blanks": [],
+      "given_steps": [],
+      "light_hint": "Write first-day fee plus $95 times the days after day 1.",
+      "critical_hint": "320 + 95(x − 1) = 95x + 225. Plug in x = 1 to eliminate 95x + 320.",
+      "core_idea": "First day + additional days rewrites with intercept 225, not 320.",
+      "unknown_change": "Unknown is the cost equation in an unseen crane story.",
+      "explanation_check": "For x = 3: 320 + 95×2 = 510 and 95×3 + 225 = 510.",
+      "path_tags": [
+        "foundation",
+        "standard",
+        "advanced"
+      ],
+      "id": "slq_lrv2_del_02",
+      "slot": "delayed",
+      "phase": "delayed",
+      "variant_index": 2,
+      "difficulty": "hard",
+      "subskill": "first_plus_additional",
+      "representation": "word_to_function_first_block",
+      "tested_reasoning": "Unseen first-day + additional-day model: write y = mx + b for x ≥ 1.",
+      "misconception_tags": [
+        "use_first_block_as_intercept",
+        "treat_first_day_as_unit_rate"
+      ],
+      "question_kind": "mcq",
+      "stem_html": "<p>The cost of renting a crane for up to 8 days is \\(\\$320\\) for the first day and \\(\\$95\\) for each additional day. Which equation gives the cost \\( y \\), in dollars, of renting the crane for \\( x \\) days, where \\( x \\) is a positive integer and \\( x \\leq 8 \\)?</p>",
+      "choices": [
+        "\\( y = 95x + 320 \\)",
+        "\\( y = 320x + 95 \\)",
+        "\\( y = 95x + 225 \\)",
+        "\\( y = 320x - 95 \\)"
+      ],
+      "correct_answer": "C",
+      "correct_math": "95x+225",
+      "distractor_rationale": {
+        "A": "Adds $95 to every day and still adds the $320 first-day fee, so day 1 would cost 415.",
+        "B": "Treats $320 as the per-day rate.",
+        "C": "Correct. y = 320 + 95(x − 1) = 95x + 225. Day 1 costs 320; day 2 costs 415.",
+        "D": "Mixes the two fees with a minus sign; day 1 would cost 225, which is too low."
+      },
+      "worked_steps": [
+        {
+          "step": 1,
+          "do": "y = 320 + 95(x − 1).",
+          "why": "First day is a block; later days add $95 each."
+        },
+        {
+          "step": 2,
+          "do": "Expand: 320 + 95x − 95 = 95x + 225.",
+          "why": "Match the slope-intercept choices."
+        },
+        {
+          "step": 3,
+          "do": "Check x = 1 → 320 and x = 2 → 415.",
+          "why": "Both must match the word rule."
+        }
+      ],
+      "common_mistake": "Writing 95x + 320, which fails on day 1.",
+      "transformation_type": "unseen_first_plus_additional_new_story_numbers",
+      "source_bank": "data/question_bank.json",
+      "source_domain": "algebra",
+      "source_topic": "1_2",
+      "source_question_index": 2,
+      "source_stem_hash": "07ea76b518155533",
+      "source_display_number": 16
+    }
+  ]
+}

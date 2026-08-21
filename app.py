@@ -212,6 +212,7 @@ app.config.update(
     ),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
     SKILL_LOOP_PILOT=False,
+    SKILL_LOOP_V2_PREVIEW=False,
     SKILL_REPAIR=False,
 )
 

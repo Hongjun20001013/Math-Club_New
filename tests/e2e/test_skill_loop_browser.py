@@ -133,9 +133,11 @@ def _login(page, base: str, username: str, remember: bool = False) -> None:
     page.wait_for_load_state("networkidle")
 
 
-def _shot(page, name: str) -> None:
+def _shot(page, name: str) -> str:
     os.makedirs(SHOT_DIR, exist_ok=True)
-    page.screenshot(path=os.path.join(SHOT_DIR, name), full_page=True)
+    path = os.path.join(SHOT_DIR, name)
+    page.screenshot(path=path, full_page=True)
+    return path
 
 
 def _continue_feedback(page) -> None:
@@ -144,15 +146,175 @@ def _continue_feedback(page) -> None:
     page.wait_for_load_state("networkidle")
 
 
-def _no_horizontal_overflow(page, selector: str = ".sl-wrap") -> bool:
+def _choose(page, letter: str) -> None:
+    page.locator(f"label.choice-card[data-letter='{letter}']").click()
+
+
+def _png_not_blank(path: str) -> bool:
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return False
+    if size < 20000:
+        return False
+    try:
+        from PIL import Image
+        image = Image.open(path).convert("RGB")
+        dark = 0
+        pixels = list(image.getdata())
+        step = max(1, len(pixels) // 8000)
+        for r, g, b in pixels[::step]:
+            if r + g + b < 420:
+                dark += 1
+        return dark > 20
+    except Exception:
+        with open(path, "rb") as handle:
+            data = handle.read()
+        return len(set(data[200:1200])) > 8
+
+
+def _assert_on_page(page, selector: str) -> None:
+    box = page.evaluate(
+        """(sel) => {
+          const el = document.querySelector(sel);
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          const top = r.top + window.scrollY;
+          return {
+            top,
+            height: r.height,
+            width: r.width,
+            scroll: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+          };
+        }""",
+        selector,
+    )
+    assert box is not None
+    assert box["height"] > 8
+    assert box["width"] > 8
+    assert box["top"] >= 0
+    assert box["top"] < box["scroll"]
+
+
+def _computed_paint(page, selector: str) -> dict:
     return page.evaluate(
         """(sel) => {
           const el = document.querySelector(sel);
+          if (!el) return null;
+          const chain = [];
+          let n = el;
+          while (n && n.nodeType === 1) {
+            const s = getComputedStyle(n);
+            chain.push({
+              tag: n.tagName,
+              cls: n.className,
+              opacity: parseFloat(s.opacity),
+              visibility: s.visibility,
+              filter: s.filter || 'none'
+            });
+            n = n.parentElement;
+          }
+          const s = getComputedStyle(el);
+          const r = el.getBoundingClientRect();
+          return {
+            opacity: parseFloat(s.opacity),
+            visibility: s.visibility,
+            filter: s.filter || 'none',
+            top: r.top + window.scrollY,
+            height: r.height,
+            width: r.width,
+            scroll: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
+            minAncestorOpacity: Math.min(...chain.map((c) => c.opacity)),
+            chain
+          };
+        }""",
+        selector,
+    )
+
+
+def _assert_mobile_phase_visible(page, feedback: bool = False) -> None:
+    if feedback:
+        root = page.locator("[data-skill-loop-feedback]")
+        root_sel = "[data-skill-loop-feedback]"
+    else:
+        root = page.locator("[data-skill-loop-phase]")
+        root_sel = "[data-skill-loop-phase]"
+    assert root.count() >= 1
+    page.wait_for_function(
+        """() => {
+          const el = document.querySelector('[data-skill-loop-phase], [data-skill-loop-feedback]');
+          if (!el) return false;
+          let n = el;
+          while (n && n.nodeType === 1) {
+            const s = getComputedStyle(n);
+            if (parseFloat(s.opacity) < 0.95) return false;
+            if (s.visibility === 'hidden') return false;
+            n = n.parentElement;
+          }
+          const nav = document.querySelector('.navbar');
+          if (nav && parseFloat(getComputedStyle(nav).opacity) < 0.95) return false;
+          return true;
+        }"""
+    )
+    paint = _computed_paint(page, root_sel)
+    assert paint is not None
+    assert paint["opacity"] >= 0.95, paint
+    assert paint["visibility"] == "visible", paint
+    assert (paint["filter"] or "none") == "none", paint
+    assert paint["minAncestorOpacity"] >= 0.95, paint
+    assert paint["height"] > 8 and paint["width"] > 8
+    assert paint["top"] >= 0
+    assert paint["top"] < paint["scroll"]
+    assert root.first.is_visible()
+    if feedback:
+        result = page.locator("[data-sl-result]")
+        assert result.first.is_visible()
+        label = result.first.inner_text().strip()
+        assert "Correct" in label or "Incorrect" in label, label
+        yours = page.locator("[data-sl-your-answer]")
+        assert yours.count() >= 1
+        yours.first.scroll_into_view_if_needed()
+        assert yours.first.is_visible()
+        key = page.locator("[data-sl-correct-answer]")
+        if key.count():
+            key.first.scroll_into_view_if_needed()
+            assert key.first.is_visible()
+        walk = page.locator(".mq-feedback-explain, [data-sl-feedback-steps], [data-sl-core-idea-visible]")
+        assert walk.count() >= 1
+        walk.first.scroll_into_view_if_needed()
+        assert walk.first.is_visible()
+        cont = page.locator("[data-sl-feedback-continue]")
+        assert cont.count() >= 1
+        cont.first.scroll_into_view_if_needed()
+        assert cont.first.is_visible()
+        return
+    stem = page.locator(".sl-stem, .sat-stem-body, [data-sl-result], .mq-feedback-title").first
+    assert stem.is_visible()
+    _assert_on_page(page, ".sl-stem, .sat-stem-body, [data-sl-result], .mq-feedback-title")
+    if page.locator("label.choice-card").count():
+        choice = page.locator("label.choice-card").first
+        choice.scroll_into_view_if_needed()
+        assert choice.is_visible()
+    if page.locator("#sl-form button[type=submit]").count():
+        submit = page.locator("#sl-form button[type=submit]").first
+        submit.scroll_into_view_if_needed()
+        assert submit.is_visible()
+    if page.locator("#sl-hint-light").count():
+        hint = page.locator("#sl-hint-light")
+        hint.scroll_into_view_if_needed()
+        assert hint.is_visible()
+
+
+def _no_horizontal_overflow(page, selector: str = ".sl-sat-page") -> bool:
+    return page.evaluate(
+        """() => {
+          const el = document.querySelector('.sl-sat-page')
+            || document.querySelector('.sl-wrap')
+            || document.querySelector('[data-skill-loop-feedback]');
           if (!el) return false;
           const rect = el.getBoundingClientRect();
           return el.scrollWidth <= el.clientWidth + 4 && rect.right <= window.innerWidth + 4;
         }""",
-        selector,
     )
 
 
@@ -245,6 +407,8 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                     if label == "desktop":
                         page.goto(on.base + f"{PREFIX}/{SKILL}/precheck")
                         _shot(page, "phase_precheck.png")
+                        _shot(page, "desktop_diagnostic.png")
+                        self.assertIn("Diagnostic", page.title())
                         page.click("#sl-hint-light")
                         page.wait_for_selector("[data-sl-hint-text]")
                         hint_text = page.locator("[data-sl-hint-text]").inner_text()
@@ -255,7 +419,7 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                         self.assertIn("Why", page.locator("[data-sl-solution-panel]").inner_text())
                         self.assertGreater(page.locator("[data-sl-explanation-check]").count(), 0)
                         _shot(page, "phase_precheck_solution.png")
-                        page.check("input[name=selected_answer][value=A]")
+                        _choose(page, "A")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         self.assertIn("Incorrect", page.locator("[data-sl-result]").inner_text())
@@ -264,6 +428,7 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                         self.assertGreater(page.locator("[data-sl-core-idea]").count(), 0)
                         self.assertGreater(page.locator("[data-sl-feedback-steps] li").count(), 3)
                         _shot(page, "feedback_precheck_incorrect.png")
+                        _shot(page, "feedback.png")
                         self.assertTrue(_no_horizontal_overflow(page))
                         _continue_feedback(page)
 
@@ -276,6 +441,7 @@ class SkillLoopBrowserE2E(unittest.TestCase):
 
                         self.assertGreater(page.locator("[data-skill-loop-phase=faded]").count(), 0)
                         _shot(page, "phase_faded.png")
+                        _shot(page, "guided.png")
                         page.fill("input[name=rate]", "1")
                         page.fill("input[name=total_hours]", "1")
                         page.locator("#sl-form button[type=submit]").click()
@@ -299,7 +465,8 @@ class SkillLoopBrowserE2E(unittest.TestCase):
 
                         self.assertGreater(page.locator("[data-skill-loop-phase=independent]").count(), 0)
                         _shot(page, "phase_independent.png")
-                        page.check("input[name=selected_answer][value=A]")
+                        _shot(page, "independent.png")
+                        _choose(page, "A")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         self.assertIn("Incorrect", page.locator("[data-sl-result]").inner_text())
@@ -318,19 +485,20 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                         self.assertNotEqual(flags[0]["mastery_status"], "immediate_pass")
                         _shot(page, "feedback_independent_incorrect.png")
                         _continue_feedback(page)
-                        page.check("input[name=selected_answer][value=B]")
+                        _choose(page, "B")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
                         if page.locator("[data-skill-loop-phase=independent]").count():
                             if page.locator("input[name=selected_answer][value=C]").count():
-                                page.check("input[name=selected_answer][value=C]")
+                                _choose(page, "C")
                                 page.locator("#sl-form button[type=submit]").click()
                                 page.wait_for_selector("[data-skill-loop-feedback]")
                                 _continue_feedback(page)
                         if page.locator("[data-skill-loop-phase=transfer]").count():
                             _shot(page, "phase_transfer.png")
-                            page.check("input[name=selected_answer][value=A]")
+                            _shot(page, "transfer.png")
+                            _choose(page, "A")
                             page.locator("#sl-form button[type=submit]").click()
                             page.wait_for_selector("[data-skill-loop-feedback]")
                             self.assertIn("Incorrect", page.locator("[data-sl-result]").inner_text())
@@ -350,21 +518,31 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                             self.assertNotEqual(tr_flags[0]["mastery_status"], "delayed_pass")
                             _continue_feedback(page)
                             if page.locator("[data-skill-loop-phase=transfer]").count():
-                                page.check("input[name=selected_answer][value=B]")
+                                _choose(page, "B")
                                 page.locator("#sl-form button[type=submit]").click()
                                 page.wait_for_selector("[data-skill-loop-feedback]")
                                 _continue_feedback(page)
                     else:
                         page.goto(on.base + f"{PREFIX}/{SKILL}/precheck")
-                        page.check("input[name=selected_answer][value=C]")
+                        self.assertIn("Diagnostic", page.title())
+                        _assert_mobile_phase_visible(page)
+                        shot = _shot(page, "mobile_diagnostic.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
+                        _choose(page, "C")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         self.assertTrue(_no_horizontal_overflow(page))
-                        _shot(page, "mobile_feedback.png")
+                        _assert_mobile_phase_visible(page, feedback=True)
+                        shot = _shot(page, "mobile_feedback.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
                         _continue_feedback(page)
+                        _assert_mobile_phase_visible(page)
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
+                        _assert_mobile_phase_visible(page)
+                        shot = _shot(page, "mobile_guided.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
                         page.click("#sl-hint-critical")
                         page.wait_for_selector("[data-sl-hint-text][data-level=critical]")
                         self.assertGreater(len(page.locator("[data-sl-hint-text]").inner_text()), 20)
@@ -379,20 +557,26 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                         self.assertTrue(_no_horizontal_overflow(page))
                         _continue_feedback(page)
                         self.assertGreater(page.locator("[data-skill-loop-phase=independent]").count(), 0)
-                        page.check("input[name=selected_answer][value=C]")
+                        _assert_mobile_phase_visible(page)
+                        shot = _shot(page, "mobile_independent.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
+                        _choose(page, "C")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
-                        page.check("input[name=selected_answer][value=B]")
+                        _choose(page, "B")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
                         self.assertGreater(page.locator("[data-skill-loop-phase=transfer]").count(), 0)
-                        page.check("input[name=selected_answer][value=C]")
+                        _assert_mobile_phase_visible(page)
+                        shot = _shot(page, "mobile_transfer.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
+                        _choose(page, "C")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
-                        page.check("input[name=selected_answer][value=B]")
+                        _choose(page, "B")
                         page.locator("#sl-form button[type=submit]").click()
                         page.wait_for_selector("[data-skill-loop-feedback]")
                         _continue_feedback(page)
@@ -408,8 +592,12 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                     )
                     page.goto(on.base + f"{PREFIX}/{SKILL}/delayed")
                     self.assertGreater(page.locator("[data-skill-loop-phase=delayed]").count(), 0)
+                    if label == "mobile":
+                        _assert_mobile_phase_visible(page)
+                        shot = _shot(page, "mobile_delayed.png")
+                        self.assertTrue(_png_not_blank(shot), shot)
                     _shot(page, f"phase_delayed_{label}.png")
-                    page.check("input[name=selected_answer][value=D]")
+                    _choose(page, "D")
                     page.locator("#sl-form button[type=submit]").click()
                     page.wait_for_selector("[data-skill-loop-feedback]")
                     mid = on.sql("SELECT mastery_status FROM skill_loop_runs WHERE user_id=?", (user_id,))[0]
@@ -417,7 +605,7 @@ class SkillLoopBrowserE2E(unittest.TestCase):
                     _continue_feedback(page)
                     if page.locator("[data-skill-loop-phase=delayed]").count() == 0:
                         page.goto(on.base + f"{PREFIX}/{SKILL}/delayed")
-                    page.check("input[name=selected_answer][value=B]")
+                    _choose(page, "B")
                     page.locator("#sl-form button[type=submit]").click()
                     page.wait_for_selector("[data-skill-loop-feedback]")
                     passed = on.sql("SELECT mastery_status FROM skill_loop_runs WHERE user_id=?", (user_id,))[0]

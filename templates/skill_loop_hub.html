@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Skill loop · {{ skill_code }}{% endblock %}
+{% block title %}Linear relationships · SAT skill practice{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='skill_loop.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 {% block content %}
-<div class="np-page-shell sl-wrap">
-  <p class="np-atelier-kicker">Skill loop usability pilot</p>
-  <h1>Linear remaining quantity</h1>
-  <p>This is a data-integrity / usability check. It is not an effectiveness conclusion.</p>
-  <p>Arm: <strong>{{ assignment.arm }}</strong> · Status: <strong>{{ status_label }}</strong></p>
+<div class="np-page-shell sl-wrap sl-hub">
+  <p class="np-atelier-kicker">SAT Math · Personalized skill practice</p>
+  <h1>Linear equations: rate and remaining quantity</h1>
+  <p>Begin with an SAT-style diagnostic. Your next stage adapts to your work: guided example, independent practice, transfer, and a later retention check.</p>
+  <p>Progress: <strong>{{ student_status_label }}</strong></p>
   {% if show_mastered %}
   <p class="sl-mastered" data-mastery="delayed_pass">已掌握</p>
   {% endif %}
   {% if run %}
-  <p>Current phase: {{ run.current_phase }} · variant {{ run.current_variant }}</p>
+  {% set phase_names = {'precheck':'Diagnostic','instruction':'Worked example','faded':'Guided practice','independent':'Independent practice','transfer':'SAT transfer','delayed':'Retention check','control':'Lesson practice'} %}
+  <p>Current stage: <strong>{{ phase_names.get(run.current_phase, run.current_phase|replace('_', ' ')|title) }}</strong></p>
   {% endif %}
   <p>
     <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('skill_loop.phase_view', skill_code=skill_code, phase=(run.current_phase if run else 'precheck')) }}">Continue</a>

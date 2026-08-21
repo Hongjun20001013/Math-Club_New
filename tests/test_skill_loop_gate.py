@@ -662,6 +662,8 @@ class _PilotCase(unittest.TestCase):
         os.environ.pop("SKILL_LOOP_PILOT", None)
         os.environ.pop("SKILL_LOOP_ASSIGN_SALT", None)
         os.environ.pop("SKILL_LOOP_ALLOWLIST_USERNAMES", None)
+        os.environ.pop("SKILL_LOOP_V2_PREVIEW", None)
+        self.app_mod.app.config["SKILL_LOOP_V2_PREVIEW"] = False
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def _set_clock(self, factory):
@@ -706,6 +708,8 @@ class _PilotCase(unittest.TestCase):
         self.force_arm(user_id, "B")
         rv = self.client.get(f"{PREFIX}/{SKILL}/precheck")
         self.assertEqual(rv.status_code, 200, rv.data[:300])
+        html = rv.get_data(as_text=True)
+        self.assertIn("<title>Diagnostic · SAT skill practice</title>", html)
         return rv
 
 
@@ -742,15 +746,42 @@ class TestFeatureFlagIsolation(_PilotCase):
     def test_old_practice_unchanged_with_flag_off(self):
         self.login()
         rv = self.client.get("/practice/algebra/1_1/0")
-        self.assertIn(rv.status_code, (200, 302))
-        conn = self.qdb()
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn('name="selected_answer"', html)
+        import re
+
+        match = re.search(r'name="attempt_id" value="(\d+)"', html)
+        self.assertIsNotNone(match)
+        before = self.qdb()
         try:
-            attempts = conn.execute("SELECT COUNT(*) FROM practice_attempts").fetchone()[0]
-            mistakes = conn.execute("SELECT COUNT(*) FROM mistake_learning_progress").fetchone()[0]
+            attempts = before.execute("SELECT COUNT(*) FROM practice_attempts").fetchone()[0]
+            responses = before.execute("SELECT COUNT(*) FROM practice_responses").fetchone()[0]
+            mistakes = before.execute("SELECT COUNT(*) FROM mistake_learning_progress").fetchone()[0]
         finally:
-            conn.close()
-        self.assertGreaterEqual(attempts, 17)
-        self.assertGreaterEqual(mistakes, 27)
+            before.close()
+        posted = self.client.post(
+            "/practice/submit",
+            data={
+                "csrf_token": "test-csrf",
+                "domain": "algebra",
+                "topic": "1_1",
+                "qnum": "0",
+                "attempt_id": match.group(1),
+                "selected_answer": "D",
+            },
+            follow_redirects=False,
+        )
+        self.assertIn(posted.status_code, (200, 302))
+        after = self.qdb()
+        try:
+            self.assertGreaterEqual(after.execute("SELECT COUNT(*) FROM practice_attempts").fetchone()[0], attempts)
+            self.assertGreaterEqual(after.execute("SELECT COUNT(*) FROM practice_responses").fetchone()[0], responses)
+            self.assertGreaterEqual(
+                after.execute("SELECT COUNT(*) FROM mistake_learning_progress").fetchone()[0], mistakes
+            )
+        finally:
+            after.close()
 
 
 class TestPublishAndStudentVisibility(_PilotCase):
@@ -882,6 +913,14 @@ class TestStateMachine(_PilotCase):
                 return
             rv = self.client.get(f"{PREFIX}/{SKILL}/{phase}")
             self.assertEqual(rv.status_code, 200, phase)
+            if phase == "instruction":
+                self.assertIn("<title>Worked example · SAT skill practice</title>", rv.get_data(as_text=True))
+            elif phase == "faded":
+                self.assertIn("<title>Guided practice · SAT skill practice</title>", rv.get_data(as_text=True))
+            elif phase == "independent":
+                self.assertIn("<title>Independent practice · SAT skill practice</title>", rv.get_data(as_text=True))
+            elif phase == "transfer":
+                self.assertIn("<title>SAT transfer · SAT skill practice</title>", rv.get_data(as_text=True))
             payload = {
                 "phase": phase,
                 "item_id": item_id,
@@ -907,10 +946,19 @@ class TestStateMachine(_PilotCase):
             conn.close()
         html = self.client.get(f"{PREFIX}/{SKILL}/independent").get_data(as_text=True)
         self.assertNotIn("已掌握", html)
-        self.assertIn("Immediate pass is not mastery", html)
+        self.assertIn('data-mastery="immediate_pass"', html)
+        self.assertIn("data-mastery-label", html)
+        self.assertNotRegex(html, r"<p class=\"sl-not-mastered\"[^>]*>Immediate pass is not mastery</p>")
+        self.assertNotIn("Arm:", html)
+        self.assertNotIn("Light hint", html)
+        self.assertIn("Small hint", html)
+        self.assertIn("Stronger hint", html)
+        self.assertIn("Show walkthrough", html)
+        self.assertIn("data-sl-why-this", html)
         self._set_clock(lambda: start + timedelta(hours=48))
         rv = self.client.get(f"{PREFIX}/{SKILL}/delayed")
         self.assertEqual(rv.status_code, 200)
+        self.assertIn("<title>Retention check · SAT skill practice</title>", rv.get_data(as_text=True))
         self.post_submit(phase="delayed", item_id="slq_lrr_del_01", selected_answer="D")
         conn = self.qdb()
         try:
@@ -2016,6 +2064,428 @@ class TestTeachingExperience(_PilotCase):
         self.assertNotIn("slq_lrr_imm_01", ids)
         self.assertNotIn("slq_lrr_precheck_02", ids)
         self.assertIn("slq_lrr_del_02", ids)
+
+
+V2_PACK = os.path.join(ROOT, "data", "skill_loop_pilot", "sat.alg.linear_relationships_v2.json")
+V1_PACK = os.path.join(ROOT, "data", "skill_loop_pilot", "sat.alg.linear_rate_remaining.json")
+V2_BLUEPRINT = {
+    "diagnostic": 3,
+    "worked_example": 2,
+    "faded": 3,
+    "independent": 4,
+    "transfer": 4,
+    "delayed": 2,
+}
+
+
+def _digit_skeleton(text: str) -> str:
+    import re
+
+    return re.sub(r"\d+", "#", (text or "").lower())
+
+
+class TestV2DraftPackAndPaths(unittest.TestCase):
+    def test_v2_blueprint_sources_and_invisibility(self):
+        from collections import Counter
+        from repair_html import html_to_plain, stem_normalized_hash
+        from skill_loop_path import classify_path, recommended_variant_ids
+
+        with open(V2_PACK, encoding="utf-8") as handle:
+            pack = json.load(handle)
+        with open(V1_PACK, encoding="utf-8") as handle:
+            v1 = json.load(handle)
+        self.assertEqual(pack["skill_code"], "sat.alg.linear_relationships_v2")
+        self.assertNotEqual(pack["skill_code"], v1["skill_code"])
+        items = pack["items"]
+        self.assertEqual(len(items), 18)
+        self.assertEqual(dict(Counter(it["slot"] for it in items)), V2_BLUEPRINT)
+        ids = [it["id"] for it in items]
+        self.assertEqual(len(ids), len(set(ids)))
+        v1_ids = {it["id"] for it in v1["items"]}
+        self.assertTrue(v1_ids.isdisjoint(ids))
+
+        bank = json.load(open(BANK, encoding="utf-8"))
+        delayed_stems = []
+        earlier_stems = []
+        for it in items:
+            self.assertEqual(it["review_status"], "draft")
+            self.assertEqual(it["publish_status"], "unpublished")
+            self.assertEqual(it["skill_code"], "sat.alg.linear_relationships_v2")
+            for key in (
+                "source_bank",
+                "source_domain",
+                "source_topic",
+                "source_question_index",
+                "source_stem_hash",
+                "transformation_type",
+                "subskill",
+                "representation",
+                "difficulty",
+                "misconception_tags",
+                "tested_reasoning",
+                "worked_steps",
+                "common_mistake",
+            ):
+                self.assertTrue(it.get(key) not in (None, "", []), key)
+            source = bank[it["source_domain"]][it["source_topic"]][int(it["source_question_index"])]
+            self.assertEqual(it["source_stem_hash"], stem_normalized_hash(html_to_plain(source["stem"])))
+            self.assertNotEqual(_digit_skeleton(html_to_plain(it["stem_html"])), _digit_skeleton(html_to_plain(source["stem"])))
+            if it["question_kind"] == "mcq":
+                choices = it["choices"]
+                self.assertEqual(len(choices), 4)
+                self.assertEqual(len(set(choices)), 4)
+                self.assertIn(it["correct_answer"], "ABCD")
+                rationale = it["distractor_rationale"]
+                self.assertEqual(set(rationale), set("ABCD"))
+                correct_letter = it["correct_answer"]
+                for letter in "ABCD":
+                    if letter == correct_letter:
+                        self.assertIn("Correct", rationale[letter])
+                    else:
+                        self.assertNotIn("Correct.", rationale[letter][:12])
+                        self.assertTrue(rationale[letter])
+            if it["slot"] == "delayed":
+                delayed_stems.append(html_to_plain(it["stem_html"]))
+            else:
+                earlier_stems.append(html_to_plain(it["stem_html"]))
+        for delayed in delayed_stems:
+            self.assertNotIn(delayed, earlier_stems)
+
+        transfer = [it for it in items if it["slot"] == "transfer"]
+        self.assertEqual(len(transfer), 4)
+        for it in transfer:
+            source = bank[it["source_domain"]][it["source_topic"]][int(it["source_question_index"])]
+            self.assertNotEqual(
+                _digit_skeleton(html_to_plain(it["stem_html"])),
+                _digit_skeleton(html_to_plain(source["stem"])),
+            )
+
+        self.assertEqual(
+            classify_path(
+                [
+                    {"is_correct": 0, "hint_level": "none"},
+                    {"is_correct": 0, "hint_level": "none"},
+                    {"is_correct": 1, "hint_level": "none"},
+                ]
+            ),
+            "foundation",
+        )
+        self.assertEqual(
+            classify_path(
+                [
+                    {"is_correct": 1, "hint_level": "light"},
+                    {"is_correct": 1, "hint_level": "none"},
+                    {"is_correct": 1, "hint_level": "none"},
+                ]
+            ),
+            "standard",
+        )
+        self.assertEqual(
+            classify_path(
+                [
+                    {"is_correct": 1, "hint_level": "none"},
+                    {"is_correct": 1, "hint_level": "none"},
+                    {"is_correct": 1, "hint_level": "none"},
+                ]
+            ),
+            "advanced",
+        )
+        self.assertNotEqual(classify_path([{"is_correct": 1, "hint_level": "none"}] * 3), classify_path([{"is_correct": 0}] * 3))
+        grouped = recommended_variant_ids(pack, "advanced")
+        self.assertEqual(len(grouped["diagnostic"]), 3)
+        self.assertTrue(grouped["independent"])
+        self.assertTrue(grouped["delayed"])
+
+        digest = sha256_file(BANK)
+        self.assertEqual(digest, "cbcdd4d6e1bbdd1eee2bd408076851e4524d7ead87e0f4e3f55eae45b285804d")
+        from scripts.skill_loop_baseline import bank_question_count
+
+        self.assertEqual(bank_question_count(BANK), 1507)
+
+    def test_v2_is_not_seeded_by_current_migrate(self):
+        from scripts.skill_loop_migrate import PACK_PATH, seed_pack
+
+        self.assertTrue(PACK_PATH.endswith("sat.alg.linear_rate_remaining.json"))
+        tmp = tempfile.mkdtemp(prefix="sl-v2-")
+        db = os.path.join(tmp, "copy.db")
+        copy_db(db)
+        try:
+            from scripts.skill_loop_migrate import apply
+
+            apply(db)
+            conn = open_db(db)
+            codes = [r[0] for r in conn.execute("SELECT code FROM skill_loop_skills")]
+            ids = [r[0] for r in conn.execute("SELECT id FROM skill_loop_items")]
+            conn.close()
+            self.assertEqual(codes, ["sat.alg.linear_rate_remaining"])
+            self.assertTrue(all(i.startswith("slq_lrr_") for i in ids))
+            self.assertEqual(len(ids), 12)
+            conn = sqlite3.connect(db)
+            with self.assertRaises(SystemExit):
+                seed_pack(conn, V2_PACK)
+            conn.close()
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+V2_SKILL = "sat.alg.linear_relationships_v2"
+
+
+class TestV2PreviewRuntime(_PilotCase):
+    """HTTP-level v2 path preview. Does not seed or publish v2 items."""
+
+    def setUp(self):
+        super().setUp()
+        self.app_mod.app.config["SKILL_LOOP_V2_PREVIEW"] = True
+        os.environ["SKILL_LOOP_V2_PREVIEW"] = "1"
+
+    def _item_id(self, html: str) -> str:
+        import re
+
+        match = re.search(r'data-item-id="([^"]+)"', html)
+        self.assertIsNotNone(match, html[:400])
+        return match.group(1)
+
+    def _post_v2(self, **payload):
+        return self.client.post(
+            f"{PREFIX}/{V2_SKILL}/submit",
+            data=json.dumps(payload),
+            headers=self.headers(),
+        )
+
+    def _pack_by_id(self) -> dict:
+        with open(V2_PACK, encoding="utf-8") as handle:
+            pack = json.load(handle)
+        return {item["id"]: item for item in pack["items"]}
+
+    def _correct_payload(self, phase: str, item_id: str) -> dict:
+        item = self._pack_by_id()[item_id]
+        payload = {
+            "phase": phase,
+            "item_id": item_id,
+            "selected_answer": item.get("correct_answer") or "",
+            "hint_level": "none",
+            "solution_viewed": False,
+        }
+        if item.get("question_kind") == "faded":
+            payload["faded"] = {
+                str(blank["id"]): str(blank["correct"])
+                for blank in (item.get("faded") or {}).get("blanks") or []
+            }
+            payload["selected_answer"] = ""
+        return payload
+
+    def _login_v2(self, user_id: int, username: str) -> None:
+        self.login(user_id=user_id, username=username)
+        rv = self.client.get(f"{PREFIX}/{V2_SKILL}/precheck")
+        self.assertEqual(rv.status_code, 200, rv.data[:400])
+
+    def _answer_current(self, phase: str, selected: str | None = None, hint: str = "none", correct: bool = False):
+        html = self.client.get(f"{PREFIX}/{V2_SKILL}/{phase}").get_data(as_text=True)
+        item_id = self._item_id(html)
+        if correct:
+            payload = self._correct_payload(phase, item_id)
+            payload["hint_level"] = hint
+        else:
+            payload = {
+                "phase": phase,
+                "item_id": item_id,
+                "selected_answer": selected or "A",
+                "hint_level": hint,
+                "solution_viewed": hint == "critical",
+            }
+        rv = self._post_v2(**payload)
+        self.assertEqual(rv.status_code, 200, rv.data[:300])
+        return item_id
+
+    def _path_from_db(self, user_id: int) -> str:
+        conn = self.qdb()
+        try:
+            row = conn.execute(
+                """
+                SELECT e.payload_json FROM skill_loop_events e
+                JOIN skill_loop_runs r ON r.id = e.run_id
+                WHERE r.user_id = ? AND r.skill_code = ? AND e.event_name = 'path_classified'
+                ORDER BY e.id DESC LIMIT 1
+                """,
+                (user_id, V2_SKILL),
+            ).fetchone()
+            self.assertIsNotNone(row)
+            return json.loads(row["payload_json"])["path"]
+        finally:
+            conn.close()
+
+    def _selected_later_ids(self, user_id: int, username: str, diag_plan: list) -> dict[str, str]:
+        self._login_v2(user_id, username)
+        for selected, hint, use_correct in diag_plan:
+            self._answer_current("precheck", selected=selected, hint=hint, correct=use_correct)
+        chosen = {"path": self._path_from_db(user_id)}
+
+        inst = self.client.get(f"{PREFIX}/{V2_SKILL}/instruction")
+        self.assertEqual(inst.status_code, 200, inst.data[:300])
+        chosen["worked_example"] = self._item_id(inst.get_data(as_text=True))
+        self.assertIn("<title>Worked example · SAT skill practice</title>", inst.get_data(as_text=True))
+        self._post_v2(**self._correct_payload("instruction", chosen["worked_example"]))
+
+        faded = self.client.get(f"{PREFIX}/{V2_SKILL}/faded")
+        self.assertEqual(faded.status_code, 200, faded.data[:300])
+        chosen["faded"] = self._item_id(faded.get_data(as_text=True))
+        self._post_v2(**self._correct_payload("faded", chosen["faded"]))
+
+        ind = self.client.get(f"{PREFIX}/{V2_SKILL}/independent")
+        self.assertEqual(ind.status_code, 200, ind.data[:300])
+        chosen["independent"] = self._item_id(ind.get_data(as_text=True))
+        self._post_v2(**self._correct_payload("independent", chosen["independent"]))
+        ind2 = self.client.get(f"{PREFIX}/{V2_SKILL}/independent")
+        if ind2.status_code == 200 and 'data-skill-loop-phase="independent"' in ind2.get_data(as_text=True):
+            self._post_v2(**self._correct_payload("independent", self._item_id(ind2.get_data(as_text=True))))
+
+        tr = self.client.get(f"{PREFIX}/{V2_SKILL}/transfer")
+        self.assertEqual(tr.status_code, 200, tr.data[:300])
+        chosen["transfer"] = self._item_id(tr.get_data(as_text=True))
+        self._post_v2(**self._correct_payload("transfer", chosen["transfer"]))
+        tr2 = self.client.get(f"{PREFIX}/{V2_SKILL}/transfer")
+        if tr2.status_code == 200 and 'data-skill-loop-phase="transfer"' in tr2.get_data(as_text=True):
+            self._post_v2(**self._correct_payload("transfer", self._item_id(tr2.get_data(as_text=True))))
+
+        conn = self.qdb()
+        try:
+            run = conn.execute(
+                "SELECT instruction_completed_at FROM skill_loop_runs WHERE user_id=? AND skill_code=?",
+                (user_id, V2_SKILL),
+            ).fetchone()
+            start = self.sl.parse_iso(run["instruction_completed_at"])
+        finally:
+            conn.close()
+        self._set_clock(lambda: start + timedelta(hours=48))
+        delayed = self.client.get(f"{PREFIX}/{V2_SKILL}/delayed")
+        self.assertEqual(delayed.status_code, 200, delayed.data[:300])
+        delayed_html = delayed.get_data(as_text=True)
+        self.assertIn("<title>Retention check · SAT skill practice</title>", delayed_html)
+        chosen["delayed"] = self._item_id(delayed_html)
+        return chosen
+
+    def test_v2_preview_off_stays_404_and_unpublished(self):
+        self.app_mod.app.config["SKILL_LOOP_V2_PREVIEW"] = False
+        os.environ.pop("SKILL_LOOP_V2_PREVIEW", None)
+        self.login()
+        self.assertEqual(self.client.get(f"{PREFIX}/{V2_SKILL}/precheck").status_code, 404)
+        conn = self.qdb()
+        try:
+            v2_rows = conn.execute(
+                "SELECT id FROM skill_loop_items WHERE skill_code=? OR id LIKE 'slq_lrv2_%'",
+                (V2_SKILL,),
+            ).fetchall()
+            self.assertEqual(list(v2_rows), [])
+        finally:
+            conn.close()
+
+    def test_production_runtime_cannot_enable_preview(self):
+        os.environ["SKILL_LOOP_V2_PREVIEW"] = "1"
+        self.app_mod.app.config["SKILL_LOOP_V2_PREVIEW"] = True
+        with mock.patch.object(self.sl, "production_runtime", return_value=True):
+            self.assertFalse(self.sl.v2_preview_enabled())
+            self.assertFalse(self.sl.skill_code_allowed(V2_SKILL))
+
+    def test_three_paths_from_diagnostic_not_user_id_or_arm(self):
+        with open(V2_PACK, encoding="utf-8") as handle:
+            pack = json.load(handle)
+        from skill_loop_path import next_item_for_path, recommended_variant_ids
+
+        conn = self.qdb()
+        try:
+            conn.execute(
+                """
+                INSERT INTO users (username, password, password_hash, role, is_active, access_scope, student_view_scope)
+                VALUES ('path-adv', '', 'x', 'student', 1, 'full', 'own')
+                """
+            )
+            conn.commit()
+            adv_id = int(conn.execute("SELECT id FROM users WHERE username='path-adv'").fetchone()[0])
+        finally:
+            conn.close()
+
+        foundation = self._selected_later_ids(
+            2,
+            "s1",
+            [("A", "critical", False), ("B", "none", False), ("A", "none", False)],
+        )
+        standard = self._selected_later_ids(
+            3,
+            "s2",
+            [(None, "none", True), (None, "none", True), ("A", "none", False)],
+        )
+        advanced = self._selected_later_ids(
+            adv_id,
+            "path-adv",
+            [(None, "none", True), (None, "none", True), (None, "none", True)],
+        )
+        self.assertEqual(foundation["path"], "foundation")
+        self.assertEqual(standard["path"], "standard")
+        self.assertEqual(advanced["path"], "advanced")
+        self.assertNotEqual(foundation["independent"], advanced["independent"])
+
+        for label, chosen in (
+            ("foundation", foundation),
+            ("standard", standard),
+            ("advanced", advanced),
+        ):
+            expected = recommended_variant_ids(pack, chosen["path"])
+            for slot in ("worked_example", "faded", "independent", "transfer", "delayed"):
+                allowed = expected[slot] or [
+                    item["id"]
+                    for item in pack["items"]
+                    if item["slot"] == slot
+                ]
+                self.assertIn(chosen[slot], allowed, f"{label} {slot} {chosen[slot]}")
+            first_ind = next_item_for_path(pack, "independent", chosen["path"], [])
+            self.assertEqual(chosen["independent"], first_ind["id"], label)
+
+        print(
+            "\nv2 preview selected item IDs:\n"
+            f"  foundation={ {k: v for k, v in foundation.items()} }\n"
+            f"  standard={ {k: v for k, v in standard.items()} }\n"
+            f"  advanced={ {k: v for k, v in advanced.items()} }"
+        )
+
+        conn = self.qdb()
+        try:
+            self.assertEqual(
+                list(conn.execute("SELECT id FROM skill_loop_items WHERE id LIKE 'slq_lrv2_%'")),
+                [],
+            )
+            asg = conn.execute(
+                "SELECT arm, assignment_source FROM skill_loop_assignments WHERE skill_code=?",
+                (V2_SKILL,),
+            ).fetchone()
+            self.assertEqual(asg["arm"], "B")
+            self.assertEqual(asg["assignment_source"], "v2_preview")
+        finally:
+            conn.close()
+
+        self.client.get("/logout")
+        self.login(user_id=2, username="s1")
+        delayed = self.client.get(f"{PREFIX}/{V2_SKILL}/delayed")
+        self.assertEqual(delayed.status_code, 200)
+        self.assertEqual(self._path_from_db(2), "foundation")
+        self.assertIn('data-skill-loop-path="foundation"', delayed.get_data(as_text=True))
+        self.assertNotIn("user_id % 2", delayed.get_data(as_text=True))
+
+    def test_same_diagnostics_same_path_across_user_ids(self):
+        self._login_v2(2, "s1")
+        for _ in range(3):
+            self._answer_current("precheck", correct=True)
+        path_a = self._path_from_db(2)
+        self._login_v2(3, "s2")
+        for _ in range(3):
+            self._answer_current("precheck", correct=True)
+        path_b = self._path_from_db(3)
+        self.assertEqual(path_a, "advanced")
+        self.assertEqual(path_b, "advanced")
+        html_a = self.client.get(f"{PREFIX}/{V2_SKILL}/instruction").get_data(as_text=True)
+        self.login(user_id=2, username="s1")
+        html_b = self.client.get(f"{PREFIX}/{V2_SKILL}/instruction").get_data(as_text=True)
+        self.assertEqual(self._item_id(html_a), self._item_id(html_b))
 
 
 class TestBankHashAfterSuite(unittest.TestCase):

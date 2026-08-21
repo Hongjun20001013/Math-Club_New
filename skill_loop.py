@@ -29,13 +29,32 @@ from scripts.skill_loop_assignment import (
     is_excluded_from_analysis,
     propose_arm,
 )
+from skill_loop_path import classify_path, next_item_for_path
 
 SKILL_CODE = "sat.alg.linear_rate_remaining"
+V2_SKILL_CODE = "sat.alg.linear_relationships_v2"
+V2_EXPERIMENT_ID = "skill_loop_v2_linear_relationships_preview"
+V2_PACK_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "data",
+    "skill_loop_pilot",
+    "sat.alg.linear_relationships_v2.json",
+)
 PHASES_B = ("precheck", "instruction", "faded", "independent", "transfer", "delayed")
 PHASES_A = ("precheck", "control", "delayed")
 DELAY_HOURS = 48
 DELAY_MAX_HOURS = 168
 SCORED_PHASES = {"precheck", "faded", "independent", "transfer", "delayed"}
+PHASE_TITLES = {
+    "precheck": "Diagnostic",
+    "instruction": "Worked example",
+    "faded": "Guided practice",
+    "independent": "Independent practice",
+    "transfer": "SAT transfer",
+    "delayed": "Retention check",
+    "control": "Lesson practice",
+}
+_V2_PACK_CACHE: dict[str, Any] | None = None
 
 skill_loop_bp = Blueprint("skill_loop", __name__, url_prefix="/practice/skill-loop")
 
@@ -110,6 +129,148 @@ def skill_loop_enabled() -> bool:
         return False
 
 
+def v2_preview_enabled() -> bool:
+    """Local/test-only v2 JSON preview. Never on in production, even if the env is set."""
+    if production_runtime():
+        return False
+    env = (os.environ.get("SKILL_LOOP_V2_PREVIEW") or "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    try:
+        return bool(current_app.config.get("SKILL_LOOP_V2_PREVIEW"))
+    except RuntimeError:
+        return False
+
+
+def skill_code_allowed(skill_code: str) -> bool:
+    if skill_code == SKILL_CODE:
+        return True
+    return skill_code == V2_SKILL_CODE and v2_preview_enabled()
+
+
+def experiment_id_for_skill(skill_code: str) -> str:
+    if skill_code == V2_SKILL_CODE:
+        return V2_EXPERIMENT_ID
+    return EXPERIMENT_ID
+
+
+def v2_pack() -> dict[str, Any]:
+    global _V2_PACK_CACHE
+    if _V2_PACK_CACHE is None:
+        with open(V2_PACK_PATH, encoding="utf-8") as handle:
+            _V2_PACK_CACHE = json.load(handle)
+    return _V2_PACK_CACHE
+
+
+class PreviewRow:
+    """sqlite3.Row-shaped wrapper for unpublished v2 JSON items."""
+
+    def __init__(self, data: dict[str, Any]):
+        self._data = data
+
+    def __getitem__(self, key: str) -> Any:
+        return self._data[key]
+
+    def keys(self):
+        return self._data.keys()
+
+
+def pack_item_to_row(item: dict[str, Any]) -> PreviewRow:
+    faded = item.get("faded") if isinstance(item.get("faded"), dict) else {}
+    return PreviewRow(
+        {
+            "id": item["id"],
+            "version": int(item.get("version") or 1),
+            "skill_code": item.get("skill_code") or V2_SKILL_CODE,
+            "slot": item["slot"],
+            "variant_index": int(item.get("variant_index") or 1),
+            "stem_html": item.get("stem_html") or "",
+            "choices_json": json.dumps(item.get("choices") or [], ensure_ascii=False),
+            "question_kind": item.get("question_kind") or "mcq",
+            "correct_answer": item.get("correct_answer") or "",
+            "answer_alternates_json": json.dumps(item.get("answer_alternates") or [], ensure_ascii=False),
+            "worked_steps_json": json.dumps(item.get("worked_steps") or [], ensure_ascii=False),
+            "faded_json": json.dumps(faded, ensure_ascii=False),
+            "review_status": item.get("review_status") or "draft",
+            "publish_status": item.get("publish_status") or "unpublished",
+            "path_tags": json.dumps(item.get("path_tags") or [], ensure_ascii=False),
+        }
+    )
+
+
+def v2_item_by_id(item_id: str) -> PreviewRow | None:
+    wanted = str(item_id or "")
+    for item in v2_pack().get("items") or []:
+        if str(item.get("id")) == wanted:
+            return pack_item_to_row(item)
+    return None
+
+
+def resolve_item(db: sqlite3.Connection, item_id: str, skill_code: str | None = None) -> Any:
+    if skill_code == V2_SKILL_CODE or str(item_id or "").startswith("slq_lrv2_"):
+        if not v2_preview_enabled():
+            return None
+        return v2_item_by_id(item_id)
+    return published_item(db, item_id)
+
+
+def get_teaching_path(db: sqlite3.Connection, run_id: int) -> str | None:
+    row = db.execute(
+        """
+        SELECT payload_json FROM skill_loop_events
+        WHERE run_id = ? AND event_name = 'path_classified'
+        ORDER BY id DESC LIMIT 1
+        """,
+        (run_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    try:
+        payload = json.loads(row["payload_json"] or "{}")
+    except json.JSONDecodeError:
+        return None
+    path = str(payload.get("path") or "").strip().lower()
+    return path or None
+
+
+def classify_and_store_path(
+    db: sqlite3.Connection, run: sqlite3.Row, user_id: int
+) -> str:
+    run_id = int(run["id"])
+    existing = get_teaching_path(db, run_id)
+    if existing:
+        return existing
+    rows = db.execute(
+        """
+        SELECT is_correct, hint_level, solution_viewed
+        FROM skill_loop_step_results
+        WHERE run_id = ? AND phase = 'precheck'
+        ORDER BY id
+        """,
+        (run_id,),
+    ).fetchall()
+    diagnostic_rows = [
+        {
+            "is_correct": int(r["is_correct"] or 0),
+            "hint_level": str(r["hint_level"] or "none"),
+            "solution_viewed": bool(r["solution_viewed"]),
+        }
+        for r in rows
+    ]
+    path = classify_path(diagnostic_rows)
+    emit(
+        db,
+        "path_classified",
+        user_id,
+        run_id,
+        None,
+        {"path": path, "diagnostic_count": len(diagnostic_rows), "source": "diagnostic"},
+    )
+    return path
+
+
 def skill_loop_allowlist_usernames() -> set[str]:
     raw = (os.environ.get("SKILL_LOOP_ALLOWLIST_USERNAMES") or "").strip()
     return {part.strip().lower() for part in raw.split(",") if part.strip()}
@@ -180,6 +341,14 @@ def published_item(db: sqlite3.Connection, item_id: str) -> sqlite3.Row | None:
 
 
 def item_for_slot(db: sqlite3.Connection, skill_code: str, slot: str, variant: int) -> sqlite3.Row | None:
+    if skill_code == V2_SKILL_CODE:
+        if not v2_preview_enabled():
+            return None
+        wanted = int(variant)
+        for item in v2_pack().get("items") or []:
+            if str(item.get("slot") or "") == slot and int(item.get("variant_index") or 1) == wanted:
+                return pack_item_to_row(item)
+        return None
     return db.execute(
         """
         SELECT * FROM skill_loop_items
@@ -291,7 +460,7 @@ def get_assignment(db: sqlite3.Connection, user_id: int, skill_code: str | None 
         SELECT * FROM skill_loop_assignments
         WHERE experiment_id = ? AND user_id = ?
         """,
-        (EXPERIMENT_ID, user_id),
+        (experiment_id_for_skill(skill_code or SKILL_CODE), user_id),
     ).fetchone()
 
 
@@ -301,22 +470,27 @@ def ensure_assignment(
     row = get_assignment(db, user_id, skill_code)
     if row is not None:
         return row
-    arm, digest = propose_arm(user_id, assign_salt(), EXPERIMENT_ID)
+    exp = experiment_id_for_skill(skill_code)
+    if skill_code == V2_SKILL_CODE:
+        arm, digest, source = "B", "", "v2_preview"
+    else:
+        arm, digest = propose_arm(user_id, assign_salt(), exp)
+        source = "hash"
     cur = db.execute(
         """
         INSERT INTO skill_loop_assignments (
             experiment_id, user_id, skill_code, arm, assignment_source,
             hash_hex, salt_version, assigned_at
-        ) VALUES (?, ?, ?, ?, 'hash', ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(experiment_id, user_id) DO NOTHING
         """,
-        (EXPERIMENT_ID, user_id, skill_code, arm, digest, SALT_VERSION, iso(now_utc())),
+        (exp, user_id, skill_code, arm, source, digest, SALT_VERSION, iso(now_utc())),
     )
     out = get_assignment(db, user_id, skill_code)
     if out is None:
         raise RuntimeError("assignment insert failed")
     if int(cur.rowcount or 0) == 1:
-        emit(db, "loop_assigned", user_id, None, None, {"arm": out["arm"], "source": "hash"})
+        emit(db, "loop_assigned", user_id, None, None, {"arm": out["arm"], "source": out["assignment_source"]})
     return out
 
 
@@ -378,6 +552,8 @@ def ensure_run(db: sqlite3.Connection, user_id: int, skill_code: str, arm: str) 
     row = get_run(db, user_id, skill_code)
     if row is not None:
         return row
+    if skill_code == V2_SKILL_CODE:
+        arm = "B"
     db.execute(
         """
         INSERT INTO skill_loop_runs (
@@ -385,7 +561,7 @@ def ensure_run(db: sqlite3.Connection, user_id: int, skill_code: str, arm: str) 
             current_phase, current_variant, started_at, created_at
         ) VALUES (?, ?, ?, ?, 'learning', 'precheck', 1, ?, ?)
         """,
-        (user_id, skill_code, EXPERIMENT_ID, arm, iso(now_utc()), iso(now_utc())),
+        (user_id, skill_code, experiment_id_for_skill(skill_code), arm, iso(now_utc()), iso(now_utc())),
     )
     row = get_run(db, user_id, skill_code)
     if row is None:
@@ -455,6 +631,13 @@ def next_unused_variant(
     db: sqlite3.Connection, skill_code: str, slot: str, run_id: int, phase: str
 ) -> int | None:
     used = attempted_item_ids(db, run_id, phase)
+    if skill_code == V2_SKILL_CODE:
+        if not v2_preview_enabled():
+            return None
+        item = next_item_for_path(v2_pack(), slot, get_teaching_path(db, run_id), used)
+        if item is None:
+            return None
+        return int(item.get("variant_index") or 1)
     rows = db.execute(
         """
         SELECT variant_index, id FROM skill_loop_items
@@ -540,6 +723,7 @@ def route_after_answer(
     run_id = int(run["id"])
     user_id = int(run["user_id"])
     arm = str(run["arm"])
+    skill = str(run["skill_code"] or SKILL_CODE)
     variant_now = int((item_row["variant_index"] if item_row is not None else run["current_variant"]) or 1)
     remediation = None
     if phase == "control":
@@ -565,6 +749,24 @@ def route_after_answer(
             "next_action": next_action_copy(phase, True, None),
         }
     if phase == "precheck":
+        if skill == V2_SKILL_CODE and v2_preview_enabled():
+            nxt = next_unused_variant(db, skill, "diagnostic", run_id, "precheck")
+            if nxt is not None:
+                return {
+                    "next_phase": "precheck",
+                    "next_variant": nxt,
+                    "remediation": None,
+                    "next_action": "Continue to the next diagnostic item.",
+                }
+            path = classify_and_store_path(db, run, user_id)
+            first = next_item_for_path(v2_pack(), "worked_example", path, set())
+            return {
+                "next_phase": "instruction",
+                "next_variant": int((first or {}).get("variant_index") or 1),
+                "remediation": None,
+                "next_action": next_action_copy(phase, is_correct, None),
+                "path": path,
+            }
         return {
             "next_phase": "instruction" if arm == "B" else "control",
             "next_variant": 1,
@@ -573,7 +775,7 @@ def route_after_answer(
         }
     if not is_correct:
         if phase == "faded":
-            nxt = next_unused_variant(db, SKILL_CODE, "faded", run_id, "faded")
+            nxt = next_unused_variant(db, skill, "faded", run_id, "faded")
             payload = {
                 "kind": "faded_rework",
                 "next_variant": nxt or variant_now,
@@ -587,7 +789,7 @@ def route_after_answer(
                 "next_action": next_action_copy(phase, False, "faded_rework"),
             }
         if phase == "independent":
-            nxt = next_unused_variant(db, SKILL_CODE, "independent", run_id, "independent")
+            nxt = next_unused_variant(db, skill, "independent", run_id, "independent")
             return {
                 "next_phase": "independent",
                 "next_variant": nxt or variant_now,
@@ -595,7 +797,7 @@ def route_after_answer(
                 "next_action": next_action_copy(phase, False, "independent_new_item"),
             }
         if phase == "transfer":
-            nxt = next_unused_variant(db, SKILL_CODE, "transfer", run_id, "transfer")
+            nxt = next_unused_variant(db, skill, "transfer", run_id, "transfer")
             return {
                 "next_phase": "transfer",
                 "next_variant": nxt or variant_now,
@@ -641,7 +843,7 @@ def route_after_answer(
                 "remediation": None,
                 "next_action": "Two independent successes recorded. Continue to transfer.",
             }
-        nxt = next_unused_variant(db, SKILL_CODE, "independent", run_id, "independent")
+        nxt = next_unused_variant(db, skill, "independent", run_id, "independent")
         return {
             "next_phase": "independent" if nxt else "transfer",
             "next_variant": nxt or 1,
@@ -661,7 +863,7 @@ def route_after_answer(
                 "remediation": None,
                 "next_action": next_action_copy(phase, True, None),
             }
-        nxt = next_unused_variant(db, SKILL_CODE, "transfer", run_id, "transfer")
+        nxt = next_unused_variant(db, skill, "transfer", run_id, "transfer")
         return {
             "next_phase": "transfer" if nxt else "delayed",
             "next_variant": nxt or 1,
@@ -669,7 +871,7 @@ def route_after_answer(
             "next_action": next_action_copy(phase, True, None),
         }
     if phase == "delayed":
-        nxt = next_unused_variant(db, SKILL_CODE, "delayed", run_id, "delayed")
+        nxt = next_unused_variant(db, skill, "delayed", run_id, "delayed")
         return {
             "next_phase": "delayed",
             "next_variant": nxt or variant_now,
@@ -695,7 +897,17 @@ def phase_blocked(run: sqlite3.Row, phase: str) -> bool:
     return seq.index(phase) > seq.index(current)
 
 
-def slot_for_phase(phase: str) -> str:
+def slot_for_phase(phase: str, skill_code: str | None = None) -> str:
+    if skill_code == V2_SKILL_CODE:
+        return {
+            "precheck": "diagnostic",
+            "instruction": "worked_example",
+            "faded": "faded",
+            "independent": "independent",
+            "transfer": "transfer",
+            "delayed": "delayed",
+            "control": "diagnostic",
+        }.get(phase, phase)
     return {
         "precheck": "precheck",
         "instruction": "worked_example",
@@ -1125,6 +1337,28 @@ def label_for_status(status: str) -> str:
     }.get(status, status)
 
 
+def student_status_label(status: str) -> str:
+    """Student-facing progress copy. Internal experiment labels stay on data attributes."""
+    return {
+        "not_started": "Not started",
+        "learning": "In progress",
+        "immediate_pass": "Ready for a later check",
+        "delayed_pass": "Retained",
+        "needs_review": "Needs more practice",
+    }.get(status, "In progress")
+
+
+PHASE_STUDENT_WHY = {
+    "precheck": "This diagnostic shows how you currently handle linear relationships.",
+    "instruction": "A worked example makes the method visible before you try it yourself.",
+    "faded": "Guided blanks let you complete one step at a time.",
+    "independent": "This SAT-style item checks whether you can do the work without a scaffold.",
+    "transfer": "The representation or unknown changed, so you have to choose the method again.",
+    "delayed": "This later item checks whether the method still holds after a break.",
+    "control": "Use the usual lesson and practice for this skill.",
+}
+
+
 def _eligible_assignments(db: sqlite3.Connection) -> list[sqlite3.Row]:
     return db.execute(
         """
@@ -1382,6 +1616,7 @@ def hub():
         run=run,
         skill_code=SKILL_CODE,
         status_label=label_for_status((run["mastery_status"] if run else "not_started")),
+        student_status_label=student_status_label((run["mastery_status"] if run else "not_started")),
         delayed_open=bool(run and delayed_unlocked(run)),
         show_mastered=bool(run and run["mastery_status"] == "delayed_pass"),
     )
@@ -1389,21 +1624,21 @@ def hub():
 
 @skill_loop_bp.route("/<skill_code>")
 def skill_home(skill_code: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     return redirect(url_for("skill_loop.hub"))
 
 
 @skill_loop_bp.route("/<skill_code>/feedback")
 def feedback(skill_code: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     db = _db()
     user = _current_user_row(db)
     if user is None:
         abort(401)
-    asg = get_assignment(db, int(user["id"]), SKILL_CODE)
-    run = get_run(db, int(user["id"]), SKILL_CODE)
+    asg = get_assignment(db, int(user["id"]), skill_code)
+    run = get_run(db, int(user["id"]), skill_code)
     if asg is None or run is None:
         abort(403)
     ev = db.execute(
@@ -1418,7 +1653,7 @@ def feedback(skill_code: str):
         return redirect(url_for("skill_loop.hub"))
     payload = json.loads(ev["payload_json"] or "{}")
     item_id = ev["item_id"]
-    item_row = published_item(db, item_id) if item_id else None
+    item_row = resolve_item(db, item_id, skill_code) if item_id else None
     teach = teaching_fields(item_row) if item_row is not None else {}
     phase = str(payload.get("phase") or "")
     is_correct = bool(payload.get("correct", True if phase in ("instruction", "control") else False))
@@ -1437,14 +1672,14 @@ def feedback(skill_code: str):
         result_label = "Self-report recorded"
     else:
         if remediation == "faded_rework":
-            continue_href = url_for("skill_loop.phase_view", skill_code=SKILL_CODE, phase="instruction")
+            continue_href = url_for("skill_loop.phase_view", skill_code=skill_code, phase="instruction")
         elif remediation == "delayed_needs_review":
             continue_href = url_for("skill_loop.hub")
         else:
             nxt_phase = str(payload.get("next_phase") or run["current_phase"])
             nxt_var = int(payload.get("next_variant") or run["current_variant"] or 1)
             continue_href = url_for(
-                "skill_loop.phase_view", skill_code=SKILL_CODE, phase=nxt_phase, v=nxt_var
+                "skill_loop.phase_view", skill_code=skill_code, phase=nxt_phase, v=nxt_var
             )
         next_action = str(payload.get("next_action") or next_action_copy(phase, is_correct, remediation))
         correct_display = display_correct_answer(item_row) if item_row is not None else ""
@@ -1479,15 +1714,18 @@ def feedback(skill_code: str):
         continue_href=continue_href,
         remediation=remediation,
         self_report=phase == "control",
-        skill_code=SKILL_CODE,
+        skill_code=skill_code,
+        phase_name=PHASE_TITLES.get(phase, phase),
         mastery_status=run["mastery_status"],
         mastery_label=label_for_status(run["mastery_status"]),
+        student_status_label=student_status_label(run["mastery_status"]),
+        why_this_item=PHASE_STUDENT_WHY.get(phase, ""),
     )
 
 
 @skill_loop_bp.route("/<skill_code>/<phase>")
 def phase_view(skill_code: str, phase: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     if phase not in set(PHASES_A) | set(PHASES_B):
         abort(404)
@@ -1498,8 +1736,8 @@ def phase_view(skill_code: str, phase: str):
     requested_uid = request.args.get("user_id")
     if requested_uid and int(requested_uid) != int(user["id"]):
         abort(403)
-    asg = ensure_assignment(db, int(user["id"]), SKILL_CODE, str(user["role"]), str(user["username"]))
-    run = ensure_run(db, int(user["id"]), SKILL_CODE, asg["arm"])
+    asg = ensure_assignment(db, int(user["id"]), skill_code, str(user["role"]), str(user["username"]))
+    run = ensure_run(db, int(user["id"]), skill_code, asg["arm"])
     if asg["arm"] == "A" and phase not in PHASES_A:
         db.commit()
         abort(403)
@@ -1515,18 +1753,20 @@ def phase_view(skill_code: str, phase: str):
             "skill_loop_control.html",
             lesson_href="/practice/materials/1-1-linear-equations",
             practice_href="/practice/algebra/1_1/0",
-            skill_code=SKILL_CODE,
+            skill_code=skill_code,
         )
     variant = int(request.args.get("v") or run["current_variant"] or 1)
-    slot = slot_for_phase(phase)
+    slot = slot_for_phase(phase, skill_code)
     pending = pending_remediation(db, int(run["id"]))
     if phase == "instruction" and pending and pending.get("kind") == "faded_rework":
         variant = 1
-    elif phase in ("faded", "independent", "transfer", "delayed"):
-        unused = next_unused_variant(db, SKILL_CODE, slot, int(run["id"]), phase)
+    elif phase in ("faded", "independent", "transfer", "delayed") or (
+        skill_code == V2_SKILL_CODE and phase in ("precheck", "instruction")
+    ):
+        unused = next_unused_variant(db, skill_code, slot, int(run["id"]), phase)
         if unused is not None:
             variant = unused
-    row = item_for_slot(db, SKILL_CODE, slot, variant)
+    row = item_for_slot(db, skill_code, slot, variant)
     if row is None:
         abort(404)
     emit(db, "item_shown", int(user["id"]), int(run["id"]), row["id"], {"phase": phase})
@@ -1543,15 +1783,19 @@ def phase_view(skill_code: str, phase: str):
     continue_href = None
     if review_example:
         nxt_v = int((pending or {}).get("next_variant") or run["current_variant"] or 2)
-        continue_href = url_for("skill_loop.phase_view", skill_code=SKILL_CODE, phase="faded", v=nxt_v)
+        continue_href = url_for("skill_loop.phase_view", skill_code=skill_code, phase="faded", v=nxt_v)
     return render_template(
         "skill_loop_phase.html",
         phase=phase,
+        phase_name=PHASE_TITLES.get(phase, phase),
         item=payload,
-        skill_code=SKILL_CODE,
+        skill_code=skill_code,
         arm=asg["arm"],
+        teaching_path=get_teaching_path(db, int(run["id"])),
         mastery_status=run["mastery_status"],
         mastery_label=label_for_status(run["mastery_status"]),
+        student_status_label=student_status_label(run["mastery_status"]),
+        why_this_item=PHASE_STUDENT_WHY.get(phase, ""),
         show_mastered=run["mastery_status"] == "delayed_pass",
         review_example=review_example,
         continue_href=continue_href,
@@ -1561,7 +1805,7 @@ def phase_view(skill_code: str, phase: str):
 
 @skill_loop_bp.route("/<skill_code>/submit", methods=["POST"])
 def submit(skill_code: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     db = _db()
     user = _current_user_row(db)
@@ -1574,8 +1818,8 @@ def submit(skill_code: str):
     faded_fields = data.get("faded") if isinstance(data.get("faded"), dict) else {}
     hint_level = str(data.get("hint_level") or "none")
     solution_viewed = bool(data.get("solution_viewed"))
-    asg = get_assignment(db, int(user["id"]), SKILL_CODE)
-    run = get_run(db, int(user["id"]), SKILL_CODE)
+    asg = get_assignment(db, int(user["id"]), skill_code)
+    run = get_run(db, int(user["id"]), skill_code)
     if asg is None or run is None:
         abort(403)
     if phase_blocked(run, phase) and phase != "control":
@@ -1586,10 +1830,10 @@ def submit(skill_code: str):
         abort(403)
     row = None
     if phase != "control":
-        row = published_item(db, item_id)
+        row = resolve_item(db, item_id, skill_code)
         if row is None:
             abort(403)
-        expected_slot = slot_for_phase(phase)
+        expected_slot = slot_for_phase(phase, skill_code)
         if str(row["slot"]) != expected_slot:
             abort(403)
     result = submit_answer(
@@ -1601,14 +1845,14 @@ def submit(skill_code: str):
         out.pop("correct_answer", None)
         out.pop("answer", None)
         out.pop("key", None)
-        out["feedback_path"] = url_for("skill_loop.feedback", skill_code=SKILL_CODE)
+        out["feedback_path"] = url_for("skill_loop.feedback", skill_code=skill_code)
         return jsonify(out)
-    return redirect(url_for("skill_loop.feedback", skill_code=SKILL_CODE))
+    return redirect(url_for("skill_loop.feedback", skill_code=skill_code))
 
 
 @skill_loop_bp.route("/<skill_code>/complete-control", methods=["POST"])
 def complete_control(skill_code: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     db = _db()
     user = _current_user_row(db)
@@ -1622,19 +1866,19 @@ def complete_control(skill_code: str):
     db.commit()
     if request.is_json:
         return jsonify(result)
-    return redirect(url_for("skill_loop.feedback", skill_code=SKILL_CODE))
+    return redirect(url_for("skill_loop.feedback", skill_code=skill_code))
 
 
 @skill_loop_bp.route("/<skill_code>/event", methods=["POST"])
 def track_event(skill_code: str):
-    if skill_code != SKILL_CODE:
+    if not skill_code_allowed(skill_code):
         abort(404)
     db = _db()
     user = _current_user_row(db)
     if user is None:
         abort(401)
     data = request.get_json(silent=True) or {}
-    run = get_run(db, int(user["id"]), SKILL_CODE)
+    run = get_run(db, int(user["id"]), skill_code)
     if run is None:
         abort(403)
     kind = str(data.get("kind") or "")
@@ -1642,7 +1886,7 @@ def track_event(skill_code: str):
     if kind not in ("solution", "hint"):
         abort(400)
     level = str(data.get("level") or "light")
-    row = published_item(db, item_id)
+    row = resolve_item(db, item_id, skill_code)
     if row is None:
         abort(403)
     record_solution_or_hint(db, int(run["id"]), int(user["id"]), item_id, kind, level)
