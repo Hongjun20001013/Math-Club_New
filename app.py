@@ -224,7 +224,7 @@ app.config.update(
     SKILL_LOOP_PILOT=False,
     SKILL_LOOP_V2_PREVIEW=False,
     SKILL_REPAIR=False,
-    PLACEMENT_PUBLIC_ACCESS=False,
+    PLACEMENT_PUBLIC_ACCESS=True,
 )
 
 from skill_loop import skill_loop_bp, skill_loop_enabled

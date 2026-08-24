@@ -1,6 +1,7 @@
 """Anonymous Placement candidates. Isolated from users / practice_attempts.
 
-Flag default off. Production must not enable PLACEMENT_PUBLIC_ACCESS via render.yaml.
+Guest Placement is on by default so students can start without signing in.
+Do not put PLACEMENT_PUBLIC_ACCESS in render.yaml. Set the env to 0 only to disable.
 """
 from __future__ import annotations
 

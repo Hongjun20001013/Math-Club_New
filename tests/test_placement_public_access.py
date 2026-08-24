@@ -207,6 +207,17 @@ class TestNonPlacementStillGated(_Base):
             self.assertIn("/login", rv.headers.get("Location") or "")
 
 
+class TestShippedDefaultAllowsGuest(_Base):
+    def test_guest_opens_catalog_without_signin(self):
+        os.environ.pop("PLACEMENT_PUBLIC_ACCESS", None)
+        self.app_mod.app.config["PLACEMENT_PUBLIC_ACCESS"] = True
+        rv = self.client.get("/placement", follow_redirects=False)
+        self.assertEqual(rv.status_code, 200)
+        start = self.client.get("/placement/enhanced-math-1/start", follow_redirects=False)
+        self.assertEqual(start.status_code, 200)
+        self.assertIn("No account needed", self.client.get("/login").get_data(as_text=True))
+
+
 class TestPublicProfile(_Base):
     def test_four_slugs_complete_profile(self):
         self.flag_on()
