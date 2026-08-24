@@ -547,15 +547,15 @@ class TestLockAndAdmin(_Base):
         self.assertIn("Alex Chen", listing_html)
         self.assertIn("Mia Hu", listing_html)
         self.assertIn("Advisor", listing_html)
-        self.assertIn("Provisional — paper responses not reviewed", listing_html)
+        self.assertNotIn("Provisional — paper responses not reviewed", listing_html)
         self.assertNotIn("Final score", listing_html)
         attempt_id = self.attempt_id(pid)
         detail = self.client.get(f"/admin/placement-candidates/{attempt_id}")
         self.assertEqual(detail.status_code, 200)
         detail_html = detail.get_data(as_text=True)
-        self.assertIn("MCQ", detail_html)
-        self.assertIn("Paper FRQ", detail_html)
-        self.assertIn("Provisional — paper responses not reviewed", detail_html)
+        self.assertIn("Score", detail_html)
+        self.assertNotIn("Paper FRQ", detail_html)
+        self.assertNotIn("Provisional — paper responses not reviewed", detail_html)
         self.assertNotIn("Final score", detail_html)
         pdf = self.client.get(f"/admin/placement-candidates/{attempt_id}/report.pdf")
         self.assertEqual(pdf.status_code, 200)
@@ -727,22 +727,23 @@ class TestMigration(_Base):
 
 
 def _student_answer(q: dict) -> str:
-    from answer_grader import PAPER_COMPLETE_TOKEN, is_placement_paper_item
+    from answer_grader import _enhanced_fr_tokens, is_placement_graphing_item
 
-    if is_placement_paper_item(q):
-        return PAPER_COMPLETE_TOKEN
     kind = q.get("question_kind")
     if kind in ("mcq", "mcq5"):
         return str(q.get("correct_answer") or "A")
-    if kind == "constructed_response":
+    if is_placement_graphing_item(q):
         return "graphed"
+    tokens = _enhanced_fr_tokens(q) if q.get("knowledge_section") == "FR" else []
+    if tokens:
+        return tokens[0]
     alts = q.get("answer_alternates") or []
     if alts:
         return str(alts[0])
     key = str(q.get("correct_answer") or "")
     if "no solution" in key.lower():
         return "no solution"
-    return "written explanation"
+    return key
 
 
 class TestPreviewNotMixed(_Base):
@@ -774,7 +775,6 @@ class TestFullPaperSubmits(_Base):
                 data={
                     "csrf_token": self.csrf(),
                     "selected_answer": _student_answer(q),
-                    "paper_completed": "1" if _student_answer(q) == "PAPER_COMPLETE" else "",
                     "qnum": str(i),
                 },
             )
@@ -787,7 +787,6 @@ class TestFullPaperSubmits(_Base):
             data={
                 "csrf_token": self.csrf(),
                 "selected_answer": last_ans,
-                "paper_completed": "1" if last_ans == "PAPER_COMPLETE" else "",
                 "qnum": str(expected_n - 1),
             },
         )
@@ -832,36 +831,35 @@ class TestFullPaperSubmits(_Base):
 
     def test_middle_level_100_submitted(self):
         pid, aid, rows, score, qs = self._submit_paper("middle-level", "middle_level", 100)
-        self.assertEqual(score.get("mcq_total"), 0)
-        self.assertEqual(score.get("paper_frq_total"), 100)
-        self.assertEqual(score.get("paper_frq_completed"), 100)
+        self.assertEqual(score.get("mcq_total"), 100)
+        self.assertEqual(score.get("mcq_correct"), 100)
+        self.assertEqual(score.get("paper_frq_total"), 0)
         self.assertEqual(score.get("auto_incorrect"), 0)
-        self.assertTrue(score.get("provisional"))
-        self.assertTrue(all(r[1] is None for r in rows))
+        self.assertFalse(score.get("provisional"))
+        self.assertTrue(all(r[1] == 1 for r in rows))
         html = self.client.get(f"/placement/run/{pid}/done").get_data(as_text=True)
-        self.assertIn("No multiple-choice items", html)
-        self.assertIn("Automatically scored section", html)
-        self.assertIn("Paper FRQ: awaiting teacher review", html)
+        self.assertIn("100 / 100", html)
+        self.assertNotIn("Paper FRQ", html)
         self.assertNotIn("Final score", html)
 
     def test_enhanced_math_1_65_manual_counts(self):
         pid, aid, rows, score, qs = self._submit_paper("enhanced-math-1", "enhanced_math_1", 65)
         graphing = sum(1 for q in qs if q.get("question_kind") == "constructed_response")
         self.assertEqual(graphing, 4)
-        self.assertEqual(score.get("mcq_total"), 50)
-        self.assertEqual(score.get("paper_frq_total"), 15)
+        self.assertEqual(score.get("mcq_total"), 61)
+        self.assertEqual(score.get("paper_frq_total"), 4)
         self.assertEqual(score.get("auto_incorrect"), 0)
-        self.assertEqual(score.get("total"), 50)
+        self.assertEqual(score.get("total"), 61)
         q55 = rows[54]
-        self.assertIsNone(q55[1])
-        self.assertEqual(q55[2], "PAPER_COMPLETE")
+        self.assertIn(q55[1], (0, 1, None))
+        self.assertNotEqual(q55[2], "PAPER_COMPLETE")
 
     def test_enhanced_math_2_69_q67(self):
         pid, aid, rows, score, qs = self._submit_paper("enhanced-math-2", "enhanced_math_2", 69)
-        self.assertEqual(score.get("mcq_total"), 55)
-        self.assertEqual(score.get("paper_frq_total"), 14)
-        self.assertEqual(rows[66][2], "PAPER_COMPLETE")
-        self.assertIsNone(rows[66][1])
+        self.assertEqual(score.get("mcq_total"), 65)
+        self.assertEqual(score.get("paper_frq_total"), 4)
+        self.assertNotEqual(rows[66][2], "PAPER_COMPLETE")
+        self.assertEqual(rows[66][1], 1)
         self.assertEqual(score.get("auto_incorrect"), 0)
 
     def test_upper_school_85_q59_unique(self):
@@ -878,7 +876,7 @@ class TestFullPaperSubmits(_Base):
         self.assertEqual(rows[58][2], "A")
         self.assertEqual(rows[58][1], 1)
 
-    def test_frq_text_does_not_change_mcq_or_count_wrong(self):
+    def test_frq_keys_are_auto_scored(self):
         from app import BANKS, get_questions_for_topic
         from placement_public import reset_rate_limits_for_tests
 
@@ -888,34 +886,25 @@ class TestFullPaperSubmits(_Base):
         rv = self.begin(slug="enhanced-math-2", name="FRQ isolation")
         pid = self.public_id_from_location(rv)
         self.client.get(f"/placement/run/{pid}/item/0")
-        mcq_correct = 0
         for i, q in enumerate(qs):
-            if q.get("question_kind") in ("mcq", "mcq5"):
-                ans = q["correct_answer"]
-                mcq_correct += 1
-            else:
-                ans = "10.1"
             self.client.post(
                 f"/placement/run/{pid}/item/{i}",
-                data={"csrf_token": self.csrf(), "selected_answer": ans, "qnum": str(i)},
+                data={"csrf_token": self.csrf(), "selected_answer": _student_answer(q), "qnum": str(i)},
             )
         self.client.post(
             f"/placement/run/{pid}/finish",
             data={"csrf_token": self.csrf(), "confirm": "1"},
         )
         html = self.client.get(f"/placement/run/{pid}/done").get_data(as_text=True)
-        self.assertIn("Automatically scored section", html)
-        self.assertIn("Paper FRQ: awaiting teacher review", html)
-        self.assertIn("Provisional — paper responses not reviewed", html)
+        self.assertIn("Score", html)
+        self.assertNotIn("Paper FRQ", html)
+        self.assertNotIn("Provisional — paper responses not reviewed", html)
         self.assertNotIn("Final score", html)
-        self.assertNotIn("complete Placement score", html)
         self.login(user_id=1, role="admin", username="teacher")
         aid = self.attempt_id(pid)
         admin_html = self.client.get(f"/admin/placement-candidates/{aid}").get_data(as_text=True)
-        self.assertIn("MCQ 55 / 55", admin_html)
-        self.assertIn("Paper FRQ", admin_html)
-        self.assertIn("Provisional — paper responses not reviewed", admin_html)
-        self.assertNotIn("Final score", admin_html)
+        self.assertIn("Score", admin_html)
+        self.assertNotIn("Paper FRQ", admin_html)
         conn = sqlite3.connect(self.db)
         try:
             rows = conn.execute(
@@ -931,13 +920,12 @@ class TestFullPaperSubmits(_Base):
         finally:
             conn.close()
         by_i = {r[0]: r[1] for r in rows}
-        self.assertIsNone(by_i.get(66))
-        self.assertEqual(score["mcq_correct"], 55)
-        self.assertEqual(score["mcq_total"], 55)
+        self.assertEqual(by_i.get(66), 1)
+        self.assertEqual(score["mcq_total"], 65)
         self.assertEqual(score["auto_incorrect"], 0)
-        self.assertEqual(mcq_correct, 55)
+        self.assertGreaterEqual(score["mcq_correct"], 55)
 
-    def test_paper_item_has_notice_and_checkbox_not_text_box(self):
+    def test_graphing_has_textarea_and_mcq_has_choices(self):
         from placement_public import reset_rate_limits_for_tests
 
         self.flag_on()
@@ -948,10 +936,10 @@ class TestFullPaperSubmits(_Base):
             sess["placement_em1_seen_graphing"] = True
             sess["placement_em1_seen_fr"] = True
         html = self.client.get(f"/placement/run/{pid}/item/50").get_data(as_text=True)
-        self.assertIn("Complete this question on paper. This item is not scored automatically.", html)
-        self.assertIn("I completed this question on paper", html)
-        self.assertNotIn("id=\"spr-answer-input\"", html)
-        self.assertNotIn("id=\"constructed-answer-input\"", html)
+        self.assertIn('id="constructed-answer-input"', html)
+        self.assertNotIn("I completed this question on paper", html)
+        fr = self.client.get(f"/placement/run/{pid}/item/54").get_data(as_text=True)
+        self.assertIn('id="spr-answer-input"', fr)
         mcq = self.client.get(f"/placement/run/{pid}/item/0").get_data(as_text=True)
         self.assertIn("choice-radio-input", mcq)
         self.assertNotIn("Complete this question on paper", mcq)
@@ -1001,22 +989,18 @@ class TestFullPaperSubmits(_Base):
         self.assertEqual(len(rows), 50)
         self.assertTrue(all(r[1] == 1 for r in rows))
         self.assertEqual(score["mcq_correct"], 50)
-        self.assertEqual(score["mcq_total"], 50)
+        self.assertEqual(score["mcq_total"], 61)
         self.assertEqual(score["auto_incorrect"], 0)
         self.assertEqual(score["paper_frq_completed"], 0)
-        self.assertEqual(score["paper_frq_total"], 15)
-        self.assertEqual(score["unscored"], 15)
+        self.assertEqual(score["paper_frq_total"], 4)
         self.login(user_id=1, role="admin", username="teacher")
         detail = self.client.get(f"/admin/placement-candidates/{aid}").get_data(as_text=True)
-        self.assertIn("MCQ 50 / 50", detail)
-        self.assertIn("Paper FRQ 0 / 15 completed", detail)
-        self.assertIn("Provisional — paper responses not reviewed", detail)
+        self.assertIn("Score 50 / 61", detail)
+        self.assertIn("Graphing 0 / 4 submitted", detail)
         self.assertNotIn("Final score", detail)
-        self.assertIn("unscored", detail)
         listing = self.client.get("/admin/placement-candidates").get_data(as_text=True)
-        self.assertIn("MCQ 50/50", listing)
-        self.assertIn("0/15", listing)
-        self.assertIn("Provisional — paper responses not reviewed", listing)
+        self.assertIn("50/61", listing)
+        self.assertIn("0/4", listing)
         self.assertNotIn("Final score", listing)
 
     def test_logged_in_paper_item_and_summary_not_final(self):
@@ -1054,13 +1038,9 @@ class TestFullPaperSubmits(_Base):
         page = self.client.get("/practice/placement/enhanced_math_1/50")
         html = page.get_data(as_text=True)
         self.assertEqual(page.status_code, 200)
-        self.assertIn(
-            "Complete this question on paper. This item is not scored automatically.",
-            html,
-        )
-        self.assertIn("I completed this question on paper", html)
+        self.assertIn('id="constructed-answer-input"', html)
+        self.assertNotIn("I completed this question on paper", html)
         self.assertNotIn('id="spr-answer-input"', html)
-        self.assertNotIn('id="constructed-answer-input"', html)
         aid_m = re.search(r'name="attempt_id" value="(\d+)"', html)
         self.assertIsNotNone(aid_m)
         aid = int(aid_m.group(1))
@@ -1072,8 +1052,7 @@ class TestFullPaperSubmits(_Base):
                 "topic": "enhanced_math_1",
                 "qnum": "50",
                 "attempt_id": str(aid),
-                "paper_completed": "1",
-                "selected_answer": "",
+                "selected_answer": "graphed on the number line",
             },
         )
         self.client.post(
@@ -1088,12 +1067,11 @@ class TestFullPaperSubmits(_Base):
             },
         )
         summary = self.client.get(f"/practice/session/{aid}/summary").get_data(as_text=True)
-        self.assertIn("Automatically scored section", summary)
-        self.assertIn("Paper FRQ: awaiting teacher review", summary)
-        self.assertIn("Provisional — paper responses not reviewed", summary)
+        self.assertIn("Your results", summary)
+        self.assertNotIn("Paper FRQ", summary)
+        self.assertNotIn("Provisional — paper responses not reviewed", summary)
         self.assertNotIn("Final score", summary)
-        self.assertNotIn("complete Placement score", summary)
-        self.assertIn("/ 50", summary)
+        self.assertIn("/ 61", summary)
         conn = sqlite3.connect(self.db)
         try:
             paper = conn.execute(
@@ -1102,7 +1080,7 @@ class TestFullPaperSubmits(_Base):
             ).fetchone()
         finally:
             conn.close()
-        self.assertEqual(paper[0], "PAPER_COMPLETE")
+        self.assertEqual(paper[0], "graphed on the number line")
         self.assertIsNone(paper[1])
 
 

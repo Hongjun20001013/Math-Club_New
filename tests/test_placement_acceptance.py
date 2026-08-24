@@ -15,11 +15,9 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 from answer_grader import (  # noqa: E402
-    PAPER_COMPLETE_TOKEN,
-    PAPER_NOTICE,
+    is_placement_graphing_item,
     is_placement_paper_item,
     placement_auto_score_breakdown,
-    placement_recorded_paper_answer,
     placement_result_status,
     response_is_correct,
 )
@@ -102,7 +100,11 @@ class TestUpperQ27Figure(unittest.TestCase):
 
 
 class TestMiddleLevelText(unittest.TestCase):
-    def test_q85_frogs_not_fogs(self):
+    def test_q21_cherries_449(self):
+        q = _bank()["placement"]["middle_level"][20]
+        self.assertIn("1347 cherries", q["stem"])
+        self.assertTrue(response_is_correct(q, "449"))
+        self.assertFalse(response_is_correct(q, "1347"))
         stem = _bank()["placement"]["middle_level"][84]["stem"]
         self.assertIn("120 blue frogs", stem)
         self.assertNotIn("fogs", stem)
@@ -137,7 +139,7 @@ class TestEnhancedOpenResponse(unittest.TestCase):
         )
         self.assertEqual(
             placement_result_status(q, 1, "no solution"),
-            "paper_response",
+            "auto correct",
         )
 
     def test_prose_not_auto_incorrect(self):
@@ -146,11 +148,11 @@ class TestEnhancedOpenResponse(unittest.TestCase):
         self.assertIsNone(got)
         self.assertEqual(
             placement_result_status(q, None, "C = 21h + 66 with slope the hourly rate"),
-            "paper_response",
+            "awaiting review",
         )
-        self.assertNotIn(
+        self.assertEqual(
             placement_result_status(q, 1, "10.1"),
-            ("auto correct", "auto incorrect"),
+            "auto correct",
         )
 
     def test_graphing_unscored(self):
@@ -159,7 +161,7 @@ class TestEnhancedOpenResponse(unittest.TestCase):
         self.assertIsNone(response_is_correct(q, "graphed on the number line"))
         self.assertEqual(
             placement_result_status(q, None, "graphed on the number line"),
-            "paper_response",
+            "submitted",
         )
         self.assertEqual(placement_result_status(q, None, ""), "unscored")
 
@@ -180,16 +182,18 @@ EXPECTED_MCQ = {
 }
 
 
-class TestPaperFrqNotAutoScored(unittest.TestCase):
-    def test_mcq_denominators(self):
+class TestScoredFillIns(unittest.TestCase):
+    def test_item_kinds(self):
         b = _bank()["placement"]
         for topic, n in EXPECTED_MCQ.items():
             mcq = sum(1 for q in b[topic] if q.get("question_kind") in ("mcq", "mcq5"))
             paper = sum(1 for q in b[topic] if is_placement_paper_item(q))
+            graph = sum(1 for q in b[topic] if is_placement_graphing_item(q))
             self.assertEqual(mcq, n, topic)
-            self.assertEqual(mcq + paper, len(b[topic]), topic)
+            self.assertEqual(paper, 0, topic)
+            self.assertEqual(graph, 4 if topic.startswith("enhanced") else 0, topic)
 
-    def test_frq_text_and_checkbox_do_not_change_mcq_score(self):
+    def test_keyed_frq_changes_score(self):
         qs = _bank()["placement"]["enhanced_math_2"]
         selected = {}
         graded = {}
@@ -202,33 +206,23 @@ class TestPaperFrqNotAutoScored(unittest.TestCase):
         graded_fr = dict(graded)
         selected_fr[66] = "10.1"
         graded_fr[66] = 1
-        polluted = placement_auto_score_breakdown(qs, selected_fr, graded_fr)
-        self.assertEqual(polluted["mcq_correct"], base["mcq_correct"])
-        self.assertEqual(polluted["mcq_total"], 55)
-        self.assertEqual(polluted["auto_incorrect"], 0)
-        box = placement_recorded_paper_answer("", "1")
-        selected_box = dict(selected)
-        selected_box[66] = box
-        boxed = placement_auto_score_breakdown(qs, selected_box, graded)
-        self.assertEqual(boxed["mcq_correct"], base["mcq_correct"])
-        self.assertEqual(boxed["paper_frq_completed"], 1)
-        self.assertEqual(box, PAPER_COMPLETE_TOKEN)
+        scored = placement_auto_score_breakdown(qs, selected_fr, graded_fr)
+        self.assertEqual(base["mcq_total"], 65)
+        self.assertEqual(scored["mcq_correct"], base["mcq_correct"] + 1)
+        self.assertEqual(scored["auto_incorrect"], 0)
+        self.assertEqual(scored["paper_frq_total"], 4)
 
-    def test_incomplete_frq_is_unscored_not_wrong(self):
+    def test_incomplete_frq_is_not_wrong(self):
         qs = _bank()["placement"]["enhanced_math_1"]
         selected = {i: q["correct_answer"] for i, q in enumerate(qs) if q.get("question_kind") == "mcq"}
         score = placement_auto_score_breakdown(qs, selected, {i: 1 for i in selected})
-        self.assertEqual(score["mcq_total"], 50)
+        self.assertEqual(score["mcq_total"], 61)
+        self.assertEqual(score["mcq_correct"], 50)
         self.assertEqual(score["auto_incorrect"], 0)
-        self.assertEqual(score["paper_frq_total"], 15)
-        self.assertEqual(score["unscored"], 15)
+        self.assertEqual(score["paper_frq_total"], 4)
         q = qs[54]
-        self.assertEqual(placement_result_status(q, 0, ""), "unscored")
-        self.assertNotEqual(placement_result_status(q, 0, ""), "auto incorrect")
-        self.assertEqual(
-            PAPER_NOTICE,
-            "Complete this question on paper. This item is not scored automatically.",
-        )
+        self.assertEqual(placement_result_status(q, None, ""), "skipped")
+        self.assertNotEqual(placement_result_status(q, 0, "zzz"), "skipped")
 
 
 def _choice_integers(text: str) -> list[int]:

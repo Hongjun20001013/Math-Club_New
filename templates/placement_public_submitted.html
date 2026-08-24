@@ -11,16 +11,17 @@
       <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
       <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Sitting locked</p>
       <h1 class="np-pl-display np-pl-display--md">Submitted</h1>
-      <p class="np-pl-lead">{{ test.title }} is locked. Scores below are the automatically scored section only.</p>
-      <section class="np-pl-score-box np-pl-score-box--monument" aria-label="Automatically scored section">
-        <p class="np-pl-score-kicker">Automatically scored section</p>
+      <p class="np-pl-lead">{{ test.title }} is locked. Your auto-scored results are below.</p>
+      <section class="np-pl-score-box np-pl-score-box--monument" aria-label="Placement score">
+        <p class="np-pl-score-kicker">Score</p>
         {% if score and score.mcq_total %}
         <p class="np-pl-score-value">{{ score.mcq_correct }} / {{ score.mcq_total }}</p>
         {% else %}
-        <p class="np-pl-score-value">No multiple-choice items</p>
+        <p class="np-pl-score-value">No scored items</p>
         {% endif %}
-        <p class="np-pl-score-paper">Paper FRQ: awaiting teacher review{% if score and score.paper_frq_total %} · {{ score.paper_frq_completed }}/{{ score.paper_frq_total }} marked complete{% endif %}</p>
-        <p class="np-pl-score-note">Provisional — paper responses not reviewed</p>
+        {% if score and score.paper_frq_total %}
+        <p class="np-pl-score-paper">Graphing items saved for advisor review · {{ score.paper_frq_completed }}/{{ score.paper_frq_total }} submitted</p>
+        {% endif %}
       </section>
       <p class="np-pl-lead">Your counselor can open the full report in Administration.</p>
     </article>

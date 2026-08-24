@@ -335,7 +335,7 @@ def _draw_score_card(
     pdf.set_xy(pdf.l_margin + pad, y0 + pad)
     pdf.set_font(font, "", 8)
     pdf.set_text_color(*_C_MUTED)
-    score_kicker = "AUTOMATICALLY SCORED SECTION" if provisional else "RAW SCORE"
+    score_kicker = "RAW SCORE"
     pdf.cell(62, 5, _pdf_core_font_safe(score_kicker), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_x(pdf.l_margin + pad)
     pdf.set_font(font, "B", 26)
@@ -348,23 +348,19 @@ def _draw_score_card(
     pdf.set_font(font, "", 9)
     pdf.set_text_color(*_C_MUTED)
     denom_note = (
-        "No multiple-choice items"
-        if provisional and not total
-        else (
-            f"{pct}% of multiple-choice items"
-            if provisional
-            else f"{pct}% of items correct"
-        )
+        "No auto-scored items"
+        if not total
+        else f"{pct}% of items correct"
     )
     pdf.cell(66, 5, _pdf_core_font_safe(denom_note), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    if provisional:
+    if paper_total:
         pdf.set_x(pdf.l_margin + pad)
         pdf.set_font(font, "", 8)
         pdf.cell(
             66,
             4.5,
             _pdf_core_font_safe(
-                f"Paper FRQ: awaiting teacher review · {paper_completed}/{paper_total}"
+                f"Graphing items for advisor review · {paper_completed}/{paper_total}"
             ),
             new_x=XPos.LMARGIN,
             new_y=YPos.NEXT,
@@ -375,14 +371,14 @@ def _draw_score_card(
     pdf.set_xy(bar_x, y0 + pad)
     pdf.set_font(font, "B", 10)
     pdf.set_text_color(*_C_INK)
-    right_title = "Provisional" if provisional else "Session accuracy"
+    right_title = "Session accuracy"
     pdf.cell(bar_w, 5, _pdf_core_font_safe(right_title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_x(bar_x)
     pdf.set_font(font, "", 8)
     pdf.set_text_color(*_C_MUTED)
     right_note = (
-        "Provisional — paper responses not reviewed. This is not a final Placement score."
-        if provisional
+        "Graphing items are saved for advisor review and are not in this percentage."
+        if paper_total
         else "How you performed on this diagnostic only—not a course grade."
     )
     pdf.multi_cell(

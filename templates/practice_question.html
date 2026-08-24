@@ -276,24 +276,12 @@
 
             <div class="sat-split-gutter" aria-hidden="true"></div>
 
-            <aside class="sat-pane sat-pane-choices" aria-label="{% if placement_paper_item|default(false) %}Paper response{% elif q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+                    <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if placement_paper_item|default(false) %}Paper response{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if placement_paper_item|default(false) %}Not scored automatically{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
-                {% if placement_paper_item|default(false) %}
-                <div class="sat-response-scroll">
-                    <div class="sat-paper-panel" role="note">
-                        <p class="sat-paper-notice">Complete this question on paper. This item is not scored automatically.</p>
-                        <label class="sat-paper-check">
-                            <input type="checkbox" name="paper_completed" id="paper-completed-input" value="1"{% if saved_selected_answer|default('') %} checked{% endif %}>
-                            <span>I completed this question on paper</span>
-                        </label>
-                        <input type="hidden" name="selected_answer" id="paper-selected-input" value="{% if saved_selected_answer|default('') %}PAPER_COMPLETE{% endif %}">
-                        <p class="sat-paper-hint">Your counselor will review the paper work. Checking the box only records that you finished it.</p>
-                    </div>
-                </div>
-                {% elif q.question_kind|default('mcq') == 'constructed_response' %}
+                {% if q.question_kind|default('mcq') == 'constructed_response' %}
                 <div class="sat-response-scroll">
                     <div class="sat-response-studio">
                         <div class="sat-response-studio__head">
@@ -358,12 +346,12 @@
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">Next question</button>
                     {% endif %}
                     {% elif is_last %}
-                    <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item. Automatically scored section uses multiple-choice items only.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
+                    <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
                     {% endif %}
-                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if placement_paper_item|default(false) %}Complete on paper, then check the box if you finished.{% elif q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
+                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
                 </div>
             </aside>
         </div>
@@ -748,8 +736,8 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pagehide", autosaveNow);
 
-const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response' and not placement_paper_item|default(false)) | tojson }};
-const isPlacementPaper = {{ (placement_paper_item|default(false)) | tojson }};
+const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response') | tojson }};
+const isPlacementPaper = false;
 
 function setAnswerState(hasAnswer, label) {
     practiceForm?.classList.toggle("is-answered", hasAnswer);
@@ -767,7 +755,7 @@ function setAnswerState(hasAnswer, label) {
     if (answerStatus) {
         answerStatus.textContent = hasAnswer
             ? (label || "Answer selected. You can submit when ready.")
-            : "{% if placement_paper_item|default(false) %}Complete on paper, then check the box if you finished.{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type your work, then click Save &amp; next.{% elif q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
+            : "{% if q.question_kind|default('mcq') == 'constructed_response' %}Type your work, then click Save &amp; next.{% elif q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
     }
 }
 

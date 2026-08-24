@@ -3,6 +3,7 @@ from answer_grader import (
     PAPER_COMPLETE_TOKEN,
     display_answer_plain,
     grade_for_db,
+    is_placement_graphing_item,
     is_placement_paper_item,
     is_mcq_item,
     placement_auto_score_breakdown,
@@ -14888,6 +14889,10 @@ def _practice_session_summary_payload(
                         correct_count += 1
                     elif label == "auto incorrect":
                         status = "incorrect"
+                    elif label == "submitted":
+                        status = "submitted"
+                    elif label in ("awaiting review", "unscored"):
+                        status = "nocheck" if yours != "—" else "unscored"
                     else:
                         status = "nocheck"
             elif not key:
@@ -14926,19 +14931,23 @@ def _practice_session_summary_payload(
         )
 
     score_pct = round(100.0 * correct_count / total_q) if total_q else 0
-    paper_frq_total = sum(1 for q in questions if is_placement_paper_item(q))
-    paper_frq_completed = sum(1 for row in rows_out if row["status"] == "paper_response")
+    paper_frq_total = sum(1 for q in questions if is_placement_graphing_item(q))
+    paper_frq_completed = sum(1 for row in rows_out if row["status"] == "submitted")
     placement_mcq_correct = correct_count
-    placement_mcq_total = sum(1 for q in questions if is_mcq_item(q)) if domain == "placement" else total_q
+    placement_mcq_total = (
+        sum(1 for q in questions if not is_placement_graphing_item(q))
+        if domain == "placement"
+        else total_q
+    )
     flow_cfg = _placement_flow_config(topic) if domain == "placement" else None
     if domain == "placement":
-        mcq_rows = [
+        auto_rows = [
             (row, qobj)
             for row, qobj in zip(rows_out, questions)
-            if is_mcq_item(qobj)
+            if not is_placement_graphing_item(qobj)
         ]
-        placement_mcq_total = len(mcq_rows)
-        placement_mcq_correct = sum(1 for row, _ in mcq_rows if row["status"] == "correct")
+        placement_mcq_total = len(auto_rows)
+        placement_mcq_correct = sum(1 for row, _ in auto_rows if row["status"] == "correct")
         if placement_mcq_total:
             score_pct = round(100.0 * placement_mcq_correct / placement_mcq_total)
         else:
@@ -14963,9 +14972,9 @@ def _practice_session_summary_payload(
     for row, qobj in zip(rows_out, questions):
         sec = qobj.get("knowledge_section", "—")
         acc[sec]["title"] = qobj.get("knowledge_section_title_en", "") or acc[sec]["title"]
-        if domain == "placement" and is_placement_paper_item(qobj):
+        if domain == "placement" and is_placement_graphing_item(qobj):
             acc[sec]["paper_total"] += 1
-            if row["status"] == "paper_response":
+            if row["status"] == "submitted":
                 acc[sec]["paper_completed"] += 1
             continue
         acc[sec]["total"] += 1
@@ -15121,7 +15130,7 @@ def _practice_session_summary_payload(
         "placement_score_total": placement_score_total if domain == "placement" else None,
         "paper_frq_completed": paper_frq_completed if domain == "placement" else None,
         "paper_frq_total": paper_frq_total if domain == "placement" else None,
-        "placement_provisional": domain == "placement",
+        "placement_provisional": False,
         "score_pct": score_pct,
         "answered_count": total_q - skipped_count,
         "answered_pct": (
@@ -15163,7 +15172,7 @@ def _practice_session_summary_payload(
         "score_pct": score_pct,
         "paper_frq_completed": paper_frq_completed if domain == "placement" else 0,
         "paper_frq_total": paper_frq_total if domain == "placement" else 0,
-        "placement_provisional": domain == "placement",
+        "placement_provisional": False,
         "session_duration_seconds": duration_seconds,
         "session_duration_label": session_duration_label,
         "topic_title": topic_title,
@@ -17512,9 +17521,9 @@ def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
             mcq_t = score.get("mcq_total", score.get("total", 0))
             paper_c = score.get("paper_frq_completed", 0)
             paper_t = score.get("paper_frq_total", 0)
-            row["score_label"] = f"MCQ {mcq_c}/{mcq_t}"
-            row["paper_label"] = f"{paper_c}/{paper_t}"
-            row["provisional"] = True
+            row["score_label"] = f"{mcq_c}/{mcq_t}"
+            row["paper_label"] = f"{paper_c}/{paper_t}" if paper_t else "—"
+            row["provisional"] = False
         else:
             row["score_label"] = "—"
             row["paper_label"] = "—"
@@ -17742,7 +17751,7 @@ def admin_placement_candidate_pdf(attempt_id: int):
         "attempt_id": attempt_id,
         "paper_frq_completed": score["paper_frq_completed"],
         "paper_frq_total": score["paper_frq_total"],
-        "placement_provisional": True,
+        "placement_provisional": False,
     }
     body = build_placement_parent_pdf(pdf_ctx)
     return Response(

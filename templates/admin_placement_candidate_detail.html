@@ -6,9 +6,8 @@
     <p><a href="{{ url_for('admin_placement_candidates') }}">← Placement Candidates</a></p>
     <h1>{{ attempt.display_name }}</h1>
     <p>{{ test.title if test else attempt.slug }} · {{ status_label }} · {{ attempt.answered_count }}/{{ attempt.total_count }} answered</p>
-    <p class="np-admin-provisional">Provisional — paper responses not reviewed</p>
     {% if score %}
-    <p>MCQ {{ score.mcq_correct }} / {{ score.mcq_total }} · Paper FRQ {{ score.paper_frq_completed }} / {{ score.paper_frq_total }} completed</p>
+    <p>Score {{ score.mcq_correct }} / {{ score.mcq_total }}{% if score.paper_frq_total %} · Graphing {{ score.paper_frq_completed }} / {{ score.paper_frq_total }} submitted{% endif %}</p>
     {% endif %}
     <p>Grade: {{ attempt.grade or "—" }} · School: {{ attempt.school or "—" }} · Course: {{ attempt.math_course or "—" }} · Advisor: {{ attempt.counselor_source or "Not provided" }}</p>
     <p>

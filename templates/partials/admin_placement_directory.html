@@ -33,11 +33,10 @@
           <div class="np-admin-directory-stat" data-label="Progress">
             <strong>{{ row.answered_count }}/{{ row.total_count }}</strong>
           </div>
-          <div class="np-admin-directory-stat" data-label="MCQ">
+          <div class="np-admin-directory-stat" data-label="Score">
             <strong>{{ row.score_label }}</strong>
-            {% if row.provisional %}<span class="np-admin-provisional">Provisional — paper responses not reviewed</span>{% endif %}
           </div>
-          <div class="np-admin-directory-stat" data-label="Paper FRQ">
+          <div class="np-admin-directory-stat" data-label="Graphing">
             <strong>{{ row.paper_label or "—" }}</strong>
           </div>
           <div class="np-admin-directory-stat" data-label="Status">

@@ -373,12 +373,14 @@ PAPER_NOTICE = "Complete this question on paper. This item is not scored automat
 PAPER_CHECKBOX_LABEL = "I completed this question on paper"
 
 
-def is_placement_paper_item(question: dict) -> bool:
-    """Placement FRQ, constructed response, and graphing items are paper-only."""
+def is_placement_graphing_item(question: dict) -> bool:
     kind = str(question.get("question_kind") or "")
-    if kind in ("constructed_response", "free_response"):
-        return True
-    return str(question.get("knowledge_section") or "") in ("FR", "G")
+    return kind == "constructed_response" or str(question.get("knowledge_section") or "") == "G"
+
+
+def is_placement_paper_item(question: dict) -> bool:
+    """Paper checkbox UI was reverted. Students type or select answers."""
+    return False
 
 
 def is_mcq_item(question: dict) -> bool:
@@ -392,13 +394,11 @@ def is_paper_complete(selected: str) -> bool:
 def placement_recorded_paper_answer(
     form_selected: str, paper_completed: str | None = None
 ) -> str:
-    """Checkbox (or any leftover typed value) records completion only. Never a graded key."""
+    """Kept for old drafts. New attempts store the typed or selected answer."""
     flag = str(paper_completed or "").strip().lower()
     if flag in ("1", "on", "true", "yes", PAPER_COMPLETE_TOKEN.lower()):
-        return PAPER_COMPLETE_TOKEN
-    if (form_selected or "").strip():
-        return PAPER_COMPLETE_TOKEN
-    return ""
+        return (form_selected or "").strip() or PAPER_COMPLETE_TOKEN
+    return (form_selected or "").strip()
 
 
 def placement_auto_score_breakdown(
@@ -406,66 +406,59 @@ def placement_auto_score_breakdown(
     selected_by_index: dict[int, str],
     is_correct_by_index: dict[int, Optional[int]] | None = None,
 ) -> dict:
-    """MCQ-only auto score. Paper FRQ never changes the numerator or denominator."""
+    """Auto-score MCQ and keyed fill-ins. Graphing stays out of the denominator."""
     is_correct_by_index = is_correct_by_index or {}
-    mcq_total = 0
-    mcq_correct = 0
-    mcq_incorrect = 0
-    paper_total = 0
-    paper_completed = 0
+    auto_total = 0
+    auto_correct = 0
+    auto_incorrect = 0
+    graphing_total = 0
+    graphing_answered = 0
+    awaiting_review = 0
     for i, question in enumerate(questions):
         selected = str(selected_by_index.get(i) or "")
-        if is_placement_paper_item(question):
-            paper_total += 1
-            if is_paper_complete(selected):
-                paper_completed += 1
+        if is_placement_graphing_item(question):
+            graphing_total += 1
+            if selected.strip():
+                graphing_answered += 1
             continue
-        if not is_mcq_item(question):
-            paper_total += 1
-            if is_paper_complete(selected):
-                paper_completed += 1
-            continue
-        mcq_total += 1
+        auto_total += 1
         ic = is_correct_by_index[i] if i in is_correct_by_index else None
         if i not in is_correct_by_index:
             graded = response_is_correct(question, selected) if selected.strip() else None
             ic = None if graded is None else int(bool(graded))
         if ic == 1:
-            mcq_correct += 1
+            auto_correct += 1
         elif ic == 0:
-            mcq_incorrect += 1
+            auto_incorrect += 1
+        elif selected.strip():
+            awaiting_review += 1
     return {
-        "mcq_correct": mcq_correct,
-        "mcq_total": mcq_total,
-        "mcq_incorrect": mcq_incorrect,
-        "paper_frq_completed": paper_completed,
-        "paper_frq_total": paper_total,
-        "provisional": True,
-        "correct": mcq_correct,
-        "scored": mcq_correct + mcq_incorrect,
-        "total": mcq_total,
+        "mcq_correct": auto_correct,
+        "mcq_total": auto_total,
+        "mcq_incorrect": auto_incorrect,
+        "paper_frq_completed": graphing_answered,
+        "paper_frq_total": graphing_total,
+        "provisional": False,
+        "correct": auto_correct,
+        "scored": auto_correct + auto_incorrect,
+        "total": auto_total,
         "item_total": len(questions),
-        "auto_correct": mcq_correct,
-        "auto_incorrect": mcq_incorrect,
-        "paper_response": paper_completed,
-        "unscored": paper_total - paper_completed,
-        "awaiting_review": 0,
-        "unscored_graphing": 0,
+        "auto_correct": auto_correct,
+        "auto_incorrect": auto_incorrect,
+        "paper_response": 0,
+        "unscored": graphing_total - graphing_answered + (auto_total - auto_correct - auto_incorrect),
+        "awaiting_review": awaiting_review,
+        "unscored_graphing": graphing_total,
+        "graphing_answered": graphing_answered,
+        "graphing_total": graphing_total,
     }
 
 
 def placement_result_status(question: dict, is_correct: Optional[int], selected: str) -> str:
-    """Staff-facing label for one placement item.
-
-    Paper FRQ / graphing items are never auto_correct or auto_incorrect.
-    """
+    """Staff-facing label for one placement item."""
     has = bool((selected or "").strip())
-    kind = question.get("question_kind")
-    sec = question.get("knowledge_section")
-    if is_placement_paper_item(question):
-        return "paper_response" if has else "unscored"
-    if kind == "constructed_response" or sec == "G":
-        return "unscored" if has else "unscored"
+    if is_placement_graphing_item(question):
+        return "submitted" if has else "unscored"
     if is_correct == 1:
         return "auto correct"
     if is_correct == 0:

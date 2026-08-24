@@ -40,7 +40,7 @@
       <div class="np-summary-hero-text">
         <p class="np-summary-kicker">{% if domain == 'placement' %}Diagnostic complete{% else %}Session complete{% endif %}</p>
         {% if domain == 'placement' %}<p class="np-pl-brand" style="margin-bottom:8px;">{{ site_brand_name }}</p>{% endif %}
-        <h1 class="np-summary-title">{% if domain == 'placement' %}Automatically scored section{% else %}Your results{% endif %}</h1>
+        <h1 class="np-summary-title">Your results</h1>
         {% if domain == 'placement' and placement_student and placement_student.name %}
         <p class="np-summary-for-student">For <strong>{{ placement_student.name }}</strong>{% if placement_student.grade %} · {{ placement_student.grade }}{% endif %}</p>
         {% endif %}
@@ -71,16 +71,16 @@
           </div>
           <p class="np-score-pct"><span id="np-score-pct-num" data-target="{{ score_pct }}">0</span>% correct</p>
           {% if domain == 'placement' %}
-          <p class="np-summary-kicker">Provisional — paper responses not reviewed</p>
-          <p class="np-score-section-label">Automatically scored section</p>
           <p class="np-summary-score-foot">
             {% if score_den %}
-            {{ correct_count }} correct of {{ score_den }} multiple-choice items
+            {{ correct_count }} correct of {{ score_den }} scored items
             {% else %}
-            This form has no multiple-choice items.
+            This form has no auto-scored items.
             {% endif %}
           </p>
-          <p class="np-summary-paper-frq">Paper FRQ: awaiting teacher review{% if paper_frq_total %} · {{ paper_frq_completed or 0 }}/{{ paper_frq_total }} marked complete{% endif %}</p>
+          {% if paper_frq_total %}
+          <p class="np-summary-paper-frq">Graphing items saved for advisor review · {{ paper_frq_completed or 0 }}/{{ paper_frq_total }} submitted</p>
+          {% endif %}
           {% else %}
           <p class="np-summary-score-foot">{{ correct_count }} correct of {{ total_q }} questions in this set</p>
           {% endif %}
@@ -438,7 +438,7 @@
         </div>
         <p class="np-knowledge-title">{{ s.title_en }}</p>
         <div class="np-knowledge-bar"><span class="np-knowledge-bar-fill" style="width: {{ s.pct }}%;"></span></div>
-        <p class="np-knowledge-count">{% if s.paper %}Paper FRQ: awaiting teacher review · {{ s.correct }} / {{ s.total }} completed{% else %}{{ s.correct }} / {{ s.total }} correct{% endif %}</p>
+        <p class="np-knowledge-count">{% if s.paper %}Graphing: {{ s.correct }} / {{ s.total }} submitted{% else %}{{ s.correct }} / {{ s.total }} correct{% endif %}</p>
       </div>
       {% endfor %}
     </div>
