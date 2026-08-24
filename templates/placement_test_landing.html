@@ -1,23 +1,17 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas">
-<div class="np-pl2 np-pl2--atelier np-pl2--landing" aria-labelledby="np-pl-heading">
-    <div class="np-pl2-mesh" aria-hidden="true">
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
-        <span class="np-pl2-mesh__aurora"></span>
-        <span class="np-pl2-mesh__noise"></span>
-    </div>
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--landing" aria-labelledby="np-pl-heading">
+    {% include 'partials/placement_atelier_mesh.html' %}
 
     <div class="np-pl-canvas__inner">
         <nav class="np-pl2-nav np-pl-reveal">
-            <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
+            <a href="{{ placement_url('placement_landing') }}" class="np-pl2-nav__back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 All placement tests
             </a>
@@ -74,11 +68,11 @@
                                 <div class="np-pl-device__input"></div>
                                 {% else %}
                                 <p class="np-pl-device__label">Select one answer</p>
-                                <p class="np-pl-device__math">\( 10x + 15y = 85 \)</p>
+                                <p class="np-pl-device__math">\( 2x + 5 = 17 \)</p>
                                 <div class="np-pl-device__mcq">
-                                    <span class="np-pl-device__choice is-selected"><em>A</em> 462; 332,640</span>
-                                    <span class="np-pl-device__choice"><em>B</em> 462; 720</span>
-                                    <span class="np-pl-device__choice"><em>C</em> 66; 332,640</span>
+                                    <span class="np-pl-device__choice is-selected"><em>A</em> 4</span>
+                                    <span class="np-pl-device__choice"><em>B</em> 6</span>
+                                    <span class="np-pl-device__choice"><em>C</em> 12</span>
                                 </div>
                                 {% endif %}
                             </div>
@@ -130,7 +124,7 @@
                     <p class="np-pl-pillar__eyebrow">Ready when you are</p>
                     <h2 class="np-pl-pillar__title">Start the diagnostic</h2>
                     <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic in ('enhanced_math_1', 'enhanced_math_2') %}Bluebook-style sections with transitions between MCQ, graphing, and free response.{% elif topic == 'placement_full' %}Bluebook-style five-gate flow — transition screens after Gates 1–4, same polish as our Enhanced Math diagnostics.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
-                    <a href="{{ url_for('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta">
+                    <a href="{{ placement_url('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta">
                         Begin placement test
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>

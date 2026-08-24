@@ -11,7 +11,7 @@
     </div>
     <div class="np-board-panel-title">
       <strong>Teaching Board</strong>
-      <span>Abc for notes · fx for Desmos math</span>
+      <span>⇧B board · ⇧P pen · ⇧D Desmos · Alt peek</span>
     </div>
 
     <div class="np-board-teach-tools" aria-label="Teaching controls">
@@ -26,6 +26,7 @@
         <button type="button" class="np-board-chip" data-np-board-font="1" title="Larger math for the room">A+</button>
       </div>
       <button type="button" class="np-board-chip" data-np-board-theme title="Toggle paper / slate board">Theme</button>
+      <button type="button" class="np-board-chip" data-np-board-grid title="Grid overlay for graphs and alignment">Grid</button>
     </div>
 
     <div class="np-board-mode" role="group" aria-label="Board mode">
@@ -36,8 +37,13 @@
       <button type="button" class="np-board-mode-btn" data-np-board-input="text" title="Normal typing: spaces, words, arrows">Abc</button>
       <button type="button" class="np-board-mode-btn is-active" data-np-board-input="math" title="Desmos math: sqrt, frac, ^, _">fx</button>
     </div>
-    <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo mark">Undo</button>
-    <button type="button" class="np-board-icon-btn" data-np-board-clear title="Clear board">Clear</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-newline title="New line">+</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-copy title="Copy board as text / LaTeX">Copy</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-undo title="Undo mark (⌘Z)">Undo</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-redo title="Redo mark (⇧⌘Z)">Redo</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-clear title="Clear board — click twice to confirm">Clear</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-peek title="See through the board (hold Alt)">Peek</button>
+    <button type="button" class="np-board-icon-btn" data-np-board-minimize title="Minimize — keep your work">Min</button>
     <button type="button" class="np-board-close" data-np-board-close aria-label="Close Board">×</button>
   </div>
 
@@ -55,6 +61,7 @@
       <input type="range" min="2" max="22" value="4" data-np-board-size>
     </label>
     <button type="button" class="np-board-tool-btn" data-np-board-tool="pen" aria-pressed="true">Pen</button>
+    <button type="button" class="np-board-tool-btn" data-np-board-tool="highlighter" aria-pressed="false">Hi</button>
     <button type="button" class="np-board-tool-btn" data-np-board-tool="eraser" aria-pressed="false">Eraser</button>
   </div>
 
@@ -64,7 +71,7 @@
       <canvas class="np-board-canvas" data-np-board-canvas></canvas>
       <div class="np-board-lines" data-np-board-lines></div>
       <p class="np-board-loading" data-np-board-loading hidden>Loading math…</p>
-      <p class="np-board-empty-hint" data-np-board-empty-hint>fx: type sqrt, frac, pi, ^ · Abc: normal words and spaces</p>
+      <p class="np-board-empty-hint" data-np-board-empty-hint>Type math, or ⇧P to mark · scratch work is saved in this tab</p>
     </div>
   </div>
 
@@ -87,10 +94,16 @@
   </div>
 </div>
 
+<button type="button" class="np-board-restore" id="np-board-restore" hidden title="Restore board (Shift+B)">
+  <span class="np-board-restore-label">Board</span>
+  <span class="np-board-restore-kbd">⇧B</span>
+</button>
+
 <script>
 window.__NP_BOARD__ = {
-  layoutKey: "np-board-panel-layout-v5",
-  prefsKey: "np-board-teach-prefs-v5",
+  layoutKey: "np-board-panel-layout-v6",
+  prefsKey: "np-board-teach-prefs-v6",
+  contentKey: "np-board-scratch-v6",
   enableShortcut: {{ np_board_shortcut|default(true)|tojson }},
   mathliveCss: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/mathlive-static.css",
   mathliveModule: "https://cdn.jsdelivr.net/npm/mathlive@0.105.3/+esm"

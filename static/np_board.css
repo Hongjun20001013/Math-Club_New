@@ -179,6 +179,24 @@
     text-transform: uppercase;
 }
 
+.np-tool-kbd {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 5px;
+    border-radius: 6px;
+    border: 1px solid currentColor;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    opacity: 0.7;
+    vertical-align: 1px;
+}
+
+@media (max-width: 720px) {
+    .np-tool-kbd { display: none; }
+}
+
 .np-board-teach-tools {
     display: flex;
     flex-wrap: wrap;
@@ -261,6 +279,18 @@
     background: var(--chip-bg);
     border: 1px solid var(--line);
     color: var(--head-fg);
+}
+
+.np-board-icon-btn.is-active,
+.np-board-chip.is-active {
+    background: rgba(165, 180, 252, 0.22);
+    color: var(--head-fg);
+}
+
+.np-board-icon-btn.is-armed {
+    background: #f87171;
+    border-color: transparent;
+    color: #1c1917;
 }
 
 .np-board-close {
@@ -636,4 +666,64 @@ html.np-board-is-open:has(.np-board-panel.dock-present.is-open) .np-cm-viewer .n
     }
 
     .np-board-panel-title span { display: none; }
+}
+
+.np-board-panel.is-highlighter .np-board-canvas { cursor: copy; }
+
+.np-board-panel.is-minimized {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: none !important;
+}
+
+.np-board-paper.is-grid {
+    background-image:
+        linear-gradient(to right, rgba(165, 180, 252, 0.13) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(165, 180, 252, 0.13) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+.np-board-panel.theme-paper .np-board-paper.is-grid {
+    background-image:
+        linear-gradient(to right, rgba(79, 70, 229, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(79, 70, 229, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+html.np-board-is-peeking .np-board-panel.is-open {
+    opacity: 0.16 !important;
+    pointer-events: none;
+}
+
+.np-board-restore {
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    z-index: 3910;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid rgba(165, 180, 252, 0.35);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #1c1c28 0%, #12121a 100%);
+    color: #f4f4f5;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    font-family: "Source Sans 3", "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
+.np-board-restore[hidden] { display: none !important; }
+
+.np-board-restore-kbd {
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.64rem;
+    font-weight: 800;
+    opacity: 0.75;
 }

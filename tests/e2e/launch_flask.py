@@ -22,5 +22,7 @@ else:
     repair_on = flag
 app.config["SKILL_LOOP_PILOT"] = flag
 app.config["SKILL_REPAIR"] = repair_on
+pub = (os.environ.get("PLACEMENT_PUBLIC_ACCESS") or "").strip().lower()
+app.config["PLACEMENT_PUBLIC_ACCESS"] = pub in ("1", "true", "yes", "on")
 app.config["TESTING"] = False
 app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)

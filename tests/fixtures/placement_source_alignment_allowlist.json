@@ -1,0 +1,118 @@
+{
+  "description": "Intentional Placement diffs versus original PDFs and the last committed bank. Upper Q33 is not listed: that key must stay A.",
+  "frozen_counts": {
+    "middle_level": 100,
+    "enhanced_math_1": 65,
+    "enhanced_math_2": 69,
+    "placement_full": 85,
+    "total": 319
+  },
+  "entries": [
+    {
+      "topic": "middle_level",
+      "question_number": 85,
+      "changed_field": "stem",
+      "original_value": "<p>The number of red frogs exceeded the number of blue frogs by 80. The number of green frogs was 20 less than the number of blue frogs. If there were 120 blue fogs, what was the sum of the reds, the blues, and the greens?</p>",
+      "current_value": "<p>The number of red frogs exceeded the number of blue frogs by 80. The number of green frogs was 20 less than the number of blue frogs. If there were 120 blue frogs, what was the sum of the reds, the blues, and the greens?</p>",
+      "reason": "typo correction: fogs → frogs",
+      "independently_verified_answer": "420"
+    },
+    {
+      "topic": "middle_level",
+      "question_number": 92,
+      "changed_field": "answer_alternates",
+      "original_value": null,
+      "current_value": ["2602 1/7", "18215/7", "2602.142857", "2602.14"],
+      "reason": "grading alternates only; canonical key unchanged",
+      "independently_verified_answer": "2602.142857"
+    },
+    {
+      "topic": "middle_level",
+      "question_number": 99,
+      "changed_field": "stem",
+      "original_value": "<p>Use two unit multipliers to convert 144 square feet to square miles. Round any decimal answer to two places.</p>",
+      "current_value": "<p>Use two unit multipliers to convert 144 square feet to square miles. Write the answer in scientific notation. Round the coefficient to two decimal places.</p>",
+      "reason": "ambiguity clarification: scientific-notation coefficient",
+      "independently_verified_answer": "5.17e-6"
+    },
+    {
+      "topic": "enhanced_math_1",
+      "question_number": 18,
+      "changed_field": "choices",
+      "choice_letter": "C",
+      "original_value": "\\(\\displaystyle \\frac{6}{27}\\)",
+      "current_value": "\\(\\displaystyle \\frac{1}{9}\\)",
+      "reason": "duplicate distractor removed: 6/27 reduces to 2/9, which was choice A",
+      "independently_verified_answer": "B"
+    },
+    {
+      "topic": "enhanced_math_1",
+      "question_number": 31,
+      "changed_field": "choices",
+      "choice_letter": "D",
+      "original_value": "\\(\\displaystyle 6\\sqrt{25}\\)",
+      "current_value": "\\(\\displaystyle 6\\sqrt{20}\\)",
+      "reason": "duplicate distractor removed: 6√25 = 30, which was choice A",
+      "independently_verified_answer": "B"
+    },
+    {
+      "topic": "enhanced_math_1",
+      "question_number": 32,
+      "changed_field": "choices",
+      "choice_letter": "D",
+      "original_value": "\\(\\displaystyle 3\\sqrt{7}\\)",
+      "current_value": "\\(\\displaystyle 13\\)",
+      "reason": "distractor optimization: 13 is a 5-12-13 Pythagorean mix-up",
+      "independently_verified_answer": "A"
+    },
+    {
+      "topic": "enhanced_math_2",
+      "question_number": 67,
+      "changed_field": "correct_answer",
+      "original_value": "c≈10.0; area ≈60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed.",
+      "current_value": "c≈10.1; area ≈60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed.",
+      "reason": "mathematically corrected from 10.0 to 10.1; area 60.2 unchanged",
+      "independently_verified_answer": "10.1"
+    },
+    {
+      "topic": "enhanced_math_2",
+      "question_number": 67,
+      "changed_field": "answer_alternates",
+      "original_value": ["10.0", "60.2"],
+      "current_value": ["10.1", "10.07", "10.073", "10.0731", "60.2"],
+      "reason": "grading alternates follow the 10.1 correction; 10.0 must not score",
+      "independently_verified_answer": "10.1"
+    },
+    {
+      "topic": "placement_full",
+      "question_number": 27,
+      "changed_field": "stem",
+      "original_value": "HEAD compiled stem used illegal SVG <line y=...>",
+      "current_value": "Faithful reconstruction from Placement_Test.tex \\circleChordDiagram",
+      "original_sha256": "5b8e57300cefababdee33cd42d538f863409c19d69fc253f7eb625caf7ff5449",
+      "current_sha256": "248640a829f7a56a0aa4ad25eb213b5e93cd24b9c92b1afc6d5902a923e1e075",
+      "reason": "faithful SVG reconstruction of intersecting chords AC and BE",
+      "independently_verified_answer": "A"
+    },
+    {
+      "topic": "placement_full",
+      "question_number": 45,
+      "changed_field": "choices",
+      "choice_letter": "D",
+      "original_value": "\\((2x-5)(x+3)\\)",
+      "current_value": "\\((2x+5)(x-3)\\)",
+      "reason": "duplicate distractor removed: (2x-5)(x+3) equals choice C",
+      "independently_verified_answer": "A"
+    },
+    {
+      "topic": "placement_full",
+      "question_number": 59,
+      "changed_field": "choices",
+      "choice_letter": "C",
+      "original_value": "\\([2,\\infty)\\setminus\\{-1\\}\\)",
+      "current_value": "\\((-\\infty,-1)\\cup[2,\\infty)\\)",
+      "reason": "equivalent distractor removed: old C was the same set as correct A",
+      "independently_verified_answer": "A"
+    }
+  ]
+}

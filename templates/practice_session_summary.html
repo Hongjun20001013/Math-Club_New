@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block extra_css %}
 {% if domain == 'placement' %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -40,7 +40,7 @@
       <div class="np-summary-hero-text">
         <p class="np-summary-kicker">{% if domain == 'placement' %}Diagnostic complete{% else %}Session complete{% endif %}</p>
         {% if domain == 'placement' %}<p class="np-pl-brand" style="margin-bottom:8px;">{{ site_brand_name }}</p>{% endif %}
-        <h1 class="np-summary-title">{% if domain == 'placement' %}Your placement report{% else %}Your results{% endif %}</h1>
+        <h1 class="np-summary-title">{% if domain == 'placement' %}Automatically scored section{% else %}Your results{% endif %}</h1>
         {% if domain == 'placement' and placement_student and placement_student.name %}
         <p class="np-summary-for-student">For <strong>{{ placement_student.name }}</strong>{% if placement_student.grade %} · {{ placement_student.grade }}{% endif %}</p>
         {% endif %}
@@ -58,7 +58,11 @@
       <div class="np-summary-hero-visual">
         <div class="np-score-pedestal">
         <div class="np-score-ring-wrap">
-          {% set score_den = placement_score_total if domain == 'placement' and placement_score_total else total_q %}
+          {% if domain == 'placement' %}
+          {% set score_den = placement_score_total if placement_score_total is not none else total_q %}
+          {% else %}
+          {% set score_den = total_q %}
+          {% endif %}
           <div class="np-score-ring" style="--pct: {{ score_pct }};">
             <div class="np-score-ring-inner">
               <span class="np-score-num">{{ correct_count }}</span>
@@ -67,7 +71,16 @@
           </div>
           <p class="np-score-pct"><span id="np-score-pct-num" data-target="{{ score_pct }}">0</span>% correct</p>
           {% if domain == 'placement' %}
-          <p class="np-summary-score-foot">{{ correct_count }} correct of {{ score_den }} auto-graded items{% if placement_ungraded_count %} · {{ answered_count }} answered overall ({{ placement_ungraded_count }} graphing item(s) need teacher review){% else %} · {{ answered_count }} answered{% endif %}</p>
+          <p class="np-summary-kicker">Provisional — paper responses not reviewed</p>
+          <p class="np-score-section-label">Automatically scored section</p>
+          <p class="np-summary-score-foot">
+            {% if score_den %}
+            {{ correct_count }} correct of {{ score_den }} multiple-choice items
+            {% else %}
+            This form has no multiple-choice items.
+            {% endif %}
+          </p>
+          <p class="np-summary-paper-frq">Paper FRQ: awaiting teacher review{% if paper_frq_total %} · {{ paper_frq_completed or 0 }}/{{ paper_frq_total }} marked complete{% endif %}</p>
           {% else %}
           <p class="np-summary-score-foot">{{ correct_count }} correct of {{ total_q }} questions in this set</p>
           {% endif %}
@@ -417,11 +430,15 @@
       <div class="np-knowledge-card">
         <div class="np-knowledge-card-top">
           <span class="np-knowledge-sec">{% if placement_gate_scores %}Gate {{ s.section }}{% else %}{{ s.section }}{% endif %}</span>
+          {% if s.paper %}
+          <span class="np-knowledge-pct">Paper</span>
+          {% else %}
           <span class="np-knowledge-pct">{{ s.pct }}%</span>
+          {% endif %}
         </div>
         <p class="np-knowledge-title">{{ s.title_en }}</p>
         <div class="np-knowledge-bar"><span class="np-knowledge-bar-fill" style="width: {{ s.pct }}%;"></span></div>
-        <p class="np-knowledge-count">{{ s.correct }} / {{ s.total }} correct</p>
+        <p class="np-knowledge-count">{% if s.paper %}Paper FRQ: awaiting teacher review · {{ s.correct }} / {{ s.total }} completed{% else %}{{ s.correct }} / {{ s.total }} correct{% endif %}</p>
       </div>
       {% endfor %}
     </div>
@@ -473,6 +490,10 @@
             <span class="np-badge np-badge-ok">Correct</span>
           {% elif row.status == 'incorrect' %}
             <span class="np-badge np-badge-bad">Incorrect</span>
+          {% elif row.status == 'paper_response' %}
+            <span class="np-badge np-badge-muted">Paper response</span>
+          {% elif row.status == 'unscored' %}
+            <span class="np-badge np-badge-muted">Unscored</span>
           {% elif row.status == 'nocheck' %}
             <span class="np-badge np-badge-muted">Key N/A</span>
           {% elif row.status == 'submitted' %}

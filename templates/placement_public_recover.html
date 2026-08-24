@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--start">
+  {% include 'partials/placement_atelier_mesh.html' %}
+  <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+    <article class="np-pl-intake np-pl-reveal">
+      <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+      <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Resume this sitting</p>
+      <h1 class="np-pl-display np-pl-display--md">Recover your placement test</h1>
+      <p class="np-pl-lead">Enter the recovery code shown when you started. Do not share it.</p>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
+      {% endif %}
+      {% endwith %}
+      <form method="post" class="np-pl-intake__form">
+        <div class="np-pl-field np-pl-field--full">
+          <label class="np-pl-label" for="pl-recovery">Recovery code</label>
+          <input id="pl-recovery" name="recovery_code" required class="np-pl-input np-pl-input--code" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX">
+        </div>
+        <div class="np-pl-intake__actions">
+          <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">Recover</button>
+          <a class="np-pl2-btn np-pl2-btn--ghost" href="{{ url_for('placement_landing') }}">Back</a>
+        </div>
+      </form>
+    </article>
+  </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

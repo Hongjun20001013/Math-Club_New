@@ -1,35 +1,28 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas">
 <div class="np-pl2 np-pl2--atelier np-pl2--start" aria-labelledby="np-pl-start-heading">
-    <div class="np-pl2-mesh" aria-hidden="true">
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
-        <span class="np-pl2-mesh__aurora"></span>
-        <span class="np-pl2-mesh__noise"></span>
-    </div>
+    {% include 'partials/placement_atelier_mesh.html' %}
 
-    <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+    <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow np-pl-canvas__inner--intake">
         <nav class="np-pl2-nav np-pl-reveal">
-            <a href="{{ url_for('placement_test_landing', slug=slug) }}" class="np-pl2-nav__back">
+            <a href="{{ placement_url('placement_test_landing', slug=slug) }}" class="np-pl2-nav__back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 {{ test.title|default('Placement overview') }}
             </a>
         </nav>
 
-        <article class="np-pl-intake np-pl-reveal">
+        <article class="np-pl-intake np-pl-intake--atelier np-pl-reveal">
             <header class="np-pl-intake__head">
                 <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                 <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>One step before question 1</p>
-                <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Personalize this run</h1>
-                <p class="np-pl-lead">A <strong>name on the report</strong> signals care. Grade and class help everyone read the band in context — on screen and in the <strong>exportable PDF</strong>.</p>
-                <p class="np-pl-intake__hint">About <strong>30 seconds</strong>, then the full {{ test.online_item_count|default(test.online_mcq_count|default(70)) }}-item diagnostic opens.</p>
+                <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Your placement profile</h1>
+                <p class="np-pl-lead">Name, grade, and current school math class are required. Advisor and school are optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -39,30 +32,83 @@
             {% endwith %}
 
             <form method="post" action="{{ url_for('placement_test_begin', slug=slug) }}" class="np-pl-intake__form">
+                {% if public_guest|default(false) %}
+                <input type="hidden" name="begin_nonce" value="{{ begin_nonce }}">
+                {% endif %}
+                <p class="np-pl-selected" data-pl-selected-test>
+                    <span>You selected</span>
+                    <strong>{{ test.title }}</strong>
+                </p>
                 <div class="np-pl-field">
                     <label class="np-pl-label" for="pl-name">Student name <span class="np-pl-req">*</span></label>
                     <input id="pl-name" name="student_name" type="text" autocomplete="name" required maxlength="160" placeholder="e.g. Alex Chen" class="np-pl-input">
                 </div>
                 <div class="np-pl-field">
-                    <label class="np-pl-label" for="pl-grade">Grade</label>
-                    <select id="pl-grade" name="student_grade" class="np-pl-input np-pl-select">
-                        <option value="">Select (optional)</option>
+                    <label class="np-pl-label" for="pl-grade">Grade <span class="np-pl-req">*</span></label>
+                    <select id="pl-grade" name="student_grade" class="np-pl-input np-pl-select" required>
+                        <option value="">Select grade</option>
                         <option>6th</option><option>7th</option><option>8th</option><option>9th</option>
                         <option>10th</option><option>11th</option><option>12th</option><option>College</option><option>Other</option>
                     </select>
                 </div>
                 <div class="np-pl-field np-pl-field--full">
-                    <label class="np-pl-label" for="pl-course">Current school math class</label>
-                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input">
+                    <label class="np-pl-label" for="pl-course">Current school math class <span class="np-pl-req">*</span></label>
+                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input" required minlength="2">
+                    <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
                 </div>
-                <p class="np-pl-intake__privacy">Name is required. Grade and class are optional — they print only on <strong>this attempt's</strong> report.</p>
-                <div class="np-pl-intake__trust" role="note">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg>
-                    <span>Clear headers, band language, and a file you can forward as-is.</span>
+                <fieldset class="np-pl-field np-pl-field--full np-pl-advisor">
+                    <legend class="np-pl-label">Advisor <span class="np-pl-opt">optional</span></legend>
+                    <div class="np-pl-choice-grid" id="pl-advisor">
+                        {% for advisor in advisor_presets %}
+                        <label class="np-pl-choice">
+                            <input type="radio" name="advisor_choice" value="{{ advisor }}"{% if placement_advisor_choice == advisor %} checked{% endif %}>
+                            <span>{{ advisor }}</span>
+                        </label>
+                        {% endfor %}
+                        <label class="np-pl-choice">
+                            <input type="radio" name="advisor_choice" value="{{ advisor_other }}"{% if placement_advisor_choice == advisor_other %} checked{% endif %}>
+                            <span>Other</span>
+                        </label>
+                    </div>
+                </fieldset>
+                <div class="np-pl-field np-pl-field--full" id="pl-advisor-other-wrap"{% if placement_advisor_choice != advisor_other %} hidden{% endif %}>
+                    <label class="np-pl-label" for="pl-advisor-other">Advisor name <span class="np-pl-opt">optional</span></label>
+                    <input id="pl-advisor-other" name="advisor_other" type="text" maxlength="200" class="np-pl-input" placeholder="Type your advisor's full name" autocomplete="off" value="{{ placement_advisor_other }}">
                 </div>
+                <div class="np-pl-field np-pl-field--full">
+                    <label class="np-pl-label" for="pl-school">School <span class="np-pl-opt">optional</span></label>
+                    <input id="pl-school" name="student_school" type="text" maxlength="200" class="np-pl-input" placeholder="School name">
+                </div>
+                <label class="np-pl-confirm">
+                    <input type="checkbox" name="counselor_confirm" value="1" required>
+                    <span>I confirm that I selected the appropriate placement test and will complete it independently.</span>
+                </label>
+                <aside class="np-pl-brief" role="note">
+                    <header class="np-pl-brief__head">
+                        <p>Read this first</p>
+                        <h2>Before you begin</h2>
+                    </header>
+                    <div class="np-pl-brief__stats">
+                        <div class="np-pl-brief__stat">
+                            <strong>{{ item_count }}</strong>
+                            <span>questions</span>
+                        </div>
+                        <div class="np-pl-brief__stat">
+                            <strong>{{ timer_minutes }}</strong>
+                            <span>minutes</span>
+                        </div>
+                    </div>
+                    <ul class="np-pl-brief__rules">
+                        <li>Scratch paper is allowed.</li>
+                        <li>You may <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}">download a blank test PDF</a>.</li>
+                        <li>All final answers must be submitted on this website.</li>
+                        <li>Answers autosave. Refresh or reopen this link to continue.</li>
+                        <li>Follow the on-screen calculator policy for each question.</li>
+                    </ul>
+                </aside>
                 <div class="np-pl-intake__actions">
-                    <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">Begin {{ test.online_item_count|default(test.online_mcq_count|default(70)) }}-item diagnostic</button>
-                    <a href="{{ url_for('placement_test_landing', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost">Back</a>
+                    <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">Begin {{ item_count|default(test.online_item_count|default(70)) }}-item diagnostic</button>
+                    <a href="{{ placement_url('placement_test_landing', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost">Back</a>
                 </div>
             </form>
         </article>
@@ -70,4 +116,21 @@
 </div>
 </div>
 {% include 'partials/placement_atelier_scripts.html' %}
+<script>
+(function () {
+  var radios = document.querySelectorAll('input[name="advisor_choice"]');
+  var wrap = document.getElementById("pl-advisor-other-wrap");
+  var other = document.getElementById("pl-advisor-other");
+  function syncAdvisorOther() {
+    var picked = document.querySelector('input[name="advisor_choice"]:checked');
+    var isOther = !!(picked && picked.value === "Other");
+    if (wrap) wrap.hidden = !isOther;
+    if (other) other.required = false;
+  }
+  radios.forEach(function (radio) {
+    radio.addEventListener("change", syncAdvisorOther);
+  });
+  syncAdvisorOther();
+})();
+</script>
 {% endblock %}

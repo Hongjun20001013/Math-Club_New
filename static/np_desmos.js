@@ -19,6 +19,37 @@
   var desmosLoadPromise = null;
   var LAYOUT_KEY = config.layoutKey || "np-desmos-panel-layout";
 
+  function isTypingTarget(el) {
+    if (!el) return false;
+    var tag = (el.tagName || "").toUpperCase();
+    if (tag === "TEXTAREA" || tag === "SELECT" || tag === "MATH-FIELD" || tag === "OPTION") return true;
+    if (tag === "INPUT") {
+      var type = String(el.type || "text").toLowerCase();
+      if (type === "button" || type === "submit" || type === "checkbox" || type === "radio" || type === "file" || type === "reset" || type === "image") {
+        return false;
+      }
+      return true;
+    }
+    if (el.isContentEditable) return true;
+    if (el.closest && el.closest("#np-board-panel, math-field, [contenteditable='true'], .np-board-text, .dcg-mq-textarea, .dcg-mq-math-mode")) {
+      return true;
+    }
+    return false;
+  }
+
+  function decorateToggles() {
+    toggles.forEach(function (btn) {
+      btn.setAttribute("title", "Desmos graphing calculator (Shift+D)");
+      btn.setAttribute("aria-keyshortcuts", "Shift+D");
+      if (btn.classList.contains("np-cm-desmos-quick")) return;
+      if (btn.querySelector(".np-tool-kbd")) return;
+      var kbd = document.createElement("span");
+      kbd.className = "np-tool-kbd";
+      kbd.textContent = "⇧D";
+      btn.appendChild(kbd);
+    });
+  }
+
   function setStatus(message) {
     if (statusEl) {
       statusEl.hidden = false;
@@ -249,22 +280,21 @@
   toggles.forEach(function (btn) {
     btn.addEventListener("click", toggle);
   });
+  decorateToggles();
   if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
   if (resetBtn) resetBtn.addEventListener("click", resetPanel);
 
   document.addEventListener("keydown", function (e) {
-    var tag = (e.target && e.target.tagName) || "";
-    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "MATH-FIELD") return;
-    if (e.target && e.target.isContentEditable) return;
-    if (e.target && e.target.closest && e.target.closest("#np-board-panel, math-field, [contenteditable='true']")) return;
-    if (document.documentElement.classList.contains("np-board-is-open")) return;
-    if (config.enableShortcut === false) return;
-    if (e.key === "d" || e.key === "D") {
-      e.preventDefault();
-      toggle();
-    }
     if (e.key === "Escape" && isOpen()) {
       setOpen(false);
+      return;
+    }
+    if (isTypingTarget(e.target)) return;
+    if (document.documentElement.classList.contains("np-board-is-open") && !(e.shiftKey && e.code === "KeyD")) return;
+    if (config.enableShortcut === false) return;
+    if (e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && e.code === "KeyD") {
+      e.preventDefault();
+      toggle();
     }
   });
 
@@ -276,6 +306,6 @@
     });
   });
 
-  window.NpDesmos = { toggle: toggle, open: function () { if (!isOpen()) toggle(); }, close: function () { setOpen(false); }, reset: resetPanel };
+  window.NpDesmos = { toggle: toggle, open: function () { if (!isOpen()) toggle(); }, close: function () { setOpen(false); }, reset: resetPanel, isOpen: isOpen };
   window.toggleCalc = toggle;
 })();

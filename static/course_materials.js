@@ -2334,7 +2334,7 @@
       "</div>" +
       '<span class="np-cm-ink-sync is-synced" data-ink-status title="Ready">' +
       '<span class="np-cm-ink-sync-dot"></span></span>' +
-      '<button type="button" class="np-cm-ink-rail-close" data-ink-collapse title="Close (P)" aria-label="Close pen toolbar">×</button>' +
+      '<button type="button" class="np-cm-ink-rail-close" data-ink-collapse title="Close (Shift+P)" aria-label="Close pen toolbar">×</button>' +
       "</div>" +
       '<div class="np-cm-ink-math-row" data-ink-math-row hidden>' +
       '<button type="button" class="np-cm-ink-formula-open" data-ink-formula-open title="Formula pad (F) — Desmos-style LaTeX">ƒx</button>' +
@@ -2352,7 +2352,7 @@
       btn.className = "np-cm-ink-compact";
       btn.setAttribute("data-ink-compact-toggle", "true");
       btn.setAttribute("aria-pressed", "false");
-      btn.title = "Open live pen (P) — works before Live Class starts";
+      btn.title = "Open live pen (Shift+P) — works before Live Class starts";
       btn.innerHTML = INK_ICON_PEN;
       btn.addEventListener("click", function () {
         toggleInkToolbar();
@@ -4465,7 +4465,7 @@
     }
     if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); guardedNavigate(1); }
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); guardedNavigate(-1); }
-    if ((e.key === "p" || e.key === "P") && isInkTeacher()) {
+    if ((e.key === "p" || e.key === "P") && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && isInkTeacher() && !window.NpBoard) {
       e.preventDefault();
       toggleInkToolbar();
       return;
@@ -4608,6 +4608,11 @@
     loadInkPrefs();
     updateInkDock();
   }
+  window.NpInk = {
+    available: function () { return isInkTeacher(); },
+    toggle: function () { toggleInkToolbar(); },
+    isOpen: function () { return !!inkExpanded; }
+  };
   setFocusMode(loadFocusMode(), { fullscreen: false });
   ensurePhase3ScoreSlide();
   if (!progress.answers) progress.answers = {};

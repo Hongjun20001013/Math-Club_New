@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--start">
+  {% include 'partials/placement_atelier_mesh.html' %}
+  <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+    <article class="np-pl-intake np-pl-intake--done np-pl-reveal">
+      <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+      <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Sitting locked</p>
+      <h1 class="np-pl-display np-pl-display--md">Submitted</h1>
+      <p class="np-pl-lead">{{ test.title }} is locked. Scores below are the automatically scored section only.</p>
+      <section class="np-pl-score-box np-pl-score-box--monument" aria-label="Automatically scored section">
+        <p class="np-pl-score-kicker">Automatically scored section</p>
+        {% if score and score.mcq_total %}
+        <p class="np-pl-score-value">{{ score.mcq_correct }} / {{ score.mcq_total }}</p>
+        {% else %}
+        <p class="np-pl-score-value">No multiple-choice items</p>
+        {% endif %}
+        <p class="np-pl-score-paper">Paper FRQ: awaiting teacher review{% if score and score.paper_frq_total %} · {{ score.paper_frq_completed }}/{{ score.paper_frq_total }} marked complete{% endif %}</p>
+        <p class="np-pl-score-note">Provisional — paper responses not reviewed</p>
+      </section>
+      <p class="np-pl-lead">Your counselor can open the full report in Administration.</p>
+    </article>
+  </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

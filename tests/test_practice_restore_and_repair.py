@@ -457,13 +457,17 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
 
     def test_start_resumes_same_delayed_run_without_resetting_clock(self):
         import json
+        from datetime import datetime, timedelta, timezone
+
         import skill_repair as sr
 
         self.login()
-        due = "2026-08-22T17:30:29Z"
+        now = datetime.now(timezone.utc)
+        due = (now + timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        instructed = (now - timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
         payload = {
             "source": "pack",
-            "instruction_completed_at": "2026-08-20T10:00:00Z",
+            "instruction_completed_at": instructed,
             "seen_item_ids": ["slq_lrr_example_01"],
         }
         with self.app_mod.app.app_context():
@@ -505,7 +509,7 @@ class PracticeRestoreAndRepairTests(unittest.TestCase):
             self.assertEqual(after[0]["delayed_available_at"], due)
             self.assertEqual(after[0]["status"], "delayed_wait")
             loaded = json.loads(after[0]["payload_json"])
-            self.assertEqual(loaded.get("instruction_completed_at"), "2026-08-20T10:00:00Z")
+            self.assertEqual(loaded.get("instruction_completed_at"), instructed)
             self.assertEqual(loaded.get("seen_item_ids"), ["slq_lrr_example_01"])
 
     def _hard21_attempt_id(self, html: str) -> str:

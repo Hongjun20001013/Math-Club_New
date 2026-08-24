@@ -31,6 +31,9 @@
         {% endif %}
         <div class="np-admin-hero-actions">
           <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-hero-btn">Export CSV</a>
+          {% if placement_public_access_enabled %}
+          <a href="#np-admin-placement" class="np-admin-hero-btn">Placement</a>
+          {% endif %}
           <a href="{{ url_for('admin_export_weekly_digest_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Weekly digest CSV</a>
           <a href="{{ url_for('student_guide') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost" target="_blank" rel="noopener">Student guide</a>
         </div>
@@ -48,6 +51,12 @@
           <strong>{{ totals.responses }}</strong>
           <span>Total responses</span>
         </div>
+        {% if placement_public_access_enabled %}
+        <div class="np-admin-stat-tile">
+          <strong>{{ placement_totals.testers }}</strong>
+          <span>Placement testers</span>
+        </div>
+        {% endif %}
       </div>
     </section>
 
@@ -572,6 +581,25 @@
       });
     })();
     </script>
+
+    {% if placement_public_access_enabled %}
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" id="np-admin-placement" aria-labelledby="np-admin-placement-heading">
+      <header class="np-admin-section-head np-admin-section-head--split">
+        <div>
+          <p class="np-admin-kicker">Placement</p>
+          <h2 id="np-admin-placement-heading">Placement testers</h2>
+          <p>{{ placement_totals.testers }} tester{{ 's' if placement_totals.testers != 1 else '' }} · {{ placement_totals.in_progress }} in progress · {{ placement_totals.submitted }} submitted. Not mixed with student accounts.</p>
+        </div>
+        <div class="np-admin-hero-actions np-admin-hero-actions--placement">
+          <a href="{{ url_for('admin_placement_candidates') }}" class="np-admin-hero-btn">Open full list</a>
+          <a href="{{ url_for('admin_placement_candidates_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Export CSV</a>
+        </div>
+      </header>
+      {% with rows=placement_candidates %}
+      {% include "partials/admin_placement_directory.html" %}
+      {% endwith %}
+    </section>
+    {% endif %}
 
     <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-students">
       <header class="np-admin-section-head np-admin-section-head--split">

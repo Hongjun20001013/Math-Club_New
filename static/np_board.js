@@ -19,12 +19,22 @@
     document.querySelectorAll("[data-np-board-toggle], [data-cm-board-toggle]")
   );
 
-  var LAYOUT_KEY = config.layoutKey || "np-board-panel-layout-v5";
-  var PREFS_KEY = config.prefsKey || "np-board-teach-prefs-v5";
+  var LAYOUT_KEY = config.layoutKey || "np-board-panel-layout-v6";
+  var PREFS_KEY = config.prefsKey || "np-board-teach-prefs-v6";
+  var CONTENT_KEY = config.contentKey || "np-board-scratch-v6";
   var emptyHint = panel.querySelector("[data-np-board-empty-hint]");
   var themeBtn = panel.querySelector("[data-np-board-theme]");
+  var gridBtn = panel.querySelector("[data-np-board-grid]");
+  var restoreBtn = document.getElementById("np-board-restore");
+  var paperEl = panel.querySelector(".np-board-paper");
+  var newlineBtn = panel.querySelector("[data-np-board-newline]");
+  var copyBtn = panel.querySelector("[data-np-board-copy]");
+  var redoBtn = panel.querySelector("[data-np-board-redo]");
+  var peekBtn = panel.querySelector("[data-np-board-peek]");
+  var minimizeBtn = panel.querySelector("[data-np-board-minimize]");
   var ctx = canvas ? canvas.getContext("2d") : null;
   var strokes = [];
+  var redoStack = [];
   var drawing = null;
   var mode = "type";
   var tool = "pen";
@@ -37,7 +47,14 @@
   var activeText = null;
   var dpr = Math.max(1, window.devicePixelRatio || 1);
   var lineSeq = 0;
-  var prefs = { theme: "slate", dock: "right", fontStep: 0, input: "math" };
+  var prefs = { theme: "slate", dock: "right", fontStep: 0, input: "math", mode: "type", grid: false };
+  var minimized = false;
+  var peeking = false;
+  var clearArmed = false;
+  var clearArmTimer = null;
+  var saveTimer = null;
+  var restoring = false;
+  var contentReady = false;
 
   function loadPrefs() {
     try {
@@ -47,6 +64,8 @@
         prefs.dock = ["left", "right", "wide", "present"].indexOf(raw.dock) >= 0 ? raw.dock : "right";
         prefs.fontStep = Math.max(-2, Math.min(4, Number(raw.fontStep) || 0));
         prefs.input = raw.input === "text" ? "text" : "math";
+        prefs.mode = raw.mode === "draw" ? "draw" : "type";
+        prefs.grid = !!raw.grid;
       }
     } catch (e) {}
   }
@@ -71,6 +90,7 @@
     panel.classList.toggle("theme-paper", prefs.theme === "paper");
     panel.classList.toggle("theme-slate", prefs.theme !== "paper");
     syncChalkSwatch();
+    applyGrid();
     // Keep the default marker on chalk when switching boards.
     if (color === "#f8fafc" || color === "#ffffff" || color === "#1c1917" || color === "#111827") {
       setColor(chalkColor());
@@ -176,6 +196,7 @@
     var hasInk = strokes.length > 0;
     panel.classList.toggle("has-content", hasWrite || hasInk || lines.length > 1);
     if (emptyHint) emptyHint.hidden = hasWrite || hasInk || lines.length > 1;
+    scheduleSave();
   }
 
   // Exact typed words → LaTeX inserted via MathLive command (Desmos-like).
@@ -282,29 +303,264 @@
     return !!(el && el.closest && el.closest("#np-board-panel"));
   }
 
-  function setOpen(open) {
-    panel.classList.toggle("is-open", !!open);
-    panel.setAttribute("aria-hidden", open ? "false" : "true");
-    document.documentElement.classList.toggle("np-board-is-open", !!open);
+  function isTypingTarget(el) {
+    if (!el) return false;
+    var tag = (el.tagName || "").toUpperCase();
+    if (tag === "TEXTAREA" || tag === "SELECT" || tag === "MATH-FIELD" || tag === "OPTION") return true;
+    if (tag === "INPUT") {
+      var type = String(el.type || "text").toLowerCase();
+      if (type === "button" || type === "submit" || type === "checkbox" || type === "radio" || type === "file" || type === "reset" || type === "image") {
+        return false;
+      }
+      return true;
+    }
+    if (el.isContentEditable) return true;
+    if (el.closest && el.closest("math-field, [contenteditable='true'], .np-board-text, .dcg-mq-textarea, .dcg-mq-math-mode, .dcg-container textarea")) {
+      return true;
+    }
+    return false;
+  }
+
+  function isShiftLetter(event, code) {
+    return !!(
+      event &&
+      event.shiftKey &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      event.code === code
+    );
+  }
+
+  function decorateToggles() {
     toggles.forEach(function (btn) {
-      btn.classList.toggle("is-active", !!open);
-      btn.setAttribute("aria-pressed", open ? "true" : "false");
+      btn.setAttribute("title", "Teaching Board (Shift+B). Shift+P for pen.");
+      btn.setAttribute("aria-keyshortcuts", "Shift+B");
+      if (btn.classList.contains("np-cm-board-quick")) return;
+      if (btn.querySelector(".np-tool-kbd")) return;
+      var kbd = document.createElement("span");
+      kbd.className = "np-tool-kbd";
+      kbd.textContent = "⇧B";
+      btn.appendChild(kbd);
+    });
+  }
+
+  function applyGrid() {
+    if (paperEl) paperEl.classList.toggle("is-grid", !!prefs.grid);
+    if (gridBtn) gridBtn.classList.toggle("is-active", !!prefs.grid);
+  }
+
+  function setPeeking(on) {
+    peeking = !!on;
+    document.documentElement.classList.toggle("np-board-is-peeking", peeking && isOpen() && !minimized);
+    if (peekBtn) peekBtn.classList.toggle("is-active", peeking);
+  }
+
+  function setMinimized(on) {
+    minimized = !!on;
+    panel.classList.toggle("is-minimized", minimized);
+    if (restoreBtn) restoreBtn.hidden = !minimized;
+    document.documentElement.classList.toggle("np-board-is-minimized", minimized);
+    document.documentElement.classList.toggle("np-board-is-open", isOpen() && !minimized);
+    if (minimized) setPeeking(false);
+    if (!minimized && isOpen()) {
+      window.setTimeout(resizeCanvas, 40);
+    }
+  }
+
+  function nudgeAwayFromDesmos() {
+    try {
+      if (!(window.NpDesmos && typeof window.NpDesmos.isOpen === "function" && window.NpDesmos.isOpen())) return;
+      if (prefs.dock === "right") applyDock("left");
+    } catch (e) {}
+  }
+
+  function serializeContent() {
+    return {
+      lines: lines.map(function (line) {
+        return lineSegs(line).map(function (el) {
+          if (el.classList.contains("np-board-text")) return { k: "t", v: el.textContent || "" };
+          try { return { k: "m", v: String(el.getValue("latex") || "") }; } catch (err) { return { k: "m", v: "" }; }
+        });
+      }),
+      strokes: strokes
+    };
+  }
+
+  function saveContent() {
+    if (restoring) return;
+    try {
+      sessionStorage.setItem(CONTENT_KEY, JSON.stringify(serializeContent()));
+    } catch (e) {}
+  }
+
+  function scheduleSave() {
+    if (restoring) return;
+    window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(saveContent, 180);
+  }
+
+  function wipeLines() {
+    lines.forEach(function (line) {
+      if (line.row && line.row.parentNode) line.row.parentNode.removeChild(line.row);
+    });
+    lines = [];
+    activeField = null;
+    activeText = null;
+  }
+
+  function hydrateLines(payload) {
+    wipeLines();
+    var rows = (payload && payload.lines) || [];
+    if (!rows.length) return;
+    rows.forEach(function (segs) {
+      var line = addLine(false);
+      if (!line) return;
+      line.body.innerHTML = "";
+      (segs || []).forEach(function (seg) {
+        if (seg && seg.k === "m") line.body.appendChild(createMathField(seg.v || ""));
+        else line.body.appendChild(createTextSeg((seg && seg.v) || ""));
+      });
+      if (!line.body.lastChild) line.body.appendChild(createTextSeg(""));
+    });
+  }
+
+  var restorePromise = null;
+
+  function restoreContent() {
+    if (restorePromise) return restorePromise;
+    var data = null;
+    try { data = JSON.parse(sessionStorage.getItem(CONTENT_KEY) || "null"); } catch (e) { data = null; }
+    if (!data || typeof data !== "object") {
+      contentReady = true;
+      restorePromise = Promise.resolve(false);
+      return restorePromise;
+    }
+    restoring = true;
+    var hasMath = Array.isArray(data.lines) && data.lines.some(function (row) {
+      return (row || []).some(function (seg) { return seg && seg.k === "m"; });
+    });
+    function apply() {
+      if (Array.isArray(data.lines) && data.lines.length) hydrateLines(data);
+      strokes = Array.isArray(data.strokes) ? data.strokes : [];
+      redoStack = [];
+      restoring = false;
+      contentReady = true;
+      redraw();
+      syncContentState();
+      return true;
+    }
+    if (hasMath) {
+      restorePromise = ensureMathLive().then(function (ok) {
+        if (!ok) {
+          restoring = false;
+          contentReady = true;
+          return false;
+        }
+        return apply();
+      });
+      return restorePromise;
+    }
+    apply();
+    restorePromise = Promise.resolve(true);
+    return restorePromise;
+  }
+
+  function copyBoard() {
+    var parts = lines.map(function (line) {
+      return lineSegs(line).map(function (el) {
+        if (el.classList.contains("np-board-text")) return el.textContent || "";
+        try { return String(el.getValue("latex") || ""); } catch (err) { return ""; }
+      }).join("");
+    }).filter(function (row) { return row.replace(/\s+/g, ""); });
+    var text = parts.join("\n");
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        if (!copyBtn) return;
+        var prev = copyBtn.textContent;
+        copyBtn.textContent = "Copied";
+        window.setTimeout(function () { copyBtn.textContent = prev; }, 1200);
+      }).catch(function () {});
+    }
+  }
+
+  function disarmClear() {
+    clearArmed = false;
+    window.clearTimeout(clearArmTimer);
+    if (clearBtn) {
+      clearBtn.textContent = "Clear";
+      clearBtn.classList.remove("is-armed");
+    }
+  }
+
+  function requestClear() {
+    var hasWrite = lines.some(function (line) { return !lineIsEmpty(line); });
+    if (!clearArmed && (hasWrite || strokes.length || lines.length > 1)) {
+      clearArmed = true;
+      if (clearBtn) {
+        clearBtn.textContent = "Sure?";
+        clearBtn.classList.add("is-armed");
+      }
+      clearArmTimer = window.setTimeout(disarmClear, 2600);
+      return;
+    }
+    disarmClear();
+    clearBoard();
+  }
+
+  function openInPenMode() {
+    prefs.mode = "draw";
+    if (!isOpen()) setOpen(true);
+    else if (minimized) setMinimized(false);
+    setTool("pen");
+    setMode("draw");
+  }
+
+  function togglePenOrInk() {
+    if (window.NpInk && typeof window.NpInk.available === "function" && window.NpInk.available()) {
+      window.NpInk.toggle();
+      return;
+    }
+    if (isOpen() && !minimized && mode === "draw") {
+      setMode("type");
+      return;
+    }
+    openInPenMode();
+  }
+
+  function setOpen(open) {
+    if (open) setMinimized(false);
+    panel.classList.toggle("is-open", !!open);
+    panel.setAttribute("aria-hidden", open && !minimized ? "false" : "true");
+    document.documentElement.classList.toggle("np-board-is-open", !!open && !minimized);
+    toggles.forEach(function (btn) {
+      btn.classList.toggle("is-active", !!open && !minimized);
+      btn.setAttribute("aria-pressed", open && !minimized ? "true" : "false");
     });
     if (open) {
       initPanelControls();
       applyTheme();
+      applyGrid();
       applyDock(prefs.dock, true);
       applyFontStep();
       applyInputKind(null, true, true);
-      resizeCanvas();
-      setMode("type");
-      if (prefs.input === "math" && lines.length && !activeField) enterMathInput();
-      syncContentState();
+      nudgeAwayFromDesmos();
+      restoreContent().then(function () {
+        resizeCanvas();
+        setMode(prefs.mode || "type");
+        if (mode === "type" && prefs.input === "math" && lines.length && !activeField) enterMathInput();
+        syncContentState();
+      });
       ensureMathLive();
     } else {
       drawing = null;
       activeField = null;
       activeText = null;
+      setPeeking(false);
+      setMinimized(false);
+      if (restoreBtn) restoreBtn.hidden = true;
+      saveContent();
     }
   }
 
@@ -395,10 +651,17 @@
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "rgba(0,0,0,1)";
       ctx.lineWidth = Math.max(12, stroke.size * 4);
+      ctx.globalAlpha = 1;
+    } else if (stroke.tool === "highlighter") {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = Math.max(14, stroke.size * 3.4);
+      ctx.globalAlpha = 0.38;
     } else {
       ctx.globalCompositeOperation = "source-over";
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.size;
+      ctx.globalAlpha = 1;
     }
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -419,6 +682,8 @@
 
   function setMode(next) {
     mode = next === "draw" ? "draw" : "type";
+    prefs.mode = mode;
+    savePrefs();
     panel.classList.toggle("is-type-mode", mode === "type");
     panel.classList.toggle("is-draw-mode", mode === "draw");
     panel.querySelectorAll("[data-np-board-mode]").forEach(function (btn) {
@@ -435,8 +700,9 @@
   }
 
   function setTool(next) {
-    tool = next === "eraser" ? "eraser" : "pen";
+    tool = next === "eraser" ? "eraser" : next === "highlighter" ? "highlighter" : "pen";
     panel.classList.toggle("is-eraser", tool === "eraser");
+    panel.classList.toggle("is-highlighter", tool === "highlighter");
     panel.querySelectorAll("[data-np-board-tool]").forEach(function (btn) {
       var on = btn.getAttribute("data-np-board-tool") === tool;
       btn.classList.toggle("is-active", on);
@@ -492,7 +758,7 @@
         mathLiveReady = null;
         if (loadingEl) {
           loadingEl.hidden = false;
-          loadingEl.textContent = "Math engine failed to load. Check network, reopen with B.";
+          loadingEl.textContent = "Math engine failed to load. Check network, reopen with Shift+B.";
         }
         return false;
       });
@@ -1091,22 +1357,75 @@
 
   function clearBoard() {
     strokes = [];
+    redoStack = [];
     drawing = null;
     redraw();
-    lines.forEach(function (line) {
-      if (line.row && line.row.parentNode) line.row.parentNode.removeChild(line.row);
-    });
-    lines = [];
-    activeField = null;
-    activeText = null;
+    wipeLines();
     if (mode === "type") addLine(true);
     syncContentState();
+    saveContent();
   }
 
   function undoStroke() {
     if (!strokes.length) return;
-    strokes.pop();
+    redoStack.push(strokes.pop());
     redraw();
+    syncContentState();
+  }
+
+  function redoStroke() {
+    if (!redoStack.length) return;
+    strokes.push(redoStack.pop());
+    redraw();
+    syncContentState();
+  }
+
+  function stepSize(delta) {
+    size = Math.max(2, Math.min(22, size + delta));
+    if (sizeInput) sizeInput.value = String(size);
+  }
+
+  function applyDrawHotkey(event) {
+    if (event.key === "u" || event.key === "U") {
+      event.preventDefault();
+      undoStroke();
+      return true;
+    }
+    if (event.key === "e" || event.key === "E") {
+      event.preventDefault();
+      setTool(tool === "eraser" ? "pen" : "eraser");
+      return true;
+    }
+    if (event.key === "h" || event.key === "H") {
+      event.preventDefault();
+      setTool(tool === "highlighter" ? "pen" : "highlighter");
+      return true;
+    }
+    if (event.key === "v" || event.key === "V") {
+      event.preventDefault();
+      setTool("pen");
+      return true;
+    }
+    if (event.key === "[" || event.key === "{") {
+      event.preventDefault();
+      stepSize(-1);
+      return true;
+    }
+    if (event.key === "]" || event.key === "}") {
+      event.preventDefault();
+      stepSize(1);
+      return true;
+    }
+    if (event.key >= "1" && event.key <= "5") {
+      var swatches = panel.querySelectorAll("[data-np-board-color]");
+      var swatch = swatches[Number(event.key) - 1];
+      if (swatch) {
+        event.preventDefault();
+        setColor(swatch.getAttribute("data-np-board-color"));
+      }
+      return true;
+    }
+    return false;
   }
 
   function initDrawing() {
@@ -1116,6 +1435,7 @@
     canvas.addEventListener("pointerdown", function (event) {
       if (mode !== "draw") return;
       event.preventDefault();
+      redoStack = [];
       var p = pointerPos(event);
       drawing = {
         pointerId: event.pointerId,
@@ -1224,6 +1544,49 @@
       });
     }
 
+    if (gridBtn) {
+      gridBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        prefs.grid = !prefs.grid;
+        savePrefs();
+        applyGrid();
+      });
+    }
+
+    if (peekBtn) {
+      peekBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        setPeeking(!peeking);
+      });
+    }
+
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        setMinimized(true);
+      });
+    }
+
+    if (newlineBtn) {
+      newlineBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        setMode("type");
+        addLine(true);
+      });
+    }
+
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        copyBoard();
+      });
+    }
+
     panel.querySelectorAll("[data-np-board-input]").forEach(function (btn) {
       btn.addEventListener("click", function (event) {
         event.preventDefault();
@@ -1255,6 +1618,10 @@
     });
 
     surface.addEventListener("pointerdown", function (event) {
+      if (event.pointerType === "pen" && mode === "type") {
+        setMode("draw");
+        return;
+      }
       if (mode !== "type") return;
       if (event.target.closest("math-field, .np-board-text, button")) return;
       if (!lines.length) {
@@ -1277,6 +1644,10 @@
   }
 
   function toggle() {
+    if (isOpen() && minimized) {
+      setMinimized(false);
+      return;
+    }
     setOpen(!isOpen());
   }
 
@@ -1304,7 +1675,15 @@
   }
   if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
   if (undoBtn) undoBtn.addEventListener("click", undoStroke);
-  if (clearBtn) clearBtn.addEventListener("click", clearBoard);
+  if (redoBtn) redoBtn.addEventListener("click", redoStroke);
+  if (clearBtn) clearBtn.addEventListener("click", requestClear);
+  if (restoreBtn) {
+    restoreBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (!isOpen()) setOpen(true);
+      else setMinimized(false);
+    });
+  }
 
   toggles.forEach(function (btn) {
     btn.addEventListener("click", function (event) {
@@ -1312,47 +1691,68 @@
       toggle();
     });
   });
+  decorateToggles();
 
   document.addEventListener(
     "keydown",
     function (e) {
-      if (eventInsideBoard(e.target) || (e.target && e.target.isContentEditable) || (e.target && (e.target.tagName || "").toUpperCase() === "MATH-FIELD")) {
-        return;
-      }
-      if (config.enableShortcut === false) return;
-      if ((e.key === "b" || e.key === "B") && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      var typing = isTypingTarget(e.target);
+      if (config.enableShortcut !== false && !typing && isShiftLetter(e, "KeyB")) {
         e.preventDefault();
         e.stopPropagation();
         toggle();
         return;
       }
-      if (!isOpen()) return;
+      if (config.enableShortcut !== false && !typing && isShiftLetter(e, "KeyP")) {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePenOrInk();
+        return;
+      }
+      if (!isOpen() || minimized) return;
       if (e.key === "Escape") {
         e.preventDefault();
         e.stopPropagation();
-        setOpen(false);
+        setMinimized(true);
         return;
       }
-      if ((e.key === "u" || e.key === "U") && mode === "draw") {
+      if (e.key === "Alt") {
+        setPeeking(true);
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === "z" || e.key === "Z") && !typing && (mode === "draw" || eventInsideBoard(e.target))) {
         e.preventDefault();
-        undoStroke();
+        if (e.shiftKey) redoStroke();
+        else undoStroke();
+        return;
+      }
+      if (mode === "draw" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+        applyDrawHotkey(e);
       }
     },
     true
   );
 
+  document.addEventListener("keyup", function (e) {
+    if (e.key === "Alt") setPeeking(false);
+  });
+  window.addEventListener("blur", function () { setPeeking(false); });
+
   loadPrefs();
   applyTheme();
   applyFontStep();
   applyInputKind(null, true, true);
+  applyGrid();
 
   window.NpBoard = {
     toggle: toggle,
-    open: function () { if (!isOpen()) setOpen(true); },
+    open: function () { if (!isOpen()) setOpen(true); else if (minimized) setMinimized(false); },
     close: function () { setOpen(false); },
+    minimize: function () { if (isOpen()) setMinimized(true); },
+    openPen: openInPenMode,
     clear: clearBoard,
     setMode: setMode,
-    isOpen: isOpen,
+    isOpen: function () { return isOpen() && !minimized; },
     dock: applyDock,
     setTheme: function (theme) {
       prefs.theme = theme === "paper" ? "paper" : "slate";

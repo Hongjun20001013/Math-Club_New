@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Candidate progress · Admin{% endblock %}
+{% block content %}
+<div class="np-page-shell">
+  <div class="np-admin-page">
+    <p><a href="{{ url_for('admin_placement_candidates') }}">← Placement Candidates</a></p>
+    <h1>{{ attempt.display_name }}</h1>
+    <p>{{ test.title if test else attempt.slug }} · {{ status_label }} · {{ attempt.answered_count }}/{{ attempt.total_count }} answered</p>
+    <p class="np-admin-provisional">Provisional — paper responses not reviewed</p>
+    {% if score %}
+    <p>MCQ {{ score.mcq_correct }} / {{ score.mcq_total }} · Paper FRQ {{ score.paper_frq_completed }} / {{ score.paper_frq_total }} completed</p>
+    {% endif %}
+    <p>Grade: {{ attempt.grade or "—" }} · School: {{ attempt.school or "—" }} · Course: {{ attempt.math_course or "—" }} · Advisor: {{ attempt.counselor_source or "Not provided" }}</p>
+    <p>
+      <a href="{{ url_for('admin_placement_candidate_pdf', attempt_id=attempt.id) }}">Download PDF</a>
+    </p>
+    {% if attempt.status == 'submitted' %}
+    <form method="post" action="{{ url_for('admin_placement_candidate_reopen', attempt_id=attempt.id) }}" style="display:inline;">
+      <button type="submit">Reopen submitted attempt</button>
+    </form>
+    {% endif %}
+    <form method="post" action="{{ url_for('admin_placement_candidate_invalidate', attempt_id=attempt.id) }}" style="display:inline;">
+      <button type="submit">Invalidate recovery access</button>
+    </form>
+    <p><button type="button" disabled>Convert to full student account (coming soon)</button></p>
+    <table class="np-admin-table">
+      <thead><tr><th>#</th><th>Student answer</th><th>Key</th><th>Result</th></tr></thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.n }}</td>
+          <td>{{ item.selected or "—" }}</td>
+          <td>{{ item.correct or "—" }}</td>
+          <td>{{ item.result_label }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

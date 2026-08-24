@@ -165,14 +165,18 @@ def _setup_font(pdf: Any) -> str:
 
 def _status_label(status: str) -> str:
     s = (status or "").strip().lower()
-    if s == "correct":
+    if s == "correct" or s == "auto correct":
         return "Correct"
-    if s == "incorrect":
+    if s == "incorrect" or s == "auto incorrect":
         return "Missed"
     if s == "skipped":
         return "Skipped"
     if s == "nocheck":
         return "N/A"
+    if s == "paper_response":
+        return "Paper"
+    if s == "unscored":
+        return "Unscored"
     return (status or "")[:10]
 
 
@@ -306,11 +310,15 @@ def _draw_score_card(
     correct: int,
     total: int,
     pct: int,
+    *,
+    provisional: bool = False,
+    paper_completed: int = 0,
+    paper_total: int = 0,
 ) -> None:
     """Score summary: plain rectangle (no rounded corners) so text is never clipped."""
     w = _content_width(pdf)
     y0 = pdf.get_y()
-    h = 44.0
+    h = 52.0 if provisional else 44.0
     pdf.set_fill_color(252, 250, 255)
     pdf.set_draw_color(200, 194, 224)
     pdf.set_line_width(0.2)
@@ -323,11 +331,12 @@ def _draw_score_card(
     pdf.line(mid_x, y0 + 10, mid_x, y0 + h - 10)
 
     pad = 10.0
-    # Left: raw score (extra top padding avoids ascenders touching the box edge)
+    # Left: automatically scored MCQ (extra top padding avoids ascenders touching the box edge)
     pdf.set_xy(pdf.l_margin + pad, y0 + pad)
     pdf.set_font(font, "", 8)
     pdf.set_text_color(*_C_MUTED)
-    pdf.cell(62, 5, _pdf_core_font_safe("RAW SCORE"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    score_kicker = "AUTOMATICALLY SCORED SECTION" if provisional else "RAW SCORE"
+    pdf.cell(62, 5, _pdf_core_font_safe(score_kicker), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_x(pdf.l_margin + pad)
     pdf.set_font(font, "B", 26)
     pdf.set_text_color(*_C_INK)
@@ -338,26 +347,53 @@ def _draw_score_card(
     pdf.set_x(pdf.l_margin + pad)
     pdf.set_font(font, "", 9)
     pdf.set_text_color(*_C_MUTED)
-    pdf.cell(66, 5, _pdf_core_font_safe(f"{pct}% of items correct"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    denom_note = (
+        "No multiple-choice items"
+        if provisional and not total
+        else (
+            f"{pct}% of multiple-choice items"
+            if provisional
+            else f"{pct}% of items correct"
+        )
+    )
+    pdf.cell(66, 5, _pdf_core_font_safe(denom_note), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    if provisional:
+        pdf.set_x(pdf.l_margin + pad)
+        pdf.set_font(font, "", 8)
+        pdf.cell(
+            66,
+            4.5,
+            _pdf_core_font_safe(
+                f"Paper FRQ: awaiting teacher review · {paper_completed}/{paper_total}"
+            ),
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+        )
 
     bar_x = mid_x + 10
     bar_w = pdf.l_margin + w - bar_x - pad
     pdf.set_xy(bar_x, y0 + pad)
     pdf.set_font(font, "B", 10)
     pdf.set_text_color(*_C_INK)
-    pdf.cell(bar_w, 5, _pdf_core_font_safe("Session accuracy"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    right_title = "Provisional" if provisional else "Session accuracy"
+    pdf.cell(bar_w, 5, _pdf_core_font_safe(right_title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_x(bar_x)
     pdf.set_font(font, "", 8)
     pdf.set_text_color(*_C_MUTED)
+    right_note = (
+        "Provisional — paper responses not reviewed. This is not a final Placement score."
+        if provisional
+        else "How you performed on this diagnostic only—not a course grade."
+    )
     pdf.multi_cell(
         bar_w,
         4.2,
-        _pdf_core_font_safe("How you performed on this diagnostic only—not a course grade."),
+        _pdf_core_font_safe(right_note),
         new_x=XPos.LMARGIN,
         new_y=YPos.NEXT,
     )
 
-    track_y = y0 + 35
+    track_y = y0 + (43 if provisional else 35)
     pdf.set_fill_color(232, 228, 244)
     pdf.rect(bar_x, track_y, bar_w, 5, "F", round_corners=False)
     fill_w = max(0.0, min(bar_w, bar_w * (pct / 100.0)))
@@ -920,14 +956,29 @@ def build_placement_parent_pdf(ctx: dict[str, Any]) -> bytes:
 
     topic_title = _pdf_core_font_safe(str(ctx.get("topic_title") or "Placement diagnostic"))
     cc = int(ctx.get("correct_count") or 0)
-    tq = int(ctx.get("placement_score_total") or ctx.get("total_q") or 85)
+    tq_raw = ctx.get("placement_score_total")
+    if tq_raw is None:
+        tq_raw = ctx.get("total_q")
+    tq = int(tq_raw or 0)
     pct = int(ctx.get("score_pct") or 0)
+    provisional = bool(ctx.get("placement_provisional"))
+    paper_completed = int(ctx.get("paper_frq_completed") or 0)
+    paper_total = int(ctx.get("paper_frq_total") or 0)
 
     pdf.add_page()
     _draw_hero_band(pdf, font, topic_title)
     stu = ctx.get("placement_student")
     _draw_student_profile(pdf, font, stu if isinstance(stu, dict) else {})
-    _draw_score_card(pdf, font, cc, tq, pct)
+    _draw_score_card(
+        pdf,
+        font,
+        cc,
+        tq,
+        pct,
+        provisional=provisional,
+        paper_completed=paper_completed,
+        paper_total=paper_total,
+    )
     _draw_trust_note(pdf, font, placement_brand)
 
     if placement_gate_scores:

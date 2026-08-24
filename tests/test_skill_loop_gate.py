@@ -2197,7 +2197,7 @@ class TestV2DraftPackAndPaths(unittest.TestCase):
         self.assertTrue(grouped["delayed"])
 
         digest = sha256_file(BANK)
-        self.assertEqual(digest, "cbcdd4d6e1bbdd1eee2bd408076851e4524d7ead87e0f4e3f55eae45b285804d")
+        self.assertEqual(digest, "238934f8b1893d91f8b6fd92e7d326854620f1da1fc14ef2dde36a4a58be83c0")
         from scripts.skill_loop_baseline import bank_question_count
 
         self.assertEqual(bank_question_count(BANK), 1507)

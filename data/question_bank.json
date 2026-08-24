@@ -19601,7 +19601,7 @@
         "correct_answer": "B"
       },
       {
-        "stem": "<p>In the figure shown, points \\(A\\), \\(B\\), \\(C\\), and \\(E\\) lie on the circle, and \\(AB\\lt BC\\). Segment \\(AC\\) is perpendicular to segment \\(BE\\) at point \\(D\\), and \\(BD=\\sqrt{346}\\). The diameter of the circle is \\(175\\). If \\(\\dfrac{CD}{AD}=r\\), what is the value of \\(r\\) (\\(\\angle ABC\\) is a right angle)?</p>\n<div class=\"stem-figure-wrap\" role=\"img\" aria-label=\"Circle with chords\"><svg viewBox=\"0 0 220 220\" width=\"220\" height=\"220\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"110\" cy=\"110\" r=\"96\" fill=\"none\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/><line x1=\"28\" y=\"94\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"58\" y=\"184\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"28\" y=\"94\" x2=\"58\" y=\"36\" stroke=\"#1f1f26\" stroke-width=\"2\"/><line x1=\"58\" y=\"36\" x2=\"192\" y=\"94\" stroke=\"#1f1f26\" stroke-width=\"2\"/><text x=\"8\" y=\"100\" font-size=\"14\" font-weight=\"600\">A</text><text x=\"44\" y=\"28\" font-size=\"14\" font-weight=\"600\">B</text><text x=\"198\" y=\"100\" font-size=\"14\" font-weight=\"600\">C</text><text x=\"44\" y=\"206\" font-size=\"14\" font-weight=\"600\">E</text><text x=\"72\" y=\"118\" font-size=\"14\" font-weight=\"600\">D</text></svg></div>",
+        "stem": "<p>In the figure shown, points \\(A\\), \\(B\\), \\(C\\), and \\(E\\) lie on the circle, and \\(AB\\lt BC\\). Segment \\(AC\\) is perpendicular to segment \\(BE\\) at point \\(D\\), and \\(BD=\\sqrt{346}\\). The diameter of the circle is \\(175\\). If \\(\\dfrac{CD}{AD}=r\\), what is the value of \\(r\\) (\\(\\angle ABC\\) is a right angle)?</p>\n<div class=\"stem-figure-wrap stem-figure-wrap--placement-chords\" role=\"img\" aria-label=\"Circle with chords AC and BE intersecting at D\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 360 320\" class=\"stem-tikz-svg stem-tikz-svg--placement-chords\" role=\"img\" aria-labelledby=\"placement-q27-title\" data-source=\"Placement_Test.tex circleChordDiagram\">\n  <title id=\"placement-q27-title\">Circle with chords AC and BE intersecting at D</title>\n  <!-- TikZ coords (y-up): O(0,0) r=2.40; A(-2.37,-0.35); B(-1.50,1.87); C(2.37,-0.35); E(-1.50,-1.87); D(-1.50,-0.35). Mapped to SVG with origin (180,168), scale 52, y-flipped. -->\n  <circle id=\"circle-o\" cx=\"180\" cy=\"168\" r=\"124.8\" fill=\"none\" stroke=\"#1f1f26\" stroke-width=\"2.4\"/>\n  <line id=\"chord-ac\" x1=\"56.76\" y1=\"186.2\" x2=\"303.24\" y2=\"186.2\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/>\n  <line id=\"chord-be\" x1=\"102\" y1=\"70.76\" x2=\"102\" y2=\"265.24\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/>\n  <line id=\"seg-ab\" x1=\"56.76\" y1=\"186.2\" x2=\"102\" y2=\"70.76\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/>\n  <line id=\"seg-bc\" x1=\"102\" y1=\"70.76\" x2=\"303.24\" y2=\"186.2\" stroke=\"#1f1f26\" stroke-width=\"2.2\"/>\n  <path id=\"right-angle-d\" d=\"M102,186.2 L102,176.84 L111.36,176.84 L111.36,186.2\" fill=\"none\" stroke=\"#1f1f26\" stroke-width=\"1.6\"/>\n  <circle id=\"pt-d\" cx=\"102\" cy=\"186.2\" r=\"2.4\" fill=\"#1f1f26\"/>\n  <text id=\"label-a\" x=\"37\" y=\"196\" font-size=\"16\" font-weight=\"700\" font-family=\"Georgia, 'Times New Roman', serif\">A</text>\n  <text id=\"label-b\" x=\"88\" y=\"54\" font-size=\"16\" font-weight=\"700\" font-family=\"Georgia, 'Times New Roman', serif\">B</text>\n  <text id=\"label-c\" x=\"318\" y=\"191\" font-size=\"16\" font-weight=\"700\" font-family=\"Georgia, 'Times New Roman', serif\">C</text>\n  <text id=\"label-e\" x=\"96\" y=\"288\" font-size=\"16\" font-weight=\"700\" font-family=\"Georgia, 'Times New Roman', serif\">E</text>\n  <text id=\"label-d\" x=\"116\" y=\"206\" font-size=\"16\" font-weight=\"700\" font-family=\"Georgia, 'Times New Roman', serif\">D</text>\n</svg></div>",
         "choices": [
           "\\(86.5\\)",
           "\\(85.5\\)",
@@ -20002,7 +20002,7 @@
           "\\((2x+3)(x-5)\\)",
           "\\((2x-3)(x+5)\\)",
           "\\((x+3)(2x-5)\\)",
-          "\\((2x-5)(x+3)\\)",
+          "\\((2x+5)(x-3)\\)",
           "prime"
         ],
         "question_kind": "mcq5",
@@ -20309,7 +20309,7 @@
         "choices": [
           "\\([2,\\infty)\\)",
           "\\((-1,\\infty)\\)",
-          "\\([2,\\infty)\\setminus\\{-1\\}\\)",
+          "\\((-\\infty,-1)\\cup[2,\\infty)\\)",
           "\\((-\\infty,-1)\\cup(-1,\\infty)\\)",
           "\\((2,\\infty)\\)"
         ],
@@ -21228,7 +21228,7 @@
         "choices": [
           "\\(\\displaystyle \\frac{2}{9}\\)",
           "\\(\\displaystyle \\frac{2}{27}\\)",
-          "\\(\\displaystyle \\frac{6}{27}\\)",
+          "\\(\\displaystyle \\frac{1}{9}\\)",
           "\\(\\displaystyle \\frac{1}{162}\\)"
         ],
         "question_kind": "mcq",
@@ -21476,7 +21476,7 @@
           "\\(\\displaystyle 30\\)",
           "\\(\\displaystyle 60\\)",
           "\\(\\displaystyle 30\\sqrt{5}\\)",
-          "\\(\\displaystyle 6\\sqrt{25}\\)"
+          "\\(\\displaystyle 6\\sqrt{20}\\)"
         ],
         "question_kind": "mcq",
         "display_number": 31,
@@ -21495,7 +21495,7 @@
           "\\(\\displaystyle 15\\)",
           "\\(\\displaystyle \\sqrt{63}\\)",
           "\\(\\displaystyle 21\\)",
-          "\\(\\displaystyle 3\\sqrt{7}\\)"
+          "\\(\\displaystyle 13\\)"
         ],
         "question_kind": "mcq",
         "display_number": 32,
@@ -23286,9 +23286,12 @@
         "knowledge_section": "FR",
         "knowledge_section_title_en": "Free response",
         "knowledge_section_title_zh": "Free response",
-        "correct_answer": "c≈10.0; area ≈60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed.",
+        "correct_answer": "c≈10.1; area ≈60.2 square units; the triangle is not given as right, so Law of Cosines/area with included angle is needed.",
         "answer_alternates": [
-          "10.0",
+          "10.1",
+          "10.07",
+          "10.073",
+          "10.0731",
           "60.2"
         ]
       },
@@ -24804,7 +24807,7 @@
         "correct_answer": "32,500"
       },
       {
-        "stem": "<p>The number of red frogs exceeded the number of blue frogs by 80. The number of green frogs was 20 less than the number of blue frogs. If there were 120 blue fogs, what was the sum of the reds, the blues, and the greens?</p>",
+        "stem": "<p>The number of red frogs exceeded the number of blue frogs by 80. The number of green frogs was 20 less than the number of blue frogs. If there were 120 blue frogs, what was the sum of the reds, the blues, and the greens?</p>",
         "choices": [],
         "question_kind": "free_response",
         "display_number": 85,
@@ -24941,7 +24944,13 @@
         "knowledge_section": "V",
         "knowledge_section_title_en": "Part V — Algebra 1/2 Readiness",
         "knowledge_section_title_zh": "Part V — Algebra 1/2 Readiness",
-        "correct_answer": "2602.142857"
+        "correct_answer": "2602.142857",
+        "answer_alternates": [
+          "2602 1/7",
+          "18215/7",
+          "2602.142857",
+          "2602.14"
+        ]
       },
       {
         "stem": "<p>Subtract:</p>\n<div class=\"stem-math-block\">\\[\n9\\frac{2}{14}-3\\frac{15}{21}\n\\]</div>",
@@ -25052,7 +25061,7 @@
         ]
       },
       {
-        "stem": "<p>Use two unit multipliers to convert 144 square feet to square miles. Round any decimal answer to two places.</p>",
+        "stem": "<p>Use two unit multipliers to convert 144 square feet to square miles. Write the answer in scientific notation. Round the coefficient to two decimal places.</p>",
         "choices": [],
         "question_kind": "free_response",
         "display_number": 99,

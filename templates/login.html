@@ -1,14 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Sign In · {{ site_brand_name }}{% endblock %}
+{% block title %}{% if placement_public_access_enabled %}Placement Test · {{ site_brand_name }}{% else %}Sign In · {{ site_brand_name }}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <div class="np-page-shell">
-<div class="np-sat-atelier np-login-atelier">
+<div class="np-sat-atelier np-login-atelier{% if placement_public_access_enabled %} np-login-atelier--placement-first{% endif %}">
 
   <nav class="np-atelier-rail" aria-label="Sign in navigation">
     <a href="{{ url_for('index') }}">Home</a>
     <span class="np-atelier-rail-sep">·</span>
-    <span class="np-atelier-rail-current">Sign in</span>
+    <span class="np-atelier-rail-current">{% if placement_public_access_enabled %}Placement{% else %}Sign in{% endif %}</span>
   </nav>
 
   {% with messages = get_flashed_messages() %}
@@ -31,6 +37,16 @@
 
     <section class="np-login-intro" aria-label="Workspace overview">
       <header class="np-login-intro-head">
+        {% if placement_public_access_enabled %}
+        <p class="np-atelier-kicker">Novel Prep · Course placement</p>
+        <h1>Your advisor sent you here.</h1>
+        <p class="np-atelier-hero-lead">Start the placement test without an account. Choose your course, enter your name, grade, and current school math class, then begin. Sign in only if you already have a Math Studio login.</p>
+        <div class="np-atelier-hero-stats" role="list">
+          <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>live tests</span></div>
+          <div class="np-atelier-stat" role="listitem"><strong>0</strong><span>accounts needed</span></div>
+          <div class="np-atelier-stat" role="listitem"><strong>✓</strong><span>score report</span></div>
+        </div>
+        {% else %}
         <p class="np-atelier-kicker">{{ site_login_kicker }}</p>
         <h1>Sign in. Feel the studio.</h1>
         <p class="np-atelier-hero-lead">Units 1–4, Hard Drill {{ hard_drill_meta.range_label or 'I–XIV + XVI' }}, session reports, and redo loops — progress that follows you, in a studio that feels premium.</p>
@@ -39,13 +55,26 @@
           <div class="np-atelier-stat" role="listitem"><strong>{{ hard_drill_meta.count or 15 }}</strong><span>hard sets</span></div>
           <div class="np-atelier-stat" role="listitem"><strong>∞</strong><span>retries</span></div>
         </div>
+        {% endif %}
       </header>
 
       <div class="np-login-role-grid" aria-label="Account types">
+        <article class="np-login-role-card np-login-role-card--placement">
+          <span class="np-login-role-icon" aria-hidden="true">P</span>
+          <div>
+            <h2>Placement Test</h2>
+            {% if placement_public_access_enabled %}
+            <p>No account needed. Choose your test, then enter name, advisor, grade, and current school math class.</p>
+            {% else %}
+            <p>Sign in, then start a course placement diagnostic from the catalog.</p>
+            {% endif %}
+            <a class="np-login-placement-inline" href="{{ url_for('placement_landing') }}">Start Placement Test</a>
+          </div>
+        </article>
         <article class="np-login-role-card">
           <span class="np-login-role-icon" aria-hidden="true">S</span>
           <div>
-            <h2>Student</h2>
+            <h2>Student studio</h2>
             <p>Practice units, hard drill, mistake analytics, and session reports. Ask {{ site_teacher_label }} for a student account.</p>
           </div>
         </article>
@@ -70,6 +99,7 @@
         </div>
       </details>
 
+      {% if not placement_public_access_enabled %}
       <aside class="np-login-preview glass-panel np-glass" aria-label="Sample workspace snapshot">
         <div class="np-login-preview-top">
           <span>SAT Math</span>
@@ -90,10 +120,38 @@
           <div><strong>3</strong><span>Hard sets done</span></div>
         </div>
       </aside>
+      {% endif %}
     </section>
 
     <article class="np-login-panel glass-panel np-glass" aria-label="Sign in form">
       <span class="np-login-panel-watermark" aria-hidden="true">→</span>
+
+      <div class="np-login-placement np-login-placement--lead" role="region" aria-label="Placement test">
+        <span class="np-login-placement-ghost" aria-hidden="true">∑</span>
+        <div class="np-login-placement-top">
+          <p class="np-login-placement-kicker">
+            <span class="np-login-placement-dot" aria-hidden="true"></span>
+            {% if placement_public_access_enabled %}No account needed{% else %}Course placement{% endif %}
+          </p>
+          <span class="np-login-placement-live"><span aria-hidden="true"></span>Live</span>
+        </div>
+        <h3>Placement Test</h3>
+        {% if placement_public_access_enabled %}
+        <p>Choose your course diagnostic and begin. Name, grade, and current school math class are required. Advisor is optional.</p>
+        <ul class="np-login-placement-tags" aria-label="What to expect">
+          <li>No sign-in</li>
+          <li>Timed diagnostic</li>
+          <li>Score report</li>
+        </ul>
+        {% else %}
+        <p>Open the placement catalog. If you are not signed in yet, you will come back here and continue after login.</p>
+        {% endif %}
+        <a class="np-login-placement-btn" id="np-login-placement-start" href="{{ url_for('placement_landing') }}">Start Placement Test</a>
+        {% if placement_public_access_enabled %}
+        <p class="np-login-placement-recover"><a href="{{ url_for('placement_public_recover') }}">Already started? Recover with your code</a></p>
+        {% endif %}
+      </div>
+      <p class="np-login-or" role="separator">or sign in to your account</p>
 
       <header class="np-login-panel-head">
         <p class="np-login-panel-kicker">Secure sign in</p>

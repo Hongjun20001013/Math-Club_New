@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" class="stem-tikz-svg stem-tikz-svg--placement-chords" role="img" aria-labelledby="placement-q27-title" data-source="Placement_Test.tex circleChordDiagram">
+  <title id="placement-q27-title">Circle with chords AC and BE intersecting at D</title>
+  <!-- TikZ coords (y-up): O(0,0) r=2.40; A(-2.37,-0.35); B(-1.50,1.87); C(2.37,-0.35); E(-1.50,-1.87); D(-1.50,-0.35). Mapped to SVG with origin (180,168), scale 52, y-flipped. -->
+  <circle id="circle-o" cx="180" cy="168" r="124.8" fill="none" stroke="#1f1f26" stroke-width="2.4"/>
+  <line id="chord-ac" x1="56.76" y1="186.2" x2="303.24" y2="186.2" stroke="#1f1f26" stroke-width="2.2"/>
+  <line id="chord-be" x1="102" y1="70.76" x2="102" y2="265.24" stroke="#1f1f26" stroke-width="2.2"/>
+  <line id="seg-ab" x1="56.76" y1="186.2" x2="102" y2="70.76" stroke="#1f1f26" stroke-width="2.2"/>
+  <line id="seg-bc" x1="102" y1="70.76" x2="303.24" y2="186.2" stroke="#1f1f26" stroke-width="2.2"/>
+  <path id="right-angle-d" d="M102,186.2 L102,176.84 L111.36,176.84 L111.36,186.2" fill="none" stroke="#1f1f26" stroke-width="1.6"/>
+  <circle id="pt-d" cx="102" cy="186.2" r="2.4" fill="#1f1f26"/>
+  <text id="label-a" x="37" y="196" font-size="16" font-weight="700" font-family="Georgia, 'Times New Roman', serif">A</text>
+  <text id="label-b" x="88" y="54" font-size="16" font-weight="700" font-family="Georgia, 'Times New Roman', serif">B</text>
+  <text id="label-c" x="318" y="191" font-size="16" font-weight="700" font-family="Georgia, 'Times New Roman', serif">C</text>
+  <text id="label-e" x="96" y="288" font-size="16" font-weight="700" font-family="Georgia, 'Times New Roman', serif">E</text>
+  <text id="label-d" x="116" y="206" font-size="16" font-weight="700" font-family="Georgia, 'Times New Roman', serif">D</text>
+</svg>

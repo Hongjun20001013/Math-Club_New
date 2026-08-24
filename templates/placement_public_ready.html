@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--start">
+  {% include 'partials/placement_atelier_mesh.html' %}
+  <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+    <article class="np-pl-intake np-pl-intake--ticket np-pl-reveal">
+      <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+      <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Keep this pass</p>
+      <h1 class="np-pl-display np-pl-display--md">Save your recovery code</h1>
+      <p class="np-pl-lead">You selected: <strong>{{ test.title }}</strong></p>
+      {% if recovery_code %}
+      <p class="np-pl-intake__hint">Write this code down. You will need it if you change browsers or devices. We cannot show it again.</p>
+      <div class="np-pl-ticket" aria-label="Recovery code">
+        <p class="np-pl-ticket__kicker">Recovery pass</p>
+        <p class="np-pl-ticket__code" data-pl-recovery-code>{{ recovery_code }}</p>
+        <p class="np-pl-ticket__fine">One sitting · one browser family · do not share</p>
+      </div>
+      {% else %}
+      <p class="np-pl-intake__hint">Your session is ready. Continue to the first question.</p>
+      {% endif %}
+      <p class="np-pl-intake__actions">
+        <a class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow" href="{{ continue_href }}" data-pl-begin-exam>Begin exam</a>
+      </p>
+    </article>
+  </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

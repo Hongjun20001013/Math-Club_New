@@ -1,5 +1,15 @@
 from __future__ import annotations
-from answer_grader import display_answer_plain, grade_for_db, response_is_correct
+from answer_grader import (
+    PAPER_COMPLETE_TOKEN,
+    display_answer_plain,
+    grade_for_db,
+    is_placement_paper_item,
+    is_mcq_item,
+    placement_auto_score_breakdown,
+    placement_recorded_paper_answer,
+    placement_result_status,
+    response_is_correct,
+)
 from course_materials_progress import (
     build_coach_system_prompt,
     build_coach_user_message,
@@ -214,10 +224,18 @@ app.config.update(
     SKILL_LOOP_PILOT=False,
     SKILL_LOOP_V2_PREVIEW=False,
     SKILL_REPAIR=False,
+    PLACEMENT_PUBLIC_ACCESS=False,
 )
 
 from skill_loop import skill_loop_bp, skill_loop_enabled
 from skill_repair import skill_repair_bp, cluster_wrong_rows, recommended_next_step, ensure_repair_tables, annotate_clusters_with_progress, skill_repair_enabled
+import placement_public as placement_public_mod
+from placement_public import (
+    ensure_tables as ensure_placement_public_tables,
+    is_public_guest,
+    placement_public_enabled,
+    public_path_allowed,
+)
 
 app.register_blueprint(skill_loop_bp)
 app.register_blueprint(skill_repair_bp)
@@ -259,7 +277,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260819-choice-restore-v1")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-login-placement-atelier")
 
 _DB_SCHEMA_READY = False
 
@@ -1132,6 +1150,7 @@ def init_db():
         """
     )
     ensure_repair_tables(db)
+    ensure_placement_public_tables(db)
     db.execute(
         """
         UPDATE users
@@ -1232,14 +1251,33 @@ def inject_template_config():
     )
 
     grants = current_user_access_grants()
+    public_guest = "user_id" not in session
     visible_tracks = _visible_learning_tracks(grants)
-    nav_show_dashboard = grants is None or "dashboard" in grants
-    nav_show_workspace = grants is None or "sat" in grants
-    nav_show_analytics = grants is None or "sat" in grants
-    student_home_href = url_for("index") if grants is None else _student_home_url(grants)
+    nav_show_dashboard = (not public_guest) and (grants is None or "dashboard" in grants)
+    nav_show_workspace = (not public_guest) and (grants is None or "sat" in grants)
+    nav_show_analytics = (not public_guest) and (grants is None or "sat" in grants)
+    if public_guest:
+        student_home_href = (
+            url_for("placement_landing") if placement_public_enabled() else url_for("login")
+        )
+        visible_tracks = []
+    else:
+        student_home_href = url_for("index") if grants is None else _student_home_url(grants)
 
-    show_np_desmos = bool(p.startswith("/practice") and not p.startswith("/practice/analytics"))
+    show_np_desmos = bool(
+        (p.startswith("/practice") and not p.startswith("/practice/analytics"))
+        or p.startswith("/placement/run/")
+    )
     show_np_board = show_np_desmos
+
+    def placement_url(endpoint: str, **values):
+        pre = placement_public_mod.sanitize_advisor_prefill(request.args.get("advisor") or "")
+        if pre and "advisor" not in values:
+            values["advisor"] = pre
+        return url_for(endpoint, **values)
+
+    advisor_prefill_raw = placement_public_mod.sanitize_advisor_prefill(request.args.get("advisor") or "")
+    advisor_state = placement_public_mod.advisor_prefill_state(advisor_prefill_raw)
 
     return {
         "desmos_api_key": DESMOS_API_KEY,
@@ -1249,11 +1287,11 @@ def inject_template_config():
         "np_board_shortcut": True,
         "active_track_label": active_track,
         "nav_path": p,
-        "learning_tracks": visible_tracks if grants is not None else LEARNING_TRACKS,
+        "learning_tracks": [] if public_guest else (visible_tracks if grants is not None else LEARNING_TRACKS),
         "student_access_grants": grants,
         "student_access_grants_label": _access_grants_label(session.get("user_access_grants")),
         "student_resource_grant_options": STUDENT_RESOURCE_GRANTS,
-        "student_has_full_access": grants is None,
+        "student_has_full_access": (not public_guest) and grants is None,
         "nav_show_dashboard": nav_show_dashboard,
         "nav_show_workspace": nav_show_workspace,
         "nav_show_analytics": nav_show_analytics,
@@ -1269,6 +1307,12 @@ def inject_template_config():
         "csrf_token": _csrf_token(),
         "skill_loop_pilot_enabled": skill_loop_enabled(),
         "skill_repair_enabled": skill_repair_enabled(),
+        "placement_public_access_enabled": placement_public_enabled(),
+        "placement_public_guest": public_guest and placement_public_enabled(),
+        "placement_url": placement_url,
+        "placement_advisor_prefill": advisor_prefill_raw,
+        "placement_advisor_choice": advisor_state["choice"],
+        "placement_advisor_other": advisor_state["other"],
         **_site_branding_context(),
     }
 
@@ -1730,6 +1774,8 @@ def require_authenticated_user():
         return None
 
     if "user_id" not in session:
+        if placement_public_enabled() and public_path_allowed(request.path or ""):
+            return None
         return redirect(url_for("login", next=request.full_path or request.path))
 
     db = get_db()
@@ -5212,6 +5258,8 @@ def _clear_placement_profile_session() -> None:
     session.pop("placement_student_name", None)
     session.pop("placement_student_grade", None)
     session.pop("placement_student_math_course", None)
+    session.pop("placement_student_advisor", None)
+    session.pop("placement_student_school", None)
 
 
 def _clear_placement_session_attempt(topic: str) -> None:
@@ -9437,7 +9485,7 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
                 {
                     "icon": "G",
                     "title": "What to do",
-                    "body": "Use the grid in each question (or graph paper). Type your graph description, interval notation, and key steps in the response box.",
+                    "body": "Complete each item on paper. Check the box online only to mark that you finished it. These items are not scored automatically.",
                 },
                 {
                     "icon": str(graph),
@@ -9472,7 +9520,7 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
                 {
                     "icon": "FR",
                     "title": "What to do",
-                    "body": "Show each step and explain your reasoning. Use the response box for your full solution — work on paper is fine too.",
+                    "body": "Complete each free-response item on paper. Check the box online only to mark that you finished it. This section is not scored automatically.",
                 },
                 {
                     "icon": str(fr),
@@ -9525,33 +9573,33 @@ def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
 
 def _placement_section_back_href(topic: str, section: str) -> str:
     cfg = _placement_flow_config(topic) or {}
+    public_id = None
+    if is_public_guest():
+        db = get_db()
+        sess = placement_public_mod.current_session_row(db)
+        if sess is not None:
+            public_id = sess["attempt_public_id"]
+
+    def _q_href(qnum: int) -> str:
+        if public_id:
+            return url_for("placement_public_item", public_id=public_id, qnum=qnum)
+        return url_for("practice_question", domain="placement", topic=topic, qnum=qnum)
+
     if cfg.get("gate_kind") == "middle_parts":
         for gate in MIDDLE_LEVEL_PART_GATES:
             if gate["section"] == section:
-                return url_for(
-                    "practice_question",
-                    domain="placement",
-                    topic=topic,
-                    qnum=int(gate["after_q_index"]),
-                )
-        return url_for("practice_question", domain="placement", topic=topic, qnum=0)
+                return _q_href(int(gate["after_q_index"]))
+        return _q_href(0)
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
             if gate["section"] == section:
-                return url_for(
-                    "practice_question",
-                    domain="placement",
-                    topic=topic,
-                    qnum=int(gate["after_q_index"]),
-                )
-        return url_for("practice_question", domain="placement", topic=topic, qnum=0)
+                return _q_href(int(gate["after_q_index"]))
+        return _q_href(0)
     mc = int(cfg.get("mc_count") or 0)
     graph = int(cfg.get("graph_count") or 0)
     if section == "graphing":
-        return url_for("practice_question", domain="placement", topic=topic, qnum=mc - 1)
-    return url_for(
-        "practice_question", domain="placement", topic=topic, qnum=mc + graph - 1
-    )
+        return _q_href(mc - 1)
+    return _q_href(mc + graph - 1)
 
 
 @app.route("/placement/<slug>/section/<section>")
@@ -9594,6 +9642,18 @@ def placement_section_begin(slug: str, section: str):
         abort(404)
     session[meta["session_flag"]] = True
     session.modified = True
+    if is_public_guest():
+        db = get_db()
+        sess = placement_public_mod.current_session_row(db)
+        if sess is None:
+            abort(404)
+        return redirect(
+            url_for(
+                "placement_public_item",
+                public_id=sess["attempt_public_id"],
+                qnum=meta["first_qnum"],
+            )
+        )
     return redirect(
         url_for(
             "practice_question",
@@ -9650,13 +9710,28 @@ def placement_test_start(slug: str):
     test = _placement_test_by_slug(slug)
     if not test or str(test.get("status") or "") != "available":
         abort(404)
-    _clear_placement_session_attempt(topic)
-    session.modified = True
+    public_guest = is_public_guest()
+    if public_guest:
+        db = get_db()
+        sess = placement_public_mod.current_session_row(db)
+        if sess is not None and sess["slug"] == slug and sess["status"] in placement_public_mod.OPEN_STATUSES:
+            return redirect(
+                url_for("placement_public_item", public_id=sess["attempt_public_id"], qnum=0)
+            )
+    else:
+        _clear_placement_session_attempt(topic)
+        session.modified = True
     return render_template(
         "placement_start.html",
         test=test,
         topic=topic,
         slug=slug,
+        public_guest=public_guest,
+        begin_nonce=placement_public_mod.begin_nonce() if public_guest else "",
+        advisor_presets=placement_public_mod.ADVISOR_PRESETS,
+        advisor_other=placement_public_mod.ADVISOR_OTHER,
+        timer_minutes=placement_public_mod.TIMER_MINUTES.get(topic, 115),
+        item_count=placement_public_mod.ITEM_COUNTS.get(topic) or test.get("online_item_count"),
     )
 
 
@@ -9674,10 +9749,10 @@ def placement_test_begin(slug: str):
     test = _placement_test_by_slug(slug)
     if not test or str(test.get("status") or "") != "available":
         abort(404)
-    _clear_placement_session_attempt(topic)
     name = request.form.get("student_name", "").strip()
     grade = request.form.get("student_grade", "").strip()
     course = request.form.get("student_math_course", "").strip()
+    school = request.form.get("student_school", "").strip()
     if len(name) < 1:
         flash("Please enter the student name.")
         return redirect(url_for("placement_test_start", slug=slug))
@@ -9686,12 +9761,371 @@ def placement_test_begin(slug: str):
         return redirect(url_for("placement_test_start", slug=slug))
     grade = grade[:120]
     course = course[:400]
+    school = school[:200]
+    counselor = placement_public_mod.resolve_advisor(
+        request.form.get("advisor_choice", ""),
+        request.form.get("advisor_other", ""),
+    )
+    if not grade:
+        flash("Please select a grade.")
+        return redirect(url_for("placement_test_start", slug=slug))
+    if len(course) < 2:
+        flash("Please enter your current school math class clearly.")
+        return redirect(url_for("placement_test_start", slug=slug))
+    if request.form.get("counselor_confirm") != "1":
+        flash("Please confirm that you selected the appropriate placement test and will complete it independently.")
+        return redirect(url_for("placement_test_start", slug=slug))
+    if is_public_guest():
+        if placement_public_mod.rate_limited("create"):
+            return ("Too many placement starts from this network. Please wait and try again.", 429)
+        placement_public_mod.record_rate_hit("create")
+        db = get_db()
+        result = placement_public_mod.create_candidate_attempt(
+            db,
+            slug=slug,
+            display_name=name[:160],
+            grade=grade,
+            math_course=course,
+            school=school,
+            counselor_source=counselor,
+            nonce=request.form.get("begin_nonce") or "",
+        )
+        return redirect(
+            url_for(
+                "placement_public_ready",
+                public_id=result["attempt_public_id"],
+            )
+        )
+    _clear_placement_session_attempt(topic)
     session["placement_student_name"] = name[:160]
     session["placement_student_grade"] = grade
     session["placement_student_math_course"] = course
+    session["placement_student_advisor"] = counselor
+    session["placement_student_school"] = school
     session.modified = True
     return redirect(
         url_for("practice_question", domain="placement", topic=topic, qnum=0)
+    )
+
+
+def _placement_public_next_href(topic: str, public_id: str, q_index: int, bank_total: int) -> str:
+    slug = _placement_slug_for_topic(topic)
+    flow = _placement_flow_config(topic)
+    if flow and flow.get("has_gates"):
+        if flow.get("gate_kind") == "middle_parts":
+            for gate in MIDDLE_LEVEL_PART_GATES:
+                if q_index == int(gate["after_q_index"]):
+                    return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
+        elif flow.get("gate_kind") == "upper_gates":
+            for gate in _upper_placement_gate_gates():
+                if q_index == int(gate["after_q_index"]):
+                    return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
+        else:
+            mc = int(flow.get("mc_count") or 0)
+            graph = int(flow.get("graph_count") or 0)
+            if q_index == mc - 1 and graph:
+                return url_for("placement_section_intro", slug=slug, section="graphing")
+            if q_index == mc + graph - 1:
+                return url_for("placement_section_intro", slug=slug, section="free_response")
+    if q_index >= bank_total - 1:
+        return url_for("placement_public_finish", public_id=public_id)
+    return url_for("placement_public_item", public_id=public_id, qnum=q_index + 1)
+
+
+def _placement_public_questions(topic: str) -> list[dict]:
+    tex_file = (BANKS.get("placement") or {}).get(topic)
+    if not tex_file:
+        return []
+    return get_questions_for_topic("placement", topic, tex_file) or []
+
+
+@app.route("/placement/recover", methods=["GET", "POST"])
+def placement_public_recover():
+    if not placement_public_enabled():
+        abort(404)
+    if "user_id" in session:
+        return redirect(url_for("placement_landing"))
+    if request.method == "GET":
+        return render_template("placement_public_recover.html")
+    if placement_public_mod.rate_limited("recover"):
+        return ("Too many recovery attempts. Please wait and try again.", 429)
+    placement_public_mod.record_rate_hit("recover")
+    db = get_db()
+    found = placement_public_mod.recover_with_code(db, request.form.get("recovery_code") or "")
+    if not found:
+        flash("That recovery code is not valid, has expired, or was revoked.")
+        return redirect(url_for("placement_public_recover"))
+    if found["status"] == "submitted":
+        return redirect(url_for("placement_public_done", public_id=found["attempt_public_id"]))
+    return redirect(url_for("placement_public_item", public_id=found["attempt_public_id"], qnum=0))
+
+
+@app.route("/placement/run/<public_id>/ready")
+def placement_public_ready(public_id: str):
+    if not is_public_guest():
+        abort(404)
+    db = get_db()
+    att = placement_public_mod.authorize_attempt(db, public_id)
+    if att is None:
+        abort(404)
+    test = _placement_test_by_slug(att["slug"])
+    recovery = placement_public_mod.pop_recovery_once()
+    return render_template(
+        "placement_public_ready.html",
+        test=test,
+        attempt=att,
+        recovery_code=recovery,
+        continue_href=url_for("placement_public_item", public_id=public_id, qnum=0),
+    )
+
+
+@app.route("/placement/run/<public_id>/item/<int:qnum>", methods=["GET", "POST"])
+def placement_public_item(public_id: str, qnum: int):
+    if not is_public_guest():
+        abort(404)
+    db = get_db()
+    att = placement_public_mod.authorize_attempt(db, public_id)
+    if att is None:
+        abort(404)
+    if att["status"] == "submitted":
+        return redirect(url_for("placement_public_done", public_id=public_id))
+    topic = str(att["topic"])
+    questions = _placement_public_questions(topic)
+    if not questions:
+        abort(404)
+    qnum = max(0, min(len(questions) - 1, int(qnum)))
+    if request.method == "POST":
+        return _placement_public_save_item(db, att, questions, qnum)
+    gate_href = _placement_section_gate_redirect(topic, qnum)
+    if gate_href:
+        return redirect(gate_href)
+    placement_public_mod.mark_in_progress(db, int(att["id"]))
+    db.commit()
+    q = questions[qnum]
+    answered_qset = placement_public_mod.answered_indices(db, int(att["id"]))
+    saved = placement_public_mod.saved_answer(db, int(att["id"]), qnum)
+    if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
+        saved = _mcq_letter(saved)
+    bank_total = len(questions)
+    answered_count = len(answered_qset)
+    calc_ok = bool(q.get("calculator_allowed", True))
+    attempt_time_row = db.execute(
+        "SELECT CAST(strftime('%s', COALESCE(started_at, created_at)) AS INTEGER) AS started_unix FROM placement_candidate_attempts WHERE id = ?",
+        (att["id"],),
+    ).fetchone()
+    attempt_started_unix = int(attempt_time_row["started_unix"] or 0) if attempt_time_row else 0
+    return render_template(
+        "practice_question.html",
+        q=_sanitize_question_for_render(q),
+        domain="placement",
+        topic=topic,
+        qnum=qnum,
+        total=bank_total,
+        bank_total=bank_total,
+        attempt_id=int(att["id"]),
+        answered_qset=answered_qset,
+        answered_count=answered_count,
+        answered_pct=min(100, int(round(100 * answered_count / bank_total))) if bank_total else 0,
+        remaining_count=max(0, bank_total - answered_count),
+        is_last=qnum >= bank_total - 1,
+        calculator_allowed=calc_ok,
+        placement_mode=True,
+        choice_letters=[chr(ord("A") + i) for i in range(len(q.get("choices") or []))],
+        practice_timer_seconds=_placement_timer_seconds(topic),
+        practice_timer_summary_url=url_for("placement_public_finish", public_id=public_id),
+        practice_timer_mode="countdown",
+        pace_training=False,
+        pace_seconds=0,
+        attempt_started_unix=attempt_started_unix,
+        miss_quiz_mode=False,
+        miss_quiz_v2=False,
+        mistake_redo_mode=False,
+        mistake_return_href="",
+        tracked_responses_hint=None,
+        placement_clear_storage=answered_count == 0,
+        lock_phase3_answers=False,
+        phase3_answer_locked=False,
+        saved_selected_answer=saved,
+        restart_href=None,
+        public_run_mode=True,
+        public_run_id=public_id,
+        public_submit_url=url_for("placement_public_item", public_id=public_id, qnum=qnum),
+        public_draft_url=url_for("placement_public_item", public_id=public_id, qnum=qnum),
+        public_autosave_url=url_for("placement_public_autosave", public_id=public_id),
+        placement_paper_item=is_placement_paper_item(q),
+    )
+
+
+def _placement_public_save_item(db, att, questions, qnum: int):
+    if placement_public_mod.rate_limited("save", str(att["public_id"])):
+        return ("Too many saves. Please wait a moment.", 429)
+    placement_public_mod.record_rate_hit("save", str(att["public_id"]))
+    public_id = att["public_id"]
+    topic = str(att["topic"])
+    q = questions[qnum]
+    raw_answer = (request.form.get("selected_answer") or "").strip()
+    goto_raw = request.form.get("goto_qnum")
+    q_kind = str(q.get("question_kind") or "mcq")
+    paper_item = is_placement_paper_item(q)
+    if q_kind in ("mcq", "mcq5") and raw_answer:
+        raw_answer = _mcq_letter(raw_answer)
+    if paper_item:
+        raw_answer = placement_recorded_paper_answer(
+            raw_answer, request.form.get("paper_completed")
+        )
+    if goto_raw is not None and goto_raw != "":
+        try:
+            goto_q = max(0, min(len(questions) - 1, int(goto_raw)))
+        except ValueError:
+            goto_q = qnum
+        if paper_item:
+            placement_public_mod.mark_in_progress(db, int(att["id"]))
+            if raw_answer:
+                placement_public_mod.save_response(
+                    db, int(att["id"]), qnum, raw_answer, "", None
+                )
+            else:
+                placement_public_mod.clear_response(db, int(att["id"]), qnum)
+            db.commit()
+        elif raw_answer:
+            placement_public_mod.save_draft(db, int(att["id"]), qnum, raw_answer)
+            db.commit()
+        return redirect(url_for("placement_public_item", public_id=public_id, qnum=goto_q))
+    if paper_item:
+        placement_public_mod.mark_in_progress(db, int(att["id"]))
+        if raw_answer:
+            placement_public_mod.save_response(
+                db, int(att["id"]), qnum, raw_answer, "", None
+            )
+        else:
+            placement_public_mod.clear_response(db, int(att["id"]), qnum)
+        db.commit()
+        return redirect(_placement_public_next_href(topic, public_id, qnum, len(questions)))
+    if not raw_answer:
+        flash("Please enter or select an answer before submitting.")
+        return redirect(url_for("placement_public_item", public_id=public_id, qnum=qnum))
+    is_correct, correct_answer = grade_for_db(q, raw_answer)
+    placement_public_mod.mark_in_progress(db, int(att["id"]))
+    placement_public_mod.save_response(
+        db, int(att["id"]), qnum, raw_answer, correct_answer, is_correct
+    )
+    db.commit()
+    return redirect(_placement_public_next_href(topic, public_id, qnum, len(questions)))
+
+
+@app.route("/placement/run/<public_id>/autosave", methods=["POST"])
+def placement_public_autosave(public_id: str):
+    if not is_public_guest():
+        return jsonify({"ok": False}), 404
+    db = get_db()
+    att = placement_public_mod.authorize_attempt(db, public_id)
+    if att is None or att["status"] == "submitted":
+        return jsonify({"ok": False}), 403
+    if placement_public_mod.rate_limited("autosave", public_id):
+        return jsonify({"ok": False, "error": "rate_limited"}), 429
+    placement_public_mod.record_rate_hit("autosave", public_id)
+    try:
+        qnum = int(request.form.get("qnum") or 0)
+    except ValueError:
+        qnum = 0
+    answer = (request.form.get("selected_answer") or "").strip()
+    questions = _placement_public_questions(str(att["topic"]))
+    qnum = max(0, min(len(questions) - 1, qnum)) if questions else qnum
+    paper_item = bool(questions) and is_placement_paper_item(questions[qnum])
+    if paper_item:
+        answer = placement_recorded_paper_answer(
+            answer, request.form.get("paper_completed")
+        )
+        if answer:
+            placement_public_mod.save_response(
+                db, int(att["id"]), qnum, answer, "", None
+            )
+        else:
+            placement_public_mod.clear_response(db, int(att["id"]), qnum)
+        db.commit()
+        return jsonify({"ok": True})
+    placement_public_mod.save_draft(db, int(att["id"]), qnum, answer)
+    db.commit()
+    return jsonify({"ok": True})
+
+
+@app.route("/placement/run/<public_id>/finish", methods=["GET", "POST"])
+def placement_public_finish(public_id: str):
+    if not is_public_guest():
+        abort(404)
+    db = get_db()
+    att = placement_public_mod.authorize_attempt(db, public_id)
+    if att is None:
+        abort(404)
+    if att["status"] == "submitted":
+        return redirect(url_for("placement_public_done", public_id=public_id))
+    test = _placement_test_by_slug(att["slug"])
+    if request.method == "GET":
+        return render_template(
+            "placement_public_finish.html",
+            test=test,
+            attempt=att,
+            answered_count=int(att["answered_count"] or 0),
+            total_count=int(att["total_count"] or 0),
+        )
+    if request.form.get("confirm") != "1":
+        flash("Please confirm that you want to submit this test.")
+        return redirect(url_for("placement_public_finish", public_id=public_id))
+    if placement_public_mod.rate_limited("finish", public_id):
+        return ("Too many submit attempts. Please wait.", 429)
+    placement_public_mod.record_rate_hit("finish", public_id)
+    questions = _placement_public_questions(str(att["topic"]))
+    responses = {
+        int(r["question_index"]): r
+        for r in db.execute(
+            "SELECT question_index, selected_answer, is_correct FROM placement_candidate_responses WHERE attempt_id = ?",
+            (att["id"],),
+        ).fetchall()
+    }
+    selected_by_index = {
+        i: str((responses.get(i)["selected_answer"] if responses.get(i) else "") or "")
+        for i in range(len(questions))
+    }
+    is_correct_by_index: dict[int, int | None] = {}
+    for i, q in enumerate(questions):
+        if is_placement_paper_item(q):
+            continue
+        row = responses.get(i)
+        if row is None:
+            continue
+        is_correct_by_index[i] = row["is_correct"]
+    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
+    locked = placement_public_mod.finish_attempt(
+        db, int(att["id"]), json.dumps(score), None
+    )
+    db.commit()
+    if not locked:
+        return redirect(url_for("placement_public_done", public_id=public_id))
+    return redirect(url_for("placement_public_done", public_id=public_id))
+
+
+@app.route("/placement/run/<public_id>/done")
+def placement_public_done(public_id: str):
+    if not is_public_guest():
+        abort(404)
+    db = get_db()
+    att = placement_public_mod.authorize_attempt(db, public_id)
+    if att is None:
+        abort(404)
+    if att["status"] != "submitted":
+        return redirect(url_for("placement_public_finish", public_id=public_id))
+    test = _placement_test_by_slug(att["slug"])
+    score = {}
+    if att["score_json"]:
+        try:
+            score = json.loads(att["score_json"])
+        except (TypeError, ValueError, json.JSONDecodeError):
+            score = {}
+    return render_template(
+        "placement_public_submitted.html",
+        test=test,
+        attempt=att,
+        score=score,
     )
 
 
@@ -13514,6 +13948,7 @@ def practice_question(domain, topic, qnum):
         restart_href=url_for("practice_new_session", domain=domain, topic=topic)
         if domain == "hard_problem" and not mistake_redo_mode
         else None,
+        placement_paper_item=placement_mode and is_placement_paper_item(q),
     )
 
 
@@ -13568,8 +14003,29 @@ def practice_draft_answer():
         session.modified = True
 
     q_kind = ""
+    qobj = questions[current_q] if questions else {}
     if questions:
-        q_kind = str(questions[current_q].get("question_kind") or "mcq")
+        q_kind = str(qobj.get("question_kind") or "mcq")
+    paper_item = domain == "placement" and is_placement_paper_item(qobj)
+    if paper_item:
+        raw_answer = placement_recorded_paper_answer(
+            raw_answer, request.form.get("paper_completed")
+        )
+        db.execute(
+            "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+            (attempt_id, current_q),
+        )
+        if raw_answer:
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (attempt_id, current_q, raw_answer, "", None),
+            )
+        _save_practice_draft(attempt_id, current_q, raw_answer, clear_empty=True)
+        return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=goto_q))
     if q_kind in ("mcq", "mcq5") and raw_answer:
         raw_answer = raw_answer.strip().upper()[:1]
     _save_practice_draft(attempt_id, current_q, raw_answer)
@@ -13611,10 +14067,31 @@ def practice_autosave_answer():
         session[sk] = attempt_id
         session.modified = True
     q_kind = ""
+    qobj = {}
     questions = get_questions_for_topic(domain, topic, domain_data[topic]) or []
     if questions:
         current_q = max(0, min(len(questions) - 1, current_q))
-        q_kind = str(questions[current_q].get("question_kind") or "mcq")
+        qobj = questions[current_q]
+        q_kind = str(qobj.get("question_kind") or "mcq")
+    if domain == "placement" and is_placement_paper_item(qobj):
+        raw_answer = placement_recorded_paper_answer(
+            raw_answer, request.form.get("paper_completed")
+        )
+        db.execute(
+            "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
+            (attempt_id, current_q),
+        )
+        if raw_answer:
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (attempt_id, current_q, raw_answer, "", None),
+            )
+        _save_practice_draft(attempt_id, current_q, raw_answer, clear_empty=True)
+        return jsonify({"ok": True, "attempt_id": attempt_id})
     if q_kind in ("mcq", "mcq5") and raw_answer:
         raw_answer = raw_answer.strip().upper()[:1]
     _save_practice_draft(attempt_id, current_q, raw_answer)
@@ -13638,22 +14115,6 @@ def submit_practice_answer():
     except ValueError:
         qnum_for_redirect = 0
 
-    if not raw_answer:
-        flash("Please enter or select an answer before submitting.")
-        if mistake_redo:
-            return redirect(
-                url_for(
-                    "practice_question",
-                    domain=domain,
-                    topic=topic,
-                    qnum=qnum_for_redirect,
-                    mistake_redo=1,
-                    analytics_part=analytics_part_f or None,
-                    miss_anchor=miss_anchor_f or None,
-                )
-            )
-        return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=qnum_for_redirect))
-
     domain_data = BANKS.get(domain)
     if not domain_data:
         return "Unknown domain", 404
@@ -13673,8 +14134,31 @@ def submit_practice_answer():
 
     q_index = qnum % len(questions)
     question = questions[q_index]
+    paper_item = domain == "placement" and is_placement_paper_item(question)
+
+    if paper_item:
+        raw_answer = placement_recorded_paper_answer(
+            raw_answer, request.form.get("paper_completed")
+        )
+    elif not raw_answer:
+        flash("Please enter or select an answer before submitting.")
+        if mistake_redo:
+            return redirect(
+                url_for(
+                    "practice_question",
+                    domain=domain,
+                    topic=topic,
+                    qnum=qnum_for_redirect,
+                    mistake_redo=1,
+                    analytics_part=analytics_part_f or None,
+                    miss_anchor=miss_anchor_f or None,
+                )
+            )
+        return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=qnum_for_redirect))
     q_kind = question.get("question_kind", "mcq")
-    if q_kind in ("mcq", "mcq5"):
+    if paper_item:
+        selected_answer = raw_answer.strip()
+    elif q_kind in ("mcq", "mcq5"):
         selected_answer = raw_answer.strip().upper()[:1]
         allowed = {"A", "B", "C", "D", "E"} if q_kind == "mcq5" else {"A", "B", "C", "D"}
         if selected_answer not in allowed:
@@ -13705,7 +14189,10 @@ def submit_practice_answer():
     else:
         selected_answer = raw_answer
 
-    is_correct, correct_answer = grade_for_db(question, selected_answer)
+    if paper_item:
+        is_correct, correct_answer = None, ""
+    else:
+        is_correct, correct_answer = grade_for_db(question, selected_answer)
 
     db = get_db()
     try:
@@ -13738,27 +14225,29 @@ def submit_practice_answer():
             "DELETE FROM practice_responses WHERE attempt_id = ? AND question_index = ?",
             (attempt_id, q_index),
         )
-        db.execute(
-            """
-            INSERT INTO practice_responses
-            (attempt_id, question_index, selected_answer, correct_answer, is_correct)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (attempt_id, q_index, selected_answer, correct_answer, is_correct),
-        )
+        if not (paper_item and not selected_answer):
+            db.execute(
+                """
+                INSERT INTO practice_responses
+                (attempt_id, question_index, selected_answer, correct_answer, is_correct)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (attempt_id, q_index, selected_answer, correct_answer, is_correct),
+            )
         _save_practice_draft(attempt_id, q_index, "", clear_empty=True)
         lk = _learner_key()
-        _apply_practice_mistake_progress(
-            db,
-            lk,
-            attempt_id,
-            domain,
-            topic,
-            q_index,
-            is_correct,
-            mistake_redo=mistake_redo,
-            graded_before=graded_before,
-        )
+        if not paper_item:
+            _apply_practice_mistake_progress(
+                db,
+                lk,
+                attempt_id,
+                domain,
+                topic,
+                q_index,
+                is_correct,
+                mistake_redo=mistake_redo,
+                graded_before=graded_before,
+            )
         if not _safe_db_commit(db):
             flash("The server was busy and could not save your answer. Please submit again.")
             return _practice_redirect(
@@ -14368,15 +14857,39 @@ def _practice_session_summary_payload(
         expl = qobj.get("explanation_en", "")
 
         if r is None:
-            status = "skipped"
-            yours = "—"
-            key_display = display_answer_plain(key) if key else "—"
+            if domain == "placement" and is_placement_paper_item(qobj):
+                status = "unscored"
+                yours = "—"
+                key_display = "Teacher review"
+            else:
+                status = "skipped"
+                yours = "—"
+                key_display = display_answer_plain(key) if key else "—"
         else:
             yours_raw = (r["selected_answer"] or "").strip()
             yours = yours_raw if yours_raw else "—"
             key_display = display_answer_plain(key if key else (r["correct_answer"] or "—"))
             if yours == "—":
                 status = "skipped"
+            elif domain == "placement":
+                if is_placement_paper_item(qobj):
+                    if yours_raw:
+                        status = "paper_response"
+                        yours = "Completed on paper"
+                    else:
+                        status = "unscored"
+                    key_display = "Teacher review"
+                else:
+                    graded = response_is_correct(qobj, yours_raw)
+                    ic = None if graded is None else int(bool(graded))
+                    label = placement_result_status(qobj, ic, yours_raw)
+                    if label == "auto correct":
+                        status = "correct"
+                        correct_count += 1
+                    elif label == "auto incorrect":
+                        status = "incorrect"
+                    else:
+                        status = "nocheck"
             elif not key:
                 if qobj.get("question_kind") in ("constructed_response", "free_response"):
                     status = "submitted" if yours != "—" else "skipped"
@@ -14413,24 +14926,24 @@ def _practice_session_summary_payload(
         )
 
     score_pct = round(100.0 * correct_count / total_q) if total_q else 0
-    placement_gradable_total = sum(1 for q in questions if extract_correct_answer(q))
-    placement_ungraded_count = max(0, total_q - placement_gradable_total)
+    paper_frq_total = sum(1 for q in questions if is_placement_paper_item(q))
+    paper_frq_completed = sum(1 for row in rows_out if row["status"] == "paper_response")
     placement_mcq_correct = correct_count
-    placement_mcq_total = total_q
+    placement_mcq_total = sum(1 for q in questions if is_mcq_item(q)) if domain == "placement" else total_q
     flow_cfg = _placement_flow_config(topic) if domain == "placement" else None
-    if flow_cfg and flow_cfg.get("mc_scored"):
+    if domain == "placement":
         mcq_rows = [
             (row, qobj)
             for row, qobj in zip(rows_out, questions)
-            if qobj.get("question_kind") in ("mcq", "mcq5")
+            if is_mcq_item(qobj)
         ]
         placement_mcq_total = len(mcq_rows)
         placement_mcq_correct = sum(1 for row, _ in mcq_rows if row["status"] == "correct")
-        # Enhanced Math course placement is MCQ-based; keep displayed % aligned.
         if placement_mcq_total:
             score_pct = round(100.0 * placement_mcq_correct / placement_mcq_total)
-    elif domain == "placement" and placement_gradable_total:
-        score_pct = round(100.0 * correct_count / placement_gradable_total)
+        else:
+            score_pct = 0
+
     mistake_focus: List[dict] = []
     skipped_count = sum(1 for r in rows_out if r["status"] == "skipped")
     if domain != "placement":
@@ -14446,11 +14959,16 @@ def _practice_session_summary_payload(
                 )
 
     section_stats: List[dict] = []
-    acc = defaultdict(lambda: {"correct": 0, "total": 0, "title": ""})
+    acc = defaultdict(lambda: {"correct": 0, "total": 0, "title": "", "paper_total": 0, "paper_completed": 0})
     for row, qobj in zip(rows_out, questions):
         sec = qobj.get("knowledge_section", "—")
-        acc[sec]["total"] += 1
         acc[sec]["title"] = qobj.get("knowledge_section_title_en", "") or acc[sec]["title"]
+        if domain == "placement" and is_placement_paper_item(qobj):
+            acc[sec]["paper_total"] += 1
+            if row["status"] == "paper_response":
+                acc[sec]["paper_completed"] += 1
+            continue
+        acc[sec]["total"] += 1
         if row["status"] == "correct":
             acc[sec]["correct"] += 1
     if domain == "placement" and topic == "enhanced_math_1":
@@ -14487,7 +15005,23 @@ def _practice_session_summary_payload(
         if sec not in acc:
             continue
         a = acc[sec]
+        paper_only = domain == "placement" and a.get("paper_total") and not a["total"]
+        if paper_only:
+            t = int(a["paper_total"])
+            section_stats.append(
+                {
+                    "section": sec,
+                    "title_en": a["title"],
+                    "correct": int(a.get("paper_completed") or 0),
+                    "total": t,
+                    "pct": 0,
+                    "paper": True,
+                }
+            )
+            continue
         t = a["total"]
+        if not t:
+            continue
         section_stats.append(
             {
                 "section": sec,
@@ -14495,6 +15029,7 @@ def _practice_session_summary_payload(
                 "correct": a["correct"],
                 "total": t,
                 "pct": round(100.0 * a["correct"] / t) if t else 0,
+                "paper": False,
             }
         )
 
@@ -14505,8 +15040,8 @@ def _practice_session_summary_payload(
     placement_brand: dict | None = None
     if domain == "placement":
         flow_cfg = _placement_flow_config(topic)
-        rec_total = placement_mcq_total if flow_cfg and flow_cfg.get("mc_scored") else total_q
-        rec_correct = placement_mcq_correct if flow_cfg and flow_cfg.get("mc_scored") else correct_count
+        rec_total = placement_mcq_total
+        rec_correct = placement_mcq_correct
         placement_rec = _placement_recommendation(
             placement_meta, rec_correct, rec_total, topic
         )
@@ -14564,20 +15099,8 @@ def _practice_session_summary_payload(
                     "practice_miss_quiz_start", domain=domain, topic=topic
                 )
 
-    placement_score_total = (
-        placement_mcq_total
-        if flow_cfg and flow_cfg.get("mc_scored") and placement_mcq_total
-        else (
-            placement_gradable_total
-            if domain == "placement" and placement_gradable_total
-            else total_q
-        )
-    )
-    display_correct_count = (
-        placement_mcq_correct
-        if flow_cfg and flow_cfg.get("mc_scored") and placement_mcq_total
-        else correct_count
-    )
+    placement_score_total = placement_mcq_total if domain == "placement" else total_q
+    display_correct_count = placement_mcq_correct if domain == "placement" else correct_count
     phase3_sat: dict[str, Any] | None = None
     if domain == "hard_problem" and topic in PHASE3_PACE_TOPICS and 18 <= total_q <= 30:
         m2_wrong = sum(
@@ -14593,9 +15116,12 @@ def _practice_session_summary_payload(
         "rows": rows_out,
         "correct_count": display_correct_count,
         "total_q": total_q,
-        "placement_gradable_total": placement_gradable_total if domain == "placement" else None,
-        "placement_ungraded_count": placement_ungraded_count if domain == "placement" else None,
+        "placement_gradable_total": placement_mcq_total if domain == "placement" else None,
+        "placement_ungraded_count": paper_frq_total if domain == "placement" else None,
         "placement_score_total": placement_score_total if domain == "placement" else None,
+        "paper_frq_completed": paper_frq_completed if domain == "placement" else None,
+        "paper_frq_total": paper_frq_total if domain == "placement" else None,
+        "placement_provisional": domain == "placement",
         "score_pct": score_pct,
         "answered_count": total_q - skipped_count,
         "answered_pct": (
@@ -14631,10 +15157,13 @@ def _practice_session_summary_payload(
         "section_stats": section_stats,
         "placement_brand": placement_brand,
         "placement_student": placement_student,
-        "correct_count": correct_count,
+        "correct_count": display_correct_count,
         "total_q": total_q,
         "placement_score_total": placement_score_total if domain == "placement" else total_q,
         "score_pct": score_pct,
+        "paper_frq_completed": paper_frq_completed if domain == "placement" else 0,
+        "paper_frq_total": paper_frq_total if domain == "placement" else 0,
+        "placement_provisional": domain == "placement",
         "session_duration_seconds": duration_seconds,
         "session_duration_label": session_duration_label,
         "topic_title": topic_title,
@@ -16914,6 +17443,17 @@ def admin():
         "active_students": sum(1 for s in students if s["is_active"]),
         "responses": sum(int(s["responses_total"] or 0) for s in students),
     }
+    placement_rows = []
+    placement_totals = {"testers": 0, "in_progress": 0, "submitted": 0}
+    if placement_public_enabled():
+        placement_rows = _placement_candidate_admin_rows(db)
+        placement_totals = {
+            "testers": len(placement_rows),
+            "in_progress": sum(
+                1 for row in placement_rows if row.get("status") in ("profile_completed", "in_progress")
+            ),
+            "submitted": sum(1 for row in placement_rows if row.get("status") == "submitted"),
+        }
     staff_scope = _current_staff_view_scope(db) if current_user_role() == ROLE_STAFF else STAFF_VIEW_ALL
     staff_view_scope_label = (
         "All students"
@@ -16941,7 +17481,311 @@ def admin():
         staff_view_scope_label=staff_view_scope_label,
         db_persistence=_db_persistence_status(),
         student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
+        placement_candidates=placement_rows,
+        placement_totals=placement_totals,
     )
+
+
+def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
+    tests = {t["slug"]: t.get("title") for t in _placement_tests_flat()}
+    rows = placement_public_mod.list_candidates(db)
+    needle = (q or "").strip().lower()
+    decorated = []
+    for row in rows:
+        row["test_title"] = tests.get(row["selected_slug"], row["selected_slug"])
+        row["status_label"] = placement_public_mod.status_label(row["status"])
+        rec = {}
+        if row.get("recommendation_json"):
+            try:
+                rec = json.loads(row["recommendation_json"])
+            except (TypeError, ValueError, json.JSONDecodeError):
+                rec = {}
+        row["recommendation"] = rec.get("title") or rec.get("title_en") or ""
+        score = {}
+        if row.get("score_json"):
+            try:
+                score = json.loads(row["score_json"])
+            except (TypeError, ValueError, json.JSONDecodeError):
+                score = {}
+        if score:
+            mcq_c = score.get("mcq_correct", score.get("correct", 0))
+            mcq_t = score.get("mcq_total", score.get("total", 0))
+            paper_c = score.get("paper_frq_completed", 0)
+            paper_t = score.get("paper_frq_total", 0)
+            row["score_label"] = f"MCQ {mcq_c}/{mcq_t}"
+            row["paper_label"] = f"{paper_c}/{paper_t}"
+            row["provisional"] = True
+        else:
+            row["score_label"] = "—"
+            row["paper_label"] = "—"
+            row["provisional"] = False
+        if needle:
+            blob = " ".join(
+                str(row.get(key) or "")
+                for key in (
+                    "display_name",
+                    "grade",
+                    "math_course",
+                    "school",
+                    "counselor_source",
+                    "test_title",
+                    "status_label",
+                )
+            ).lower()
+            if needle not in blob:
+                continue
+        decorated.append(row)
+    return decorated
+
+
+@app.route("/admin/placement-candidates")
+def admin_placement_candidates():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    q = (request.args.get("q") or "").strip()
+    rows = _placement_candidate_admin_rows(db, q)
+    return render_template("admin_placement_candidates.html", rows=rows, q=q)
+
+
+@app.route("/admin/placement-candidates.csv")
+def admin_placement_candidates_csv():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    import csv
+    from io import StringIO
+
+    db = get_db()
+    rows = placement_public_mod.list_candidates(db)
+    tests = {t["slug"]: t.get("title") for t in _placement_tests_flat()}
+    buf = StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "student_name",
+            "grade",
+            "school",
+            "current_course",
+            "test",
+            "progress",
+            "status",
+            "started_at",
+            "last_activity",
+            "submitted_at",
+            "score",
+            "advisor",
+        ]
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["display_name"],
+                row.get("grade") or "",
+                row.get("school") or "",
+                row.get("math_course") or "",
+                tests.get(row["selected_slug"], row["selected_slug"]),
+                f"{row['answered_count']}/{row['total_count']}",
+                row["status"],
+                row.get("started_at") or "",
+                row.get("last_activity_at") or "",
+                row.get("submitted_at") or "",
+                row.get("score_json") or "",
+                row.get("counselor_source") or "Not provided",
+            ]
+        )
+    return Response(
+        buf.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=placement-candidates.csv"},
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>")
+def admin_placement_candidate_detail(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        """
+        SELECT a.*, c.display_name, c.grade, c.math_course, c.school, c.counselor_source,
+               c.id AS candidate_table_id
+        FROM placement_candidate_attempts a
+        JOIN placement_candidates c ON c.id = a.candidate_id
+        WHERE a.id = ?
+        """,
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    questions = _placement_public_questions(str(att["topic"]))
+    responses = {
+        int(r["question_index"]): dict(r)
+        for r in db.execute(
+            "SELECT * FROM placement_candidate_responses WHERE attempt_id = ? ORDER BY question_index",
+            (attempt_id,),
+        ).fetchall()
+    }
+    items = []
+    selected_by_index = {}
+    is_correct_by_index: dict[int, int | None] = {}
+    for i, q in enumerate(questions):
+        resp = responses.get(i) or {}
+        selected = str(resp.get("selected_answer") or "")
+        selected_by_index[i] = selected
+        if not is_placement_paper_item(q) and i in responses:
+            is_correct_by_index[i] = resp.get("is_correct")
+        items.append(
+            {
+                "n": i + 1,
+                "selected": "Completed on paper"
+                if is_placement_paper_item(q) and selected
+                else (selected or ""),
+                "correct": "" if is_placement_paper_item(q) else (resp.get("correct_answer") or ""),
+                "is_correct": None if is_placement_paper_item(q) else resp.get("is_correct"),
+                "result_label": placement_result_status(
+                    q,
+                    None if is_placement_paper_item(q) else resp.get("is_correct"),
+                    selected,
+                ),
+                "paper": is_placement_paper_item(q),
+            }
+        )
+    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
+    test = _placement_test_by_slug(att["slug"])
+    return render_template(
+        "admin_placement_candidate_detail.html",
+        attempt=dict(att),
+        test=test,
+        items=items,
+        score=score,
+        status_label=placement_public_mod.status_label(att["status"]),
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/report.pdf")
+def admin_placement_candidate_pdf(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        """
+        SELECT a.*, c.display_name, c.grade, c.math_course
+        FROM placement_candidate_attempts a
+        JOIN placement_candidates c ON c.id = a.candidate_id
+        WHERE a.id = ?
+        """,
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    questions = _placement_public_questions(str(att["topic"]))
+    responses = {
+        int(r["question_index"]): r
+        for r in db.execute(
+            "SELECT * FROM placement_candidate_responses WHERE attempt_id = ?",
+            (attempt_id,),
+        ).fetchall()
+    }
+    rows_out = []
+    selected_by_index = {}
+    is_correct_by_index: dict[int, int | None] = {}
+    for i, q in enumerate(questions):
+        resp = responses.get(i)
+        selected = str((resp["selected_answer"] if resp else "") or "")
+        is_correct = None if is_placement_paper_item(q) else (resp["is_correct"] if resp else None)
+        selected_by_index[i] = selected
+        if not is_placement_paper_item(q) and resp is not None:
+            is_correct_by_index[i] = resp["is_correct"]
+        rows_out.append(
+            {
+                "q_index": i,
+                "selected": "Completed on paper" if is_placement_paper_item(q) and selected else (selected or "—"),
+                "correct": "Teacher review" if is_placement_paper_item(q) else ((resp["correct_answer"] if resp else None) or "—"),
+                "is_correct": is_correct,
+                "status": placement_result_status(q, is_correct, selected),
+                "stem": "",
+            }
+        )
+    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
+    total_q = len(questions)
+    pdf_ctx = {
+        "rows": rows_out,
+        "placement_rec": None,
+        "placement_gate_scores": [],
+        "placement_gate_rec": None,
+        "section_stats": [],
+        "placement_brand": {"name": "Novel Prep"},
+        "placement_student": {
+            "name": att["display_name"],
+            "grade": att["grade"] or "",
+            "math_course": att["math_course"] or "",
+        },
+        "correct_count": score["mcq_correct"],
+        "total_q": score["mcq_total"],
+        "placement_score_total": score["mcq_total"],
+        "score_pct": int(round(100 * score["mcq_correct"] / score["mcq_total"])) if score["mcq_total"] else 0,
+        "session_duration_seconds": 0,
+        "session_duration_label": "",
+        "topic_title": (_placement_test_by_slug(att["slug"]) or {}).get("title") or att["topic"],
+        "attempt_id": attempt_id,
+        "paper_frq_completed": score["paper_frq_completed"],
+        "paper_frq_total": score["paper_frq_total"],
+        "placement_provisional": True,
+    }
+    body = build_placement_parent_pdf(pdf_ctx)
+    return Response(
+        body,
+        mimetype="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="placement-candidate-{attempt_id}.pdf"'
+        },
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/reopen", methods=["POST"])
+def admin_placement_candidate_reopen(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    ok = placement_public_mod.reopen_attempt(db, attempt_id)
+    db.commit()
+    flash("Attempt reopened." if ok else "Only a submitted attempt can be reopened.")
+    return redirect(url_for("admin_placement_candidate_detail", attempt_id=attempt_id))
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/invalidate", methods=["POST"])
+def admin_placement_candidate_invalidate(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        "SELECT candidate_id FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    placement_public_mod.revoke_recovery(db, int(att["candidate_id"]))
+    db.commit()
+    flash("Recovery access invalidated.")
+    return redirect(url_for("admin_placement_candidates"))
 
 
 @app.route("/admin/students/<int:user_id>")

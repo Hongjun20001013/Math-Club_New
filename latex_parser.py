@@ -1,4 +1,6 @@
+import os
 import re
+from pathlib import Path
 from typing import Any, Optional
 
 from tikz_svg import replace_tikz_with_svg_html
@@ -976,26 +978,34 @@ def _normalize_placement_question_markers(body: str) -> str:
 
 
 def _expand_placement_inline_diagram_macros(text: str) -> str:
-    """Inline hybrid-gate diagram macros (e.g. circle chord figure for Q27)."""
+    """Inline hybrid-gate diagram macros from Placement_Test.tex circleChordDiagram."""
     if r"\circleChordDiagram" not in text:
         return text
-    chord_svg = (
-        '<div class="stem-figure-wrap" role="img" aria-label="Circle with chords">'
-        '<svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">'
-        '<circle cx="110" cy="110" r="96" fill="none" stroke="#1f1f26" stroke-width="2.2"/>'
-        '<line x1="28" y="94" x2="192" y="94" stroke="#1f1f26" stroke-width="2"/>'
-        '<line x1="58" y="36" x2="58" y="184" stroke="#1f1f26" stroke-width="2"/>'
-        '<line x1="28" y="94" x2="58" y="36" stroke="#1f1f26" stroke-width="2"/>'
-        '<line x1="58" y="36" x2="192" y="94" stroke="#1f1f26" stroke-width="2"/>'
-        '<text x="8" y="100" font-size="14" font-weight="600">A</text>'
-        '<text x="44" y="28" font-size="14" font-weight="600">B</text>'
-        '<text x="198" y="100" font-size="14" font-weight="600">C</text>'
-        '<text x="44" y="206" font-size="14" font-weight="600">E</text>'
-        '<text x="72" y="118" font-size="14" font-weight="600">D</text>'
-        "</svg></div>"
+    svg_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "static",
+        "placement",
+        "upper_q27_circle_chords.svg",
     )
-    text = text.replace(r"\circleChordDiagram", chord_svg)
-    return text
+    try:
+        svg = Path(svg_path).read_text(encoding="utf-8")
+    except OSError:
+        svg = ""
+    svg = re.sub(r"^<\?xml[^>]*\?>\s*", "", svg.strip())
+    if not svg:
+        svg = (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" '
+            'class="stem-tikz-svg stem-tikz-svg--placement-chords">'
+            '<circle cx="180" cy="168" r="124.8" fill="none" stroke="#1f1f26" stroke-width="2.4"/>'
+            "</svg>"
+        )
+    chord_html = (
+        '<div class="stem-figure-wrap stem-figure-wrap--placement-chords" '
+        'role="img" aria-label="Circle with chords AC and BE intersecting at D">'
+        f"{svg}"
+        "</div>"
+    )
+    return text.replace(r"\circleChordDiagram", chord_html)
 
 
 def _placement_part_meta(n: int) -> tuple[str, str]:

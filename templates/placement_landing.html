@@ -1,19 +1,13 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas">
-<div class="np-pl2 np-pl2--atelier" aria-labelledby="np-pl-heading">
-    <div class="np-pl2-mesh" aria-hidden="true">
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
-        <span class="np-pl2-mesh__aurora"></span>
-        <span class="np-pl2-mesh__noise"></span>
-    </div>
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema" aria-labelledby="np-pl-heading">
+    {% include 'partials/placement_atelier_mesh.html' %}
 
     <div class="np-pl-canvas__inner">
         <nav class="np-pl2-nav np-pl-reveal">
@@ -40,6 +34,7 @@
                     </div>
                 </div>
                 <div class="np-pl-hero__visual" aria-hidden="true">
+                    {% include 'partials/placement_constellation.html' %}
                     <div class="np-pl-hero__visual-copy">
                         <strong>Official placement</strong>
                         <span>Same band rubric as the printable guide · Shareable PDF · Clear advising language.</span>

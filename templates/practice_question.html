@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 {% block extra_css %}
 {% if placement_mode %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endif %}
 {% endblock %}
 {% block content %}
 {% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
 
 <div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
+{% if placement_mode %}
+<div class="sat-placement-sky" aria-hidden="true">
+    <span class="sat-placement-sky__orb sat-placement-sky__orb--a"></span>
+    <span class="sat-placement-sky__orb sat-placement-sky__orb--b"></span>
+    <span class="sat-placement-sky__grain"></span>
+</div>
+{% endif %}
 <p class="sat-mobile-practice-hint" role="note">Best on tablet or laptop — rotate to landscape on phone for easier reading.</p>
 <div class="exam-container practice-run sat-practice sat-practice--split-lock{% if placement_mode %} sat-practice--placement{% endif %}{% if chrome_focus %} sat-practice--miss-quiz{% endif %}">
 
@@ -176,12 +183,12 @@
         {% else %}
         <div class="sat-subnav-group sat-subnav-group--primary">
         {% if qnum > 0 %}
-        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum - 1 }}">
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ qnum - 1 }}">
             ← Previous
         </button>
         {% endif %}
         {% if qnum < total - 1 %}
-        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ qnum + 1 }}">
             Next →
         </button>
         {% endif %}
@@ -202,11 +209,14 @@
             <span class="q-picker-trigger-text">Jump</span>
             <span class="q-picker-trigger-chevron" aria-hidden="true">▾</span>
         </button>
-        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" data-np-board-toggle title="Teaching Board (B): type notes, insert math with $, mark with pen.">Board</button>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" data-np-board-toggle title="Teaching Board (Shift+B). Shift+P for pen.">Board</button>
         {% if calculator_allowed %}
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" data-np-desmos-toggle>Desmos</button>
         {% else %}
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc-off" disabled title="Calculator is not available on this item (paper Section 1 rules)">Calculator</button>
+        {% endif %}
+        {% if public_run_mode|default(false) %}
+        <a href="{{ url_for('placement_public_finish', public_id=public_run_id) }}" class="nav-btn nav-btn-secondary" data-pl-open-finish>Submit test</a>
         {% endif %}
         </div>
         {% elif not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
@@ -215,7 +225,7 @@
             <span aria-hidden="true">☆</span> Mark
         </button>
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" onclick="openQuestionPicker()">Jump</button>
-        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" data-np-board-toggle title="Teaching Board (B): type notes, insert math with $, mark with pen.">Board</button>
+        <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn" data-np-board-toggle title="Teaching Board (Shift+B). Shift+P for pen.">Board</button>
         {% if calculator_allowed %}
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc" data-np-desmos-toggle>Desmos</button>
         {% endif %}
@@ -225,7 +235,7 @@
         {% endif %}
     </div>
 
-      <form id="practice-answer-form" method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
+      <form id="practice-answer-form" method="post" action="{% if miss_quiz_mode %}{{ url_for('practice_miss_quiz_submit') }}{% elif public_run_mode|default(false) %}{{ public_submit_url }}{% else %}{{ url_for('submit_practice_answer') }}{% endif %}" class="practice-form sat-practice-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         {% if tracked_responses_hint %}
         <p class="np-tracked-hint" role="note">{{ tracked_responses_hint }}</p>
@@ -266,12 +276,24 @@
 
             <div class="sat-split-gutter" aria-hidden="true"></div>
 
-            <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+            <aside class="sat-pane sat-pane-choices" aria-label="{% if placement_paper_item|default(false) %}Paper response{% elif q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if placement_paper_item|default(false) %}Paper response{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if placement_paper_item|default(false) %}Not scored automatically{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
-                {% if q.question_kind|default('mcq') == 'constructed_response' %}
+                {% if placement_paper_item|default(false) %}
+                <div class="sat-response-scroll">
+                    <div class="sat-paper-panel" role="note">
+                        <p class="sat-paper-notice">Complete this question on paper. This item is not scored automatically.</p>
+                        <label class="sat-paper-check">
+                            <input type="checkbox" name="paper_completed" id="paper-completed-input" value="1"{% if saved_selected_answer|default('') %} checked{% endif %}>
+                            <span>I completed this question on paper</span>
+                        </label>
+                        <input type="hidden" name="selected_answer" id="paper-selected-input" value="{% if saved_selected_answer|default('') %}PAPER_COMPLETE{% endif %}">
+                        <p class="sat-paper-hint">Your counselor will review the paper work. Checking the box only records that you finished it.</p>
+                    </div>
+                </div>
+                {% elif q.question_kind|default('mcq') == 'constructed_response' %}
                 <div class="sat-response-scroll">
                     <div class="sat-response-studio">
                         <div class="sat-response-studio__head">
@@ -336,12 +358,12 @@
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">Next question</button>
                     {% endif %}
                     {% elif is_last %}
-                    <p class="sat-submit-hint">Finish this question to see your score for all {{ total }} questions.</p>
+                    <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item. Automatically scored section uses multiple-choice items only.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
                     {% endif %}
-                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
+                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if placement_paper_item|default(false) %}Complete on paper, then check the box if you finished.{% elif q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
                 </div>
             </aside>
         </div>
@@ -671,15 +693,20 @@ function clearLegacyPracticeDrafts() {
 const selectedInput = document.getElementById("selected-answer-input");
 const sprInput = document.getElementById("spr-answer-input");
 const constructedInput = document.getElementById("constructed-answer-input");
+const paperCompletedInput = document.getElementById("paper-completed-input");
+const paperSelectedInput = document.getElementById("paper-selected-input");
 const practiceForm = document.querySelector(".sat-practice-form");
 const answerStatus = document.getElementById("sat-answer-status");
 const submitButtons = document.querySelectorAll(".sat-submit-btn");
-const autosaveUrl = {{ url_for('practice_autosave_answer')|tojson }};
+const autosaveUrl = {{ (public_autosave_url if public_run_mode|default(false) else url_for('practice_autosave_answer'))|tojson }};
 const autosaveCsrf = {{ csrf_token|tojson }};
 let autosaveTimer = null;
 let lastAutosaved = "";
 
 function currentPracticeAnswer() {
+    if (paperCompletedInput) {
+        return paperCompletedInput.checked ? "PAPER_COMPLETE" : "";
+    }
     if (constructedInput) return (constructedInput.value || "").trim();
     if (sprInput) return (sprInput.value || "").trim();
     const checked = document.querySelector(".choice-radio-input:checked");
@@ -689,7 +716,8 @@ function currentPracticeAnswer() {
 
 function autosaveNow() {
     const answer = currentPracticeAnswer();
-    if (!answer || !practiceAttemptId || answer === lastAutosaved) return;
+    if (!practiceAttemptId || answer === lastAutosaved) return;
+    if (!answer && !paperCompletedInput) return;
     const body = new FormData();
     body.append("csrf_token", autosaveCsrf);
     body.append("domain", "{{ domain }}");
@@ -697,6 +725,9 @@ function autosaveNow() {
     body.append("qnum", String(practiceQnum));
     body.append("attempt_id", String(practiceAttemptId));
     body.append("selected_answer", answer);
+    if (paperCompletedInput && paperCompletedInput.checked) {
+        body.append("paper_completed", "1");
+    }
     lastAutosaved = answer;
     fetch(autosaveUrl, {
         method: "POST",
@@ -717,14 +748,15 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pagehide", autosaveNow);
 
-const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response') | tojson }};
+const isConstructedMode = {{ (q.question_kind|default('mcq') == 'constructed_response' and not placement_paper_item|default(false)) | tojson }};
+const isPlacementPaper = {{ (placement_paper_item|default(false)) | tojson }};
 
 function setAnswerState(hasAnswer, label) {
     practiceForm?.classList.toggle("is-answered", hasAnswer);
     answerStatus?.classList.toggle("is-visible", hasAnswer || isConstructedMode);
     const nativeChoice = document.querySelector(".choice-radio-input");
     submitButtons.forEach((btn) => {
-        if (isConstructedMode || nativeChoice || sprInput) {
+        if (isConstructedMode || isPlacementPaper || nativeChoice || sprInput) {
             btn.removeAttribute("disabled");
             btn.classList.remove("is-disabled");
             return;
@@ -735,11 +767,20 @@ function setAnswerState(hasAnswer, label) {
     if (answerStatus) {
         answerStatus.textContent = hasAnswer
             ? (label || "Answer selected. You can submit when ready.")
-            : "{% if q.question_kind|default('mcq') == 'constructed_response' %}Type your work, then click Save &amp; next.{% elif q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
+            : "{% if placement_paper_item|default(false) %}Complete on paper, then check the box if you finished.{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type your work, then click Save &amp; next.{% elif q.question_kind|default('mcq') == 'free_response' %}Enter an answer before submitting.{% else %}Choose an answer before submitting.{% endif %}";
     }
 }
 
-if (isConstructedMode) {
+if (isPlacementPaper) {
+    const syncPaper = () => {
+        const on = !!(paperCompletedInput && paperCompletedInput.checked);
+        if (paperSelectedInput) paperSelectedInput.value = on ? "PAPER_COMPLETE" : "";
+        setAnswerState(true, on ? "Marked complete on paper. You can continue." : "Complete on paper, then check the box if you finished.");
+        scheduleAutosave();
+    };
+    paperCompletedInput?.addEventListener("change", syncPaper);
+    syncPaper();
+} else if (isConstructedMode) {
     setAnswerState(true, "Type your work in the box, then save and continue.");
 } else {
     setAnswerState(false);
@@ -908,7 +949,12 @@ window.addEventListener("load", () => {
     }
 
     const saved = localStorage.getItem(storageKey);
-    if (constructedInput) {
+    if (isPlacementPaper) {
+        const on = serverSavedAnswer === "PAPER_COMPLETE" || serverSavedAnswer === "1" || !!serverSavedAnswer;
+        if (paperCompletedInput) paperCompletedInput.checked = on;
+        if (paperSelectedInput) paperSelectedInput.value = on ? "PAPER_COMPLETE" : "";
+        setAnswerState(true, on ? "Marked complete on paper. You can continue." : "Complete on paper, then check the box if you finished.");
+    } else if (constructedInput) {
         if (serverSavedAnswer) constructedInput.value = serverSavedAnswer;
         else if (saved !== null && saved !== "") constructedInput.value = saved;
         setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
@@ -968,7 +1014,9 @@ document.addEventListener("keydown", (event) => {
             cards[index].click();
         }
     } else if (event.key === "Enter") {
-        const canSubmit = constructedInput
+        const canSubmit = isPlacementPaper
+            ? true
+            : constructedInput
             ? true
             : sprInput
             ? sprInput.value.trim()
@@ -986,6 +1034,12 @@ document.querySelector("#practice-answer-form")?.addEventListener("submit", (eve
     if (action.indexOf("draft") !== -1) {
         const checked = document.querySelector(".choice-radio-input:checked");
         if (checked && selectedInput) selectedInput.value = checked.value;
+        return;
+    }
+    if (isPlacementPaper) {
+        if (paperSelectedInput && paperCompletedInput) {
+            paperSelectedInput.value = paperCompletedInput.checked ? "PAPER_COMPLETE" : "";
+        }
         return;
     }
     if (constructedInput) {
@@ -1021,6 +1075,9 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
         const qIndex = link.getAttribute("data-q-index");
         if (qIndex === null || Number(qIndex) === practiceQnum) return;
         event.preventDefault();
+        if (isPlacementPaper && paperSelectedInput && paperCompletedInput) {
+            paperSelectedInput.value = paperCompletedInput.checked ? "PAPER_COMPLETE" : "";
+        }
         const checked = document.querySelector(".choice-radio-input:checked");
         if (checked && selectedInput) selectedInput.value = checked.value;
         let goto = form.querySelector('input[name="goto_qnum"]');
@@ -1031,7 +1088,7 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
             form.appendChild(goto);
         }
         goto.value = qIndex;
-        form.setAttribute("action", {{ url_for('practice_draft_answer')|tojson }});
+        form.setAttribute("action", {{ (public_draft_url if public_run_mode|default(false) else url_for('practice_draft_answer'))|tojson }});
         form.submit();
     });
 });

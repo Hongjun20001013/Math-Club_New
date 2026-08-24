@@ -1,29 +1,27 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_cinema.css') }}?v={{ style_css_revision }}">
+{% include 'partials/placement_cinema_css.html' %}
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas">
-<div class="np-pl2 np-pl2--atelier" aria-labelledby="np-pl-catalog-heading">
-    <div class="np-pl2-mesh" aria-hidden="true">
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--1"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--2"></span>
-        <span class="np-pl2-mesh__orb np-pl2-mesh__orb--3"></span>
-        <span class="np-pl2-mesh__aurora"></span>
-        <span class="np-pl2-mesh__noise"></span>
-    </div>
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema" aria-labelledby="np-pl-catalog-heading">
+    {% include 'partials/placement_atelier_mesh.html' %}
 
     <div class="np-pl-canvas__inner">
         <nav class="np-pl2-nav np-pl-reveal">
+            {% if placement_public_guest|default(false) %}
+            <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
+            {% else %}
             <a href="{{ url_for('index') }}" class="np-pl2-nav__back">
+            {% endif %}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Math Studio
+                {% if placement_public_guest|default(false) %}Course placement{% else %}Math Studio{% endif %}
             </a>
         </nav>
 
-        <header class="np-pl-hero np-pl-reveal">
+        <header class="np-pl-hero np-pl-hero--catalog np-pl-reveal">
             <div class="np-pl-hero__layout">
                 <div class="np-pl-hero__copy">
                     <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
@@ -39,12 +37,18 @@
                         <li class="np-pl-tag">Counselor-ready PDF</li>
                         <li class="np-pl-tag">Blank test download</li>
                     </ul>
-                </div>
-                <div class="np-pl-hero__visual" aria-hidden="true">
-                    <div class="np-pl-hero__visual-copy">
-                        <strong>Four live pathways</strong>
-                        <span>Middle · Enhanced · Upper — one polished diagnostic experience.</span>
-                    </div>
+                    <nav class="np-pl-quickstart" aria-label="Start a placement test">
+                        {% for tier in catalog.tiers %}
+                        {% for test in tier.tests %}
+                        {% if test.status == 'available' %}
+                        <a href="{{ placement_url('placement_test_start', slug=test.slug) }}" class="np-pl-quickstart__btn">Start {{ test.title }}</a>
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
+                    </nav>
+                    {% if placement_public_guest|default(false) %}
+                    <p class="np-pl-lead np-pl-lead--recover"><a href="{{ url_for('placement_public_recover') }}">Already started? Recover with your code</a></p>
+                    {% endif %}
                 </div>
             </div>
             <div class="np-pl-hero__rule" aria-hidden="true"></div>
@@ -118,10 +122,11 @@
                         </div>
                         <div class="np-pl-card__foot">
                             {% if test.status == 'available' %}
-                            <a href="{{ url_for('placement_test_landing', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">
-                                Open diagnostic
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <a href="{{ placement_url('placement_test_start', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">
+                                Start test
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </a>
+                            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-pl-card__overview">Overview</a>
                             {% else %}
                             <span class="np-pl-soon">Coming soon</span>
                             {% endif %}
