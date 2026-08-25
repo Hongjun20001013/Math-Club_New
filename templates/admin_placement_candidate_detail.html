@@ -1,40 +1,266 @@
 {% extends "base.html" %}
-{% block title %}Candidate progress · Admin{% endblock %}
+{% block title %}{{ attempt.display_name }} · Placement report{% endblock %}
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
 {% block content %}
+{% set auto_correct = score.mcq_correct if score else 0 %}
+{% set auto_total = score.mcq_total if score else 0 %}
+{% set graphing_total = score.paper_frq_total if score else 0 %}
+{% set graphing_done = score.paper_frq_completed if score else 0 %}
+{% set pname = attempt.display_name or '' %}
+{% set name_parts = pname.split() %}
+{% set miss_rows = items | selectattr('status', 'equalto', 'incorrect') | list %}
 <div class="np-page-shell">
-  <div class="np-admin-page">
-    <p><a href="{{ url_for('admin_placement_candidates') }}">← Placement Candidates</a></p>
-    <h1>{{ attempt.display_name }}</h1>
-    <p>{{ test.title if test else attempt.slug }} · {{ status_label }} · {{ attempt.answered_count }}/{{ attempt.total_count }} answered</p>
-    {% if score %}
-    <p>Score {{ score.mcq_correct }} / {{ score.mcq_total }}{% if score.paper_frq_total %} · Graphing {{ score.paper_frq_completed }} / {{ score.paper_frq_total }} submitted{% endif %}</p>
+<div class="exam-container np-summary-page np-summary-report-v3 np-summary-report-luxe np-summary-atelier np-summary-page--placement np-admin-placement-report">
+  {% include 'partials/placement_atelier_mesh.html' %}
+  <p class="np-pw-breadcrumb np-summary-bc"><a href="{{ url_for('admin_placement_candidates') }}">← Placement Candidates</a></p>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% endwith %}
+
+  <nav class="np-summary-jump np-summary-jump--v3 np-glass" aria-label="Jump to report sections">
+    <a class="np-summary-jump-external" href="#np-admin-pl-hero">Score</a>
+    <a href="#np-study-report">Study report</a>
+    {% if section_stats %}<a href="#np-by-area">By section</a>{% endif %}
+    {% if miss_rows %}<a href="#np-admin-pl-misses">Misses</a>{% endif %}
+    <a href="#np-summary-full-sheet">Item list</a>
+  </nav>
+
+  <aside class="np-summary-luxe-ribbon" aria-label="Report quality signals">
+    <span class="np-summary-luxe-ribbon-brand">{{ site_brand_name }}</span>
+    <ul class="np-summary-luxe-signals">
+      <li>Advisor briefing</li>
+      <li>{{ status_label }}</li>
+      <li>Shareable PDF</li>
+    </ul>
+  </aside>
+
+  <header id="np-admin-pl-hero" class="np-summary-hero np-summary-hero--layout-v3 np-summary-hero--placement-finale">
+    <div class="np-summary-hero-split">
+      <div class="np-summary-hero-text">
+        <span class="np-admin-pl-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <p class="np-summary-kicker">Advisor report · {{ status_label }}</p>
+        <p class="np-pl-brand">{{ site_brand_name }}</p>
+        <h1 class="np-summary-title">Placement results</h1>
+        <p class="np-summary-for-student">For <strong>{{ attempt.display_name }}</strong>{% if attempt.grade %} · {{ attempt.grade }}{% endif %}</p>
+        <p class="np-summary-meta">{{ test.title if test else attempt.slug }}</p>
+        <p class="np-summary-time-spent">Answered <strong>{{ answered_live }}/{{ attempt.total_count }}</strong></p>
+        <ul class="np-admin-pl-chips" aria-label="Student profile">
+          <li>Grade {{ attempt.grade or "—" }}</li>
+          <li>{{ attempt.math_course or "Course —" }}</li>
+          <li>{{ attempt.school or "School —" }}</li>
+          <li>Advisor {{ attempt.counselor_source or "Not provided" }}</li>
+        </ul>
+      </div>
+      <div class="np-summary-hero-visual">
+        <div class="np-score-pedestal">
+          <div class="np-score-ring-wrap">
+            <div class="np-score-ring" style="--pct: {{ score_pct }};">
+              <div class="np-score-ring-inner">
+                <span class="np-score-num">{{ auto_correct }}</span>
+                <span class="np-score-den">/ {{ auto_total }}</span>
+              </div>
+            </div>
+            <p class="np-score-pct">{{ score_pct }}% correct</p>
+            <p class="np-summary-score-foot">Score {{ auto_correct }} / {{ auto_total }}</p>
+            {% if graphing_total %}
+            <p class="np-summary-paper-frq">Graphing {{ graphing_done }} / {{ graphing_total }} submitted</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="np-summary-miss-quiz-row np-summary-miss-quiz-luxe glass-panel np-glass" aria-label="Advisor actions">
+      <div class="np-summary-miss-quiz-copy">
+        <p class="np-summary-miss-quiz-kicker">Advisor tools</p>
+        <p class="np-summary-miss-quiz-title">Share, reopen, or lock this sitting</p>
+        <p class="np-summary-miss-quiz-lead">PDF is the family copy. Reopen if the student still needs time. Invalidating recovery stops the guest code from being reused.</p>
+      </div>
+      <div class="np-summary-miss-quiz-btns">
+        <a class="np-pw-btn np-pw-btn--primary" href="{{ url_for('admin_placement_candidate_pdf', attempt_id=attempt.id) }}">Download PDF</a>
+        {% if attempt.status == 'submitted' %}
+        <form method="post" action="{{ url_for('admin_placement_candidate_reopen', attempt_id=attempt.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit" class="np-pw-btn np-pw-btn--ghost">Reopen submitted attempt</button>
+        </form>
+        {% endif %}
+        <form method="post" action="{{ url_for('admin_placement_candidate_invalidate', attempt_id=attempt.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit" class="np-pw-btn np-pw-btn--ghost">Invalidate recovery access</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <section class="np-placement-profile np-placement-strip-luxe glass-panel np-glass" aria-label="Student information on file">
+    <header class="np-placement-profile-head">
+      <div class="np-placement-profile-monogram" aria-hidden="true">
+        {% if name_parts | length >= 2 %}{{ (name_parts[0][0] ~ name_parts[-1][0]) | upper }}{% elif name_parts and name_parts[0] %}{{ name_parts[0][0] | upper }}{% else %}—{% endif %}
+      </div>
+      <div class="np-placement-profile-head-copy">
+        <p class="np-placement-profile-kicker">Learner on file</p>
+        <h2 class="np-placement-profile-title">{{ attempt.display_name }}</h2>
+        <p class="np-placement-profile-lead">These fields match the PDF header—confirm spelling before you share.</p>
+      </div>
+    </header>
+    <dl class="np-placement-profile-facts">
+      <div class="np-placement-profile-row">
+        <dt>Grade</dt>
+        <dd>{{ attempt.grade or "—" }}</dd>
+      </div>
+      <div class="np-placement-profile-row">
+        <dt>School</dt>
+        <dd>{{ attempt.school or "—" }}</dd>
+      </div>
+      <div class="np-placement-profile-row np-placement-profile-row--wide">
+        <dt>Current math class</dt>
+        <dd>{{ attempt.math_course or "—" }}</dd>
+      </div>
+      <div class="np-placement-profile-row np-placement-profile-row--wide">
+        <dt>Advisor</dt>
+        <dd>{{ attempt.counselor_source or "Not provided" }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section id="np-study-report" class="np-learning-report glass-panel np-glass np-learning-report--v3 np-learning-report--placement" aria-label="Report snapshot">
+    <div class="np-learning-report-head">
+      <p class="np-learning-report-kicker">Study report</p>
+      <h2>{% if score_pct >= 85 %}Strong diagnostic.{% elif score_pct >= 70 %}Solid base. Review the misses.{% elif auto_total %}Useful placement signal.{% else %}Waiting on scored answers.{% endif %}</h2>
+      <p>Use the score ring, area bars, and item sheet to brief the family. Download the PDF when you need a counselor copy.</p>
+      <p class="np-learning-report-family-note np-learning-report-family-note--placement"><span class="np-learning-report-family-label">For advisors</span> Anchor the conversation on <strong>Score band</strong> and <strong>Score by section</strong>—the PDF is the shareable copy.</p>
+    </div>
+    <div class="np-learning-report-grid">
+      <article class="np-learning-report-card">
+        <span>Score band</span>
+        <strong>{{ score_pct }}%</strong>
+        <em>{{ auto_correct }} correct of {{ auto_total }} scored items</em>
+      </article>
+      <article class="np-learning-report-card">
+        <span>Progress</span>
+        <strong>{{ answered_live }}/{{ attempt.total_count }}</strong>
+        <em>{{ status_label }}</em>
+      </article>
+      <article class="np-learning-report-card">
+        <span>Misses</span>
+        <strong>{{ miss_rows | length }}</strong>
+        <em>{% if miss_rows %}Auto-incorrect items to review{% else %}No auto-incorrect items{% endif %}</em>
+      </article>
+      <article class="np-learning-report-card">
+        <span>Advisor</span>
+        <strong>{{ attempt.counselor_source or "—" }}</strong>
+        <em>{{ attempt.grade or "Grade —" }}{% if attempt.math_course %} · {{ attempt.math_course }}{% endif %}</em>
+      </article>
+    </div>
+  </section>
+
+  {% if section_stats %}
+  <section id="np-by-area" class="np-pl-paper-sheet glass-panel np-glass" aria-label="Score by section">
+    <header class="np-pl-paper-sheet-cap">
+      <p class="np-summary-sheet-kicker">Printed diagnostic</p>
+      <h2 class="np-summary-sheet-title">Score by section</h2>
+      <p class="np-summary-sheet-lead">Each row is one part of this test — the same sections students see on paper, not a SAT knowledge tag.</p>
+    </header>
+    <div class="np-pl-paper-table" role="table">
+      <div class="np-pl-paper-head" role="row">
+        <span>Part</span>
+        <span>Area</span>
+        <span>Score</span>
+        <span>Rate</span>
+        <span>Reading</span>
+      </div>
+      {% for s in section_stats %}
+      <div class="np-pl-paper-row np-pl-paper-row--{{ s.status }}" role="row">
+        <div class="np-pl-paper-partcol">
+          <strong>{{ s.part_label }}</strong>
+          {% if s.range_label %}<em>{{ s.range_label }}</em>{% endif %}
+        </div>
+        <div class="np-pl-paper-area">{{ s.area_title }}</div>
+        <div class="np-pl-paper-score">{% if s.paper %}{{ s.correct }}/{{ s.total }}{% else %}{{ s.correct }}/{{ s.total }}{% endif %}</div>
+        <div class="np-pl-paper-rate">
+          {% if s.paper %}
+          <b>Review</b>
+          {% else %}
+          <b>{{ s.pct }}%</b>
+          <span class="np-knowledge-bar"><span class="np-knowledge-bar-fill" style="width: {{ s.pct }}%;"></span></span>
+          {% endif %}
+        </div>
+        <div class="np-pl-paper-read">
+          <span class="np-pl-paper-pill">{{ s.status_label }}</span>
+          <p>{{ s.interpretation }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if miss_rows %}
+  <section id="np-admin-pl-misses" class="np-admin-pl-misses glass-panel np-glass" aria-label="Missed items">
+    <p class="np-summary-sheet-kicker">Misses</p>
+    <h2 class="np-summary-sheet-title">Jump to incorrect items</h2>
+    <p class="np-summary-sheet-lead">{{ miss_rows | length }} auto-incorrect item{{ 's' if miss_rows | length != 1 else '' }} in this sitting.</p>
+    <div class="np-admin-pl-miss-chips">
+      {% for row in miss_rows %}
+      <a href="#np-admin-pl-q{{ row.n }}">Q{{ row.n }}</a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section id="np-summary-full-sheet" class="np-summary-table-wrap np-summary-sheet-luxe glass-panel np-glass">
+    <header class="np-summary-sheet-cap">
+      <p class="np-summary-sheet-kicker">Full breakdown</p>
+      <h2 class="np-summary-sheet-title">Item-by-item results</h2>
+      <p class="np-summary-sheet-lead">Grouped by the same printed sections as the paper. Student answer, key, and auto-score for every item.</p>
+    </header>
+    <div class="np-summary-table-head np-admin-pl-sheet-head">
+      <span class="col-q">#</span>
+      <span class="col-yours">Student answer</span>
+      <span class="col-key">Correct</span>
+      <span class="col-st">Status</span>
+    </div>
+    {% set ns = namespace(cur='') %}
+    {% for row in items %}
+    {% if row.knowledge_section != ns.cur %}
+    {% set ns.cur = row.knowledge_section %}
+    <div class="np-pl-paper-partband">
+      <span>{{ row.part_label }}</span>
+      <strong>{{ row.area_title }}</strong>
+      {% if row.range_label %}<em>{{ row.range_label }}</em>{% endif %}
+    </div>
     {% endif %}
-    <p>Grade: {{ attempt.grade or "—" }} · School: {{ attempt.school or "—" }} · Course: {{ attempt.math_course or "—" }} · Advisor: {{ attempt.counselor_source or "Not provided" }}</p>
-    <p>
-      <a href="{{ url_for('admin_placement_candidate_pdf', attempt_id=attempt.id) }}">Download PDF</a>
-    </p>
-    {% if attempt.status == 'submitted' %}
-    <form method="post" action="{{ url_for('admin_placement_candidate_reopen', attempt_id=attempt.id) }}" style="display:inline;">
-      <button type="submit">Reopen submitted attempt</button>
-    </form>
-    {% endif %}
-    <form method="post" action="{{ url_for('admin_placement_candidate_invalidate', attempt_id=attempt.id) }}" style="display:inline;">
-      <button type="submit">Invalidate recovery access</button>
-    </form>
-    <p><button type="button" disabled>Convert to full student account (coming soon)</button></p>
-    <table class="np-admin-table">
-      <thead><tr><th>#</th><th>Student answer</th><th>Key</th><th>Result</th></tr></thead>
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>{{ item.n }}</td>
-          <td>{{ item.selected or "—" }}</td>
-          <td>{{ item.correct or "—" }}</td>
-          <td>{{ item.result_label }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <div class="np-summary-block np-row-{{ row.status }}" id="np-admin-pl-q{{ row.n }}">
+      <div class="np-summary-row np-summary-row-main np-admin-pl-sheet-row">
+        <span class="col-q"><span class="np-q-main">{{ row.n }}</span></span>
+        <span class="col-yours">{{ row.yours_display }}</span>
+        <span class="col-key">{{ row.key_display }}</span>
+        <span class="col-st">
+          {% if row.status == 'correct' %}
+          <span class="np-badge np-badge-ok">Correct</span>
+          {% elif row.status == 'incorrect' %}
+          <span class="np-badge np-badge-bad">Incorrect</span>
+          {% elif row.status == 'submitted' %}
+          <span class="np-badge np-badge-muted">Submitted</span>
+          {% elif row.status == 'unscored' %}
+          <span class="np-badge np-badge-muted">Unscored</span>
+          {% elif row.status == 'nocheck' %}
+          <span class="np-badge np-badge-muted">Review</span>
+          {% else %}
+          <span class="np-badge np-badge-muted">Skipped</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <p class="np-admin-pl-soon">Convert to full student account (coming soon)</p>
 </div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
 {% endblock %}

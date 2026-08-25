@@ -533,6 +533,10 @@ def _draw_gate_scores_panel(
 
 def _section_card_label(sec: str, use_gates: bool) -> str:
     s = str(sec or "").strip()
+    if s == "G":
+        return "Graphing"
+    if s == "FR":
+        return "Free response"
     if use_gates and s.isdigit():
         return f"Gate {s}"
     return f"Part {s}"
@@ -620,7 +624,7 @@ def _section_card_height_for_width(
     inner_w = card_w - accent_w - pad_x * 2
 
     sec = str(s.get("section") or "")
-    tit_raw = _pdf_core_font_safe(str(s.get("title_en") or ""))
+    tit_raw = _pdf_core_font_safe(str(s.get("area_title") or s.get("title_en") or ""))
     tit = _pdf_core_font_safe(_strip_part_prefix(sec, tit_raw))
 
     pdf.set_font(font, "", 8)
@@ -674,7 +678,7 @@ def _draw_one_section_card_at(
     inner_w = card_w - accent_w - pad_x * 2
 
     sec = _pdf_core_font_safe(str(s.get("section") or ""))
-    tit_raw = _pdf_core_font_safe(str(s.get("title_en") or ""))
+    tit_raw = _pdf_core_font_safe(str(s.get("area_title") or s.get("title_en") or ""))
     tit = _pdf_core_font_safe(_strip_part_prefix(str(s.get("section") or ""), tit_raw))
     pct = int(s.get("pct") or 0)
     cor = int(s.get("correct") or 0)
@@ -691,7 +695,12 @@ def _draw_one_section_card_at(
     pdf.set_xy(content_x, y_cursor)
     pdf.set_font(font, "B", 9.5)
     pdf.set_text_color(*_C_INK)
-    pdf.cell(inner_w - 24, row1_h, _section_card_label(sec, bool(s.get("use_gate_label"))), align="L")
+    pdf.cell(
+        inner_w - 24,
+        row1_h,
+        _pdf_core_font_safe(str(s.get("part_label") or _section_card_label(sec, bool(s.get("use_gate_label"))))),
+        align="L",
+    )
     pdf.set_text_color(*_C_VIOLET_SOFT)
     pdf.cell(24, row1_h, f"{pct}%", align="R")
     pdf.ln(row1_h)
@@ -775,7 +784,7 @@ def _draw_section_cards(
         0,
         4,
         _pdf_core_font_safe(
-            "Each card is one part of the diagnostic (I–V). The item-by-item table follows on the next page."
+            "Each card is one printed section of this diagnostic. The item-by-item table follows on the next page."
         ),
         new_x=XPos.LMARGIN,
         new_y=YPos.NEXT,

@@ -58,6 +58,10 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
+from placement_intelligent_report import (
+    build_intelligent_placement_report,
+    enrich_placement_section_stats,
+)
 
 # =====================================================
 # BASIC CONFIG
@@ -278,7 +282,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-login-placement-atelier")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-login-placement-luxe")
 
 _DB_SCHEMA_READY = False
 
@@ -17615,13 +17619,16 @@ def admin_placement_candidates_csv():
     )
 
 
-@app.route("/admin/placement-candidates/<int:attempt_id>")
-def admin_placement_candidate_detail(attempt_id: int):
-    gate = _require_admin_response()
-    if gate is not None:
-        return gate
-    if not placement_public_enabled():
-        abort(404)
+def _placement_part_order(topic: str) -> tuple[str, ...] | None:
+    return {
+        "enhanced_math_1": ("A", "B", "C", "G", "FR"),
+        "enhanced_math_2": ("A", "B", "G", "FR"),
+        "middle_level": ("I", "II", "III", "IV", "V"),
+        "placement_full": ("1", "2", "3", "4", "5"),
+    }.get(str(topic or ""))
+
+
+def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     db = get_db()
     att = db.execute(
         """
@@ -17634,7 +17641,7 @@ def admin_placement_candidate_detail(attempt_id: int):
         (attempt_id,),
     ).fetchone()
     if att is None:
-        abort(404)
+        return None
     questions = _placement_public_questions(str(att["topic"]))
     responses = {
         int(r["question_index"]): dict(r)
@@ -17650,33 +17657,201 @@ def admin_placement_candidate_detail(attempt_id: int):
         resp = responses.get(i) or {}
         selected = str(resp.get("selected_answer") or "")
         selected_by_index[i] = selected
-        if not is_placement_paper_item(q) and i in responses:
-            is_correct_by_index[i] = resp.get("is_correct")
+        stored_correct = resp.get("is_correct") if i in responses else None
+        if i in responses:
+            is_correct_by_index[i] = stored_correct
+        label = placement_result_status(q, stored_correct, selected)
+        if label == "auto correct":
+            status = "correct"
+        elif label == "auto incorrect":
+            status = "incorrect"
+        elif label == "submitted":
+            status = "submitted"
+        elif label == "unscored":
+            status = "unscored"
+        elif label == "awaiting review":
+            status = "nocheck"
+        elif selected:
+            status = "nocheck"
+        else:
+            status = "skipped"
+        sec, title_en, _detail = _summary_topic_fields("placement", q)
+        key = extract_correct_answer(q) or resp.get("correct_answer") or ""
         items.append(
             {
                 "n": i + 1,
-                "selected": "Completed on paper"
-                if is_placement_paper_item(q) and selected
-                else (selected or ""),
-                "correct": "" if is_placement_paper_item(q) else (resp.get("correct_answer") or ""),
-                "is_correct": None if is_placement_paper_item(q) else resp.get("is_correct"),
-                "result_label": placement_result_status(
-                    q,
-                    None if is_placement_paper_item(q) else resp.get("is_correct"),
-                    selected,
-                ),
-                "paper": is_placement_paper_item(q),
+                "q_display": str(i + 1),
+                "selected": selected,
+                "correct": key,
+                "is_correct": stored_correct,
+                "result_label": label,
+                "status": status,
+                "yours_display": selected or "—",
+                "key_display": display_answer_plain(key) if key else "—",
+                "knowledge_section": sec,
+                "knowledge_title_en": title_en,
             }
         )
     score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
     test = _placement_test_by_slug(att["slug"])
+    answered_live = sum(1 for row in items if str(row.get("selected") or "").strip())
+    auto_total = int(score.get("mcq_total") or 0)
+    auto_correct = int(score.get("mcq_correct") or 0)
+    score_pct = round(100.0 * auto_correct / auto_total) if auto_total else 0
+    acc = defaultdict(lambda: {"correct": 0, "total": 0, "title": "", "paper_total": 0, "paper_completed": 0})
+    for row, qobj in zip(items, questions):
+        sec = row.get("knowledge_section") or qobj.get("knowledge_section") or "—"
+        acc[sec]["title"] = row.get("knowledge_title_en") or qobj.get("knowledge_section_title_en") or acc[sec]["title"]
+        if is_placement_graphing_item(qobj):
+            acc[sec]["paper_total"] += 1
+            if row["status"] == "submitted":
+                acc[sec]["paper_completed"] += 1
+            continue
+        acc[sec]["total"] += 1
+        if row["status"] == "correct":
+            acc[sec]["correct"] += 1
+    topic = str(att["topic"] or "")
+    part_order = _placement_part_order(topic) or tuple(acc.keys())
+    section_stats = []
+    for sec in part_order:
+        if sec not in acc:
+            continue
+        a = acc[sec]
+        if a.get("paper_total") and not a["total"]:
+            t = int(a["paper_total"])
+            section_stats.append(
+                {
+                    "section": sec,
+                    "title_en": a["title"] or "Graphing",
+                    "correct": int(a.get("paper_completed") or 0),
+                    "total": t,
+                    "pct": 0,
+                    "paper": True,
+                }
+            )
+            continue
+        t = a["total"]
+        if not t:
+            continue
+        section_stats.append(
+            {
+                "section": sec,
+                "title_en": a["title"] or str(sec),
+                "correct": a["correct"],
+                "total": t,
+                "pct": round(100.0 * a["correct"] / t) if t else 0,
+                "paper": False,
+            }
+        )
+    section_stats = enrich_placement_section_stats(topic, section_stats)
+    by_sec = {str(s.get("section")): s for s in section_stats}
+    for row in items:
+        s = by_sec.get(str(row.get("knowledge_section") or ""), {})
+        row["part_label"] = s.get("part_label") or row.get("knowledge_section") or "—"
+        row["area_title"] = s.get("area_title") or row.get("knowledge_title_en") or ""
+        row["range_label"] = s.get("range_label") or ""
+    placement_meta = _load_placement_meta_file(topic)
+    placement_rec = _placement_recommendation(placement_meta, auto_correct, auto_total, topic)
+    placement_gate_scores: list[dict] = []
+    if topic == "placement_full":
+        placement_gate_scores = _placement_gate_scores_from_sections(section_stats, placement_meta)
+    placement_student = {
+        "name": att["display_name"] or "",
+        "grade": att["grade"] or "",
+        "math_course": att["math_course"] or "",
+        "school": att["school"] or "",
+    }
+    topic_title = (test or {}).get("title") or att["topic"]
+    pdf_rows = [
+        {
+            "q_display": str(row["n"]),
+            "knowledge_section": row.get("part_label") or row.get("knowledge_section") or "",
+            "yours_display": row["yours_display"],
+            "key_display": row["key_display"],
+            "status": row["status"],
+        }
+        for row in items
+    ]
+    intelligent = None
+    try:
+        built = build_intelligent_placement_report(
+            topic=topic,
+            topic_title=str(topic_title),
+            attempt_id=attempt_id,
+            rows=items,
+            questions=questions,
+            section_stats=section_stats,
+            placement_student=placement_student,
+            placement_rec=placement_rec,
+            placement_gate_scores=placement_gate_scores,
+            correct_count=auto_correct,
+            gradable_total=auto_total,
+            score_pct=score_pct,
+            meta=placement_meta,
+        )
+        if built and built.get("report_kind") == "bilingual_assessment":
+            intelligent = built
+    except Exception:
+        intelligent = None
+    brand = placement_meta.get("brand") if isinstance(placement_meta.get("brand"), dict) else {}
+    pdf_ctx = {
+        "rows": pdf_rows,
+        "placement_rec": placement_rec,
+        "placement_gate_scores": placement_gate_scores,
+        "placement_gate_rec": None,
+        "section_stats": section_stats,
+        "placement_brand": {
+            "name": brand.get("name") or "Novel Prep",
+            "trust_line": brand.get("trust_line")
+            or f"Score bands follow the printed {SITE_BRAND_NAME} placement guide.",
+        },
+        "placement_student": placement_student,
+        "correct_count": auto_correct,
+        "total_q": auto_total,
+        "placement_score_total": auto_total,
+        "score_pct": score_pct,
+        "session_duration_seconds": 0,
+        "session_duration_label": "",
+        "topic_title": topic_title,
+        "attempt_id": attempt_id,
+        "paper_frq_completed": score["paper_frq_completed"],
+        "paper_frq_total": score["paper_frq_total"],
+        "placement_provisional": False,
+        "intelligent_report": intelligent,
+    }
+    return {
+        "attempt": dict(att),
+        "test": test,
+        "items": items,
+        "score": score,
+        "score_pct": score_pct,
+        "answered_live": answered_live,
+        "section_stats": section_stats,
+        "status_label": placement_public_mod.status_label(att["status"]),
+        "pdf_ctx": pdf_ctx,
+    }
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>")
+def admin_placement_candidate_detail(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx is None:
+        abort(404)
     return render_template(
         "admin_placement_candidate_detail.html",
-        attempt=dict(att),
-        test=test,
-        items=items,
-        score=score,
-        status_label=placement_public_mod.status_label(att["status"]),
+        attempt=ctx["attempt"],
+        test=ctx["test"],
+        items=ctx["items"],
+        score=ctx["score"],
+        score_pct=ctx["score_pct"],
+        answered_live=ctx["answered_live"],
+        section_stats=ctx["section_stats"],
+        status_label=ctx["status_label"],
     )
 
 
@@ -17687,73 +17862,16 @@ def admin_placement_candidate_pdf(attempt_id: int):
         return gate
     if not placement_public_enabled():
         abort(404)
-    db = get_db()
-    att = db.execute(
-        """
-        SELECT a.*, c.display_name, c.grade, c.math_course
-        FROM placement_candidate_attempts a
-        JOIN placement_candidates c ON c.id = a.candidate_id
-        WHERE a.id = ?
-        """,
-        (attempt_id,),
-    ).fetchone()
-    if att is None:
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx is None:
         abort(404)
-    questions = _placement_public_questions(str(att["topic"]))
-    responses = {
-        int(r["question_index"]): r
-        for r in db.execute(
-            "SELECT * FROM placement_candidate_responses WHERE attempt_id = ?",
-            (attempt_id,),
-        ).fetchall()
-    }
-    rows_out = []
-    selected_by_index = {}
-    is_correct_by_index: dict[int, int | None] = {}
-    for i, q in enumerate(questions):
-        resp = responses.get(i)
-        selected = str((resp["selected_answer"] if resp else "") or "")
-        is_correct = None if is_placement_paper_item(q) else (resp["is_correct"] if resp else None)
-        selected_by_index[i] = selected
-        if not is_placement_paper_item(q) and resp is not None:
-            is_correct_by_index[i] = resp["is_correct"]
-        rows_out.append(
-            {
-                "q_index": i,
-                "selected": "Completed on paper" if is_placement_paper_item(q) and selected else (selected or "—"),
-                "correct": "Teacher review" if is_placement_paper_item(q) else ((resp["correct_answer"] if resp else None) or "—"),
-                "is_correct": is_correct,
-                "status": placement_result_status(q, is_correct, selected),
-                "stem": "",
-            }
-        )
-    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
-    total_q = len(questions)
-    pdf_ctx = {
-        "rows": rows_out,
-        "placement_rec": None,
-        "placement_gate_scores": [],
-        "placement_gate_rec": None,
-        "section_stats": [],
-        "placement_brand": {"name": "Novel Prep"},
-        "placement_student": {
-            "name": att["display_name"],
-            "grade": att["grade"] or "",
-            "math_course": att["math_course"] or "",
-        },
-        "correct_count": score["mcq_correct"],
-        "total_q": score["mcq_total"],
-        "placement_score_total": score["mcq_total"],
-        "score_pct": int(round(100 * score["mcq_correct"] / score["mcq_total"])) if score["mcq_total"] else 0,
-        "session_duration_seconds": 0,
-        "session_duration_label": "",
-        "topic_title": (_placement_test_by_slug(att["slug"]) or {}).get("title") or att["topic"],
-        "attempt_id": attempt_id,
-        "paper_frq_completed": score["paper_frq_completed"],
-        "paper_frq_total": score["paper_frq_total"],
-        "placement_provisional": False,
-    }
-    body = build_placement_parent_pdf(pdf_ctx)
+    try:
+        body = build_placement_parent_pdf(ctx["pdf_ctx"])
+    except Exception:
+        app.logger.exception("Admin placement PDF failed for attempt %s", attempt_id)
+        fallback = dict(ctx["pdf_ctx"])
+        fallback.pop("intelligent_report", None)
+        body = build_placement_parent_pdf(fallback)
     return Response(
         body,
         mimetype="application/pdf",

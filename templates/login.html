@@ -40,7 +40,7 @@
         {% if placement_public_access_enabled %}
         <p class="np-atelier-kicker">Novel Prep · Course placement</p>
         <h1>Your advisor sent you here.</h1>
-        <p class="np-atelier-hero-lead">Start the placement test without an account. Choose your course, enter your name, grade, and current school math class, then begin. Sign in only if you already have a Math Studio login.</p>
+        <p class="np-atelier-hero-lead">Start the placement test without an account. Choose the course, enter your name, grade, and current school math class, then begin. Sign in only if you already have a Math Studio login.</p>
         <div class="np-atelier-hero-stats" role="list">
           <div class="np-atelier-stat" role="listitem"><strong>4</strong><span>live tests</span></div>
           <div class="np-atelier-stat" role="listitem"><strong>0</strong><span>accounts needed</span></div>
@@ -58,16 +58,40 @@
         {% endif %}
       </header>
 
+      {% if placement_public_access_enabled %}
+      <ol class="np-login-steps" aria-label="How placement works">
+        <li>
+          <span>01</span>
+          <div>
+            <h2>Choose the test</h2>
+            <p>Middle Level, Enhanced Math I or II, or Upper Algebra–Precalculus.</p>
+          </div>
+        </li>
+        <li>
+          <span>02</span>
+          <div>
+            <h2>Tell us who you are</h2>
+            <p>Name, grade, and current school math class. Advisor is optional.</p>
+          </div>
+        </li>
+        <li>
+          <span>03</span>
+          <div>
+            <h2>Finish for the report</h2>
+            <p>Your advisor gets a section-by-section score report and PDF.</p>
+          </div>
+        </li>
+      </ol>
+      <aside class="np-login-studio-note">
+        <p><strong>Already a student?</strong> Sign in on the right for SAT practice, hard drill, and mistake analytics.</p>
+      </aside>
+      {% else %}
       <div class="np-login-role-grid" aria-label="Account types">
         <article class="np-login-role-card np-login-role-card--placement">
           <span class="np-login-role-icon" aria-hidden="true">P</span>
           <div>
             <h2>Placement Test</h2>
-            {% if placement_public_access_enabled %}
-            <p>No account needed. Choose your test, then enter name, advisor, grade, and current school math class.</p>
-            {% else %}
             <p>Sign in, then start a course placement diagnostic from the catalog.</p>
-            {% endif %}
             <a class="np-login-placement-inline" href="{{ url_for('placement_landing') }}">Start Placement Test</a>
           </div>
         </article>
@@ -79,6 +103,8 @@
           </div>
         </article>
       </div>
+      {% endif %}
+
       <details class="np-login-staff-note">
         <summary>For instructors</summary>
         <div class="np-login-role-grid np-login-role-grid--staff">
@@ -123,9 +149,7 @@
       {% endif %}
     </section>
 
-    <article class="np-login-panel glass-panel np-glass" aria-label="Sign in form">
-      <span class="np-login-panel-watermark" aria-hidden="true">→</span>
-
+    <div class="np-login-aside">
       <div class="np-login-placement np-login-placement--lead" role="region" aria-label="Placement test">
         <span class="np-login-placement-ghost" aria-hidden="true">∑</span>
         <div class="np-login-placement-top">
@@ -151,55 +175,56 @@
         <p class="np-login-placement-recover"><a href="{{ url_for('placement_public_recover') }}">Already started? Recover with your code</a></p>
         {% endif %}
       </div>
-      <p class="np-login-or" role="separator">or sign in to your account</p>
 
-      <header class="np-login-panel-head">
-        <p class="np-login-panel-kicker">Secure sign in</p>
-        <h2>Welcome back</h2>
-        <p class="np-login-panel-lead">Use the username and password from {{ site_teacher_label }}. Students, colleagues, and supervisors all sign in here — you’ll land in the right workspace automatically.</p>
-      </header>
+      <article class="np-login-panel glass-panel np-glass" aria-label="Sign in form">
+        <header class="np-login-panel-head">
+          <p class="np-login-panel-kicker">Secure sign in</p>
+          <h2>Welcome back</h2>
+          <p class="np-login-panel-lead">{% if placement_public_access_enabled %}For SAT practice and existing accounts.{% else %}Use the username and password from {{ site_teacher_label }}. You’ll land in the right workspace automatically.{% endif %}</p>
+        </header>
 
-      <form method="post" class="np-login-form" id="np-login-form" novalidate>
-        <div class="np-login-field">
-          <label class="np-login-label" for="np-login-user">Username</label>
-          <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="student@example.com" required autofocus>
-        </div>
-
-        <div class="np-login-field">
-          <label class="np-login-label" for="np-login-pass">Password</label>
-          <div class="np-login-pass-wrap">
-            <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        <form method="post" class="np-login-form" id="np-login-form" novalidate>
+          <div class="np-login-field">
+            <label class="np-login-label" for="np-login-user">Username</label>
+            <input id="np-login-user" class="np-login-input" name="username" type="text" autocomplete="username" placeholder="student@example.com" required{% if not placement_public_access_enabled %} autofocus{% endif %}>
           </div>
+
+          <div class="np-login-field">
+            <label class="np-login-label" for="np-login-pass">Password</label>
+            <div class="np-login-pass-wrap">
+              <input id="np-login-pass" class="np-login-input" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+            </div>
+          </div>
+
+          <div class="np-login-options" role="group" aria-label="Sign-in options">
+            <label class="np-login-check">
+              <input type="checkbox" id="np-login-remember" name="remember" value="1">
+              <span>Remember username</span>
+            </label>
+            <label class="np-login-check">
+              <input type="checkbox" id="np-login-show-pass" aria-controls="np-login-pass">
+              <span>Show password</span>
+            </label>
+          </div>
+
+          <button type="submit" class="np-login-submit big-btn mp-btn-pill" id="np-login-submit">
+            <span class="np-login-submit-text">Continue to workspace</span>
+            <span class="np-login-submit-busy" aria-hidden="true">Signing in…</span>
+          </button>
+        </form>
+
+        <div class="np-login-trust" aria-label="Security note">
+          <span class="np-login-trust-icon" aria-hidden="true">🔒</span>
+          <p>Sessions are encrypted. After too many failed attempts, sign-in is briefly paused to protect your account.</p>
         </div>
 
-        <div class="np-login-options" role="group" aria-label="Sign-in options">
-          <label class="np-login-check">
-            <input type="checkbox" id="np-login-remember" name="remember" value="1">
-            <span>Remember username</span>
-          </label>
-          <label class="np-login-check">
-            <input type="checkbox" id="np-login-show-pass" aria-controls="np-login-pass">
-            <span>Show password</span>
-          </label>
-        </div>
-
-        <button type="submit" class="np-login-submit big-btn mp-btn-pill" id="np-login-submit">
-          <span class="np-login-submit-text">Continue to workspace</span>
-          <span class="np-login-submit-busy" aria-hidden="true">Signing in…</span>
-        </button>
-      </form>
-
-      <div class="np-login-trust" aria-label="Security note">
-        <span class="np-login-trust-icon" aria-hidden="true">🔒</span>
-        <p>Sessions are encrypted. After too many failed attempts, sign-in is briefly paused to protect your account.</p>
-      </div>
-
-      {% if needs_admin_setup %}
-      <p class="np-login-footnote">First time on this site? <a href="{{ url_for('admin_setup') }}">Create the supervisor account</a> to get started.</p>
-      {% else %}
-      <p class="np-login-footnote">Need access? Ask {{ site_teacher_label }} for a <strong>student</strong> account, or contact the site supervisor for a <strong>staff</strong> account. <a href="{{ url_for('student_guide') }}">Student &amp; parent guide</a></p>
-      {% endif %}
-    </article>
+        {% if needs_admin_setup %}
+        <p class="np-login-footnote">First time on this site? <a href="{{ url_for('admin_setup') }}">Create the supervisor account</a> to get started.</p>
+        {% else %}
+        <p class="np-login-footnote">Need access? Ask {{ site_teacher_label }} for a <strong>student</strong> account, or contact the site supervisor for a <strong>staff</strong> account. <a href="{{ url_for('student_guide') }}">Student &amp; parent guide</a></p>
+        {% endif %}
+      </article>
+    </div>
 
   </div>
 </div>

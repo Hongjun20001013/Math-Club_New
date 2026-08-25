@@ -809,3 +809,161 @@ def build_intelligent_placement_report(
         score_pct=score_pct,
         meta=meta,
     )
+
+
+PLACEMENT_SECTION_RANGES: dict[str, dict[str, str]] = {
+    "middle_level": {
+        "I": "Q1–20",
+        "II": "Q21–40",
+        "III": "Q41–60",
+        "IV": "Q61–80",
+        "V": "Q81–100",
+    },
+    "enhanced_math_1": {
+        "A": "Q1–10",
+        "B": "Q11–30",
+        "C": "Q31–50",
+        "G": "Graphing",
+        "FR": "Free response",
+    },
+    "enhanced_math_2": {
+        "A": "Q1–28",
+        "B": "Q29–55",
+        "G": "Graphing",
+        "FR": "Free response",
+    },
+    "placement_full": {
+        "1": "Q1–16",
+        "2": "Q17–37",
+        "3": "Q38–53",
+        "4": "Q54–69",
+        "5": "Q70–85",
+    },
+}
+
+
+def _part_label_for_section(sec: str) -> str:
+    s = str(sec or "").strip()
+    if s == "G":
+        return "Graphing"
+    if s == "FR":
+        return "Free response"
+    if s in ("I", "II", "III", "IV", "V", "A", "B", "C"):
+        return f"Part {s}"
+    if s.isdigit():
+        return f"Gate {s}"
+    return f"Part {s}" if s else "Part"
+
+
+def _area_title_for_section(sec: str, title: str) -> str:
+    t = str(title or "").strip()
+    if not t:
+        return _part_label_for_section(sec)
+    sec_s = str(sec or "").strip()
+    prefixes = (
+        f"Part {sec_s} —",
+        f"Part {sec_s} -",
+        f"Part {sec_s}–",
+        f"Gate {sec_s} —",
+        f"Gate {sec_s} -",
+        f"Gate {sec_s}–",
+        f"{sec_s} —",
+        f"{sec_s} -",
+    )
+    for p in prefixes:
+        if t.lower().startswith(p.lower()):
+            return t[len(p) :].strip() or t
+    return t
+
+
+def _section_readiness(correct: int, total: int, *, paper: bool, topic: str) -> dict[str, str]:
+    if paper:
+        return {
+            "status": "review",
+            "status_label": "Advisor review",
+            "interpretation": "Submitted for advisor review. Not in the auto-score.",
+        }
+    if total <= 0:
+        return {
+            "status": "empty",
+            "status_label": "—",
+            "interpretation": "No scored items in this part.",
+        }
+    if topic == "middle_level" and total == 20:
+        if correct >= 18:
+            return {
+                "status": "pass_strong",
+                "status_label": "Strong",
+                "interpretation": "Strong foundation in this readiness band.",
+            }
+        if correct >= 16:
+            return {
+                "status": "pass",
+                "status_label": "Passed",
+                "interpretation": "Passed this band. Review the misses before moving up.",
+            }
+        if correct >= 14:
+            return {
+                "status": "borderline",
+                "status_label": "Borderline",
+                "interpretation": "Just below the 16/20 advance line — rebuild this band first.",
+            }
+        if correct >= 8:
+            return {
+                "status": "needs_support",
+                "status_label": "Needs support",
+                "interpretation": "Significant support needed in this readiness band.",
+            }
+        return {
+            "status": "not_ready",
+            "status_label": "Not yet ready",
+            "interpretation": "This band is not yet in range.",
+        }
+    rate = round(100.0 * correct / total)
+    if rate >= 85:
+        return {
+            "status": "pass_strong",
+            "status_label": "Strong",
+            "interpretation": f"Strong on this part ({rate}%).",
+        }
+    if rate >= 70:
+        return {
+            "status": "pass",
+            "status_label": "Solid",
+            "interpretation": f"Solid on this part ({rate}%). Tighten the misses.",
+        }
+    if rate >= 55:
+        return {
+            "status": "borderline",
+            "status_label": "Developing",
+            "interpretation": f"Developing ({rate}%). Targeted review will move this band.",
+        }
+    return {
+        "status": "needs_support",
+        "status_label": "Needs support",
+        "interpretation": f"This part needs rebuild ({rate}%).",
+    }
+
+
+def enrich_placement_section_stats(topic: str, section_stats: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Add paper-style labels: Part I, Q-range, readiness reading."""
+    ranges = PLACEMENT_SECTION_RANGES.get(str(topic or ""), {})
+    out: list[dict[str, Any]] = []
+    for raw in section_stats:
+        s = dict(raw)
+        sec = str(s.get("section") or "")
+        paper = bool(s.get("paper"))
+        correct = int(s.get("correct") or 0)
+        total = int(s.get("total") or 0)
+        reading = _section_readiness(correct, total, paper=paper, topic=str(topic or ""))
+        s["part_label"] = _part_label_for_section(sec)
+        s["area_title"] = _area_title_for_section(sec, str(s.get("title_en") or ""))
+        range_label = ranges.get(sec) or (f"{total} items" if total else "")
+        if range_label in (s["part_label"], s["area_title"]):
+            range_label = f"{total} items" if total else ""
+        s["range_label"] = range_label
+        s["status"] = reading["status"]
+        s["status_label"] = reading["status_label"]
+        s["interpretation"] = reading["interpretation"]
+        out.append(s)
+    return out
