@@ -22,7 +22,7 @@
                 <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                 <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>One step before question 1</p>
                 <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Your placement profile</h1>
-                <p class="np-pl-lead">Name, grade, and current school math class are required. Advisor and school are optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
+                <p class="np-pl-lead">Name, grade, advisor, and current school math class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -57,22 +57,22 @@
                     <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
                 </div>
                 <fieldset class="np-pl-field np-pl-field--full np-pl-advisor">
-                    <legend class="np-pl-label">Advisor <span class="np-pl-opt">optional</span></legend>
+                    <legend class="np-pl-label">Advisor <span class="np-pl-req">required</span></legend>
                     <div class="np-pl-choice-grid" id="pl-advisor">
                         {% for advisor in advisor_presets %}
                         <label class="np-pl-choice">
-                            <input type="radio" name="advisor_choice" value="{{ advisor }}"{% if placement_advisor_choice == advisor %} checked{% endif %}>
+                            <input type="radio" name="advisor_choice" value="{{ advisor }}" required{% if placement_advisor_choice == advisor %} checked{% endif %}>
                             <span>{{ advisor }}</span>
                         </label>
                         {% endfor %}
                         <label class="np-pl-choice">
-                            <input type="radio" name="advisor_choice" value="{{ advisor_other }}"{% if placement_advisor_choice == advisor_other %} checked{% endif %}>
+                            <input type="radio" name="advisor_choice" value="{{ advisor_other }}" required{% if placement_advisor_choice == advisor_other %} checked{% endif %}>
                             <span>Other</span>
                         </label>
                     </div>
                 </fieldset>
                 <div class="np-pl-field np-pl-field--full" id="pl-advisor-other-wrap"{% if placement_advisor_choice != advisor_other %} hidden{% endif %}>
-                    <label class="np-pl-label" for="pl-advisor-other">Advisor name <span class="np-pl-opt">optional</span></label>
+                    <label class="np-pl-label" for="pl-advisor-other">Advisor name <span class="np-pl-req">required</span></label>
                     <input id="pl-advisor-other" name="advisor_other" type="text" maxlength="200" class="np-pl-input" placeholder="Type your advisor's full name" autocomplete="off" value="{{ placement_advisor_other }}">
                 </div>
                 <div class="np-pl-field np-pl-field--full">
@@ -125,7 +125,7 @@
     var picked = document.querySelector('input[name="advisor_choice"]:checked');
     var isOther = !!(picked && picked.value === "Other");
     if (wrap) wrap.hidden = !isOther;
-    if (other) other.required = false;
+    if (other) other.required = isOther;
   }
   radios.forEach(function (radio) {
     radio.addEventListener("change", syncAdvisorOther);

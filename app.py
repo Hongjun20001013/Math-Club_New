@@ -58,6 +58,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
+from placement_atelier_pdf import build_placement_atelier_pdf
 from placement_intelligent_report import (
     build_intelligent_placement_report,
     enrich_placement_section_stats,
@@ -282,7 +283,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-login-placement-luxe")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-admin-placement-roster")
 
 _DB_SCHEMA_READY = False
 
@@ -9771,6 +9772,9 @@ def placement_test_begin(slug: str):
         request.form.get("advisor_choice", ""),
         request.form.get("advisor_other", ""),
     )
+    if not counselor:
+        flash("Please select your advisor. If you choose Other, type the advisor's full name.")
+        return redirect(url_for("placement_test_start", slug=slug))
     if not grade:
         flash("Please select a grade.")
         return redirect(url_for("placement_test_start", slug=slug))
@@ -17495,6 +17499,7 @@ def admin():
         db_persistence=_db_persistence_status(),
         student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
         placement_candidates=placement_rows,
+        placement_groups=_group_placement_admin_rows(placement_rows),
         placement_totals=placement_totals,
     )
 
@@ -17547,8 +17552,44 @@ def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
             ).lower()
             if needle not in blob:
                 continue
+        raw_when = str(
+            row.get("last_activity_at") or row.get("submitted_at") or row.get("started_at") or ""
+        ).strip()
+        row["when_label"] = raw_when.replace("T", " ")[:10]
         decorated.append(row)
     return decorated
+
+
+def _group_placement_admin_rows(rows: list[dict]) -> list[dict]:
+    buckets: dict[str, list[dict]] = {}
+    for row in rows:
+        name = str(row.get("counselor_source") or "").strip() or "Unassigned"
+        buckets.setdefault(name, []).append(row)
+
+    def sort_key(name: str) -> tuple[int, str]:
+        return (1 if name == "Unassigned" else 0, name.lower())
+
+    groups = []
+    for name in sorted(buckets, key=sort_key):
+        people = buckets[name]
+        parts = name.split()
+        if name == "Unassigned":
+            initials = "?"
+        elif len(parts) >= 2:
+            initials = f"{parts[0][0]}{parts[-1][0]}".upper()
+        else:
+            initials = name[:1].upper()
+        groups.append(
+            {
+                "advisor": name,
+                "unassigned": name == "Unassigned",
+                "initials": initials,
+                "count": len(people),
+                "submitted": sum(1 for item in people if item.get("status") == "submitted"),
+                "rows": people,
+            }
+        )
+    return groups
 
 
 @app.route("/admin/placement-candidates")
@@ -17561,7 +17602,12 @@ def admin_placement_candidates():
     db = get_db()
     q = (request.args.get("q") or "").strip()
     rows = _placement_candidate_admin_rows(db, q)
-    return render_template("admin_placement_candidates.html", rows=rows, q=q)
+    return render_template(
+        "admin_placement_candidates.html",
+        rows=rows,
+        placement_groups=_group_placement_admin_rows(rows),
+        q=q,
+    )
 
 
 @app.route("/admin/placement-candidates.csv")
@@ -17766,6 +17812,9 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         {
             "q_display": str(row["n"]),
             "knowledge_section": row.get("part_label") or row.get("knowledge_section") or "",
+            "part_label": row.get("part_label") or "",
+            "area_title": row.get("area_title") or "",
+            "range_label": row.get("range_label") or "",
             "yours_display": row["yours_display"],
             "key_display": row["key_display"],
             "status": row["status"],
@@ -17806,6 +17855,12 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             or f"Score bands follow the printed {SITE_BRAND_NAME} placement guide.",
         },
         "placement_student": placement_student,
+        "advisor": att["counselor_source"] or "",
+        "status_label": placement_public_mod.status_label(att["status"]),
+        "answered_live": answered_live,
+        "item_total": int(att["total_count"] or 0),
+        "brand_name": SITE_BRAND_NAME,
+        "miss_ns": [row["n"] for row in items if row["status"] == "incorrect"],
         "correct_count": auto_correct,
         "total_q": auto_total,
         "placement_score_total": auto_total,
@@ -17866,12 +17921,15 @@ def admin_placement_candidate_pdf(attempt_id: int):
     if ctx is None:
         abort(404)
     try:
-        body = build_placement_parent_pdf(ctx["pdf_ctx"])
+        body = build_placement_atelier_pdf(ctx["pdf_ctx"])
     except Exception:
-        app.logger.exception("Admin placement PDF failed for attempt %s", attempt_id)
+        app.logger.exception("Admin placement web PDF failed for attempt %s", attempt_id)
         fallback = dict(ctx["pdf_ctx"])
         fallback.pop("intelligent_report", None)
-        body = build_placement_parent_pdf(fallback)
+        try:
+            body = build_placement_atelier_pdf(fallback)
+        except Exception:
+            body = build_placement_parent_pdf(fallback)
     return Response(
         body,
         mimetype="application/pdf",

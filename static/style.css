@@ -26299,6 +26299,274 @@ html[data-exam-theme="dark"] .np-login-setup-notice {
     text-decoration: none;
 }
 
+.np-admin-card--placement {
+    padding-bottom: 18px;
+}
+
+.np-pl-roster-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.np-pl-roster-summary li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(108, 78, 255, 0.07);
+    border: 1px solid rgba(108, 78, 255, 0.1);
+    color: #5f5778;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.np-pl-roster-summary strong {
+    color: #2a2446;
+    font-variant-numeric: tabular-nums;
+}
+
+.np-pl-roster-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 16px;
+}
+
+.np-pl-roster {
+    display: grid;
+    gap: 16px;
+}
+
+.np-pl-roster-group {
+    border: 1px solid rgba(108, 78, 255, 0.12);
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(252, 250, 255, 0.84);
+}
+
+.np-pl-roster-advisor {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    background:
+        linear-gradient(90deg, rgba(79, 50, 186, 0.1), rgba(255, 255, 255, 0.35));
+    border-bottom: 1px solid rgba(108, 78, 255, 0.1);
+}
+
+.np-pl-roster-advisor-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: #4f32ba;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+}
+
+.np-pl-roster-advisor-copy p {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5b4d8a;
+}
+
+.np-pl-roster-advisor-copy h3 {
+    margin: 2px 0 0;
+    color: #1a1430;
+    font-size: 1.12rem;
+    letter-spacing: -0.03em;
+}
+
+.np-pl-roster-advisor-count {
+    margin: 0;
+    color: #6b6580;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.np-pl-roster-group.is-unassigned .np-pl-roster-advisor-mark {
+    background: #8a839c;
+}
+
+.np-pl-roster-list {
+    display: grid;
+}
+
+.np-pl-roster-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.15fr) minmax(140px, 1fr) auto auto;
+    gap: 10px 16px;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(108, 78, 255, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.np-pl-roster-card:first-child {
+    border-top: 0;
+}
+
+.np-pl-roster-who {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-width: 0;
+}
+
+.np-pl-roster-id a {
+    display: block;
+    overflow: hidden;
+    color: #4f32ba;
+    font-weight: 800;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.np-pl-roster-id a:hover {
+    text-decoration: underline;
+}
+
+.np-pl-roster-id p {
+    margin: 3px 0 0;
+    color: #6b6580;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.np-pl-roster-test {
+    margin: 0;
+    color: #2a2446;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.np-pl-roster-metrics {
+    display: flex;
+    gap: 14px;
+    margin: 0;
+}
+
+.np-pl-roster-metrics div {
+    min-width: 58px;
+}
+
+.np-pl-roster-metrics dt {
+    margin: 0;
+    color: #8a839c;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.np-pl-roster-metrics dd {
+    margin: 3px 0 0;
+    color: #1a1430;
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.np-pl-roster-end {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+}
+
+.np-pl-roster-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(108, 78, 255, 0.1);
+    color: #43308f;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.np-pl-roster-status--submitted {
+    background: rgba(22, 163, 74, 0.12);
+    color: #166534;
+}
+
+.np-pl-roster-status--in_progress,
+.np-pl-roster-status--profile_completed {
+    background: rgba(79, 50, 186, 0.1);
+    color: #4f32ba;
+}
+
+.np-pl-roster-status--expired,
+.np-pl-roster-status--needs_review {
+    background: rgba(244, 63, 94, 0.1);
+    color: #9f1239;
+}
+
+.np-pl-roster-end time {
+    color: #8a839c;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.np-pl-roster-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 50, 186, 0.2);
+    background: #4f32ba;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.np-pl-roster-open:hover {
+    background: #3d2599;
+}
+
+@media (max-width: 860px) {
+    .np-pl-roster-card {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .np-pl-roster-end {
+        justify-items: start;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        width: 100%;
+    }
+
+    .np-pl-roster-advisor {
+        grid-template-columns: 40px minmax(0, 1fr);
+    }
+
+    .np-pl-roster-advisor-count {
+        grid-column: 2;
+    }
+}
+
 .np-admin-directory-stats {
     display: contents;
 }
@@ -38940,6 +39208,28 @@ html[data-exam-theme="dark"] .np-pl2-input {
 .np-admin-placement-report .np-admin-pl-sheet-head,
 .np-admin-placement-report .np-admin-pl-sheet-row {
     grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1fr) 102px;
+}
+
+@media print {
+    .np-admin-placement-report .np-pw-breadcrumb,
+    .np-admin-placement-report .np-summary-jump,
+    .np-admin-placement-report .np-summary-luxe-ribbon,
+    .np-admin-placement-report .np-summary-miss-quiz-row,
+    .np-admin-placement-report .np-pl2-flash,
+    .np-admin-placement-report .np-admin-pl-soon,
+    .np-admin-placement-report .np-placement-profile {
+        display: none !important;
+    }
+
+    .np-admin-placement-report {
+        max-width: none !important;
+        box-shadow: none !important;
+    }
+
+    .np-page-shell {
+        padding: 0 !important;
+        background: #eeedf6 !important;
+    }
 }
 
 @media (max-width: 819px) {

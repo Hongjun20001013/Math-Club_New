@@ -258,9 +258,10 @@ class TestPublicProfile(_Base):
         self.assertIn("Your advisor sent you here.", on_html)
         self.assertIn("Already started? Recover with your code", on_html)
 
-    def test_required_profile_rejects_incomplete_advisor_optional(self):
+    def test_required_profile_rejects_incomplete(self):
         self.flag_on()
         html = self.client.get("/placement/enhanced-math-1/start").get_data(as_text=True)
+        self.assertIn("Advisor <span class=\"np-pl-req\">required</span>", html)
         nonce = re.search(r'name="begin_nonce" value="([^"]+)"', html).group(1)
         token = self.csrf()
         base = {
@@ -273,7 +274,9 @@ class TestPublicProfile(_Base):
         }
         missing_course = dict(base, student_math_course="")
         missing_confirm = dict(base, counselor_confirm="")
-        for payload in (missing_course, missing_confirm):
+        missing_advisor = dict(base)
+        other_blank = dict(base, advisor_choice="Other", advisor_other=" ")
+        for payload in (missing_course, missing_confirm, missing_advisor, other_blank):
             rv = self.client.post("/placement/enhanced-math-1/begin", data=payload)
             self.assertEqual(rv.status_code, 302)
             self.assertIn("/placement/enhanced-math-1/start", rv.headers.get("Location") or "")
@@ -284,12 +287,12 @@ class TestPublicProfile(_Base):
             conn.close()
         html = self.client.get("/placement/enhanced-math-1/start").get_data(as_text=True)
         nonce = re.search(r'name="begin_nonce" value="([^"]+)"', html).group(1)
-        no_advisor = self.client.post(
+        ok = self.client.post(
             "/placement/enhanced-math-1/begin",
-            data=dict(base, begin_nonce=nonce),
+            data=dict(base, begin_nonce=nonce, advisor_choice="Mia Hu"),
         )
-        self.assertEqual(no_advisor.status_code, 302)
-        pid = self.public_id_from_location(no_advisor)
+        self.assertEqual(ok.status_code, 302)
+        pid = self.public_id_from_location(ok)
         conn = sqlite3.connect(self.db)
         try:
             after = conn.execute("SELECT COUNT(*) FROM placement_candidates").fetchone()[0]
@@ -305,12 +308,12 @@ class TestPublicProfile(_Base):
         finally:
             conn.close()
         self.assertEqual(after, before + 1)
-        self.assertTrue(row[0] in (None, ""))
+        self.assertEqual(row[0], "Mia Hu")
         self.assertEqual(row[1], "8th")
         self.assertEqual(row[2], "Algebra I Honors")
         self.login(user_id=1, role="admin", username="teacher")
         listing = self.client.get("/admin/placement-candidates").get_data(as_text=True)
-        self.assertIn("Not provided", listing)
+        self.assertIn("Mia Hu", listing)
 
     def test_advisor_query_is_plain_text_prefill_not_auth(self):
         self.flag_on()
@@ -560,6 +563,17 @@ class TestLockAndAdmin(_Base):
         pdf = self.client.get(f"/admin/placement-candidates/{attempt_id}/report.pdf")
         self.assertEqual(pdf.status_code, 200)
         self.assertIn("pdf", pdf.mimetype)
+        from io import BytesIO
+        from pypdf import PdfReader
+
+        pdf_text = "\n".join(
+            (page.extract_text() or "") for page in PdfReader(BytesIO(pdf.data)).pages
+        )
+        self.assertIn("Placement results", pdf_text)
+        self.assertIn("Score by section", pdf_text)
+        self.assertIn("Item-by-item results", pdf_text)
+        self.assertNotIn("Course placement report", pdf_text)
+        self.assertNotIn("Reopen submitted attempt", pdf_text)
         self.client.post(
             f"/admin/placement-candidates/{attempt_id}/reopen",
             data={"csrf_token": "test-csrf"},

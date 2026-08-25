@@ -3,20 +3,23 @@
 {% block content %}
 <div class="np-page-shell">
   <div class="np-admin-page np-admin-studio">
-    <section class="np-admin-card glass-panel np-glass">
+    <section class="np-admin-card np-admin-card--placement glass-panel np-glass">
       <header class="np-admin-section-head np-admin-section-head--split">
         <div>
           <p class="np-admin-kicker">Placement</p>
           <h1 id="np-admin-placement-heading">Placement testers</h1>
-          <p>{{ rows|length }} tester{{ 's' if rows|length != 1 else '' }} — name, advisor, grade, school math class, progress, and score. Not mixed with Students accounts.</p>
+          <ul class="np-pl-roster-summary">
+            <li><strong>{{ rows|length }}</strong> sitting{{ 's' if rows|length != 1 else '' }}</li>
+            <li>Grouped by advisor</li>
+          </ul>
         </div>
         <form method="get" action="{{ url_for('admin_placement_candidates') }}" class="np-admin-search np-admin-search--studio">
-          <input name="q" value="{{ q or '' }}" type="search" placeholder="Search name, advisor, grade, course…">
+          <input name="q" value="{{ q or '' }}" type="search" placeholder="Search name, advisor, course…">
           <button type="submit">Search</button>
         </form>
       </header>
-      <p>
-        <a class="np-admin-hero-btn" href="{{ url_for('admin_placement_candidates_csv') }}">Export CSV</a>
+      <p class="np-pl-roster-toolbar">
+        <a class="np-admin-hero-btn" href="{{ url_for('admin_placement_candidates_csv') }}">CSV</a>
         <a class="np-admin-hero-btn np-admin-hero-btn--ghost" href="{{ url_for('admin') }}#np-admin-placement">Back to admin</a>
       </p>
       {% include "partials/admin_placement_directory.html" %}

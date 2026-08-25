@@ -583,21 +583,23 @@
     </script>
 
     {% if placement_public_access_enabled %}
-    <section class="np-admin-card glass-panel np-glass mp-animate-up" id="np-admin-placement" aria-labelledby="np-admin-placement-heading">
+    <section class="np-admin-card np-admin-card--placement glass-panel np-glass mp-animate-up" id="np-admin-placement" aria-labelledby="np-admin-placement-heading">
       <header class="np-admin-section-head np-admin-section-head--split">
         <div>
           <p class="np-admin-kicker">Placement</p>
           <h2 id="np-admin-placement-heading">Placement testers</h2>
-          <p>{{ placement_totals.testers }} tester{{ 's' if placement_totals.testers != 1 else '' }} · {{ placement_totals.in_progress }} in progress · {{ placement_totals.submitted }} submitted. Not mixed with student accounts.</p>
+          <ul class="np-pl-roster-summary">
+            <li><strong>{{ placement_totals.testers }}</strong> sitting{{ 's' if placement_totals.testers != 1 else '' }}</li>
+            <li><strong>{{ placement_totals.submitted }}</strong> submitted</li>
+            <li><strong>{{ placement_totals.in_progress }}</strong> in progress</li>
+          </ul>
         </div>
         <div class="np-admin-hero-actions np-admin-hero-actions--placement">
-          <a href="{{ url_for('admin_placement_candidates') }}" class="np-admin-hero-btn">Open full list</a>
-          <a href="{{ url_for('admin_placement_candidates_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Export CSV</a>
+          <a href="{{ url_for('admin_placement_candidates') }}" class="np-admin-hero-btn">All sittings</a>
+          <a href="{{ url_for('admin_placement_candidates_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">CSV</a>
         </div>
       </header>
-      {% with rows=placement_candidates %}
       {% include "partials/admin_placement_directory.html" %}
-      {% endwith %}
     </section>
     {% endif %}
 

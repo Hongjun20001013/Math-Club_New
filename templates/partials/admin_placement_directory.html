@@ -1,58 +1,51 @@
-<div class="np-admin-directory np-admin-directory--placement">
-  <div class="np-admin-directory-head" aria-hidden="true">
-    <span>Student</span>
-    <span>Advisor</span>
-    <span>Test</span>
-    <span>Progress</span>
-    <span>Status</span>
-    <span>Last active</span>
-    <span>Open</span>
-  </div>
-  <div class="np-admin-directory-body">
-    {% for row in rows %}
-    <article class="np-admin-dir-entry">
-      <div class="np-admin-directory-row">
-        <div class="np-admin-directory-student">
-          <div class="np-admin-student-avatar" aria-hidden="true">{{ (row.display_name or "?")[:1]|upper }}</div>
-          <div class="np-admin-directory-identity">
-            <strong><a href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">{{ row.display_name }}</a></strong>
-            <span class="np-admin-directory-meta">{{ row.grade or "Grade —" }} · {{ row.math_course or "Course —" }}</span>
-            <div class="np-admin-directory-badges">
-              {% if row.school %}<span class="np-admin-grants-pill">{{ row.school }}</span>{% endif %}
-              <span class="np-admin-status{% if row.status not in ('in_progress', 'profile_completed', 'submitted') %} is-inactive{% endif %}">{{ row.status_label }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="np-admin-directory-stats">
-          <div class="np-admin-directory-stat" data-label="Advisor">
-            <strong>{{ row.counselor_source or "Not provided" }}</strong>
-          </div>
-          <div class="np-admin-directory-stat" data-label="Test">
-            <strong>{{ row.test_title }}</strong>
-          </div>
-          <div class="np-admin-directory-stat" data-label="Progress">
-            <strong>{{ row.answered_count }}/{{ row.total_count }}</strong>
-          </div>
-          <div class="np-admin-directory-stat" data-label="Score">
-            <strong>{{ row.score_label }}</strong>
-          </div>
-          <div class="np-admin-directory-stat" data-label="Graphing">
-            <strong>{{ row.paper_label or "—" }}</strong>
-          </div>
-          <div class="np-admin-directory-stat" data-label="Status">
-            <strong>{{ row.status_label }}</strong>
-          </div>
-          <div class="np-admin-directory-stat np-admin-directory-stat--time" data-label="Last active">
-            <strong>{{ row.last_activity_at or row.started_at or "—" }}</strong>
-          </div>
-        </div>
-        <div class="np-admin-directory-manage">
-          <a href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}" class="np-admin-action-trigger">Open</a>
-        </div>
+<div class="np-pl-roster">
+  {% for group in placement_groups %}
+  <section class="np-pl-roster-group{% if group.unassigned %} is-unassigned{% endif %}" aria-label="Advisor {{ group.advisor }}">
+    <header class="np-pl-roster-advisor">
+      <span class="np-pl-roster-advisor-mark" aria-hidden="true">{{ group.initials }}</span>
+      <div class="np-pl-roster-advisor-copy">
+        <p>Advisor</p>
+        <h3>{{ group.advisor }}</h3>
       </div>
-    </article>
-    {% else %}
-    <p class="np-admin-empty">No placement testers yet.</p>
-    {% endfor %}
-  </div>
+      <p class="np-pl-roster-advisor-count">{{ group.count }} sitting{{ 's' if group.count != 1 else '' }}{% if group.submitted %} · {{ group.submitted }} submitted{% endif %}</p>
+    </header>
+    <div class="np-pl-roster-list">
+      {% for row in group.rows %}
+      <article class="np-pl-roster-card">
+        <div class="np-pl-roster-who">
+          <div class="np-admin-student-avatar" aria-hidden="true">{{ (row.display_name or "?")[:1]|upper }}</div>
+          <div class="np-pl-roster-id">
+            <a href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">{{ row.display_name }}</a>
+            <p>{{ row.grade or "Grade —" }}{% if row.math_course %} · {{ row.math_course }}{% endif %}</p>
+          </div>
+        </div>
+        <p class="np-pl-roster-test">{{ row.test_title }}</p>
+        <dl class="np-pl-roster-metrics">
+          <div>
+            <dt>Answered</dt>
+            <dd>{{ row.answered_count }}/{{ row.total_count }}</dd>
+          </div>
+          <div>
+            <dt>Score</dt>
+            <dd>{{ row.score_label }}</dd>
+          </div>
+          {% if row.paper_label and row.paper_label != "—" %}
+          <div>
+            <dt>Graphing</dt>
+            <dd>{{ row.paper_label }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+        <div class="np-pl-roster-end">
+          <span class="np-pl-roster-status np-pl-roster-status--{{ row.status }}">{{ row.status_label }}</span>
+          {% if row.when_label %}<time>{{ row.when_label }}</time>{% endif %}
+          <a class="np-pl-roster-open" href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">Open report</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% else %}
+  <p class="np-admin-empty">No placement testers yet.</p>
+  {% endfor %}
 </div>

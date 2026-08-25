@@ -234,7 +234,7 @@ def advisor_prefill_state(raw: str) -> dict[str, str]:
 
 
 def resolve_advisor(choice: str, other_name: str) -> str:
-    """Optional advisor. Empty string means not provided — not an error."""
+    """Resolve advisor from the intake radios. Empty string means missing/invalid."""
     picked = (choice or "").strip()
     if picked in ADVISOR_PRESETS:
         return picked
