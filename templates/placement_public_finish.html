@@ -12,6 +12,7 @@
       <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Lock this sitting</p>
       <h1 class="np-pl-display np-pl-display--md">Submit {{ test.title }}</h1>
       <p class="np-pl-lead">Saved answers: <strong>{{ answered_count }} / {{ total_count }}</strong>. After you submit, you cannot change answers.</p>
+      {% include 'partials/placement_recovery_ticket.html' %}
       {% with messages = get_flashed_messages() %}
       {% if messages %}
       <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>

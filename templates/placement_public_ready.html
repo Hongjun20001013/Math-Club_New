@@ -13,12 +13,8 @@
       <h1 class="np-pl-display np-pl-display--md">Save your recovery code</h1>
       <p class="np-pl-lead">You selected: <strong>{{ test.title }}</strong></p>
       {% if recovery_code %}
-      <p class="np-pl-intake__hint">Write this code down. You will need it if you change browsers or devices. We cannot show it again.</p>
-      <div class="np-pl-ticket" aria-label="Recovery code">
-        <p class="np-pl-ticket__kicker">Recovery pass</p>
-        <p class="np-pl-ticket__code" data-pl-recovery-code>{{ recovery_code }}</p>
-        <p class="np-pl-ticket__fine">One sitting · one browser family · do not share</p>
-      </div>
+      <p class="np-pl-intake__hint">Copy this code and keep it. Starting a new test will not bring this sitting back — only this code will. Do not share it.</p>
+      {% include 'partials/placement_recovery_ticket.html' %}
       {% else %}
       <p class="np-pl-intake__hint">Your session is ready. Continue to the first question.</p>
       {% endif %}

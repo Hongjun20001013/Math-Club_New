@@ -14,12 +14,15 @@
       <p class="np-pl-lead">{{ test.title }} is locked. Your auto-scored results are below.</p>
       <section class="np-pl-score-box np-pl-score-box--monument" aria-label="Placement score">
         <p class="np-pl-score-kicker">Score</p>
-        {% if score and score.mcq_total %}
+        {% if score and score.paper_max_points %}
+        <p class="np-pl-score-value">{{ score.total_points }} / {{ score.max_points }}</p>
+        <p class="np-pl-score-paper">Multiple choice {{ score.mcq_correct }}/{{ score.mcq_total }} auto-scored. Graphing and free response are graded by your advisor ({{ score.paper_max_points }} points).{% if score.paper_complete %} Paper {{ score.paper_points }}/{{ score.paper_max_points }}.{% endif %}</p>
+        {% elif score and score.mcq_total %}
         <p class="np-pl-score-value">{{ score.mcq_correct }} / {{ score.mcq_total }}</p>
         {% else %}
         <p class="np-pl-score-value">No scored items</p>
         {% endif %}
-        {% if score and score.paper_frq_total %}
+        {% if score and score.paper_frq_total and not score.paper_max_points %}
         <p class="np-pl-score-paper">Graphing items saved for advisor review · {{ score.paper_frq_completed }}/{{ score.paper_frq_total }} submitted</p>
         {% endif %}
       </section>

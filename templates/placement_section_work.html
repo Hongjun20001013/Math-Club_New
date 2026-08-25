@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--section" aria-labelledby="np-pl-work-heading">
+    {% include 'partials/placement_atelier_mesh.html' %}
+    <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+        <nav class="np-pl2-nav np-pl-reveal">
+            {% if questions_href %}
+            <a href="{{ questions_href }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back to questions
+            </a>
+            {% else %}
+            <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Placement
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="np-pl-part np-pl-reveal">
+            <header class="np-pl-part__head">
+                <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+                <p class="np-pl-eyebrow np-pl-eyebrow--section">Paper work · {{ section_label }}{% if placement_remaining_seconds is defined %} · <span id="np-pl-paper-time">{{ '%d:%02d'|format((placement_remaining_seconds|int) // 60, (placement_remaining_seconds|int) % 60) }}</span> left{% endif %}</p>
+                <h1 class="np-pl-display np-pl-display--md" id="np-pl-work-heading">{% if section == 'paper' %}Download the PDF, work on paper, upload one file{% else %}Upload your {{ section_label|lower }} pages{% endif %}</h1>
+                <p class="np-pl-lead">{% if paper_intro %}{{ paper_intro.lead }}{% else %}You finished this whole {{ section_label|lower }} block on paper. Photograph every page (or upload a PDF) so your advisor can grade it. Need the blank test? Download it first.{% endif %}</p>
+            </header>
+
+            {% include 'partials/placement_recovery_ticket.html' %}
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
+            {% endif %}
+            {% endwith %}
+
+            <section class="np-pl-part__bento" aria-label="How to submit">
+                {% if paper_intro %}
+                {% for card in paper_intro.cards %}
+                <article class="np-pl-part__card">
+                    <div class="np-pl-part__card-copy">
+                        <h2>{{ card.title }}</h2>
+                        <p>{{ card.body }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+                {% else %}
+                <article class="np-pl-part__card">
+                    <div class="np-pl-part__card-copy">
+                        <h2>1. Paper</h2>
+                        <p>Use the same pages you just worked. Include all {{ n_items }} {{ section_label|lower }} items.</p>
+                    </div>
+                </article>
+                <article class="np-pl-part__card">
+                    <div class="np-pl-part__card-copy">
+                        <h2>2. Photo or PDF</h2>
+                        <p>JPG, PNG, or PDF. Up to 8 files, 8 MB each. You can add more than one page.</p>
+                    </div>
+                </article>
+                <article class="np-pl-part__card">
+                    <div class="np-pl-part__card-copy">
+                        <h2>3. Continue</h2>
+                        <p>{% if section == 'graphing' %}After at least one upload, continue to free response.{% else %}After at least one upload, finish the sitting so your advisor can review.{% endif %}</p>
+                    </div>
+                </article>
+                {% endif %}
+            </section>
+
+            <section class="np-pl-work-panel" aria-label="Submit paper work">
+                <header class="np-pl-work-panel__head">
+                    <div>
+                        <p class="np-pl-label" id="pl-work-label">{% if section == 'paper' %}One PDF for graphing + free response{% else %}Photos of your work{% endif %}</p>
+                        <p class="np-pl-work-panel__hint">{% if section == 'paper' %}All graphing and free-response pages in a single PDF. Not shown as questions on this website.{% else %}Drop pages in, or tap the area to choose files.{% endif %}</p>
+                    </div>
+                    <a href="{{ pdf_href }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-cta-pulse np-pl-work-panel__pdf">Download PDF</a>
+                </header>
+
+                <form method="post" action="{{ continue_href }}" enctype="multipart/form-data" class="np-pl-work-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="np-pl-drop" data-pl-drop>
+                        <div class="np-pl-drop__zone">
+                            <input id="pl-work-pages" class="np-pl-drop__input" name="pages" type="file" accept="{% if section == 'paper' %}application/pdf,.pdf{% else %}image/jpeg,image/png,image/webp,image/gif,application/pdf{% endif %}" {% if section != 'paper' %}multiple{% endif %} aria-labelledby="pl-work-label">
+                            <div class="np-pl-drop__copy">
+                                <span class="np-pl-drop__icon" aria-hidden="true">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 16.5V18a2 2 0 002 2h10a2 2 0 002-2v-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                </span>
+                                <strong>{% if section == 'paper' %}Drop one PDF here{% else %}Drop photos or a PDF{% endif %}</strong>
+                                <span>{% if section == 'paper' %}PDF · graphing + free response together · up to 20 MB{% else %}JPG, PNG, or PDF · up to 8 files · 8 MB each{% endif %}</span>
+                                <em>{% if section == 'paper' %}Choose PDF{% else %}Choose files{% endif %}</em>
+                            </div>
+                        </div>
+                        <ul class="np-pl-drop__queue" data-pl-drop-list hidden></ul>
+                    </div>
+                    <div class="np-pl-work-actions">
+                        {% if questions_href %}
+                        <a href="{{ questions_href }}" class="np-pl2-btn np-pl2-btn--ghost">Review Q1{% if mc_count %}–{{ mc_count }}{% endif %}</a>
+                        {% endif %}
+                        <button type="submit" class="np-pl2-btn np-pl2-btn--ghost" name="save" value="1">Save pages</button>
+                        <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-cta-pulse" name="continue" value="1">{% if section == 'paper' %}Save and finish{% else %}Save and continue{% endif %}</button>
+                    </div>
+                </form>
+
+                {% if files %}
+                <section class="np-pl-work-files" aria-label="Uploaded pages">
+                    <h2>Already on this sitting <span>{{ files|length }}</span></h2>
+                    <ul>
+                        {% for f in files %}
+                        <li>
+                            <strong>{{ f.original_name }}</strong>
+                            <span>{{ (f.byte_size / 1024)|round(0, 'floor')|int }} KB</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% if placement_remaining_seconds is defined %}
+<script>
+(function () {
+    var left = {{ placement_remaining_seconds|int }};
+    var el = document.getElementById("np-pl-paper-time");
+    if (!el) return;
+    var end = Date.now() + Math.max(0, left) * 1000;
+    function tick() {
+        var s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+        el.textContent =
+            String(Math.floor(s / 60)).padStart(2, "0") + ":" +
+            String(s % 60).padStart(2, "0");
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -401,18 +401,32 @@ def placement_recorded_paper_answer(
     return (form_selected or "").strip()
 
 
+ENHANCED_PAPER_TOPICS = frozenset({"enhanced_math_1", "enhanced_math_2"})
+
+
+def is_enhanced_paper_topic(topic: str | None) -> bool:
+    return str(topic or "") in ENHANCED_PAPER_TOPICS
+
+
 def placement_auto_score_breakdown(
     questions: list,
     selected_by_index: dict[int, str],
     is_correct_by_index: dict[int, Optional[int]] | None = None,
+    topic: str | None = None,
 ) -> dict:
-    """Auto-score MCQ and keyed fill-ins. Graphing stays out of the denominator."""
+    """Auto-score MCQ and keyed fill-ins. Graphing stays out of the denominator.
+
+    Enhanced Math paper items (graphing + free response) are advisor-graded
+    and are not included in mcq_total.
+    """
     is_correct_by_index = is_correct_by_index or {}
+    em_paper = is_enhanced_paper_topic(topic)
     auto_total = 0
     auto_correct = 0
     auto_incorrect = 0
     graphing_total = 0
     graphing_answered = 0
+    fr_paper_total = 0
     awaiting_review = 0
     for i, question in enumerate(questions):
         selected = str(selected_by_index.get(i) or "")
@@ -420,6 +434,9 @@ def placement_auto_score_breakdown(
             graphing_total += 1
             if selected.strip():
                 graphing_answered += 1
+            continue
+        if em_paper and not is_mcq_item(question):
+            fr_paper_total += 1
             continue
         auto_total += 1
         ic = is_correct_by_index[i] if i in is_correct_by_index else None
@@ -432,7 +449,10 @@ def placement_auto_score_breakdown(
             auto_incorrect += 1
         elif selected.strip():
             awaiting_review += 1
-    return {
+    paper_max = 0
+    if em_paper:
+        paper_max = graphing_total * 1 + fr_paper_total * 4
+    out = {
         "mcq_correct": auto_correct,
         "mcq_total": auto_total,
         "mcq_incorrect": auto_incorrect,
@@ -451,12 +471,77 @@ def placement_auto_score_breakdown(
         "unscored_graphing": graphing_total,
         "graphing_answered": graphing_answered,
         "graphing_total": graphing_total,
+        "fr_paper_total": fr_paper_total,
+        "paper_max_points": paper_max,
+        "max_points": (auto_total + paper_max) if em_paper else auto_total,
+        "total_points": auto_correct,
+        "paper_points": 0,
+        "paper_complete": False,
     }
+    return out
 
 
-def placement_result_status(question: dict, is_correct: Optional[int], selected: str) -> str:
+def placement_paper_rubric(topic: str | None, questions: list) -> list[dict]:
+    """Advisor-graded items for Enhanced Math: graphing 1 pt, FR 4 pt."""
+    if not is_enhanced_paper_topic(topic):
+        return []
+    rows = []
+    for i, question in enumerate(questions):
+        if is_mcq_item(question):
+            continue
+        graphing = is_placement_graphing_item(question)
+        rows.append(
+            {
+                "index": i,
+                "n": i + 1,
+                "kind": "graphing" if graphing else "free_response",
+                "label": "Graphing" if graphing else "Free response",
+                "max_points": 1 if graphing else 4,
+            }
+        )
+    return rows
+
+
+def placement_apply_paper_grades(score: dict, grades: dict[int, int], rubric: list[dict]) -> dict:
+    """Add advisor paper points onto an auto-score dict."""
+    out = dict(score or {})
+    paper_points = 0
+    graded_n = 0
+    by_item = {}
+    for row in rubric:
+        idx = int(row["index"])
+        cap = int(row["max_points"])
+        if idx not in grades:
+            continue
+        try:
+            pts = int(grades[idx])
+        except (TypeError, ValueError):
+            continue
+        pts = max(0, min(cap, pts))
+        paper_points += pts
+        graded_n += 1
+        by_item[idx] = pts
+    paper_max = int(out.get("paper_max_points") or sum(int(r["max_points"]) for r in rubric) or 0)
+    mcq_correct = int(out.get("mcq_correct") or 0)
+    mcq_total = int(out.get("mcq_total") or 0)
+    out["paper_points"] = paper_points
+    out["paper_graded_count"] = graded_n
+    out["paper_item_count"] = len(rubric)
+    out["paper_complete"] = bool(rubric) and graded_n == len(rubric)
+    out["paper_max_points"] = paper_max
+    out["max_points"] = mcq_total + paper_max
+    out["total_points"] = mcq_correct + paper_points
+    out["paper_grades"] = by_item
+    return out
+
+
+def placement_result_status(
+    question: dict, is_correct: Optional[int], selected: str, topic: str | None = None
+) -> str:
     """Staff-facing label for one placement item."""
     has = bool((selected or "").strip())
+    if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
+        return "paper"
     if is_placement_graphing_item(question):
         return "submitted" if has else "unscored"
     if is_correct == 1:
@@ -479,3 +564,22 @@ def grade_for_db(question: dict, student_raw: str) -> tuple[Optional[int], str]:
     if res is None:
         return None, key_s
     return int(bool(res)), key_s
+
+
+def grade_placement_response(
+    question: dict, student_raw: str, topic: str | None = None
+) -> tuple[Optional[int], str]:
+    """Enhanced Math paper items are teacher-graded. Placement MCQ is an exact A–D/E key match."""
+    if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
+        return None, ""
+    if is_mcq_item(question):
+        kind = str(question.get("question_kind") or "mcq")
+        allowed = {"A", "B", "C", "D", "E"} if kind == "mcq5" else {"A", "B", "C", "D"}
+        key = str(question.get("correct_answer") or "").strip().upper()
+        letter = str(student_raw or "").strip().upper()
+        if not letter:
+            return None, key
+        if letter not in allowed:
+            return 0, key
+        return (1 if letter == key else 0), key
+    return grade_for_db(question, student_raw)

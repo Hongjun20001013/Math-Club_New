@@ -3,10 +3,14 @@ from answer_grader import (
     PAPER_COMPLETE_TOKEN,
     display_answer_plain,
     grade_for_db,
+    grade_placement_response,
     is_placement_graphing_item,
     is_placement_paper_item,
     is_mcq_item,
+    is_enhanced_paper_topic,
     placement_auto_score_breakdown,
+    placement_apply_paper_grades,
+    placement_paper_rubric,
     placement_recorded_paper_answer,
     placement_result_status,
     response_is_correct,
@@ -283,7 +287,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260824-admin-placement-roster")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260825-recover-glow")
 
 _DB_SCHEMA_READY = False
 
@@ -1937,6 +1941,7 @@ def _placement_flow_config(topic: str) -> dict | None:
         "total": total or (mc + graph + fr),
         "has_gates": bool(session_prefix and mc > 0 and graph > 0),
         "gate_kind": "enhanced_sections",
+        "paper_mode": "combined_pdf" if topic in ("enhanced_math_1", "enhanced_math_2") else "section_uploads",
         "session_prefix": session_prefix,
         "mc_scored": topic in ("enhanced_math_1", "enhanced_math_2"),
     }
@@ -1949,6 +1954,16 @@ def _placement_timer_seconds(topic: str) -> int:
         "middle_level": 150 * 60,
         "placement_full": 115 * 60,
     }.get(topic, 115 * 60)
+
+
+def _placement_remaining_seconds(started_unix: int, topic: str, now: int | None = None) -> int:
+    """Seconds left on the sitting clock. Uses the original start, never a fresh full duration."""
+    total = _placement_timer_seconds(topic)
+    if not started_unix:
+        return total
+    clock = int(now if now is not None else time.time())
+    elapsed = max(0, clock - int(started_unix))
+    return max(0, total - elapsed)
 
 
 # Phase 3 mock sets: ~Digital SAT Module pace (≈35 min / 22 Q).
@@ -9469,6 +9484,49 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
     graph = int(cfg["graph_count"])
     fr = int(cfg["fr_count"])
     prefix = str(cfg["session_prefix"])
+    paper_max = graph * 1 + fr * 4
+    sitting_total = mc + paper_max
+    if cfg.get("paper_mode") == "combined_pdf" and section == "paper":
+        return {
+            "section": "paper",
+            "session_flag": f"{prefix}_seen_paper",
+            "first_qnum": mc,
+            "kicker": "Placement · Paper section",
+            "title": "Graphing + free response — on paper",
+            "lead": (
+                f"You finished the {mc} multiple-choice items. "
+                "The remaining questions are not on this screen. Download the blank test PDF, "
+                f"work all {graph} graphing items (1 point each) and {fr} free-response items "
+                "(4 points each) on paper, then upload one PDF that includes both."
+            ),
+            "begin_label": "Continue to upload",
+            "part_num": 2,
+            "part_total": 2,
+            "q_start": mc + 1,
+            "q_end": mc + graph + fr,
+            "total_items": mc + graph + fr,
+            "show_blank_pdf": True,
+            "cards": [
+                {
+                    "icon": "↓",
+                    "title": "Download the PDF",
+                    "body": "Use the blank test. Graphing and free response are only on that packet — not as on-screen questions.",
+                },
+                {
+                    "icon": "1",
+                    "title": "Paper and pencil",
+                    "body": f"Complete graphing Q{mc + 1}–Q{mc + graph} and free response Q{mc + graph + 1}–Q{mc + graph + fr} on paper.",
+                },
+                {
+                    "icon": "↑",
+                    "title": "Upload one PDF",
+                    "body": (
+                        f"Combine every graphing and free-response page into a single PDF and upload it "
+                        f"so your advisor can grade ({paper_max} points; sitting total {sitting_total})."
+                    ),
+                },
+            ],
+        }
     if section == "graphing":
         mc_label = str(mc)
         return {
@@ -9476,10 +9534,11 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
             "session_flag": f"{prefix}_seen_graphing",
             "first_qnum": mc,
             "kicker": "Placement · Section 2 of 3",
-            "title": "Graphing — show your work",
+            "title": "Graphing — paper and pencil",
             "lead": (
                 f"You finished the {mc_label} multiple-choice items. "
-                f"Next: {graph} graphing and coordinate-reasoning questions."
+                f"This next block is {graph} graphing items. Take out paper and a pencil now. "
+                "Work the whole section on paper, then upload photos after the last item."
             ),
             "begin_label": "Begin graphing section",
             "part_num": 2,
@@ -9487,21 +9546,22 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
             "q_start": mc + 1,
             "q_end": mc + graph,
             "total_items": mc + graph + fr,
+            "show_blank_pdf": True,
             "cards": [
                 {
-                    "icon": "G",
-                    "title": "What to do",
-                    "body": "Complete each item on paper. Check the box online only to mark that you finished it. These items are not scored automatically.",
+                    "icon": "1",
+                    "title": "Paper first",
+                    "body": "Take out paper and a pencil. Sketch every graph and write interval notation on the page — not only in the text box.",
                 },
                 {
                     "icon": str(graph),
-                    "title": f"{graph} items",
-                    "body": "Number line, inequalities, systems, and transformations — same order as the printable placement test.",
+                    "title": f"{graph} items in this block",
+                    "body": "Stay in this section until the last graphing question. Do not upload yet.",
                 },
                 {
-                    "icon": "✓",
-                    "title": "Scoring",
-                    "body": "These items are saved for your teacher or advisor. They are not auto-scored online.",
+                    "icon": "↑",
+                    "title": "Upload at the end",
+                    "body": "After the last graphing item you will photograph your pages and upload them so your advisor can grade the work.",
                 },
             ],
         }
@@ -9511,10 +9571,10 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
             "session_flag": f"{prefix}_seen_fr",
             "first_qnum": mc + graph,
             "kicker": "Placement · Section 3 of 3",
-            "title": "Free response — modeling & reasoning",
+            "title": "Free response — paper and pencil",
             "lead": (
-                f"Final section: {fr} written-response items covering modeling, proof, "
-                "and Enhanced readiness challenge."
+                f"Final written block: {fr} free-response items. "
+                "Keep your paper out. Work the whole section on paper, then upload photos after the last item."
             ),
             "begin_label": "Begin free response section",
             "part_num": 3,
@@ -9522,21 +9582,22 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
             "q_start": mc + graph + 1,
             "q_end": mc + graph + fr,
             "total_items": mc + graph + fr,
+            "show_blank_pdf": True,
             "cards": [
                 {
-                    "icon": "FR",
-                    "title": "What to do",
-                    "body": "Complete each free-response item on paper. Check the box online only to mark that you finished it. This section is not scored automatically.",
+                    "icon": "1",
+                    "title": "Write on paper",
+                    "body": "Show full reasoning on paper. You can still type a short answer online when the item asks for one.",
                 },
                 {
                     "icon": str(fr),
-                    "title": f"{fr} items",
-                    "body": "Equation reasoning through advanced topics — matches the paper test’s free-response block.",
+                    "title": f"{fr} items in this block",
+                    "body": "Stay in this section until the last free-response question. Upload only after you finish the block.",
                 },
                 {
-                    "icon": "⏱",
-                    "title": "Timer",
-                    "body": "Your placement timer keeps running. Take your time on proofs and explanations.",
+                    "icon": "↑",
+                    "title": "Upload at the end",
+                    "body": "After the last item, photograph every page and upload it so your advisor can grade your written work.",
                 },
             ],
         }
@@ -9570,6 +9631,10 @@ def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
     graph = int(cfg["graph_count"])
     fr_start = mc + graph
     prefix = str(cfg["session_prefix"])
+    if cfg.get("paper_mode") == "combined_pdf":
+        if qnum >= mc:
+            return url_for("placement_section_work", slug=slug, section="paper")
+        return None
     if qnum >= fr_start and not session.get(f"{prefix}_seen_fr"):
         return url_for("placement_section_intro", slug=slug, section="free_response")
     if mc <= qnum < fr_start and not session.get(f"{prefix}_seen_graphing"):
@@ -9603,7 +9668,7 @@ def _placement_section_back_href(topic: str, section: str) -> str:
         return _q_href(0)
     mc = int(cfg.get("mc_count") or 0)
     graph = int(cfg.get("graph_count") or 0)
-    if section == "graphing":
+    if section in ("graphing", "paper"):
         return _q_href(mc - 1)
     return _q_href(mc + graph - 1)
 
@@ -9614,6 +9679,17 @@ def placement_section_intro(slug: str, section: str):
     topic = _placement_topic_for_slug(slug)
     if not topic:
         abort(404)
+    cfg = _placement_flow_config(topic) or {}
+    if cfg.get("paper_mode") == "combined_pdf" and section in ("graphing", "free_response"):
+        return redirect(url_for("placement_section_intro", slug=slug, section="paper"))
+    if cfg.get("paper_mode") == "combined_pdf" and section == "paper":
+        if is_public_guest():
+            db = get_db()
+            sess = placement_public_mod.current_session_row(db)
+            if sess is not None and str(sess["slug"]) == slug and sess["status"] != "submitted":
+                return redirect(url_for("placement_section_work", slug=slug, section="paper"))
+        elif session.get("user_id") and session.get(_practice_session_key("placement", topic)):
+            return redirect(url_for("placement_section_work", slug=slug, section="paper"))
     meta = _placement_section_intro_meta(topic, section)
     if not meta:
         abort(404)
@@ -9635,6 +9711,8 @@ def placement_section_intro(slug: str, section: str):
         begin_label=meta["begin_label"],
         back_href=back_href,
         begin_href=url_for("placement_section_begin", slug=slug, section=section),
+        pdf_href=url_for("placement_blank_test_pdf", slug=slug) if meta.get("show_blank_pdf") else None,
+        **_placement_recovery_ctx(),
     )
 
 
@@ -9648,6 +9726,8 @@ def placement_section_begin(slug: str, section: str):
         abort(404)
     session[meta["session_flag"]] = True
     session.modified = True
+    if section == "paper":
+        return redirect(url_for("placement_section_work", slug=slug, section="paper"))
     if is_public_guest():
         db = get_db()
         sess = placement_public_mod.current_session_row(db)
@@ -9668,6 +9748,159 @@ def placement_section_begin(slug: str, section: str):
             qnum=meta["first_qnum"],
         )
     )
+
+
+def _placement_work_owner(slug: str):
+    topic = _placement_topic_for_slug(slug)
+    if not topic:
+        abort(404)
+    db = get_db()
+    if is_public_guest():
+        sess = placement_public_mod.current_session_row(db)
+        if sess is None or str(sess["slug"]) != slug:
+            abort(404)
+        if sess["status"] == "submitted":
+            return redirect(url_for("placement_public_done", public_id=sess["attempt_public_id"]))
+        return db, topic, int(sess["attempt_id"]), str(sess["attempt_public_id"]), "candidate"
+    user_id = session.get("user_id")
+    if not user_id:
+        abort(404)
+    sk = _practice_session_key("placement", topic)
+    attempt_id = session.get(sk)
+    if attempt_id is None:
+        abort(404)
+    row = db.execute(
+        "SELECT id FROM practice_attempts WHERE id = ? AND domain = 'placement' AND topic = ?",
+        (int(attempt_id), topic),
+    ).fetchone()
+    if row is None or not _attempt_user_matches(db, int(row["id"]), user_id):
+        abort(404)
+    return db, topic, int(row["id"]), None, "practice"
+
+
+def _placement_work_continue_href(slug: str, section: str, topic: str, public_id: str | None, attempt_id: int) -> str:
+    if section == "graphing":
+        return url_for("placement_section_intro", slug=slug, section="free_response")
+    if public_id:
+        return url_for("placement_public_finish", public_id=public_id)
+    return url_for("practice_session_summary", attempt_id=attempt_id)
+
+
+@app.route("/placement/<slug>/section/<section>/work", methods=["GET", "POST"])
+def placement_section_work(slug: str, section: str):
+    if section not in placement_public_mod.PAPER_UPLOAD_SECTIONS:
+        abort(404)
+    topic = _placement_topic_for_slug(slug)
+    cfg = _placement_flow_config(topic or "")
+    if not cfg or cfg.get("gate_kind") != "enhanced_sections":
+        abort(404)
+    owned = _placement_work_owner(slug)
+    if not isinstance(owned, tuple):
+        return owned
+    db, topic, attempt_id, public_id, owner_kind = owned
+    test = _placement_test_by_slug(slug)
+    if request.method == "POST":
+        if placement_public_mod.rate_limited("upload", str(attempt_id)):
+            flash("Too many uploads. Wait a moment and try again.")
+            return redirect(url_for("placement_section_work", slug=slug, section=section))
+        placement_public_mod.record_rate_hit("upload", str(attempt_id))
+        files = request.files.getlist("pages")
+        saved = 0
+        errors = []
+        existing = placement_public_mod.upload_count(db, attempt_id, section, owner_kind=owner_kind)
+        for fh in files:
+            if not fh or not getattr(fh, "filename", ""):
+                continue
+            if existing + saved >= placement_public_mod.UPLOAD_MAX_FILES:
+                errors.append(f"You can upload at most {placement_public_mod.UPLOAD_MAX_FILES} files in this section.")
+                break
+            payload = fh.read()
+            if not payload:
+                continue
+            try:
+                placement_public_mod.save_upload(
+                    db, attempt_id, section, fh.filename, payload, owner_kind=owner_kind
+                )
+                saved += 1
+            except ValueError as exc:
+                errors.append(str(exc))
+        db.commit()
+        for msg in errors:
+            flash(msg)
+        if saved:
+            flash(f"Saved {saved} page{'s' if saved != 1 else ''} for your advisor.")
+        if request.form.get("continue") == "1":
+            if placement_public_mod.upload_count(db, attempt_id, section, owner_kind=owner_kind) < 1:
+                flash(
+                    "Upload the paper PDF before continuing."
+                    if section == "paper"
+                    else "Upload at least one photo of your paper work before continuing."
+                )
+                return redirect(url_for("placement_section_work", slug=slug, section=section))
+            return redirect(_placement_work_continue_href(slug, section, topic, public_id, attempt_id))
+        return redirect(url_for("placement_section_work", slug=slug, section=section))
+    files = placement_public_mod.list_uploads(db, attempt_id, section, owner_kind=owner_kind)
+    if section == "paper":
+        label = "graphing and free response"
+        n_items = int(cfg.get("graph_count") or 0) + int(cfg.get("fr_count") or 0)
+    elif section == "graphing":
+        label = "Graphing"
+        n_items = int(cfg.get("graph_count") or 0)
+    else:
+        label = "Free response"
+        n_items = int(cfg.get("fr_count") or 0)
+    intro = _placement_section_intro_meta(topic, "paper") if section == "paper" else None
+    mc_count = int(cfg.get("mc_count") or 0)
+    questions_href = _placement_section_back_href(topic, section)
+    recovery_ctx = _placement_recovery_ctx()
+    time_row = db.execute(
+        "SELECT CAST(strftime('%s', COALESCE(started_at, created_at)) AS INTEGER) AS started_unix FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone() if owner_kind == "candidate" else db.execute(
+        "SELECT CAST(strftime('%s', created_at) AS INTEGER) AS started_unix FROM practice_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    started_unix = int(time_row["started_unix"] or 0) if time_row else 0
+    remaining = _placement_remaining_seconds(started_unix, topic)
+    return render_template(
+        "placement_section_work.html",
+        test=test,
+        slug=slug,
+        topic=topic,
+        section=section,
+        section_label=label,
+        n_items=n_items,
+        files=files,
+        pdf_href=url_for("placement_blank_test_pdf", slug=slug),
+        continue_href=url_for("placement_section_work", slug=slug, section=section),
+        paper_intro=intro,
+        questions_href=questions_href,
+        mc_count=mc_count,
+        attempt_started_unix=started_unix,
+        placement_remaining_seconds=remaining,
+        practice_timer_seconds=_placement_timer_seconds(topic),
+        **recovery_ctx,
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/uploads/<int:upload_id>")
+def admin_placement_upload(attempt_id: int, upload_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    row = db.execute(
+        "SELECT * FROM placement_candidate_uploads WHERE id = ? AND attempt_id = ? AND owner_kind = 'candidate'",
+        (upload_id, attempt_id),
+    ).fetchone()
+    if row is None:
+        abort(404)
+    path = placement_public_mod.upload_abs_path(dict(row))
+    if not os.path.isfile(path):
+        abort(404)
+    return send_file(path, mimetype=row["mime_type"] or "application/octet-stream", as_attachment=False, download_name=row["original_name"])
 
 
 @app.route("/placement")
@@ -9817,6 +10050,79 @@ def placement_test_begin(slug: str):
     )
 
 
+def _placement_paper_upload_after(topic: str, q_index: int) -> str | None:
+    cfg = _placement_flow_config(topic) or {}
+    if cfg.get("gate_kind") != "enhanced_sections":
+        return None
+    if cfg.get("paper_mode") == "combined_pdf":
+        return None
+    mc = int(cfg.get("mc_count") or 0)
+    graph = int(cfg.get("graph_count") or 0)
+    fr = int(cfg.get("fr_count") or 0)
+    if graph and q_index == mc + graph - 1:
+        return "graphing"
+    if fr and q_index == mc + graph + fr - 1:
+        return "free_response"
+    return None
+
+
+def _placement_paper_upload_banner(topic: str, q_index: int) -> dict | None:
+    section = _placement_paper_upload_after(topic, q_index)
+    if not section:
+        return None
+    cfg = _placement_flow_config(topic) or {}
+    if section == "graphing":
+        n = int(cfg.get("graph_count") or 0)
+        return {
+            "section": section,
+            "title": "Last graphing item",
+            "body": f"Finish this question, then photograph all {n} graphing pages and upload them for your advisor.",
+        }
+    n = int(cfg.get("fr_count") or 0)
+    return {
+        "section": section,
+        "title": "Last free-response item",
+        "body": f"Finish this question, then photograph your {n} free-response pages and upload them for your advisor.",
+    }
+
+
+def _placement_recovery_ctx() -> dict:
+    hours = placement_public_mod.SITTING_TTL_HOURS
+    if not is_public_guest():
+        return {"recovery_code": None, "recover_href": None, "sitting_ttl_hours": hours}
+    return {
+        "recovery_code": placement_public_mod.peek_recovery_code(),
+        "recover_href": url_for("placement_public_recover"),
+        "sitting_ttl_hours": hours,
+    }
+
+
+def _placement_exam_nav_ctx(topic: str) -> dict:
+    cfg = _placement_flow_config(topic) or {}
+    paper_gate = cfg.get("paper_mode") == "combined_pdf"
+    mc = int(cfg.get("mc_count") or 0) if paper_gate else 0
+    slug = _placement_slug_for_topic(topic) if paper_gate else None
+    return {
+        "placement_paper_gate": paper_gate,
+        "placement_mc_count": mc,
+        "paper_work_href": (
+            url_for("placement_section_work", slug=slug, section="paper")
+            if paper_gate and slug
+            else None
+        ),
+    }
+
+
+def _placement_combined_paper_href_if_past_mc(topic: str, qnum: int) -> str | None:
+    ctx = _placement_exam_nav_ctx(topic)
+    if not ctx["placement_paper_gate"]:
+        return None
+    if int(qnum) < int(ctx["placement_mc_count"] or 0):
+        return None
+    return ctx["paper_work_href"]
+
+
+
 def _placement_public_next_href(topic: str, public_id: str, q_index: int, bank_total: int) -> str:
     slug = _placement_slug_for_topic(topic)
     flow = _placement_flow_config(topic)
@@ -9833,9 +10139,12 @@ def _placement_public_next_href(topic: str, public_id: str, q_index: int, bank_t
             mc = int(flow.get("mc_count") or 0)
             graph = int(flow.get("graph_count") or 0)
             if q_index == mc - 1 and graph:
+                if flow.get("paper_mode") == "combined_pdf":
+                    return url_for("placement_section_work", slug=slug, section="paper")
                 return url_for("placement_section_intro", slug=slug, section="graphing")
-            if q_index == mc + graph - 1:
-                return url_for("placement_section_intro", slug=slug, section="free_response")
+            paper_upload = _placement_paper_upload_after(topic, q_index)
+            if paper_upload:
+                return url_for("placement_section_work", slug=slug, section=paper_upload)
     if q_index >= bank_total - 1:
         return url_for("placement_public_finish", public_id=public_id)
     return url_for("placement_public_item", public_id=public_id, qnum=q_index + 1)
@@ -9855,7 +10164,10 @@ def placement_public_recover():
     if "user_id" in session:
         return redirect(url_for("placement_landing"))
     if request.method == "GET":
-        return render_template("placement_public_recover.html")
+        return render_template(
+            "placement_public_recover.html",
+            sitting_ttl_hours=placement_public_mod.SITTING_TTL_HOURS,
+        )
     if placement_public_mod.rate_limited("recover"):
         return ("Too many recovery attempts. Please wait and try again.", 429)
     placement_public_mod.record_rate_hit("recover")
@@ -9866,6 +10178,13 @@ def placement_public_recover():
         return redirect(url_for("placement_public_recover"))
     if found["status"] == "submitted":
         return redirect(url_for("placement_public_done", public_id=found["attempt_public_id"]))
+    cfg = _placement_flow_config(str(found.get("topic") or ""))
+    if cfg and cfg.get("paper_mode") == "combined_pdf" and found.get("slug"):
+        mc = int(cfg.get("mc_count") or 0)
+        if placement_public_mod.should_resume_paper(db, int(found["attempt_id"]), mc):
+            return redirect(
+                url_for("placement_section_work", slug=found["slug"], section="paper")
+            )
     return redirect(url_for("placement_public_item", public_id=found["attempt_public_id"], qnum=0))
 
 
@@ -9878,13 +10197,15 @@ def placement_public_ready(public_id: str):
     if att is None:
         abort(404)
     test = _placement_test_by_slug(att["slug"])
-    recovery = placement_public_mod.pop_recovery_once()
+    recovery = placement_public_mod.peek_recovery_code()
     return render_template(
         "placement_public_ready.html",
         test=test,
         attempt=att,
         recovery_code=recovery,
         continue_href=url_for("placement_public_item", public_id=public_id, qnum=0),
+        sitting_ttl_hours=placement_public_mod.SITTING_TTL_HOURS,
+        recover_href=url_for("placement_public_recover"),
     )
 
 
@@ -9946,6 +10267,7 @@ def placement_public_item(public_id: str, qnum: int):
         pace_training=False,
         pace_seconds=0,
         attempt_started_unix=attempt_started_unix,
+        placement_remaining_seconds=_placement_remaining_seconds(attempt_started_unix, topic),
         miss_quiz_mode=False,
         miss_quiz_v2=False,
         mistake_redo_mode=False,
@@ -9962,6 +10284,9 @@ def placement_public_item(public_id: str, qnum: int):
         public_draft_url=url_for("placement_public_item", public_id=public_id, qnum=qnum),
         public_autosave_url=url_for("placement_public_autosave", public_id=public_id),
         placement_paper_item=is_placement_paper_item(q),
+        paper_upload_next=_placement_paper_upload_banner(topic, qnum),
+        **_placement_exam_nav_ctx(topic),
+        **_placement_recovery_ctx(),
     )
 
 
@@ -9999,6 +10324,9 @@ def _placement_public_save_item(db, att, questions, qnum: int):
         elif raw_answer:
             placement_public_mod.save_draft(db, int(att["id"]), qnum, raw_answer)
             db.commit()
+        paper_href = _placement_combined_paper_href_if_past_mc(topic, goto_q)
+        if paper_href:
+            return redirect(paper_href)
         return redirect(url_for("placement_public_item", public_id=public_id, qnum=goto_q))
     if paper_item:
         placement_public_mod.mark_in_progress(db, int(att["id"]))
@@ -10013,7 +10341,7 @@ def _placement_public_save_item(db, att, questions, qnum: int):
     if not raw_answer:
         flash("Please enter or select an answer before submitting.")
         return redirect(url_for("placement_public_item", public_id=public_id, qnum=qnum))
-    is_correct, correct_answer = grade_for_db(q, raw_answer)
+    is_correct, correct_answer = grade_placement_response(q, raw_answer, topic)
     placement_public_mod.mark_in_progress(db, int(att["id"]))
     placement_public_mod.save_response(
         db, int(att["id"]), qnum, raw_answer, correct_answer, is_correct
@@ -10076,6 +10404,7 @@ def placement_public_finish(public_id: str):
             attempt=att,
             answered_count=int(att["answered_count"] or 0),
             total_count=int(att["total_count"] or 0),
+            **_placement_recovery_ctx(),
         )
     if request.form.get("confirm") != "1":
         flash("Please confirm that you want to submit this test.")
@@ -10103,7 +10432,22 @@ def placement_public_finish(public_id: str):
         if row is None:
             continue
         is_correct_by_index[i] = row["is_correct"]
-    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
+    score = placement_auto_score_breakdown(
+        questions, selected_by_index, is_correct_by_index, topic=str(att["topic"])
+    )
+    if is_enhanced_paper_topic(str(att["topic"])):
+        mc = int((_placement_flow_config(str(att["topic"])) or {}).get("mc_count") or 0)
+        answered_idxs = [i for i, ans in selected_by_index.items() if str(ans).strip()]
+        reached_paper = (mc - 1) in answered_idxs or any(i >= mc for i in answered_idxs)
+        if reached_paper and placement_public_mod.upload_count(
+            db, int(att["id"]), "paper", owner_kind="candidate"
+        ) < 1:
+            flash("Upload one PDF with your graphing and free-response work before submitting.")
+            return redirect(url_for("placement_section_work", slug=att["slug"], section="paper"))
+        grades = placement_public_mod.list_paper_grades(db, int(att["id"]))
+        score = placement_apply_paper_grades(
+            score, grades, placement_paper_rubric(str(att["topic"]), questions)
+        )
     locked = placement_public_mod.finish_attempt(
         db, int(att["id"]), json.dumps(score), None
     )
@@ -13943,6 +14287,11 @@ def practice_question(domain, topic, qnum):
         pace_training=bool(pace_seconds),
         pace_seconds=int(pace_seconds or 0),
         attempt_started_unix=attempt_started_unix,
+        placement_remaining_seconds=(
+            _placement_remaining_seconds(attempt_started_unix, topic)
+            if placement_mode
+            else 0
+        ),
         miss_quiz_mode=False,
         miss_quiz_v2=False,
         mistake_redo_mode=mistake_redo_mode,
@@ -13958,6 +14307,9 @@ def practice_question(domain, topic, qnum):
         if domain == "hard_problem" and not mistake_redo_mode
         else None,
         placement_paper_item=placement_mode and is_placement_paper_item(q),
+        paper_upload_next=_placement_paper_upload_banner(topic, question_index) if placement_mode else None,
+        **(_placement_exam_nav_ctx(topic) if placement_mode else {}),
+        **(_placement_recovery_ctx() if placement_mode else {}),
     )
 
 
@@ -14034,10 +14386,21 @@ def practice_draft_answer():
                 (attempt_id, current_q, raw_answer, "", None),
             )
         _save_practice_draft(attempt_id, current_q, raw_answer, clear_empty=True)
+        paper_href = (
+            _placement_combined_paper_href_if_past_mc(topic, goto_q)
+            if domain == "placement"
+            else None
+        )
+        if paper_href:
+            return redirect(paper_href)
         return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=goto_q))
     if q_kind in ("mcq", "mcq5") and raw_answer:
         raw_answer = raw_answer.strip().upper()[:1]
     _save_practice_draft(attempt_id, current_q, raw_answer)
+    if domain == "placement":
+        paper_href = _placement_combined_paper_href_if_past_mc(topic, goto_q)
+        if paper_href:
+            return redirect(paper_href)
     return redirect(url_for("practice_question", domain=domain, topic=topic, qnum=goto_q))
 
 
@@ -14198,10 +14561,16 @@ def submit_practice_answer():
     else:
         selected_answer = raw_answer
 
-    if paper_item:
+    if paper_item or (
+        domain == "placement" and is_enhanced_paper_topic(topic) and not is_mcq_item(question)
+    ):
         is_correct, correct_answer = None, ""
     else:
-        is_correct, correct_answer = grade_for_db(question, selected_answer)
+        is_correct, correct_answer = grade_placement_response(
+            question,
+            selected_answer,
+            topic if domain == "placement" else None,
+        )
 
     db = get_db()
     try:
@@ -14333,18 +14702,29 @@ def submit_practice_answer():
                 mc = int(flow["mc_count"])
                 graph = int(flow["graph_count"])
                 if q_index == mc - 1:
+                    if flow.get("paper_mode") == "combined_pdf":
+                        return redirect(
+                            url_for("placement_section_work", slug=slug, section="paper")
+                        )
                     return redirect(
                         url_for("placement_section_intro", slug=slug, section="graphing")
                     )
-                if q_index == mc + graph - 1:
+                paper_upload = _placement_paper_upload_after(topic, q_index)
+                if paper_upload:
                     return redirect(
-                        url_for(
-                            "placement_section_intro", slug=slug, section="free_response"
-                        )
+                        url_for("placement_section_work", slug=slug, section=paper_upload)
                     )
         return redirect(
             url_for("practice_question", domain=domain, topic=topic, qnum=q_index + 1)
         )
+
+    if domain == "placement":
+        paper_upload = _placement_paper_upload_after(topic, q_index)
+        if paper_upload:
+            slug = _placement_slug_for_topic(topic)
+            return redirect(
+                url_for("placement_section_work", slug=slug, section=paper_upload)
+            )
 
     sk = _practice_session_key(domain, topic)
     session[sk] = attempt_id
@@ -14952,7 +15332,7 @@ def _practice_session_summary_payload(
         auto_rows = [
             (row, qobj)
             for row, qobj in zip(rows_out, questions)
-            if not is_placement_graphing_item(qobj)
+            if (is_mcq_item(qobj) if is_enhanced_paper_topic(topic) else not is_placement_graphing_item(qobj))
         ]
         placement_mcq_total = len(auto_rows)
         placement_mcq_correct = sum(1 for row, _ in auto_rows if row["status"] == "correct")
@@ -17528,10 +17908,15 @@ def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
         if score:
             mcq_c = score.get("mcq_correct", score.get("correct", 0))
             mcq_t = score.get("mcq_total", score.get("total", 0))
-            paper_c = score.get("paper_frq_completed", 0)
-            paper_t = score.get("paper_frq_total", 0)
-            row["score_label"] = f"{mcq_c}/{mcq_t}"
-            row["paper_label"] = f"{paper_c}/{paper_t}" if paper_t else "—"
+            if int(score.get("paper_max_points") or 0) > 0:
+                row["score_label"] = f"{int(score.get('total_points') or mcq_c)}/{int(score.get('max_points') or mcq_t)}"
+                pmax = int(score.get("paper_max_points") or 0)
+                row["paper_label"] = f"{int(score.get('paper_points') or 0)}/{pmax}"
+            else:
+                paper_c = score.get("paper_frq_completed", 0)
+                paper_t = score.get("paper_frq_total", 0)
+                row["score_label"] = f"{mcq_c}/{mcq_t}"
+                row["paper_label"] = f"{paper_c}/{paper_t}" if paper_t else "—"
             row["provisional"] = False
         else:
             row["score_label"] = "—"
@@ -17706,7 +18091,7 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         stored_correct = resp.get("is_correct") if i in responses else None
         if i in responses:
             is_correct_by_index[i] = stored_correct
-        label = placement_result_status(q, stored_correct, selected)
+        label = placement_result_status(q, stored_correct, selected, topic=str(att["topic"]))
         if label == "auto correct":
             status = "correct"
         elif label == "auto incorrect":
@@ -17715,6 +18100,8 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             status = "submitted"
         elif label == "unscored":
             status = "unscored"
+        elif label == "paper":
+            status = "paper"
         elif label == "awaiting review":
             status = "nocheck"
         elif selected:
@@ -17738,25 +18125,47 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                 "knowledge_title_en": title_en,
             }
         )
-    score = placement_auto_score_breakdown(questions, selected_by_index, is_correct_by_index)
+    score = placement_auto_score_breakdown(
+        questions, selected_by_index, is_correct_by_index, topic=str(att["topic"])
+    )
+    paper_rubric = placement_paper_rubric(str(att["topic"]), questions)
+    paper_grades = placement_public_mod.list_paper_grades(db, attempt_id, owner_kind="candidate")
+    if paper_rubric:
+        score = placement_apply_paper_grades(score, paper_grades, paper_rubric)
+        for row in items:
+            idx = int(row["n"]) - 1
+            if idx in paper_grades:
+                cap = next((r["max_points"] for r in paper_rubric if r["index"] == idx), None)
+                if cap is not None:
+                    row["yours_display"] = f"{paper_grades[idx]} / {cap}"
+                    row["status"] = "correct" if paper_grades[idx] >= cap else "paper"
+                    row["result_label"] = "advisor grade"
     test = _placement_test_by_slug(att["slug"])
-    answered_live = sum(1 for row in items if str(row.get("selected") or "").strip())
+    answered_live = sum(
+        1
+        for row, qobj in zip(items, questions)
+        if is_mcq_item(qobj) and str(row.get("selected") or "").strip()
+    )
     auto_total = int(score.get("mcq_total") or 0)
     auto_correct = int(score.get("mcq_correct") or 0)
-    score_pct = round(100.0 * auto_correct / auto_total) if auto_total else 0
+    display_total = int(score.get("max_points") or auto_total)
+    display_correct = int(score.get("total_points") if paper_rubric else auto_correct)
+    score_pct = round(100.0 * display_correct / display_total) if display_total else 0
     acc = defaultdict(lambda: {"correct": 0, "total": 0, "title": "", "paper_total": 0, "paper_completed": 0})
+    topic = str(att["topic"] or "")
     for row, qobj in zip(items, questions):
         sec = row.get("knowledge_section") or qobj.get("knowledge_section") or "—"
         acc[sec]["title"] = row.get("knowledge_title_en") or qobj.get("knowledge_section_title_en") or acc[sec]["title"]
-        if is_placement_graphing_item(qobj):
+        if is_placement_graphing_item(qobj) or (is_enhanced_paper_topic(topic) and not is_mcq_item(qobj)):
             acc[sec]["paper_total"] += 1
-            if row["status"] == "submitted":
+            if row["status"] in ("submitted", "paper", "correct") and (
+                not is_enhanced_paper_topic(topic) or (int(row["n"]) - 1) in paper_grades
+            ):
                 acc[sec]["paper_completed"] += 1
             continue
         acc[sec]["total"] += 1
         if row["status"] == "correct":
             acc[sec]["correct"] += 1
-    topic = str(att["topic"] or "")
     part_order = _placement_part_order(topic) or tuple(acc.keys())
     section_stats = []
     for sec in part_order:
@@ -17873,7 +18282,12 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         "paper_frq_total": score["paper_frq_total"],
         "placement_provisional": False,
         "intelligent_report": intelligent,
+        "max_points": score.get("max_points"),
+        "total_points": score.get("total_points"),
+        "paper_points": score.get("paper_points"),
+        "paper_max_points": score.get("paper_max_points"),
     }
+    paper_uploads = placement_public_mod.list_uploads(db, attempt_id, owner_kind="candidate")
     return {
         "attempt": dict(att),
         "test": test,
@@ -17884,6 +18298,9 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         "section_stats": section_stats,
         "status_label": placement_public_mod.status_label(att["status"]),
         "pdf_ctx": pdf_ctx,
+        "paper_uploads": paper_uploads,
+        "paper_rubric": paper_rubric,
+        "paper_grades": paper_grades,
     }
 
 
@@ -17907,7 +18324,55 @@ def admin_placement_candidate_detail(attempt_id: int):
         answered_live=ctx["answered_live"],
         section_stats=ctx["section_stats"],
         status_label=ctx["status_label"],
+        paper_uploads=ctx.get("paper_uploads") or [],
+        paper_rubric=ctx.get("paper_rubric") or [],
+        paper_grades=ctx.get("paper_grades") or {},
     )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/paper-grades", methods=["POST"])
+def admin_placement_paper_grades(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        "SELECT id, topic FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    questions = _placement_public_questions(str(att["topic"]))
+    rubric = placement_paper_rubric(str(att["topic"]), questions)
+    if not rubric:
+        abort(404)
+    rows = []
+    for item in rubric:
+        raw = (request.form.get(f"pts_{item['index']}") or "").strip()
+        if raw == "":
+            continue
+        try:
+            pts = int(raw)
+        except ValueError:
+            continue
+        pts = max(0, min(int(item["max_points"]), pts))
+        rows.append((int(item["index"]), pts, int(item["max_points"])))
+    if not rows:
+        flash("Choose a score for at least one graphing or free-response item.")
+        return redirect(url_for("admin_placement_candidate_detail", attempt_id=attempt_id))
+    placement_public_mod.save_paper_grades(db, attempt_id, rows, owner_kind="candidate")
+    db.commit()
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx:
+        db.execute(
+            "UPDATE placement_candidate_attempts SET score_json = ? WHERE id = ?",
+            (json.dumps(ctx["score"]), attempt_id),
+        )
+        db.commit()
+    flash("Paper scores saved.")
+    return redirect(url_for("admin_placement_candidate_detail", attempt_id=attempt_id) + "#np-admin-pl-paper")
 
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/report.pdf")

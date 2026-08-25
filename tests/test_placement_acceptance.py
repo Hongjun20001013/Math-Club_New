@@ -193,7 +193,7 @@ class TestScoredFillIns(unittest.TestCase):
             self.assertEqual(paper, 0, topic)
             self.assertEqual(graph, 4 if topic.startswith("enhanced") else 0, topic)
 
-    def test_keyed_frq_changes_score(self):
+    def test_keyed_frq_is_not_auto_scored_on_em2(self):
         qs = _bank()["placement"]["enhanced_math_2"]
         selected = {}
         graded = {}
@@ -201,28 +201,105 @@ class TestScoredFillIns(unittest.TestCase):
             if q.get("question_kind") in ("mcq", "mcq5"):
                 selected[i] = q["correct_answer"]
                 graded[i] = 1
-        base = placement_auto_score_breakdown(qs, selected, graded)
+        base = placement_auto_score_breakdown(qs, selected, graded, topic="enhanced_math_2")
         selected_fr = dict(selected)
         graded_fr = dict(graded)
         selected_fr[66] = "10.1"
         graded_fr[66] = 1
-        scored = placement_auto_score_breakdown(qs, selected_fr, graded_fr)
-        self.assertEqual(base["mcq_total"], 65)
-        self.assertEqual(scored["mcq_correct"], base["mcq_correct"] + 1)
+        scored = placement_auto_score_breakdown(
+            qs, selected_fr, graded_fr, topic="enhanced_math_2"
+        )
+        self.assertEqual(base["mcq_total"], 55)
+        self.assertEqual(scored["mcq_correct"], base["mcq_correct"])
         self.assertEqual(scored["auto_incorrect"], 0)
         self.assertEqual(scored["paper_frq_total"], 4)
+        self.assertEqual(scored["fr_paper_total"], 10)
+        self.assertEqual(scored["max_points"], 99)
+        self.assertEqual(scored["paper_max_points"], 44)
 
     def test_incomplete_frq_is_not_wrong(self):
         qs = _bank()["placement"]["enhanced_math_1"]
         selected = {i: q["correct_answer"] for i, q in enumerate(qs) if q.get("question_kind") == "mcq"}
-        score = placement_auto_score_breakdown(qs, selected, {i: 1 for i in selected})
-        self.assertEqual(score["mcq_total"], 61)
+        score = placement_auto_score_breakdown(qs, selected, {i: 1 for i in selected}, topic="enhanced_math_1")
+        self.assertEqual(score["mcq_total"], 50)
         self.assertEqual(score["mcq_correct"], 50)
         self.assertEqual(score["auto_incorrect"], 0)
         self.assertEqual(score["paper_frq_total"], 4)
+        self.assertEqual(score["max_points"], 98)
         q = qs[54]
-        self.assertEqual(placement_result_status(q, None, ""), "skipped")
-        self.assertNotEqual(placement_result_status(q, 0, "zzz"), "skipped")
+        self.assertEqual(placement_result_status(q, None, "", topic="enhanced_math_1"), "paper")
+
+
+class TestEM1McqExactAndPaperTeacherGraded(unittest.TestCase):
+    def test_fifty_mcq_keys_grade_exactly(self):
+        from tests.test_placement_pdf_alignment import PDFS, extract_enhanced_pdf_mcq_keys
+        from answer_grader import grade_placement_response, is_mcq_item
+
+        qs = _bank()["placement"]["enhanced_math_1"]
+        pdf_keys = extract_enhanced_pdf_mcq_keys(PDFS["enhanced_math_1"])
+        self.assertEqual(len(pdf_keys), 50)
+        for i, q in enumerate(qs[:50]):
+            self.assertTrue(is_mcq_item(q), i)
+            key = str(q["correct_answer"])
+            self.assertEqual(key, pdf_keys[i + 1], i + 1)
+            ok, stored = grade_placement_response(q, key, topic="enhanced_math_1")
+            self.assertEqual(ok, 1, i + 1)
+            self.assertEqual(stored, key)
+            for letter in "ABCD":
+                got, _ = grade_placement_response(q, letter, topic="enhanced_math_1")
+                self.assertEqual(got, 1 if letter == key else 0, (i + 1, letter))
+
+    def test_paper_items_are_not_auto_scored(self):
+        from answer_grader import grade_placement_response, is_mcq_item
+
+        qs = _bank()["placement"]["enhanced_math_1"]
+        paper = [q for q in qs if not is_mcq_item(q)]
+        self.assertEqual(len(paper), 15)
+        for q in paper:
+            ok, stored = grade_placement_response(q, "anything", topic="enhanced_math_1")
+            self.assertIsNone(ok)
+            self.assertEqual(stored, "")
+
+
+class TestEM2McqExactAndPaperTeacherGraded(unittest.TestCase):
+    def test_fifty_five_mcq_keys_grade_exactly(self):
+        from tests.test_placement_pdf_alignment import PDFS, extract_enhanced_pdf_mcq_keys
+        from answer_grader import grade_placement_response, is_mcq_item
+
+        qs = _bank()["placement"]["enhanced_math_2"]
+        pdf_keys = extract_enhanced_pdf_mcq_keys(PDFS["enhanced_math_2"])
+        self.assertEqual(len(pdf_keys), 55)
+        for i, q in enumerate(qs[:55]):
+            self.assertTrue(is_mcq_item(q), i)
+            key = str(q["correct_answer"])
+            self.assertEqual(key, pdf_keys[i + 1], i + 1)
+            ok, stored = grade_placement_response(q, key, topic="enhanced_math_2")
+            self.assertEqual(ok, 1, i + 1)
+            self.assertEqual(stored, key)
+            for letter in "ABCD":
+                got, _ = grade_placement_response(q, letter, topic="enhanced_math_2")
+                self.assertEqual(got, 1 if letter == key else 0, (i + 1, letter))
+
+    def test_paper_items_are_not_auto_scored(self):
+        from answer_grader import grade_placement_response, is_mcq_item
+
+        qs = _bank()["placement"]["enhanced_math_2"]
+        paper = [q for q in qs if not is_mcq_item(q)]
+        self.assertEqual(len(paper), 14)
+        for q in paper:
+            ok, stored = grade_placement_response(q, "anything", topic="enhanced_math_2")
+            self.assertIsNone(ok)
+            self.assertEqual(stored, "")
+        score = placement_auto_score_breakdown(
+            qs,
+            {i: q["correct_answer"] for i, q in enumerate(qs) if is_mcq_item(q)},
+            None,
+            topic="enhanced_math_2",
+        )
+        self.assertEqual(score["mcq_total"], 55)
+        self.assertEqual(score["max_points"], 99)
+        q = qs[66]
+        self.assertEqual(placement_result_status(q, None, "10.1", topic="enhanced_math_2"), "paper")
 
 
 def _choice_integers(text: str) -> list[int]:

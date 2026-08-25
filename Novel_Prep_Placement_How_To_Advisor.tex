@@ -1,0 +1,266 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=0.7in,top=0.64in,bottom=0.7in]{geometry}
+\usepackage[UTF8,fontset=fandol]{ctex}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{xurl}
+
+\usetikzlibrary{arrows.meta,positioning}
+
+\graphicspath{{placement_howto_assets/}}
+
+\definecolor{navy}{HTML}{2A2446}
+\definecolor{slate}{HTML}{615B73}
+\definecolor{purple}{HTML}{6B4CC2}
+\definecolor{deeppurple}{HTML}{4F3298}
+\definecolor{lilac}{HTML}{F2ECFF}
+\definecolor{paleLilac}{HTML}{FAF7FF}
+\definecolor{lavenderLine}{HTML}{D8CCF5}
+\definecolor{softGold}{HTML}{FFF8E8}
+\definecolor{softRose}{HTML}{FFF5FA}
+
+\hypersetup{colorlinks=true,linkcolor=deeppurple,urlcolor=purple}
+\raggedbottom
+\setlength{\emergencystretch}{2em}
+
+\pagestyle{fancy}
+\setlength{\headheight}{22pt}
+\fancyhf{}
+\lhead{\small\bfseries\color{navy}Novel Prep · 顾问指南 / Advisor}
+\rhead{\small\color{slate}课程规划 / Course planning}
+\cfoot{\small\color{slate}\thepage\ /\ \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{lavenderLine}\leaders\hrule height \headrulewidth\hfill}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlist[itemize]{leftmargin=1.15em,itemsep=4pt,topsep=4pt}
+\titleformat{\section}{\large\bfseries\color{navy}}{}{0pt}{}[\vspace{-3pt}{\color{lavenderLine}\rule{\textwidth}{0.65pt}}]
+
+\newcommand{\enzh}[2]{#1\nopagebreak\newline{\small\color{slate}#2}}
+\newcommand{\sitebox}{%
+  \begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=lilac,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+  {\small\bfseries\color{navy}学生入口 / Student site}\\[3pt]
+  {\small\url{https://novel-prep-sat-0f9q.onrender.com}}\\[3pt]
+  {\small Advisor 把这个网址发给学生。学生点 \textbf{Start Placement Test}，再点 Advisor 指定的那一套。}\\
+  {\small\color{slate}The advisor sends this URL. The student clicks Start Placement Test, then the named test.}
+  \end{tcolorbox}%
+}
+\newcommand{\fig}[4][0.28\textheight]{%
+  \begin{tcolorbox}[
+    enhanced, boxrule=0.5pt, colframe=lavenderLine, colback=white,
+    arc=9pt, left=8pt, right=8pt, top=8pt, bottom=8pt
+  ]
+  {\small\bfseries\color{deeppurple}#2}\\[5pt]
+  \centering
+  \includegraphics[max width=\linewidth,max height=#1,keepaspectratio]{#3}\\[5pt]
+  {\small #4}
+  \end{tcolorbox}
+}
+
+\begin{document}
+
+\begin{tcolorbox}[enhanced,boxrule=0pt,colback=navy,arc=11pt,left=13pt,right=13pt,top=12pt,bottom=11pt]
+{\color{lilac}\small\bfseries Novel Prep Learning Center}\\[3pt]
+{\color{white}\LARGE\bfseries Advisor How-To}\\[1pt]
+{\color{lilac}\large 课程规划测试 · 顾问操作指南}\\[6pt]
+{\color{lilac}\small 选卷 \textbullet\ 按姓名收卷 \textbullet\ Enhanced 纸考打分 \textbullet\ 报告 PDF}\\[1pt]
+{\color{lilac}\small Assign the test \textbullet\ Roster by advisor \textbullet\ Grade Enhanced paper \textbullet\ Report PDF}
+\end{tcolorbox}
+
+\vspace{4pt}
+\enzh{Advisor 负责指定试卷、确认学生选择了该 Advisor 姓名、收卷后批改 Enhanced 纸考，并依据报告与家长商定后续课程。学生另有一份操作指南。}{The advisor assigns the test, confirms the student selected that advisor, grades Enhanced paper after submit, and uses the report to plan the next course with the family. Students have a separate guide.}
+
+\vspace{4pt}
+\sitebox
+
+\vspace{8pt}
+\begin{center}
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={
+    rounded corners=6pt, draw=lavenderLine, line width=0.55pt,
+    fill=lilac, align=center, inner sep=5pt, text width=1.38in,
+    minimum height=0.7in, font=\bfseries\small\color{navy}
+  },
+  arr/.style={-{Latex[length=5.5pt]}, purple, line width=1.05pt}
+]
+\node[box] (a) {1\\按路径发一套卷\\{\scriptsize\color{slate}One test only}};
+\node[box, right=0.28in of a] (b) {2\\选对 Advisor 姓名\\{\scriptsize\color{slate}Advisor name on the form}};
+\node[box, right=0.28in of b] (c) {3\\当场完成并抄码\\{\scriptsize\color{slate}Finish; 24-hour code}};
+\node[box, below=0.34in of a] (d) {4\\提交后在 Advisor 分组\\{\scriptsize\color{slate}Placement testers}};
+\node[box, right=0.28in of d] (e) {5\\Enhanced 判纸考\\{\scriptsize\color{slate}Grade the PDF}};
+\node[box, right=0.28in of e] (f) {6\\下载报告谈选课\\{\scriptsize\color{slate}Report PDF, next course}};
+\draw[arr] (a) -- (b);
+\draw[arr] (b) -- (c);
+\draw[arr] (c.south) -- ++(0,-0.10in) -| (d.north);
+\draw[arr] (d) -- (e);
+\draw[arr] (e) -- (f);
+\end{tikzpicture}
+\end{center}
+
+\section{选哪一套 / Which test}
+
+\enzh{Advisor 按学生校内数学路径指定一套试卷。请勿由学生自行改选更难的试卷。}{The advisor assigns one test according to the school math pathway. The student should not choose a harder paper.}
+
+\vspace{4pt}
+{\small
+\begin{tabularx}{\textwidth}{@{}
+  >{\raggedright\arraybackslash}p{1.72in}
+  >{\centering\arraybackslash}p{0.95in}
+  >{\raggedright\arraybackslash}X
+  @{}}
+\toprule
+\color{navy}试卷 / Test & \color{navy}时长 / Time & \color{navy}适用 / When \\
+\midrule
+\textbf{Middle Level}\\{\color{slate}初中段} &
+150 min\newline 100 auto &
+Math 5 $\rightarrow$ Algebra 1/2\newline
+{\color{slate}100 道填空，全自动 / 100 fill-ins, all auto} \\[6pt]
+\textbf{Enhanced Math 1} &
+120 min\newline 98 pts &
+Math I / EM1\newline
+{\color{slate}50 选择自动 + 纸考 48 分 / 50 MCQ auto + paper 48} \\[6pt]
+\textbf{Enhanced Math 2} &
+130 min\newline 99 pts &
+Enhanced Math II\newline
+{\color{slate}55 选择自动 + 纸考 44 分 / 55 MCQ auto + paper 44} \\[6pt]
+\textbf{Upper}\\{\color{slate}高中段} &
+115 min\newline 85 auto &
+Algebra 1 $\rightarrow$ Precalculus\newline
+{\color{slate}85 道选择，全自动 / 85 MCQ, all auto} \\
+\bottomrule
+\end{tabularx}
+}
+
+\vspace{8pt}
+\fig[0.26\textheight]{学生端目录 / Student catalog}{02_catalog_hero.png}{\enzh{四个紫色按钮对应四套试卷。Advisor 发送 \url{https://novel-prep-sat-0f9q.onrender.com}，并口头指定其中一套。}{Four purple buttons = four tests. The advisor sends the live site and names one test.}}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=softGold,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{考试规定 / Examination rules}\\[3pt]
+\enzh{每位学生只发放一套试卷。请尽量在当场时限内一次完成（约两小时，以该套试卷倒计时为准，115--150 分钟）。如遇断网、误关网页等特殊情况，学生可凭事先抄下的恢复码返回续考；恢复码自开考起仅有效 \textbf{24 小时}，逾期未提交则系统删除该场试卷，Advisor 后台无法查看。开错试卷同样占用此时限。}{Assign one test only. Students should finish in one sitting, within the on-screen limit (about two hours; 115--150 minutes by test). If they must leave, they may resume with the recovery code they copied. That code is valid for \textbf{24 hours} from the start. Unsubmitted work is then deleted and will not appear for the advisor. A wrong test still uses this window.}
+\end{tcolorbox}
+
+\section{考前须知 / Pre-exam notice}
+
+\begin{itemize}
+  \item \enzh{\textbf{选择该 Advisor 姓名}：Mia Hu / Jimmy Zheng / Other（填写全名）。选错则本场试卷不会出现在该 Advisor 名单中。}{\textbf{Select that advisor:} Mia Hu / Jimmy Zheng / Other (full name). If the wrong name is chosen, the test will not appear in that advisor's roster.}
+  \item \enzh{\textbf{请尽量当场完成。}各套限时约两小时（以屏幕倒计时为准）。倒计时不会因离开网页而暂停或重置。}{\textbf{Finish in one sitting.} Each test is about two hours on the on-screen clock. Leaving the page does not pause or reset the countdown.}
+  \item \enzh{\textbf{当场抄下恢复码}（\texttt{XXXX-XXXX-XXXX-XXXX}），并另行保存。仅在断网、误关网页等特殊情况下用于续考。恢复码自开考起有效 \textbf{24 小时}，逾期未提交则删除，Advisor 无法查看。}{\textbf{Copy the recovery code} immediately and keep it outside the browser. Use it only if the student must leave. It is valid for \textbf{24 hours} from the start. After that, unsubmitted work is deleted and the advisor cannot see it.}
+  \item \enzh{\textbf{Enhanced}：下载或打印空白 PDF，纸上作答，最后上传 \textbf{一份} PDF，再 Final Submit。}{\textbf{Enhanced:} download or print the blank PDF, work on paper, upload \textbf{one} PDF, then Final Submit.}
+  \item \enzh{请使用电脑或平板。}{A laptop or tablet is required.}
+\end{itemize}
+
+\vspace{4pt}
+\fig[0.32\textheight]{学生须抄下的恢复码 / Recovery code the student must copy}{04_recovery_ticket.png}{\enzh{Advisor 不会收到此码，也不能代为找回未提交的试卷。}{The advisor does not receive this code and cannot recover an unsubmitted test for the student.}}
+
+\section{收卷与评分 / After submit}
+
+\enzh{Advisor 使用员工账号登录，请勿使用学生端 Placement 链接。打开 Administration，再选择 \textbf{Placement testers}。名单按 Advisor 分组。}{The advisor signs in with a staff account, not the public Placement link. Open Administration, then \textbf{Placement testers}. The list is grouped by advisor.}
+
+{\small 后台路径 / Admin path: \texttt{/admin/placement-candidates}}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=paleLilac,arc=9pt,left=9pt,right=9pt,top=8pt,bottom=8pt]
+{\small\color{slate}顾问 / Advisor}\\[1pt]
+{\bfseries\color{navy}Mia Hu}\hfill{\small 已提交 2 份 / 2 submitted}\\[6pt]
+\begin{tcolorbox}[boxrule=0.45pt,colframe=lavenderLine,colback=white,arc=7pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries Alex Chen}\hfill{\color{purple}\small Open report}\\
+{\small\color{slate}9th · Algebra I Honors \quad Enhanced Math 1 \quad 50/98 \quad Paper 0/48 \quad Submitted}
+\end{tcolorbox}
+\end{tcolorbox}
+
+\vspace{4pt}
+\begin{itemize}
+  \item \enzh{Advisor 点姓名或 \textbf{Open report}。核对年级、校内数学课、试卷。}{The advisor clicks the name or \textbf{Open report}, then checks grade, school math class, and test.}
+  \item \enzh{\textbf{Middle / Upper} 已自动判。Advisor 看分数段、分板块、错题，下载 counselor PDF，用来规划后面的课。}{\textbf{Middle / Upper} are auto-scored. The advisor reads the section scores and misses, downloads the counselor PDF, and uses it to plan the next course.}
+  \item \enzh{\textbf{Enhanced} 选择题已自动判。Advisor 打开学生 PDF，在 \textbf{Grade the paper packet} 打分。}{\textbf{Enhanced} MCQ is auto. The advisor opens the uploaded PDF and scores \textbf{Grade the paper packet}.}
+\end{itemize}
+
+\vspace{4pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=white,arc=9pt,left=9pt,right=9pt,top=8pt,bottom=8pt]
+{\bfseries\color{navy}Grade the paper packet / 批改纸考}\\[2pt]
+{\small\color{slate}作图每题 1 分，大题每题 4 分。 / Graphing 1 pt each, free response 4 pt each.}\\[6pt]
+{\small Q51 \quad 作图 / Graphing · 1 pt \hfill {\fbox{0}\;{\color{white}\colorbox{purple}{\makebox[0.9em]{\strut 1}}}}}\\[5pt]
+{\small Q55 \quad 大题 / Free response · 4 pt \hfill \fbox{0}\;\fbox{1}\;\fbox{2}\;\fbox{3}\;{\color{white}\colorbox{purple}{\makebox[0.9em]{\strut 4}}}}\\[8pt]
+{\centering\color{white}\colorbox{purple}{\makebox[2.4in]{\strut\textbf{Save paper scores / 保存}}}\par}
+\end{tcolorbox}
+
+\vspace{6pt}
+\enzh{EM1 满分 98，EM2 满分 99。保存后总分更新。Advisor 下载 \textbf{report PDF}：先看分数段和板块，再一起商量后面怎么排课，不要只报一个总分。}{EM1 is out of 98; EM2 is out of 99. After Save, the total updates. The advisor downloads the \textbf{report PDF}, starts from the section scores, then plans the next course --- not one raw number.}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=softRose,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{Advisor 无法查看 / The advisor will not see}\\[3pt]
+\enzh{未提交的试卷；超过 24 小时已删除的试卷；学生选择了其他 Advisor 的试卷；纸考尚未评分（显示为 0）。}{Unsubmitted tests. Tests deleted after 24 hours. A different advisor was selected. Paper points before the advisor grades them (shown as 0).}
+\end{tcolorbox}
+
+\section{计分 / Scoring}
+
+{\small
+\begin{tabularx}{\textwidth}{@{}l c c r@{}}
+\toprule
+\color{navy}试卷 / Test & \color{navy}自动 / Auto & \color{navy}顾问 / Advisor & \color{navy}满分 / Max \\
+\midrule
+Middle Level & $100\times1$ & --- & 100 \\
+Enhanced Math 1 & 50 MCQ & 作图 $4\times1$ + 大题 $11\times4$ & 98 \\
+Enhanced Math 2 & 55 MCQ & 作图 $4\times1$ + 大题 $10\times4$ & 99 \\
+Upper & 85 MCQ & --- & 85 \\
+\bottomrule
+\end{tabularx}
+}
+
+\vspace{4pt}
+\enzh{学生提交后即可查看自动评分。纸考经 Advisor 批改后，总分方为完整。}{Auto-scores appear for the student immediately after submit. The total is complete only after the advisor grades paper.}
+
+\Needspace{0.42\textheight}
+\section{核对清单 / Checklists}
+
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=lilac,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{开考前 / Before the examination}\\[3pt]
+$\square$ \enzh{按上表指定正确试卷}{Correct test from the table}\\[1pt]
+$\square$ \enzh{告知学生选择该 Advisor 姓名}{Student selects that advisor}\\[1pt]
+$\square$ \enzh{告知学生尽量当场完成；抄下恢复码；须在 24 小时内提交}{Finish in one sitting; copy the code; submit within 24 hours}\\[1pt]
+$\square$ \enzh{Enhanced：空白 PDF、铅笔、最后上传一份 PDF}{Enhanced: blank PDF, pencil, one upload}
+\end{tcolorbox}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=paleLilac,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{收卷后 / After submit}\\[3pt]
+$\square$ \enzh{Placement testers 里该 Advisor 的分组能看到学生}{Sitting appears under that advisor}\\[1pt]
+$\square$ \enzh{Enhanced：打开 PDF，每题打分并保存}{Enhanced: score every paper item and Save}\\[1pt]
+$\square$ \enzh{下载 report PDF，按分数段商量后面怎么排课}{Download the report PDF; use it to plan the next course}
+\end{tcolorbox}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=white,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{常见情况 / Common situations}\\[4pt]
+\textbf{名单中没有该学生 / Missing from the advisor roster}\\
+\enzh{多为选错顾问、尚未提交，或已超过 24 小时。}{Usually the wrong advisor, not yet submitted, or past 24 hours.}\\[3pt]
+\textbf{纸考仍为 0 分 / Paper still 0}\\
+\enzh{作图与大题不会自动评分，须由 Advisor 录入分数。}{Graphing and free response are not auto-scored. The advisor must enter points.}\\[3pt]
+\textbf{学生反映最后一题 Next 无反应 / Next on last MCQ}\\
+\enzh{请学生刷新后再次点 Next 或 Save \& continue to paper。上传 PDF 之前请勿 Final Submit。}{Refresh, then Next or Save \& continue to paper. Do not Final Submit before the PDF.}\\[8pt]
+{\bfseries\color{navy}入口 / Links}\\[3pt]
+{\small\url{https://novel-prep-sat-0f9q.onrender.com}}\\[2pt]
+学生 / Student: \texttt{/placement} \quad 恢复 / Recover: \texttt{/placement/recover}\\
+顾问名单 / Roster: \texttt{/admin/placement-candidates}\\[3pt]
+\enzh{学生无需登录。Advisor 评分及下载 PDF 须使用员工账号。}{Students do not log in. A staff account is required for the advisor to grade and download PDFs.}
+\end{tcolorbox}
+
+\end{document}

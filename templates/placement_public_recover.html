@@ -11,7 +11,7 @@
       <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
       <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Resume this sitting</p>
       <h1 class="np-pl-display np-pl-display--md">Recover your placement test</h1>
-      <p class="np-pl-lead">Enter the recovery code shown when you started. Do not share it.</p>
+      <p class="np-pl-lead">Enter the recovery code from your sitting. Do not share it. Unfinished tests are deleted {{ sitting_ttl_hours|default(24) }} hours after you start, and your advisor will not see them.</p>
       {% with messages = get_flashed_messages() %}
       {% if messages %}
       <ul class="np-pl2-flash" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>

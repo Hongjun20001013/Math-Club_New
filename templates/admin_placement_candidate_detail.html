@@ -8,6 +8,9 @@
 {% set auto_total = score.mcq_total if score else 0 %}
 {% set graphing_total = score.paper_frq_total if score else 0 %}
 {% set graphing_done = score.paper_frq_completed if score else 0 %}
+{% set paper_sitting = score.paper_max_points|default(0) %}
+{% set ring_num = score.total_points if paper_sitting else auto_correct %}
+{% set ring_den = score.max_points if paper_sitting else auto_total %}
 {% set pname = attempt.display_name or '' %}
 {% set name_parts = pname.split() %}
 {% set miss_rows = items | selectattr('status', 'equalto', 'incorrect') | list %}
@@ -26,6 +29,7 @@
     <a class="np-summary-jump-external" href="#np-admin-pl-hero">Score</a>
     <a href="#np-study-report">Study report</a>
     {% if section_stats %}<a href="#np-by-area">By section</a>{% endif %}
+    {% if paper_rubric %}<a href="#np-admin-pl-paper">Paper grades</a>{% endif %}
     {% if miss_rows %}<a href="#np-admin-pl-misses">Misses</a>{% endif %}
     <a href="#np-summary-full-sheet">Item list</a>
   </nav>
@@ -61,13 +65,15 @@
           <div class="np-score-ring-wrap">
             <div class="np-score-ring" style="--pct: {{ score_pct }};">
               <div class="np-score-ring-inner">
-                <span class="np-score-num">{{ auto_correct }}</span>
-                <span class="np-score-den">/ {{ auto_total }}</span>
+                <span class="np-score-num">{{ ring_num }}</span>
+                <span class="np-score-den">/ {{ ring_den }}</span>
               </div>
             </div>
-            <p class="np-score-pct">{{ score_pct }}% correct</p>
-            <p class="np-summary-score-foot">Score {{ auto_correct }} / {{ auto_total }}</p>
-            {% if graphing_total %}
+            <p class="np-score-pct">{{ score_pct }}% of sitting</p>
+            <p class="np-summary-score-foot">Score {{ ring_num }} / {{ ring_den }}</p>
+            {% if paper_sitting %}
+            <p class="np-summary-paper-frq">MC auto-scored {{ auto_correct }}/{{ auto_total }} · advisor grades graphing (1 pt) and FR (4 pt) · Paper {{ score.paper_points or 0 }}/{{ score.paper_max_points }}{% if not score.paper_complete %} · not fully graded{% endif %}</p>
+            {% elif graphing_total %}
             <p class="np-summary-paper-frq">Graphing {{ graphing_done }} / {{ graphing_total }} submitted</p>
             {% endif %}
           </div>
@@ -138,7 +144,7 @@
       <article class="np-learning-report-card">
         <span>Score band</span>
         <strong>{{ score_pct }}%</strong>
-        <em>{{ auto_correct }} correct of {{ auto_total }} scored items</em>
+        <em>{{ auto_correct }} MC of {{ auto_total }}{% if paper_sitting %} · {{ ring_num }}/{{ ring_den }} total{% endif %}</em>
       </article>
       <article class="np-learning-report-card">
         <span>Progress</span>
@@ -199,6 +205,48 @@
   </section>
   {% endif %}
 
+  {% if paper_uploads or paper_rubric %}
+  <section id="np-admin-pl-paper" class="np-admin-pl-misses glass-panel np-glass" aria-label="Uploaded paper work">
+    <p class="np-summary-sheet-kicker">Paper work</p>
+    <h2 class="np-summary-sheet-title">{% if paper_sitting %}Grade the paper packet{% else %}Photos students uploaded{% endif %}</h2>
+    <p class="np-summary-sheet-lead">{% if paper_sitting %}One PDF should include graphing (1 pt each) and free response (4 pt each). Open the file, then mark each item.{% else %}Graphing and free-response pages from this sitting. Open a file to grade it.{% endif %}</p>
+    {% if paper_uploads %}
+    <div class="np-admin-pl-uploads">
+      {% for f in paper_uploads %}
+      <a class="np-admin-pl-upload" href="{{ url_for('admin_placement_upload', attempt_id=attempt.id, upload_id=f.id) }}" target="_blank" rel="noopener">
+        <strong>{% if f.section == 'paper' %}Paper packet{% elif f.section == 'graphing' %}Graphing{% else %}Free response{% endif %}</strong>
+        <span>{{ f.original_name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if paper_rubric %}
+    <form method="post" action="{{ url_for('admin_placement_paper_grades', attempt_id=attempt.id) }}" class="np-pl-grade-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <ul class="np-pl-grade-list">
+        {% for row in paper_rubric %}
+        <li class="np-pl-grade-row">
+          <div class="np-pl-grade-meta">
+            <strong>Q{{ row.n }}</strong>
+            <span>{{ row.label }} · {{ row.max_points }} pt</span>
+          </div>
+          <div class="np-pl-grade-pills" role="group" aria-label="Q{{ row.n }} score">
+            {% for p in range(0, row.max_points + 1) %}
+            <label class="np-pl-grade-pill{% if paper_grades.get(row.index, paper_grades.get(row.index|string)) == p %} is-on{% endif %}">
+              <input type="radio" name="pts_{{ row.index }}" value="{{ p }}"{% if paper_grades.get(row.index, paper_grades.get(row.index|string)) == p %} checked{% endif %}>
+              {{ p }}
+            </label>
+            {% endfor %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <button type="submit" class="np-pw-btn np-pw-btn--primary">Save paper scores</button>
+    </form>
+    {% endif %}
+  </section>
+  {% endif %}
+
   {% if miss_rows %}
   <section id="np-admin-pl-misses" class="np-admin-pl-misses glass-panel np-glass" aria-label="Missed items">
     <p class="np-summary-sheet-kicker">Misses</p>
@@ -216,7 +264,7 @@
     <header class="np-summary-sheet-cap">
       <p class="np-summary-sheet-kicker">Full breakdown</p>
       <h2 class="np-summary-sheet-title">Item-by-item results</h2>
-      <p class="np-summary-sheet-lead">Grouped by the same printed sections as the paper. Student answer, key, and auto-score for every item.</p>
+      <p class="np-summary-sheet-lead">{% if paper_sitting %}Multiple choice is auto-scored against the answer key. Graphing and free response wait for advisor grades.{% else %}Grouped by the same printed sections as the paper. Student answer, key, and auto-score for every item.{% endif %}</p>
     </header>
     <div class="np-summary-table-head np-admin-pl-sheet-head">
       <span class="col-q">#</span>
@@ -248,6 +296,8 @@
           <span class="np-badge np-badge-muted">Submitted</span>
           {% elif row.status == 'unscored' %}
           <span class="np-badge np-badge-muted">Unscored</span>
+          {% elif row.status == 'paper' %}
+          <span class="np-badge np-badge-muted">Paper</span>
           {% elif row.status == 'nocheck' %}
           <span class="np-badge np-badge-muted">Review</span>
           {% else %}

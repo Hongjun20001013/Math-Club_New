@@ -1,0 +1,196 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=0.7in,top=0.64in,bottom=0.7in]{geometry}
+\usepackage[UTF8,fontset=fandol]{ctex}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{xurl}
+
+\usetikzlibrary{arrows.meta,positioning}
+
+\graphicspath{{placement_howto_assets/}}
+
+\definecolor{navy}{HTML}{2A2446}
+\definecolor{slate}{HTML}{615B73}
+\definecolor{purple}{HTML}{6B4CC2}
+\definecolor{deeppurple}{HTML}{4F3298}
+\definecolor{lilac}{HTML}{F2ECFF}
+\definecolor{paleLilac}{HTML}{FAF7FF}
+\definecolor{lavenderLine}{HTML}{D8CCF5}
+\definecolor{softGold}{HTML}{FFF8E8}
+\definecolor{softRose}{HTML}{FFF5FA}
+
+\hypersetup{colorlinks=true,linkcolor=deeppurple,urlcolor=purple}
+\raggedbottom
+\setlength{\emergencystretch}{2em}
+
+\pagestyle{fancy}
+\setlength{\headheight}{22pt}
+\fancyhf{}
+\lhead{\small\bfseries\color{navy}Novel Prep · 学生指南 / Student}
+\rhead{\small\color{slate}课程规划 / Course planning}
+\cfoot{\small\color{slate}\thepage\ /\ \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{lavenderLine}\leaders\hrule height \headrulewidth\hfill}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlist[itemize]{leftmargin=1.15em,itemsep=3pt,topsep=3pt}
+\titleformat{\section}{\large\bfseries\color{navy}}{}{0pt}{}[\vspace{-3pt}{\color{lavenderLine}\rule{\textwidth}{0.65pt}}]
+
+\newcommand{\enzh}[2]{#1\nopagebreak\newline{\small\color{slate}#2}}
+\newcommand{\sitebox}{%
+  \begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=lilac,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+  {\small\bfseries\color{navy}在线地址 / Live site}\\[3pt]
+  {\small\url{https://novel-prep-sat-0f9q.onrender.com}}\\[3pt]
+  {\small 打开后点紫色 \textbf{Start Placement Test}。若已开考中途离开，点下方 Recover，凭恢复码返回。}\\
+  {\small\color{slate}Open the site, then \textbf{Start Placement Test}. If you already began and left, use Recover with your saved code.}
+  \end{tcolorbox}%
+}
+\newcommand{\step}[3]{%
+  \Needspace{0.42\textheight}%
+  \vspace{8pt}%
+  {\color{deeppurple}\large\bfseries #1\quad #2}\par
+  {\small\color{slate}#3}\par
+  \vspace{3pt}%
+}
+\newcommand{\fig}[4][0.34\textheight]{%
+  \begin{tcolorbox}[
+    enhanced, boxrule=0.5pt, colframe=lavenderLine, colback=white,
+    arc=9pt, left=8pt, right=8pt, top=8pt, bottom=8pt
+  ]
+  {\small\bfseries\color{deeppurple}#2}\\[5pt]
+  \centering
+  \includegraphics[max width=\linewidth,max height=#1,keepaspectratio]{#3}\\[5pt]
+  {\small #4}
+  \end{tcolorbox}
+}
+
+\begin{document}
+
+\begin{tcolorbox}[enhanced,boxrule=0pt,colback=navy,arc=11pt,left=13pt,right=13pt,top=12pt,bottom=11pt]
+{\color{lilac}\small\bfseries Novel Prep Learning Center}\\[3pt]
+{\color{white}\LARGE\bfseries Student How-To}\\[1pt]
+{\color{lilac}\large 课程规划测试 · 学生操作指南}\\[6pt]
+{\color{lilac}\small 当场完成 \textbullet\ 恢复码有效 24 小时 \textbullet\ Enhanced 交一份 PDF}\\[1pt]
+{\color{lilac}\small Finish in one sitting \textbullet\ Recovery code: 24 hours \textbullet\ Enhanced: one PDF}
+\end{tcolorbox}
+
+\vspace{4pt}
+\enzh{请按顾问指定的试卷参加课程规划测试。本测试用于了解当前程度，以便安排后续课程。打开下列网址即可，无需注册。建议使用电脑或平板。}{Take the test your advisor named. It is used to see where you are and to plan the next math course. Open the site below --- no account. A laptop or tablet is recommended.}
+
+\vspace{4pt}
+\sitebox
+
+\vspace{8pt}
+\begin{center}
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={
+    rounded corners=6pt, draw=lavenderLine, line width=0.55pt,
+    fill=lilac, align=center, inner sep=5pt, text width=1.38in,
+    minimum height=0.7in, font=\bfseries\small\color{navy}
+  },
+  arr/.style={-{Latex[length=5.5pt]}, purple, line width=1.05pt}
+]
+\node[box] (a) {1\\打开测试入口\\{\scriptsize\color{slate}Open /placement}};
+\node[box, right=0.28in of a] (b) {2\\只开指定试卷\\{\scriptsize\color{slate}One named test}};
+\node[box, right=0.28in of b] (c) {3\\选对顾问姓名\\{\scriptsize\color{slate}Mia / Jimmy / Other}};
+\node[box, below=0.34in of a] (d) {4\\抄下恢复码\\{\scriptsize\color{slate}Valid 24 hours}};
+\node[box, right=0.28in of d] (e) {5\\当场时限内作答\\{\scriptsize\color{slate}About two hours}};
+\node[box, right=0.28in of e] (f) {6\\提交（Enhanced 先交 PDF）\\{\scriptsize\color{slate}PDF then Final Submit}};
+\draw[arr] (a) -- (b);
+\draw[arr] (b) -- (c);
+\draw[arr] (c.south) -- ++(0,-0.10in) -| (d.north);
+\draw[arr] (d) -- (e);
+\draw[arr] (e) -- (f);
+\end{tikzpicture}
+\end{center}
+
+\vspace{2pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=softGold,arc=8pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+\enzh{请尽量在当场时限内一次完成（约两小时，以屏幕倒计时为准）。如遇断网、误关网页等特殊情况，可用事先抄下的恢复码返回续考；恢复码仅有效 \textbf{24 小时}，逾期未提交则试卷删除。另请选对顾问姓名；Enhanced 须在最后上传一份 PDF。}{Please finish in one sitting, within the on-screen time limit (about two hours). If you must leave --- network drop, closed tab --- resume with the recovery code you copied. That code is valid for \textbf{24 hours} only. Unsubmitted work is then deleted. Also select the correct advisor. Enhanced: upload one PDF at the end.}
+\end{tcolorbox}
+
+\Needspace{0.72\textheight}
+\section{开始 / Getting started}
+
+\step{1}{登录页点紫色按钮}{Click \textbf{Start Placement Test}. No account is required.}
+
+\fig[0.30\textheight]{登录页 / Login}{01_login_card.png}{\enzh{点 \textbf{Start Placement Test}。若已开考：点 \textbf{Already started? Recover with your code}，凭恢复码返回本场考试。}{Click \textbf{Start Placement Test}. If you already began, use \textbf{Recover with your code} to return to the same sitting.}}
+
+\step{2}{只打开顾问指定的试卷}{Open only the test your advisor named.}
+
+\fig[0.36\textheight]{试卷目录 / Test catalog}{02_catalog_live.png}{\enzh{四个紫色按钮对应四套试卷。请只打开顾问指定的一套，不要自行改选更难的试卷。}{The four purple buttons are the four tests. Open only the one your advisor named. Do not choose a harder paper on your own.}}
+
+\vspace{4pt}
+\fig[0.12\textheight]{恢复入口 / Resume}{02b_recover_cta.png}{\enzh{此处不会新开试卷。中途离开后，点这里粘贴恢复码，返回原场考试。}{This does not start a new test. After leaving, tap here, paste your recovery code, and return to the same sitting.}}
+
+\section{报名资料与恢复码 / Profile and recovery code}
+
+\step{3}{填写资料，顾问姓名必须选对}{Complete the form. Select the correct advisor.}
+
+\fig[0.50\textheight]{姓名、年级、校内数学课、顾问 / Name, grade, school math class, advisor}{03_start_fields.png}{\enzh{顾问请选 \textbf{Mia Hu}、\textbf{Jimmy Zheng}，或 Other 并填写全名。选错则该顾问无法查看本场试卷。确认后点 Begin。}{Select \textbf{Mia Hu}, \textbf{Jimmy Zheng}, or Other and type the full name. If the wrong advisor is selected, they will not see this test. Check the box, then Begin.}}
+
+\step{4}{先抄下恢复码，再 Begin exam}{Copy the recovery code, then Begin exam.}
+
+\fig[0.36\textheight]{恢复码（有效期 24 小时） / Recovery code (24 hours)}{04_recovery_ticket.png}{\enzh{请立即点 Copy code，抄到备忘录或发给家长，不要只留在本网页。请尽量当场完成。如遇特殊情况中途离开，凭此码返回续考；自开考起仅有效 \textbf{24 小时}，逾期未提交则删除。}{Select Copy code at once and keep it outside this browser. Please finish in one sitting. If you must leave, this code is the only way back. It is valid for \textbf{24 hours} from the start. Unsubmitted work is then deleted.}}
+
+\section{考试进行中 / During the examination}
+
+\step{5}{屏幕作答会自动保存}{On-screen answers are saved as you go.}
+
+\enzh{倒计时不会因离开网页而暂停或重置。可用 Previous / Jump。Middle / Upper 全部完成后即可 Submit。}{The countdown does not pause or restart if you leave the page. Previous / Jump may be used. Middle / Upper: Submit when finished --- there is no paper page.}
+
+\Needspace{16\baselineskip}
+\enzh{\textbf{Enhanced 屏幕最后一题}显示 \textbf{50/50}（EM1）或 \textbf{55/55}（EM2）。请点 \textbf{Next} 或 \textbf{Save \& continue to paper}。此时请勿 Final Submit。}{\textbf{Enhanced, last on-screen question:} \textbf{50/50} (EM1) or \textbf{55/55} (EM2). Click \textbf{Next} or \textbf{Save \& continue to paper}. Do not Final Submit yet.}
+
+\fig[0.40\textheight]{屏幕最后一题 / Last on-screen MCQ}{05d_last_mcq_tight.png}{\enzh{紫色按钮 \textbf{Save \& continue to paper} 进入纸考上传页。}{The purple button opens the paper-upload page.}}
+
+\step{6}{Enhanced：纸上作答，上传一份 PDF}{Enhanced only: complete the paper packet and upload one PDF.}
+
+\fig[0.48\textheight]{下载空白卷 $\rightarrow$ 上传一份 PDF $\rightarrow$ Save and finish}{06c_paper_upload.png}{\enzh{作图与大题请合并为 \textbf{一份} PDF（不超过 20 MB），放入 \textbf{Drop one PDF here}。先 Save and finish，再 Final Submit。未上传 PDF 请勿提交。不接受照片。}{Place graphing and free response in \textbf{one} PDF (20 MB or less) on \textbf{Drop one PDF here}. Save and finish, then Final Submit. Do not submit without the PDF. Photographs are not accepted.}}
+
+\Needspace{0.55\textheight}
+\section{中途中断与续考 / Interruption and resume}
+
+\fig[0.30\textheight]{凭恢复码续考 / Resume with the recovery code}{07_recover_form.png}{\enzh{在登录页或目录页点 Recover，粘贴已保存的恢复码。倒计时自开考起连续计算，不会重新计时。须在 24 小时内提交。}{On the login or catalog page, select Recover and paste the saved code. The countdown continues from the original start; it does not reset. Submit within 24 hours.}}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=paleLilac,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{提交前核对 / Before Final Submit}\\[4pt]
+$\square$ \enzh{恢复码已另行保存，不只留在本网页}{Recovery code saved outside this browser}\\[2pt]
+$\square$ \enzh{屏幕题目已完成（空题为有意跳过）}{On-screen items completed (or skipped on purpose)}\\[2pt]
+$\square$ \enzh{Enhanced：一份 PDF 已上传}{Enhanced: one PDF is uploaded}\\[2pt]
+$\square$ \enzh{已勾选确认，并点 Final Submit}{Confirmation checked, then Final Submit}
+\end{tcolorbox}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,boxrule=0.5pt,colframe=lavenderLine,colback=softRose,arc=8pt,left=8pt,right=8pt,top=7pt,bottom=7pt]
+\textbf{注意事项 / Please note}\\[4pt]
+\textbf{选错顾问 / Wrong advisor}\\
+\enzh{本场试卷不会出现在该顾问名单中。}{This test will not appear in that advisor's roster.}\\[3pt]
+\textbf{另行开考 / A second test was started}\\
+\enzh{原恢复码不能打开新的一场考试。}{The original code will not open the new test.}\\[3pt]
+\textbf{上传照片 / Photographs instead of one PDF}\\
+\enzh{系统只接受一份 PDF。}{The upload accepts one PDF only.}\\[8pt]
+{\bfseries\color{navy}入口 / Links}\\[3pt]
+{\small\url{https://novel-prep-sat-0f9q.onrender.com}}\\[2pt]
+\enzh{目录 \texttt{/placement} \quad 恢复 \texttt{/placement/recover}}{Catalog \texttt{/placement} \quad Recover \texttt{/placement/recover}}\\[2pt]
+\enzh{无需学生账号。选择题提交后即可查看自动评分；Enhanced 纸考由顾问批改。}{No student account is required. Multiple-choice scores appear after submit. Enhanced paper is graded by the advisor.}
+\end{tcolorbox}
+
+\end{document}

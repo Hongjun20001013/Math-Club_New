@@ -10,6 +10,7 @@ import hmac
 import os
 import re
 import secrets
+import shutil
 import sqlite3
 import time
 from typing import Any
@@ -38,6 +39,8 @@ TIMER_MINUTES = {
     "placement_full": 115,
 }
 OPEN_STATUSES = frozenset({"profile_completed", "in_progress"})
+SITTING_TTL_HOURS = 24
+SITTING_TTL_SQL = f"-{SITTING_TTL_HOURS} hours"
 ADVISOR_PRESETS = ("Mia Hu", "Jimmy Zheng")
 ADVISOR_OTHER = "Other"
 ADVISOR_CHOICES = ADVISOR_PRESETS + (ADVISOR_OTHER,)
@@ -54,6 +57,7 @@ RATE_LIMITS = {
     "save": (180, 60),
     "autosave": (400, 60),
     "finish": (12, 60),
+    "upload": (24, 60),
 }
 _RATE_HITS: dict[str, list[float]] = {}
 
@@ -134,6 +138,32 @@ SQL_STATEMENTS = [
         PRIMARY KEY (attempt_id, question_index)
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS placement_candidate_uploads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        attempt_id INTEGER NOT NULL,
+        owner_kind TEXT NOT NULL DEFAULT 'candidate',
+        section TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        mime_type TEXT,
+        byte_size INTEGER,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_pcu_attempt ON placement_candidate_uploads(owner_kind, attempt_id, section, created_at)",
+    """
+    CREATE TABLE IF NOT EXISTS placement_paper_grades (
+        attempt_id INTEGER NOT NULL,
+        owner_kind TEXT NOT NULL DEFAULT 'candidate',
+        question_index INTEGER NOT NULL,
+        points INTEGER NOT NULL,
+        max_points INTEGER NOT NULL,
+        graded_at TEXT NOT NULL DEFAULT (datetime('now')),
+        PRIMARY KEY (attempt_id, owner_kind, question_index)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_ppg_attempt ON placement_paper_grades(owner_kind, attempt_id)",
 ]
 
 
@@ -267,7 +297,7 @@ def bind_browser_session(db: sqlite3.Connection, candidate_id: int, attempt_id: 
         """
         INSERT INTO placement_candidate_sessions
             (candidate_id, attempt_id, token_hash, expires_at, last_seen_at)
-        VALUES (?, ?, ?, datetime('now', '+12 hours'), datetime('now'))
+        VALUES (?, ?, ?, datetime('now', '+24 hours'), datetime('now'))
         """,
         (candidate_id, attempt_id, hash_token(raw_token)),
     )
@@ -309,6 +339,19 @@ def current_session_row(db: sqlite3.Connection) -> sqlite3.Row | None:
         (row["id"],),
     )
     if expired:
+        return None
+    stale = _row(
+        db,
+        """
+        SELECT 1 FROM placement_candidate_attempts
+        WHERE id = ? AND status IN ('profile_completed', 'in_progress')
+          AND datetime(created_at) <= datetime('now', ?)
+        """,
+        (row["attempt_id"], SITTING_TTL_SQL),
+    )
+    if stale:
+        _delete_open_sitting(db, int(row["attempt_id"]), int(row["candidate_id"]))
+        db.commit()
         return None
     db.execute(
         "UPDATE placement_candidate_sessions SET last_seen_at = datetime('now') WHERE id = ?",
@@ -371,7 +414,7 @@ def create_candidate_attempt(
             return {
                 "candidate": att,
                 "attempt_public_id": sess["attempt_public_id"],
-                "recovery_code": None,
+                "recovery_code": peek_recovery_code(),
                 "replayed": True,
             }
     existing = current_session_row(db)
@@ -379,10 +422,11 @@ def create_candidate_attempt(
         return {
             "candidate": load_attempt(db, str(existing["attempt_public_id"])),
             "attempt_public_id": existing["attempt_public_id"],
-            "recovery_code": None,
+            "recovery_code": peek_recovery_code(),
             "replayed": True,
         }
 
+    purge_expired_open_sittings(db)
     recovery = new_recovery_code()
     session_token = new_session_token()
     candidate_public = new_public_id()
@@ -432,11 +476,57 @@ def create_candidate_attempt(
     }
 
 
+def peek_recovery_code() -> str | None:
+    code = session.get(SESSION_RECOVERY_ONCE)
+    text = str(code or "").strip()
+    return text or None
+
+
 def pop_recovery_once() -> str | None:
-    code = session.pop(SESSION_RECOVERY_ONCE, None)
-    if code:
-        session.modified = True
-    return code
+    """Show the sitting code without discarding it — paper upload still needs it."""
+    return peek_recovery_code()
+
+
+def _delete_open_sitting(db: sqlite3.Connection, attempt_id: int, candidate_id: int) -> None:
+    folder = os.path.join(upload_root(), "candidate", str(int(attempt_id)))
+    if os.path.isdir(folder):
+        shutil.rmtree(folder, ignore_errors=True)
+    db.execute(
+        "DELETE FROM placement_candidate_uploads WHERE owner_kind = 'candidate' AND attempt_id = ?",
+        (attempt_id,),
+    )
+    db.execute(
+        "DELETE FROM placement_paper_grades WHERE owner_kind = 'candidate' AND attempt_id = ?",
+        (attempt_id,),
+    )
+    db.execute("DELETE FROM placement_candidate_responses WHERE attempt_id = ?", (attempt_id,))
+    db.execute("DELETE FROM placement_candidate_drafts WHERE attempt_id = ?", (attempt_id,))
+    db.execute("DELETE FROM placement_candidate_sessions WHERE attempt_id = ?", (attempt_id,))
+    db.execute("DELETE FROM placement_candidate_attempts WHERE id = ?", (attempt_id,))
+    leftover = _row(
+        db,
+        "SELECT 1 FROM placement_candidate_attempts WHERE candidate_id = ?",
+        (candidate_id,),
+    )
+    if leftover is None:
+        db.execute("DELETE FROM placement_candidates WHERE id = ?", (candidate_id,))
+
+
+def purge_expired_open_sittings(db: sqlite3.Connection) -> int:
+    """Remove unfinished guest sittings after 24 hours so advisors never see them."""
+    rows = db.execute(
+        """
+        SELECT id, candidate_id FROM placement_candidate_attempts
+        WHERE status IN ('profile_completed', 'in_progress')
+          AND datetime(created_at) <= datetime('now', ?)
+        """,
+        (SITTING_TTL_SQL,),
+    ).fetchall()
+    for row in rows:
+        _delete_open_sitting(db, int(row["id"]), int(row["candidate_id"]))
+    if rows:
+        db.commit()
+    return len(rows)
 
 
 def mark_in_progress(db: sqlite3.Connection, attempt_id: int) -> None:
@@ -587,6 +677,7 @@ def finish_attempt(db: sqlite3.Connection, attempt_id: int, score_json: str | No
 
 
 def recover_with_code(db: sqlite3.Connection, raw_code: str) -> dict[str, Any] | None:
+    purge_expired_open_sittings(db)
     compact = re.sub(r"[^0-9A-Z]", "", (raw_code or "").upper().replace("O", "0").replace("I", "1"))
     if len(compact) < 12:
         return None
@@ -595,21 +686,61 @@ def recover_with_code(db: sqlite3.Connection, raw_code: str) -> dict[str, Any] |
         db,
         """
         SELECT c.id AS candidate_id, a.id AS attempt_id, a.public_id, a.status,
-               c.recovery_revoked_at
+               c.recovery_revoked_at, a.slug, a.topic, a.answered_count
         FROM placement_candidates c
         JOIN placement_candidate_attempts a ON a.candidate_id = c.id
         WHERE c.recovery_code_hash = ?
+          AND datetime(c.created_at) > datetime('now', ?)
         ORDER BY a.id DESC
         LIMIT 1
         """,
-        (digest,),
+        (digest, SITTING_TTL_SQL),
     )
     if row is None or row["recovery_revoked_at"]:
         return None
     token = new_session_token()
     bind_browser_session(db, int(row["candidate_id"]), int(row["attempt_id"]), token)
+    formatted = "-".join(compact[i : i + 4] for i in range(0, 16, 4)) if len(compact) >= 16 else compact
+    session[SESSION_RECOVERY_ONCE] = formatted
+    session.modified = True
     db.commit()
-    return {"attempt_public_id": row["public_id"], "status": row["status"]}
+    return {
+        "attempt_id": int(row["attempt_id"]),
+        "attempt_public_id": row["public_id"],
+        "status": row["status"],
+        "slug": row["slug"],
+        "topic": row["topic"],
+        "answered_count": int(row["answered_count"] or 0),
+    }
+
+
+def should_resume_paper(db: sqlite3.Connection, attempt_id: int, mc_count: int) -> bool:
+    """True if this sitting already moved past on-screen MCQ into the paper packet."""
+    if mc_count <= 0:
+        return False
+    if int(upload_count(db, attempt_id, "paper")) > 0:
+        return True
+    row = _row(
+        db,
+        "SELECT answered_count FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    )
+    if row and int(row["answered_count"] or 0) >= mc_count:
+        return True
+    farthest = _row(
+        db,
+        """
+        SELECT MAX(question_index) AS q FROM (
+            SELECT question_index FROM placement_candidate_responses WHERE attempt_id = ?
+            UNION ALL
+            SELECT question_index FROM placement_candidate_drafts WHERE attempt_id = ?
+        )
+        """,
+        (attempt_id, attempt_id),
+    )
+    if farthest is None or farthest["q"] is None:
+        return False
+    return int(farthest["q"]) >= mc_count - 1
 
 
 def revoke_recovery(db: sqlite3.Connection, candidate_id: int) -> None:
@@ -639,6 +770,7 @@ def reopen_attempt(db: sqlite3.Connection, attempt_id: int) -> bool:
 
 
 def list_candidates(db: sqlite3.Connection) -> list[dict[str, Any]]:
+    purge_expired_open_sittings(db)
     rows = db.execute(
         """
         SELECT c.id, c.public_id AS candidate_public_id, c.display_name, c.grade,
@@ -668,3 +800,166 @@ def status_label(status: str) -> str:
         "expired": "Expired",
         "needs_review": "Needs review",
     }.get(status, status.replace("_", " ").title())
+
+
+UPLOAD_MAX_BYTES = 8 * 1024 * 1024
+UPLOAD_MAX_BYTES_PAPER = 20 * 1024 * 1024
+UPLOAD_MAX_FILES = 8
+PAPER_UPLOAD_SECTIONS = ("graphing", "free_response", "paper")
+
+
+def _sniff_upload_ext(data: bytes) -> tuple[str, str] | None:
+    if data.startswith(b"\xff\xd8\xff"):
+        return ".jpg", "image/jpeg"
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return ".png", "image/png"
+    if data.startswith(b"%PDF"):
+        return ".pdf", "application/pdf"
+    if data.startswith(b"GIF87a") or data.startswith(b"GIF89a"):
+        return ".gif", "image/gif"
+    if data.startswith(b"RIFF") and data[8:12] == b"WEBP":
+        return ".webp", "image/webp"
+    return None
+
+
+def upload_root() -> str:
+    try:
+        import app as app_mod
+
+        db_path = str(getattr(app_mod, "DB_PATH", "") or "")
+    except Exception:
+        db_path = ""
+    if db_path:
+        return os.path.join(os.path.dirname(os.path.abspath(db_path)), "placement_uploads")
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "placement_uploads")
+
+
+def list_uploads(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    section: str | None = None,
+    *,
+    owner_kind: str = "candidate",
+) -> list[dict[str, Any]]:
+    if section:
+        rows = db.execute(
+            """
+            SELECT * FROM placement_candidate_uploads
+            WHERE owner_kind = ? AND attempt_id = ? AND section = ?
+            ORDER BY id
+            """,
+            (owner_kind, attempt_id, section),
+        ).fetchall()
+    else:
+        rows = db.execute(
+            """
+            SELECT * FROM placement_candidate_uploads
+            WHERE owner_kind = ? AND attempt_id = ?
+            ORDER BY section, id
+            """,
+            (owner_kind, attempt_id),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def upload_count(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    section: str,
+    *,
+    owner_kind: str = "candidate",
+) -> int:
+    row = db.execute(
+        "SELECT COUNT(*) AS n FROM placement_candidate_uploads WHERE owner_kind = ? AND attempt_id = ? AND section = ?",
+        (owner_kind, attempt_id, section),
+    ).fetchone()
+    return int(row["n"] if row else 0)
+
+
+def save_upload(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    section: str,
+    original_name: str,
+    data: bytes,
+    *,
+    owner_kind: str = "candidate",
+) -> dict[str, Any]:
+    if section not in PAPER_UPLOAD_SECTIONS:
+        raise ValueError("invalid section")
+    if owner_kind not in ("candidate", "practice"):
+        raise ValueError("invalid owner")
+    sniffed = _sniff_upload_ext(data)
+    if not sniffed:
+        raise ValueError("Please upload a photo (JPG, PNG, WEBP, GIF) or a PDF.")
+    ext, mime = sniffed
+    if len(data) > (UPLOAD_MAX_BYTES_PAPER if section == "paper" else UPLOAD_MAX_BYTES):
+        raise ValueError(
+            "Each file must be 20 MB or smaller." if section == "paper" else "Each file must be 8 MB or smaller."
+        )
+    stored = f"{secrets.token_hex(12)}{ext}"
+    folder = os.path.join(upload_root(), owner_kind, str(int(attempt_id)), section)
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, stored)
+    with open(path, "wb") as handle:
+        handle.write(data)
+    db.execute(
+        """
+        INSERT INTO placement_candidate_uploads
+            (attempt_id, owner_kind, section, original_name, stored_name, mime_type, byte_size)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (int(attempt_id), owner_kind, section, (original_name or "page")[:180], stored, mime, len(data)),
+    )
+    row = db.execute("SELECT * FROM placement_candidate_uploads WHERE id = last_insert_rowid()").fetchone()
+    return dict(row)
+
+
+def upload_abs_path(row: dict[str, Any]) -> str:
+    kind = str(row.get("owner_kind") or "candidate")
+    return os.path.join(
+        upload_root(),
+        kind,
+        str(int(row["attempt_id"])),
+        str(row["section"]),
+        str(row["stored_name"]),
+    )
+
+
+def list_paper_grades(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    *,
+    owner_kind: str = "candidate",
+) -> dict[int, int]:
+    rows = db.execute(
+        """
+        SELECT question_index, points FROM placement_paper_grades
+        WHERE owner_kind = ? AND attempt_id = ?
+        """,
+        (owner_kind, int(attempt_id)),
+    ).fetchall()
+    return {int(r["question_index"]): int(r["points"]) for r in rows}
+
+
+def save_paper_grades(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    grades: list[tuple[int, int, int]],
+    *,
+    owner_kind: str = "candidate",
+) -> None:
+    """grades: (question_index, points, max_points). Replaces rows for those indices."""
+    for index, points, max_points in grades:
+        db.execute(
+            """
+            INSERT INTO placement_paper_grades
+                (attempt_id, owner_kind, question_index, points, max_points, graded_at)
+            VALUES (?, ?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(attempt_id, owner_kind, question_index) DO UPDATE SET
+                points = excluded.points,
+                max_points = excluded.max_points,
+                graded_at = datetime('now')
+            """,
+            (int(attempt_id), owner_kind, int(index), int(points), int(max_points)),
+        )

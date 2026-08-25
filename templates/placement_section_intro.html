@@ -38,6 +38,7 @@
                 <p class="np-pl-eyebrow np-pl-eyebrow--section">{{ section_kicker }}</p>
                 <h1 class="np-pl-display np-pl-display--md" id="np-pl-section-heading">{{ section_title }}</h1>
                 <p class="np-pl-lead">{{ section_lead }}</p>
+                {% include 'partials/placement_recovery_ticket.html' %}
                 {% if q_start and q_end and total_items %}
                 <div class="np-pl-part__range" aria-label="Question range">
                     <span class="np-pl-part__pill">Q {{ q_start }}–{{ q_end }}</span>
@@ -67,10 +68,16 @@
         </div>
 
         <footer class="np-pl-part__dock np-pl-reveal" data-pl-reveal>
-            <p class="np-pl-part__dock-hint">Timer keeps running · Answers saved as you go</p>
-            <form method="post" action="{{ begin_href }}" class="np-pl-part__dock-form">
-                <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow np-pl-part__cta">{{ begin_label }}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            </form>
+            <p class="np-pl-part__dock-hint">{% if pdf_href %}Download the blank test, work this whole section on paper, then upload photos after the last item.{% else %}Timer keeps running · Answers saved as you go{% endif %}</p>
+            <div class="np-pl-part__dock-form" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;">
+                {% if pdf_href %}
+                <a href="{{ pdf_href }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-cta-pulse">Download PDF</a>
+                {% endif %}
+                <form method="post" action="{{ begin_href }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow np-pl-part__cta np-pl-cta-pulse">{{ begin_label }}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                </form>
+            </div>
         </footer>
     </div>
 </div>

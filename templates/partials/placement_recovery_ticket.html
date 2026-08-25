@@ -1,0 +1,22 @@
+{% if recovery_code %}
+<section class="np-pl-ticket np-pl-ticket--keep{% if ticket_compact|default(false) %} np-pl-ticket--exam{% endif %}" aria-label="Recovery code" data-pl-ticket>
+  <header class="np-pl-ticket__top">
+    <div>
+      <p class="np-pl-ticket__kicker">Keep this code · 24-hour pass</p>
+      <p class="np-pl-ticket__sub">Private sitting · do not share</p>
+    </div>
+    <p class="np-pl-ticket__ttl"><span>Expires</span> {{ sitting_ttl_hours|default(24) }} hours</p>
+  </header>
+  <div class="np-pl-ticket__stage">
+    <p class="np-pl-ticket__label">Your only way back</p>
+    <p class="np-pl-ticket__code" data-pl-recovery-code>{{ recovery_code }}</p>
+  </div>
+  <p class="np-pl-ticket__fine">Copy it now. If you leave this browser, this code is the only way back. The sitting is deleted after {{ sitting_ttl_hours|default(24) }} hours if you have not submitted — your advisor will not see it.</p>
+  <div class="np-pl-ticket__actions">
+    <button type="button" class="np-pl-ticket__copy" data-pl-copy-recovery>Copy code</button>
+    {% if recover_href %}
+    <a class="np-pl-ticket__resume" href="{{ recover_href }}">Resume later with this code</a>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

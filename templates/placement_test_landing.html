@@ -85,7 +85,7 @@
                     <h2 class="np-pl-section-title">Your path to results</h2>
                     <ol class="np-pl-flow__steps">
                         <li class="np-pl-flow__step"><span class="np-pl-flow__num">1</span><div><strong>Student profile</strong><span>Quick intake before question 1</span></div></li>
-                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">2</span><div><strong>Timed diagnostic</strong><span>{% if topic == 'middle_level' %}100 fill-in items · 5 readiness bands{% elif topic == 'enhanced_math_1' %}50 MCQ → graphing → free response{% elif topic == 'enhanced_math_2' %}55 MCQ → graphing → free response{% elif topic == 'placement_full' %}85 MCQ · five gates with transition screens{% else %}Work straight through or jump ahead{% endif %}</span></div></li>
+                        <li class="np-pl-flow__step"><span class="np-pl-flow__num">2</span><div><strong>Timed diagnostic</strong><span>{% if topic == 'middle_level' %}100 fill-in items · 5 readiness bands{% elif topic == 'enhanced_math_1' %}50 MCQ, then one paper PDF (graphing + free response){% elif topic == 'enhanced_math_2' %}55 MCQ, then one paper PDF (graphing + free response){% elif topic == 'placement_full' %}85 MCQ · five gates with transition screens{% else %}Work straight through or jump ahead{% endif %}</span></div></li>
                         <li class="np-pl-flow__step"><span class="np-pl-flow__num">3</span><div><strong>Instant report</strong><span>Score bands, part breakdown, highlights</span></div></li>
                         <li class="np-pl-flow__step"><span class="np-pl-flow__num">4</span><div><strong>Export PDF</strong><span>Share with parents &amp; counselors</span></div></li>
                     </ol>
@@ -109,9 +109,9 @@
                     {% if topic == 'middle_level' %}
                     <p class="np-pl-structure__note">Each band shows on screen (e.g. <strong>Math 6 readiness</strong>) throughout the 100-question run.</p>
                     {% elif topic == 'enhanced_math_1' %}
-                    <p class="np-pl-structure__note">Online: <strong>50 MCQ</strong> auto-scored, then <strong>4 graphing</strong> + <strong>11 free response</strong> for advisor review.</p>
+                    <p class="np-pl-structure__note">Online: <strong>50 MCQ</strong> auto-scored (1 pt each). Graphing (1 pt) and free response (4 pt) are graded by your advisor — download the PDF, work on paper, upload one file. Sitting total <strong>98</strong>.</p>
                     {% elif topic == 'enhanced_math_2' %}
-                    <p class="np-pl-structure__note">Online: <strong>55 MCQ</strong> auto-scored, then <strong>4 graphing</strong> + <strong>10 free response</strong> for advisor review.</p>
+                    <p class="np-pl-structure__note">Online: <strong>55 MCQ</strong> auto-scored (1 pt each). Graphing (1 pt) and free response (4 pt) are graded by your advisor — download the PDF, work on paper, upload one file. Sitting total <strong>99</strong>.</p>
                     {% elif topic == 'placement_full' %}
                     <p class="np-pl-structure__note">Five-gate hybrid diagnostic: <strong>85 items</strong>, multiple choice with gate transitions — same Bluebook-style flow as Enhanced Math.</p>
                     {% endif %}
@@ -123,14 +123,14 @@
                 <div class="np-pl-pillar">
                     <p class="np-pl-pillar__eyebrow">Ready when you are</p>
                     <h2 class="np-pl-pillar__title">Start the diagnostic</h2>
-                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic in ('enhanced_math_1', 'enhanced_math_2') %}Bluebook-style sections with transitions between MCQ, graphing, and free response.{% elif topic == 'placement_full' %}Bluebook-style five-gate flow — transition screens after Gates 1–4, same polish as our Enhanced Math diagnostics.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
-                    <a href="{{ placement_url('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta">
+                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic == 'enhanced_math_1' %}50 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'enhanced_math_2' %}55 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'placement_full' %}Bluebook-style five-gate flow — transition screens after Gates 1–4, same polish as our Enhanced Math diagnostics.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
+                    <a href="{{ placement_url('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta np-pl-cta-pulse">
                         Begin placement test
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
-                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. Transitions after Q50 and Q54.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. Transitions after Q55 and Q59.{% else %}About <strong>115 minutes</strong>. Pause screens after Q16, Q37, Q53, and Q69.{% endif %}</p>
+                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. After Q50, download the PDF and upload one file.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. After Q55, download the PDF and upload one file.{% else %}About <strong>115 minutes</strong>. Pause screens after Q16, Q37, Q53, and Q69.{% endif %}</p>
                 </div>
-                <div class="np-pl-pdf">
+                <div class="np-pl-pdf" id="np-pl-pdf">
                     <div class="np-pl-pdf__icon" aria-hidden="true">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
                     </div>
@@ -141,7 +141,7 @@
                         <p class="np-pl-pdf__meta"><span class="np-pl-pdf__meta-pill">{{ pdf_meta.pages }} pages</span> · Synced {{ pdf_meta.updated_label }}</p>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-pdf__btn">Download PDF</a>
+                    <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-pdf__btn np-pl-cta-pulse">Download PDF</a>
                 </div>
             </aside>
         </div>

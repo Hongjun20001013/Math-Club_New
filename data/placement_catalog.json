@@ -1,6 +1,6 @@
 {
   "title": "Course placement diagnostics",
-  "subtitle": "Choose the track that matches your student's school math pathway.",
+  "subtitle": "Choose the test your advisor named.",
   "tiers": [
     {
       "id": "middle",

@@ -30,7 +30,7 @@
                         Novel Prep · Course placement
                     </p>
                     <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Place with clarity') }}</h1>
-                    <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the track that matches your student\'s school math pathway.') }}</p>
+                    <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the test your advisor named.') }}</p>
                     <ul class="np-pl-tags" aria-label="Features">
                         <li class="np-pl-tag">Timed diagnostic</li>
                         <li class="np-pl-tag">Instant score report</li>
@@ -41,13 +41,22 @@
                         {% for tier in catalog.tiers %}
                         {% for test in tier.tests %}
                         {% if test.status == 'available' %}
-                        <a href="{{ placement_url('placement_test_start', slug=test.slug) }}" class="np-pl-quickstart__btn">Start {{ test.title }}</a>
+                        <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-pl-quickstart__btn">Start {{ test.title }}</a>
                         {% endif %}
                         {% endfor %}
                         {% endfor %}
                     </nav>
                     {% if placement_public_guest|default(false) %}
-                    <p class="np-pl-lead np-pl-lead--recover"><a href="{{ url_for('placement_public_recover') }}">Already started? Recover with your code</a></p>
+                    <a class="np-pl-recover-cta" href="{{ url_for('placement_public_recover') }}">
+                        <span class="np-pl-recover-cta__shine" aria-hidden="true"></span>
+                        <span class="np-pl-recover-cta__icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10V8a5 5 0 0110 0v2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><rect x="5" y="10" width="14" height="11" rx="2.4" stroke="currentColor" stroke-width="1.9"/><path d="M12 14.2v2.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+                        </span>
+                        <span class="np-pl-recover-cta__copy">
+                            <em>Left the test?</em>
+                            <strong>Already started? Recover with your code</strong>
+                        </span>
+                    </a>
                     {% endif %}
                 </div>
             </div>
@@ -104,7 +113,7 @@
                             {% endif %}
                             {% if test.pdf_meta and test.pdf_meta.available %}
                             <p class="np-pl-card__pdf-note">
-                                <span class="np-pl-card__pdf-pill">Print PDF</span>
+                                <a class="np-pl-card__pdf-pill np-pl-cta-pulse" href="{{ url_for('placement_blank_test_pdf', slug=test.slug) }}">Print PDF</a>
                                 {{ test.pdf_meta.pages }} pages · {{ test.pdf_meta.updated_label }}
                             </p>
                             {% endif %}
@@ -122,7 +131,7 @@
                         </div>
                         <div class="np-pl-card__foot">
                             {% if test.status == 'available' %}
-                            <a href="{{ placement_url('placement_test_start', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">
+                            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow np-pl-cta-pulse">
                                 Start test
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </a>

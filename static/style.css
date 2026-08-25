@@ -28245,6 +28245,42 @@ html[data-exam-theme="dark"] .np-admin-persist-warn {
     text-underline-offset: 3px;
 }
 
+.np-login-placement-recover-cta {
+    display: block;
+    width: 100%;
+    margin: 14px 0 0;
+    padding: 12px 18px;
+    border-radius: 14px;
+    text-align: center;
+    text-decoration: none !important;
+    color: #4f2fd8 !important;
+    font: 750 0.9rem / 1.3 "Outfit", system-ui, sans-serif;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(108, 78, 255, 0.34);
+    box-shadow: 0 8px 20px rgba(26, 18, 48, 0.06);
+    animation: np-login-recover-nudge 2.4s ease-in-out infinite;
+}
+.np-login-placement-recover-cta:hover {
+    animation: none;
+    transform: none;
+    border-color: rgba(108, 78, 255, 0.55);
+}
+@keyframes np-login-recover-nudge {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 20px rgba(26, 18, 48, 0.06), 0 0 0 0 rgba(108, 78, 255, 0);
+        border-color: rgba(108, 78, 255, 0.34);
+    }
+    42% {
+        transform: scale(1.03);
+        box-shadow: 0 10px 26px rgba(79, 47, 216, 0.2), 0 0 0 7px rgba(108, 78, 255, 0.18);
+        border-color: rgba(108, 78, 255, 0.7);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .np-login-placement-recover-cta { animation: none; }
+}
+
 .np-login-placement-btn:hover {
     transform: translateY(-1px);
 }
@@ -39023,6 +39059,106 @@ html[data-exam-theme="dark"] .np-pl2-input {
 
 .np-admin-pl-miss-chips a:hover {
     background: rgba(124, 58, 237, 0.14);
+}
+
+.np-admin-pl-uploads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.np-admin-pl-upload {
+    display: grid;
+    gap: 4px;
+    min-width: 160px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(91, 33, 182, 0.16);
+    background: rgba(124, 58, 237, 0.06);
+    color: #3d2599;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.np-admin-pl-upload strong {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.np-pl-grade-form {
+    margin-top: 18px;
+}
+
+.np-pl-grade-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.np-pl-grade-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(91, 33, 182, 0.14);
+    background: rgba(124, 58, 237, 0.04);
+}
+
+.np-pl-grade-meta {
+    display: grid;
+    gap: 2px;
+}
+
+.np-pl-grade-meta strong {
+    font-size: 14px;
+    color: #2d1b69;
+}
+
+.np-pl-grade-meta span {
+    font-size: 12px;
+    color: #6b6288;
+}
+
+.np-pl-grade-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.np-pl-grade-pill {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(91, 33, 182, 0.16);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 750;
+    color: #3d2599;
+    cursor: pointer;
+}
+
+.np-pl-grade-pill input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.np-pl-grade-pill.is-on,
+.np-pl-grade-pill:has(input:checked) {
+    background: #6c4eff;
+    border-color: #6c4eff;
+    color: #fff;
 }
 
 #np-admin-pl-hero,

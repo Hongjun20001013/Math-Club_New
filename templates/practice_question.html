@@ -6,6 +6,10 @@
 {% endblock %}
 {% block content %}
 {% set chrome_focus = miss_quiz_mode or (mistake_redo_mode|default(false)) %}
+{% set paper_gate = placement_paper_gate|default(false) %}
+{% set mc_count = placement_mc_count|default(0) %}
+{% set nav_total = mc_count if paper_gate and mc_count else total %}
+{% set last_paper_mc = paper_gate and mc_count and qnum == (mc_count - 1) %}
 
 <div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
 {% if placement_mode %}
@@ -41,10 +45,16 @@
         <span class="sat-placement-ribbon-meta">Item {{ qnum + 1 }} / {{ total }}</span>
         {% endif %}
       </div>
-      <div class="sat-placement-ribbon-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ qnum + 1 }}" aria-label="Diagnostic progress">
-        <span class="sat-placement-ribbon-progress-fill" style="width: {{ (((qnum + 1) / total) * 100)|round }}%;"></span>
+      <div class="sat-placement-ribbon-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ nav_total }}" aria-valuenow="{{ qnum + 1 }}" aria-label="Diagnostic progress">
+        <span class="sat-placement-ribbon-progress-fill" style="width: {{ (((qnum + 1) / nav_total) * 100)|round }}%;"></span>
       </div>
     </div>
+    {% if recovery_code %}
+    <div class="np-pl-ticket-exam">
+      {% set ticket_compact = true %}
+      {% include 'partials/placement_recovery_ticket.html' %}
+    </div>
+    {% endif %}
     {% endif %}
     <!-- Header -->
     <div class="exam-header sat-exam-top">
@@ -59,7 +69,7 @@
         >
             <span class="exam-timer-icon" aria-hidden="true">{% if practice_timer_mode == 'per_question' %}⏱{% else %}⏳{% endif %}</span>
             <span class="exam-timer-copy">
-                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode or practice_timer_mode == 'per_question' %}{{ '%d:%02d'|format((practice_timer_seconds|default(95)) // 60, (practice_timer_seconds|default(95)) % 60) }}{% else %}00:00{% endif %}</span>
+                <span id="time" class="exam-timer-digits" aria-live="polite">{% if placement_mode %}{{ '%d:%02d'|format(((placement_remaining_seconds|default(practice_timer_seconds)|int) // 60), ((placement_remaining_seconds|default(practice_timer_seconds)|int) % 60)) }}{% elif practice_timer_mode == 'per_question' %}{{ '%d:%02d'|format((practice_timer_seconds|default(95)) // 60, (practice_timer_seconds|default(95)) % 60) }}{% else %}00:00{% endif %}</span>
                 {% if practice_timer_mode == 'per_question' %}
                 <span class="exam-timer-mode" id="exam-timer-mode">Pace · 1:35</span>
                 {% elif not placement_mode %}
@@ -96,7 +106,7 @@
                 {% else %}
                 <span class="progress-current">{{ qnum + 1 }}</span>
                 <span class="progress-sep">/</span>
-                <span class="progress-total">{{ total }}</span>
+                <span class="progress-total">{{ nav_total }}</span>
                 {% endif %}
             </div>
         </div>
@@ -120,7 +130,7 @@
     <div class="progress-bar-wrap sat-progress-inner">
         <div class="progress-bar">
             <div class="progress-fill"
-                 style="width: {% if miss_quiz_mode %}{{ ((miss_quiz_step + 1) / miss_quiz_total) * 100 }}{% elif mistake_redo_mode|default(false) %}100{% else %}{{ ((qnum+1)/total)*100 }}{% endif %}%;">
+                 style="width: {% if miss_quiz_mode %}{{ ((miss_quiz_step + 1) / miss_quiz_total) * 100 }}{% elif mistake_redo_mode|default(false) %}100{% else %}{{ ((qnum+1)/nav_total)*100 }}{% endif %}%;">
             </div>
         </div>
     </div>
@@ -183,12 +193,12 @@
         {% else %}
         <div class="sat-subnav-group sat-subnav-group--primary">
         {% if qnum > 0 %}
-        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ qnum - 1 }}">
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ qnum - 1 }}" data-pl-draft-nav>
             ← Previous
         </button>
         {% endif %}
-        {% if qnum < total - 1 %}
-        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ qnum + 1 }}">
+        {% if qnum < nav_total - 1 or last_paper_mc %}
+        <button type="submit" class="nav-btn nav-btn-secondary" form="practice-answer-form" formaction="{% if public_run_mode|default(false) %}{{ public_draft_url }}{% else %}{{ url_for('practice_draft_answer') }}{% endif %}" name="goto_qnum" value="{{ mc_count if last_paper_mc else qnum + 1 }}" data-pl-draft-nav>
             Next →
         </button>
         {% endif %}
@@ -332,6 +342,11 @@
                     <textarea id="sat-scratch-note" class="sat-scratch-note" rows="4" placeholder="Write quick steps, formulas, or why you chose this answer. Notes stay in this browser only."></textarea>
                 </details>
                 <div class="sat-submit-wrap">
+                    {% if paper_upload_next %}
+                    <div class="np-pl-work-banner" role="status">
+                        <p class="sat-submit-hint"><strong>{{ paper_upload_next.title }}.</strong> {{ paper_upload_next.body }}</p>
+                    </div>
+                    {% endif %}
                     {% if miss_quiz_mode %}
                     <p class="sat-submit-hint">You will see <strong>instant feedback</strong> before moving on.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Check answer</button>
@@ -345,6 +360,11 @@
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill" formaction="{{ url_for('practice_draft_answer') }}" name="goto_qnum" value="{{ qnum + 1 }}">Next question</button>
                     {% endif %}
+                    {% elif paper_upload_next %}
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Save &amp; upload paper work</button>
+                    {% elif last_paper_mc %}
+                    <p class="sat-submit-hint">This is the last on-screen question. Next opens the paper PDF upload for graphing and free response.</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Save &amp; continue to paper</button>
                     {% elif is_last %}
                     <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
@@ -373,11 +393,11 @@
                 <p class="q-picker-sub">
                     <span class="q-picker-sub-line">Tap a number to move in this set.</span>
                     <span class="q-picker-progress" aria-live="polite">
-                        <strong>{{ answered_count }}</strong> of <strong>{{ total }}</strong> answered
-                        {% if answered_count < total %}· <span class="q-picker-remain">{{ total - answered_count }} left</span>{% endif %}
+                        <strong>{{ answered_count }}</strong> of <strong>{{ nav_total }}</strong> answered
+                        {% if answered_count < nav_total %}· <span class="q-picker-remain">{{ nav_total - answered_count }} left</span>{% endif %}
                     </span>
                 </p>
-                <div class="q-picker-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ answered_count }}" aria-label="Answered in this session">
+                <div class="q-picker-bar" role="progressbar" aria-valuemin="0" aria-valuemax="{{ nav_total }}" aria-valuenow="{{ answered_count }}" aria-label="Answered in this session">
                     <span class="q-picker-bar-fill" style="width: {{ answered_pct }}%;"></span>
                 </div>
                 <div class="q-picker-legend" aria-hidden="true">
@@ -391,7 +411,7 @@
         </div>
         <div class="q-picker-scroll">
             <div class="question-nav q-picker-grid">
-                {% for i in range(total) %}
+                {% for i in range(nav_total) %}
                 {% set done = i in answered_qset %}
                 <a href="{{ url_for('practice_question', domain=domain, topic=topic, qnum=i) }}"
                    class="q-nav-btn js-practice-jump{% if i == qnum %} is-current{% endif %}{% if done %} is-done{% endif %}"
@@ -429,11 +449,17 @@ const placementTimerMode = {{ placement_mode | tojson }};
 const practiceTimerMode = {{ practice_timer_mode|default('elapsed')|tojson }};
 const paceTrainingMode = practiceTimerMode === "per_question";
 const attemptStartedUnix = {{ attempt_started_unix|default(0)|int }};
+const placementRemainingAtLoad = {{ placement_remaining_seconds|default(0)|int }};
 const PLACEMENT_DEADLINE_KEY = "sat-placement-deadline-ms-" + String(practiceAttemptId);
 const PACE_DEADLINE_KEY =
     "sat-pace-deadline-ms-" + String(practiceAttemptId) + "-q" + String(practiceQnum);
+const placementDeadlineFixedMs = Date.now() + Math.max(0, placementRemainingAtLoad) * 1000;
 
 function placementDeadlineMs() {
+    /* Sitting clock is server-started. Recover / new tab must not mint a fresh full duration. */
+    if (placementTimerMode && (attemptStartedUnix > 0 || placementRemainingAtLoad > 0)) {
+        return placementDeadlineFixedMs;
+    }
     let raw = sessionStorage.getItem(PLACEMENT_DEADLINE_KEY);
     if (!raw) {
         const end = Date.now() + practiceTimerSeconds * 1000;
@@ -1019,7 +1045,9 @@ document.addEventListener("keydown", (event) => {
 document.querySelector("#practice-answer-form")?.addEventListener("submit", (event) => {
     const submitter = event.submitter;
     const action = (submitter && submitter.getAttribute("formaction")) || "";
-    if (action.indexOf("draft") !== -1) {
+    const isDraftNav = (submitter && (submitter.name === "goto_qnum" || submitter.hasAttribute("data-pl-draft-nav")))
+        || action.indexOf("draft") !== -1;
+    if (isDraftNav) {
         const checked = document.querySelector(".choice-radio-input:checked");
         if (checked && selectedInput) selectedInput.value = checked.value;
         return;
@@ -1086,6 +1114,9 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
 </script>
 {% if q.question_kind|default('mcq') == 'free_response' %}
 <script src="{{ url_for('static', filename='spr_math_input.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
+{% if recovery_code %}
+{% include 'partials/placement_atelier_scripts.html' %}
 {% endif %}
 
 {% endblock %}
