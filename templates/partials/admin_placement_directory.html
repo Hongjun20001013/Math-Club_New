@@ -39,7 +39,14 @@
         <div class="np-pl-roster-end">
           <span class="np-pl-roster-status np-pl-roster-status--{{ row.status }}">{{ row.status_label }}</span>
           {% if row.when_label %}<time>{{ row.when_label }}</time>{% endif %}
-          <a class="np-pl-roster-open" href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">Open report</a>
+          <div class="np-pl-roster-actions">
+            <a class="np-pl-roster-open" href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">Open report</a>
+            <form method="post" action="{{ url_for('admin_placement_candidate_delete', attempt_id=row.attempt_id) }}" class="np-pl-roster-remove" onsubmit="return confirm({{ ('Remove ' ~ (row.display_name or 'this sitting') ~ ' from Placement testers? This cannot be undone.')|tojson }});">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="from" value="{{ 'list' if request.endpoint == 'admin_placement_candidates' else 'admin' }}">
+              <button type="submit">Remove</button>
+            </form>
+          </div>
         </div>
       </article>
       {% endfor %}

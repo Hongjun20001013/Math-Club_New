@@ -428,3 +428,53 @@ class TestRecoverTimerInBrowser(unittest.TestCase):
         finally:
             on.close()
 
+
+@unittest.skipUnless(
+    __import__("importlib").util.find_spec("playwright") is not None,
+    "playwright not installed",
+)
+class TestAdminRosterRemoveInBrowser(unittest.TestCase):
+    def test_login_lands_on_testers_and_remove_clears_row(self):
+        from playwright.sync_api import sync_playwright
+
+        from tests.e2e.test_placement_public_browser import E2E_PASSWORD, _Server
+
+        on = _Server(True)
+        try:
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=True)
+                guest = browser.new_page(viewport={"width": 1280, "height": 800})
+                guest.goto(on.base + "/placement/enhanced-math-1/start", wait_until="networkidle")
+                guest.fill("#pl-name", "Delete Probe")
+                guest.select_option("#pl-grade", "9th")
+                guest.fill("#pl-course", "Algebra I Honors")
+                guest.locator("label.np-pl-choice", has_text="Mia Hu").click()
+                guest.check("input[name=counselor_confirm]")
+                guest.click("button[type=submit]")
+                guest.wait_for_url("**/placement/run/**/ready")
+                guest.close()
+
+                page = browser.new_page(viewport={"width": 1280, "height": 800})
+                page.goto(on.base + "/login", wait_until="networkidle")
+                page.fill("#np-login-user", "teacher")
+                page.fill("#np-login-pass", E2E_PASSWORD)
+                page.click("#np-login-submit")
+                page.wait_for_url("**/admin**")
+                self.assertIn("np-admin-placement", page.url)
+                heading = page.locator("#np-admin-placement-heading")
+                self.assertTrue(heading.is_visible())
+                self.assertEqual(heading.inner_text().strip(), "Placement testers")
+                card = page.locator(".np-pl-roster-card", has_text="Delete Probe")
+                self.assertEqual(card.count(), 1)
+                self.assertTrue(card.locator(".np-pl-roster-open").is_visible())
+                remove = card.locator(".np-pl-roster-remove button")
+                self.assertTrue(remove.is_visible())
+                self.assertEqual(remove.inner_text().strip(), "Remove")
+                page.once("dialog", lambda dialog: dialog.accept())
+                remove.click()
+                page.wait_for_url("**/admin**")
+                self.assertEqual(page.locator(".np-pl-roster-card", has_text="Delete Probe").count(), 0)
+                browser.close()
+        finally:
+            on.close()
+

@@ -287,7 +287,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260825-recover-glow")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260825-roster-remove")
 
 _DB_SCHEMA_READY = False
 
@@ -1592,6 +1592,13 @@ def current_user_is_supervisor() -> bool:
 def current_user_can_access_admin() -> bool:
     """Supervisor or colleague — student data & account management."""
     return current_user_role() in STAFF_ROLES
+
+
+def _admin_landing_url() -> str:
+    """Colleagues land on Placement testers instead of the Team directory."""
+    if placement_public_enabled():
+        return url_for("admin", _anchor="np-admin-placement")
+    return url_for("admin")
 
 
 def _current_staff_view_scope(db: sqlite3.Connection) -> str:
@@ -15882,7 +15889,7 @@ def login():
             _set_login_session(user)
             next_url = _safe_redirect_target(request.args.get("next") or "")
             if current_user_can_access_admin():
-                return redirect(next_url or url_for("admin"))
+                return redirect(next_url or _admin_landing_url())
             grants = _normalize_access_grants(user["access_grants"] or user["access_scope"])
             if next_url and _path_allowed_for_grants(next_url.split("?")[0], grants, db):
                 return redirect(next_url)
@@ -18436,6 +18443,35 @@ def admin_placement_candidate_invalidate(attempt_id: int):
     db.commit()
     flash("Recovery access invalidated.")
     return redirect(url_for("admin_placement_candidates"))
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/delete", methods=["POST"])
+def admin_placement_candidate_delete(attempt_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        """
+        SELECT a.id, a.candidate_id, c.display_name
+        FROM placement_candidate_attempts a
+        JOIN placement_candidates c ON c.id = a.candidate_id
+        WHERE a.id = ?
+        """,
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    name = str(att["display_name"] or "this sitting")
+    placement_public_mod.delete_sitting(db, attempt_id)
+    db.commit()
+    flash(f"Removed {name} from Placement testers.")
+    origin = (request.form.get("from") or "").strip()
+    if origin == "list":
+        return redirect(url_for("admin_placement_candidates"))
+    return redirect(_admin_landing_url())
 
 
 @app.route("/admin/students/<int:user_id>")

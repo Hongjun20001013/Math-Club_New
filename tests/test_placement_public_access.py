@@ -894,6 +894,82 @@ class TestLockAndAdmin(_Base):
             conn.close()
         self.assertEqual(status, "in_progress")
 
+    def test_admin_can_remove_sitting_from_roster(self):
+        self.flag_on()
+        rv = self.begin(name="Jack Zeng")
+        pid = self.public_id_from_location(rv)
+        self.client.get(f"/placement/run/{pid}/item/0")
+        self.client.post(
+            f"/placement/run/{pid}/item/0",
+            data={"csrf_token": self.csrf(), "selected_answer": "A", "qnum": "0"},
+        )
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        aid = self.attempt_id(pid)
+        self.login(user_id=1, role="admin", username="teacher")
+        home = self.client.get("/admin").get_data(as_text=True)
+        self.assertIn("Jack Zeng", home)
+        self.assertIn(f"/admin/placement-candidates/{aid}/delete", home)
+        gone = self.client.post(
+            f"/admin/placement-candidates/{aid}/delete",
+            data={"csrf_token": "test-csrf", "from": "admin"},
+        )
+        self.assertEqual(gone.status_code, 302)
+        loc = gone.headers.get("Location") or ""
+        self.assertIn("/admin", loc)
+        self.assertIn("np-admin-placement", loc)
+        after = self.client.get("/admin").get_data(as_text=True)
+        self.assertIn("Removed Jack Zeng from Placement testers.", after)
+        self.assertNotIn(f'href="/admin/placement-candidates/{aid}"', after)
+        self.assertNotIn(f"/admin/placement-candidates/{aid}/delete", after)
+        conn = sqlite3.connect(self.db)
+        try:
+            n_att = conn.execute(
+                "SELECT COUNT(*) FROM placement_candidate_attempts WHERE id=?",
+                (aid,),
+            ).fetchone()[0]
+            n_cand = conn.execute(
+                "SELECT COUNT(*) FROM placement_candidates WHERE display_name=?",
+                ("Jack Zeng",),
+            ).fetchone()[0]
+            n_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        finally:
+            conn.close()
+        self.assertEqual(n_att, 0)
+        self.assertEqual(n_cand, 0)
+        self.assertGreaterEqual(n_users, 1)
+
+    def test_staff_login_opens_placement_testers(self):
+        from werkzeug.security import generate_password_hash
+
+        self.flag_on()
+        conn = sqlite3.connect(self.db)
+        try:
+            row = conn.execute("SELECT username FROM users WHERE id=1").fetchone()
+            self.assertIsNotNone(row)
+            conn.execute(
+                """
+                UPDATE users
+                SET password_hash=?, password='', is_active=1, role='admin'
+                WHERE id=1
+                """,
+                (generate_password_hash("secret-login"),),
+            )
+            conn.commit()
+            username = row[0]
+        finally:
+            conn.close()
+        rv = self.client.post(
+            "/login",
+            data={"username": username, "password": "secret-login"},
+            follow_redirects=False,
+        )
+        self.assertEqual(rv.status_code, 302)
+        loc = rv.headers.get("Location") or ""
+        self.assertTrue(loc.endswith("/admin#np-admin-placement") or "#np-admin-placement" in loc, loc)
+
 
 class TestBanksAndLegacy(_Base):
     def test_item_counts_unchanged(self):

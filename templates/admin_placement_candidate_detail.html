@@ -98,6 +98,11 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
           <button type="submit" class="np-pw-btn np-pw-btn--ghost">Invalidate recovery access</button>
         </form>
+        <form method="post" action="{{ url_for('admin_placement_candidate_delete', attempt_id=attempt.id) }}" class="np-pl-roster-remove np-pl-roster-remove--detail" onsubmit="return confirm({{ ('Remove ' ~ (attempt.display_name or 'this sitting') ~ ' from Placement testers? This cannot be undone.')|tojson }});">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="from" value="admin">
+          <button type="submit" class="np-pw-btn np-pw-btn--ghost">Remove sitting</button>
+        </form>
       </div>
     </div>
   </header>

@@ -487,6 +487,19 @@ def pop_recovery_once() -> str | None:
     return peek_recovery_code()
 
 
+def delete_sitting(db: sqlite3.Connection, attempt_id: int) -> bool:
+    """Remove one guest sitting and its answers. Does not touch SAT student accounts."""
+    row = _row(
+        db,
+        "SELECT id, candidate_id FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    )
+    if row is None:
+        return False
+    _delete_open_sitting(db, int(row["id"]), int(row["candidate_id"]))
+    return True
+
+
 def _delete_open_sitting(db: sqlite3.Connection, attempt_id: int, candidate_id: int) -> None:
     folder = os.path.join(upload_root(), "candidate", str(int(attempt_id)))
     if os.path.isdir(folder):
