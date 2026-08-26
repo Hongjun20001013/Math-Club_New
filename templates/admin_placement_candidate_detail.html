@@ -43,43 +43,41 @@
     </ul>
   </aside>
 
-  <header id="np-admin-pl-hero" class="np-summary-hero np-summary-hero--layout-v3 np-summary-hero--placement-finale">
-    <div class="np-summary-hero-split">
-      <div class="np-summary-hero-text">
-        <span class="np-admin-pl-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <p class="np-summary-kicker">Advisor report · {{ status_label }}</p>
-        <p class="np-pl-brand">{{ site_brand_name }}</p>
-        <h1 class="np-summary-title">Placement results</h1>
-        <p class="np-summary-for-student">For <strong>{{ attempt.display_name }}</strong>{% if attempt.grade %} · {{ attempt.grade }}{% endif %}</p>
-        <p class="np-summary-meta">{{ test.title if test else attempt.slug }}</p>
-        <p class="np-summary-time-spent">Answered <strong>{{ answered_live }}/{{ attempt.total_count }}</strong></p>
-        <ul class="np-admin-pl-chips" aria-label="Student profile">
-          <li>Grade {{ attempt.grade or "—" }}</li>
-          <li>{{ attempt.math_course or "Course —" }}</li>
-          <li>{{ attempt.school or "School —" }}</li>
-          <li>Advisor {{ attempt.counselor_source or "Not provided" }}</li>
-        </ul>
-      </div>
-      <div class="np-summary-hero-visual">
-        <div class="np-score-pedestal">
-          <div class="np-score-ring-wrap">
-            <div class="np-score-ring" style="--pct: {{ score_pct }};">
-              <div class="np-score-ring-inner">
-                <span class="np-score-num">{{ ring_num }}</span>
-                <span class="np-score-den">/ {{ ring_den }}</span>
-              </div>
-            </div>
-            <p class="np-score-pct">{{ score_pct }}% of sitting</p>
-            <p class="np-summary-score-foot">Score {{ ring_num }} / {{ ring_den }}</p>
-            {% if paper_sitting %}
-            <p class="np-summary-paper-frq">MC auto-scored {{ auto_correct }}/{{ auto_total }} · advisor grades graphing (1 pt) and FR (4 pt) · Paper {{ score.paper_points or 0 }}/{{ score.paper_max_points }}{% if not score.paper_complete %} · not fully graded{% endif %}</p>
-            {% elif graphing_total %}
-            <p class="np-summary-paper-frq">Graphing {{ graphing_done }} / {{ graphing_total }} submitted</p>
-            {% endif %}
+  <header id="np-admin-pl-hero" class="np-pl-report-hero">
+    <div class="np-pl-report-hero__copy">
+      <p class="np-pl-report-kicker">Family briefing · {{ status_label }}</p>
+      <p class="np-pl-brand">{{ site_brand_name }}</p>
+      <h1 class="np-pl-report-name">{{ attempt.display_name }}</h1>
+      <p class="np-pl-report-test">{{ test.title if test else attempt.slug }}</p>
+      <p class="np-pl-report-meta">Answered <strong>{{ answered_live }}/{{ attempt.total_count }}</strong></p>
+      <ul class="np-admin-pl-chips" aria-label="Student profile">
+        {% if attempt.grade %}<li>Grade {{ attempt.grade }}</li>{% endif %}
+        {% if attempt.math_course and attempt.math_course != (test.title if test else '') %}
+        <li>{{ attempt.math_course }}</li>
+        {% endif %}
+        {% if attempt.school %}<li>{{ attempt.school }}</li>{% endif %}
+        {% if attempt.counselor_source %}<li>Advisor {{ attempt.counselor_source }}</li>{% endif %}
+      </ul>
+    </div>
+    <aside class="np-pl-report-hero__score" aria-label="Sitting score">
+      <div class="np-score-ring-wrap">
+        <div class="np-score-ring" style="--pct: {{ score_pct }};">
+          <div class="np-score-ring-inner">
+            <span class="np-score-num">{{ ring_num }}</span>
+            <span class="np-score-den">/ {{ ring_den }}</span>
           </div>
         </div>
+        <p class="np-score-pct">{{ score_pct }}% of sitting</p>
+        <p class="np-summary-score-foot">Score {{ ring_num }} / {{ ring_den }}</p>
+        {% if paper_sitting %}
+        <p class="np-summary-paper-frq">MC auto-scored {{ auto_correct }}/{{ auto_total }}</p>
+        <p class="np-summary-paper-frq">Graphing 1 pt · FR 4 pt · Paper {{ score.paper_points or 0 }}/{{ score.paper_max_points }}{% if not score.paper_complete %} · still grading{% endif %}</p>
+        {% elif graphing_total %}
+        <p class="np-summary-paper-frq">Graphing {{ graphing_done }} / {{ graphing_total }} submitted</p>
+        {% endif %}
       </div>
-    </div>
+    </aside>
+  </header>
     <div class="np-summary-miss-quiz-row np-summary-miss-quiz-luxe glass-panel np-glass" aria-label="Advisor actions">
       <div class="np-summary-miss-quiz-copy">
         <p class="np-summary-miss-quiz-kicker">Advisor tools</p>
@@ -105,7 +103,6 @@
         </form>
       </div>
     </div>
-  </header>
 
   <section class="np-placement-profile np-placement-strip-luxe glass-panel np-glass" aria-label="Student information on file">
     <header class="np-placement-profile-head">
@@ -232,7 +229,7 @@
         {% for row in paper_rubric %}
         <li class="np-pl-grade-row">
           <div class="np-pl-grade-meta">
-            <strong>Q{{ row.n }}</strong>
+            <strong><a href="{{ url_for('admin_placement_candidate_item', attempt_id=attempt.id, q_index=row.index) }}">Q{{ row.n }}</a></strong>
             <span>{{ row.label }} · {{ row.max_points }} pt</span>
           </div>
           <div class="np-pl-grade-pills" role="group" aria-label="Q{{ row.n }} score">
@@ -259,7 +256,7 @@
     <p class="np-summary-sheet-lead">{{ miss_rows | length }} auto-incorrect item{{ 's' if miss_rows | length != 1 else '' }} in this sitting.</p>
     <div class="np-admin-pl-miss-chips">
       {% for row in miss_rows %}
-      <a href="#np-admin-pl-q{{ row.n }}">Q{{ row.n }}</a>
+      <a href="{{ row.review_href }}">Q{{ row.n }}</a>
       {% endfor %}
     </div>
   </section>
@@ -269,7 +266,7 @@
     <header class="np-summary-sheet-cap">
       <p class="np-summary-sheet-kicker">Full breakdown</p>
       <h2 class="np-summary-sheet-title">Item-by-item results</h2>
-      <p class="np-summary-sheet-lead">{% if paper_sitting %}Multiple choice is auto-scored against the answer key. Graphing and free response wait for advisor grades.{% else %}Grouped by the same printed sections as the paper. Student answer, key, and auto-score for every item.{% endif %}</p>
+      <p class="np-summary-sheet-lead">{% if paper_sitting %}Click a question number to open the original item. Multiple choice is auto-scored. Graphing and free response wait for advisor grades.{% else %}Click a question number to open the original item. Grouped by the same printed sections as the paper.{% endif %}</p>
     </header>
     <div class="np-summary-table-head np-admin-pl-sheet-head">
       <span class="col-q">#</span>
@@ -289,7 +286,7 @@
     {% endif %}
     <div class="np-summary-block np-row-{{ row.status }}" id="np-admin-pl-q{{ row.n }}">
       <div class="np-summary-row np-summary-row-main np-admin-pl-sheet-row">
-        <span class="col-q"><span class="np-q-main">{{ row.n }}</span></span>
+        <span class="col-q"><a class="np-q-link" href="{{ row.review_href }}" title="Open question {{ row.n }}"><span class="np-q-main">{{ row.n }}</span></a></span>
         <span class="col-yours">{{ row.yours_display }}</span>
         <span class="col-key">{{ row.key_display }}</span>
         <span class="col-st">

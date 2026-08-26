@@ -287,7 +287,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260825-roster-remove")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260826-report-math")
 
 _DB_SCHEMA_READY = False
 
@@ -1253,7 +1253,12 @@ def inject_template_config():
         active_track = track_lookup.get(k, {}).get("title", "Platform")
 
     # MathJax is heavy (~hundreds of KB); skip on mostly-static pages to reduce jank.
-    load_mathjax = not (
+    # Placement family reports and item review still need TeX stems/keys.
+    p_math = p.split("?", 1)[0]
+    placement_report_math = bool(
+        re.match(r"^/admin/placement-candidates/\d+(/item/\d+)?/?$", p_math)
+    )
+    load_mathjax = placement_report_math or not (
         p.startswith("/admin")
         or p in ("/", "")
         or p.startswith("/login")
@@ -9675,9 +9680,11 @@ def _placement_section_back_href(topic: str, section: str) -> str:
         return _q_href(0)
     mc = int(cfg.get("mc_count") or 0)
     graph = int(cfg.get("graph_count") or 0)
-    if section in ("graphing", "paper"):
-        return _q_href(mc - 1)
-    return _q_href(mc + graph - 1)
+    if section == "paper":
+        return _q_href(0)
+    if section == "graphing":
+        return _q_href(max(0, mc - 1))
+    return _q_href(max(0, mc + graph - 1))
 
 
 @app.route("/placement/<slug>/section/<section>")
@@ -10104,14 +10111,18 @@ def _placement_recovery_ctx() -> dict:
     }
 
 
-def _placement_exam_nav_ctx(topic: str) -> dict:
+def _placement_exam_nav_ctx(topic: str, attempt_id: int | None = None) -> dict:
     cfg = _placement_flow_config(topic) or {}
     paper_gate = cfg.get("paper_mode") == "combined_pdf"
     mc = int(cfg.get("mc_count") or 0) if paper_gate else 0
     slug = _placement_slug_for_topic(topic) if paper_gate else None
+    resume = False
+    if paper_gate and attempt_id:
+        resume = placement_public_mod.should_resume_paper(get_db(), int(attempt_id), mc)
     return {
         "placement_paper_gate": paper_gate,
         "placement_mc_count": mc,
+        "placement_resume_paper": resume,
         "paper_work_href": (
             url_for("placement_section_work", slug=slug, section="paper")
             if paper_gate and slug
@@ -10292,7 +10303,7 @@ def placement_public_item(public_id: str, qnum: int):
         public_autosave_url=url_for("placement_public_autosave", public_id=public_id),
         placement_paper_item=is_placement_paper_item(q),
         paper_upload_next=_placement_paper_upload_banner(topic, qnum),
-        **_placement_exam_nav_ctx(topic),
+        **_placement_exam_nav_ctx(topic, int(att["id"])),
         **_placement_recovery_ctx(),
     )
 
@@ -18120,7 +18131,11 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         items.append(
             {
                 "n": i + 1,
+                "q_index": i,
                 "q_display": str(i + 1),
+                "review_href": url_for(
+                    "admin_placement_candidate_item", attempt_id=attempt_id, q_index=i
+                ),
                 "selected": selected,
                 "correct": key,
                 "is_correct": stored_correct,
@@ -18334,6 +18349,67 @@ def admin_placement_candidate_detail(attempt_id: int):
         paper_uploads=ctx.get("paper_uploads") or [],
         paper_rubric=ctx.get("paper_rubric") or [],
         paper_grades=ctx.get("paper_grades") or {},
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/item/<int:q_index>")
+def admin_placement_candidate_item(attempt_id: int, q_index: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx is None:
+        abort(404)
+    questions = _placement_public_questions(str(ctx["attempt"]["topic"]))
+    if q_index < 0 or q_index >= len(questions):
+        abort(404)
+    qobj = _sanitize_question_for_render(questions[q_index])
+    row = ctx["items"][q_index]
+    kind = str(qobj.get("question_kind") or "mcq")
+    result_choices = _mcq_result_choices(
+        qobj.get("choices"),
+        str(row.get("selected") or ""),
+        extract_correct_answer(qobj),
+        question_kind=kind,
+    )
+    summary_href = url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
+    topic_title = (ctx.get("test") or {}).get("title") or ctx["attempt"].get("topic") or "Placement"
+    part_label = str(row.get("part_label") or "")
+    area_title = str(row.get("area_title") or "")
+    if part_label and area_title.lower().startswith(part_label.lower()):
+        area_title = area_title[len(part_label) :].lstrip(" —–-")
+    return render_template(
+        "admin_placement_item.html",
+        attempt=ctx["attempt"],
+        test=ctx["test"],
+        q=qobj,
+        row=row,
+        q_index=q_index,
+        total_q=len(questions),
+        status=row.get("status") or "review",
+        yours_display=row.get("yours_display") or "—",
+        key_display=row.get("key_display") or "—",
+        knowledge_section=row.get("knowledge_section") or qobj.get("knowledge_section") or "—",
+        knowledge_title_en=row.get("knowledge_title_en") or qobj.get("knowledge_section_title_en") or "",
+        topic_title=topic_title,
+        part_label=part_label,
+        area_title=area_title,
+        is_paper_item=not is_mcq_item(qobj),
+        result_choices=result_choices,
+        explanation_en=qobj.get("explanation_en") or qobj.get("solution_en") or "",
+        summary_href=summary_href,
+        prev_href=(
+            url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index - 1)
+            if q_index > 0
+            else None
+        ),
+        next_href=(
+            url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index + 1)
+            if q_index + 1 < len(questions)
+            else None
+        ),
     )
 
 

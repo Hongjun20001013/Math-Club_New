@@ -395,11 +395,13 @@ html.np-pl-js .np-pl2--atelier [data-pl-reveal].is-visible {
 
 .np-pl-recover-cta {
     position: relative;
-    overflow: visible;
+    box-sizing: border-box;
+    overflow: hidden;
     display: flex;
     align-items: center;
     gap: 14px;
     width: min(100%, 420px);
+    max-width: 100%;
     margin-top: 18px;
     padding: 14px 16px 14px 14px;
     border-radius: 20px;
@@ -408,7 +410,7 @@ html.np-pl-js .np-pl2--atelier [data-pl-reveal].is-visible {
     background: rgba(255, 255, 255, 0.94);
     border: 1px solid rgba(108, 78, 255, 0.34);
     box-shadow: 0 10px 28px rgba(26, 18, 48, 0.06);
-    animation: np-pl-recover-nudge 2.4s ease-in-out infinite;
+    animation: np-pl-recover-nudge 2.8s ease-in-out infinite;
 }
 .np-pl-recover-cta__shine {
     display: block;
@@ -469,14 +471,14 @@ html.np-pl-js .np-pl2--atelier [data-pl-reveal].is-visible {
 }
 @keyframes np-pl-recover-nudge {
     0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 10px 28px rgba(26, 18, 48, 0.06), 0 0 0 0 rgba(108, 78, 255, 0);
+        transform: none;
+        box-shadow: 0 10px 28px rgba(26, 18, 48, 0.06);
         border-color: rgba(108, 78, 255, 0.34);
     }
     42% {
-        transform: scale(1.03);
-        box-shadow: 0 16px 36px rgba(79, 47, 216, 0.22), 0 0 0 8px rgba(108, 78, 255, 0.18);
-        border-color: rgba(108, 78, 255, 0.7);
+        transform: none;
+        box-shadow: 0 14px 30px rgba(79, 47, 216, 0.16);
+        border-color: rgba(108, 78, 255, 0.6);
     }
 }
 @keyframes np-pl-recover-icon {
@@ -936,10 +938,12 @@ a.np-pl-card__pdf-pill.np-pl-cta-pulse {
 }
 
 .np-pl-work-panel {
+    box-sizing: border-box;
+    overflow: hidden;
     margin-top: 22px;
-    padding: 18px;
+    padding: 20px 20px 18px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.92);
     border: 1px solid var(--pl-line);
     box-shadow: 0 18px 40px rgba(26, 18, 48, 0.08);
 }
@@ -1077,15 +1081,37 @@ a.np-pl-card__pdf-pill.np-pl-cta-pulse {
 }
 
 .np-pl-work-actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
     gap: 10px;
     margin-top: 16px;
 }
 
 .np-pl-work-actions .np-pl2-btn {
-    flex: 1 1 160px;
+    min-width: 0;
+    width: 100%;
     justify-content: center;
+    white-space: nowrap;
+}
+
+.np-pl-work-review {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 14px;
+    color: #4f2fd8;
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+}
+
+.np-pl-work-review:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.np-pl-part__bento {
+    grid-template-columns: 1fr 1fr;
 }
 
 .np-pl-work-files {
@@ -1685,6 +1711,8 @@ a.np-pl-card__pdf-pill.np-pl-cta-pulse {
     .np-pl-hero { min-height: 0; }
     .np-pl-work-panel__pdf { width: 100%; justify-content: center; }
     .np-pl-drop__zone { min-height: 152px; }
+    .np-pl-part__bento { grid-template-columns: 1fr; }
+    .np-pl-work-actions { grid-template-columns: 1fr; }
 }
 
 /* ── Placement summary report (observatory skin) ── */
@@ -2371,4 +2399,162 @@ html[data-exam-theme="dark"] .np-pl-tier__panel {
 .np-pl-ticket--exam .np-pl-ticket__actions,
 .np-pl-ticket-exam .np-pl-ticket__actions {
     margin-top: 10px;
+}
+
+/* Family placement report — isolated hero so SAT luxe title clip cannot garble names */
+.np-admin-placement-report.np-summary-page {
+    max-width: 1040px;
+}
+
+.np-pl-report-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+    gap: clamp(20px, 3vw, 36px) clamp(24px, 4vw, 48px);
+    align-items: center;
+    margin: 18px 0 10px;
+    padding: clamp(22px, 4vw, 36px);
+    border-radius: 32px;
+    min-width: 0;
+    overflow: visible;
+    background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 242, 255, 0.9) 100%);
+    border: 1px solid rgba(108, 78, 255, 0.12);
+    box-shadow:
+        0 28px 64px rgba(47, 24, 110, 0.1),
+        0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+.np-pl-report-hero__copy,
+.np-pl-report-hero__score {
+    min-width: 0;
+}
+
+.np-pl-report-kicker {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6c4eff;
+}
+
+.np-pl-report-hero .np-pl-brand {
+    margin: 0 0 6px;
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+}
+
+.np-pl-report-name {
+    margin: 4px 0 10px;
+    font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+    font-size: clamp(2.05rem, 4.2vw, 3.15rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: #140a3c;
+    background: none;
+    -webkit-text-fill-color: #140a3c;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+}
+
+.np-pl-report-test {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: #3d2a7a;
+}
+
+.np-pl-report-meta {
+    margin: 10px 0 0;
+    color: #5f5778;
+    font-size: 15px;
+}
+
+.np-pl-report-hero__score {
+    justify-self: end;
+    padding: clamp(16px, 3vw, 24px);
+    background: linear-gradient(175deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 28px;
+    box-shadow: 0 20px 44px rgba(49, 38, 130, 0.1);
+    text-align: center;
+}
+
+.np-pl-report-hero .np-summary-paper-frq {
+    max-width: 16rem;
+    margin: 6px auto 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #6b6288;
+}
+
+.np-admin-placement-report .np-q-link {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgba(108, 78, 255, 0.16);
+    box-shadow: 0 8px 18px rgba(49, 38, 130, 0.07);
+}
+
+.np-admin-placement-report .np-q-link:hover,
+.np-admin-placement-report .np-q-link:focus-visible {
+    background: #f4f0ff;
+    border-color: rgba(108, 78, 255, 0.4);
+    outline: none;
+}
+
+.np-admin-placement-report .np-pl-grade-meta a {
+    color: #2d1b69;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(61, 37, 153, 0.35);
+}
+
+.np-admin-placement-report .np-pl-grade-meta a:hover {
+    color: #6c4eff;
+}
+
+.np-admin-pl-item {
+    position: relative;
+    overflow: visible;
+}
+
+.np-admin-pl-item .np-session-item-stem,
+.np-admin-pl-item .choice-content {
+    overflow: visible;
+}
+
+.np-admin-pl-item mjx-container {
+    max-width: 100%;
+}
+
+.np-admin-pl-item-note {
+    margin: 8px 0 0;
+    max-width: 42rem;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #5f5778;
+}
+
+@media (max-width: 719px) {
+    .np-pl-report-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .np-pl-report-hero__score {
+        justify-self: center;
+        width: min(100%, 280px);
+    }
+
+    .np-admin-placement-report .np-admin-pl-chips {
+        justify-content: center;
+    }
+
+    .np-admin-placement-report .np-q-link {
+        min-width: 52px;
+        min-height: 40px;
+    }
 }

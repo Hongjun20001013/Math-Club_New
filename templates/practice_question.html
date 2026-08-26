@@ -226,6 +226,9 @@
         <button type="button" class="nav-btn nav-btn-secondary sat-nav-tool-btn sat-nav-tool-btn--calc-off" disabled title="Calculator is not available on this item (paper Section 1 rules)">Calculator</button>
         {% endif %}
         {% if public_run_mode|default(false) %}
+        {% if placement_resume_paper|default(false) and paper_work_href %}
+        <a href="{{ paper_work_href }}" class="nav-btn nav-btn-secondary">Paper PDF</a>
+        {% endif %}
         <a href="{{ url_for('placement_public_finish', public_id=public_run_id) }}" class="nav-btn nav-btn-secondary" data-pl-open-finish>Submit test</a>
         {% endif %}
         </div>

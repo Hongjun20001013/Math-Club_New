@@ -97,13 +97,13 @@
                         <ul class="np-pl-drop__queue" data-pl-drop-list hidden></ul>
                     </div>
                     <div class="np-pl-work-actions">
-                        {% if questions_href %}
-                        <a href="{{ questions_href }}" class="np-pl2-btn np-pl2-btn--ghost">Review Q1{% if mc_count %}–{{ mc_count }}{% endif %}</a>
-                        {% endif %}
                         <button type="submit" class="np-pl2-btn np-pl2-btn--ghost" name="save" value="1">Save pages</button>
-                        <button type="submit" class="np-pl2-btn np-pl2-btn--primary np-pl-cta-pulse" name="continue" value="1">{% if section == 'paper' %}Save and finish{% else %}Save and continue{% endif %}</button>
+                        <button type="submit" class="np-pl2-btn np-pl2-btn--primary" name="continue" value="1">{% if section == 'paper' %}Save and finish{% else %}Save and continue{% endif %}</button>
                     </div>
                 </form>
+                {% if questions_href %}
+                <a href="{{ questions_href }}" class="np-pl-work-review">Review multiple-choice Q1{% if mc_count %}–{{ mc_count }}{% endif %}</a>
+                {% endif %}
 
                 {% if files %}
                 <section class="np-pl-work-files" aria-label="Uploaded pages">

@@ -172,7 +172,10 @@
         {% endif %}
         <a class="np-login-placement-btn" id="np-login-placement-start" href="{{ url_for('placement_landing') }}">Start Placement Test</a>
         {% if placement_public_access_enabled %}
-        <a class="np-login-placement-recover-cta" href="{{ url_for('placement_public_recover') }}">Already started? Recover with your code</a>
+        <a class="np-login-placement-recover-cta" href="{{ url_for('placement_public_recover') }}">
+          <span>Already started</span>
+          <strong>Recover with your code</strong>
+        </a>
         {% endif %}
       </div>
 

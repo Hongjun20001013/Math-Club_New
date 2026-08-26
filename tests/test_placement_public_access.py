@@ -253,7 +253,7 @@ class TestPublicProfile(_Base):
         self.assertIn("Start Placement Test", off_html)
         self.assertIn('id="np-login-placement-start"', off_html)
         self.assertIn('href="/placement"', off_html)
-        self.assertNotIn("Already started? Recover with your code", off_html)
+        self.assertNotIn("Recover with your code", off_html)
         self.flag_on()
         on = self.client.get("/login")
         self.assertEqual(on.status_code, 200)
@@ -263,7 +263,8 @@ class TestPublicProfile(_Base):
         self.assertIn('href="/placement"', on_html)
         self.assertIn("No account needed", on_html)
         self.assertIn("Your advisor sent you here.", on_html)
-        self.assertIn("Already started? Recover with your code", on_html)
+        self.assertIn("Already started", on_html)
+        self.assertIn("Recover with your code", on_html)
 
     def test_required_profile_rejects_incomplete(self):
         self.flag_on()
@@ -491,8 +492,8 @@ class TestRecoveryAndIsolation(_Base):
         self.assertIn(code, work)
         self.assertIn("Back to questions", work)
         self.assertIn("/placement/run/", work)
-        self.assertIn("/item/49", work)
-        back = self.client.get(f"/placement/run/{pid}/item/49")
+        self.assertIn("/item/0", work)
+        back = self.client.get(f"/placement/run/{pid}/item/0")
         self.assertEqual(back.status_code, 200)
         self.assertIn("choice", back.get_data(as_text=True).lower())
         self.assertIn(code, back.get_data(as_text=True))
@@ -863,9 +864,31 @@ class TestLockAndAdmin(_Base):
         self.assertEqual(detail.status_code, 200)
         detail_html = detail.get_data(as_text=True)
         self.assertIn("Score", detail_html)
+        self.assertIn("Alex Chen", detail_html)
+        self.assertIn("np-pl-report-name", detail_html)
+        self.assertIn("Family briefing", detail_html)
+        self.assertIn(f"/admin/placement-candidates/{attempt_id}/item/0", detail_html)
         self.assertNotIn("Paper FRQ", detail_html)
         self.assertNotIn("Provisional — paper responses not reviewed", detail_html)
         self.assertNotIn("Final score", detail_html)
+        item = self.client.get(f"/admin/placement-candidates/{attempt_id}/item/0")
+        self.assertEqual(item.status_code, 200)
+        item_html = item.get_data(as_text=True)
+        self.assertIn("Question 1 of", item_html)
+        self.assertIn("Back to Alex Chen report", item_html)
+        self.assertIn("sat-stem-body", item_html)
+        self.assertIn("tex-mml-chtml.js", item_html)
+        self.assertIn("tex-mml-chtml.js", detail_html)
+        last_idx = COUNTS["enhanced_math_1"] - 1
+        last_item = self.client.get(
+            f"/admin/placement-candidates/{attempt_id}/item/{last_idx}"
+        )
+        self.assertEqual(last_item.status_code, 200)
+        self.assertIn(f"Question {last_idx + 1} of", last_item.get_data(as_text=True))
+        missing = self.client.get(
+            f"/admin/placement-candidates/{attempt_id}/item/{last_idx + 8}"
+        )
+        self.assertEqual(missing.status_code, 404)
         pdf = self.client.get(f"/admin/placement-candidates/{attempt_id}/report.pdf")
         self.assertEqual(pdf.status_code, 200)
         self.assertIn("pdf", pdf.mimetype)
@@ -1602,12 +1625,18 @@ class TestPaperWorkGates(_Base):
         self.assertIn("Download PDF", html)
         self.assertIn("np-pl-drop__zone", html)
         self.assertIn("Back to questions", html)
-        self.assertIn("/item/49", html)
+        self.assertIn("/item/0", html)
+        self.assertIn("Review multiple-choice Q1–50", html)
         self.assertIn("data-pl-recovery-code", html)
         self.assertIn("24-hour pass", html)
-        review = self.client.get(f"/placement/run/{pid}/item/49")
+        review = self.client.get(f"/placement/run/{pid}/item/0", follow_redirects=False)
         self.assertEqual(review.status_code, 200)
         self.assertNotIn("/section/paper/work", review.headers.get("Location") or "")
+        mid = self.client.get(f"/placement/run/{pid}/item/12", follow_redirects=False)
+        self.assertEqual(mid.status_code, 200)
+        mid_html = mid.get_data(as_text=True)
+        self.assertIn("id=\"question-area\"", mid_html)
+        self.assertIn("Paper PDF", mid_html)
         blocked = self.client.post(
             "/placement/enhanced-math-1/section/paper/work",
             data={"csrf_token": self.csrf(), "continue": "1"},
@@ -1674,9 +1703,12 @@ class TestPaperWorkGates(_Base):
         self.assertEqual(work.status_code, 200)
         html = work.get_data(as_text=True)
         self.assertIn("Drop one PDF here", html)
-        self.assertIn("/item/54", html)
+        self.assertIn("/item/0", html)
         self.assertIn("data-pl-recovery-code", html)
-        self.assertIn("Review Q1–55", html)
+        self.assertIn("Review multiple-choice Q1–55", html)
+        review = self.client.get(f"/placement/run/{pid}/item/0", follow_redirects=False)
+        self.assertEqual(review.status_code, 200)
+        self.assertNotIn("/section/paper/work", review.headers.get("Location") or "")
         uploaded = self.client.post(
             "/placement/enhanced-math-2/section/paper/work",
             data={
