@@ -953,14 +953,19 @@ def enrich_placement_section_stats(topic: str, section_stats: list[dict[str, Any
         s = dict(raw)
         sec = str(s.get("section") or "")
         paper = bool(s.get("paper"))
+        paper_kind = bool(s.get("paper_kind") or paper)
         correct = int(s.get("correct") or 0)
         total = int(s.get("total") or 0)
         reading = _section_readiness(correct, total, paper=paper, topic=str(topic or ""))
         s["part_label"] = _part_label_for_section(sec)
         s["area_title"] = _area_title_for_section(sec, str(s.get("title_en") or ""))
-        range_label = ranges.get(sec) or (f"{total} items" if total else "")
-        if range_label in (s["part_label"], s["area_title"]):
-            range_label = f"{total} items" if total else ""
+        if paper_kind:
+            n_items = int(s.get("item_count") or 0)
+            range_label = f"{n_items} items" if n_items else (ranges.get(sec) or "")
+        else:
+            range_label = ranges.get(sec) or (f"{total} items" if total else "")
+            if range_label in (s["part_label"], s["area_title"]):
+                range_label = f"{total} items" if total else ""
         s["range_label"] = range_label
         s["status"] = reading["status"]
         s["status_label"] = reading["status_label"]

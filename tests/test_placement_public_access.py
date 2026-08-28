@@ -1674,6 +1674,8 @@ class TestPaperWorkGates(_Base):
         body = graded.get_data(as_text=True)
         self.assertIn("Paper scores saved", body)
         self.assertIn("Score 49 / 98", body)
+        self.assertIn("44/44", body)
+        self.assertNotIn("Submitted for advisor review", body)
         pdf = self.client.get(f"/admin/placement-candidates/{aid}/report.pdf")
         self.assertEqual(pdf.status_code, 200)
         from pypdf import PdfReader
@@ -1752,6 +1754,23 @@ class TestPaperWorkGates(_Base):
         body = graded.get_data(as_text=True)
         self.assertIn("Paper scores saved", body)
         self.assertIn("Score 45 / 99", body)
+        self.assertIn("40/40", body)
+        self.assertNotIn("Submitted for advisor review", body)
+        self.assertNotIn("Advisor review", body)
+        mixed = {"csrf_token": self.csrf()}
+        for idx in range(55, 69):
+            mixed[f"pts_{idx}"] = "1" if idx < 59 else "4"
+        mixed["pts_56"] = "0"
+        mixed["pts_58"] = "0"
+        mixed_body = self.client.post(
+            f"/admin/placement-candidates/{aid}/paper-grades",
+            data=mixed,
+            follow_redirects=True,
+        ).get_data(as_text=True)
+        self.assertIn("Score 43 / 99", mixed_body)
+        self.assertIn("2/4", mixed_body)
+        self.assertIn("40/40", mixed_body)
+        self.assertIn("50%", mixed_body)
         pdf = self.client.get(f"/admin/placement-candidates/{aid}/report.pdf")
         self.assertEqual(pdf.status_code, 200)
         from pypdf import PdfReader
@@ -1759,11 +1778,14 @@ class TestPaperWorkGates(_Base):
         pdf_text = "\n".join(
             (page.extract_text() or "") for page in PdfReader(BytesIO(pdf.data)).pages
         )
-        self.assertIn("Score 45 / 99", pdf_text)
+        self.assertIn("Score 43 / 99", pdf_text)
         self.assertIn("MC auto-scored 1/55", pdf_text)
-        self.assertIn("Paper 44/44", pdf_text)
+        self.assertIn("Paper 42/44", pdf_text)
+        self.assertIn("2/4", pdf_text)
+        self.assertIn("40/40", pdf_text)
         self.assertNotIn("Graphing 0 / 4 submitted", pdf_text)
         self.assertNotIn("Score 1 / 55", pdf_text)
+        self.assertNotIn("Submitted for advisor review", pdf_text)
 
 
 if __name__ == "__main__":

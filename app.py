@@ -18173,17 +18173,33 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     display_total = int(score.get("max_points") or auto_total)
     display_correct = int(score.get("total_points") if paper_rubric else auto_correct)
     score_pct = round(100.0 * display_correct / display_total) if display_total else 0
-    acc = defaultdict(lambda: {"correct": 0, "total": 0, "title": "", "paper_total": 0, "paper_completed": 0})
+    acc = defaultdict(
+        lambda: {
+            "correct": 0,
+            "total": 0,
+            "title": "",
+            "paper_items": 0,
+            "paper_graded": 0,
+            "paper_points": 0,
+            "paper_max": 0,
+        }
+    )
     topic = str(att["topic"] or "")
+    rubric_by_index = {int(r["index"]): r for r in (paper_rubric or [])}
     for row, qobj in zip(items, questions):
         sec = row.get("knowledge_section") or qobj.get("knowledge_section") or "—"
         acc[sec]["title"] = row.get("knowledge_title_en") or qobj.get("knowledge_section_title_en") or acc[sec]["title"]
-        if is_placement_graphing_item(qobj) or (is_enhanced_paper_topic(topic) and not is_mcq_item(qobj)):
-            acc[sec]["paper_total"] += 1
-            if row["status"] in ("submitted", "paper", "correct") and (
-                not is_enhanced_paper_topic(topic) or (int(row["n"]) - 1) in paper_grades
-            ):
-                acc[sec]["paper_completed"] += 1
+        if is_placement_graphing_item(qobj) or (
+            is_enhanced_paper_topic(topic) and not is_mcq_item(qobj)
+        ):
+            idx = int(row["n"]) - 1
+            spec = rubric_by_index.get(idx) or {}
+            cap = int(spec.get("max_points") or (1 if is_placement_graphing_item(qobj) else 4))
+            acc[sec]["paper_items"] += 1
+            acc[sec]["paper_max"] += cap
+            if idx in paper_grades:
+                acc[sec]["paper_graded"] += 1
+                acc[sec]["paper_points"] += int(paper_grades[idx])
             continue
         acc[sec]["total"] += 1
         if row["status"] == "correct":
@@ -18194,16 +18210,22 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         if sec not in acc:
             continue
         a = acc[sec]
-        if a.get("paper_total") and not a["total"]:
-            t = int(a["paper_total"])
+        if a.get("paper_items") and not a["total"]:
+            items_n = int(a["paper_items"])
+            graded_n = int(a.get("paper_graded") or 0)
+            max_pts = int(a.get("paper_max") or 0)
+            pts = int(a.get("paper_points") or 0)
+            scored = bool(items_n) and graded_n == items_n
             section_stats.append(
                 {
                     "section": sec,
                     "title_en": a["title"] or "Graphing",
-                    "correct": int(a.get("paper_completed") or 0),
-                    "total": t,
-                    "pct": 0,
-                    "paper": True,
+                    "correct": pts if scored else graded_n,
+                    "total": max_pts if scored else items_n,
+                    "pct": round(100.0 * pts / max_pts) if scored and max_pts else 0,
+                    "paper": not scored,
+                    "paper_kind": True,
+                    "item_count": items_n,
                 }
             )
             continue
