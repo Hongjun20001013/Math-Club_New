@@ -9,7 +9,6 @@
 {% set graphing_total = score.paper_frq_total if score else 0 %}
 {% set graphing_done = score.paper_frq_completed if score else 0 %}
 {% set paper_sitting = score.paper_max_points|default(0) %}
-{% set written_sitting = attempt.topic == 'english_grade_9' %}
 {% set ring_num = score.total_points if paper_sitting else auto_correct %}
 {% set ring_den = score.max_points if paper_sitting else auto_total %}
 {% set pname = attempt.display_name or '' %}
@@ -70,9 +69,7 @@
         </div>
         <p class="np-score-pct">{{ score_pct }}% of sitting</p>
         <p class="np-summary-score-foot">Score {{ ring_num }} / {{ ring_den }}</p>
-        {% if written_sitting %}
-        <p class="np-summary-paper-frq">Written work · {{ ring_num }} / {{ ring_den }}{% if not score.paper_complete %} · still grading{% endif %}</p>
-        {% elif paper_sitting %}
+        {% if paper_sitting %}
         <p class="np-summary-paper-frq">MC auto-scored {{ auto_correct }}/{{ auto_total }}</p>
         <p class="np-summary-paper-frq">Graphing 1 pt · FR 4 pt · Paper {{ score.paper_points or 0 }}/{{ score.paper_max_points }}{% if not score.paper_complete %} · still grading{% endif %}</p>
         {% elif graphing_total %}
@@ -128,7 +125,7 @@
         <dd>{{ attempt.school or "—" }}</dd>
       </div>
       <div class="np-placement-profile-row np-placement-profile-row--wide">
-        <dt>{% if written_sitting %}Current English class{% else %}Current math class{% endif %}</dt>
+        <dt>Current math class</dt>
         <dd>{{ attempt.math_course or "—" }}</dd>
       </div>
       <div class="np-placement-profile-row np-placement-profile-row--wide">
@@ -141,7 +138,7 @@
   <section id="np-study-report" class="np-learning-report glass-panel np-glass np-learning-report--v3 np-learning-report--placement" aria-label="Report snapshot">
     <div class="np-learning-report-head">
       <p class="np-learning-report-kicker">Study report</p>
-      <h2>{% if score_pct >= 85 %}Strong diagnostic.{% elif score_pct >= 70 %}Solid base. Review the misses.{% elif auto_total or paper_sitting %}Useful placement signal.{% else %}Waiting on scored answers.{% endif %}</h2>
+      <h2>{% if score_pct >= 85 %}Strong diagnostic.{% elif score_pct >= 70 %}Solid base. Review the misses.{% elif auto_total %}Useful placement signal.{% else %}Waiting on scored answers.{% endif %}</h2>
       <p>Use the score ring, area bars, and item sheet to brief the family. Download the PDF when you need a counselor copy.</p>
       <p class="np-learning-report-family-note np-learning-report-family-note--placement"><span class="np-learning-report-family-label">For advisors</span> Anchor the conversation on <strong>Score band</strong> and <strong>Score by section</strong>—the PDF is the shareable copy.</p>
     </div>
@@ -149,7 +146,7 @@
       <article class="np-learning-report-card">
         <span>Score band</span>
         <strong>{{ score_pct }}%</strong>
-        <em>{% if written_sitting %}{{ ring_num }}/{{ ring_den }} written{% else %}{{ auto_correct }} MC of {{ auto_total }}{% if paper_sitting %} · {{ ring_num }}/{{ ring_den }} total{% endif %}{% endif %}</em>
+        <em>{{ auto_correct }} MC of {{ auto_total }}{% if paper_sitting %} · {{ ring_num }}/{{ ring_den }} total{% endif %}</em>
       </article>
       <article class="np-learning-report-card">
         <span>Progress</span>
@@ -213,8 +210,8 @@
   {% if paper_uploads or paper_rubric %}
   <section id="np-admin-pl-paper" class="np-admin-pl-misses glass-panel np-glass" aria-label="Uploaded paper work">
     <p class="np-summary-sheet-kicker">Paper work</p>
-    <h2 class="np-summary-sheet-title">{% if written_sitting %}Grade written responses{% elif paper_sitting %}Grade the paper packet{% else %}Photos students uploaded{% endif %}</h2>
-    <p class="np-summary-sheet-lead">{% if written_sitting %}Open each question, read the typed answer, then mark points. Keys sit under each row.{% elif paper_sitting %}One PDF should include graphing (1 pt each) and free response (4 pt each). Open the file, then mark each item.{% else %}Graphing and free-response pages from this sitting. Open a file to grade it.{% endif %}</p>
+    <h2 class="np-summary-sheet-title">{% if paper_sitting %}Grade the paper packet{% else %}Photos students uploaded{% endif %}</h2>
+    <p class="np-summary-sheet-lead">{% if paper_sitting %}One PDF should include graphing (1 pt each) and free response (4 pt each). Open the file, then mark each item.{% else %}Graphing and free-response pages from this sitting. Open a file to grade it.{% endif %}</p>
     {% if paper_uploads %}
     <div class="np-admin-pl-uploads">
       {% for f in paper_uploads %}
@@ -234,7 +231,6 @@
           <div class="np-pl-grade-meta">
             <strong><a href="{{ url_for('admin_placement_candidate_item', attempt_id=attempt.id, q_index=row.index) }}">Q{{ row.n }}</a></strong>
             <span>{{ row.label }} · {{ row.max_points }} pt</span>
-            {% if row.advisor_key %}<p class="np-pl-grade-key">{{ row.advisor_key }}</p>{% endif %}
           </div>
           <div class="np-pl-grade-pills" role="group" aria-label="Q{{ row.n }} score">
             {% for p in range(0, row.max_points + 1) %}
@@ -247,7 +243,7 @@
         </li>
         {% endfor %}
       </ul>
-      <button type="submit" class="np-pw-btn np-pw-btn--primary">{% if written_sitting %}Save written scores{% else %}Save paper scores{% endif %}</button>
+      <button type="submit" class="np-pw-btn np-pw-btn--primary">Save paper scores</button>
     </form>
     {% endif %}
   </section>
@@ -270,7 +266,7 @@
     <header class="np-summary-sheet-cap">
       <p class="np-summary-sheet-kicker">Full breakdown</p>
       <h2 class="np-summary-sheet-title">Item-by-item results</h2>
-      <p class="np-summary-sheet-lead">{% if written_sitting %}Click a question number to read the student writing. Assign points in Grade written responses.{% elif paper_sitting %}Click a question number to open the original item. Multiple choice is auto-scored. Graphing and free response wait for advisor grades.{% else %}Click a question number to open the original item. Grouped by the same printed sections as the paper.{% endif %}</p>
+      <p class="np-summary-sheet-lead">{% if paper_sitting %}Click a question number to open the original item. Multiple choice is auto-scored. Graphing and free response wait for advisor grades.{% else %}Click a question number to open the original item. Grouped by the same printed sections as the paper.{% endif %}</p>
     </header>
     <div class="np-summary-table-head np-admin-pl-sheet-head">
       <span class="col-q">#</span>

@@ -24,7 +24,6 @@ SLUG_TO_TOPIC = {
     "enhanced-math-1": "enhanced_math_1",
     "enhanced-math-2": "enhanced_math_2",
     "upper-algebra-precalc": "placement_full",
-    "english-grade-9": "english_grade_9",
 }
 TOPIC_TO_SLUG = {v: k for k, v in SLUG_TO_TOPIC.items()}
 ITEM_COUNTS = {
@@ -32,14 +31,12 @@ ITEM_COUNTS = {
     "enhanced_math_1": 65,
     "enhanced_math_2": 69,
     "placement_full": 85,
-    "english_grade_9": 12,
 }
 TIMER_MINUTES = {
     "middle_level": 150,
     "enhanced_math_1": 120,
     "enhanced_math_2": 130,
     "placement_full": 115,
-    "english_grade_9": 50,
 }
 OPEN_STATUSES = frozenset({"profile_completed", "in_progress"})
 SITTING_TTL_HOURS = 24

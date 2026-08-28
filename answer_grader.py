@@ -374,8 +374,6 @@ PAPER_CHECKBOX_LABEL = "I completed this question on paper"
 
 
 def is_placement_graphing_item(question: dict) -> bool:
-    if question.get("advisor_grade") or str(question.get("subject") or "") == "english":
-        return False
     kind = str(question.get("question_kind") or "")
     return kind == "constructed_response" or str(question.get("knowledge_section") or "") == "G"
 
@@ -404,15 +402,6 @@ def placement_recorded_paper_answer(
 
 
 ENHANCED_PAPER_TOPICS = frozenset({"enhanced_math_1", "enhanced_math_2"})
-ADVISOR_WRITTEN_TOPICS = frozenset({"english_grade_9"})
-
-
-def is_advisor_written_topic(topic: str | None) -> bool:
-    return str(topic or "") in ADVISOR_WRITTEN_TOPICS
-
-
-def is_advisor_written_item(question: dict) -> bool:
-    return bool(question.get("advisor_grade")) or str(question.get("subject") or "") == "english"
 
 
 def is_enhanced_paper_topic(topic: str | None) -> bool:
@@ -432,7 +421,6 @@ def placement_auto_score_breakdown(
     """
     is_correct_by_index = is_correct_by_index or {}
     em_paper = is_enhanced_paper_topic(topic)
-    written = is_advisor_written_topic(topic)
     auto_total = 0
     auto_correct = 0
     auto_incorrect = 0
@@ -440,15 +428,8 @@ def placement_auto_score_breakdown(
     graphing_answered = 0
     fr_paper_total = 0
     awaiting_review = 0
-    written_max = 0
     for i, question in enumerate(questions):
         selected = str(selected_by_index.get(i) or "")
-        if written or is_advisor_written_item(question):
-            fr_paper_total += 1
-            written_max += int(question.get("max_points") or 4)
-            if selected.strip():
-                graphing_answered += 1
-            continue
         if is_placement_graphing_item(question):
             graphing_total += 1
             if selected.strip():
@@ -471,14 +452,12 @@ def placement_auto_score_breakdown(
     paper_max = 0
     if em_paper:
         paper_max = graphing_total * 1 + fr_paper_total * 4
-    elif written:
-        paper_max = written_max
     out = {
         "mcq_correct": auto_correct,
         "mcq_total": auto_total,
         "mcq_incorrect": auto_incorrect,
         "paper_frq_completed": graphing_answered,
-        "paper_frq_total": fr_paper_total if written else graphing_total,
+        "paper_frq_total": graphing_total,
         "provisional": False,
         "correct": auto_correct,
         "scored": auto_correct + auto_incorrect,
@@ -494,7 +473,7 @@ def placement_auto_score_breakdown(
         "graphing_total": graphing_total,
         "fr_paper_total": fr_paper_total,
         "paper_max_points": paper_max,
-        "max_points": (auto_total + paper_max) if (em_paper or written) else auto_total,
+        "max_points": (auto_total + paper_max) if em_paper else auto_total,
         "total_points": auto_correct,
         "paper_points": 0,
         "paper_complete": False,
@@ -503,21 +482,7 @@ def placement_auto_score_breakdown(
 
 
 def placement_paper_rubric(topic: str | None, questions: list) -> list[dict]:
-    """Advisor-graded items. Enhanced Math uses graphing 1 pt / FR 4 pt. English uses item max_points."""
-    if is_advisor_written_topic(topic):
-        rows = []
-        for i, question in enumerate(questions):
-            rows.append(
-                {
-                    "index": i,
-                    "n": i + 1,
-                    "kind": "constructed_response",
-                    "label": str(question.get("short_title") or f"Item {i + 1}"),
-                    "max_points": int(question.get("max_points") or 4),
-                    "advisor_key": str(question.get("advisor_key") or ""),
-                }
-            )
-        return rows
+    """Advisor-graded items for Enhanced Math: graphing 1 pt, FR 4 pt."""
     if not is_enhanced_paper_topic(topic):
         return []
     rows = []
@@ -575,8 +540,6 @@ def placement_result_status(
 ) -> str:
     """Staff-facing label for one placement item."""
     has = bool((selected or "").strip())
-    if is_advisor_written_topic(topic) or is_advisor_written_item(question):
-        return "awaiting review" if has else "skipped"
     if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
         return "paper"
     if is_placement_graphing_item(question):
@@ -607,8 +570,6 @@ def grade_placement_response(
     question: dict, student_raw: str, topic: str | None = None
 ) -> tuple[Optional[int], str]:
     """Enhanced Math paper items are teacher-graded. Placement MCQ is an exact A–D/E key match."""
-    if is_advisor_written_topic(topic) or is_advisor_written_item(question):
-        return None, ""
     if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
         return None, ""
     if is_mcq_item(question):

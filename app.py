@@ -8,8 +8,6 @@ from answer_grader import (
     is_placement_paper_item,
     is_mcq_item,
     is_enhanced_paper_topic,
-    is_advisor_written_topic,
-    is_advisor_written_item,
     placement_auto_score_breakdown,
     placement_apply_paper_grades,
     placement_paper_rubric,
@@ -289,7 +287,7 @@ def _safe_redirect_target(raw: str, *, default: str = "") -> str:
     return target
 
 # Bump when bundled CSS changes. Optional env override per environment.
-STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260826-english-studio")
+STYLE_CSS_REVISION = os.environ.get("STYLE_CSS_REVISION", "20260826-report-math")
 
 _DB_SCHEMA_READY = False
 
@@ -1917,19 +1915,6 @@ def _placement_flow_config(topic: str) -> dict | None:
     row = _placement_test_by_topic(topic)
     if not row or str(row.get("status") or "") != "available":
         return None
-    if topic == "english_grade_9":
-        total = int(row.get("online_item_count") or 12)
-        return {
-            "mc_count": 0,
-            "graph_count": 0,
-            "fr_count": total,
-            "total": total,
-            "has_gates": False,
-            "paper_mode": "",
-            "session_prefix": "placement_english_g9",
-            "mc_scored": False,
-            "advisor_graded": True,
-        }
     if topic == "middle_level":
         return {
             "mc_count": 0,
@@ -1980,7 +1965,6 @@ def _placement_timer_seconds(topic: str) -> int:
         "enhanced_math_2": 130 * 60,
         "middle_level": 150 * 60,
         "placement_full": 115 * 60,
-        "english_grade_9": 50 * 60,
     }.get(topic, 115 * 60)
 
 
@@ -2168,21 +2152,17 @@ def _load_placement_catalog() -> dict:
 
 def _placement_tests_flat() -> list[dict]:
     out: list[dict] = []
-    catalog = _load_placement_catalog()
-    for key in ("tiers", "english_tiers"):
-        for tier in catalog.get(key) or []:
-            if not isinstance(tier, dict):
-                continue
-            subject = "english" if key == "english_tiers" else "math"
-            for test in tier.get("tests") or []:
-                if isinstance(test, dict):
-                    row = dict(test)
-                    row["tier_id"] = tier.get("id")
-                    row["tier_title"] = tier.get("title")
-                    row["tier_title_zh"] = tier.get("title_zh")
-                    row["tier_description"] = tier.get("description")
-                    row.setdefault("subject", subject)
-                    out.append(row)
+    for tier in _load_placement_catalog().get("tiers") or []:
+        if not isinstance(tier, dict):
+            continue
+        for test in tier.get("tests") or []:
+            if isinstance(test, dict):
+                row = dict(test)
+                row["tier_id"] = tier.get("id")
+                row["tier_title"] = tier.get("title")
+                row["tier_title_zh"] = tier.get("title_zh")
+                row["tier_description"] = tier.get("description")
+                out.append(row)
     return out
 
 
@@ -4383,11 +4363,6 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         full_path = os.path.join(APP_DIR, file_path)
         if not os.path.isfile(full_path):
             return []
-        if str(file_path).endswith(".json"):
-            with open(full_path, "r", encoding="utf-8") as handle:
-                payload = json.load(handle)
-            qs = payload.get("questions") if isinstance(payload, dict) else payload
-            return [dict(q) for q in qs] if isinstance(qs, list) else []
         if domain == "placement":
             if topic == "enhanced_math_1":
                 qs = parse_enhanced_math_placement_tex_file(full_path, profile="math_1")
@@ -4487,7 +4462,6 @@ BANKS: Dict[str, Dict[str, str]] = {
         "enhanced_math_1": "Placement_Enhanced_Math_1.tex",
         "enhanced_math_2": "Placement_Enhanced_Math_2.tex",
         "middle_level": "Placement_Middle_Level.tex",
-        "english_grade_9": "data/placement_english_g9.json",
     },
 }
 
@@ -9946,35 +9920,10 @@ def admin_placement_upload(attempt_id: int, upload_id: int):
 @app.route("/placement")
 def placement_landing():
     session["active_track_label"] = "Course placement"
-    return render_template("placement_studio.html")
-
-
-@app.route("/placement/math")
-def placement_math_catalog():
-    session["active_track_label"] = "Course placement"
     catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
     return render_template(
         "placement_catalog.html",
         catalog=catalog,
-        placement_subject="math",
-    )
-
-
-@app.route("/placement/english")
-def placement_english_catalog():
-    session["active_track_label"] = "Course placement"
-    src = _load_placement_catalog()
-    catalog = _enrich_placement_catalog_with_pdf_meta(
-        {
-            "title": "English placement",
-            "subtitle": "Choose the diagnostic your advisor named.",
-            "tiers": src.get("english_tiers") or [],
-        }
-    )
-    return render_template(
-        "placement_catalog.html",
-        catalog=catalog,
-        placement_subject="english",
     )
 
 
@@ -10036,7 +9985,6 @@ def placement_test_start(slug: str):
         advisor_other=placement_public_mod.ADVISOR_OTHER,
         timer_minutes=placement_public_mod.TIMER_MINUTES.get(topic, 115),
         item_count=placement_public_mod.ITEM_COUNTS.get(topic) or test.get("online_item_count"),
-        pdf_meta=_placement_pdf_meta(test.get("pdf_file")),
     )
 
 
@@ -10078,11 +10026,7 @@ def placement_test_begin(slug: str):
         flash("Please select a grade.")
         return redirect(url_for("placement_test_start", slug=slug))
     if len(course) < 2:
-        flash(
-            "Please enter your current English class clearly."
-            if topic == "english_grade_9"
-            else "Please enter your current school math class clearly."
-        )
+        flash("Please enter your current school math class clearly.")
         return redirect(url_for("placement_test_start", slug=slug))
     if request.form.get("counselor_confirm") != "1":
         flash("Please confirm that you selected the appropriate placement test and will complete it independently.")
@@ -10509,16 +10453,15 @@ def placement_public_finish(public_id: str):
     score = placement_auto_score_breakdown(
         questions, selected_by_index, is_correct_by_index, topic=str(att["topic"])
     )
-    if is_enhanced_paper_topic(str(att["topic"])) or is_advisor_written_topic(str(att["topic"])):
-        if is_enhanced_paper_topic(str(att["topic"])):
-            mc = int((_placement_flow_config(str(att["topic"])) or {}).get("mc_count") or 0)
-            answered_idxs = [i for i, ans in selected_by_index.items() if str(ans).strip()]
-            reached_paper = (mc - 1) in answered_idxs or any(i >= mc for i in answered_idxs)
-            if reached_paper and placement_public_mod.upload_count(
-                db, int(att["id"]), "paper", owner_kind="candidate"
-            ) < 1:
-                flash("Upload one PDF with your graphing and free-response work before submitting.")
-                return redirect(url_for("placement_section_work", slug=att["slug"], section="paper"))
+    if is_enhanced_paper_topic(str(att["topic"])):
+        mc = int((_placement_flow_config(str(att["topic"])) or {}).get("mc_count") or 0)
+        answered_idxs = [i for i, ans in selected_by_index.items() if str(ans).strip()]
+        reached_paper = (mc - 1) in answered_idxs or any(i >= mc for i in answered_idxs)
+        if reached_paper and placement_public_mod.upload_count(
+            db, int(att["id"]), "paper", owner_kind="candidate"
+        ) < 1:
+            flash("Upload one PDF with your graphing and free-response work before submitting.")
+            return redirect(url_for("placement_section_work", slug=att["slug"], section="paper"))
         grades = placement_public_mod.list_paper_grades(db, int(att["id"]))
         score = placement_apply_paper_grades(
             score, grades, placement_paper_rubric(str(att["topic"]), questions)
@@ -18131,7 +18074,6 @@ def _placement_part_order(topic: str) -> tuple[str, ...] | None:
         "enhanced_math_2": ("A", "B", "G", "FR"),
         "middle_level": ("I", "II", "III", "IV", "V"),
         "placement_full": ("1", "2", "3", "4", "5"),
-        "english_grade_9": ("R", "L"),
     }.get(str(topic or ""))
 
 
@@ -18186,10 +18128,6 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             status = "skipped"
         sec, title_en, _detail = _summary_topic_fields("placement", q)
         key = extract_correct_answer(q) or resp.get("correct_answer") or ""
-        if is_advisor_written_item(q) or is_advisor_written_topic(str(att["topic"])):
-            key_display = str(q.get("advisor_key") or "Advisor graded")
-        else:
-            key_display = display_answer_plain(key) if key else "—"
         items.append(
             {
                 "n": i + 1,
@@ -18204,7 +18142,7 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                 "result_label": label,
                 "status": status,
                 "yours_display": selected or "—",
-                "key_display": key_display,
+                "key_display": display_answer_plain(key) if key else "—",
                 "knowledge_section": sec,
                 "knowledge_title_en": title_en,
             }
@@ -18216,25 +18154,20 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     paper_grades = placement_public_mod.list_paper_grades(db, attempt_id, owner_kind="candidate")
     if paper_rubric:
         score = placement_apply_paper_grades(score, paper_grades, paper_rubric)
-        written_topic = is_advisor_written_topic(str(att["topic"]))
         for row in items:
             idx = int(row["n"]) - 1
             if idx in paper_grades:
                 cap = next((r["max_points"] for r in paper_rubric if r["index"] == idx), None)
                 if cap is not None:
-                    if not written_topic:
-                        row["yours_display"] = f"{paper_grades[idx]} / {cap}"
+                    row["yours_display"] = f"{paper_grades[idx]} / {cap}"
                     row["status"] = "correct" if paper_grades[idx] >= cap else "paper"
                     row["result_label"] = "advisor grade"
     test = _placement_test_by_slug(att["slug"])
-    if is_advisor_written_topic(str(att["topic"])):
-        answered_live = sum(1 for row in items if str(row.get("selected") or "").strip())
-    else:
-        answered_live = sum(
-            1
-            for row, qobj in zip(items, questions)
-            if str(row.get("selected") or "").strip() and is_mcq_item(qobj)
-        )
+    answered_live = sum(
+        1
+        for row, qobj in zip(items, questions)
+        if is_mcq_item(qobj) and str(row.get("selected") or "").strip()
+    )
     auto_total = int(score.get("mcq_total") or 0)
     auto_correct = int(score.get("mcq_correct") or 0)
     display_total = int(score.get("max_points") or auto_total)
@@ -18245,9 +18178,7 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     for row, qobj in zip(items, questions):
         sec = row.get("knowledge_section") or qobj.get("knowledge_section") or "—"
         acc[sec]["title"] = row.get("knowledge_title_en") or qobj.get("knowledge_section_title_en") or acc[sec]["title"]
-        if is_placement_graphing_item(qobj) or is_advisor_written_item(qobj) or (
-            is_enhanced_paper_topic(topic) and not is_mcq_item(qobj)
-        ) or is_advisor_written_topic(topic):
+        if is_placement_graphing_item(qobj) or (is_enhanced_paper_topic(topic) and not is_mcq_item(qobj)):
             acc[sec]["paper_total"] += 1
             if row["status"] in ("submitted", "paper", "correct") and (
                 not is_enhanced_paper_topic(topic) or (int(row["n"]) - 1) in paper_grades
@@ -18469,8 +18400,7 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
         topic_title=topic_title,
         part_label=part_label,
         area_title=area_title,
-        is_paper_item=is_enhanced_paper_topic(str(ctx["attempt"]["topic"])) and not is_mcq_item(qobj),
-        is_written_item=is_advisor_written_item(qobj),
+        is_paper_item=not is_mcq_item(qobj),
         result_choices=result_choices,
         explanation_en=qobj.get("explanation_en") or qobj.get("solution_en") or "",
         summary_href=summary_href,
@@ -18517,7 +18447,7 @@ def admin_placement_paper_grades(attempt_id: int):
         pts = max(0, min(int(item["max_points"]), pts))
         rows.append((int(item["index"]), pts, int(item["max_points"])))
     if not rows:
-        flash("Choose a score for at least one advisor-graded item.")
+        flash("Choose a score for at least one graphing or free-response item.")
         return redirect(url_for("admin_placement_candidate_detail", attempt_id=attempt_id))
     placement_public_mod.save_paper_grades(db, attempt_id, rows, owner_kind="candidate")
     db.commit()

@@ -11,9 +11,13 @@
 
     <div class="np-pl-canvas__inner">
         <nav class="np-pl2-nav np-pl-reveal">
-            <a href="{{ placement_url('placement_landing') }}" class="np-pl2-nav__back">
+            {% if placement_public_guest|default(false) %}
+            <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
+            {% else %}
+            <a href="{{ url_for('index') }}" class="np-pl2-nav__back">
+            {% endif %}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Course placement
+                {% if placement_public_guest|default(false) %}Course placement{% else %}Math Studio{% endif %}
             </a>
         </nav>
 
@@ -28,17 +32,10 @@
                     <h1 class="np-pl-display" id="np-pl-catalog-heading">{{ catalog.title|default('Place with clarity') }}</h1>
                     <p class="np-pl-lead">{{ catalog.subtitle|default('Choose the test your advisor named.') }}</p>
                     <ul class="np-pl-tags" aria-label="Features">
-                        {% if placement_subject|default('') == 'english' %}
-                        <li class="np-pl-tag">Timed diagnostic</li>
-                        <li class="np-pl-tag">Written on screen</li>
-                        <li class="np-pl-tag">Advisor graded</li>
-                        <li class="np-pl-tag">Counselor-ready PDF</li>
-                        {% else %}
                         <li class="np-pl-tag">Timed diagnostic</li>
                         <li class="np-pl-tag">Instant score report</li>
                         <li class="np-pl-tag">Counselor-ready PDF</li>
                         <li class="np-pl-tag">Blank test download</li>
-                        {% endif %}
                     </ul>
                     <nav class="np-pl-quickstart" aria-label="Start a placement test">
                         {% for tier in catalog.tiers %}
@@ -85,8 +82,6 @@
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                         {% elif tier.id == 'integrated' %}
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-                        {% elif tier.id == 'english-secondary' %}
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 5h7a4 4 0 014 4v12H8a4 4 0 01-4-4V5z" stroke="currentColor" stroke-width="1.8"/><path d="M20 5h-5a4 4 0 00-4 4v12h9a4 4 0 004-4V5z" stroke="currentColor" stroke-width="1.8"/><path d="M12 9v12" stroke="currentColor" stroke-width="1.8"/></svg>
                         {% else %}
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 12v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5" stroke="currentColor" stroke-width="1.8"/></svg>
                         {% endif %}
