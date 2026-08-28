@@ -1540,7 +1540,11 @@ class TestPaperWorkGates(_Base):
         self.assertIn("np-pl-cta-pulse", catalog)
         self.assertIn("np-pl-recover-cta", catalog)
         self.assertIn("Already started? Recover with your code", catalog)
-        self.assertIn('href="/placement/enhanced-math-1"', catalog)
+        self.assertIn('href="/placement/math"', catalog)
+        self.assertIn('href="/placement/english"', catalog)
+        self.assertIn("Choose your studio", catalog)
+        math_catalog = self.client.get("/placement/math").get_data(as_text=True)
+        self.assertIn('href="/placement/enhanced-math-1"', math_catalog)
         landing = self.client.get("/placement/enhanced-math-1").get_data(as_text=True)
         self.assertIn("Begin placement test", landing)
         self.assertIn("Download PDF", landing)
@@ -1674,6 +1678,18 @@ class TestPaperWorkGates(_Base):
         body = graded.get_data(as_text=True)
         self.assertIn("Paper scores saved", body)
         self.assertIn("Score 49 / 98", body)
+        pdf = self.client.get(f"/admin/placement-candidates/{aid}/report.pdf")
+        self.assertEqual(pdf.status_code, 200)
+        from pypdf import PdfReader
+
+        pdf_text = "\n".join(
+            (page.extract_text() or "") for page in PdfReader(BytesIO(pdf.data)).pages
+        )
+        self.assertIn("Score 49 / 98", pdf_text)
+        self.assertIn("MC auto-scored 1/50", pdf_text)
+        self.assertIn("Paper 48/48", pdf_text)
+        self.assertNotIn("Graphing 0 / 4 submitted", pdf_text)
+        self.assertNotIn("Score 1 / 50", pdf_text)
 
     def test_em2_combined_pdf_and_admin_grades(self):
         from io import BytesIO
@@ -1740,6 +1756,135 @@ class TestPaperWorkGates(_Base):
         body = graded.get_data(as_text=True)
         self.assertIn("Paper scores saved", body)
         self.assertIn("Score 45 / 99", body)
+        pdf = self.client.get(f"/admin/placement-candidates/{aid}/report.pdf")
+        self.assertEqual(pdf.status_code, 200)
+        from pypdf import PdfReader
+
+        pdf_text = "\n".join(
+            (page.extract_text() or "") for page in PdfReader(BytesIO(pdf.data)).pages
+        )
+        self.assertIn("Score 45 / 99", pdf_text)
+        self.assertIn("MC auto-scored 1/55", pdf_text)
+        self.assertIn("Paper 44/44", pdf_text)
+        self.assertNotIn("Graphing 0 / 4 submitted", pdf_text)
+        self.assertNotIn("Score 1 / 55", pdf_text)
+
+
+class TestEnglishPlacement(_Base):
+    def test_studio_and_english_g9_advisor_grade(self):
+        from app import BANKS, get_questions_for_topic
+
+        self.flag_on()
+        qs = get_questions_for_topic(
+            "placement", "english_grade_9", BANKS["placement"]["english_grade_9"]
+        )
+        self.assertEqual(len(qs), 12)
+        self.assertEqual(sum(int(q.get("max_points") or 0) for q in qs), 50)
+        self.assertTrue(all(q.get("advisor_grade") for q in qs))
+        self.assertTrue(all(not str(q.get("correct_answer") or "").strip() for q in qs))
+        self.assertEqual(sha256_file(BANK), BANK_SHA)
+
+        studio = self.client.get("/placement").get_data(as_text=True)
+        self.assertIn("Choose your studio", studio)
+        self.assertIn('href="/placement/math"', studio)
+        self.assertIn('href="/placement/english"', studio)
+        self.assertNotIn('href="/placement/enhanced-math-1"', studio)
+
+        math_catalog = self.client.get("/placement/math").get_data(as_text=True)
+        self.assertIn('href="/placement/enhanced-math-1"', math_catalog)
+        self.assertNotIn("english-grade-9", math_catalog)
+
+        english_catalog = self.client.get("/placement/english").get_data(as_text=True)
+        self.assertIn('href="/placement/english-grade-9"', english_catalog)
+        self.assertIn("Grade 9 English", english_catalog)
+        self.assertNotIn("enhanced-math-1", english_catalog)
+
+        landing = self.client.get("/placement/english-grade-9").get_data(as_text=True)
+        self.assertIn("Begin placement test", landing)
+        self.assertIn("50", landing)
+        self.assertIn("advisor", landing.lower())
+        self.assertNotIn("Upload one combined PDF", landing)
+        self.assertNotIn("auto-scored", landing)
+
+        start = self.client.get("/placement/english-grade-9/start").get_data(as_text=True)
+        self.assertIn("Current English class", start)
+        self.assertIn("You selected", start)
+        self.assertNotIn("Current school math class", start)
+
+        rv = self.begin(slug="english-grade-9", name="English Writer", grade="9th")
+        self.assertEqual(rv.status_code, 302)
+        pid = self.public_id_from_location(rv)
+        item = self.client.get(f"/placement/run/{pid}/item/0")
+        self.assertEqual(item.status_code, 200)
+        html = item.get_data(as_text=True)
+        self.assertIn("The Red Badge of Courage", html)
+        self.assertIn("constructed-answer-input", html)
+        self.assertIn("Write in complete sentences", html)
+        self.assertNotIn("Paper FRQ", html)
+
+        saved = self.client.post(
+            f"/placement/run/{pid}/item/0",
+            data={
+                "csrf_token": self.csrf(),
+                "qnum": "0",
+                "selected_answer": "A Civil War camp at dawn, with an army on the hills and campfires across the river.",
+            },
+        )
+        self.assertEqual(saved.status_code, 302)
+        self.assertIn("/item/1", saved.headers.get("Location") or "")
+
+        last = self.client.get(f"/placement/run/{pid}/item/11").get_data(as_text=True)
+        self.assertIn("This is the last written item", last)
+        self.assertNotIn("Save &amp; continue to paper", last)
+
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        done = self.client.get(f"/placement/run/{pid}/done").get_data(as_text=True)
+        self.assertIn("Awaiting advisor", done)
+        self.assertNotIn("Paper FRQ", done)
+        self.assertNotIn("Final score", done)
+        self.assertNotIn("Provisional — paper responses not reviewed", done)
+
+        self.login(user_id=1, role="admin", username="teacher")
+        aid = self.attempt_id(pid)
+        detail = self.client.get(f"/admin/placement-candidates/{aid}").get_data(as_text=True)
+        self.assertIn("Grade written responses", detail)
+        self.assertIn("Civil War camp", detail)
+        self.assertIn("Setting", detail)
+        self.assertIn("pts_0", detail)
+        self.assertNotIn("Grade the paper packet", detail)
+        self.assertNotIn("Paper FRQ", detail)
+        self.assertNotIn("Final score", detail)
+        self.assertNotIn("MC auto-scored", detail)
+
+        item_admin = self.client.get(f"/admin/placement-candidates/{aid}/item/0").get_data(as_text=True)
+        self.assertIn("Written response", item_admin)
+        self.assertIn("Civil War camp", item_admin)
+        self.assertIn("Advisor key", item_admin)
+
+        grade_data = {"csrf_token": self.csrf(), "pts_0": "4"}
+        graded = self.client.post(
+            f"/admin/placement-candidates/{aid}/paper-grades",
+            data=grade_data,
+            follow_redirects=True,
+        )
+        body = graded.get_data(as_text=True)
+        self.assertIn("Paper scores saved", body)
+        self.assertIn("4 / 50", body)
+        pdf = self.client.get(f"/admin/placement-candidates/{aid}/report.pdf")
+        self.assertEqual(pdf.status_code, 200)
+        from io import BytesIO
+        from pypdf import PdfReader
+
+        pdf_text = "\n".join(
+            (page.extract_text() or "") for page in PdfReader(BytesIO(pdf.data)).pages
+        )
+        self.assertIn("Score 4 / 50", pdf_text)
+        self.assertIn("Written work", pdf_text)
+        self.assertNotIn("MC auto-scored 0/0", pdf_text)
+        self.assertEqual(sha256_file(BANK), BANK_SHA)
 
 
 if __name__ == "__main__":

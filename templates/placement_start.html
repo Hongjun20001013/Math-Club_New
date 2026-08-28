@@ -22,7 +22,7 @@
                 <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                 <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>One step before question 1</p>
                 <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Your placement profile</h1>
-                <p class="np-pl-lead">Name, grade, advisor, and current school math class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
+                <p class="np-pl-lead">{% if topic == 'english_grade_9' %}Name, grade, advisor, and current English class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.{% else %}Name, grade, advisor, and current school math class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.{% endif %}</p>
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -52,9 +52,15 @@
                     </select>
                 </div>
                 <div class="np-pl-field np-pl-field--full">
+                    {% if topic == 'english_grade_9' %}
+                    <label class="np-pl-label" for="pl-course">Current English class <span class="np-pl-req">*</span></label>
+                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. English 9, Honors English, Literature" class="np-pl-input" required minlength="2">
+                    <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
+                    {% else %}
                     <label class="np-pl-label" for="pl-course">Current school math class <span class="np-pl-req">*</span></label>
                     <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input" required minlength="2">
                     <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
+                    {% endif %}
                 </div>
                 <fieldset class="np-pl-field np-pl-field--full np-pl-advisor">
                     <legend class="np-pl-label">Advisor <span class="np-pl-req">required</span></legend>
@@ -99,11 +105,21 @@
                         </div>
                     </div>
                     <ul class="np-pl-brief__rules">
+                        {% if topic == 'english_grade_9' %}
+                        <li>Write in complete sentences unless the item asks for a word or list.</li>
+                        {% if pdf_meta and pdf_meta.available %}
+                        <li>You may <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}">download a blank test PDF</a>.</li>
+                        {% endif %}
+                        <li>Type every answer on this website. There is no multiple-choice key.</li>
+                        <li>Answers autosave. Refresh or reopen this link to continue.</li>
+                        <li>Your advisor grades the sitting after you submit.</li>
+                        {% else %}
                         <li>Scratch paper is allowed.</li>
                         <li>You may <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}">download a blank test PDF</a>.</li>
                         <li>All final answers must be submitted on this website.</li>
                         <li>Answers autosave. Refresh or reopen this link to continue.</li>
                         <li>Follow the on-screen calculator policy for each question.</li>
+                        {% endif %}
                     </ul>
                 </aside>
                 <div class="np-pl-intake__actions">

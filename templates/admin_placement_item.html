@@ -28,12 +28,16 @@
       <h1 class="np-session-item-title np-session-item-title--bad">Incorrect</h1>
       {% elif status == 'skipped' %}
       <h1 class="np-session-item-title np-session-item-title--skip">Skipped</h1>
+      {% elif is_written_item %}
+      <h1 class="np-session-item-title">Written response</h1>
       {% elif is_paper_item %}
       <h1 class="np-session-item-title">Paper item</h1>
       {% else %}
       <h1 class="np-session-item-title">Review</h1>
       {% endif %}
-      {% if is_paper_item %}
+      {% if is_written_item %}
+      <p class="np-admin-pl-item-note">The student typed this on screen. Use the report to assign points. The key below is for advisors only.</p>
+      {% elif is_paper_item %}
       <p class="np-admin-pl-item-note">This prompt is from the paper packet. The student writes the work on paper; advisors grade it on the report.</p>
       {% endif %}
     </div>
@@ -43,7 +47,7 @@
         <strong>{{ yours_display }}</strong>
       </div>
       <div class="np-session-item-answer-card">
-        <span>{% if is_paper_item %}Max / key{% else %}Correct{% endif %}</span>
+        <span>{% if is_written_item %}Advisor key{% elif is_paper_item %}Max / key{% else %}Correct{% endif %}</span>
         <strong>{{ key_display }}</strong>
       </div>
     </div>

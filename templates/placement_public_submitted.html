@@ -11,10 +11,13 @@
       <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
       <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Sitting locked</p>
       <h1 class="np-pl-display np-pl-display--md">Submitted</h1>
-      <p class="np-pl-lead">{{ test.title }} is locked. Your auto-scored results are below.</p>
+      <p class="np-pl-lead">{% if attempt.topic == 'english_grade_9' %}{{ test.title }} is locked. Your advisor will grade the written work and share the family report.{% else %}{{ test.title }} is locked. Your auto-scored results are below.{% endif %}</p>
       <section class="np-pl-score-box np-pl-score-box--monument" aria-label="Placement score">
         <p class="np-pl-score-kicker">Score</p>
-        {% if score and score.paper_max_points %}
+        {% if attempt.topic == 'english_grade_9' %}
+        <p class="np-pl-score-value">{% if score and score.paper_complete %}{{ score.total_points }} / {{ score.max_points }}{% else %}Awaiting advisor{% endif %}</p>
+        <p class="np-pl-score-paper">Twelve written items · 50 points. Nothing is auto-scored.{% if score and score.paper_complete %} Advisor total {{ score.paper_points }}/{{ score.paper_max_points }}.{% endif %}</p>
+        {% elif score and score.paper_max_points %}
         <p class="np-pl-score-value">{{ score.total_points }} / {{ score.max_points }}</p>
         <p class="np-pl-score-paper">Multiple choice {{ score.mcq_correct }}/{{ score.mcq_total }} auto-scored. Graphing and free response are graded by your advisor ({{ score.paper_max_points }} points).{% if score.paper_complete %} Paper {{ score.paper_points }}/{{ score.paper_max_points }}.{% endif %}</p>
         {% elif score and score.mcq_total %}

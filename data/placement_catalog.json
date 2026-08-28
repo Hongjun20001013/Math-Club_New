@@ -101,5 +101,31 @@
         }
       ]
     }
+  ],
+  "english_tiers": [
+    {
+      "id": "english-secondary",
+      "title": "Secondary English",
+      "title_zh": "英语课程规划",
+      "description": "Reading and language arts diagnostics. Written work is graded by the advisor.",
+      "tests": [
+        {
+          "slug": "english-grade-9",
+          "topic": "english_grade_9",
+          "subject": "english",
+          "title": "Grade 9 English",
+          "subtitle": "Crane reading passage plus language arts · advisor-graded writing",
+          "status": "available",
+          "pdf_file": "Placement_English_Grade_9.pdf",
+          "online_mcq_count": 0,
+          "online_item_count": 12,
+          "paper_sections": "2 reading · 10 language arts · 50 points · advisor graded",
+          "parts": [
+            {"code": "R", "range": "1–2", "label": "Reading"},
+            {"code": "L", "range": "3–12", "label": "Language arts"}
+          ]
+        }
+      ]
+    }
   ]
 }

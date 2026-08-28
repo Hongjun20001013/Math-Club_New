@@ -839,6 +839,10 @@ PLACEMENT_SECTION_RANGES: dict[str, dict[str, str]] = {
         "4": "Q54–69",
         "5": "Q70–85",
     },
+    "english_grade_9": {
+        "R": "Q1–2",
+        "L": "Q3–12",
+    },
 }
 
 
@@ -848,6 +852,10 @@ def _part_label_for_section(sec: str) -> str:
         return "Graphing"
     if s == "FR":
         return "Free response"
+    if s == "R":
+        return "Reading"
+    if s == "L":
+        return "Language arts"
     if s in ("I", "II", "III", "IV", "V", "A", "B", "C"):
         return f"Part {s}"
     if s.isdigit():

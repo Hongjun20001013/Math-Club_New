@@ -11,9 +11,9 @@
 
     <div class="np-pl-canvas__inner">
         <nav class="np-pl2-nav np-pl-reveal">
-            <a href="{{ placement_url('placement_landing') }}" class="np-pl2-nav__back">
+            <a href="{{ placement_url('placement_english_catalog') if topic == 'english_grade_9' else placement_url('placement_math_catalog') }}" class="np-pl2-nav__back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                All placement tests
+                {% if topic == 'english_grade_9' %}English placement{% else %}Math placement{% endif %}
             </a>
         </nav>
 
@@ -41,7 +41,7 @@
                             </div>
                             <div class="np-pl-metric np-pl-metric--time" role="listitem">
                                 <span class="np-pl-metric__val">
-                                    {% if topic == 'middle_level' %}150{% elif topic == 'enhanced_math_1' %}120{% elif topic == 'enhanced_math_2' %}130{% elif topic == 'placement_full' %}115{% else %}95{% endif %}
+                                    {% if topic == 'middle_level' %}150{% elif topic == 'enhanced_math_1' %}120{% elif topic == 'enhanced_math_2' %}130{% elif topic == 'placement_full' %}115{% elif topic == 'english_grade_9' %}50{% else %}95{% endif %}
                                 </span>
                                 <span class="np-pl-metric__lbl">Minutes</span>
                             </div>
@@ -57,6 +57,8 @@
                                 <span>Gate 2</span><span>Q 27 / {{ test.online_item_count|default(85) }}</span>
                                 {% elif topic == 'enhanced_math_1' %}
                                 <span>Part II</span><span>Q 12 / {{ test.online_item_count|default(65) }}</span>
+                                {% elif topic == 'english_grade_9' %}
+                                <span>Reading</span><span>Q 1 / 12</span>
                                 {% else %}
                                 <span>Part II</span><span>Q 12 / {{ test.online_item_count|default(69) }}</span>
                                 {% endif %}
@@ -66,6 +68,10 @@
                                 <p class="np-pl-device__label">Fill in the answer</p>
                                 <p class="np-pl-device__math">\( 3x + 7 = 28 \)</p>
                                 <div class="np-pl-device__input"></div>
+                                {% elif topic == 'english_grade_9' %}
+                                <p class="np-pl-device__label">Write in complete sentences</p>
+                                <p class="np-pl-device__math np-pl-device__math--en">Explain the setting.</p>
+                                <div class="np-pl-device__input np-pl-device__input--en"></div>
                                 {% else %}
                                 <p class="np-pl-device__label">Select one answer</p>
                                 <p class="np-pl-device__math">\( 2x + 5 = 17 \)</p>
@@ -114,6 +120,8 @@
                     <p class="np-pl-structure__note">Online: <strong>55 MCQ</strong> auto-scored (1 pt each). Graphing (1 pt) and free response (4 pt) are graded by your advisor — download the PDF, work on paper, upload one file. Sitting total <strong>99</strong>.</p>
                     {% elif topic == 'placement_full' %}
                     <p class="np-pl-structure__note">Five-gate hybrid diagnostic: <strong>85 items</strong>, multiple choice with gate transitions — same Bluebook-style flow as Enhanced Math.</p>
+                    {% elif topic == 'english_grade_9' %}
+                    <p class="np-pl-structure__note">Twelve written items · <strong>50 points</strong>. Reading (Q1–2) then language arts (Q3–12). There is no multiple-choice key — your advisor grades each response.</p>
                     {% endif %}
                 </section>
                 {% endif %}
@@ -123,13 +131,14 @@
                 <div class="np-pl-pillar">
                     <p class="np-pl-pillar__eyebrow">Ready when you are</p>
                     <h2 class="np-pl-pillar__title">Start the diagnostic</h2>
-                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic == 'enhanced_math_1' %}50 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'enhanced_math_2' %}55 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'placement_full' %}Bluebook-style five-gate flow — transition screens after Gates 1–4, same polish as our Enhanced Math diagnostics.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
+                    <p class="np-pl-pillar__body">{% if topic == 'middle_level' %}One continuous 100-question run from Math 5 through Algebra 1/2 readiness. Fill-in answers, SAT-style.{% elif topic == 'enhanced_math_1' %}50 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'enhanced_math_2' %}55 multiple-choice items on screen, then download the PDF for graphing and free response. Upload one combined PDF.{% elif topic == 'placement_full' %}Bluebook-style five-gate flow — transition screens after Gates 1–4, same polish as our Enhanced Math diagnostics.{% elif topic == 'english_grade_9' %}Write on screen. Crane reading, then language arts. Your advisor marks each item after you submit.{% else %}Five gates with transition screens after Gates 1–4 — same flow as our other placement diagnostics.{% endif %}</p>
                     <a href="{{ placement_url('placement_test_start', slug=slug) }}" class="np-pl2-btn np-pl2-btn--cta np-pl-btn-glow np-pl-pillar__cta np-pl-cta-pulse">
                         Begin placement test
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
-                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. After Q50, download the PDF and upload one file.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. After Q55, download the PDF and upload one file.{% else %}About <strong>115 minutes</strong>. Pause screens after Q16, Q37, Q53, and Q69.{% endif %}</p>
+                    <p class="np-pl-pillar__fine">{% if topic == 'middle_level' %}Allow about <strong>2.5 hours</strong>. Quick student profile first.{% elif topic == 'enhanced_math_1' %}About <strong>2 hours</strong>. After Q50, download the PDF and upload one file.{% elif topic == 'enhanced_math_2' %}About <strong>2h 10m</strong>. After Q55, download the PDF and upload one file.{% elif topic == 'english_grade_9' %}About <strong>50 minutes</strong>. Quick student profile first — no multiple choice.{% else %}About <strong>115 minutes</strong>. Pause screens after Q16, Q37, Q53, and Q69.{% endif %}</p>
                 </div>
+                {% if pdf_meta and pdf_meta.available %}
                 <div class="np-pl-pdf" id="np-pl-pdf">
                     <div class="np-pl-pdf__icon" aria-hidden="true">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -143,6 +152,7 @@
                     </div>
                     <a href="{{ url_for('placement_blank_test_pdf', slug=slug) }}" class="np-pl2-btn np-pl2-btn--ghost np-pl-pdf__btn np-pl-cta-pulse">Download PDF</a>
                 </div>
+                {% endif %}
             </aside>
         </div>
     </div>

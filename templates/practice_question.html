@@ -291,8 +291,8 @@
 
                     <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if q.advisor_grade or q.subject|default('') == 'english' %}Your writing{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if q.advisor_grade or q.subject|default('') == 'english' %}Write in complete sentences unless the item asks for a word or list{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
                 {% if q.question_kind|default('mcq') == 'constructed_response' %}
                 <div class="sat-response-scroll">
@@ -302,9 +302,9 @@
                             <span class="sat-response-studio__badge">Saved for review</span>
                         </div>
                         <div class="sat-response-studio__frame">
-                            <textarea class="sat-constructed-input sat-response-studio__input" name="selected_answer" id="constructed-answer-input" rows="10" autocomplete="off" placeholder="Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed."{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} readonly{% endif %}>{{ saved_selected_answer|default('') }}</textarea>
+                            <textarea class="sat-constructed-input sat-response-studio__input" name="selected_answer" id="constructed-answer-input" rows="10" autocomplete="off" placeholder="{% if q.advisor_grade or q.subject|default('') == 'english' %}Write your answer here. Use complete sentences unless the item asks for a word or list.{% else %}Show each step, label graphs, and state your final answer. Use the grid in the question for sketching on paper if needed.{% endif %}"{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} readonly{% endif %}>{{ saved_selected_answer|default('') }}</textarea>
                         </div>
-                        <p class="sat-constructed-hint">{% if q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
+                        <p class="sat-constructed-hint">{% if q.advisor_grade or q.subject|default('') == 'english' %}Your advisor grades this item after you submit the sitting. It is not auto-scored.{% elif q.placement_section == 'graphing' %}Graph on paper using the grid above, then describe your graph and interval notation here.{% else %}Write full reasoning — these items are saved for your teacher/advisor review (not auto-scored).{% endif %}</p>
                     </div>
                 </div>
                 {% elif q.question_kind|default('mcq') == 'free_response' %}
@@ -369,7 +369,7 @@
                     <p class="sat-submit-hint">This is the last on-screen question. Next opens the paper PDF upload for graphing and free response.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Save &amp; continue to paper</button>
                     {% elif is_last %}
-                    <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
+                    <p class="sat-submit-hint">{% if topic == 'english_grade_9' %}This is the last written item. Submit so your advisor can grade the sitting.{% elif placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>

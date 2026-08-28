@@ -135,7 +135,15 @@ def _chip_row(pdf: FPDF, chips: list[str], y: float) -> float:
     return y + h
 
 
-def _score_ring(pdf: FPDF, cx: float, cy: float, correct: int, total: int, pct: int) -> None:
+def _score_ring(
+    pdf: FPDF,
+    cx: float,
+    cy: float,
+    correct: int,
+    total: int,
+    pct: int,
+    pct_label: str = "correct",
+) -> None:
     size = 36
     x = cx - size / 2
     y = cy - size / 2
@@ -172,11 +180,40 @@ def _score_ring(pdf: FPDF, cx: float, cy: float, correct: int, total: int, pct: 
     pdf.set_font(pdf._ff, "B", 8.5)  # type: ignore[attr-defined]
     pdf.set_text_color(*_C_INK)
     pdf.set_xy(cx - 22, cy + 16)
-    pdf.cell(44, 4.5, f"{pct}% correct", align="C")
+    pdf.cell(44, 4.5, f"{pct}% {pct_label}", align="C")
     pdf.set_font(pdf._ff, "", 7.2)  # type: ignore[attr-defined]
     pdf.set_text_color(*_C_MUTED)
     pdf.set_xy(cx - 22, cy + 21)
     pdf.cell(44, 4, f"Score {correct} / {total}", align="C")
+
+
+def _sitting_from_ctx(ctx: dict[str, Any]) -> dict[str, Any]:
+    """Match the on-screen report ring: sitting total when paper/written points exist."""
+    mcq_c = int(
+        ctx.get("mcq_correct") if ctx.get("mcq_correct") is not None else ctx.get("correct_count") or 0
+    )
+    mcq_t = int(ctx.get("mcq_total") if ctx.get("mcq_total") is not None else ctx.get("total_q") or 0)
+    paper_max = int(ctx.get("paper_max_points") or 0)
+    paper_pts = int(ctx.get("paper_points") or 0)
+    if paper_max:
+        correct = int(
+            ctx.get("total_points") if ctx.get("total_points") is not None else ctx.get("correct_count") or 0
+        )
+        total = int(ctx.get("max_points") or ctx.get("placement_score_total") or (mcq_t + paper_max))
+    else:
+        correct = int(ctx.get("correct_count") or 0)
+        total = int(ctx.get("placement_score_total") or ctx.get("total_q") or 0)
+    return {
+        "correct": correct,
+        "total": total,
+        "mcq_c": mcq_c,
+        "mcq_t": mcq_t,
+        "paper_max": paper_max,
+        "paper_pts": paper_pts,
+        "paper_complete": bool(ctx.get("paper_complete")),
+        "paper_frq_done": int(ctx.get("paper_frq_completed") or 0),
+        "paper_frq_total": int(ctx.get("paper_frq_total") or 0),
+    }
 
 
 def _draw_hero(pdf: FPDF, ctx: dict[str, Any]) -> None:
@@ -193,13 +230,20 @@ def _draw_hero(pdf: FPDF, ctx: dict[str, Any]) -> None:
     brand = str(ctx.get("brand_name") or "Novel Prep Math Studio")
     answered = int(ctx.get("answered_live") or 0)
     item_total = int(ctx.get("item_total") or ctx.get("total_q") or 0)
-    correct = int(ctx.get("correct_count") or 0)
-    total = int(ctx.get("placement_score_total") or ctx.get("total_q") or 0)
+    sitting = _sitting_from_ctx(ctx)
+    correct = sitting["correct"]
+    total = sitting["total"]
     pct = int(ctx.get("score_pct") or 0)
-    paper_done = int(ctx.get("paper_frq_completed") or 0)
-    paper_total = int(ctx.get("paper_frq_total") or 0)
+    paper_done = sitting["paper_frq_done"]
+    paper_total = sitting["paper_frq_total"]
+    paper_max = sitting["paper_max"]
 
-    card_h = 78 if paper_total else 72
+    extra = 0
+    if paper_max:
+        extra = 10 if sitting["mcq_t"] else 6
+    elif paper_total:
+        extra = 6
+    card_h = 72 + extra
     _card(pdf, pdf.l_margin, y0, w, card_h, radius=6)
     left = pdf.l_margin + 8
     pdf.set_xy(left, y0 + 7)
@@ -244,11 +288,34 @@ def _draw_hero(pdf: FPDF, ctx: dict[str, Any]) -> None:
     pdf.set_left_margin(left)
     _chip_row(pdf, chips, y0 + 51)
     pdf.set_left_margin(11)
-    _score_ring(pdf, pdf.w - pdf.r_margin - 28, y0 + 34, correct, total, pct)
-    if paper_total:
-        pdf.set_font(pdf._ff, "", 6.8)  # type: ignore[attr-defined]
-        pdf.set_text_color(*_C_MUTED)
-        pdf.set_xy(pdf.w - pdf.r_margin - 50, y0 + 64)
+    _score_ring(
+        pdf,
+        pdf.w - pdf.r_margin - 28,
+        y0 + 34,
+        correct,
+        total,
+        pct,
+        pct_label="of sitting" if paper_max else "correct",
+    )
+    pdf.set_font(pdf._ff, "", 6.8)  # type: ignore[attr-defined]
+    pdf.set_text_color(*_C_MUTED)
+    foot_x = pdf.w - pdf.r_margin - 50
+    if paper_max and sitting["mcq_t"]:
+        pdf.set_xy(foot_x, y0 + 64)
+        pdf.cell(44, 4, f"MC auto-scored {sitting['mcq_c']}/{sitting['mcq_t']}", align="C")
+        paper_line = f"Graphing 1 pt · FR 4 pt · Paper {sitting['paper_pts']}/{paper_max}"
+        if not sitting["paper_complete"]:
+            paper_line += " · still grading"
+        pdf.set_xy(foot_x - 8, y0 + 68.5)
+        pdf.cell(60, 4, paper_line, align="C")
+    elif paper_max:
+        written = f"Written work · {correct} / {total}"
+        if not sitting["paper_complete"]:
+            written += " · still grading"
+        pdf.set_xy(foot_x, y0 + 64)
+        pdf.cell(44, 4, written, align="C")
+    elif paper_total:
+        pdf.set_xy(foot_x, y0 + 64)
         pdf.cell(44, 4, f"Graphing {paper_done} / {paper_total} submitted", align="C")
     pdf.set_y(y0 + card_h + 6)
 
@@ -257,8 +324,9 @@ def _draw_study(pdf: FPDF, ctx: dict[str, Any]) -> None:
     w = _cw(pdf)
     y0 = pdf.get_y()
     student = ctx.get("placement_student") if isinstance(ctx.get("placement_student"), dict) else {}
-    correct = int(ctx.get("correct_count") or 0)
-    total = int(ctx.get("placement_score_total") or ctx.get("total_q") or 0)
+    sitting = _sitting_from_ctx(ctx)
+    correct = sitting["correct"]
+    total = sitting["total"]
     pct = int(ctx.get("score_pct") or 0)
     answered = int(ctx.get("answered_live") or 0)
     item_total = int(ctx.get("item_total") or 0)
@@ -278,8 +346,14 @@ def _draw_study(pdf: FPDF, ctx: dict[str, Any]) -> None:
     pdf.set_font(pdf._ff, "B", 13)  # type: ignore[attr-defined]
     pdf.set_text_color(*_C_INK)
     pdf.cell(0, 6.5, _txt(pdf, headline), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    if sitting["paper_max"] and sitting["mcq_t"]:
+        band_note = f"{sitting['mcq_c']} MC of {sitting['mcq_t']} · {correct}/{total} total"
+    elif sitting["paper_max"]:
+        band_note = f"{correct}/{total} written"
+    else:
+        band_note = f"{correct} correct of {total} scored items"
     cards = [
-        ("Score band", f"{pct}%", f"{correct} correct of {total} scored items"),
+        ("Score band", f"{pct}%", band_note),
         ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
         ("Misses", str(len(misses)), "Auto-incorrect items to review" if misses else "No auto-incorrect items"),
         ("Advisor", advisor, grade + (f" · {course}" if course else "")),
