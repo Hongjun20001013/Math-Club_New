@@ -21,87 +21,70 @@
       <em>AP Calculus AB / BC</em>
     </nav>
 
-    <header class="np-cmx-hero np-ap-calc-hero">
+    <header class="np-cmx-hero np-ap-calc-hero np-ap-calc-hero--portal">
       <div class="np-cmx-hero__copy">
         <p class="np-cmx-brand">{{ site_brand_name }}</p>
-        <h1 class="np-cmx-display">AP Calculus Studio</h1>
-        <p class="np-cmx-lede">Unit 1 · Limits &amp; Continuity — interactive slide decks, AP-style checks, and printable practice packets.</p>
+        <h1 class="np-cmx-display">AP Calculus</h1>
+        <p class="np-cmx-lede">AB · 8 units &nbsp;|&nbsp; BC · +2 units (9–10) &nbsp;|&nbsp; Interactive courseware &amp; practice packets</p>
       </div>
-      <div class="np-cmx-hero__stat np-cmx-hero__stat--inline" aria-label="Library stats">
-        <div class="np-cmx-hero__stat-card"><strong>{{ materials_ready }}</strong><span>Live lessons</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>1</strong><span>Unit</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>3</strong><span>Packets</span></div>
+      <div class="np-cmx-hero__stat np-cmx-hero__stat--inline" aria-label="Progress stats">
+        <div class="np-cmx-hero__stat-card"><strong>{{ live_chapters }}</strong><span>Live chapters</span></div>
+        <div class="np-cmx-hero__stat-card"><strong>10</strong><span>Units</span></div>
+        <div class="np-cmx-hero__stat-card"><strong>{{ live_packets }}</strong><span>Packets</span></div>
       </div>
     </header>
+
+    <section class="np-ap-portals" aria-labelledby="ap-portals-title">
+      <h2 id="ap-portals-title" class="sr-only">Choose a workspace</h2>
+      <div class="np-ap-portal-grid" role="list">
+        <a href="{{ url_for('ap_calc_course') }}" class="np-ap-portal np-ap-portal--course" role="listitem">
+          <span class="np-ap-portal__glyph" aria-hidden="true">§</span>
+          <div class="np-ap-portal__body">
+            <span class="np-ap-portal__tag">Course materials</span>
+            <h3>Slide decks &amp; lessons</h3>
+            <p>10 units · Unit 1 has 15 chapters. Sections 1.1–1.3 are live with graphs, definitions, and AP checks.</p>
+            <span class="np-ap-portal__cta">Browse units →</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-ap-portal np-ap-portal--practice" role="listitem">
+          <span class="np-ap-portal__glyph" aria-hidden="true">✎</span>
+          <div class="np-ap-portal__body">
+            <span class="np-ap-portal__tag">Practice</span>
+            <h3>Packets &amp; solutions</h3>
+            <p>Printable worksheets aligned to each chapter — packet PDF + full solution key.</p>
+            <span class="np-ap-portal__cta">Open practice →</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_overview') }}" class="np-ap-portal np-ap-portal--overview" role="listitem">
+          <span class="np-ap-portal__glyph" aria-hidden="true">∞</span>
+          <div class="np-ap-portal__body">
+            <span class="np-ap-portal__tag">Curriculum map</span>
+            <h3>AB / BC overview</h3>
+            <p>Full topic map: which units are AB-only vs BC extensions, and what is coming next.</p>
+            <span class="np-ap-portal__cta">View roadmap →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
     {% if continue_material %}
     <a href="{{ url_for('ap_calc_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide|default(1) }}"
        class="np-cmx-feature np-ap-calc-feature">
       <div class="np-cmx-feature__rail" aria-hidden="true"></div>
       <div class="np-cmx-feature__copy">
-        <p class="np-cmx-feature__kicker">Continue learning</p>
+        <p class="np-cmx-feature__kicker">Continue where you left off</p>
         <h2>{{ continue_material.section }} · {{ continue_material.title }}</h2>
-        <p>Slide {{ continue_material.continue_slide|default(1) }} / {{ continue_material.slide_count }}{% if continue_material.continue_mastery_pct %} · {{ continue_material.continue_mastery_pct }}% mastery{% endif %}</p>
+        <p>Slide {{ continue_material.continue_slide|default(1) }} / {{ continue_material.slide_count }}</p>
       </div>
       <span class="np-cmx-feature__cta">Resume →</span>
     </a>
     {% endif %}
 
-    <section class="np-ap-calc-lessons" aria-labelledby="ap-calc-lessons-title">
-      <div class="np-cmx-pick__head">
-        <h2 id="ap-calc-lessons-title">Unit 1 lessons</h2>
-        <p>Sections 1.1–1.3 — theory, worked examples, and packet-aligned practice.</p>
-      </div>
-
-      <div class="np-ap-calc-grid" role="list">
-        {% for material in materials %}
-        {% set prog = user_progress_map.get(material.slug, {}) %}
-        {% set mastery = material.user_mastery_pct|default(0) %}
-        <a href="{{ url_for('ap_calc_material_view', slug=material.slug) }}"
-           class="np-ap-calc-card{% if loop.first and not continue_material %} is-lead{% endif %}"
-           role="listitem"
-           style="--i: {{ loop.index0 }};">
-          <div class="np-ap-calc-card__banner" aria-hidden="true">
-            <span class="np-ap-calc-card__section">{{ material.section }}</span>
-            <span class="np-ap-calc-card__glyph">∫</span>
-          </div>
-          <div class="np-ap-calc-card__body">
-            <div class="np-ap-calc-card__meta">
-              <span class="np-cmx-chip">Unit {{ material.unit }}</span>
-              <span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span>
-              {% if mastery %}<span class="np-cmx-chip">{{ mastery }}%</span>{% endif %}
-            </div>
-            <h3>{{ material.title }}</h3>
-            <p>{{ material.slide_count }} slides{% if material.interactive_count %} · {{ material.interactive_count }} challenges{% endif %}</p>
-            <span class="np-ap-calc-card__cta">Open deck <em aria-hidden="true">→</em></span>
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-    </section>
-
-    <section class="np-ap-calc-packets glass-panel np-glass" aria-labelledby="ap-calc-packets-title">
-      <h2 id="ap-calc-packets-title">Practice packets</h2>
-      <p>Printable worksheets with full solution keys — aligned to each lesson.</p>
-      <div class="np-ap-calc-packet-grid">
-        {% for material in materials %}
-        <div class="np-ap-calc-packet-item">
-          <strong>{{ material.section }}</strong>
-          <span>{{ material.title }}</span>
-          <div class="np-ap-calc-packet-links">
-            <a href="{{ url_for('ap_calc_practice_pdf', section=material.practice_section|default(material.section), kind='packet') }}" target="_blank" rel="noopener">Packet</a>
-            <a href="{{ url_for('ap_calc_practice_pdf', section=material.practice_section|default(material.section), kind='solutions') }}" target="_blank" rel="noopener">Solutions</a>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-
     <footer class="np-cmx-foot">
+      <span>Graph · Table · Algebra</span>
       <span>Interactive slides</span>
-      <span>Mastery tracking</span>
       <span>Practice PDFs</span>
-      <span>Desmos &amp; board tools</span>
+      <span>Desmos &amp; board</span>
     </footer>
   </div>
 </div>

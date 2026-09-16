@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Unit {{ unit.unit }} · AP Calculus · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="np-cmx np-ap-calc">
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb">
+      <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
+      <span>/</span>
+      <a href="{{ url_for('ap_calc_course') }}">Course</a>
+      <span>/</span>
+      <em>Unit {{ unit.unit }}</em>
+    </nav>
+
+    <header class="np-cmx-phase">
+      <div class="np-cmx-phase__mark" aria-hidden="true">{{ unit.unit }}</div>
+      <div class="np-cmx-phase__copy">
+        <a href="{{ url_for('ap_calc_course') }}" class="np-cmx-back">← All units</a>
+        <p class="np-cmx-eyebrow">{{ unit.track_label }}</p>
+        <h1 class="np-cmx-phase__title">{{ unit.title }}</h1>
+        <div class="np-cmx-stats">
+          <div><strong>{{ unit.chapters|selectattr('live')|list|length }}</strong><span>live</span></div>
+          <div><strong>{{ unit.chapters|length }}</strong><span>chapters</span></div>
+        </div>
+      </div>
+    </header>
+
+    <ol class="np-ap-chapter-list">
+      {% for ch in unit.chapters %}
+      <li class="np-ap-chapter{% if ch.live %} is-live{% else %} is-soon{% endif %}">
+        {% if ch.live and ch.slug %}
+        <a href="{{ url_for('ap_calc_material_view', slug=ch.slug) }}" class="np-ap-chapter__link">
+          <span class="np-ap-chapter__section">{{ ch.section }}</span>
+          <span class="np-ap-chapter__title">{{ ch.title }}</span>
+          <span class="np-ap-chapter__badge np-cmx-chip np-cmx-chip--live"><i></i>Live</span>
+          <span class="np-ap-chapter__arrow" aria-hidden="true">→</span>
+        </a>
+        {% else %}
+        <div class="np-ap-chapter__link np-ap-chapter__link--disabled">
+          <span class="np-ap-chapter__section">{{ ch.section }}</span>
+          <span class="np-ap-chapter__title">{{ ch.title }}</span>
+          <span class="np-ap-chapter__badge">Soon</span>
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

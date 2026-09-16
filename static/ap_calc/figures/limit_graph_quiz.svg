@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" role="img" aria-label="AP limit reading practice graph">
+  <rect width="520" height="320" fill="#faf8ff" rx="12"/>
+  <line x1="60" y1="260" x2="480" y2="260" stroke="#4c3d99" stroke-width="2"/>
+  <line x1="60" y1="30" x2="60" y2="260" stroke="#4c3d99" stroke-width="2"/>
+  <text x="488" y="275" font-size="13">x</text>
+  <text x="42" y="40" font-size="13">y</text>
+  <!-- piecewise: (-5,-2)->(0,2), hole at (0,2), (0,-1) to (2,3) hole at (2,3), (2,1) to (5,4) -->
+  <polyline points="100,220 180,140 240,100" fill="none" stroke="#6a4ce6" stroke-width="3"/>
+  <polyline points="260,180 300,140 420,80" fill="none" stroke="#6a4ce6" stroke-width="3"/>
+  <line x1="240" y1="100" x2="260" y2="180" stroke="#6a4ce6" stroke-width="3"/>
+  <circle cx="240" cy="100" r="7" fill="#fff" stroke="#6a4ce6" stroke-width="3"/>
+  <circle cx="260" cy="140" r="7" fill="#6a4ce6"/>
+  <circle cx="300" cy="140" r="7" fill="#fff" stroke="#6a4ce6" stroke-width="3"/>
+  <circle cx="180" cy="140" r="6" fill="#6a4ce6"/>
+  <!-- ticks labels -->
+  <text x="175" y="278" font-size="11">2</text>
+  <text x="235" y="278" font-size="11">0</text>
+  <text x="295" y="278" font-size="11">2</text>
+  <text x="415" y="278" font-size="11">5</text>
+  <text x="40" y="145" font-size="11">2</text>
+  <text x="40" y="185" font-size="11">1</text>
+  <text x="40" y="105" font-size="11">3</text>
+  <text x="200" y="24" font-size="13" fill="#4c3d99">f(x)  packet-style limit graph</text>
+</svg>

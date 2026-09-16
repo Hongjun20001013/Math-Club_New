@@ -108,6 +108,7 @@ COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 COURSE_MATERIALS_PATH = os.path.join(APP_DIR, "data", "course_materials.json")
 COURSE_MATERIALS_MANIFEST_PATH = os.path.join(APP_DIR, "data", "course_materials_manifest.json")
 AP_CALC_MATERIALS_PATH = os.path.join(APP_DIR, "data", "ap_calc_materials.json")
+AP_CALC_CATALOG_PATH = os.path.join(APP_DIR, "data", "ap_calc_catalog.json")
 AP_CALC_PRACTICE_DIR = os.path.join(APP_DIR, "static", "ap_calc", "practice")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
 PLACEMENT_CATALOG_PATH = os.path.join(APP_DIR, "data", "placement_catalog.json")
@@ -2755,6 +2756,32 @@ def _ap_calc_materials_user_progress(materials: list[dict[str, Any]]) -> dict[st
     return user_progress
 
 
+def load_ap_calc_catalog() -> dict[str, Any]:
+    if not os.path.isfile(AP_CALC_CATALOG_PATH):
+        return {"units": []}
+    try:
+        with open(AP_CALC_CATALOG_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {"units": []}
+
+
+def _ap_calc_catalog_unit(unit_num: int) -> dict[str, Any] | None:
+    for row in load_ap_calc_catalog().get("units") or []:
+        if int(row.get("unit") or 0) == unit_num:
+            return row
+    return None
+
+
+def _ap_calc_live_chapter_count() -> int:
+    n = 0
+    for unit in load_ap_calc_catalog().get("units") or []:
+        for ch in unit.get("chapters") or []:
+            if ch.get("live"):
+                n += 1
+    return n
+
+
 def _ap_calc_hub_context() -> dict[str, Any]:
     materials = list(load_ap_calc_materials().get("materials") or [])
     user_progress = _ap_calc_materials_user_progress(materials)
@@ -2764,12 +2791,16 @@ def _ap_calc_hub_context() -> dict[str, Any]:
     )
     continue_material = _pick_continue_material(ready, user_progress)
     payload = load_ap_calc_materials()
+    catalog = load_ap_calc_catalog()
     return {
         "materials": ready,
         "materials_total": int(payload.get("total") or len(materials)),
         "materials_ready": int(payload.get("available") or len(ready)),
         "continue_material": continue_material,
         "user_progress_map": user_progress,
+        "catalog": catalog,
+        "live_chapters": _ap_calc_live_chapter_count(),
+        "live_packets": len(ready),
     }
 
 
@@ -10784,11 +10815,39 @@ def ap_calc_hub():
     return render_template("ap_calc_hub.html", **ctx)
 
 
+@app.route("/ap/calc/course")
+def ap_calc_course():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_course.html", catalog=catalog)
+
+
+@app.route("/ap/calc/course/unit/<int:unit_num>")
+def ap_calc_course_unit(unit_num: int):
+    session["active_track_label"] = "AP Calculus AB / BC"
+    unit = _ap_calc_catalog_unit(unit_num)
+    if not unit:
+        abort(404)
+    return render_template("ap_calc_course_unit.html", unit=unit)
+
+
+@app.route("/ap/calc/practice")
+def ap_calc_practice_hub():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_practice_hub.html", catalog=catalog)
+
+
+@app.route("/ap/calc/overview")
+def ap_calc_overview():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_overview.html", catalog=catalog)
+
+
 @app.route("/ap/calc/materials")
 def ap_calc_materials_gate():
-    session["active_track_label"] = "AP Calculus AB / BC"
-    ctx = _ap_calc_hub_context()
-    return render_template("ap_calc_materials_gate.html", **ctx)
+    return redirect(url_for("ap_calc_course"))
 
 
 @app.route("/ap/calc/materials/<slug>")
@@ -10822,11 +10881,11 @@ def ap_calc_material_view(slug: str):
         cm_classroom_href=None,
         cm_nav_hub_href=url_for("ap_calc_hub"),
         cm_nav_hub_label="AP Calculus",
-        cm_nav_library_href=url_for("ap_calc_materials_gate"),
+        cm_nav_library_href=url_for("ap_calc_course"),
         cm_nav_library_label="Course materials",
         cm_nav_aria_label="AP Calculus navigation",
         cm_view_route="ap_calc_material_view",
-        cm_all_lessons_href=url_for("ap_calc_materials_gate"),
+        cm_all_lessons_href=url_for("ap_calc_course_unit", unit_num=int(material.get("unit") or 1)),
         cm_track_class="ap-calc",
     )
 

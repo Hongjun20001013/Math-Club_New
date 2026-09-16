@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}AP Calculus · Course Materials · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="np-cmx np-ap-calc">
+  <div class="np-cmx-stage" aria-hidden="true"><div class="np-cmx-stage__wash"></div></div>
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb">
+      <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
+      <span>/</span>
+      <em>Course materials</em>
+    </nav>
+
+    <header class="np-cmx-hero np-ap-calc-hero np-ap-calc-hero--compact">
+      <div class="np-cmx-hero__copy">
+        <h1 class="np-cmx-display">Course Materials</h1>
+        <p class="np-cmx-lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension</p>
+      </div>
+    </header>
+
+    <div class="np-ap-unit-grid" role="list">
+      {% for unit in catalog.units %}
+      <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}"
+         class="np-ap-unit-card{% if not unit.live %} is-soon{% endif %}{% if unit.unit <= 8 %} is-ab{% else %} is-bc{% endif %}"
+         role="listitem">
+        <div class="np-ap-unit-card__head">
+          <span class="np-ap-unit-card__num">Unit {{ unit.unit }}</span>
+          <span class="np-ap-unit-card__track">{{ unit.track_label }}</span>
+        </div>
+        <h3>{{ unit.title }}</h3>
+        <p>
+          {% if unit.chapters %}
+          {{ unit.chapters|length }} chapters
+          {% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
+          {% else %}
+          Coming soon
+          {% endif %}
+        </p>
+        <span class="np-ap-unit-card__cta">{% if unit.live or unit.chapters %}Open unit{% else %}Preview{% endif %} →</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

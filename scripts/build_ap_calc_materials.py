@@ -1,366 +1,374 @@
 #!/usr/bin/env python3
-"""Build AP Calculus AB/BC course materials JSON (Unit 1 sections 1.1–1.3)."""
+"""Build AP Calculus AB/BC course materials JSON — Unit 1 sections 1.1–1.3 (expert edition)."""
 from __future__ import annotations
 
 import json
 import os
+import sys
 from datetime import datetime, timezone
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(APP_DIR, "scripts"))
+
+from ap_calc_slide_helpers import (  # noqa: E402
+    FIG,
+    SlideBuilder,
+    answer,
+    big_idea,
+    checkpoint,
+    definition,
+    fig,
+    intro,
+    key_point,
+    math_block,
+    mcq,
+    outline,
+    practice_packet,
+    role,
+    section_divider,
+    warning,
+)
+
 OUTPUT = os.path.join(APP_DIR, "data", "ap_calc_materials.json")
 
 
-def _role(label: str, title: str, lead: str) -> str:
-    return (
-        f'<div class="cm-slide-role cm-slide-role--lesson">'
-        f'<span class="cm-slide-role-label">{label}</span>'
-        f"<strong>{title}</strong><p>{lead}</p></div>"
-    )
-
-
-def _intro(unit: str, section: str, title: str, chips: list[tuple[str, str]]) -> str:
-    chip_html = "".join(
-        f'<button type="button" class="cm-intro-chip" data-cm-jump-section="{idx}">'
-        f'<span class="cm-intro-chip-num">{num}</span>'
-        f'<span class="cm-intro-chip-label">{label}</span></button>'
-        for num, (idx, label) in enumerate(chips, 1)
-    )
-    return (
-        '<div class="cm-intro-canvas ap-calc-intro">'
-        '<div class="cm-intro-bg" aria-hidden="true">'
-        '<span class="cm-intro-orb cm-intro-orb--1"></span>'
-        '<span class="cm-intro-orb cm-intro-orb--2"></span>'
-        '<span class="cm-intro-grid"></span></div>'
-        '<div class="cm-intro-content">'
-        '<span class="cm-intro-kicker">Novel Prep · AP Calculus AB / BC</span>'
-        f'<p class="cm-intro-unit">Unit {unit} · Section {section}</p>'
-        f'<h1 class="cm-intro-title">{title}</h1>'
-        '<p class="cm-intro-lede">Expanded lesson deck with theory, worked examples, and packet-aligned practice — same studio flow as SAT Math.</p>'
-        '<div class="cm-intro-meta">'
-        '<span class="cm-intro-meta-item"><em>Track</em>Limits &amp; Continuity</span>'
-        '<span class="cm-intro-meta-item"><em>Practice</em>Packet + solutions PDF</span>'
-        "</div>"
-        f'<div class="cm-intro-chips">{chip_html}</div>'
-        '<p class="cm-intro-cta">Tap a section chip or press <strong>Next</strong> to begin.</p>'
-        "</div></div>"
-    )
-
-
-def _outline(unit: str, section: str, title: str, items: list[tuple[str, str]]) -> str:
-    rows = "".join(
-        f'<li><button type="button" class="cm-content-item" data-cm-jump-section="{idx}">'
-        f'<span class="cm-content-num">{num:02d}</span>'
-        f'<span class="cm-content-copy"><strong>{label}</strong>'
-        f"<span>Jump to section</span></span>"
-        f'<span class="cm-content-arrow" aria-hidden="true">→</span></button></li>'
-        for num, (idx, label) in enumerate(items, 1)
-    )
-    return (
-        '<div class="cm-content-canvas"><div class="cm-content-bg" aria-hidden="true">'
-        '<span class="cm-content-orb cm-content-orb--1"></span>'
-        '<span class="cm-content-orb cm-content-orb--2"></span>'
-        '<span class="cm-content-grid"></span></div>'
-        '<div class="cm-content-inner">'
-        '<span class="cm-content-kicker">Lesson outline</span>'
-        f'<p class="cm-content-unit">Unit {unit} · {section}</p>'
-        f'<h2 class="cm-content-title">{title}</h2>'
-        f'<p class="cm-content-lede">{len(items)} sections · theory, examples, and AP-style checks.</p>'
-        f'<ol class="cm-content-list">{rows}</ol>'
-        "</div></div>"
-    )
-
-
-def _section_divider(num: str, title: str) -> str:
-    return (
-        f'<div class="cm-section-divider"><span class="cm-section-num">{num}</span>'
-        f'<span class="cm-section-kicker">Up next</span>'
-        f'<h3 class="cm-section-title">{title}</h3></div>'
-    )
-
-
-def _mcq(stem: str, choices: list[str], correct: str, strategy: str = "") -> str:
-    letters = "ABCD"
-    grid = "".join(
-        f'<button type="button" class="cm-mcq-choice" data-choice="{letters[i]}">'
-        f'<span class="cm-mcq-letter">{letters[i]}</span>'
-        f'<span class="cm-mcq-text">{c}</span></button>'
-        for i, c in enumerate(choices[:4])
-    )
-    strat = (
-        f'<div class="cm-strategy-chip"><span class="cm-strategy-chip-label">Strategy</span>'
-        f"<p>{strategy}</p></div>"
-        if strategy
-        else ""
-    )
-    return (
-        '<div class="cm-question-workspace"><div class="cm-question-stem">'
-        f"{strat}"
-        '<div class="cm-slide-role cm-slide-role--question">'
-        '<span class="cm-slide-role-label">Question Practice</span>'
-        "<strong>Try it first</strong>"
-        "<p>Pause and solve before revealing the worked solution.</p></div>"
-        f"{stem}</div>"
-        '<div class="cm-question-interact">'
-        f'<div class="cm-mcq-interactive" data-cm-mcq data-cm-correct="{correct}">'
-        '<p class="cm-mcq-prompt">Choose your answer</p>'
-        f'<div class="cm-mcq-grid">{grid}</div>'
-        '<div class="cm-mcq-actions">'
-        '<button type="button" class="cm-mcq-check" data-cm-check-mcq disabled>Check answer</button>'
-        '<button type="button" class="cm-mcq-skip" data-cm-go-answer>View worked solution →</button>'
-        "</div></div></div></div>"
-    )
-
-
-def _answer(correct_line: str, solution_html: str) -> str:
-    return (
-        '<div class="cm-slide-role cm-slide-role--answer">'
-        '<span class="cm-slide-role-label">Answer Review</span>'
-        "<strong>Check and correct</strong>"
-        "<p>Compare your work with the final answer and fix any missed step.</p></div>"
-        f"<p><strong>{correct_line}</strong></p>"
-        '<div class="cm-try-banner" data-cm-try-banner>'
-        '<div class="cm-try-banner-icon" aria-hidden="true">✦</div>'
-        '<div class="cm-try-banner-copy"><strong>Your turn</strong>'
-        "<span>Work it out on paper first — reveal when you're ready.</span></div>"
-        '<button type="button" class="cm-reveal-btn" data-cm-reveal-solution>Show solution</button>'
-        "</div>"
-        '<p><strong>Solution:</strong></p>'
-        f'<div class="cm-solution-panel cm-is-collapsed" data-cm-solution-panel>{solution_html}</div>'
-    )
-
-
-def _practice_packet(section: str, title: str) -> str:
-    return (
-        '<div class="ap-calc-packet-card glass-panel np-glass">'
-        '<p class="np-atelier-kicker">Practice packet</p>'
-        f"<h2>{title}</h2>"
-        "<p>Download the classroom packet and solutions — aligned with this lesson deck.</p>"
-        '<div class="ap-calc-packet-actions">'
-        f'<a class="np-atelier-btn np-atelier-btn--primary" href="/ap/calc/practice/{section}/packet.pdf" target="_blank" rel="noopener">Open packet PDF</a>'
-        f'<a class="np-atelier-btn np-atelier-btn--ghost" href="/ap/calc/practice/{section}/solutions.pdf" target="_blank" rel="noopener">Open solutions PDF</a>'
-        "</div></div>"
-    )
-
-
 def lesson_1_1() -> dict:
-    slides = []
-    idx = 1
-
-    def add(title, html, kind="lesson", **kw):
-        nonlocal idx
-        slides.append(
-            {
-                "index": idx,
-                "title": title,
-                "html": html,
-                "kind": kind,
-                "group": kw.get("group", "learn"),
-                "section": kw.get("section", "1.1"),
-                "study_tip": kw.get("study_tip", ""),
-                **{k: v for k, v in kw.items() if k not in ("group", "section", "study_tip")},
-            }
-        )
-        idx += 1
-
-    add(
+    s = SlideBuilder("1.1")
+    s.add(
         "AP Unit 1.1 · Can change occur at an instant?",
-        _intro("1", "1.1", "Can change occur at an instant?", [(4, "Average rate"), (7, "Secant → tangent"), (10, "Context graphs"), (14, "Packet practice")]),
-        kind="intro",
-        group="divider",
-    )
-    add(
-        "Lesson outline",
-        _outline(
+        intro(
             "1",
             "1.1",
             "Can change occur at an instant?",
-            [(4, "Average vs instantaneous"), (7, "Secant slopes"), (10, "Graph interpretation"), (12, "AP-style MCQ"), (14, "Practice packet")],
+            [(4, "Big idea"), (8, "Average rate"), (14, "Difference quotient"), (20, "Context graphs"), (26, "AP practice")],
+        ),
+        kind="intro",
+        group="divider",
+    )
+    s.add(
+        "Lesson outline",
+        outline(
+            "1",
+            "1.1",
+            "Introducing calculus & instantaneous change",
+            [
+                (4, "Central question of calculus"),
+                (8, "Average vs instantaneous rate"),
+                (12, "Secant → tangent (visual)"),
+                (16, "Difference quotient example"),
+                (20, "Mr. Brust motion graph"),
+                (24, "AP-style multiple choice"),
+                (28, "Practice packet"),
+            ],
         ),
         kind="content",
         group="divider",
     )
-    add(
-        "Section 01 · Average vs instantaneous",
-        _section_divider("01", "Average vs instantaneous"),
-        kind="section",
-        group="divider",
+    s.add("Section 01 · Big idea", section_divider("01", "The central question"), kind="section", group="divider")
+    s.add(
+        "Why calculus begins with an instant",
+        role("Conceptual Frame", "Start with the question", "Calculus is the language of change — including change at a single moment.")
+        + big_idea(
+            "<p><em>How can we describe what is happening at an instant when change usually takes time?</em></p>"
+            "<p><strong>Average rate of change</strong> measures change across an interval. "
+            "<strong>Instantaneous rate of change</strong> asks what happens at one input value — and that requires <strong>limits</strong>.</p>"
+        )
+        + fig(f"{FIG}/packet_1_1_p1.png", "Packet 1.1 · Historical motivation & Mr. Brust scenario", "ap-fig--wide"),
     )
-    add(
-        "The big question of calculus",
-        _role("Knowledge Point", "Build the method", "Average rate uses an interval; instantaneous rate asks about a single instant.")
-        + "<p>Calculus begins with a precise question:</p>"
-        '<blockquote class="ap-calc-quote"><em>How can we describe what is happening at an instant when change usually takes time?</em></blockquote>'
-        "<p><strong>Average rate of change</strong> on \\([a,b]\\):</p>"
-        '<div class="stem-math-block cm-math-block">\\[\\frac{f(b)-f(a)}{b-a}\\]</div>'
-        "<p><strong>Instantaneous rate</strong> at \\(t=a\\) uses shorter intervals and a <strong>limit</strong>.</p>",
-        section="1.1",
+    s.add(
+        "Two types of rate — notation",
+        role("Knowledge Point", "Distinguish the two rates", "Interval language vs. instant language.")
+        + definition(
+            "Average rate of change",
+            "<p>On \\([a,b]\\), for a quantity \\(f\\):</p>"
+            + math_block("\\[\\text{Average rate} = \\frac{f(b)-f(a)}{b-a}\\]")
+            + "<p>This is the <strong>slope of a secant line</strong> on the graph of \\(f\\).</p>",
+        )
+        + definition(
+            "Instantaneous rate of change (preview)",
+            "<p>At \\(x=c\\), we examine shorter and shorter intervals and take a <strong>limit</strong>:</p>"
+            + math_block(
+                "\\[\\text{Instantaneous rate at }c = \\lim_{h\\to 0}\\frac{f(c+h)-f(c)}{h}\\]"
+            ),
+        ),
     )
-    add(
-        "Secant slopes shrink toward a tangent",
-        _role("Knowledge Point", "Build the method", "Shrink the interval — the secant slope approaches the tangent slope.")
-        + "<p>For position \\(s(t)=t^2+1\\), the average rate from \\(t=2\\) to \\(t=2+h\\) is</p>"
-        '<div class="stem-math-block cm-math-block">\\[\\frac{s(2+h)-s(2)}{h}=4+h\\]</div>'
-        "<p>As \\(h\\to 0\\), the rate approaches <strong>\\(4\\)</strong>. That limiting value is the instantaneous rate at \\(t=2\\).</p>",
-        section="1.1",
+    s.add("Section 02 · Average rate", section_divider("02", "Average rate of change"), kind="section", group="divider")
+    s.add(
+        "Position function example",
+        role("Worked Example", "Compute an average rate", "Always identify the interval endpoints first.")
+        + "<p>A particle has position \\(s(t)=t^2+1\\) (meters), with \\(t\\) in seconds.</p>"
+        + key_point(
+            "Interval [2, 3]",
+            math_block(
+                "\\[\\frac{s(3)-s(2)}{3-2}=\\frac{(9+1)-(4+1)}{1}=\\frac{10-5}{1}=5\\ \\text{m/s}\\]"
+            )
+            + "<p>Interpretation: on average, the particle moved 5 meters per second from \\(t=2\\) to \\(t=3\\).</p>",
+        ),
     )
-    add(
-        "Section 02 · Secant → tangent",
-        _section_divider("02", "Secant → tangent"),
-        kind="section",
-        group="divider",
+    s.add(
+        "Shorter intervals — approaching an instant",
+        role("Knowledge Point", "Shrink the interval", "Same formula — smaller \\(\\Delta t\\).")
+        + "<p>From \\(t=2\\) to \\(t=2+h\\):</p>"
+        + math_block("\\[\\frac{s(2+h)-s(2)}{h}=\\frac{(2+h)^2+1-5}{h}=4+h\\]")
+        + "<table class='ap-data-table'><thead><tr><th>\\(h\\)</th><th>Interval</th><th>Average rate \\(4+h\\)</th></tr></thead>"
+        "<tbody><tr><td>1</td><td>[2,3]</td><td>5</td></tr>"
+        "<tr><td>0.5</td><td>[2,2.5]</td><td>4.5</td></tr>"
+        "<tr><td>0.1</td><td>[2,2.1]</td><td>4.1</td></tr>"
+        "<tr><td>0.01</td><td>[2,2.01]</td><td>4.01</td></tr></tbody></table>"
+        + checkpoint("As \\(h\\to 0\\), the average rate approaches <strong>4</strong>. That limiting value is the instantaneous rate at \\(t=2\\)."),
     )
-    add(
-        "Worked example: simplify the difference quotient",
-        _role("Worked Example", "Show every algebra step", "Expand, cancel \\(h\\), then interpret the limit.")
-        + "<p>Given \\(s(t)=t^2+1\\), simplify \\(\\dfrac{s(2+h)-s(2)}{h}\\).</p>"
-        '<div class="stem-math-block cm-math-block">\\[\\frac{(2+h)^2+1-(4+1)}{h}=\\frac{4h+h^2}{h}=4+h\\]</div>'
-        "<p>So the instantaneous rate at \\(t=2\\) is <strong>\\(4\\)</strong>.</p>",
-        section="1.1",
+    s.add("Section 03 · Secant → tangent", section_divider("03", "Secant lines approach a tangent"), kind="section", group="divider")
+    s.add(
+        "Visual: secant slopes converge",
+        role("Graphical Skill", "Connect algebra to the picture", "Each secant uses two points; the tangent uses one point and a limiting direction.")
+        + fig(f"{FIG}/secant_to_tangent.svg", "Secant lines on \\(s(t)=t^2+1\\) as \\(h\\to 0\\)")
+        + key_point(
+            "Geometric meaning",
+            "<ul class='stem-itemize'>"
+            "<li><strong>Secant slope</strong> = average rate on \\([2,2+h]\\)</li>"
+            "<li><strong>Tangent slope</strong> = instantaneous rate at \\(t=2\\)</li>"
+            "<li>When the limit exists, secant slopes approach the tangent slope.</li>"
+            "</ul>",
+        ),
     )
-    add(
-        "Section 03 · Context graphs",
-        _section_divider("03", "Context graphs"),
-        kind="section",
-        group="divider",
+    s.add("Section 04 · Difference quotient", section_divider("04", "Difference quotient"), kind="section", group="divider")
+    s.add(
+        "Full algebra: simplify before taking the limit",
+        role("Worked Example", "Show every step", "Expand, combine like terms, cancel \\(h\\).")
+        + "<p>Simplify \\(\\displaystyle\\frac{s(2+h)-s(2)}{h}\\) for \\(s(t)=t^2+1\\).</p>"
+        + math_block(
+            "\\[\\begin{aligned}"
+            "\\frac{s(2+h)-s(2)}{h}"
+            "&=\\frac{(2+h)^2+1-(2^2+1)}{h}\\\\"
+            "&=\\frac{4+4h+h^2+1-5}{h}\\\\"
+            "&=\\frac{4h+h^2}{h}=4+h\\quad (h\\neq 0)"
+            "\\end{aligned}\\]"
+        )
+        + math_block("\\[\\lim_{h\\to 0}(4+h)=4\\]")
+        + checkpoint("After simplification, the limit is visible. Without canceling \\(h\\), the expression is undefined at \\(h=0\\) — but the <em>limit</em> can still exist."),
     )
-    add(
-        "Interpreting motion on a graph (packet: Mr. Brust)",
-        _role("Application", "Read the graph", "Slope of a secant = average rate; tangent slope ≈ instantaneous rate.")
-        + "<p>Distance-from-home \\(D(t)\\) vs. time: turning around creates a non-monotonic graph.</p>"
-        "<ul class=\"stem-itemize\">"
-        "<li><strong>(a)</strong> Average speed for the whole trip: \\(\\dfrac{D(8)-D(0)}{8-0}\\).</li>"
-        "<li><strong>(b)</strong> Average rate from \\(t=2\\) to \\(t=6\\): slope of the secant on that interval.</li>"
-        "<li><strong>(c)</strong> Near \\(t=2\\), use a <em>short</em> interval (e.g. \\(2\\) to \\(2.1\\)) to estimate the instantaneous rate.</li>"
-        "</ul>",
-        section="1.1",
+    s.add("Section 05 · Context graphs", section_divider("05", "Real contexts on graphs"), kind="section", group="divider")
+    s.add(
+        "Mr. Brust's trip — read the distance graph",
+        role("Application", "Packet problem 1.1", "Turn around → graph is not monotone; secant slope = average rate.")
+        + fig(f"{FIG}/packet_1_1_p2.png", "Mr. Brust distance-from-home \\(D(t)\\) vs. time", "ap-fig--wide")
+        + "<ol class='stem-itemize ap-problem-list'>"
+        "<li><strong>(a)</strong> Average speed whole trip: \\(\\dfrac{D(8)-D(0)}{8-0}\\).</li>"
+        "<li><strong>(b)</strong> Average rate on \\([2,6]\\): slope of secant from \\(t=2\\) to \\(t=6\\).</li>"
+        "<li><strong>(c)</strong> Shorter interval \\([2,3]\\) gives a better estimate of the rate <em>near</em> \\(t=2\\).</li>"
+        "<li><strong>(d)</strong> Estimate instantaneous rate at \\(t=2\\) using \\(\\dfrac{D(2.1)-D(1.9)}{0.2}\\) (tiny interval).</li>"
+        "</ol>",
     )
-    add(
-        "Social-media views: tangent at w = 10",
-        _role("Application", "Estimate from the graph", "Draw a tangent line; its slope estimates the instantaneous rate.")
-        + "<p>Channel views \\(v(w)\\) vs. weeks \\(w\\): at \\(w=10\\), sketch a tangent line and estimate its slope "
-        "(views per week at that instant).</p>"
-        "<p>To <em>estimate</em> without a tangent, use average rate on a tiny interval: "
-        "\\(\\dfrac{v(10.1)-v(9.9)}{0.2}\\).</p>",
-        section="1.1",
+    s.add(
+        "Social-media views — tangent interpretation",
+        role("Application", "Estimate from a curve", "Views per week ≈ slope of tangent at that week.")
+        + "<p>Channel views \\(v(w)\\) vs. weeks \\(w\\). At \\(w=10\\):</p>"
+        + math_block("\\[\\text{Estimate} \\approx \\frac{v(10.1)-v(9.9)}{0.2}\\]")
+        + warning(
+            "Do not confuse <strong>average rate on an interval</strong> with <strong>instantaneous rate at a point</strong>. "
+            "The notation \\(\\lim_{h\\to 0}\\frac{v(10+h)-v(10)}{h}\\) describes the latter."
+        ),
     )
-    add(
-        "Section 04 · AP-style MCQ",
-        _section_divider("04", "AP-style MCQ"),
-        kind="section",
-        group="divider",
-    )
-    q_idx = idx
-    add(
-        "Question: buffalo population interpretation",
-        _mcq(
+    s.add("Section 06 · AP practice", section_divider("06", "AP-style practice"), kind="section", group="divider")
+    q = s.add(
+        "Question: interpret a difference quotient",
+        mcq(
             "<p>Buffalo population \\(b(t)\\), \\(t\\) = years since 1800. What does "
             "\\(\\dfrac{b(50)-b(0)}{50-0}\\) represent?</p>",
             [
                 "The population in year 1850",
                 "The average rate of change of population from 1800 to 1850",
-                "The instantaneous rate in 1800",
-                "The total change in population in 50 years only at year 50",
+                "The instantaneous rate of change at \\(t=0\\)",
+                "The total population change only at \\(t=50\\)",
             ],
             "B",
-            "Difference quotient over an interval → average rate of change.",
+            "A difference quotient over \\([0,50]\\) always describes an <em>average</em> rate on that interval.",
         ),
         kind="question",
         group="practice",
-        answer_index=q_idx + 1,
-        correct_choice="B",
-        section="1.1",
     )
-    add(
+    s.add(
         "Answer: buffalo population",
-        _answer(
+        answer(
             "Correct Answer: B",
-            "<p>\\(\\dfrac{b(50)-b(0)}{50-0}\\) is the <strong>average rate of change</strong> of buffalo population "
-            "from \\(t=0\\) to \\(t=50\\) (years 1800–1850).</p>",
+            math_block("\\[\\frac{b(50)-b(0)}{50-0}=\\text{average rate of change on }[0,50]\\]")
+            + "<p>Years 1800–1850: average change in population per year.</p>",
         ),
         kind="answer",
         group="practice",
-        question_index=q_idx,
-        section="1.1",
+        question_index=q,
+        correct_choice="B",
         inline_solution=True,
         interactive=True,
     )
-    add(
-        "Section 05 · Practice packet",
-        _section_divider("05", "Practice packet"),
-        kind="section",
-        group="divider",
+    q = s.add(
+        "Question: instantaneous rate setup",
+        mcq(
+            "<p>For \\(s(t)=t^2+1\\), which expression represents the instantaneous rate at \\(t=2\\)?</p>",
+            [
+                "\\(\\dfrac{s(3)-s(2)}{3-2}\\)",
+                "\\(\\displaystyle\\lim_{h\\to 0}\\dfrac{s(2+h)-s(2)}{h}\\)",
+                "\\(s(2)\\)",
+                "\\(\\dfrac{s(2+h)-s(2)}{h}\\) for a fixed \\(h=0.1\\) only",
+            ],
+            "B",
+            "Instantaneous rate requires a limit as the interval length goes to 0.",
+        ),
+        kind="question",
+        group="practice",
     )
-    add(
+    s.add(
+        "Answer: instantaneous setup",
+        answer(
+            "Correct Answer: B",
+            "<p>Only choice B uses the limit definition of instantaneous rate at \\(t=2\\).</p>",
+        ),
+        kind="answer",
+        group="practice",
+        question_index=q,
+        correct_choice="B",
+        inline_solution=True,
+        interactive=True,
+    )
+    s.add("Section 07 · Practice packet", section_divider("07", "Practice packet"), kind="section", group="divider")
+    s.add(
         "Download Unit 1.1 practice",
-        _practice_packet("1.1", "Unit 1.1 · Can change occur at an instant?"),
+        practice_packet("1.1", "Unit 1.1 · Can change occur at an instant?"),
         kind="lesson",
         group="practice",
-        section="1.1",
     )
     return {
         "slug": "ap-1-1-instantaneous-change",
         "unit": 1,
         "unit_name": "Limits and Continuity",
         "section": "1.1",
-        "title": "Can Change Occur at an Instant?",
+        "title": "Introducing Calculus: Can Change Occur at an Instant?",
         "deck_title": "AP Unit 1.1 · Instantaneous change",
-        "slide_count": len(slides),
-        "slides": slides,
+        "slide_count": len(s.slides),
+        "slides": s.slides,
         "practice_section": "1.1",
     }
 
 
 def lesson_1_2() -> dict:
-    slides = []
-    idx = 1
-
-    def add(title, html, kind="lesson", **kw):
-        nonlocal idx
-        slides.append({"index": idx, "title": title, "html": html, "kind": kind, "group": kw.get("group", "learn"), "section": kw.get("section", "1.2"), "study_tip": kw.get("study_tip", ""), **{k: v for k, v in kw.items() if k not in ("group", "section", "study_tip")}})
-        idx += 1
-
-    add("AP Unit 1.2 · Defining limits", _intro("1", "1.2", "Defining limits and limit notation", [(4, "Limit meaning"), (8, "Value vs limit"), (12, "Graph limits"), (16, "Packet practice")]), kind="intro", group="divider")
-    add("Lesson outline", _outline("1", "1.2", "Defining limits", [(4, "Informal definition"), (8, "Piecewise example"), (12, "Graph reading"), (14, "AP MCQ"), (16, "Practice packet")]), kind="content", group="divider")
-    add("Section 01 · Limit meaning", _section_divider("01", "What a limit means"), kind="section", group="divider")
-    add(
+    s = SlideBuilder("1.2")
+    s.add(
+        "AP Unit 1.2 · Defining limits",
+        intro(
+            "1",
+            "1.2",
+            "Defining limits and limit notation",
+            [(4, "Limit meaning"), (10, "Notation"), (16, "Value vs limit"), (22, "Graph practice"), (28, "AP MCQ")],
+        ),
+        kind="intro",
+        group="divider",
+    )
+    s.add(
+        "Lesson outline",
+        outline(
+            "1",
+            "1.2",
+            "Defining limits & limit notation",
+            [
+                (4, "Informal definition"),
+                (8, "How to read \\(\\lim_{x\\to c} f(x)=L\\)"),
+                (12, "Limit \\(\\neq\\) function value"),
+                (16, "Piecewise worked example"),
+                (20, "Packet graph problems"),
+                (24, "True / false reasoning"),
+                (28, "Practice packet"),
+            ],
+        ),
+        kind="content",
+        group="divider",
+    )
+    s.add("Section 01 · What is a limit?", section_divider("01", "What a limit means"), kind="section", group="divider")
+    s.add(
         "Informal definition",
-        _role("Knowledge Point", "Build the method", "A limit describes approach, not necessarily the function value.")
-        + "<p>\\(\\displaystyle\\lim_{x\\to c} f(x)=L\\) means: as \\(x\\) approaches \\(c\\), \\(f(x)\\) approaches \\(L\\).</p>"
-        "<p><strong>Key:</strong> the limit can exist even when \\(f(c)\\) is undefined or different from \\(L\\).</p>",
-        section="1.2",
+        role("Knowledge Point", "Approach, not necessarily equal", "A limit describes behavior near a point.")
+        + definition(
+            "Limit at a point (informal)",
+            math_block("\\[\\lim_{x\\to c} f(x)=L\\]")
+            + "<p>means: as \\(x\\) gets <strong>arbitrarily close</strong> to \\(c\\) (but not necessarily equal to \\(c\\)), "
+            "the values \\(f(x)\\) get arbitrarily close to \\(L\\).</p>",
+        )
+        + key_point(
+            "Read it aloud",
+            "<p>“The limit of \\(f(x)\\) as \\(x\\) approaches \\(c\\) is \\(L\\).”</p>"
+            + "<p>The arrow \\(x\\to c\\) always refers to the <strong>input</strong> variable.</p>",
+        ),
     )
-    add(
-        "Limit notation cheat sheet",
-        _role("Reference", "Read notation fluently", "Say the limit aloud before computing.")
-        + "<ul class=\"stem-itemize\">"
-        "<li>\\(\\lim_{x\\to 3} f(x)=5\\): “as \\(x\\) approaches 3, \\(f(x)\\) approaches 5.”</li>"
-        "<li>\\(f(3)\\) is a <em>separate</em> question (filled dot on the graph).</li>"
-        "<li>Open circle at \\((c,L)\\) often signals \\(\\lim_{x\\to c} f(x)=L\\) but \\(f(c)\\neq L\\).</li>"
-        "</ul>",
-        section="1.2",
+    s.add(
+        "Formal precision (optional)",
+        role("Extension", "ε–δ definition", "AP may reference this for rigor; focus on the idea first.")
+        + definition(
+            "Limit (precise)",
+            math_block(
+                "\\[\\forall \\varepsilon>0,\\ \\exists \\delta>0:\\ "
+                "0<|x-c|<\\delta \\Rightarrow |f(x)-L|<\\varepsilon\\]"
+            )
+            + "<p>For every tolerance \\(\\varepsilon\\) on outputs, we can find a distance \\(\\delta\\) on inputs that forces \\(f(x)\\) within \\(\\varepsilon\\) of \\(L\\).</p>",
+        ),
     )
-    add("Section 02 · Value vs limit", _section_divider("02", "Function value vs limit"), kind="section", group="divider")
-    add(
-        "Piecewise example",
-        _role("Worked Example", "Compare limit and value", "Simplify on both sides of the hole.")
-        + "<p>Let \\(f(x)=x+2\\) for \\(x\\neq 3\\), and \\(f(3)=10\\).</p>"
-        "<p>\\(\\displaystyle\\lim_{x\\to 3} f(x)=5\\) but \\(f(3)=10\\). The limit and the function value <strong>differ</strong>.</p>",
-        section="1.2",
+    s.add("Section 02 · Notation reference", section_divider("02", "Limit notation cheat sheet"), kind="section", group="divider")
+    s.add(
+        "Notation you must read fluently",
+        role("Reference", "Symbols → meaning", "Say the limit before computing.")
+        + "<table class='ap-data-table ap-notation-table'>"
+        "<thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>"
+        "<tr><td>\\(\\lim_{x\\to 3} f(x)=5\\)</td><td>As \\(x\\to 3\\), outputs approach 5</td></tr>"
+        "<tr><td>\\(\\lim_{x\\to 3^-} f(x)\\)</td><td>Approach from the left (\\(x<3\\))</td></tr>"
+        "<tr><td>\\(\\lim_{x\\to 3^+} f(x)\\)</td><td>Approach from the right (\\(x>3\\))</td></tr>"
+        "<tr><td>\\(f(3)\\)</td><td>Actual function value at \\(x=3\\) (may differ from the limit)</td></tr>"
+        "</tbody></table>"
+        + warning("A limit statement never guarantees \\(f(c)=L\\). Always check the graph for a filled dot vs. open circle."),
     )
-    add("Section 03 · Graph limits", _section_divider("03", "Limits from graphs"), kind="section", group="divider")
-    add(
-        "Reading limits at x = 2",
-        _role("Graphical Skill", "Two-sided approach", "Left-hand and right-hand must agree for the two-sided limit to exist.")
-        + "<p>From a graph: trace \\(x\\to 2^{-}\\) and \\(x\\to 2^{+}\\). If both approach the same \\(y\\)-value, "
-        "\\(\\lim_{x\\to 2} f(x)\\) exists.</p>"
-        "<p><strong>False generalization:</strong> \\(f(1)\\) is <em>not always</em> equal to \\(\\lim_{x\\to 1} f(x)\\).</p>",
-        section="1.2",
+    s.add("Section 03 · Value vs limit", section_divider("03", "Function value vs limit"), kind="section", group="divider")
+    s.add(
+        "Piecewise example — limit exists but value differs",
+        role("Worked Example", "Compare \\(\\lim\\) and \\(f(c)\\)", "Simplify on both sides of the hole.")
+        + "<p>\\(f(x)=x+2\\) for \\(x\\neq 3\\), and \\(f(3)=10\\).</p>"
+        + math_block(
+            "\\[\\lim_{x\\to 3} f(x)=\\lim_{x\\to 3}(x+2)=5,\\qquad f(3)=10\\]"
+        )
+        + key_point(
+            "When can they differ?",
+            "<ul class='stem-itemize'>"
+            "<li>Removable hole: open circle at \\((c,L)\\), filled dot elsewhere</li>"
+            "<li>Undefined at \\(c\\) but limit still exists</li>"
+            "</ul>",
+        ),
     )
-    add("Section 04 · AP MCQ", _section_divider("04", "AP-style multiple choice"), kind="section", group="divider")
-    q_idx = idx
-    add(
-        "Question: best interpretation of a limit",
-        _mcq(
+    s.add("Section 04 · Graph practice", section_divider("04", "Limits from the packet graph"), kind="section", group="divider")
+    s.add(
+        "Packet 1.2 — read limits from the graph",
+        role("Graphical Skill", "Left, right, then two-sided", "Use the same graph for all items.")
+        + fig(f"{FIG}/packet_1_2_p1.png", "Packet 1.2 · Limit notation with graphs", "ap-fig--wide")
+        + fig(f"{FIG}/limit_graph_quiz.svg", "Reference graph for limit exercises")
+        + "<ol class='stem-itemize ap-problem-list'>"
+        "<li>\\(\\displaystyle\\lim_{x\\to 1} f(x)\\) — approach from both sides</li>"
+        "<li>\\(f(-3)\\) — function <em>value</em>, not a limit</li>"
+        "<li>\\(\\displaystyle\\lim_{x\\to 2} f(x)\\) — check left vs. right</li>"
+        "<li>\\(f(2)\\) vs. \\(\\displaystyle\\lim_{x\\to 2} f(x)\\) — may differ</li>"
+        "</ol>",
+    )
+    s.add(
+        "Interpretation in words",
+        role("Application", "Translate notation", "AP free-response often asks for verbal interpretation.")
+        + definition(
+            "Verbal form",
+            "<p>\\(\\displaystyle\\lim_{x\\to 7} f(x)=10\\) means:</p>"
+            "<p><em>As \\(x\\) approaches 7, the values of \\(f(x)\\) approach 10.</em></p>",
+        )
+        + checkpoint(
+            "True or false? \\(f(1)=\\displaystyle\\lim_{x\\to 1} f(x)\\) in <strong>all</strong> cases. "
+            "<strong>False.</strong> Counterexample: any removable discontinuity."
+        ),
+    )
+    s.add("Section 05 · AP practice", section_divider("05", "AP-style multiple choice"), kind="section", group="divider")
+    q = s.add(
+        "Question: best interpretation",
+        mcq(
             "<p>Which is the best interpretation of \\(\\displaystyle\\lim_{x\\to 4} f(x)=8\\)?</p>",
             [
                 "The value of \\(f\\) at \\(x=4\\) is 8",
@@ -369,28 +377,24 @@ def lesson_1_2() -> dict:
                 "As \\(x\\) approaches 8, the values of \\(f(x)\\) approach 4",
             ],
             "C",
-            "Limits describe approaching behavior, not necessarily the function value at the point.",
+            "Match input approach (\\(x\\to 4\\)) with output approach (\\(\\to 8\\)).",
         ),
         kind="question",
         group="practice",
-        answer_index=q_idx + 1,
-        correct_choice="C",
-        section="1.2",
     )
-    add(
-        "Answer: limit interpretation",
-        _answer("Correct Answer: C", "<p>A limit statement is always about <strong>approaching</strong> inputs and outputs — choice C.</p>"),
+    s.add(
+        "Answer: interpretation",
+        answer("Correct Answer: C", "<p>Limits describe approaching behavior — choice C.</p>"),
         kind="answer",
         group="practice",
-        question_index=q_idx,
-        section="1.2",
+        question_index=q,
+        correct_choice="C",
         inline_solution=True,
         interactive=True,
     )
-    q_idx = idx
-    add(
-        "Question: limit as x approaches −1",
-        _mcq(
+    q = s.add(
+        "Question: limit at x = −1",
+        mcq(
             "<p>Which is the best interpretation of \\(\\displaystyle\\lim_{x\\to -1} f(x)=2\\)?</p>",
             [
                 "As \\(x\\) approaches 2, \\(f(x)\\) approaches \\(-1\\)",
@@ -399,26 +403,49 @@ def lesson_1_2() -> dict:
                 "As \\(x\\) approaches \\(-1\\), the values of \\(f(x)\\) approach 2",
             ],
             "D",
-            "Match the arrow direction: \\(x\\to -1\\), outputs approach 2.",
+            "Read the arrow on the input: \\(x\\to -1\\).",
         ),
         kind="question",
         group="practice",
-        answer_index=q_idx + 1,
-        correct_choice="D",
-        section="1.2",
     )
-    add(
+    s.add(
         "Answer: limit at −1",
-        _answer("Correct Answer: D", "<p>As \\(x\\to -1\\), outputs approach 2 — that is exactly choice D.</p>"),
+        answer("Correct Answer: D", "<p>Input approaches \\(-1\\); outputs approach 2.</p>"),
         kind="answer",
         group="practice",
-        question_index=q_idx,
-        section="1.2",
+        question_index=q,
+        correct_choice="D",
         inline_solution=True,
         interactive=True,
     )
-    add("Section 05 · Practice packet", _section_divider("05", "Practice packet"), kind="section", group="divider")
-    add("Download Unit 1.2 practice", _practice_packet("1.2", "Unit 1.2 · Defining limits"), kind="lesson", group="practice", section="1.2")
+    q = s.add(
+        "Question: f(1) vs limit",
+        mcq(
+            "<p>On a graph, \\(\\displaystyle\\lim_{x\\to 1} f(x)=3\\) but \\(f(1)=5\\). Which is true?</p>",
+            [
+                "The limit does not exist",
+                "\\(f\\) is continuous at \\(x=1\\)",
+                "The limit exists but \\(f(1)\\neq\\displaystyle\\lim_{x\\to 1} f(x)\\)",
+                "We cannot determine the limit from the graph",
+            ],
+            "C",
+            "A limit can exist even when the function value differs.",
+        ),
+        kind="question",
+        group="practice",
+    )
+    s.add(
+        "Answer: f(1) vs limit",
+        answer("Correct Answer: C", "<p>Limit 3, value 5 — removable-type mismatch.</p>"),
+        kind="answer",
+        group="practice",
+        question_index=q,
+        correct_choice="C",
+        inline_solution=True,
+        interactive=True,
+    )
+    s.add("Section 06 · Practice packet", section_divider("06", "Practice packet"), kind="section", group="divider")
+    s.add("Download Unit 1.2 practice", practice_packet("1.2", "Unit 1.2 · Defining limits"), kind="lesson", group="practice")
     return {
         "slug": "ap-1-2-defining-limits",
         "unit": 1,
@@ -426,54 +453,123 @@ def lesson_1_2() -> dict:
         "section": "1.2",
         "title": "Defining Limits and Using Limit Notation",
         "deck_title": "AP Unit 1.2 · Defining limits",
-        "slide_count": len(slides),
-        "slides": slides,
+        "slide_count": len(s.slides),
+        "slides": s.slides,
         "practice_section": "1.2",
     }
 
 
 def lesson_1_3() -> dict:
-    slides = []
-    idx = 1
-
-    def add(title, html, kind="lesson", **kw):
-        nonlocal idx
-        slides.append({"index": idx, "title": title, "html": html, "kind": kind, "group": kw.get("group", "learn"), "section": kw.get("section", "1.3"), "study_tip": kw.get("study_tip", ""), **{k: v for k, v in kw.items() if k not in ("group", "section", "study_tip")}})
-        idx += 1
-
-    add("AP Unit 1.3 · Limits from graphs", _intro("1", "1.3", "Estimating limits from graphs", [(4, "One-sided limits"), (8, "Jump discontinuity"), (12, "Sketch constraints"), (16, "Packet practice")]), kind="intro", group="divider")
-    add("Lesson outline", _outline("1", "1.3", "Limits from graphs", [(4, "One-sided limits"), (8, "When limits DNE"), (12, "Graph design"), (14, "AP MCQ"), (16, "Practice packet")]), kind="content", group="divider")
-    add("Section 01 · One-sided limits", _section_divider("01", "One-sided limits"), kind="section", group="divider")
-    add(
-        "Left-hand and right-hand limits",
-        _role("Knowledge Point", "Build the method", "Approach from one side only — use superscript − or +.")
-        + "<p>A <strong>one-sided limit</strong> is the value \\(f(x)\\) approaches as \\(x\\) nears \\(c\\) from the left (\\(x\\to c^{-}\\)) "
-        "or right (\\(x\\to c^{+}\\)).</p>"
-        "<p>Two-sided limit exists only when left and right limits exist and are <strong>equal</strong>.</p>",
-        section="1.3",
+    s = SlideBuilder("1.3")
+    s.add(
+        "AP Unit 1.3 · Limits from graphs",
+        intro(
+            "1",
+            "1.3",
+            "Estimating limit values from graphs",
+            [(4, "One-sided limits"), (10, "Two-sided limits"), (16, "Jump & holes"), (22, "Sketching"), (28, "AP MCQ")],
+        ),
+        kind="intro",
+        group="divider",
     )
-    add("Section 02 · When limits DNE", _section_divider("02", "When limits fail to exist"), kind="section", group="divider")
-    add(
-        "Jump at x = 3",
-        _role("Worked Example", "Compare one-sided limits", "Different left and right limits → two-sided limit DNE.")
-        + "<p>Example: \\(\\lim_{x\\to 3^{-}} f(x)=-1\\), \\(\\lim_{x\\to 3^{+}} f(x)=2\\). "
-        "Because \\(-1\\neq 2\\), \\(\\displaystyle\\lim_{x\\to 3} f(x)\\) <strong>does not exist</strong>.</p>",
-        section="1.3",
+    s.add(
+        "Lesson outline",
+        outline(
+            "1",
+            "1.3",
+            "Estimating limits from graphs",
+            [
+                (4, "One-sided limits"),
+                (8, "When two-sided limits exist"),
+                (12, "Piecewise graph example"),
+                (16, "Jump discontinuity"),
+                (20, "Packet examples"),
+                (24, "Graph checklist"),
+                (28, "Practice packet"),
+            ],
+        ),
+        kind="content",
+        group="divider",
     )
-    add("Section 03 · Graph design", _section_divider("03", "Sketching with constraints"), kind="section", group="divider")
-    add(
-        "Sketch a function with given limits",
-        _role("Application", "Design the graph", "Open vs closed dots encode limits vs function values.")
-        + "<p>Sketch \\(g\\) such that: \\(g(3)=-1\\), \\(\\lim_{x\\to 3} g(x)=4\\), and \\(g\\) is increasing on \\((-2,3)\\).</p>"
-        "<p><strong>Tip:</strong> open circle at \\((3,4)\\) for the limit, filled dot at \\((3,-1)\\) for the value.</p>",
-        section="1.3",
+    s.add("Section 01 · One-sided limits", section_divider("01", "One-sided limits"), kind="section", group="divider")
+    s.add(
+        "Definition: approach from one side",
+        role("Knowledge Point", "Left vs right", "Superscript − and + tell you which direction.")
+        + definition(
+            "One-sided limits",
+            math_block(
+                "\\[\\lim_{x\\to c^-} f(x)=L \\quad\\text{(from the left)},\\qquad "
+                "\\lim_{x\\to c^+} f(x)=M \\quad\\text{(from the right)}\\]"
+            )
+            + "<p>A <strong>one-sided limit</strong> is the value \\(f(x)\\) approaches as \\(x\\) nears \\(c\\) from one side only.</p>",
+        )
+        + fig(f"{FIG}/jump_discontinuity.svg", "Jump at \\(x=3\\): \\(\\lim_{x\\to 3^-}=-1\\), \\(\\lim_{x\\to 3^+}=2\\)"),
     )
-    add("Section 04 · AP MCQ", _section_divider("04", "AP-style multiple choice"), kind="section", group="divider")
-    q_idx = idx
-    add(
-        "Question: which statement is true?",
-        _mcq(
-            "<p>The graph of \\(f\\) has a jump at \\(x=b\\) with left limit 3 and right limit 5. Which is true?</p>",
+    s.add(
+        "Two-sided limit exists only when sides agree",
+        role("Knowledge Point", "Combine one-sided limits", "Different sides → DNE.")
+        + definition(
+            "Two-sided limit",
+            math_block(
+                "\\[\\lim_{x\\to c} f(x)=L \\iff "
+                "\\lim_{x\\to c^-} f(x)=\\lim_{x\\to c^+} f(x)=L\\]"
+            )
+        )
+        + checkpoint("If left and right limits differ, the two-sided limit <strong>does not exist</strong> (even if \\(f(c)\\) is defined)."),
+    )
+    s.add("Section 02 · Piecewise graph", section_divider("02", "Classic piecewise graph"), kind="section", group="divider")
+    s.add(
+        "Read limits at x = 2",
+        role("Worked Example", "Follow the graph checklist", "Open circle = limit; filled dot = function value.")
+        + fig(f"{FIG}/limit_piecewise_at_2.svg", "Piecewise graph: limit at \\(x=2\\) is 3, but \\(f(2)=1.5\\)")
+        + math_block(
+            "\\[\\lim_{x\\to 2^-} f(x)=3,\\quad \\lim_{x\\to 2^+} f(x)=3,\\quad "
+            "\\lim_{x\\to 2} f(x)=3,\\quad f(2)=1.5\\]"
+        )
+        + warning("\\(\\displaystyle\\lim_{x\\to 2} f(x)\\neq f(2)\\) — so \\(f\\) is <strong>not continuous</strong> at \\(x=2\\)."),
+    )
+    s.add("Section 03 · Packet graphs", section_divider("03", "Packet 1.3 exercises"), kind="section", group="divider")
+    s.add(
+        "Packet 1.3 — one-sided limits from graphs",
+        role("Application", "Packet examples 1–3", "Work each limit from the graph before revealing solutions.")
+        + fig(f"{FIG}/packet_1_3_p1.png", "Packet 1.3 · One-sided limits at \\(x=3\\)", "ap-fig--wide")
+        + "<ol class='stem-itemize ap-problem-list'>"
+        "<li>\\(\\displaystyle\\lim_{x\\to 3^-} f(x)=-1\\), \\(\\displaystyle\\lim_{x\\to 3^+} f(x)=2\\) → \\(\\displaystyle\\lim_{x\\to 3} f(x)\\) DNE</li>"
+        "<li>At \\(x=-2\\): compare left and right limits</li>"
+        "<li>Sketch \\(g\\) with \\(g(3)=-1\\), \\(\\displaystyle\\lim_{x\\to 3} g(x)=4\\), increasing on \\((-2,3)\\)</li>"
+        "</ol>",
+    )
+    s.add(
+        "Graph reading checklist",
+        role("Reference", "Four questions every time", "Use this on every AP graph problem.")
+        + key_point(
+            "Graph checklist",
+            "<ol class='stem-itemize'>"
+            "<li>What does the graph approach from the <strong>left</strong>?</li>"
+            "<li>What does the graph approach from the <strong>right</strong>?</li>"
+            "<li>Are those values <strong>equal</strong>?</li>"
+            "<li>Where is the <strong>filled dot</strong> (actual function value)?</li>"
+            "</ol>",
+        )
+        + fig(f"{FIG}/packet_1_3_p2.png", "Additional packet graph exercises", "ap-fig--wide"),
+    )
+    s.add("Section 04 · Sketching", section_divider("04", "Sketching with constraints"), kind="section", group="divider")
+    s.add(
+        "Design a graph satisfying all conditions",
+        role("Worked Example", "Open vs closed dots", "Constraints on value, limit, and monotonicity.")
+        + "<p>Sketch \\(g\\) such that:</p>"
+        + "<ul class='stem-itemize'>"
+        "<li>\\(g(3)=-1\\) (filled dot at \\((3,-1)\\))</li>"
+        "<li>\\(\\displaystyle\\lim_{x\\to 3} g(x)=4\\) (open circle at \\((3,4)\\))</li>"
+        "<li>\\(g\\) increasing on \\((-2,3)\\)</li>"
+        "</ul>"
+        + checkpoint("Increasing on \\((-2,3)\\) means as \\(x\\) increases toward 3, \\(g(x)\\) increases — the graph rises toward the open circle at height 4."),
+    )
+    s.add("Section 05 · AP practice", section_divider("05", "AP-style multiple choice"), kind="section", group="divider")
+    q = s.add(
+        "Question: jump discontinuity",
+        mcq(
+            "<p>At \\(x=b\\), \\(\\displaystyle\\lim_{x\\to b^-} f(x)=3\\) and \\(\\displaystyle\\lim_{x\\to b^+} f(x)=5\\). Which is true?</p>",
             [
                 "\\(\\displaystyle\\lim_{x\\to b} f(x)=4\\)",
                 "\\(\\displaystyle\\lim_{x\\to b} f(x)=5\\)",
@@ -481,26 +577,50 @@ def lesson_1_3() -> dict:
                 "\\(\\displaystyle\\lim_{x\\to b} f(x)=3\\)",
             ],
             "C",
-            "Mismatched one-sided limits ⇒ two-sided limit does not exist.",
+            "Mismatched one-sided limits ⇒ two-sided limit DNE.",
         ),
         kind="question",
         group="practice",
-        answer_index=q_idx + 1,
-        correct_choice="C",
-        section="1.3",
     )
-    add(
-        "Answer: jump discontinuity",
-        _answer("Correct Answer: C", "<p>Left limit \\(3\\) and right limit \\(5\\) disagree, so the two-sided limit <strong>does not exist</strong>.</p>"),
+    s.add(
+        "Answer: jump",
+        answer("Correct Answer: C", "<p>Left limit 3, right limit 5 — two-sided limit does not exist.</p>"),
         kind="answer",
         group="practice",
-        question_index=q_idx,
-        section="1.3",
+        question_index=q,
+        correct_choice="C",
         inline_solution=True,
         interactive=True,
     )
-    add("Section 05 · Practice packet", _section_divider("05", "Practice packet"), kind="section", group="divider")
-    add("Download Unit 1.3 practice", _practice_packet("1.3", "Unit 1.3 · Limits from graphs"), kind="lesson", group="practice", section="1.3")
+    q = s.add(
+        "Question: read the piecewise graph",
+        mcq(
+            "<p>Using the piecewise graph at \\(x=2\\) (open circle at \\((2,3)\\), filled dot at \\((2,1.5)\\)), "
+            "what is \\(\\displaystyle\\lim_{x\\to 2} f(x)\\)?</p>",
+            [
+                "1.5",
+                "3",
+                "Does not exist",
+                "2.25",
+            ],
+            "B",
+            "The limit is the \\(y\\)-value approached from both sides — the open circle height.",
+        ),
+        kind="question",
+        group="practice",
+    )
+    s.add(
+        "Answer: piecewise at 2",
+        answer("Correct Answer: B", "<p>Both sides approach \\(y=3\\); \\(f(2)=1.5\\) is separate.</p>"),
+        kind="answer",
+        group="practice",
+        question_index=q,
+        correct_choice="B",
+        inline_solution=True,
+        interactive=True,
+    )
+    s.add("Section 06 · Practice packet", section_divider("06", "Practice packet"), kind="section", group="divider")
+    s.add("Download Unit 1.3 practice", practice_packet("1.3", "Unit 1.3 · Limits from graphs"), kind="lesson", group="practice")
     return {
         "slug": "ap-1-3-limits-from-graphs",
         "unit": 1,
@@ -508,8 +628,8 @@ def lesson_1_3() -> dict:
         "section": "1.3",
         "title": "Estimating Limit Values from Graphs",
         "deck_title": "AP Unit 1.3 · Limits from graphs",
-        "slide_count": len(slides),
-        "slides": slides,
+        "slide_count": len(s.slides),
+        "slides": s.slides,
         "practice_section": "1.3",
     }
 
@@ -542,7 +662,7 @@ def main() -> None:
     payload = build()
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
-    print(f"Wrote {OUTPUT} ({payload['total']} lessons)")
+    print(f"Wrote {OUTPUT} ({payload['total']} lessons, {sum(m['slide_count'] for m in payload['materials'])} slides)")
 
 
 if __name__ == "__main__":
