@@ -1,0 +1,250 @@
+/* AP Calculus track — teal/emerald accent on shared cinema shell */
+.np-ap-calc {
+  --ap-accent: #10b981;
+  --ap-accent-soft: rgba(16, 185, 129, 0.18);
+  --ap-accent-glow: rgba(52, 211, 153, 0.35);
+}
+
+.np-ap-calc .np-cmx-stage__wash {
+  background: radial-gradient(ellipse 80% 60% at 20% 0%, rgba(16, 185, 129, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(6, 182, 212, 0.08), transparent 50%);
+}
+
+.np-ap-calc-orb {
+  background: radial-gradient(circle, var(--ap-accent-glow), transparent 70%) !important;
+}
+
+.np-ap-calc-hero .np-cmx-display {
+  background: linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 45%, #6ee7b7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.np-ap-calc-feature .np-cmx-feature__rail {
+  background: linear-gradient(180deg, var(--ap-accent), #059669);
+}
+
+.np-ap-calc-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 1.5rem;
+}
+
+.np-ap-calc-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  animation: np-ap-calc-in 0.5s ease both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+.np-ap-calc-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15);
+}
+
+.np-ap-calc-card.is-lead {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.np-ap-calc-card__banner {
+  position: relative;
+  min-height: 5.5rem;
+  background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+
+.np-ap-calc-card__section {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.np-ap-calc-card__glyph {
+  font-size: 2rem;
+  opacity: 0.35;
+  font-style: italic;
+}
+
+.np-ap-calc-card__body {
+  padding: 1.1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.np-ap-calc-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.np-ap-calc-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.np-ap-calc-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  opacity: 0.75;
+}
+
+.np-ap-calc-card__cta {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--ap-accent);
+  font-weight: 600;
+}
+
+.np-ap-calc-packets {
+  margin-top: 2.5rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 1rem;
+}
+
+.np-ap-calc-packets h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.np-ap-calc-packets > p {
+  margin: 0 0 1.25rem;
+  opacity: 0.8;
+  font-size: 0.92rem;
+}
+
+.np-ap-calc-packet-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.np-ap-calc-packet-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.np-ap-calc-packet-item:last-child {
+  border-bottom: none;
+}
+
+.np-ap-calc-packet-item strong {
+  font-size: 1rem;
+  color: var(--ap-accent);
+  min-width: 2.5rem;
+}
+
+.np-ap-calc-packet-item span {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.np-ap-calc-packet-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.np-ap-calc-packet-links a {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--ap-accent);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.np-ap-calc-packet-links a:hover {
+  background: var(--ap-accent-soft);
+}
+
+/* Slide viewer theme */
+.np-cm-viewer--ap-calc .np-cm-hero {
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.np-cm-viewer--ap-calc .np-cm-cinema-kicker {
+  color: #6ee7b7;
+}
+
+.np-cm-viewer--ap-calc .np-cm-mastery-fill {
+  stroke: var(--ap-accent);
+}
+
+.ap-calc-quote {
+  margin: 1rem 0;
+  padding: 0.85rem 1.1rem;
+  border-left: 3px solid var(--ap-accent);
+  background: var(--ap-accent-soft);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+}
+
+.ap-calc-packet-card {
+  padding: 1.5rem 1.75rem;
+  border-radius: 1rem;
+  margin: 0.5rem 0;
+}
+
+.ap-calc-packet-card h2 {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.ap-calc-packet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ap-calc-intro .cm-intro-orb--1 {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.35), transparent 70%);
+}
+
+.ap-calc-intro .cm-intro-orb--2 {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.25), transparent 70%);
+}
+
+@keyframes np-ap-calc-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .np-ap-calc-packet-item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .np-ap-calc-packet-links {
+    justify-content: flex-start;
+  }
+}
