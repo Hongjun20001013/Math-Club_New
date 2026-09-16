@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T19:03:00.790088Z",
+  "generated_at": "2026-09-16T01:31:20.138836Z",
   "total": 48,
   "available": 48,
   "materials": [
@@ -6114,11 +6114,11 @@
         {
           "index": 33,
           "title": "Question: Solving a Quadratic Equation Involving Radicals",
-          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Solve the quadratic equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    x^2 - 2x - 9 = 0\n    \\]</div>\n<p>One solution to the equation can be written in the form \\(1 + \\sqrt{k}\\), where \\(k\\) is a constant.</p>\n<p>What is the value of \\(k\\)?</p>\n<p><strong>Options:</strong></p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(8\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(10\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(20\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(40\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Solve the quadratic equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    x^2 - 2x - 9 = 0\n    \\]</div>\n<p>One solution to the equation can be written in the form \\(1 + \\sqrt{k}\\), where \\(k\\) is a constant.</p>\n<p>What is the value of \\(k\\)?</p>\n<p><strong>Options:</strong></p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(8\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(10\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(20\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(40\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button><button type=\"button\" class=\"cm-mcq-skip\" data-cm-go-answer>View worked solution →</button></div></div></div></div>",
           "kind": "question",
           "interactive": true,
           "answer_index": 34,
-          "correct_choice": "C",
+          "correct_choice": "B",
           "group": "practice",
           "section": "Quadratic Formula(X-Intercept)",
           "study_tip": "Write your full work before opening the solution — partial credit thinking helps on test day.",
@@ -6127,7 +6127,7 @@
         {
           "index": 34,
           "title": "Answer Explanation: Solving a Quadratic Equation Involving Radicals",
-          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p><strong>Correct Answer: C: \\(20\\)</strong></p>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Use the quadratic formula:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        x = \\frac{2 \\pm \\sqrt{(-2)^2 - 4(1)(-9)}}{2(1)} = \\frac{2 \\pm \\sqrt{4 + 36}}{2} = \\frac{2 \\pm \\sqrt{40}}{2}\n        \\]</div></li><li>Simplify:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        x = \\frac{2 \\pm 2\\sqrt{10}}{2} = 1 \\pm \\sqrt{10}\n        \\]</div></li><li>One solution is \\(1 + \\sqrt{10}\\), so we identify:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        \\sqrt{k} = \\sqrt{10} ⇒ k = 10\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\boxed{10}\\)</span></div></div></div>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--answer\"><span class=\"cm-slide-role-label\">Answer Review</span><strong>Check and correct</strong><p>Compare your work with the final answer and fix any missed step.</p></div><p><strong>Correct Answer: B: \\(10\\)</strong></p>\n<div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Your turn</strong><span>Work it out on paper first — reveal when you're ready.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><p><strong>Solution:</strong></p><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel>\n<ul class=\"stem-itemize\"><li>Use the quadratic formula:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        x = \\frac{2 \\pm \\sqrt{(-2)^2 - 4(1)(-9)}}{2(1)} = \\frac{2 \\pm \\sqrt{4 + 36}}{2} = \\frac{2 \\pm \\sqrt{40}}{2}\n        \\]</div></li><li>Simplify:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        x = \\frac{2 \\pm 2\\sqrt{10}}{2} = 1 \\pm \\sqrt{10}\n        \\]</div></li><li>One solution is \\(1 + \\sqrt{10}\\), so we identify:\n        <div class=\"stem-math-block cm-math-block\">\\[\n        \\sqrt{k} = \\sqrt{10} ⇒ k = 10\n        \\]</div></li></ul>\n<div class=\"cm-answer-card\"><span class=\"cm-answer-card-label\">Final Answer</span><div class=\"cm-answer-card-value\"><span class=\"cm-answer-card-math\">\\(\\boxed{10}\\)</span></div></div></div>",
           "kind": "answer",
           "inline_solution": true,
           "interactive": true,
@@ -6699,7 +6699,7 @@
           "title": "Solving a Quadratic Equation Involving Radicals",
           "section": "Quadratic Formula(X-Intercept)",
           "kind": "question",
-          "correct": "C",
+          "correct": "B",
           "answer_index": 34,
           "stem_html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Label opposite, adjacent, and hypotenuse relative to the given angle.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">Question Practice</span><strong>Try it first</strong><p>Pause and solve before checking the answer or worked solution.</p></div><p>Solve the quadratic equation:</p>\n<div class=\"stem-math-block cm-math-block\">\\[\n    x^2 - 2x - 9 = 0\n    \\]</div>\n<p>One solution to the equation can be written in the form \\(1 + \\sqrt{k}\\), where \\(k\\) is a constant.</p>\n<p>What is the value of \\(k\\)?</p>\n<p><strong>Options:</strong></p></div><div class=\"cm-question-interact\">",
           "choices": [
@@ -40297,9 +40297,9 @@
       "prev_lesson_slug": "hard-question-27",
       "next_lesson_slug": "hard-question-29",
       "tex_available": true,
-      "pdf_available": true,
+      "pdf_available": false,
       "tex_file": "SAT_Hard_Question_28_PPT.tex",
-      "pdf_file": "SAT_Hard_Question_Part_28_PPT.pdf",
+      "pdf_file": null,
       "interactive_count": 44,
       "learn_count": 0,
       "practice_slide_count": 88,
