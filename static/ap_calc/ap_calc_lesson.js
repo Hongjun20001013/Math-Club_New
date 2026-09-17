@@ -397,6 +397,9 @@
 
   function initAll(scope) {
     var root = scope || document;
+    if (window.ApCalcMathLab && typeof window.ApCalcMathLab.init === "function") {
+      window.ApCalcMathLab.init(root);
+    }
     root.querySelectorAll("[data-ap-secant-demo]").forEach(initSecantDemo);
     root.querySelectorAll("[data-ap-limit-demo]").forEach(initLimitApproach);
     root.querySelectorAll("[data-ap-trace-demo]").forEach(initLimitTracer);

@@ -1237,7 +1237,183 @@ html[data-exam-theme="dark"] .ap-data-table td {
   .ap-fig img,
   .ap-secant-svg,
   .ap-limit-svg,
-  .ap-trace-svg {
+  .ap-trace-svg,
+  .ap-lab-svg {
     max-width: 100%;
+  }
+}
+
+/* ═══ Interactive Math Lab ═══ */
+.ap-math-lab {
+  margin: 1.25rem 0;
+  padding: 1.1rem 1.2rem 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(108, 78, 255, 0.16);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(243, 236, 251, 0.92));
+  box-shadow: 0 14px 40px rgba(79, 47, 216, 0.08);
+}
+
+.ap-lab-phase {
+  margin-bottom: 1rem;
+}
+
+.ap-lab-phase__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4f2fd8;
+}
+
+.ap-lab-phase__prompt {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  color: #433a5c;
+}
+
+.ap-lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.ap-lab-btn {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(108, 78, 255, 0.2);
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4f2fd8;
+  cursor: pointer;
+}
+
+.ap-lab-btn--primary {
+  background: linear-gradient(135deg, #4f2fd8, #6c4eff);
+  color: #fff;
+  border-color: transparent;
+}
+
+.ap-lab-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(108, 78, 255, 0.15);
+}
+
+.ap-lab-range {
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.ap-lab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin: 0.75rem 0;
+}
+
+.ap-lab-table th,
+.ap-lab-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid rgba(108, 78, 255, 0.1);
+  text-align: center;
+}
+
+.ap-lab-table tr.is-active {
+  background: rgba(108, 78, 255, 0.08);
+  font-weight: 700;
+}
+
+.ap-lab-estimates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  font-size: 0.84rem;
+  color: #433a5c;
+}
+
+.ap-lab-feedback {
+  margin: 0.5rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.65rem;
+  background: rgba(108, 78, 255, 0.08);
+  font-size: 0.88rem;
+}
+
+.ap-lab-predict-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ap-lab-case-tabs,
+.ap-lab-scenario-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.ap-lab-case-tab,
+.ap-lab-scenario-tab {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(108, 78, 255, 0.18);
+  background: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.ap-lab-case-tab.is-active,
+.ap-lab-scenario-tab.is-active {
+  background: #6c4eff;
+  color: #fff;
+}
+
+.ap-lab-dashboard {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.ap-lab-step {
+  margin: 0.2rem 0;
+  font-size: 0.82rem;
+  color: #6f658c;
+}
+
+.ap-lab-step.is-active {
+  color: #4f2fd8;
+  font-weight: 700;
+}
+
+.ap-lab-step.is-done {
+  color: #059669;
+}
+
+.ap-lab-dash-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0.65rem 0 0;
+  font-size: 0.84rem;
+}
+
+.ap-lab-tutor {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(108, 78, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-math-lab * {
+    animation: none !important;
+    transition: none !important;
   }
 }
