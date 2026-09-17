@@ -352,5 +352,8 @@
   'interactive_count': material.interactive_count|default(0),
   'slide_count': material.slide_count|default(0)
 }|tojson }}</script>
+{% if cm_track_class == 'ap-calc' %}
+<script defer src="{{ url_for('static', filename='ap_calc/ap_calc_lesson.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
 <script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}

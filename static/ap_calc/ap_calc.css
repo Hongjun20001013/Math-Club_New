@@ -610,6 +610,168 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin-top: 1rem;
 }
 
+/* Pedagogical components */
+.ap-phase-divider {
+  margin: 0 0 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.65rem;
+  background: linear-gradient(90deg, #ede8ff, transparent);
+  border-left: 4px solid var(--ap-violet, #6c4eff);
+}
+
+.ap-phase-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ap-violet-deep, #4f2fd8);
+}
+
+.ap-phase-title {
+  margin: 0.2rem 0 0;
+  font-size: 1.1rem;
+  color: var(--ap-ink, #161022);
+}
+
+.ap-concept-frame {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ap-concept-row {
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #faf8ff;
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.ap-concept-row span {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ap-violet-deep, #4f2fd8);
+  margin-bottom: 0.2rem;
+}
+
+.ap-concept-row--warn {
+  background: #fff5f5;
+  border-color: rgba(198, 40, 40, 0.15);
+}
+
+.ap-thinking-space {
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border: 2px dashed rgba(108, 78, 255, 0.35);
+  border-radius: 0.75rem;
+  min-height: 4.5rem;
+  background: #fff;
+}
+
+.ap-thinking-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ap-muted, #6f658c);
+  margin: 0 0 0.35rem;
+}
+
+.ap-hint-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.ap-hint-item--hidden {
+  display: none;
+}
+
+.ap-hint-btn {
+  margin-bottom: 0.75rem;
+}
+
+.ap-graph-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.ap-graph-grid--2x2 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.ap-fig-notice {
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--ap-soft, #433a5c);
+  line-height: 1.45;
+}
+
+.ap-procedure-list {
+  margin: 0.5rem 0 0 1.2rem;
+  line-height: 1.6;
+}
+
+.ap-secant-demo {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  border: 1px solid rgba(108, 78, 255, 0.15);
+}
+
+.ap-secant-controls label {
+  font-size: 0.95rem;
+  color: var(--ap-ink, #161022);
+}
+
+.ap-secant-readout {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.ap-secant-svg {
+  width: 100%;
+  max-width: 480px;
+  display: block;
+  margin: 0 auto;
+}
+
+.ap-exit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ap-exit-list li {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--ap-line, rgba(22, 16, 34, 0.1));
+}
+
+.ap-exit-num {
+  font-weight: 800;
+  color: var(--ap-violet-deep, #4f2fd8);
+  min-width: 1.5rem;
+}
+
+.ap-box--optional {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  background: #f8f8fa;
+  border: 1px dashed rgba(108, 78, 255, 0.25);
+}
+
+.ap-box--optional summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ap-muted, #6f658c);
+}
+
 /* Breadcrumb & footer legibility */
 .np-ap-calc .np-cmx-crumb {
   font-size: 0.9rem;
