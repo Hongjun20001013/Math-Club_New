@@ -315,6 +315,8 @@ def secant_math_lab_embed(spec_json: str) -> str:
         '<div class="ap-lab-tutor" data-ap-tutor>'
         '<p data-ap-tutor-text>Need a nudge? Tap for a hint (Level 1).</p>'
         '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
+        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
+        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p>'
         "</div>"
     )
     controls_note = (
@@ -371,7 +373,9 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<p>Compare: <strong data-ap-compare>—</strong> · Limit: <strong data-ap-limit-val>—</strong> · f(c): <strong data-ap-fc-val>—</strong></p>'
         "</div></div>"
         '<div class="ap-lab-tutor" data-ap-tutor><p data-ap-tutor-text>Need a nudge? Tap for a hint.</p>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button></div>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
+        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
+        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
     )
     return _math_lab_shell(spec_json, inner)
 
@@ -426,7 +430,9 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<span class="ap-box-label">Conclusion</span>'
         '<div class="ap-box-body">Use Left → Right → Compare → Value on every graph.</div></div>'
         '<div class="ap-lab-tutor" data-ap-tutor><p data-ap-tutor-text>Need a nudge? Tap for a hint.</p>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button></div>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
+        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
+        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
     )
     return _math_lab_shell(spec_json, inner)
 

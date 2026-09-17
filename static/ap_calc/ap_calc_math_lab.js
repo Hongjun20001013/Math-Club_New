@@ -169,7 +169,11 @@
     this.level = Math.min(5, this.level + 1);
     var msg = this._message(context);
     if (this.text) this.text.textContent = msg;
-    if (this.level >= 5 && this.btn) this.btn.textContent = "Full solution shown";
+    if (this.level >= 5) {
+      if (this.btn) this.btn.textContent = "Full solution shown";
+      var reflect = this.root.querySelector("[data-ap-reflection]");
+      if (reflect) reflect.hidden = false;
+    }
     return this.level;
   };
 
@@ -177,6 +181,8 @@
     this.level = 0;
     if (this.text) this.text.textContent = "Need a nudge? Tap for a hint (Level 1).";
     if (this.btn) this.btn.textContent = "Get hint";
+    var reflect = this.root.querySelector("[data-ap-reflection]");
+    if (reflect) reflect.hidden = true;
   };
 
   Tutor.prototype.misconception = function (tag) {
@@ -190,6 +196,10 @@
     if (L === 2) return "Use the slope triangle: orange run h, blue rise Δs, gray secant, green tangent.";
     if (L === 3) return ctx.setup || "Setup: secant slope = (s(a+h)−s(a))/h. For s(t)=t²+1 at t=2, slope = 4+h.";
     if (L === 4) return ctx.step || "With h=0.1, Δs=0.41 and slope=4.1. Both sides approach 4.";
+    if (L === 5) {
+      return (ctx.solution || "Instantaneous rate ≈ 4 m/s. Left and right secant slopes agree → tangent slope 4.")
+        + " Reflection: explain in your own words why the answer holds.";
+    }
     return ctx.solution || "Instantaneous rate ≈ 4 m/s. Left and right secant slopes agree → tangent slope 4.";
   };
 
