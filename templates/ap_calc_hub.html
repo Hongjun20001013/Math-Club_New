@@ -2,99 +2,142 @@
 {% block title %}AP Calculus AB / BC · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cmx" data-ap-calc-hub>
-  <div class="np-cmx-stage" aria-hidden="true">
-    <div class="np-cmx-stage__wash"></div>
-    <div class="np-cmx-stage__orb np-cmx-stage__orb--a"></div>
-    <div class="np-cmx-stage__orb np-cmx-stage__orb--b"></div>
+{% set coverage_pct = ((materials_ready / materials_total * 100) if materials_total else 0)|round|int %}
+<div class="np-ap-studio" data-ap-calc-hub>
+  <div class="np-ap-studio__ambient" aria-hidden="true">
+    <svg class="np-ap-studio__curve" viewBox="0 0 400 200" aria-hidden="true">
+      <path d="M20,160 C80,160 120,40 200,80 S320,20 380,60" />
+      <circle cx="200" cy="80" r="5" />
+      <circle cx="320" cy="50" r="4" />
+    </svg>
   </div>
 
-  <div class="np-cmx-shell">
-    <nav class="np-cmx-crumb" aria-label="AP Calculus navigation">
+  <div class="np-ap-studio__shell">
+    <nav class="np-ap-studio__rail" aria-label="AP Calculus navigation">
       <a href="{{ url_for('index') }}">Home</a>
-      <span>/</span>
+      <span aria-hidden="true">·</span>
       <em>AP Calculus</em>
     </nav>
 
-    <header class="np-cmx-hero">
-      <div class="np-cmx-hero__copy">
-        <p class="np-cmx-brand">{{ site_brand_name }}</p>
-        <h1 class="np-cmx-display">AP Calculus</h1>
-        <p class="np-cmx-lede">AB · 8 units &nbsp;·&nbsp; BC · +2 units &nbsp;·&nbsp; Interactive slide decks, graphs, and practice packets.</p>
+    <header class="np-ap-studio__hero">
+      <div>
+        <p class="np-ap-studio__kicker">{{ site_brand_name }}</p>
+        <h1 class="np-ap-studio__title">AP Calculus</h1>
+        <p class="np-ap-studio__lede">AB · 8 units &nbsp;·&nbsp; BC · +2 units. Interactive slide decks with graphs, limit demos, and printable practice packets.</p>
+        <div class="np-ap-studio__stats" role="list">
+          <div class="np-ap-studio__stat np-ap-studio__stat--live" role="listitem">
+            <strong>{{ live_chapters }}</strong>
+            <span>Live lessons</span>
+          </div>
+          <div class="np-ap-studio__stat" role="listitem">
+            <strong>10</strong>
+            <span>Units</span>
+          </div>
+          <div class="np-ap-studio__stat" role="listitem">
+            <strong>{{ live_packets }}</strong>
+            <span>Packets</span>
+          </div>
+        </div>
       </div>
-      <div class="np-cmx-hero__stat np-cmx-hero__stat--inline" aria-label="Course stats">
-        <div class="np-cmx-hero__stat-card"><strong>{{ live_chapters }}</strong><span>Live</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>10</strong><span>Units</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>{{ live_packets }}</strong><span>Packets</span></div>
-      </div>
+      <aside class="np-ap-studio__coverage" aria-label="Course coverage">
+        <div class="np-ap-studio__ring" style="--ap-pct: {{ coverage_pct }};" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ coverage_pct }}">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="np-ap-studio__ring-track" cx="60" cy="60" r="52"></circle>
+            <circle class="np-ap-studio__ring-fill" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="np-ap-studio__ring-label">
+            <strong>{{ materials_ready }}<small>/{{ materials_total }}</small></strong>
+            <span>Online</span>
+          </div>
+        </div>
+        <p class="np-ap-studio__coverage-note">Lessons go live as each unit section is built.</p>
+      </aside>
     </header>
-
-    <section class="np-cmx-pick" aria-labelledby="ap-pick-title">
-      <div class="np-cmx-pick__head">
-        <h2 id="ap-pick-title">Choose your workspace</h2>
-        <p>Courseware, practice worksheets, or the full AB / BC roadmap.</p>
-      </div>
-      <div class="np-cmx-trio" role="list">
-        <a href="{{ url_for('ap_calc_course') }}" class="np-cmx-card is-lead" role="listitem" style="--i: 0">
-          <div class="np-cmx-card__banner">
-            <div class="np-cmx-card__sheen" aria-hidden="true"></div>
-            <span class="np-cmx-card__num">01</span>
-            <span class="np-cmx-card__glyph" aria-hidden="true">§</span>
-          </div>
-          <div class="np-cmx-card__body">
-            <div class="np-cmx-card__meta"><span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span></div>
-            <h3>Course materials</h3>
-            <p>Slide decks for every unit — Unit 1 sections 1.1–1.3 are live with interactive graphs and AP checks.</p>
-            <span class="np-cmx-card__cta">Browse units <em aria-hidden="true">→</em></span>
-          </div>
-        </a>
-        <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-cmx-card np-cmx-card--p2" role="listitem" style="--i: 1">
-          <div class="np-cmx-card__banner">
-            <div class="np-cmx-card__sheen" aria-hidden="true"></div>
-            <span class="np-cmx-card__num">02</span>
-            <span class="np-cmx-card__glyph" aria-hidden="true">✎</span>
-          </div>
-          <div class="np-cmx-card__body">
-            <div class="np-cmx-card__meta"><span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span></div>
-            <h3>Practice</h3>
-            <p>Printable packet PDFs and full solution keys aligned to each live chapter.</p>
-            <span class="np-cmx-card__cta">Open practice <em aria-hidden="true">→</em></span>
-          </div>
-        </a>
-        <a href="{{ url_for('ap_calc_overview') }}" class="np-cmx-card np-cmx-card--p3" role="listitem" style="--i: 2">
-          <div class="np-cmx-card__banner">
-            <div class="np-cmx-card__sheen" aria-hidden="true"></div>
-            <span class="np-cmx-card__num">03</span>
-            <span class="np-cmx-card__glyph" aria-hidden="true">∞</span>
-          </div>
-          <div class="np-cmx-card__body">
-            <div class="np-cmx-card__meta"><span class="np-cmx-chip">Map</span></div>
-            <h3>Curriculum</h3>
-            <p>Full AB / BC topic map — which units are shared and what is coming next.</p>
-            <span class="np-cmx-card__cta">View roadmap <em aria-hidden="true">→</em></span>
-          </div>
-        </a>
-      </div>
-    </section>
 
     {% if continue_material %}
     <a href="{{ url_for('ap_calc_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide|default(1) }}"
-       class="np-cmx-feature">
-      <div class="np-cmx-feature__rail" aria-hidden="true"></div>
-      <div class="np-cmx-feature__copy">
-        <p class="np-cmx-feature__kicker">Continue</p>
+       class="np-ap-studio__resume">
+      <div>
+        <p class="np-ap-studio__resume-kicker">Continue</p>
         <h2>{{ continue_material.section }} · {{ continue_material.title }}</h2>
-        <p>Slide {{ continue_material.continue_slide|default(1) }} / {{ continue_material.slide_count }}</p>
+        <p>Slide {{ continue_material.continue_slide|default(1) }} of {{ continue_material.slide_count }}</p>
       </div>
-      <span class="np-cmx-feature__cta">Resume →</span>
+      <span class="np-ap-studio__resume-cta">Resume →</span>
     </a>
     {% endif %}
 
-    <footer class="np-cmx-foot">
+    {% if materials %}
+    <section class="np-ap-studio__path" aria-label="Live lessons">
+      <div class="np-ap-studio__section-head">
+        <h2>Unit 1 · Live now</h2>
+        <p>Limits and continuity — sections 1.1 through 1.3</p>
+      </div>
+      <ol class="np-ap-studio__path-track">
+        {% for m in materials %}
+        <li class="np-ap-studio__path-node">
+          <a href="{{ url_for('ap_calc_material_view', slug=m.slug) }}" title="{{ m.title }}">
+            <span class="np-ap-studio__path-num">{{ m.section }}</span>
+            <span class="np-ap-studio__path-label">{{ m.title }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    <section aria-labelledby="ap-workspace-title">
+      <div class="np-ap-studio__section-head">
+        <h2 id="ap-workspace-title">Workspace</h2>
+        <p>Courseware, practice worksheets, or the full AB / BC roadmap.</p>
+      </div>
+      <ul class="np-ap-studio__workspaces">
+        <li class="np-ap-studio__workspace is-primary">
+          <a href="{{ url_for('ap_calc_course') }}">
+            <span class="np-ap-studio__workspace-icon" aria-hidden="true">∫</span>
+            <div class="np-ap-studio__workspace-copy">
+              <h3>Course materials</h3>
+              <p>Slide decks for every unit — Unit 1.1–1.3 live with interactive graphs and AP checks.</p>
+            </div>
+            <div class="np-ap-studio__workspace-meta">
+              <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
+              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
+            </div>
+          </a>
+        </li>
+        <li class="np-ap-studio__workspace">
+          <a href="{{ url_for('ap_calc_practice_hub') }}">
+            <span class="np-ap-studio__workspace-icon" aria-hidden="true">✎</span>
+            <div class="np-ap-studio__workspace-copy">
+              <h3>Practice</h3>
+              <p>Printable packet PDFs and full solution keys aligned to each live chapter.</p>
+            </div>
+            <div class="np-ap-studio__workspace-meta">
+              <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
+              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
+            </div>
+          </a>
+        </li>
+        <li class="np-ap-studio__workspace">
+          <a href="{{ url_for('ap_calc_overview') }}">
+            <span class="np-ap-studio__workspace-icon" aria-hidden="true">∞</span>
+            <div class="np-ap-studio__workspace-copy">
+              <h3>Curriculum</h3>
+              <p>Full AB / BC topic map — which units are shared and what is coming next.</p>
+            </div>
+            <div class="np-ap-studio__workspace-meta">
+              <span class="np-ap-studio__badge">Map</span>
+              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="np-ap-studio__foot">
       <span>Graph · Table · Algebra</span>
       <span>Interactive slides</span>
       <span>Practice PDFs</span>

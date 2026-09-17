@@ -2,75 +2,83 @@
 {% block title %}AP Calculus · Course Materials · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cmx">
-  <div class="np-cmx-stage" aria-hidden="true">
-    <div class="np-cmx-stage__wash"></div>
-  </div>
+{% set live_units = catalog.units|selectattr('live')|list|length %}
+<div class="np-ap-studio">
+  <div class="np-ap-studio__ambient" aria-hidden="true"></div>
 
-  <div class="np-cmx-shell">
-    <nav class="np-cmx-crumb">
+  <div class="np-ap-studio__shell">
+    <nav class="np-ap-studio__rail">
       <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
-      <span>/</span>
+      <span aria-hidden="true">·</span>
       <em>Course materials</em>
     </nav>
 
-    <header class="np-cmx-phase">
-      <div class="np-cmx-phase__mark" aria-hidden="true">10</div>
-      <div class="np-cmx-phase__copy">
-        <a href="{{ url_for('ap_calc_hub') }}" class="np-cmx-back">← AP Calculus</a>
-        <p class="np-cmx-eyebrow">AB + BC</p>
-        <h1 class="np-cmx-phase__title">Course materials</h1>
-        <p class="np-cmx-lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension</p>
-        <div class="np-cmx-stats">
-          <div><strong>1</strong><span>live unit</span></div>
-          <div><strong>10</strong><span>total</span></div>
+    <header class="np-ap-studio__hero">
+      <div>
+        <a href="{{ url_for('ap_calc_hub') }}" class="np-ap-studio__back">← AP Calculus</a>
+        <p class="np-ap-studio__kicker">AB + BC</p>
+        <h1 class="np-ap-studio__title">Course materials</h1>
+        <p class="np-ap-studio__lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension. Open a unit to browse chapter slide decks.</p>
+        <div class="np-ap-studio__stats" role="list">
+          <div class="np-ap-studio__stat np-ap-studio__stat--live" role="listitem">
+            <strong>{{ live_units }}</strong>
+            <span>Live unit</span>
+          </div>
+          <div class="np-ap-studio__stat" role="listitem">
+            <strong>{{ catalog.units|length }}</strong>
+            <span>Total</span>
+          </div>
         </div>
       </div>
     </header>
 
-    <div class="np-cmx-grid" role="list">
-      {% for unit in catalog.units %}
-      <article class="np-cmx-deck{% if not unit.live and not unit.chapters %} is-soon{% elif unit.live %} is-active{% endif %}"
-               role="listitem" style="--deck-i: {{ loop.index0 }};">
-        {% if unit.live or unit.chapters %}
-        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-cmx-deck__link">
-          <div class="np-cmx-deck__top" aria-hidden="true">
-            <span class="np-cmx-deck__code">{{ unit.unit }}</span>
-            <span class="np-cmx-deck__mark">∫</span>
-          </div>
-          <div class="np-cmx-deck__body">
-            <div class="np-cmx-deck__badges">
-              {% if unit.live %}<span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span>{% endif %}
-              <span class="np-cmx-chip">{{ unit.track_label }}</span>
+    <section class="np-ap-studio__index" aria-label="All units">
+      <div class="np-ap-studio__index-head">
+        <span>Unit</span>
+        <span>Title</span>
+        <span>Track</span>
+        <span></span>
+      </div>
+      <ol class="np-ap-studio__index-list">
+        {% for unit in catalog.units %}
+        <li class="np-ap-studio__index-row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
+          {% if unit.live or unit.chapters %}
+          <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}">
+            <span class="np-ap-studio__index-num">{{ '%02d'|format(unit.unit) }}</span>
+            <div class="np-ap-studio__index-title">
+              <h3>{{ unit.title }}</h3>
+              <p>
+                {% if unit.chapters %}
+                {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
+                {% else %}Preview{% endif %}
+              </p>
             </div>
-            <h3>{{ unit.title }}</h3>
-            <p>
-              {% if unit.chapters %}
-              {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
-              {% else %}Preview{% endif %}
-            </p>
-            <span class="np-cmx-deck__cta">Open unit <em aria-hidden="true">→</em></span>
+            <span class="np-ap-studio__index-track">{{ unit.track_label }}</span>
+            {% if unit.live %}
+            <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
+            {% else %}
+            <span class="np-ap-studio__index-arrow" aria-hidden="true">→</span>
+            {% endif %}
+          </a>
+          {% else %}
+          <div class="np-ap-studio__index-static">
+            <span class="np-ap-studio__index-num">{{ '%02d'|format(unit.unit) }}</span>
+            <div class="np-ap-studio__index-title">
+              <h3>{{ unit.title }}</h3>
+              <p>Coming soon</p>
+            </div>
+            <span class="np-ap-studio__index-track">{{ unit.track_label }}</span>
+            <span class="np-ap-studio__badge">Soon</span>
           </div>
-        </a>
-        {% else %}
-        <div class="np-cmx-deck__link is-static">
-          <div class="np-cmx-deck__top is-muted" aria-hidden="true">
-            <span class="np-cmx-deck__code">{{ unit.unit }}</span>
-          </div>
-          <div class="np-cmx-deck__body">
-            <div class="np-cmx-deck__badges"><span class="np-cmx-chip">Soon</span></div>
-            <h3>{{ unit.title }}</h3>
-            <p>{{ unit.track_label }} · Coming soon</p>
-          </div>
-        </div>
-        {% endif %}
-      </article>
-      {% endfor %}
-    </div>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
   </div>
 </div>
 {% endblock %}
