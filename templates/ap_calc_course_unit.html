@@ -2,17 +2,23 @@
 {% block title %}Unit {{ unit.unit }} · AP Calculus · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_violet_v2.css') }}?v={{ style_css_revision }}" type="text/css">
 <link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
 {% set live_count = unit.chapters|selectattr('live')|list|length %}
-<div class="np-cm-cinema np-cm-cinema--phase np-ap-violet">
-  <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
+{% set soon_chapters = unit.chapters|rejectattr('live')|list %}
+{% set progress_pct = ((live_count / unit.chapters|length * 100) if unit.chapters|length else 0)|round %}
+<div class="np-cm-vio np-cm-vio--v3 np-ap-calc">
+  <div class="np-cm-vio__canvas" aria-hidden="true">
+    <div class="np-cm-vio__orb np-cm-vio__orb--1"></div>
+    <div class="np-cm-vio__orb np-cm-vio__orb--2"></div>
+    <div class="np-cm-vio__noise"></div>
+  </div>
 
-  <div class="np-cm-phase-wrap">
-    <nav class="np-cm-cinema-rail np-cm-phase-rail">
+  <div class="np-cm-vio__frame">
+    <nav class="np-cm-vio__rail">
       <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
       <span aria-hidden="true">·</span>
       <a href="{{ url_for('ap_calc_course') }}">Course</a>
@@ -20,38 +26,60 @@
       <span>Unit {{ unit.unit }}</span>
     </nav>
 
-    <header class="np-cm-phase-hero">
-      <div>
-        <p class="np-cm-phase-kicker">{{ unit.track_label }}</p>
-        <h1>Unit {{ unit.unit }} · {{ unit.title }}</h1>
-        <div class="np-cm-phase-stats">
-          <span class="np-cm-phase-stat"><strong>{{ live_count }}</strong> live</span>
-          <span class="np-cm-phase-stat"><strong>{{ unit.chapters|length }}</strong> chapters</span>
+    <header class="np-cm-vio-phase-hero np-cm-vio-phase-hero--v3">
+      <span class="np-cm-vio-phase-hero__watermark" aria-hidden="true">{{ unit.unit }}</span>
+      <div class="np-cm-vio-phase-hero__copy">
+        <a href="{{ url_for('ap_calc_course') }}" class="np-cm-vio-back">← All units</a>
+        <p class="np-cm-vio-brand">{{ unit.track_label }}</p>
+        <h1>{{ unit.title }}</h1>
+        <div class="np-cm-vio-phase-chips">
+          <span><strong>{{ live_count }}</strong> live</span>
+          <span><strong>{{ unit.chapters|length }}</strong> chapters</span>
+          <span><strong>{{ progress_pct }}%</strong> complete</span>
         </div>
       </div>
-      <a href="{{ url_for('ap_calc_course') }}" class="np-cm-phase-back">← All units</a>
+      <div class="np-cm-vio-ring np-cm-vio-ring--glow" style="--ring-pct: {{ progress_pct }};">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="np-cm-vio-ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="np-cm-vio-ring-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="np-cm-vio-ring-label">
+          <strong>{{ live_count }}</strong>
+          <span>Live</span>
+        </div>
+      </div>
     </header>
 
     {% if live_count %}
-    <section class="np-cm-phase-unit" aria-label="Live chapters">
-      <div class="np-ap-chapters-head">
+    <section class="np-cm-vio-collection" aria-label="Live chapters">
+      <div class="np-cm-vio-collection__head">
         <div>
-          <p class="np-ap-section-label">Available now</p>
+          <p>Available now</p>
           <h2>Live chapters</h2>
         </div>
-        <span class="np-cm-phase-unit-count">{{ live_count }} of {{ unit.chapters|length }}</span>
+        <span class="np-cm-vio-collection__count">{{ live_count }} of {{ unit.chapters|length }}</span>
       </div>
-      <div class="np-cm-phase-lessons">
+      <div class="np-cm-vio-bento">
         {% for ch in unit.chapters if ch.live and ch.slug %}
-        <article class="np-cm-phase-lesson">
-          <a href="{{ url_for('ap_calc_material_view', slug=ch.slug) }}" class="np-cm-phase-lesson-link">
-            <div class="np-cm-phase-lesson-top">
-              <span class="np-cm-phase-lesson-section">{{ ch.section }}</span>
-              <span class="np-cm-phase-lesson-badge">Live</span>
+        <article class="np-cm-vio-deck" style="--deck-i: {{ loop.index0 }};">
+          <a href="{{ url_for('ap_calc_material_view', slug=ch.slug) }}" class="np-cm-vio-deck-link">
+            <div class="np-cm-vio-deck-side">
+              <span class="np-cm-vio-deck-section">{{ ch.section }}</span>
+              <div class="np-cm-vio-deck-preview" aria-hidden="true">
+                <span class="np-cm-vio-deck-preview-card"></span>
+                <span class="np-cm-vio-deck-preview-card"></span>
+                <span class="np-cm-vio-deck-preview-card is-front"></span>
+              </div>
             </div>
-            <h3>{{ ch.title }}</h3>
-            <p class="np-cm-phase-lesson-meta">Interactive slide deck · practice packet · study mode</p>
-            <span class="np-cm-phase-lesson-cta">Open deck →</span>
+            <div class="np-cm-vio-deck-main">
+              <div class="np-cm-vio-deck-top">
+                <span class="np-cm-vio-deck-badge">Live</span>
+              </div>
+              <h3>{{ ch.title }}</h3>
+              <p>Interactive slides · graphs · practice packet</p>
+              <div class="np-cm-vio-deck-progress" aria-hidden="true"><span style="--deck-progress: 100;"></span></div>
+              <span class="np-cm-vio-deck-go">Open deck →</span>
+            </div>
           </a>
         </article>
         {% endfor %}
@@ -59,28 +87,24 @@
     </section>
     {% endif %}
 
-    {% set soon_chapters = unit.chapters|rejectattr('live')|list %}
     {% if soon_chapters %}
-    <section class="np-cm-phase-unit" aria-label="Coming soon">
-      <div class="np-ap-chapters-head">
+    <section class="np-cm-vio-collection" aria-label="Coming soon">
+      <div class="np-cm-vio-collection__head">
         <div>
-          <p class="np-ap-section-label">In progress</p>
+          <p>In development</p>
           <h2>Coming soon</h2>
         </div>
-        <span class="np-cm-phase-unit-count">{{ soon_chapters|length }} chapters</span>
+        <span class="np-cm-vio-collection__count">{{ soon_chapters|length }} chapters</span>
       </div>
-      <div class="np-cm-phase-lessons">
+      <ol class="np-ap-soon-list">
         {% for ch in soon_chapters %}
-        <article class="np-cm-phase-lesson is-pending">
-          <div class="np-cm-phase-lesson-top">
-            <span class="np-cm-phase-lesson-section">{{ ch.section }}</span>
-            <span class="np-cm-phase-lesson-badge np-cm-phase-lesson-badge--soon">Soon</span>
-          </div>
-          <h3>{{ ch.title }}</h3>
-          <p class="np-cm-phase-lesson-meta">Slide deck and practice packet in development</p>
-        </article>
+        <li class="np-ap-soon-row">
+          <span class="np-ap-soon-row__num">{{ ch.section }}</span>
+          <span class="np-ap-soon-row__title">{{ ch.title }}</span>
+          <span class="np-ap-soon-row__badge">Soon</span>
+        </li>
         {% endfor %}
-      </div>
+      </ol>
     </section>
     {% endif %}
   </div>

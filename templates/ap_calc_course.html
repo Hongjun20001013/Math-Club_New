@@ -2,106 +2,136 @@
 {% block title %}AP Calculus · Course Materials · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_violet_v2.css') }}?v={{ style_css_revision }}" type="text/css">
 <link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
 {% set live_units = catalog.units|selectattr('live')|list|length %}
-<div class="np-cm-cinema np-cm-cinema--phase np-ap-violet">
-  <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
+<div class="np-cm-vio np-cm-vio--v3 np-ap-calc">
+  <div class="np-cm-vio__canvas" aria-hidden="true">
+    <div class="np-cm-vio__orb np-cm-vio__orb--1"></div>
+    <div class="np-cm-vio__orb np-cm-vio__orb--2"></div>
+    <div class="np-cm-vio__noise"></div>
+  </div>
 
-  <div class="np-cm-phase-wrap">
-    <nav class="np-cm-cinema-rail np-cm-phase-rail">
+  <div class="np-cm-vio__frame">
+    <nav class="np-cm-vio__rail">
       <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
       <span aria-hidden="true">·</span>
       <span>Course materials</span>
     </nav>
 
-    <header class="np-cm-phase-hero">
-      <div>
-        <p class="np-cm-phase-kicker">AB + BC</p>
+    <header class="np-cm-vio-phase-hero np-cm-vio-phase-hero--v3">
+      <span class="np-cm-vio-phase-hero__watermark" aria-hidden="true">{{ catalog.units|length }}</span>
+      <div class="np-cm-vio-phase-hero__copy">
+        <a href="{{ url_for('ap_calc_hub') }}" class="np-cm-vio-back">← AP Calculus</a>
+        <p class="np-cm-vio-brand">AB + BC</p>
         <h1>Course materials</h1>
-        <p class="np-cm-phase-lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension. Select a unit to browse chapter slide decks.</p>
-        <div class="np-cm-phase-stats">
-          <span class="np-cm-phase-stat"><strong>{{ live_units }}</strong> live unit</span>
-          <span class="np-cm-phase-stat"><strong>{{ catalog.units|length }}</strong> total</span>
+        <p>Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension</p>
+        <div class="np-cm-vio-phase-chips">
+          <span><strong>{{ live_units }}</strong> live</span>
+          <span><strong>{{ catalog.units|length }}</strong> units</span>
         </div>
       </div>
-      <a href="{{ url_for('ap_calc_hub') }}" class="np-cm-phase-back">← AP Calculus</a>
+      <div class="np-cm-vio-ring np-cm-vio-ring--glow" style="--ring-pct: {{ ((live_units / catalog.units|length * 100) if catalog.units|length else 0)|round }};">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="np-cm-vio-ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="np-cm-vio-ring-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="np-cm-vio-ring-label">
+          <strong>{{ live_units }}</strong>
+          <span>Live</span>
+        </div>
+      </div>
     </header>
 
-    <section class="np-ap-spine" aria-label="All units">
-      <div class="np-ap-spine__group-label">AB · Units 1–8</div>
-      {% for unit in catalog.units if unit.unit <= 8 %}
-      <article class="np-ap-spine__row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
-        {% if unit.live or unit.chapters %}
-        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-spine__link">
-          <span class="np-ap-spine__num">{{ unit.unit }}</span>
-          <div class="np-ap-spine__copy">
-            <h3>{{ unit.title }}</h3>
-            <p>
-              {% if unit.chapters %}
-              {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
-              {% else %}Preview{% endif %}
-            </p>
-          </div>
-          <div class="np-ap-spine__meta">
-            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
-            {% if unit.live and unit.chapters %}
-            <div class="np-ap-spine__progress" aria-hidden="true">
-              <i style="width: {{ ((unit.chapters|selectattr('live')|list|length / unit.chapters|length * 100) if unit.chapters|length else 0)|round }}%;"></i>
+    <section class="np-cm-vio-collection" aria-label="AB units">
+      <div class="np-cm-vio-collection__head">
+        <div>
+          <p>AB track</p>
+          <h2>Units 1–8</h2>
+        </div>
+      </div>
+      <div class="np-ap-unit-grid">
+        {% for unit in catalog.units if unit.unit <= 8 %}
+        <article class="np-ap-unit-card{% if not unit.live and not unit.chapters %} is-soon{% endif %}" style="--unit-i: {{ loop.index0 }};">
+          {% if unit.live or unit.chapters %}
+          <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-unit-card__link">
+            <span class="np-ap-unit-card__num">{{ unit.unit }}</span>
+            <div class="np-ap-unit-card__copy">
+              <h3>{{ unit.title }}</h3>
+              <p>
+                {% if unit.chapters %}
+                {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
+                {% else %}Preview{% endif %}
+              </p>
             </div>
-            <span class="np-ap-live-pill"><i></i>Live</span>
-            {% endif %}
-            <span class="np-ap-spine__arrow" aria-hidden="true">→</span>
+            <div class="np-ap-unit-card__meta">
+              <span class="np-ap-unit-card__track">{{ unit.track_label }}</span>
+              {% if unit.live and unit.chapters %}
+              <div class="np-ap-unit-card__progress" aria-hidden="true">
+                <i style="width: {{ ((unit.chapters|selectattr('live')|list|length / unit.chapters|length * 100) if unit.chapters|length else 0)|round }}%;"></i>
+              </div>
+              {% endif %}
+              <span class="np-ap-unit-card__go">Open →</span>
+            </div>
+          </a>
+          {% else %}
+          <div class="np-ap-unit-card__link">
+            <span class="np-ap-unit-card__num">{{ unit.unit }}</span>
+            <div class="np-ap-unit-card__copy">
+              <h3>{{ unit.title }}</h3>
+              <p>Coming soon</p>
+            </div>
+            <div class="np-ap-unit-card__meta">
+              <span class="np-ap-unit-card__track">{{ unit.track_label }}</span>
+              <span class="np-ap-unit-card__go" style="opacity:0.5;">Soon</span>
+            </div>
           </div>
-        </a>
-        {% else %}
-        <div class="np-ap-spine__static">
-          <span class="np-ap-spine__num">{{ unit.unit }}</span>
-          <div class="np-ap-spine__copy">
-            <h3>{{ unit.title }}</h3>
-            <p>Coming soon</p>
-          </div>
-          <div class="np-ap-spine__meta">
-            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
-            <span class="np-ap-live-pill" style="opacity:0.6;">Soon</span>
-          </div>
-        </div>
-        {% endif %}
-      </article>
-      {% endfor %}
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+    </section>
 
-      <div class="np-ap-spine__group-label">BC extension · Units 9–10</div>
-      {% for unit in catalog.units if unit.unit > 8 %}
-      <article class="np-ap-spine__row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
-        {% if unit.live or unit.chapters %}
-        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-spine__link">
-          <span class="np-ap-spine__num">{{ unit.unit }}</span>
-          <div class="np-ap-spine__copy">
-            <h3>{{ unit.title }}</h3>
-            <p>{% if unit.chapters %}{{ unit.chapters|length }} chapters{% else %}Preview{% endif %}</p>
-          </div>
-          <div class="np-ap-spine__meta">
-            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
-            <span class="np-ap-spine__arrow" aria-hidden="true">→</span>
-          </div>
-        </a>
-        {% else %}
-        <div class="np-ap-spine__static">
-          <span class="np-ap-spine__num">{{ unit.unit }}</span>
-          <div class="np-ap-spine__copy">
-            <h3>{{ unit.title }}</h3>
-            <p>Coming soon</p>
-          </div>
-          <div class="np-ap-spine__meta">
-            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
-          </div>
+    <section class="np-cm-vio-collection" aria-label="BC units">
+      <div class="np-cm-vio-collection__head">
+        <div>
+          <p>BC extension</p>
+          <h2>Units 9–10</h2>
         </div>
-        {% endif %}
-      </article>
-      {% endfor %}
+      </div>
+      <div class="np-ap-unit-grid">
+        {% for unit in catalog.units if unit.unit > 8 %}
+        <article class="np-ap-unit-card is-soon" style="--unit-i: {{ loop.index0 }};">
+          {% if unit.live or unit.chapters %}
+          <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-unit-card__link">
+            <span class="np-ap-unit-card__num">{{ unit.unit }}</span>
+            <div class="np-ap-unit-card__copy">
+              <h3>{{ unit.title }}</h3>
+              <p>{% if unit.chapters %}{{ unit.chapters|length }} chapters{% else %}Preview{% endif %}</p>
+            </div>
+            <div class="np-ap-unit-card__meta">
+              <span class="np-ap-unit-card__track">{{ unit.track_label }}</span>
+              <span class="np-ap-unit-card__go">Open →</span>
+            </div>
+          </a>
+          {% else %}
+          <div class="np-ap-unit-card__link">
+            <span class="np-ap-unit-card__num">{{ unit.unit }}</span>
+            <div class="np-ap-unit-card__copy">
+              <h3>{{ unit.title }}</h3>
+              <p>Coming soon</p>
+            </div>
+            <div class="np-ap-unit-card__meta">
+              <span class="np-ap-unit-card__track">{{ unit.track_label }}</span>
+            </div>
+          </div>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
     </section>
   </div>
 </div>
