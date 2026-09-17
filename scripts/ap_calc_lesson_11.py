@@ -60,7 +60,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Position graph s(t) = t² + 1",
         phase_divider("Visual Investigation", "Position vs time")
         + role("Visual", "Read the curve", "Slope of a secant = average rate on that time interval.")
-        + fig(g["s_parabola_11"], "Position function s(t) = t² + 1 (meters)", notice="The curve rises faster as t increases — slope is not constant."),
+        + fig(g["s_parabola_11"], "Position function s(t) = t² + 1 (meters)", cls="ap-fig--teach", notice="The curve rises faster as t increases — slope is not constant."),
         path_phase="Visual Investigation",
     )
 
@@ -119,7 +119,7 @@ def build(graphs: dict[str, str]) -> dict:
             "<li><strong>Quotient</strong> — secant slope = rise ÷ run</li>"
             "</ul>",
         )
-        + fig(g["diff_quotient_11"], "Geometric meaning of the difference quotient", notice="Δs is rise; h is run; quotient = secant slope.")
+        + fig(g["diff_quotient_11"], "Geometric meaning of the difference quotient", cls="ap-fig--teach", notice="Δs is rise; h is run; quotient = secant slope.")
         + key_point(
             "Preview only",
             "We will formalize “approach” in Section 1.2. Here: shorter intervals → secant slope → instantaneous rate.",

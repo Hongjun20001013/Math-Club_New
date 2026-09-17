@@ -186,11 +186,16 @@ def render_graph(
     return "\n".join(parts)
 
 
-def write_graph(spec: GraphSpec, compact: bool = False) -> str:
+def write_graph(spec: GraphSpec, variant: str = "full") -> str:
+    """Write SVG. variant: full (teaching), thumb (4-across strip), gallery (2×2 grid)."""
     os.makedirs(FIG_DIR, exist_ok=True)
-    suffix = "_thumb" if compact else ""
+    sizes = {"full": (520, 340), "thumb": (216, 128), "gallery": (280, 168)}
+    if variant not in sizes:
+        raise ValueError(f"unknown variant: {variant}")
+    compact = variant != "full"
+    w, h = sizes[variant]
+    suffix = "" if variant == "full" else f"_{variant}"
     graph_id = f"{spec.graph_id}{suffix}"
-    w, h = (216, 128) if compact else (520, 340)
     path = os.path.join(FIG_DIR, f"{graph_id}.svg")
     with open(path, "w", encoding="utf-8") as f:
         f.write(render_graph(spec, width=w, height=h, compact=compact))
@@ -297,7 +302,47 @@ def build_all_graphs() -> dict[str, str]:
         (case_d, "limit_case_d"),
     ):
         paths[key] = write_graph(spec)
-        paths[f"{key}_thumb"] = write_graph(spec, compact=True)
+        paths[f"{key}_thumb"] = write_graph(spec, variant="thumb")
+        paths[f"{key}_gallery"] = write_graph(spec, variant="gallery")
+
+    removable_hole = GraphSpec(
+        graph_id="removable_hole",
+        title="Removable discontinuity",
+        x_min=0, x_max=5, y_min=0, y_max=6,
+        segments=[PlotSegment(lambda x: x + 1, 0.5, 1.95),
+                  PlotSegment(lambda x: x + 1, 2.05, 4.5)],
+        points=[PlotPoint(2, 3, "open", "lim=3")],
+        notice="A single point can be removed without changing the limit.",
+    )
+    jump_at_3 = GraphSpec(
+        graph_id="jump_at_3",
+        title="Jump discontinuity at x = 3",
+        x_min=0, x_max=6, y_min=-2, y_max=6,
+        segments=[
+            PlotSegment(lambda x: x - 4, 0.5, 2.98, color=LEFT_COLOR),
+            PlotSegment(lambda x: x + 1, 3.02, 5.5, color=RIGHT_COLOR),
+        ],
+        points=[PlotPoint(3, 0, "filled", "f(3)=0")],
+        notice="lim x→3⁻ = −1, lim x→3⁺ = 4 → two-sided limit DNE.",
+    )
+    infinite_limit_13 = GraphSpec(
+        graph_id="infinite_limit_13",
+        title="Infinite behavior near x = 0",
+        x_min=-2, x_max=2, y_min=-4, y_max=4,
+        segments=[
+            PlotSegment(lambda x: 1 / x, -1.9, -0.15, color=LEFT_COLOR),
+            PlotSegment(lambda x: 1 / x, 0.15, 1.9, color=RIGHT_COLOR),
+        ],
+        v_asymptotes=[0],
+        notice="|y| grows without bound as x→0⁺ or x→0⁻.",
+    )
+    for spec, key in (
+        (removable_hole, "removable_hole"),
+        (jump_at_3, "jump_at_3"),
+        (infinite_limit_13, "infinite_limit_13"),
+    ):
+        paths[key] = write_graph(spec)
+        paths[f"{key}_gallery"] = write_graph(spec, variant="gallery")
 
     # 1.3 piecewise from tex: x+1 for x<2, -x+5 for x>2, open (2,3), filled (2,1.5)
     paths["piecewise_limit_2"] = write_graph(GraphSpec(
@@ -312,32 +357,6 @@ def build_all_graphs() -> dict[str, str]:
         notice="Both branches approach y=3. The filled point does not change the limit.",
     ))
 
-    # Jump at 3
-    paths["jump_at_3"] = write_graph(GraphSpec(
-        graph_id="jump_at_3",
-        title="Jump discontinuity at x = 3",
-        x_min=0, x_max=6, y_min=-2, y_max=4,
-        segments=[
-            PlotSegment(lambda x: -1, 0, 2.99, color=LEFT_COLOR),
-            PlotSegment(lambda x: 2, 3.01, 5.5, color=RIGHT_COLOR),
-        ],
-        points=[PlotPoint(3, -1, "open"), PlotPoint(3, 2, "open")],
-        notice="lim x→3⁻ = −1, lim x→3⁺ = 2 → two-sided limit DNE.",
-    ))
-
-    # Infinite behavior
-    paths["infinite_limit_13"] = write_graph(GraphSpec(
-        graph_id="infinite_limit_13",
-        title="Infinite behavior near x = 0",
-        x_min=-2, x_max=2, y_min=-4, y_max=4,
-        segments=[
-            PlotSegment(lambda x: 1 / x, -1.9, -0.15, color=LEFT_COLOR),
-            PlotSegment(lambda x: 1 / x, 0.15, 1.9, color=RIGHT_COLOR),
-        ],
-        v_asymptotes=[0],
-        notice="|y| grows without bound as x→0⁺ or x→0⁻.",
-    ))
-
     # Sketch task graph
     paths["sketch_task_13"] = write_graph(GraphSpec(
         graph_id="sketch_task_13",
@@ -349,17 +368,6 @@ def build_all_graphs() -> dict[str, str]:
         ],
         points=[PlotPoint(2, 3, "open", "→3"), PlotPoint(2, -1, "filled", "f(2)=−1")],
         notice="Open circle at limit height; filled dot at actual value.",
-    ))
-
-    # Removable hole only
-    paths["removable_hole"] = write_graph(GraphSpec(
-        graph_id="removable_hole",
-        title="Removable discontinuity",
-        x_min=0, x_max=5, y_min=0, y_max=6,
-        segments=[PlotSegment(lambda x: x + 1, 0.5, 1.95),
-                  PlotSegment(lambda x: x + 1, 2.05, 4.5)],
-        points=[PlotPoint(2, 3, "open", "lim=3")],
-        notice="A single point can be removed without changing the limit.",
     ))
 
     # Endpoint / one-sided domain: f(x)=sqrt(x) on [0,4]

@@ -100,8 +100,8 @@
     this.padR = opts.padR || 16;
     this.padT = opts.padT || 18;
     this.padB = opts.padB || 30;
-    this.W = opts.W || 400;
-    this.H = opts.H || 220;
+    this.W = opts.W || 480;
+    this.H = opts.H || 280;
     this.xMin = opts.xMin;
     this.xMax = opts.xMax;
     this.yMin = opts.yMin;

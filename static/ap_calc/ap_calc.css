@@ -496,7 +496,7 @@ html[data-exam-theme="dark"] .ap-box--checkpoint {
   background: rgba(108, 78, 255, 0.14);
 }
 
-/* Figures — compact by default so text/examples stay primary */
+/* ═══ AP figure sizing system (student-optimal tiers) ═══ */
 .ap-fig {
   margin: 0.65rem auto;
   text-align: center;
@@ -504,7 +504,7 @@ html[data-exam-theme="dark"] .ap-box--checkpoint {
 }
 
 .ap-fig img {
-  max-width: min(100%, 380px);
+  max-width: min(100%, 400px);
   height: auto;
   border-radius: 0.65rem;
   border: 1px solid rgba(108, 78, 255, 0.12);
@@ -512,16 +512,32 @@ html[data-exam-theme="dark"] .ap-box--checkpoint {
   background: #fff;
 }
 
-.ap-fig--compact img {
-  max-width: min(100%, 360px);
+/* Tier 1: one graph is the focus of the slide */
+.ap-fig--teach img {
+  max-width: min(100%, 440px);
 }
 
-.ap-fig--thumb img {
-  max-width: min(100%, 200px);
+/* Tier 2: supporting illustration */
+.ap-fig--standard img {
+  max-width: min(100%, 400px);
+}
+
+/* Tier 3: guided / worked example reference */
+.ap-fig--practice img {
+  max-width: min(100%, 380px);
+}
+
+/* Legacy aliases */
+.ap-fig--compact img {
+  max-width: min(100%, 400px);
 }
 
 .ap-fig--wide img {
   max-width: min(100%, 440px);
+}
+
+.ap-fig--thumb img {
+  max-width: min(100%, 200px);
 }
 
 .ap-fig-cap {
@@ -1224,7 +1240,7 @@ html[data-exam-theme="dark"] .ap-data-table td {
 
 .ap-fig--case img {
   max-width: 100%;
-  max-height: 88px;
+  max-height: 100px;
   width: auto;
   height: auto;
   margin: 0 auto;
@@ -1232,6 +1248,48 @@ html[data-exam-theme="dark"] .ap-data-table td {
   border: none;
   box-shadow: none;
   background: transparent;
+}
+
+/* Tier 4: 2×2 comparison gallery (1.3 discontinuity types) */
+.ap-graph-grid--gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  max-width: 38rem;
+  margin: 0.75rem auto 1rem;
+}
+
+.ap-fig--gallery {
+  margin: 0;
+  padding: 0.55rem 0.5rem 0.6rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(108, 78, 255, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.ap-fig--gallery img {
+  max-width: 100%;
+  max-height: 148px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.ap-fig--gallery .ap-fig-cap {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4f2fd8;
+}
+
+.ap-fig--gallery .ap-fig-notice {
+  font-size: 0.74rem;
+  margin-top: 0.2rem;
+  line-height: 1.35;
 }
 
 .ap-fig--case .ap-fig-cap {
@@ -1370,7 +1428,6 @@ html[data-exam-theme="dark"] .ap-data-table td {
 }
 
 .ap-lab-graph-wrap {
-  max-width: 26rem;
   margin: 0.5rem auto 0;
   border-radius: 0.65rem;
   border: 1px solid rgba(108, 78, 255, 0.12);
@@ -1378,12 +1435,59 @@ html[data-exam-theme="dark"] .ap-data-table td {
   overflow: hidden;
 }
 
+.ap-lab-graph-wrap--interactive {
+  max-width: min(100%, 34rem);
+}
+
 .ap-lab-svg {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 200px;
+  aspect-ratio: 12 / 7;
+  max-height: 280px;
   vertical-align: top;
+}
+
+.ap-lab-body--split {
+  display: grid;
+  grid-template-columns: 1fr min(270px, 34%);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 0.5rem;
+}
+
+.ap-lab-main {
+  min-width: 0;
+}
+
+.ap-math-lab--tracer .ap-lab-dashboard {
+  margin: 0;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.ap-lab-dashboard__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f2fd8;
+}
+
+@media (max-width: 720px) {
+  .ap-lab-body--split {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-math-lab--tracer .ap-lab-dashboard {
+    order: -1;
+    position: static;
+  }
+
+  .ap-graph-grid--gallery {
+    max-width: 100%;
+  }
 }
 
 .ap-lab-side-msg {
@@ -1410,7 +1514,7 @@ html[data-exam-theme="dark"] .ap-data-table td {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.45rem;
   margin: 0.45rem 0;
-  max-width: 26rem;
+  max-width: min(100%, 34rem);
 }
 
 .ap-math-lab .ap-metric {

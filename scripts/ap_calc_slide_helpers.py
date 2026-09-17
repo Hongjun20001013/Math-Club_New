@@ -4,7 +4,14 @@ from __future__ import annotations
 FIG = "/static/ap_calc/figures"
 
 
-def fig(path: str, caption: str = "", cls: str = "ap-fig--compact", notice: str = "") -> str:
+def fig(path: str, caption: str = "", cls: str = "ap-fig--standard", notice: str = "") -> str:
+    """Embed a graph. Size classes (use consistently across AP lessons):
+    ap-fig--teach — primary slide visual (one graph is the focus)
+    ap-fig--standard — supporting illustration
+    ap-fig--practice — guided / worked example reference
+    ap-fig--gallery — 2×2 comparison card (use *_gallery SVG assets)
+    ap-fig--case — 4-across summary strip (use *_thumb SVG assets)
+    """
     cap = f'<figcaption class="ap-fig-cap">{caption}</figcaption>' if caption else ""
     notice_html = f'<p class="ap-fig-notice"><strong>What to notice:</strong> {notice}</p>' if notice else ""
     return (
@@ -241,14 +248,20 @@ def exit_ticket(items: list[tuple[str, str]]) -> str:
     )
 
 
-def _math_lab_shell(spec_json: str, inner: str) -> str:
+def _math_lab_shell(spec_json: str, inner: str, lab_mod: str = "") -> str:
+    mod_cls = f" ap-math-lab--{lab_mod}" if lab_mod else ""
     return (
-        '<div class="ap-math-lab tex2jax_ignore" data-ap-math-lab>'
+        f'<div class="ap-math-lab tex2jax_ignore{mod_cls}" data-ap-math-lab>'
         f'<script type="application/json" data-ap-lab-spec>{spec_json}</script>'
         f"{inner}"
         '<div class="sr-only" data-ap-live aria-live="polite"></div>'
         "</div>"
     )
+
+
+_LAB_VIEWBOX = "0 0 480 280"
+_LAB_SVG = 480
+_LAB_SVG_H = 280
 
 
 def secant_math_lab_embed(spec_json: str) -> str:
@@ -279,10 +292,10 @@ def secant_math_lab_embed(spec_json: str) -> str:
         "</div>"
         '<p class="ap-formula-readout" data-ap-formula-val></p>'
         '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
-        '<div class="ap-lab-graph-wrap">'
-        '<svg class="ap-lab-svg ap-secant-svg" viewBox="0 0 400 220" role="img" '
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
+        f'<svg class="ap-lab-svg ap-secant-svg" viewBox="{_LAB_VIEWBOX}" role="img" '
         'aria-label="Secant and tangent on s(t)=t²+1">'
-        '<rect width="400" height="220" fill="#faf8ff" rx="10"/>'
+        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
         '<line data-ap-run stroke="#ea580c" stroke-width="2.5" stroke-dasharray="5 3"/>'
         '<line data-ap-rise stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5 3"/>'
         '<path data-ap-curve fill="none" stroke="#6c4eff" stroke-width="2.5"/>'
@@ -330,7 +343,7 @@ def secant_math_lab_embed(spec_json: str) -> str:
     return _math_lab_shell(spec_json, inner.replace(
         '<div class="ap-lab-controls" data-ap-controls></div>',
         '<div class="ap-lab-controls" data-ap-controls>' + controls_note + "</div>",
-    ))
+    ), lab_mod="secant")
 
 
 def limit_cases_math_lab_embed(spec_json: str) -> str:
@@ -357,9 +370,9 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         'aria-label="Trace x toward c"/>'
         '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
         '<div class="ap-secant-metrics"><div class="ap-metric"><span>f(x)</span><strong data-ap-y-read>—</strong></div></div>'
-        '<div class="ap-lab-graph-wrap">'
-        '<svg class="ap-lab-svg ap-lab-svg--limit" viewBox="0 0 400 220" role="img" aria-label="Limit case graph">'
-        '<rect width="400" height="220" fill="#faf8ff" rx="10"/>'
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
+        f'<svg class="ap-lab-svg ap-lab-svg--limit" viewBox="{_LAB_VIEWBOX}" role="img" aria-label="Limit case graph">'
+        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
         '<g data-ap-plot-layer>'
         '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.5"/>'
         '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.5"/>'
@@ -383,7 +396,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<p class="ap-lab-reflection" data-ap-reflection hidden>'
         '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
     )
-    return _math_lab_shell(spec_json, inner)
+    return _math_lab_shell(spec_json, inner, lab_mod="limit")
 
 
 def tracer_math_lab_embed(spec_json: str) -> str:
@@ -397,7 +410,35 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="5">Infinite</button>'
         "</div>"
         '<p class="ap-lab-scenario-note" data-ap-scenario-note></p>'
+        '<div class="ap-lab-body ap-lab-body--split">'
+        '<div class="ap-lab-main">'
+        '<div class="ap-lab-controls">'
+        '<button type="button" class="ap-lab-btn" data-ap-action="left">Trace left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="right">Trace right</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right</button>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-lock-compare>Compare</button>'
+        "</div>"
+        '<label class="ap-lab-slider-label" for="ap-trace-x">'
+        'x = <strong data-ap-trace-x>0.50</strong> · y = <strong data-ap-trace-y>—</strong></label>'
+        '<input type="range" id="ap-trace-x" class="ap-range ap-lab-range" data-ap-trace-slider '
+        'aria-label="Trace x on graph"/>'
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
+        f'<svg class="ap-lab-svg ap-trace-svg" viewBox="{_LAB_VIEWBOX}" role="img">'
+        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
+        '<g data-ap-plot-layer>'
+        '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.5"/>'
+        '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.5"/>'
+        '<line data-ap-target-x stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4 3"/>'
+        '<path data-ap-branch="0" fill="none" stroke-width="2.5"/>'
+        '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
+        '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
+        '<circle data-ap-tracer r="6" fill="#059669" stroke="#fff" stroke-width="2" visibility="hidden"/>'
+        "</g></svg></div></div>"
         '<aside class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
+        '<p class="ap-lab-dashboard__title">Observation dashboard</p>'
         '<p data-ap-step="1" class="ap-lab-step is-active">1 · Trace from the left</p>'
         '<p data-ap-step="2" class="ap-lab-step">2 · Lock left-hand result</p>'
         '<p data-ap-step="3" class="ap-lab-step">3 · Trace from the right</p>'
@@ -410,33 +451,7 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         "<dt>Same?</dt><dd data-d-same>—</dd>"
         "<dt>Two-sided</dt><dd data-d-two>—</dd>"
         "<dt>f(c)</dt><dd data-d-fc>—</dd>"
-        "</dl></aside>"
-        '<div class="ap-lab-explore">'
-        '<div class="ap-lab-controls">'
-        '<button type="button" class="ap-lab-btn" data-ap-action="left">Trace left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="right">Trace right</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right</button>'
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-lock-compare>Compare</button>'
-        "</div>"
-        '<label for="ap-trace-x">x = <strong data-ap-trace-x>0.50</strong></label>'
-        '<input type="range" id="ap-trace-x" class="ap-range ap-lab-range" data-ap-trace-slider '
-        'aria-label="Trace x on graph"/>'
-        '<p>y = <strong data-ap-trace-y>—</strong></p>'
-        '<div class="ap-lab-graph-wrap">'
-        '<svg class="ap-lab-svg ap-trace-svg" viewBox="0 0 400 220" role="img">'
-        '<rect width="400" height="220" fill="#faf8ff" rx="10"/>'
-        '<g data-ap-plot-layer>'
-        '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.5"/>'
-        '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.5"/>'
-        '<line data-ap-target-x stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4 3"/>'
-        '<path data-ap-branch="0" fill="none" stroke-width="2.5"/>'
-        '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
-        '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
-        '<circle data-ap-tracer r="6" fill="#059669" stroke="#fff" stroke-width="2" visibility="hidden"/>'
-        "</g></svg></div></div>"
+        "</dl></aside></div>"
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'
         '<div class="ap-box-body">Use Left → Right → Compare → Value on every graph.</div></div>'
@@ -445,7 +460,7 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<p class="ap-lab-reflection" data-ap-reflection hidden>'
         '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
     )
-    return _math_lab_shell(spec_json, inner)
+    return _math_lab_shell(spec_json, inner, lab_mod="tracer")
 
 
 def secant_interactive_embed() -> str:
