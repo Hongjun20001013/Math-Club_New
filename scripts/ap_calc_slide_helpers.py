@@ -380,6 +380,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<path data-ap-branch="0" data-ap-curve fill="none" stroke-width="2.5"/>'
         '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
         '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
         '<circle data-ap-tracer r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div>"
@@ -434,6 +435,7 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<path data-ap-branch="0" fill="none" stroke-width="2.5"/>'
         '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
         '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
         '<circle data-ap-tracer r="6" fill="#059669" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div></div>"

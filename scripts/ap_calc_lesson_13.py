@@ -67,7 +67,7 @@ def build(graphs: dict[str, str]) -> dict:
                 "\\[\\lim_{x\\to c^-} f(x)=L \\quad\\text{(from left)},\\qquad "
                 "\\lim_{x\\to c^+} f(x)=M \\quad\\text{(from right)}\\]"
             )
-            + "<p>Superscript − means \\(x<c\\); superscript + means \\(x>c\\).</p>",
+            + "<p>Superscript − means \\(x \\lt c\\); superscript + means \\(x \\gt c\\).</p>",
         )
         + fig(g["jump_at_3"], "Jump at x = 3", cls="ap-fig--teach", notice="L⁻ = −1, L⁺ = 4 → two-sided limit DNE."),
         path_phase="Concept & Definition",

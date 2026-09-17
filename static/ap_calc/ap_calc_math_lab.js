@@ -183,13 +183,41 @@
     for (var x = x0; x <= x1; x += step) {
       var y = safeEval(fn, x);
       if (!isFinite(y)) continue;
-      var py = this.mapY(y);
-      if (py < this.plotTop - 2 || py > this.plotBottom + 2) continue;
-      pts.push(this.mapX(x).toFixed(1) + "," + py.toFixed(1));
+      pts.push(this.mapX(x).toFixed(1) + "," + this.mapY(y).toFixed(1));
     }
     if (pts.length < 2) return "";
     return "M" + pts.join(" L");
   };
+
+  function computePlotBounds(branches, openPoints, closedPoints, targetX) {
+    var xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+    (branches || []).forEach(function (br) {
+      xMin = Math.min(xMin, br.x0, targetX);
+      xMax = Math.max(xMax, br.x1, targetX);
+      var step = Math.max((br.x1 - br.x0) / 40, 0.05);
+      for (var x = br.x0; x <= br.x1; x += step) {
+        var y = safeEval(br.fn, x);
+        if (isFinite(y)) {
+          yMin = Math.min(yMin, y);
+          yMax = Math.max(yMax, y);
+        }
+      }
+    });
+    function scanPts(pts) {
+      (pts || []).forEach(function (p) {
+        xMin = Math.min(xMin, p.x);
+        xMax = Math.max(xMax, p.x);
+        yMin = Math.min(yMin, p.y);
+        yMax = Math.max(yMax, p.y);
+      });
+    }
+    scanPts(openPoints);
+    scanPts(closedPoints);
+    if (!isFinite(xMin)) { xMin = targetX - 1; xMax = targetX + 1; yMin = -1; yMax = 5; }
+    var xPad = Math.max((xMax - xMin) * 0.14, 0.4);
+    var yPad = Math.max((yMax - yMin) * 0.2, 0.6);
+    return { xMin: xMin - xPad, xMax: xMax + xPad, yMin: yMin - yPad, yMax: yMax + yPad };
+  }
 
   function setPoint(svg, sel, x, y, plot, visible) {
     var pt = svg.querySelector(sel);
@@ -431,7 +459,7 @@
       slider.setAttribute("aria-valuetext", "h equals " + h + " seconds");
     }
     var rate = this.slope(h);
-    var deltaS = this.s(a + h) - this.s(a);
+    var deltaS = this.s(this.a + h) - this.s(this.a);
     var units = this.spec.annotations.units || {};
 
     this.root.querySelectorAll("[data-ap-h-val]").forEach(function (n) { n.textContent = h; });
@@ -491,7 +519,7 @@
   SecantTangentLab.prototype._draw = function (h, rate, deltaS) {
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var plot = new SVGPlot(svg, { xMin: 0, xMax: 4.2, yMin: 0, yMax: 16 });
+    var plot = new SVGPlot(svg, { xMin: 0, xMax: 4.2, yMin: 0, yMax: 20 });
     var a = this.a;
     var s = this.s.bind(this);
     var curve = svg.querySelector("[data-ap-curve]");
@@ -636,7 +664,8 @@
     var c = this.current();
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var plot = new SVGPlot(svg, { xMin: 0, xMax: 6, yMin: -1, yMax: 11 });
+    var bounds = computePlotBounds(c.branches, c.openPoints, c.closedPoints, c.targetX);
+    var plot = new SVGPlot(svg, bounds);
     plot.drawTargetX(c.targetX);
     c.branches.forEach(function (br, i) {
       var path = svg.querySelector("[data-ap-branch='" + i + "']") || svg.querySelector("[data-ap-curve]");
@@ -648,9 +677,15 @@
     });
     var branch1 = svg.querySelector("[data-ap-branch='1']");
     if (branch1 && c.branches.length < 2) branch1.style.display = "none";
-    var open0 = (c.openPoints || [])[0];
+    var i;
+    for (i = 0; i < 2; i++) {
+      var op = (c.openPoints || [])[i];
+      var sel = "[data-ap-open-" + i + "]";
+      setPoint(svg, sel, op ? op.x : NaN, op ? op.y : NaN, plot, !!op);
+      var ptEl = svg.querySelector(sel);
+      if (ptEl && op && c.branches[i]) ptEl.setAttribute("stroke", c.branches[i].color || COLORS.curve);
+    }
     var closed0 = (c.closedPoints || [])[0];
-    setPoint(svg, "[data-ap-open-0]", open0 ? open0.x : NaN, open0 ? open0.y : NaN, plot, !!open0);
     setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
     setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
   };
@@ -747,9 +782,15 @@
     dash.querySelector("[data-d-left]").textContent = this.leftLocked != null ? this.leftLocked : "—";
     dash.querySelector("[data-d-right]").textContent = this.rightLocked != null ? this.rightLocked : "—";
     var same = sc.leftLimit != null && sc.rightLimit != null && sc.leftLimit === sc.rightLimit;
-    dash.querySelector("[data-d-same]").textContent = sc.leftLimit == null || sc.rightLimit == null ? "n/a" : (same ? "same" : "different");
-    dash.querySelector("[data-d-two]").textContent = sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE";
-    dash.querySelector("[data-d-fc]").textContent = sc.functionValue != null ? sc.functionValue : "undefined";
+    dash.querySelector("[data-d-same]").textContent = this.step >= 5
+      ? (sc.leftLimit == null || sc.rightLimit == null ? "n/a" : (same ? "same" : "different"))
+      : "—";
+    dash.querySelector("[data-d-two]").textContent = this.step >= 5
+      ? (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE")
+      : "—";
+    dash.querySelector("[data-d-fc]").textContent = this.step >= 6
+      ? (sc.functionValue != null ? sc.functionValue : "undefined")
+      : "—";
     dash.querySelectorAll("[data-ap-step]").forEach(function (node) {
       var n = parseInt(node.getAttribute("data-ap-step"), 10);
       node.classList.toggle("is-done", n < this.step);
@@ -780,8 +821,9 @@
     var sc = this.scenario();
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var xMin = sc.domainMin != null ? sc.domainMin - 0.3 : -0.5;
-    var plot = new SVGPlot(svg, { xMin: xMin, xMax: 4.5, yMin: -1.5, yMax: 6 });
+    var bounds = computePlotBounds(sc.branches, sc.openPoints, sc.closedPoints, sc.targetX);
+    if (sc.domainMin != null) bounds.xMin = sc.domainMin - 0.2;
+    var plot = new SVGPlot(svg, bounds);
     plot.drawTargetX(sc.targetX);
     sc.branches.forEach(function (br, i) {
       var path = svg.querySelector("[data-ap-branch='" + i + "']");
@@ -793,9 +835,18 @@
     });
     var branch1 = svg.querySelector("[data-ap-branch='1']");
     if (branch1 && sc.branches.length < 2) branch1.style.display = "none";
-    var open0 = (sc.openPoints || [])[0];
+    var j;
+    for (j = 0; j < 2; j++) {
+      var op2 = (sc.openPoints || [])[j];
+      var sel2 = "[data-ap-open-" + j + "]";
+      setPoint(svg, sel2, op2 ? op2.x : NaN, op2 ? op2.y : NaN, plot, !!op2);
+      var ptEl2 = svg.querySelector(sel2);
+      if (ptEl2 && op2) {
+        var brCol = sc.branches[j] ? sc.branches[j].color : COLORS.curve;
+        ptEl2.setAttribute("stroke", brCol || COLORS.curve);
+      }
+    }
     var closed0 = (sc.closedPoints || [])[0];
-    setPoint(svg, "[data-ap-open-0]", open0 ? open0.x : NaN, open0 ? open0.y : NaN, plot, !!open0);
     setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
     setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
   };

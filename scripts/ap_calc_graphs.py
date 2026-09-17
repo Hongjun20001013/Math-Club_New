@@ -25,6 +25,7 @@ class PlotPoint:
     style: Literal["open", "filled", "none"] = "filled"
     label: str = ""
     r: float = 6
+    color: str = PURPLE
 
 
 @dataclass
@@ -164,13 +165,14 @@ def render_graph(
         cx = _x_map(pt.x, spec, width, pad_l, pad_r)
         cy = _y_map(pt.y, spec, height, pad_t, pad_b)
         r = pt.r if not compact else pt_r
+        col = pt.color or PURPLE
         if pt.style == "open":
             parts.append(
                 f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="#fff" '
-                f'stroke="{PURPLE}" stroke-width="2"/>'
+                f'stroke="{col}" stroke-width="2.5"/>'
             )
         else:
-            parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{PURPLE}"/>')
+            parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{col}"/>')
         if pt.label and not compact:
             parts.append(
                 f'<text x="{cx+10:.1f}" y="{cy-8:.1f}" font-size="{font_pt}" '
@@ -287,13 +289,17 @@ def build_all_graphs() -> dict[str, str]:
     case_d = GraphSpec(
         graph_id="limit_case_d",
         title="Case D: limit DNE, f(c) defined",
-        x_min=0, x_max=6, y_min=-2, y_max=6,
+        x_min=0, x_max=6, y_min=-3, y_max=7,
         segments=[
-            PlotSegment(lambda x: x - 4, 0.5, 2.98, color=LEFT_COLOR),
-            PlotSegment(lambda x: x + 1, 3.02, 5.5, color=RIGHT_COLOR),
+            PlotSegment(lambda x: x - 4, 0.5, 2.92, color=LEFT_COLOR, width=3),
+            PlotSegment(lambda x: x + 1, 3.08, 5.5, color=RIGHT_COLOR, width=3),
         ],
-        points=[PlotPoint(3, 0, "filled")],
-        notice="Left → −1, right → 4; two-sided limit DNE.",
+        points=[
+            PlotPoint(3, -1, "open", color=LEFT_COLOR),
+            PlotPoint(3, 4, "open", color=RIGHT_COLOR),
+            PlotPoint(3, 0, "filled", "f(3)=0"),
+        ],
+        notice="L⁻ → −1, L⁺ → 4; two-sided limit DNE.",
     )
     for spec, key in (
         (case_a, "limit_case_a"),
@@ -317,13 +323,17 @@ def build_all_graphs() -> dict[str, str]:
     jump_at_3 = GraphSpec(
         graph_id="jump_at_3",
         title="Jump discontinuity at x = 3",
-        x_min=0, x_max=6, y_min=-2, y_max=6,
+        x_min=0, x_max=6, y_min=-3, y_max=7,
         segments=[
-            PlotSegment(lambda x: x - 4, 0.5, 2.98, color=LEFT_COLOR),
-            PlotSegment(lambda x: x + 1, 3.02, 5.5, color=RIGHT_COLOR),
+            PlotSegment(lambda x: x - 4, 0.5, 2.92, color=LEFT_COLOR, width=3),
+            PlotSegment(lambda x: x + 1, 3.08, 5.5, color=RIGHT_COLOR, width=3),
         ],
-        points=[PlotPoint(3, 0, "filled", "f(3)=0")],
-        notice="lim x→3⁻ = −1, lim x→3⁺ = 4 → two-sided limit DNE.",
+        points=[
+            PlotPoint(3, -1, "open", "L⁻→−1", color=LEFT_COLOR),
+            PlotPoint(3, 4, "open", "L⁺→4", color=RIGHT_COLOR),
+            PlotPoint(3, 0, "filled", "f(3)=0"),
+        ],
+        notice="lim x→3⁻ f(x)=−1, lim x→3⁺ f(x)=4 → two-sided limit DNE.",
     )
     infinite_limit_13 = GraphSpec(
         graph_id="infinite_limit_13",
