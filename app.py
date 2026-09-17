@@ -19316,4 +19316,5 @@ def admin_clear_all_records():
 # =====================================================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8888, debug=True)
+    # use_reloader=False avoids connection resets through port-forward tunnels.
+    app.run(host="0.0.0.0", port=8888, debug=True, use_reloader=False)
