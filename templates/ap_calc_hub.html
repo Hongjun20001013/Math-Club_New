@@ -2,146 +2,152 @@
 {% block title %}AP Calculus AB / BC · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}" type="text/css">
 <link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
 {% set coverage_pct = ((materials_ready / materials_total * 100) if materials_total else 0)|round|int %}
-<div class="np-ap-studio" data-ap-calc-hub>
-  <div class="np-ap-studio__ambient" aria-hidden="true">
-    <svg class="np-ap-studio__curve" viewBox="0 0 400 200" aria-hidden="true">
-      <path d="M20,160 C80,160 120,40 200,80 S320,20 380,60" />
-      <circle cx="200" cy="80" r="5" />
-      <circle cx="320" cy="50" r="4" />
-    </svg>
-  </div>
+{% set featured = continue_material or (materials[0] if materials else none) %}
+<div class="np-cm-cinema np-cm-cinema--hub np-ap-violet" data-ap-calc-hub>
+  <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
 
-  <div class="np-ap-studio__shell">
-    <nav class="np-ap-studio__rail" aria-label="AP Calculus navigation">
+  <div class="np-page-shell np-cm-hub-wrap">
+    <nav class="np-cm-cinema-rail np-cm-hub-rail" aria-label="AP Calculus navigation">
       <a href="{{ url_for('index') }}">Home</a>
       <span aria-hidden="true">·</span>
-      <em>AP Calculus</em>
+      <span>AP Calculus</span>
     </nav>
 
-    <header class="np-ap-studio__hero">
-      <div>
-        <p class="np-ap-studio__kicker">{{ site_brand_name }}</p>
-        <h1 class="np-ap-studio__title">AP Calculus</h1>
-        <p class="np-ap-studio__lede">AB · 8 units &nbsp;·&nbsp; BC · +2 units. Interactive slide decks with graphs, limit demos, and printable practice packets.</p>
-        <div class="np-ap-studio__stats" role="list">
-          <div class="np-ap-studio__stat np-ap-studio__stat--live" role="listitem">
+    <header class="np-cm-hub-command mp-animate-in">
+      <div class="np-cm-hub-command-copy">
+        <p class="np-cm-hub-kicker">{{ site_brand_name }}</p>
+        <h1>AP Calculus</h1>
+        <p class="np-cm-hub-lede">AB · 8 units &nbsp;·&nbsp; BC · +2 units. Interactive slide decks with graphs, limit demos, and printable practice packets.</p>
+        <div class="np-cm-hub-stats" role="list">
+          <div class="np-cm-hub-stat np-cm-hub-stat--live" role="listitem">
             <strong>{{ live_chapters }}</strong>
             <span>Live lessons</span>
           </div>
-          <div class="np-ap-studio__stat" role="listitem">
+          <div class="np-cm-hub-stat" role="listitem">
             <strong>10</strong>
             <span>Units</span>
           </div>
-          <div class="np-ap-studio__stat" role="listitem">
+          <div class="np-cm-hub-stat" role="listitem">
             <strong>{{ live_packets }}</strong>
             <span>Packets</span>
           </div>
         </div>
       </div>
-      <aside class="np-ap-studio__coverage" aria-label="Course coverage">
-        <div class="np-ap-studio__ring" style="--ap-pct: {{ coverage_pct }};" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ coverage_pct }}">
+      <aside class="np-cm-hub-coverage" aria-label="Course coverage">
+        <div class="np-cm-hub-ring" style="--cm-pct: {{ coverage_pct }};" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ coverage_pct }}">
           <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="np-ap-studio__ring-track" cx="60" cy="60" r="52"></circle>
-            <circle class="np-ap-studio__ring-fill" cx="60" cy="60" r="52"></circle>
+            <circle class="np-cm-hub-ring-track" cx="60" cy="60" r="52"></circle>
+            <circle class="np-cm-hub-ring-fill" cx="60" cy="60" r="52"></circle>
           </svg>
-          <div class="np-ap-studio__ring-label">
+          <div class="np-cm-hub-ring-label">
             <strong>{{ materials_ready }}<small>/{{ materials_total }}</small></strong>
             <span>Online</span>
           </div>
         </div>
-        <p class="np-ap-studio__coverage-note">Lessons go live as each unit section is built.</p>
+        <p class="np-cm-hub-coverage-note">Lessons go live as each unit section is built.</p>
       </aside>
     </header>
 
     {% if continue_material %}
     <a href="{{ url_for('ap_calc_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide|default(1) }}"
-       class="np-ap-studio__resume">
-      <div>
-        <p class="np-ap-studio__resume-kicker">Continue</p>
-        <h2>{{ continue_material.section }} · {{ continue_material.title }}</h2>
+       class="np-cm-hub-resume mp-animate-up">
+      <div class="np-cm-hub-resume-copy">
+        <p class="np-cm-hub-resume-kicker">Pick up where you left off</p>
+        <h2>{{ continue_material.section }} — {{ continue_material.title }}</h2>
         <p>Slide {{ continue_material.continue_slide|default(1) }} of {{ continue_material.slide_count }}</p>
+        <span class="np-cm-hub-resume-cta">Resume lesson →</span>
       </div>
-      <span class="np-ap-studio__resume-cta">Resume →</span>
+    </a>
+    {% endif %}
+
+    {% if featured and (not continue_material or featured.slug != continue_material.slug) %}
+    <a href="{{ url_for('ap_calc_material_view', slug=featured.slug) }}" class="np-cm-hub-featured mp-animate-up">
+      <div class="np-cm-hub-featured-copy">
+        <p class="np-cm-hub-featured-kicker">Featured · Unit {{ featured.unit|default(1) }}</p>
+        <h2>{{ featured.section }} — {{ featured.title }}</h2>
+        <p>{{ featured.slide_count or '—' }} slides · interactive graphs · study mode · practice packet</p>
+        <span class="np-cm-hub-featured-cta">Open deck →</span>
+      </div>
+      <div class="np-cm-hub-featured-visual" aria-hidden="true">
+        <div class="np-cm-hub-slide-stack">
+          <div class="np-cm-hub-slide np-cm-hub-slide--back"></div>
+          <div class="np-cm-hub-slide np-cm-hub-slide--mid"></div>
+          <div class="np-cm-hub-slide np-cm-hub-slide--front">
+            <span class="np-cm-hub-slide-badge">{{ featured.section }}</span>
+            <strong>{{ featured.title }}</strong>
+            <em>{{ featured.slide_count or '—' }} slides</em>
+          </div>
+        </div>
+      </div>
     </a>
     {% endif %}
 
     {% if materials %}
-    <section class="np-ap-studio__path" aria-label="Live lessons">
-      <div class="np-ap-studio__section-head">
+    <section class="np-cm-hub-continue mp-animate-up" aria-label="Live lessons">
+      <div class="np-cm-hub-continue-head">
         <h2>Unit 1 · Live now</h2>
-        <p>Limits and continuity — sections 1.1 through 1.3</p>
+        <span>{{ materials|length }} deck{{ 's' if materials|length != 1 else '' }}</span>
       </div>
-      <ol class="np-ap-studio__path-track">
+      <div class="np-cm-hub-continue-track">
         {% for m in materials %}
-        <li class="np-ap-studio__path-node">
-          <a href="{{ url_for('ap_calc_material_view', slug=m.slug) }}" title="{{ m.title }}">
-            <span class="np-ap-studio__path-num">{{ m.section }}</span>
-            <span class="np-ap-studio__path-label">{{ m.title }}</span>
-          </a>
-        </li>
+        <a href="{{ url_for('ap_calc_material_view', slug=m.slug) }}" class="np-cm-hub-continue-chip{% if loop.first %} is-latest{% endif %}">
+          <span class="np-cm-hub-continue-unit">Unit {{ m.unit|default(1) }}</span>
+          <strong>{{ m.section }}</strong>
+          <em>{{ m.title }}</em>
+          <span class="np-cm-hub-continue-meta">{{ m.slide_count or '—' }} slides · packet</span>
+        </a>
         {% endfor %}
-      </ol>
+      </div>
     </section>
     {% endif %}
 
-    <section aria-labelledby="ap-workspace-title">
-      <div class="np-ap-studio__section-head">
-        <h2 id="ap-workspace-title">Workspace</h2>
-        <p>Courseware, practice worksheets, or the full AB / BC roadmap.</p>
+    <section class="mp-animate-up" aria-labelledby="ap-bento-title">
+      <p class="np-ap-section-label" id="ap-bento-title">Workspace</p>
+      <div class="np-ap-bento">
+        <a href="{{ url_for('ap_calc_course') }}" class="np-ap-bento-card np-ap-bento-card--lead">
+          <div>
+            <span class="np-ap-bento-card__glyph" aria-hidden="true">∫</span>
+            <p class="np-ap-bento-card__kicker">Slide decks</p>
+            <h3>Course materials</h3>
+            <p>Every unit and chapter — Unit 1.1–1.3 live with interactive graphs and AP checks.</p>
+          </div>
+          <div class="np-ap-bento-card__foot">
+            <span class="np-ap-live-pill"><i></i>Live</span>
+            <span class="np-ap-bento-card__arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-ap-bento-card np-ap-bento-card--side">
+          <div>
+            <span class="np-ap-bento-card__glyph" aria-hidden="true">✎</span>
+            <p class="np-ap-bento-card__kicker">Worksheets</p>
+            <h3>Practice</h3>
+            <p>Printable packet PDFs and full solution keys.</p>
+          </div>
+          <div class="np-ap-bento-card__foot">
+            <span class="np-ap-live-pill"><i></i>Live</span>
+            <span class="np-ap-bento-card__arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_overview') }}" class="np-ap-bento-card np-ap-bento-card--half">
+          <div>
+            <span class="np-ap-bento-card__glyph" aria-hidden="true">∞</span>
+            <p class="np-ap-bento-card__kicker">Roadmap</p>
+            <h3>Curriculum</h3>
+            <p>Full AB / BC topic map and release schedule.</p>
+          </div>
+          <div class="np-ap-bento-card__foot">
+            <span class="np-ap-bento-card__cta">View map</span>
+            <span class="np-ap-bento-card__arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
       </div>
-      <ul class="np-ap-studio__workspaces">
-        <li class="np-ap-studio__workspace is-primary">
-          <a href="{{ url_for('ap_calc_course') }}">
-            <span class="np-ap-studio__workspace-icon" aria-hidden="true">∫</span>
-            <div class="np-ap-studio__workspace-copy">
-              <h3>Course materials</h3>
-              <p>Slide decks for every unit — Unit 1.1–1.3 live with interactive graphs and AP checks.</p>
-            </div>
-            <div class="np-ap-studio__workspace-meta">
-              <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
-              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
-        </li>
-        <li class="np-ap-studio__workspace">
-          <a href="{{ url_for('ap_calc_practice_hub') }}">
-            <span class="np-ap-studio__workspace-icon" aria-hidden="true">✎</span>
-            <div class="np-ap-studio__workspace-copy">
-              <h3>Practice</h3>
-              <p>Printable packet PDFs and full solution keys aligned to each live chapter.</p>
-            </div>
-            <div class="np-ap-studio__workspace-meta">
-              <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
-              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
-        </li>
-        <li class="np-ap-studio__workspace">
-          <a href="{{ url_for('ap_calc_overview') }}">
-            <span class="np-ap-studio__workspace-icon" aria-hidden="true">∞</span>
-            <div class="np-ap-studio__workspace-copy">
-              <h3>Curriculum</h3>
-              <p>Full AB / BC topic map — which units are shared and what is coming next.</p>
-            </div>
-            <div class="np-ap-studio__workspace-meta">
-              <span class="np-ap-studio__badge">Map</span>
-              <span class="np-ap-studio__workspace-arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
-        </li>
-      </ul>
     </section>
-
-    <footer class="np-ap-studio__foot">
-      <span>Graph · Table · Algebra</span>
-      <span>Interactive slides</span>
-      <span>Practice PDFs</span>
-    </footer>
   </div>
 </div>
 {% endblock %}

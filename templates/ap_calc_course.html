@@ -2,82 +2,106 @@
 {% block title %}AP Calculus · Course Materials · {{ site_brand_name }}{% endblock %}
 
 {% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}" type="text/css">
 <link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
 {% set live_units = catalog.units|selectattr('live')|list|length %}
-<div class="np-ap-studio">
-  <div class="np-ap-studio__ambient" aria-hidden="true"></div>
+<div class="np-cm-cinema np-cm-cinema--phase np-ap-violet">
+  <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
 
-  <div class="np-ap-studio__shell">
-    <nav class="np-ap-studio__rail">
+  <div class="np-cm-phase-wrap">
+    <nav class="np-cm-cinema-rail np-cm-phase-rail">
       <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
       <span aria-hidden="true">·</span>
-      <em>Course materials</em>
+      <span>Course materials</span>
     </nav>
 
-    <header class="np-ap-studio__hero">
+    <header class="np-cm-phase-hero">
       <div>
-        <a href="{{ url_for('ap_calc_hub') }}" class="np-ap-studio__back">← AP Calculus</a>
-        <p class="np-ap-studio__kicker">AB + BC</p>
-        <h1 class="np-ap-studio__title">Course materials</h1>
-        <p class="np-ap-studio__lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension. Open a unit to browse chapter slide decks.</p>
-        <div class="np-ap-studio__stats" role="list">
-          <div class="np-ap-studio__stat np-ap-studio__stat--live" role="listitem">
-            <strong>{{ live_units }}</strong>
-            <span>Live unit</span>
-          </div>
-          <div class="np-ap-studio__stat" role="listitem">
-            <strong>{{ catalog.units|length }}</strong>
-            <span>Total</span>
-          </div>
+        <p class="np-cm-phase-kicker">AB + BC</p>
+        <h1>Course materials</h1>
+        <p class="np-cm-phase-lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension. Select a unit to browse chapter slide decks.</p>
+        <div class="np-cm-phase-stats">
+          <span class="np-cm-phase-stat"><strong>{{ live_units }}</strong> live unit</span>
+          <span class="np-cm-phase-stat"><strong>{{ catalog.units|length }}</strong> total</span>
         </div>
       </div>
+      <a href="{{ url_for('ap_calc_hub') }}" class="np-cm-phase-back">← AP Calculus</a>
     </header>
 
-    <section class="np-ap-studio__index" aria-label="All units">
-      <div class="np-ap-studio__index-head">
-        <span>Unit</span>
-        <span>Title</span>
-        <span>Track</span>
-        <span></span>
-      </div>
-      <ol class="np-ap-studio__index-list">
-        {% for unit in catalog.units %}
-        <li class="np-ap-studio__index-row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
-          {% if unit.live or unit.chapters %}
-          <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}">
-            <span class="np-ap-studio__index-num">{{ '%02d'|format(unit.unit) }}</span>
-            <div class="np-ap-studio__index-title">
-              <h3>{{ unit.title }}</h3>
-              <p>
-                {% if unit.chapters %}
-                {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
-                {% else %}Preview{% endif %}
-              </p>
-            </div>
-            <span class="np-ap-studio__index-track">{{ unit.track_label }}</span>
-            {% if unit.live %}
-            <span class="np-ap-studio__badge np-ap-studio__badge--live"><i></i>Live</span>
-            {% else %}
-            <span class="np-ap-studio__index-arrow" aria-hidden="true">→</span>
-            {% endif %}
-          </a>
-          {% else %}
-          <div class="np-ap-studio__index-static">
-            <span class="np-ap-studio__index-num">{{ '%02d'|format(unit.unit) }}</span>
-            <div class="np-ap-studio__index-title">
-              <h3>{{ unit.title }}</h3>
-              <p>Coming soon</p>
-            </div>
-            <span class="np-ap-studio__index-track">{{ unit.track_label }}</span>
-            <span class="np-ap-studio__badge">Soon</span>
+    <section class="np-ap-spine" aria-label="All units">
+      <div class="np-ap-spine__group-label">AB · Units 1–8</div>
+      {% for unit in catalog.units if unit.unit <= 8 %}
+      <article class="np-ap-spine__row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
+        {% if unit.live or unit.chapters %}
+        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-spine__link">
+          <span class="np-ap-spine__num">{{ unit.unit }}</span>
+          <div class="np-ap-spine__copy">
+            <h3>{{ unit.title }}</h3>
+            <p>
+              {% if unit.chapters %}
+              {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
+              {% else %}Preview{% endif %}
+            </p>
           </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ol>
+          <div class="np-ap-spine__meta">
+            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
+            {% if unit.live and unit.chapters %}
+            <div class="np-ap-spine__progress" aria-hidden="true">
+              <i style="width: {{ ((unit.chapters|selectattr('live')|list|length / unit.chapters|length * 100) if unit.chapters|length else 0)|round }}%;"></i>
+            </div>
+            <span class="np-ap-live-pill"><i></i>Live</span>
+            {% endif %}
+            <span class="np-ap-spine__arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
+        {% else %}
+        <div class="np-ap-spine__static">
+          <span class="np-ap-spine__num">{{ unit.unit }}</span>
+          <div class="np-ap-spine__copy">
+            <h3>{{ unit.title }}</h3>
+            <p>Coming soon</p>
+          </div>
+          <div class="np-ap-spine__meta">
+            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
+            <span class="np-ap-live-pill" style="opacity:0.6;">Soon</span>
+          </div>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+
+      <div class="np-ap-spine__group-label">BC extension · Units 9–10</div>
+      {% for unit in catalog.units if unit.unit > 8 %}
+      <article class="np-ap-spine__row{% if unit.live %} is-live{% elif not unit.chapters %} is-soon{% endif %}">
+        {% if unit.live or unit.chapters %}
+        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-ap-spine__link">
+          <span class="np-ap-spine__num">{{ unit.unit }}</span>
+          <div class="np-ap-spine__copy">
+            <h3>{{ unit.title }}</h3>
+            <p>{% if unit.chapters %}{{ unit.chapters|length }} chapters{% else %}Preview{% endif %}</p>
+          </div>
+          <div class="np-ap-spine__meta">
+            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
+            <span class="np-ap-spine__arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
+        {% else %}
+        <div class="np-ap-spine__static">
+          <span class="np-ap-spine__num">{{ unit.unit }}</span>
+          <div class="np-ap-spine__copy">
+            <h3>{{ unit.title }}</h3>
+            <p>Coming soon</p>
+          </div>
+          <div class="np-ap-spine__meta">
+            <span class="np-ap-spine__track">{{ unit.track_label }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
     </section>
   </div>
 </div>
