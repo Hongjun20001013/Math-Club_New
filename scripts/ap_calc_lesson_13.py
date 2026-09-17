@@ -13,7 +13,13 @@ from ap_calc_slide_helpers import (
     intro,
     key_point,
     limit_tracer_embed,
+    limit_card,
     math_block,
+    NOTICE_HOLE,
+    NOTICE_INFINITE,
+    NOTICE_JUMP_DNE,
+    NOTICE_LIMIT_EQ_FC,
+    visual_limit_vs_value,
     mcq_reveal,
     phase_divider,
     practice_packet,
@@ -53,7 +59,7 @@ def build(graphs: dict[str, str]) -> dict:
             "Graphs appear on every AP exam before algebraic limit rules.",
             "Open circle vs filled dot; left vs right branch heights.",
             "Reading the filled dot before comparing sides.",
-            "Re-trace both branches; label L⁻ and L⁺ before deciding.",
+            "Re-trace both branches; label \\(L^{-}\\) and \\(L^{+}\\) before deciding.",
         ),
         path_phase="Launch",
     )
@@ -69,7 +75,9 @@ def build(graphs: dict[str, str]) -> dict:
             )
             + "<p>Superscript − means \\(x \\lt c\\); superscript + means \\(x \\gt c\\).</p>",
         )
-        + fig(g["jump_at_3"], "Jump at x = 3", cls="ap-fig--teach", notice="L⁻ = −1, L⁺ = 4 → two-sided limit DNE."),
+        + limit_card("x\\to 3^-", equals="-1")
+        + limit_card("x\\to 3^+", equals="4")
+        + fig(g["jump_at_3"], "Jump at \\(x=3\\)", cls="ap-fig--teach", notice=NOTICE_JUMP_DNE),
         path_phase="Concept & Definition",
     )
 
@@ -83,7 +91,11 @@ def build(graphs: dict[str, str]) -> dict:
                 "\\lim_{x\\to c^-} f(x)=\\lim_{x\\to c^+} f(x)=L\\]"
             )
         )
-        + checkpoint("If left and right limits differ, the two-sided limit <strong>does not exist</strong>."),
+        + visual_limit_vs_value("2", "3", fc_val="1.5")
+        + checkpoint(
+            "If \\(L^{-}\\neq L^{+}\\), then "
+            "\\(\\displaystyle\\lim_{x\\to c} f(x)\\) <strong>does not exist</strong>."
+        ),
         path_phase="Why It Works",
     )
 
@@ -94,10 +106,10 @@ def build(graphs: dict[str, str]) -> dict:
             "Find \\(\\lim_{x\\to 2} f(x)\\), \\(f(2)\\), and continuity at x=2.",
             "Graph: left branch y = x+1, right branch y = −x+5.",
             solution_steps([
-                "Left trace: as x→2⁻, y→3.",
-                "Right trace: as x→2⁺, y→3.",
-                "Compare: both sides → 3, so \\(\\lim_{x\\to 2} f(x)=3\\).",
-                "Filled dot at (2, 1.5) gives \\(f(2)=1.5\\neq 3\\) → not continuous.",
+                "Left trace: as \\(x\\to 2^{-}\\), \\(y\\to 3\\).",
+                "Right trace: as \\(x\\to 2^{+}\\), \\(y\\to 3\\).",
+                "Compare: both sides \\(\\to 3\\), so \\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\).",
+                "Filled dot at \\((2,1.5)\\) gives \\(f(2)=1.5\\neq 3\\) \\(\\Rightarrow\\) not continuous.",
             ]),
             "\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\), \\(f(2)=1.5\\), not continuous at 2.",
             "Open circle at height 3; filled dot at 1.5.",
@@ -110,10 +122,10 @@ def build(graphs: dict[str, str]) -> dict:
         "Case gallery: continuity types",
         phase_divider("Visual Investigation", "Compare discontinuity types")
         + '<div class="ap-graph-grid ap-graph-grid--gallery">'
-        + fig(g["limit_case_a_gallery"], "Continuous", cls="ap-fig--gallery", notice="Limit = f(c).")
-        + fig(g["removable_hole_gallery"], "Removable hole", cls="ap-fig--gallery", notice="Limit exists; f(c) may be missing.")
-        + fig(g["jump_at_3_gallery"], "Jump", cls="ap-fig--gallery", notice="Two-sided limit DNE.")
-        + fig(g["infinite_limit_13_gallery"], "Infinite (extension)", cls="ap-fig--gallery", notice="|y| → ∞ near c.")
+        + fig(g["limit_case_a_gallery"], "Continuous", cls="ap-fig--gallery", notice=NOTICE_LIMIT_EQ_FC)
+        + fig(g["removable_hole_gallery"], "Removable hole", cls="ap-fig--gallery", notice=NOTICE_HOLE)
+        + fig(g["jump_at_3_gallery"], "Jump", cls="ap-fig--gallery", notice=NOTICE_JUMP_DNE)
+        + fig(g["infinite_limit_13_gallery"], "Infinite (extension)", cls="ap-fig--gallery", notice=NOTICE_INFINITE)
         + "</div>",
         path_phase="Visual Investigation",
     )
@@ -122,7 +134,13 @@ def build(graphs: dict[str, str]) -> dict:
         "Endpoint and one-sided domain",
         phase_divider("Representation Transfer", "When only one side exists")
         + role("Transfer", "Domain matters", "At an endpoint, a left-hand limit may be undefined.")
-        + fig(g["endpoint_sqrt_13"], "f(x) = √x on [0, 4]", cls="ap-fig--teach", notice="At x=0 only x→0⁺ is in the domain.")
+        + limit_card("x\\to 0^+", equals="0")
+        + fig(
+            g["endpoint_sqrt_13"],
+            "\\(f(x)=\\sqrt{x}\\) on \\([0,4]\\)",
+            cls="ap-fig--teach",
+            notice="At \\(x=0\\) only \\(x\\to 0^{+}\\) is in the domain.",
+        )
         + key_point(
             "At x = 0",
             "<p>\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\). There is <strong>no</strong> left-hand approach on this domain.</p>",
@@ -165,7 +183,8 @@ def build(graphs: dict[str, str]) -> dict:
             "<p>For the jump graph at x=3, find \\(\\lim_{x\\to 3^-} f(x)\\), \\(\\lim_{x\\to 3^+} f(x)\\), and \\(\\lim_{x\\to 3} f(x)\\).</p>"
             + fig(g["jump_at_3"], "Jump graph", cls="ap-fig--practice"),
             ["Trace left branch to x=3.", "Trace right branch to x=3.", "Are the heights equal?"],
-            "<p>L⁻ = −1, L⁺ = 4, two-sided limit <strong>DNE</strong>.</p>",
+            "<p>\\(L^{-}=-1\\), \\(L^{+}=4\\), "
+            "\\(\\displaystyle\\lim_{x\\to 3} f(x)\\) <strong>DNE</strong>.</p>",
         ),
         group="practice", path_phase="Guided Example",
     )
@@ -175,7 +194,12 @@ def build(graphs: dict[str, str]) -> dict:
         guided_example(
             "<p>Sketch a graph such that \\(\\lim_{x\\to 2^-} f(x)=3\\), \\(\\lim_{x\\to 2^+} f(x)=3\\), but \\(f(2)=-1\\).</p>",
             ["Draw open circle at (2, 3).", "Draw branches approaching that open circle.", "Place filled dot at (2, −1)."],
-            fig(g["sketch_task_13"], "One valid sketch", cls="ap-fig--practice", notice="Limit 3; value −1.")
+            fig(
+                g["sketch_task_13"],
+                "One valid sketch",
+                cls="ap-fig--practice",
+                notice="\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\); \\(f(2)=-1\\).",
+            )
             + "<p>Your sketch may differ in shape — check open vs filled points and branch heights.</p>",
         ),
         group="practice", path_phase="Guided Example",
@@ -185,7 +209,12 @@ def build(graphs: dict[str, str]) -> dict:
         "Practice: jump discontinuity",
         mcq_reveal(
             "<p>Left limit 3, right limit 5 at x=b. Which is true?</p>",
-            ["\\(\\lim_{x\\to b} f(x)=4\\)", "\\(\\lim_{x\\to b} f(x)=5\\)", "Limit DNE", "\\(\\lim_{x\\to b} f(x)=3\\)"],
+            [
+                "\\(\\displaystyle\\lim_{x\\to b} f(x)=4\\)",
+                "\\(\\displaystyle\\lim_{x\\to b} f(x)=5\\)",
+                "\\(\\displaystyle\\lim_{x\\to b} f(x)\\) DNE",
+                "\\(\\displaystyle\\lim_{x\\to b} f(x)=3\\)",
+            ],
             "C",
             "Unequal one-sided limits → DNE.",
             "<p><strong>C</strong> — cannot average 3 and 5. Jump means two-sided limit does not exist.</p>",

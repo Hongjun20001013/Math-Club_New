@@ -13,7 +13,10 @@ def fig(path: str, caption: str = "", cls: str = "ap-fig--standard", notice: str
     ap-fig--case — 4-across summary strip (use *_thumb SVG assets)
     """
     cap = f'<figcaption class="ap-fig-cap">{caption}</figcaption>' if caption else ""
-    notice_html = f'<p class="ap-fig-notice"><strong>What to notice:</strong> {notice}</p>' if notice else ""
+    notice_html = (
+        f'<p class="ap-fig-notice"><strong>What to notice:</strong> '
+        f'<span class="ap-fig-notice-math">{notice}</span></p>'
+    ) if notice else ""
     return (
         f'<figure class="ap-fig {cls}">'
         f'<img src="{path}" alt="{caption or "Graph"}" loading="lazy"/>'
@@ -95,7 +98,66 @@ def role(label: str, title: str, lead: str) -> str:
 
 
 def math_block(tex: str) -> str:
-    return f'<div class="stem-math-block cm-math-block ap-math-block">{tex}</div>'
+    """Display math card — auto \\displaystyle inside \\[ ... \\] for limits/fractions."""
+    inner = tex
+    if "\\[" in inner and "\\displaystyle" not in inner and ("\\lim" in inner or "\\frac" in inner):
+        inner = inner.replace("\\[", "\\[\\displaystyle ", 1)
+    return (
+        f'<div class="stem-math-block cm-math-block ap-math-block ap-math-display">{inner}</div>'
+    )
+
+
+def limit_card(x_to: str, expr: str = "f(x)", equals: str | None = None) -> str:
+    """Hero limit anchor — matches Novel Prep display limit visual (Fig. 1 style)."""
+    eq = f" = {equals}" if equals is not None else ""
+    return math_block(f"\\[\\displaystyle\\lim_{{{x_to}}} {expr}{eq}\\]")
+
+
+def limit_inline(x_to: str, expr: str = "f(x)", equals: str | None = None) -> str:
+    eq = f" = {equals}" if equals is not None else ""
+    return f"\\(\\displaystyle\\lim_{{{x_to}}} {expr}{eq}\\)"
+
+
+def rate_card(formula: str, label: str = "") -> str:
+    cap = f'<span class="ap-math-display__label">{label}</span>' if label else ""
+    return f'<div class="ap-math-display ap-math-display--rate">{cap}{math_block(f"\\[\\displaystyle {formula}\\]")}</div>'
+
+
+def visual_limit_vs_value(
+    c: str,
+    limit_val: str,
+    fc_val: str | None = None,
+    fc_undefined: bool = False,
+) -> str:
+    """Side-by-side limit (approach) vs function value (at c) — visual model."""
+    x_to = f"x\\to {c}"
+    if fc_undefined:
+        fc_inner = math_block(f"\\[\\displaystyle f({c})\\ \\text{{undefined}}\\]")
+    elif fc_val is not None:
+        fc_inner = math_block(f"\\[\\displaystyle f({c}) = {fc_val}\\]")
+    else:
+        fc_inner = '<p class="ap-visual-pair__na">Inspect the filled point after comparing sides.</p>'
+    return (
+        '<div class="ap-visual-pair">'
+        '<div class="ap-visual-pair__col">'
+        '<span class="ap-visual-pair__tag">Approach (limit)</span>'
+        + limit_card(x_to, equals=limit_val)
+        + "</div>"
+        '<div class="ap-visual-pair__col">'
+        '<span class="ap-visual-pair__tag">At the point (value)</span>'
+        + fc_inner
+        + "</div></div>"
+    )
+
+
+# Standard figure notices (LaTeX)
+NOTICE_LIMIT_EQ_FC = "\\(\\displaystyle\\lim_{x\\to c} f(x) = f(c)\\)"
+NOTICE_JUMP_DNE = (
+    "\\(L^{-}=-1\\), \\(L^{+}=4\\), "
+    "\\(\\displaystyle\\lim_{x\\to 3} f(x)\\) DNE"
+)
+NOTICE_HOLE = "\\(\\displaystyle\\lim_{x\\to c} f(x)\\) exists; \\(f(c)\\) may be missing"
+NOTICE_INFINITE = "\\(|y|\\to\\infty\\) near \\(c\\) — finite two-sided limit DNE"
 
 
 def data_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -448,11 +510,11 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<p data-ap-step="5" class="ap-lab-step">5 · Compare</p>'
         '<p data-ap-step="6" class="ap-lab-step">6 · Inspect filled point</p>'
         '<dl class="ap-lab-dash-stats">'
-        "<dt>L⁻</dt><dd data-d-left>—</dd>"
-        "<dt>L⁺</dt><dd data-d-right>—</dd>"
+        '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
+        '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
         "<dt>Same?</dt><dd data-d-same>—</dd>"
         "<dt>Two-sided</dt><dd data-d-two>—</dd>"
-        "<dt>f(c)</dt><dd data-d-fc>—</dd>"
+        "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
         "</dl></aside></div>"
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'

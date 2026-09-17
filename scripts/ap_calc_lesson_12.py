@@ -14,7 +14,13 @@ from ap_calc_slide_helpers import (
     intro,
     limit_approach_embed,
     key_point,
+    limit_card,
     math_block,
+    NOTICE_LIMIT_EQ_FC,
+    NOTICE_JUMP_DNE,
+    NOTICE_HOLE,
+    NOTICE_INFINITE,
+    visual_limit_vs_value,
     mcq_reveal,
     optional_note,
     phase_divider,
@@ -49,7 +55,7 @@ def build(graphs: dict[str, str]) -> dict:
         + concept_frame(
             "As x approaches c, outputs f(x) approach L.",
             "Limits let us define instantaneous rate and continuity.",
-            "Phrase “as x approaches c” or arrow notation x → c.",
+            "Phrase “as x approaches c” or the notation \\(x \\to c\\).",
             "Assuming f(c) must equal L.",
             "Compare table values near c from both sides.",
         ),
@@ -61,13 +67,14 @@ def build(graphs: dict[str, str]) -> dict:
         phase_divider("Concept & Definition", "Symbol by symbol")
         + definition(
             "Informal limit",
-            math_block("\\[\\lim_{x\\to c} f(x)=L\\]")
+            limit_card("x\\to c", equals="L")
+            + limit_card("x\\to 3", equals="5")
             + data_table(
                 ["Symbol", "Meaning"],
                 [
                     ["x", "input variable"],
                     ["c", "the value x approaches"],
-                    ["x → c", "x gets arbitrarily close to c (not necessarily equal)"],
+                    ["\\(x \\to c\\)", "x gets arbitrarily close to c (not necessarily equal)"],
                     ["f(x)", "output values of the function"],
                     ["L", "the value f(x) approaches"],
                 ],
@@ -85,10 +92,13 @@ def build(graphs: dict[str, str]) -> dict:
         phase_divider("Visual Investigation", "Limit vs function value")
         + role("Visual", "Four possibilities", "Same limit language — different graphs.")
         + '<div class="ap-graph-grid ap-graph-grid--cases">'
-        + fig(g["limit_case_a_thumb"], "A · Continuous", cls="ap-fig--case", notice="Limit = f(c).")
-        + fig(g["limit_case_b_thumb"], "B · Limit ≠ value", cls="ap-fig--case", notice="Limit 5, f(3)=10.")
-        + fig(g["limit_case_c_thumb"], "C · Undefined at c", cls="ap-fig--case", notice="Limit exists; f(c) missing.")
-        + fig(g["limit_case_d_thumb"], "D · Limit DNE", cls="ap-fig--case", notice="Jump; f(c) may still be defined.")
+        + fig(g["limit_case_a_thumb"], "A · Continuous", cls="ap-fig--case", notice=NOTICE_LIMIT_EQ_FC)
+        + fig(
+            g["limit_case_b_thumb"], "B · Limit ≠ value", cls="ap-fig--case",
+            notice="\\(\\displaystyle\\lim_{x\\to 3} f(x)=5\\), \\(f(3)=10\\).",
+        )
+        + fig(g["limit_case_c_thumb"], "C · Undefined at c", cls="ap-fig--case", notice=NOTICE_HOLE)
+        + fig(g["limit_case_d_thumb"], "D · Limit DNE", cls="ap-fig--case", notice=NOTICE_JUMP_DNE)
         + "</div>"
         + limit_approach_embed(),
         path_phase="Visual Investigation",
@@ -103,7 +113,7 @@ def build(graphs: dict[str, str]) -> dict:
             [
                 ["Symbolic", "\\(\\displaystyle\\lim_{x\\to 3} f(x)=5\\)"],
                 ["Verbal", "As x approaches 3, f(x) approaches 5."],
-                ["Table", "x: 2.9, 2.99, 3.01 → f(x) → 5"],
+                ["Table", "\\(x\\): 2.9, 2.99, 3.01 \\(\\Rightarrow f(x)\\to 5\\)"],
                 ["Graph", "Branches near x=3 approach height y=5"],
             ],
         )
@@ -125,7 +135,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(\\displaystyle\\lim_{x\\to 3} f(x)=5\\) while \\(f(3)=10\\).",
             "Graph would show open circle at (3,5) and filled dot at (3,10).",
-        ),
+        )
+        + visual_limit_vs_value("3", "5", fc_val="10"),
         path_phase="Worked Example",
     )
 
@@ -133,7 +144,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Contrast: common mis-readings",
         phase_divider("Contrast / Error Analysis", "What the limit does NOT say")
         + warning(
-            "<p><strong>Wrong:</strong> “f(3) = 5 because the limit is 5.”</p>"
+            "<p><strong>Wrong:</strong> “\\(f(3)=5\\) because the limit is 5.”</p>"
             "<p><strong>Why:</strong> Limits describe approach; \\(f(3)\\) is read from the definition or filled dot.</p>"
         )
         + warning(
@@ -199,7 +210,12 @@ def build(graphs: dict[str, str]) -> dict:
         "Practice: best interpretation",
         mcq_reveal(
             "<p>Best interpretation of \\(\\displaystyle\\lim_{x\\to 4} f(x)=8\\)?</p>",
-            ["f(4)=8", "f(8)=4", "As x→4, f(x)→8", "As x→8, f(x)→4"],
+            [
+                "\\(f(4)=8\\)",
+                "\\(f(8)=4\\)",
+                "As \\(x\\to 4\\), \\(f(x)\\to 8\\)",
+                "As \\(x\\to 8\\), \\(f(x)\\to 4\\)",
+            ],
             "C",
             "Match input approach with output approach.",
             "<p><strong>A</strong> confuses limit with value. <strong>B,D</strong> swap 4 and 8. <strong>C</strong> is correct.</p>",

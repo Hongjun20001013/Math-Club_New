@@ -601,6 +601,71 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin: 0.85rem 0;
 }
 
+/* Display math cards — limit / rate anchors (Fig. 1 style) */
+.np-cm-viewer--ap-calc .ap-math-display {
+  position: relative;
+  padding: 1rem 1.15rem 1.05rem 1.25rem;
+  border-left: 4px solid #6c4eff;
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(135deg, rgba(248, 245, 255, 0.98) 0%, rgba(237, 232, 255, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 10px 28px rgba(79, 47, 216, 0.08);
+  text-align: center;
+}
+
+.np-cm-viewer--ap-calc .ap-math-display mjx-container[jax="CHTML"][display="true"] {
+  margin: 0.15rem 0 !important;
+  color: #2d3a5c;
+}
+
+.ap-visual-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.85rem 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .ap-visual-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-visual-pair__tag {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f658c;
+  text-align: center;
+}
+
+.ap-visual-pair__col .ap-math-display {
+  margin: 0;
+}
+
+.ap-visual-pair__na {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  font-size: 0.84rem;
+  color: #6f658c;
+  text-align: center;
+  border-radius: 0.65rem;
+  background: rgba(108, 78, 255, 0.06);
+}
+
+.ap-fig-notice-math mjx-container {
+  font-size: 0.95em;
+}
+
+.ap-lab-dash-stats dt mjx-container {
+  font-size: 0.92em;
+}
+
 /* Slide viewer chrome */
 .np-cm-viewer--ap-calc .np-cm-hero {
   border-color: rgba(108, 78, 255, 0.18);

@@ -13,7 +13,9 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
+    limit_card,
     math_block,
+    rate_card,
     mcq_reveal,
     phase_divider,
     practice_packet,
@@ -60,7 +62,12 @@ def build(graphs: dict[str, str]) -> dict:
         "Position graph s(t) = t² + 1",
         phase_divider("Visual Investigation", "Position vs time")
         + role("Visual", "Read the curve", "Slope of a secant = average rate on that time interval.")
-        + fig(g["s_parabola_11"], "Position function s(t) = t² + 1 (meters)", cls="ap-fig--teach", notice="The curve rises faster as t increases — slope is not constant."),
+        + fig(
+            g["s_parabola_11"],
+            "Position function \\(s(t) = t^2 + 1\\) (meters)",
+            cls="ap-fig--teach",
+            notice="Slope of the secant \\(=\\dfrac{\\Delta s}{\\Delta t}\\) — steeper as \\(t\\) increases.",
+        ),
         path_phase="Visual Investigation",
     )
 
@@ -96,7 +103,11 @@ def build(graphs: dict[str, str]) -> dict:
                 ["−0.01", "[1.99, 2]", "3.99"],
             ],
         )
-        + checkpoint("From both sides, average rates approach <strong>4</strong>. That limiting value is the instantaneous rate at t = 2."),
+        + limit_card("h\\to 0", expr="\\dfrac{s(2+h)-s(2)}{h}", equals="4")
+        + checkpoint(
+            "From both sides, average rates approach <strong>4</strong>. "
+            "That limiting value is the instantaneous rate at \\(t=2\\)."
+        ),
         path_phase="Visual Investigation",
     )
 
@@ -119,10 +130,16 @@ def build(graphs: dict[str, str]) -> dict:
             "<li><strong>Quotient</strong> — secant slope = rise ÷ run</li>"
             "</ul>",
         )
-        + fig(g["diff_quotient_11"], "Geometric meaning of the difference quotient", cls="ap-fig--teach", notice="Δs is rise; h is run; quotient = secant slope.")
+        + fig(
+            g["diff_quotient_11"],
+            "Geometric meaning of the difference quotient",
+            cls="ap-fig--teach",
+            notice="\\(\\Delta s\\) = rise, \\(h\\) = run, \\(\\dfrac{\\Delta s}{h}\\) = secant slope.",
+        )
         + key_point(
             "Preview only",
-            "We will formalize “approach” in Section 1.2. Here: shorter intervals → secant slope → instantaneous rate.",
+            "We will formalize approach in Section 1.2. Here: shorter intervals "
+            "\\(\\Rightarrow\\) secant slope \\(\\Rightarrow\\) instantaneous rate.",
         ),
         path_phase="Concept & Definition",
     )
