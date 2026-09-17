@@ -21,21 +21,24 @@
       <em>AP Calculus AB / BC</em>
     </nav>
 
-    <header class="np-cmx-hero np-ap-calc-hero np-ap-calc-hero--portal">
-      <div class="np-cmx-hero__copy">
-        <p class="np-cmx-brand">{{ site_brand_name }}</p>
-        <h1 class="np-cmx-display">AP Calculus</h1>
-        <p class="np-cmx-lede">AB · 8 units &nbsp;|&nbsp; BC · +2 units (9–10) &nbsp;|&nbsp; Interactive courseware &amp; practice packets</p>
+    <header class="np-ap-hub-hero">
+      <div class="np-ap-hub-hero__main">
+        <p class="np-ap-hub-hero__brand">{{ site_brand_name }}</p>
+        <h1 class="np-ap-hub-hero__title">AP Calculus</h1>
+        <p class="np-ap-hub-hero__sub">AB · 8 units &nbsp;·&nbsp; BC · +2 units &nbsp;·&nbsp; Interactive slides, graphs &amp; practice packets</p>
       </div>
-      <div class="np-cmx-hero__stat np-cmx-hero__stat--inline" aria-label="Progress stats">
-        <div class="np-cmx-hero__stat-card"><strong>{{ live_chapters }}</strong><span>Live chapters</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>10</strong><span>Units</span></div>
-        <div class="np-cmx-hero__stat-card"><strong>{{ live_packets }}</strong><span>Packets</span></div>
+      <div class="np-ap-hub-stats" aria-label="Course stats">
+        <div class="np-ap-hub-stat"><strong>{{ live_chapters }}</strong><span>Live chapters</span></div>
+        <div class="np-ap-hub-stat"><strong>10</strong><span>Units</span></div>
+        <div class="np-ap-hub-stat"><strong>{{ live_packets }}</strong><span>Packets</span></div>
       </div>
     </header>
 
     <section class="np-ap-portals" aria-labelledby="ap-portals-title">
-      <h2 id="ap-portals-title" class="sr-only">Choose a workspace</h2>
+      <div class="np-ap-section-head">
+        <h2 id="ap-portals-title">Choose your workspace</h2>
+        <p>Courseware, practice, or full curriculum map</p>
+      </div>
       <div class="np-ap-portal-grid" role="list">
         <a href="{{ url_for('ap_calc_course') }}" class="np-ap-portal np-ap-portal--course" role="listitem">
           <span class="np-ap-portal__glyph" aria-hidden="true">§</span>

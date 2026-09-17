@@ -69,7 +69,7 @@ def build(graphs: dict[str, str]) -> dict:
             )
             + "<p>Superscript − means \\(x<c\\); superscript + means \\(x>c\\).</p>",
         )
-        + fig(g["jump_at_3"], "Jump at x = 3", notice="L⁻ = −1, L⁺ = 2 → two-sided limit DNE."),
+        + fig(g["jump_at_3"], "Jump at x = 3", cls="ap-fig--compact", notice="L⁻ = −1, L⁺ = 2 → two-sided limit DNE."),
         path_phase="Concept & Definition",
     )
 
@@ -102,19 +102,18 @@ def build(graphs: dict[str, str]) -> dict:
             "\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\), \\(f(2)=1.5\\), not continuous at 2.",
             "Open circle at height 3; filled dot at 1.5.",
         )
-        + limit_tracer_embed()
-        + fig(g["piecewise_limit_2"], "Reference graph", notice="Both branches approach y=3; f(2)=1.5."),
+        + limit_tracer_embed(),
         path_phase="Worked Example",
     )
 
     s.add(
         "Case gallery: continuity types",
         phase_divider("Visual Investigation", "Compare discontinuity types")
-        + '<div class="ap-graph-grid ap-graph-grid--2x2">'
-        + fig(g["limit_case_a"], "Continuous", notice="Limit = f(c).")
-        + fig(g["removable_hole"], "Removable hole", notice="Limit exists; f(c) may be missing.")
-        + fig(g["jump_at_3"], "Jump", notice="Two-sided limit DNE.")
-        + fig(g["infinite_limit_13"], "Infinite (extension)", notice="|y| → ∞ near c.")
+        + '<div class="ap-graph-grid ap-graph-grid--2x2 ap-graph-grid--thumb">'
+        + fig(g["limit_case_a"], "Continuous", cls="ap-fig--thumb", notice="Limit = f(c).")
+        + fig(g["removable_hole"], "Removable hole", cls="ap-fig--thumb", notice="Limit exists; f(c) may be missing.")
+        + fig(g["jump_at_3"], "Jump", cls="ap-fig--thumb", notice="Two-sided limit DNE.")
+        + fig(g["infinite_limit_13"], "Infinite (extension)", cls="ap-fig--thumb", notice="|y| → ∞ near c.")
         + "</div>",
         path_phase="Visual Investigation",
     )
@@ -123,7 +122,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Endpoint and one-sided domain",
         phase_divider("Representation Transfer", "When only one side exists")
         + role("Transfer", "Domain matters", "At an endpoint, a left-hand limit may be undefined.")
-        + fig(g["endpoint_sqrt_13"], "f(x) = √x on [0, 4]", notice="At x=0 only x→0⁺ is in the domain.")
+        + fig(g["endpoint_sqrt_13"], "f(x) = √x on [0, 4]", cls="ap-fig--compact", notice="At x=0 only x→0⁺ is in the domain.")
         + key_point(
             "At x = 0",
             "<p>\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\). There is <strong>no</strong> left-hand approach on this domain.</p>",
@@ -153,7 +152,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Guided: trace from the left",
         guided_example(
             "<p>Use the piecewise graph at x=2. What is \\(\\displaystyle\\lim_{x\\to 2^-} f(x)\\)?</p>"
-            + fig(g["piecewise_limit_2"], "Reference graph", notice="Follow left branch only."),
+            + fig(g["piecewise_limit_2"], "Reference graph", cls="ap-fig--thumb", notice="Follow left branch only."),
             ["Start at x < 2 on the left branch.", "Move toward x = 2 along that branch.", "Record the y-value approached."],
             "<p><strong>Solution:</strong> Left branch y = x+1 approaches <strong>3</strong>.</p>",
         ),
@@ -164,7 +163,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Guided: compare sides",
         guided_example(
             "<p>For the jump graph at x=3, find \\(\\lim_{x\\to 3^-} f(x)\\), \\(\\lim_{x\\to 3^+} f(x)\\), and \\(\\lim_{x\\to 3} f(x)\\).</p>"
-            + fig(g["jump_at_3"], "Jump graph"),
+            + fig(g["jump_at_3"], "Jump graph", cls="ap-fig--thumb"),
             ["Trace left branch to x=3.", "Trace right branch to x=3.", "Are the heights equal?"],
             "<p>L⁻ = −1, L⁺ = 2, two-sided limit <strong>DNE</strong>.</p>",
         ),
@@ -176,7 +175,7 @@ def build(graphs: dict[str, str]) -> dict:
         guided_example(
             "<p>Sketch a graph such that \\(\\lim_{x\\to 2^-} f(x)=3\\), \\(\\lim_{x\\to 2^+} f(x)=3\\), but \\(f(2)=-1\\).</p>",
             ["Draw open circle at (2, 3).", "Draw branches approaching that open circle.", "Place filled dot at (2, −1)."],
-            fig(g["sketch_task_13"], "One valid sketch", notice="Limit 3; value −1.")
+            fig(g["sketch_task_13"], "One valid sketch", cls="ap-fig--thumb", notice="Limit 3; value −1.")
             + "<p>Your sketch may differ in shape — check open vs filled points and branch heights.</p>",
         ),
         group="practice", path_phase="Guided Example",
@@ -234,7 +233,7 @@ def build(graphs: dict[str, str]) -> dict:
             "<p><strong>C</strong> — AP treats unbounded behavior as “limit DNE.” "
             "<strong>D</strong> describes one side only; the question asks about the two-sided limit.</p>",
         )
-        + fig(g["infinite_limit_13"], "Reference: 1/x near 0", notice="Left and right diverge to −∞ and +∞."),
+        + fig(g["infinite_limit_13"], "Reference: 1/x near 0", cls="ap-fig--thumb", notice="Left and right diverge to −∞ and +∞."),
         kind="question", group="practice", path_phase="AP Practice",
     )
 

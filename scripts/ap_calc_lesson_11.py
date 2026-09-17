@@ -103,8 +103,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Secant → tangent",
         phase_divider("Visual Investigation", "Secant lines approach a tangent")
-        + secant_interactive_embed()
-        + fig(g["secants_t2_11"], "Static view: secants for h = 1, 0.5, 0.1 and tangent slope 4", notice="Secant slopes 5, 4.5, 4.1 → 4."),
+        + secant_interactive_embed(),
         path_phase="Visual Investigation",
     )
 

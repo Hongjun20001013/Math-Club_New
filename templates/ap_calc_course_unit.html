@@ -17,15 +17,17 @@
       <em>Unit {{ unit.unit }}</em>
     </nav>
 
-    <header class="np-cmx-phase">
-      <div class="np-cmx-phase__mark" aria-hidden="true">{{ unit.unit }}</div>
-      <div class="np-cmx-phase__copy">
-        <a href="{{ url_for('ap_calc_course') }}" class="np-cmx-back">← All units</a>
-        <p class="np-cmx-eyebrow">{{ unit.track_label }}</p>
-        <h1 class="np-cmx-phase__title">{{ unit.title }}</h1>
-        <div class="np-cmx-stats">
-          <div><strong>{{ unit.chapters|selectattr('live')|list|length }}</strong><span>live</span></div>
-          <div><strong>{{ unit.chapters|length }}</strong><span>chapters</span></div>
+    <header class="np-ap-unit-hero">
+      <a href="{{ url_for('ap_calc_course') }}" class="np-ap-unit-hero__back">← All units</a>
+      <div class="np-ap-unit-hero__row">
+        <span class="np-ap-unit-hero__num" aria-hidden="true">{{ unit.unit }}</span>
+        <div>
+          <p class="np-ap-unit-hero__track">{{ unit.track_label }}</p>
+          <h1 class="np-ap-unit-hero__title">{{ unit.title }}</h1>
+          <p class="np-ap-unit-hero__meta">
+            <strong>{{ unit.chapters|selectattr('live')|list|length }}</strong> live ·
+            <strong>{{ unit.chapters|length }}</strong> chapters
+          </p>
         </div>
       </div>
     </header>

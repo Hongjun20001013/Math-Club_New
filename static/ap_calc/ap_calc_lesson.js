@@ -105,7 +105,9 @@
     }
 
     var curve = svg.querySelector("[data-ap-curve]");
+    var secantHalo = svg.querySelector("[data-ap-secant-halo]");
     var secant = svg.querySelector("[data-ap-secant]");
+    var secantLabel = svg.querySelector("[data-ap-secant-label]");
     var tangent = svg.querySelector("[data-ap-tangent]");
     var rise = svg.querySelector("[data-ap-rise]");
     var run = svg.querySelector("[data-ap-run]");
@@ -125,7 +127,7 @@
       if (runVal) runVal.textContent = h.toFixed(2);
       if (formulaVal) {
         formulaVal.textContent =
-          "[" + deltaS.toFixed(2) + " m] ÷ [" + h.toFixed(2) + " s] = " + rate.toFixed(2) + " m/s";
+          "Δs ÷ h = " + deltaS.toFixed(2) + " ÷ " + h.toFixed(2) + " = " + rate.toFixed(2) + " m/s";
       }
 
       var pts = [];
@@ -138,23 +140,34 @@
       var y0 = s(a);
       var x1 = a + h;
       var y1 = s(x1);
-      var m = (y1 - y0) / (x1 - x0);
-      var sx0 = 0.4;
-      var sx1 = 4.0;
-      if (secant) {
-        secant.setAttribute("x1", mapX(sx0));
-        secant.setAttribute("y1", mapY(y0 + m * (sx0 - x0)));
-        secant.setAttribute("x2", mapX(sx1));
-        secant.setAttribute("y2", mapY(y0 + m * (sx1 - x0)));
-      }
-      if (tangent) {
-        tangent.setAttribute("x1", mapX(sx0));
-        tangent.setAttribute("y1", mapY(y0 + slopeLimit * (sx0 - a)));
-        tangent.setAttribute("x2", mapX(sx1));
-        tangent.setAttribute("y2", mapY(y0 + slopeLimit * (sx1 - a)));
-      }
       var cx0 = mapX(x0), cy0 = mapY(y0);
       var cx1 = mapX(x1), cy1 = mapY(y1);
+      var midX = (cx0 + cx1) / 2;
+      var midY = (cy0 + cy1) / 2;
+      if (secantHalo) {
+        secantHalo.setAttribute("x1", cx0);
+        secantHalo.setAttribute("y1", cy0);
+        secantHalo.setAttribute("x2", cx1);
+        secantHalo.setAttribute("y2", cy1);
+      }
+      if (secant) {
+        secant.setAttribute("x1", cx0);
+        secant.setAttribute("y1", cy0);
+        secant.setAttribute("x2", cx1);
+        secant.setAttribute("y2", cy1);
+      }
+      if (secantLabel) {
+        secantLabel.setAttribute("x", midX + 6);
+        secantLabel.setAttribute("y", midY - 8);
+      }
+      if (tangent) {
+        var tx0 = 0.4;
+        var tx1 = 4.0;
+        tangent.setAttribute("x1", mapX(tx0));
+        tangent.setAttribute("y1", mapY(y0 + slopeLimit * (tx0 - a)));
+        tangent.setAttribute("x2", mapX(tx1));
+        tangent.setAttribute("y2", mapY(y0 + slopeLimit * (tx1 - a)));
+      }
       if (rise) {
         rise.setAttribute("x1", cx1);
         rise.setAttribute("y1", cy0);

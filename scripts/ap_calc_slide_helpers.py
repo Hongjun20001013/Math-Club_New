@@ -4,7 +4,7 @@ from __future__ import annotations
 FIG = "/static/ap_calc/figures"
 
 
-def fig(path: str, caption: str = "", cls: str = "", notice: str = "") -> str:
+def fig(path: str, caption: str = "", cls: str = "ap-fig--compact", notice: str = "") -> str:
     cap = f'<figcaption class="ap-fig-cap">{caption}</figcaption>' if caption else ""
     notice_html = f'<p class="ap-fig-notice"><strong>What to notice:</strong> {notice}</p>' if notice else ""
     return (
@@ -243,7 +243,7 @@ def exit_ticket(items: list[tuple[str, str]]) -> str:
 
 def secant_interactive_embed() -> str:
     return (
-        '<div class="ap-interactive ap-secant-demo" data-ap-secant-demo '
+        '<div class="ap-interactive ap-secant-demo tex2jax_ignore" data-ap-secant-demo '
         'data-a="2" data-base-y="5" data-slope-limit="4">'
         '<div class="ap-interactive__header">'
         '<span class="ap-interactive__badge">Interactive</span>'
@@ -255,22 +255,24 @@ def secant_interactive_embed() -> str:
         '<input type="range" id="ap-secant-h" class="ap-range" min="0.05" max="1" step="0.05" '
         'value="1" data-ap-secant-slider/>'
         "</div>"
-        '<div class="ap-secant-metrics">'
+        '<div class="ap-secant-metrics tex2jax_ignore">'
         '<div class="ap-metric"><span>Rise Δs</span><strong data-ap-rise-val>5.00</strong> m</div>'
         '<div class="ap-metric"><span>Run h</span><strong data-ap-run-val>1.00</strong> s</div>'
         '<div class="ap-metric ap-metric--accent"><span>Avg rate</span>'
         '<strong data-ap-rate-val>5.00</strong> m/s</div>'
         "</div>"
-        '<p class="ap-formula-readout" data-ap-formula-val>'
-        "[5.00 m] ÷ [1.00 s] = 5.00 m/s</p>"
-        '<svg class="ap-secant-svg" viewBox="0 0 520 320" aria-label="Difference quotient visualization">'
-        '<rect width="520" height="320" fill="#faf8ff" rx="12"/>'
-        '<polygon data-ap-rise-poly fill="rgba(37,99,235,0.08)" stroke="none"/>'
-        '<line data-ap-run stroke="#ea580c" stroke-width="2.5" stroke-dasharray="6 4"/>'
-        '<line data-ap-rise stroke="#2563eb" stroke-width="2.5" stroke-dasharray="6 4"/>'
-        '<path data-ap-curve fill="none" stroke="#6a4ce6" stroke-width="3"/>'
-        '<line data-ap-secant stroke="#2563eb" stroke-width="2.5"/>'
+        '<p class="ap-formula-readout tex2jax_ignore" data-ap-formula-val>'
+        "Δs ÷ h = 5.00 m/s</p>"
+        '<svg class="ap-secant-svg" viewBox="0 0 520 300" aria-label="Difference quotient visualization">'
+        '<rect width="520" height="300" fill="#faf8ff" rx="12"/>'
+        '<polygon data-ap-rise-poly fill="rgba(37,99,235,0.1)" stroke="none"/>'
+        '<line data-ap-run stroke="#ea580c" stroke-width="2" stroke-dasharray="5 3"/>'
+        '<line data-ap-rise stroke="#2563eb" stroke-width="2" stroke-dasharray="5 3"/>'
+        '<path data-ap-curve fill="none" stroke="#6a4ce6" stroke-width="2.5"/>'
+        '<line data-ap-secant-halo stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>'
+        '<line data-ap-secant stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"/>'
         '<line data-ap-tangent stroke="#059669" stroke-width="2" stroke-dasharray="6 4"/>'
+        '<text data-ap-secant-label font-size="11" font-weight="700" fill="#1d4ed8">secant</text>'
         '<circle data-ap-fixed cx="0" cy="0" r="7" fill="#6a4ce6"/>'
         '<circle data-ap-moving cx="0" cy="0" r="6" fill="#fff" stroke="#2563eb" stroke-width="2.5"/>'
         '<text data-ap-lbl-rise font-size="12" fill="#2563eb" font-weight="600"></text>'
@@ -284,7 +286,7 @@ def secant_interactive_embed() -> str:
 
 def limit_approach_embed() -> str:
     return (
-        '<div class="ap-interactive ap-limit-demo" data-ap-limit-demo data-c="3">'
+        '<div class="ap-interactive ap-limit-demo tex2jax_ignore" data-ap-limit-demo data-c="3">'
         '<div class="ap-interactive__header">'
         '<span class="ap-interactive__badge">Interactive</span>'
         '<p class="ap-interactive__lead">Slide <strong>x</strong> toward 3. Watch outputs approach '
@@ -317,7 +319,7 @@ def limit_approach_embed() -> str:
 
 def limit_tracer_embed() -> str:
     return (
-        '<div class="ap-interactive ap-trace-demo" data-ap-trace-demo data-c="2">'
+        '<div class="ap-interactive ap-trace-demo tex2jax_ignore" data-ap-trace-demo data-c="2">'
         '<div class="ap-interactive__header">'
         '<span class="ap-interactive__badge">Interactive</span>'
         '<p class="ap-interactive__lead">Drag along the graph: <strong>Left → Right → Compare → Value</strong>.</p>'
