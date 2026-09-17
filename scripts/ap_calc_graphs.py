@@ -74,13 +74,18 @@ def _y_map(y: float, spec: GraphSpec, h: int, pad_t: int, pad_b: int) -> float:
     return h - pad_b - (y - spec.y_min) / (spec.y_max - spec.y_min) * (h - pad_t - pad_b)
 
 
-def render_graph(spec: GraphSpec, width: int = 520, height: int = 320) -> str:
-    pad_l, pad_r, pad_t, pad_b = 52, 24, 36, 44
+def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
+    pad_l, pad_r, pad_t, pad_b = 58, 28, 52, 48
     parts: list[str] = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
         f'role="img" aria-label="{spec.title}" class="ap-graph-svg">',
         f'<rect width="{width}" height="{height}" fill="{BG}" rx="12"/>',
     ]
+    if spec.title:
+        parts.append(
+            f'<text x="{width / 2:.1f}" y="24" text-anchor="middle" font-size="14" '
+            f'font-weight="700" fill="{PURPLE_DARK}">{spec.title}</text>'
+        )
     # grid
     for i in range(6):
         gx = pad_l + i * (width - pad_l - pad_r) / 5
@@ -91,10 +96,15 @@ def render_graph(spec: GraphSpec, width: int = 520, height: int = 320) -> str:
     # axes
     parts.append(f'<line x1="{pad_l}" y1="{height-pad_b}" x2="{width-pad_r}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
     parts.append(f'<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
-    parts.append(f'<text x="{width-pad_r+4}" y="{height-pad_b+4}" font-size="13" fill="{PURPLE_DARK}">{spec.x_label}</text>')
-    parts.append(f'<text x="{pad_l-8}" y="{pad_t-8}" font-size="13" fill="{PURPLE_DARK}">{spec.y_label}</text>')
-    if spec.title:
-        parts.append(f'<text x="{pad_l}" y="22" font-size="14" font-weight="700" fill="{PURPLE_DARK}">{spec.title}</text>')
+    parts.append(
+        f'<text x="{width - pad_r + 2:.1f}" y="{height - pad_b + 18:.1f}" text-anchor="end" '
+        f'font-size="12" fill="{PURPLE_DARK}">{spec.x_label}</text>'
+    )
+    parts.append(
+        f'<text x="16" y="{(pad_t + height - pad_b) / 2:.1f}" text-anchor="middle" '
+        f'font-size="12" fill="{PURPLE_DARK}" transform="rotate(-90 16 {(pad_t + height - pad_b) / 2:.1f})">'
+        f'{spec.y_label}</text>'
+    )
 
     for va in spec.v_asymptotes:
         vx = _x_map(va, spec, width, pad_l, pad_r)
@@ -184,6 +194,25 @@ def build_all_graphs() -> dict[str, str]:
         slope = (s(2 + h) - s(2)) / h
         y0 = s(2) - slope * 2
         lines_11.append(PlotLine(0.5, y0 + slope * 0.5, 4, y0 + slope * 4, color=col, dashed=True))
+    # Difference quotient rise/run at t=2, h=1
+    paths["diff_quotient_11"] = write_graph(GraphSpec(
+        graph_id="diff_quotient_11",
+        title="Rise Δs and run h at t = 2",
+        x_min=0, x_max=4.2, y_min=0, y_max=18,
+        x_label="t (s)", y_label="s (m)",
+        segments=[PlotSegment(s, 0, 4)],
+        lines=[
+            PlotLine(2, s(2), 3, s(2), color=RIGHT_COLOR, width=2.5, dashed=True),
+            PlotLine(3, s(2), 3, s(3), color=LEFT_COLOR, width=2.5, dashed=True),
+            PlotLine(2, s(2), 3, s(3), color="#94a3b8", width=2, dashed=True),
+        ],
+        points=[
+            PlotPoint(2, s(2), "filled", "a"),
+            PlotPoint(3, s(3), "open", "a+h"),
+        ],
+        notice="Blue vertical = Δs; orange horizontal = h; gray = secant slope.",
+    ))
+
     paths["secants_t2_11"] = write_graph(GraphSpec(
         graph_id="secants_t2_11",
         title="Secants approaching tangent at t = 2",

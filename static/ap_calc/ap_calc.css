@@ -98,10 +98,22 @@ html[data-exam-theme="dark"] .np-ap-calc .np-cmx-stage__wash {
   text-decoration: none;
   color: var(--ap-ink);
   border: 1px solid var(--ap-line);
-  background: var(--ap-card);
-  box-shadow: var(--ap-shadow);
+  background: linear-gradient(160deg, #ffffff 0%, #faf7ff 100%);
+  box-shadow:
+    0 1px 2px rgba(79, 50, 240, 0.04),
+    0 14px 40px rgba(79, 50, 240, 0.08);
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s, border-color 0.22s;
   min-height: 11.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.np-ap-portal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(155, 140, 255, 0.12), transparent 55%);
+  pointer-events: none;
 }
 
 .np-ap-portal:hover {
@@ -279,8 +291,9 @@ html[data-exam-theme="dark"] .np-ap-unit-card__track {
 
 a.np-ap-chapter__link:hover {
   border-color: rgba(108, 78, 255, 0.35);
-  background: var(--ap-lavender-soft);
+  background: linear-gradient(90deg, #faf7ff, #fff);
   box-shadow: 0 10px 28px rgba(79, 50, 240, 0.1);
+  transform: translateX(2px);
 }
 
 .np-ap-chapter__link--disabled {
@@ -713,6 +726,42 @@ html[data-exam-theme="dark"] .ap-data-table td {
   line-height: 1.6;
 }
 
+/* ── Premium interactive panels ── */
+.ap-interactive {
+  margin: 1.25rem 0;
+  padding: 1.25rem 1.35rem 1.35rem;
+  border-radius: 1rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f8f5ff 100%);
+  border: 1px solid rgba(108, 78, 255, 0.2);
+  box-shadow:
+    0 4px 6px rgba(79, 50, 240, 0.04),
+    0 18px 40px rgba(79, 50, 240, 0.1);
+}
+
+.ap-interactive__header {
+  margin-bottom: 1rem;
+}
+
+.ap-interactive__badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ap-violet), var(--ap-violet-deep));
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
+}
+
+.ap-interactive__lead {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ap-soft);
+}
+
 .ap-secant-demo {
   margin: 1rem 0;
   padding: 1rem;
@@ -722,8 +771,99 @@ html[data-exam-theme="dark"] .ap-data-table td {
 }
 
 .ap-secant-controls label {
+  display: block;
   font-size: 0.95rem;
   color: var(--ap-ink, #161022);
+  margin-bottom: 0.45rem;
+  font-weight: 600;
+}
+
+.ap-range {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e0d4ff, #c4b5fd);
+  outline: none;
+  cursor: pointer;
+}
+
+.ap-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #7c5cff, #5b3fd4);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(79, 50, 240, 0.35);
+  cursor: grab;
+}
+
+.ap-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #7c5cff, #5b3fd4);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(79, 50, 240, 0.35);
+  cursor: grab;
+}
+
+.ap-secant-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+  margin: 0.85rem 0;
+}
+
+.ap-metric {
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.ap-metric span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ap-muted);
+  margin-bottom: 0.15rem;
+}
+
+.ap-metric strong {
+  font-size: 1.05rem;
+  color: var(--ap-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-metric--accent strong {
+  color: var(--ap-violet-deep);
+}
+
+.ap-metric--wide {
+  grid-column: span 2;
+}
+
+.ap-metric-msg {
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35;
+}
+
+.ap-formula-readout {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.55rem;
+  background: #ede8ff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ap-violet-deep);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .ap-secant-readout {
@@ -731,11 +871,15 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin: 0.5rem 0;
 }
 
-.ap-secant-svg {
+.ap-secant-svg,
+.ap-limit-svg,
+.ap-trace-svg {
   width: 100%;
-  max-width: 480px;
+  max-width: 520px;
   display: block;
   margin: 0 auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(79, 50, 240, 0.08);
 }
 
 .ap-exit-list {

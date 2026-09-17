@@ -12,6 +12,7 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
+    limit_tracer_embed,
     math_block,
     mcq_reveal,
     phase_divider,
@@ -101,7 +102,8 @@ def build(graphs: dict[str, str]) -> dict:
             "\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\), \\(f(2)=1.5\\), not continuous at 2.",
             "Open circle at height 3; filled dot at 1.5.",
         )
-        + fig(g["piecewise_limit_2"], "f(x) piecewise at x = 2", notice="Both branches approach y=3; f(2)=1.5."),
+        + limit_tracer_embed()
+        + fig(g["piecewise_limit_2"], "Reference graph", notice="Both branches approach y=3; f(2)=1.5."),
         path_phase="Worked Example",
     )
 

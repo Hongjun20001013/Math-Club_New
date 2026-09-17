@@ -18,6 +18,39 @@ from ap_calc_lesson_13 import build as build_lesson_13  # noqa: E402
 OUTPUT = os.path.join(APP_DIR, "data", "ap_calc_materials.json")
 
 
+def _build_knowledge_map(slides: list[dict]) -> list[dict]:
+    """Build knowledge-map sections compatible with course_materials.js."""
+    sections: list[dict] = []
+    current: dict | None = None
+    skip_kinds = {"intro"}
+
+    for slide in slides:
+        kind = slide.get("kind", "lesson")
+        if kind in skip_kinds:
+            continue
+        phase = (slide.get("path_phase") or "").strip() or "Lesson flow"
+        if current is None or current["title"] != phase:
+            if current:
+                sections.append(current)
+            current = {
+                "title": phase,
+                "start_index": slide["index"],
+                "items": [],
+            }
+        current["items"].append(
+            {
+                "index": slide["index"],
+                "kind": kind,
+                "title": (slide.get("title") or "")[:96],
+                "interactive": kind == "question",
+                "has_mcq": "data-cm-mcq" in (slide.get("html") or ""),
+            }
+        )
+    if current:
+        sections.append(current)
+    return sections
+
+
 def _finalize_materials(materials: list[dict]) -> list[dict]:
     for i, material in enumerate(materials):
         slides = material.get("slides") or []
@@ -30,13 +63,7 @@ def _finalize_materials(materials: list[dict]) -> list[dict]:
         material["phase"] = 1
         material["prev_lesson_slug"] = materials[i - 1]["slug"] if i > 0 else None
         material["next_lesson_slug"] = materials[i + 1]["slug"] if i + 1 < len(materials) else None
-        phases = []
-        for s in slides:
-            ph = s.get("path_phase")
-            if ph and (not phases or phases[-1]["label"] != ph):
-                phases.append({"label": ph, "slide_index": s["index"]})
-        if phases:
-            material["knowledge_map"] = phases
+        material["knowledge_map"] = _build_knowledge_map(slides)
     return materials
 
 

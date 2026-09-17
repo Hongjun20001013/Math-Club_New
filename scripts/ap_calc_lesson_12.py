@@ -12,6 +12,7 @@ from ap_calc_slide_helpers import (
     fig,
     guided_example,
     intro,
+    limit_approach_embed,
     key_point,
     math_block,
     mcq_reveal,
@@ -88,7 +89,8 @@ def build(graphs: dict[str, str]) -> dict:
         + fig(g["limit_case_b"], "B · Limit ≠ value", notice="Limit 5, f(3)=10.")
         + fig(g["limit_case_c"], "C · Undefined at c", notice="Limit exists; f(c) missing.")
         + fig(g["limit_case_d"], "D · Limit DNE", notice="Jump; f(c) may still be defined.")
-        + "</div>",
+        + "</div>"
+        + limit_approach_embed(),
         path_phase="Visual Investigation",
     )
 

@@ -243,23 +243,109 @@ def exit_ticket(items: list[tuple[str, str]]) -> str:
 
 def secant_interactive_embed() -> str:
     return (
-        '<div class="ap-secant-demo" data-ap-secant-demo '
+        '<div class="ap-interactive ap-secant-demo" data-ap-secant-demo '
         'data-a="2" data-base-y="5" data-slope-limit="4">'
-        '<div class="ap-secant-controls">'
-        '<label for="ap-secant-h">Interval length h = <strong data-ap-h-val>1.00</strong></label>'
-        '<input type="range" id="ap-secant-h" min="0.05" max="1" step="0.05" value="1" data-ap-secant-slider/>'
+        '<div class="ap-interactive__header">'
+        '<span class="ap-interactive__badge">Interactive</span>'
+        '<p class="ap-interactive__lead">Drag <strong>h</strong> to see how '
+        '\\(\\dfrac{s(a+h)-s(a)}{h}\\) is <em>rise over run</em> on the graph.</p>'
         "</div>"
-        '<p class="ap-secant-readout">Average rate = <strong data-ap-rate-val>5.00</strong> '
-        "(secant slope)</p>"
-        '<svg class="ap-secant-svg" viewBox="0 0 480 300" aria-label="Secant approaching tangent">'
-        '<rect width="480" height="300" fill="#faf8ff" rx="10"/>'
-        '<path data-ap-curve fill="none" stroke="#6a4ce6" stroke-width="2.5"/>'
+        '<div class="ap-secant-controls">'
+        '<label for="ap-secant-h">Interval h = <strong data-ap-h-val>1.00</strong> s</label>'
+        '<input type="range" id="ap-secant-h" class="ap-range" min="0.05" max="1" step="0.05" '
+        'value="1" data-ap-secant-slider/>'
+        "</div>"
+        '<div class="ap-secant-metrics">'
+        '<div class="ap-metric"><span>Rise Δs</span><strong data-ap-rise-val>5.00</strong> m</div>'
+        '<div class="ap-metric"><span>Run h</span><strong data-ap-run-val>1.00</strong> s</div>'
+        '<div class="ap-metric ap-metric--accent"><span>Avg rate</span>'
+        '<strong data-ap-rate-val>5.00</strong> m/s</div>'
+        "</div>"
+        '<p class="ap-formula-readout" data-ap-formula-val>'
+        "[5.00 m] ÷ [1.00 s] = 5.00 m/s</p>"
+        '<svg class="ap-secant-svg" viewBox="0 0 520 320" aria-label="Difference quotient visualization">'
+        '<rect width="520" height="320" fill="#faf8ff" rx="12"/>'
+        '<polygon data-ap-rise-poly fill="rgba(37,99,235,0.08)" stroke="none"/>'
+        '<line data-ap-run stroke="#ea580c" stroke-width="2.5" stroke-dasharray="6 4"/>'
+        '<line data-ap-rise stroke="#2563eb" stroke-width="2.5" stroke-dasharray="6 4"/>'
+        '<path data-ap-curve fill="none" stroke="#6a4ce6" stroke-width="3"/>'
         '<line data-ap-secant stroke="#2563eb" stroke-width="2.5"/>'
         '<line data-ap-tangent stroke="#059669" stroke-width="2" stroke-dasharray="6 4"/>'
         '<circle data-ap-fixed cx="0" cy="0" r="7" fill="#6a4ce6"/>'
         '<circle data-ap-moving cx="0" cy="0" r="6" fill="#fff" stroke="#2563eb" stroke-width="2.5"/>'
+        '<text data-ap-lbl-rise font-size="12" fill="#2563eb" font-weight="600"></text>'
+        '<text data-ap-lbl-run font-size="12" fill="#ea580c" font-weight="600" text-anchor="middle"></text>'
         "</svg>"
-        '<p class="ap-fig-notice"><strong>What to notice:</strong> As h → 0, the secant slope approaches <strong>4</strong>.</p>'
+        '<p class="ap-fig-notice"><strong>What to notice:</strong> Orange <strong>h</strong> (run) and blue '
+        '<strong>Δs</strong> (rise) form a slope triangle. As h → 0, secant → tangent (green), rate → <strong>4</strong>.</p>'
+        "</div>"
+    )
+
+
+def limit_approach_embed() -> str:
+    return (
+        '<div class="ap-interactive ap-limit-demo" data-ap-limit-demo data-c="3">'
+        '<div class="ap-interactive__header">'
+        '<span class="ap-interactive__badge">Interactive</span>'
+        '<p class="ap-interactive__lead">Slide <strong>x</strong> toward 3. Watch outputs approach '
+        '<strong>L = 5</strong> — even when \\(f(3)\\neq 5\\).</p>'
+        "</div>"
+        '<div class="ap-secant-controls">'
+        '<label for="ap-limit-x">Position x = <strong data-ap-x-read>2.50</strong></label>'
+        '<input type="range" id="ap-limit-x" class="ap-range" min="2.5" max="3.5" step="0.05" '
+        'value="2.5" data-ap-limit-slider/>'
+        "</div>"
+        '<div class="ap-secant-metrics">'
+        '<div class="ap-metric"><span>f(x)</span><strong data-ap-y-read>4.50</strong></div>'
+        '<div class="ap-metric ap-metric--wide"><span>Interpretation</span>'
+        '<strong data-ap-limit-msg class="ap-metric-msg">From the left…</strong></div>'
+        "</div>"
+        '<svg class="ap-limit-svg" viewBox="0 0 520 300" aria-label="Limit approach visualization">'
+        '<rect width="520" height="300" fill="#faf8ff" rx="12"/>'
+        '<path data-ap-curve fill="none" stroke="#6a4ce6" stroke-width="3"/>'
+        '<line x1="0" y1="0" x2="0" y2="0" stroke="rgba(108,78,230,0.2)" stroke-width="1.5" '
+        'stroke-dasharray="4 4" data-ap-vline style="display:none"/>'
+        '<circle data-ap-open cx="0" cy="0" r="6" fill="#fff" stroke="#6a4ce6" stroke-width="2.5"/>'
+        '<circle data-ap-filled cx="0" cy="0" r="6" fill="#6a4ce6"/>'
+        '<circle data-ap-tracer cx="0" cy="0" r="8" fill="#ea580c" stroke="#fff" stroke-width="2"/>'
+        "</svg>"
+        '<p class="ap-fig-notice"><strong>What to notice:</strong> Open circle at (3, 5) shows the limit. '
+        "Filled dot at (3, 10) is \\(f(3)\\) — approach and value can differ.</p>"
+        "</div>"
+    )
+
+
+def limit_tracer_embed() -> str:
+    return (
+        '<div class="ap-interactive ap-trace-demo" data-ap-trace-demo data-c="2">'
+        '<div class="ap-interactive__header">'
+        '<span class="ap-interactive__badge">Interactive</span>'
+        '<p class="ap-interactive__lead">Drag along the graph: <strong>Left → Right → Compare → Value</strong>.</p>'
+        "</div>"
+        '<div class="ap-secant-controls">'
+        '<label for="ap-trace-x">Trace at x = <strong data-ap-trace-x>0.50</strong></label>'
+        '<input type="range" id="ap-trace-x" class="ap-range" min="0.5" max="3.8" step="0.05" '
+        'value="0.5" data-ap-trace-slider/>'
+        "</div>"
+        '<div class="ap-secant-metrics">'
+        '<div class="ap-metric"><span>y on graph</span><strong data-ap-trace-y>1.50</strong></div>'
+        '<div class="ap-metric ap-metric--wide"><span>Branch</span>'
+        '<strong data-ap-trace-side class="ap-metric-msg">Left branch</strong></div>'
+        '<div class="ap-metric ap-metric--wide"><span>Limit read</span>'
+        '<strong data-ap-trace-limit class="ap-metric-msg">L⁻ = 3</strong></div>'
+        "</div>"
+        '<svg class="ap-trace-svg" viewBox="0 0 520 300" aria-label="Graph limit tracer">'
+        '<rect width="520" height="300" fill="#faf8ff" rx="12"/>'
+        '<line data-ap-vline stroke="rgba(108,78,230,0.35)" stroke-width="1.5" stroke-dasharray="4 4"/>'
+        '<path data-ap-left fill="none" stroke="#2563eb" stroke-width="3"/>'
+        '<path data-ap-right fill="none" stroke="#ea580c" stroke-width="3"/>'
+        '<circle data-ap-open cx="0" cy="0" r="6" fill="#fff" stroke="#6a4ce6" stroke-width="2.5"/>'
+        '<text x="0" y="0" font-size="11" fill="#6a4ce6" data-ap-open-lbl>limit 3</text>'
+        '<circle data-ap-filled cx="0" cy="0" r="6" fill="#6a4ce6"/>'
+        '<circle data-ap-tracer cx="0" cy="0" r="8" fill="#059669" stroke="#fff" stroke-width="2"/>'
+        "</svg>"
+        '<p class="ap-fig-notice"><strong>What to notice:</strong> Both branches approach y = 3. '
+        "The filled point at y = 1.5 is \\(f(2)\\), not the limit.</p>"
         "</div>"
     )
 

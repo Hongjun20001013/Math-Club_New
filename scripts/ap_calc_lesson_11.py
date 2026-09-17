@@ -115,11 +115,12 @@ def build(graphs: dict[str, str]) -> dict:
             "Difference quotient at t = a",
             math_block("\\[\\frac{s(a+h)-s(a)}{h}\\]")
             + "<ul class='stem-itemize'>"
-            "<li><strong>s(a+h) − s(a)</strong> — change in position</li>"
-            "<li><strong>h</strong> — change in time (length of interval)</li>"
-            "<li><strong>Quotient</strong> — slope of secant from a to a+h</li>"
+            "<li><strong>s(a+h) − s(a)</strong> — vertical rise Δs on the graph</li>"
+            "<li><strong>h</strong> — horizontal run (time interval)</li>"
+            "<li><strong>Quotient</strong> — secant slope = rise ÷ run</li>"
             "</ul>",
         )
+        + fig(g["diff_quotient_11"], "Geometric meaning of the difference quotient", notice="Δs is rise; h is run; quotient = secant slope.")
         + key_point(
             "Preview only",
             "We will formalize “approach” in Section 1.2. Here: shorter intervals → secant slope → instantaneous rate.",

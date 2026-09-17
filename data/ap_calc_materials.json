@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T02:03:31.612592Z",
+  "generated_at": "2026-09-17T18:15:41.881946Z",
   "track": "ap_calc",
   "total": 3,
   "available": 3,
@@ -66,7 +66,7 @@
         {
           "index": 6,
           "title": "Secant → tangent",
-          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Visual Investigation\"><span class=\"ap-phase-label\">Visual Investigation</span><h3 class=\"ap-phase-title\">Secant lines approach a tangent</h3><p class=\"ap-phase-sub\">Secant lines approach a tangent</p></div><div class=\"ap-secant-demo\" data-ap-secant-demo data-a=\"2\" data-base-y=\"5\" data-slope-limit=\"4\"><div class=\"ap-secant-controls\"><label for=\"ap-secant-h\">Interval length h = <strong data-ap-h-val>1.00</strong></label><input type=\"range\" id=\"ap-secant-h\" min=\"0.05\" max=\"1\" step=\"0.05\" value=\"1\" data-ap-secant-slider/></div><p class=\"ap-secant-readout\">Average rate = <strong data-ap-rate-val>5.00</strong> (secant slope)</p><svg class=\"ap-secant-svg\" viewBox=\"0 0 480 300\" aria-label=\"Secant approaching tangent\"><rect width=\"480\" height=\"300\" fill=\"#faf8ff\" rx=\"10\"/><path data-ap-curve fill=\"none\" stroke=\"#6a4ce6\" stroke-width=\"2.5\"/><line data-ap-secant stroke=\"#2563eb\" stroke-width=\"2.5\"/><line data-ap-tangent stroke=\"#059669\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><circle data-ap-fixed cx=\"0\" cy=\"0\" r=\"7\" fill=\"#6a4ce6\"/><circle data-ap-moving cx=\"0\" cy=\"0\" r=\"6\" fill=\"#fff\" stroke=\"#2563eb\" stroke-width=\"2.5\"/></svg><p class=\"ap-fig-notice\"><strong>What to notice:</strong> As h → 0, the secant slope approaches <strong>4</strong>.</p></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/secants_t2_11.svg\" alt=\"Static view: secants for h = 1, 0.5, 0.1 and tangent slope 4\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Static view: secants for h = 1, 0.5, 0.1 and tangent slope 4</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Secant slopes 5, 4.5, 4.1 → 4.</p></figure>",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Visual Investigation\"><span class=\"ap-phase-label\">Visual Investigation</span><h3 class=\"ap-phase-title\">Secant lines approach a tangent</h3><p class=\"ap-phase-sub\">Secant lines approach a tangent</p></div><div class=\"ap-interactive ap-secant-demo\" data-ap-secant-demo data-a=\"2\" data-base-y=\"5\" data-slope-limit=\"4\"><div class=\"ap-interactive__header\"><span class=\"ap-interactive__badge\">Interactive</span><p class=\"ap-interactive__lead\">Drag <strong>h</strong> to see how \\(\\dfrac{s(a+h)-s(a)}{h}\\) is <em>rise over run</em> on the graph.</p></div><div class=\"ap-secant-controls\"><label for=\"ap-secant-h\">Interval h = <strong data-ap-h-val>1.00</strong> s</label><input type=\"range\" id=\"ap-secant-h\" class=\"ap-range\" min=\"0.05\" max=\"1\" step=\"0.05\" value=\"1\" data-ap-secant-slider/></div><div class=\"ap-secant-metrics\"><div class=\"ap-metric\"><span>Rise Δs</span><strong data-ap-rise-val>5.00</strong> m</div><div class=\"ap-metric\"><span>Run h</span><strong data-ap-run-val>1.00</strong> s</div><div class=\"ap-metric ap-metric--accent\"><span>Avg rate</span><strong data-ap-rate-val>5.00</strong> m/s</div></div><p class=\"ap-formula-readout\" data-ap-formula-val>[5.00 m] ÷ [1.00 s] = 5.00 m/s</p><svg class=\"ap-secant-svg\" viewBox=\"0 0 520 320\" aria-label=\"Difference quotient visualization\"><rect width=\"520\" height=\"320\" fill=\"#faf8ff\" rx=\"12\"/><polygon data-ap-rise-poly fill=\"rgba(37,99,235,0.08)\" stroke=\"none\"/><line data-ap-run stroke=\"#ea580c\" stroke-width=\"2.5\" stroke-dasharray=\"6 4\"/><line data-ap-rise stroke=\"#2563eb\" stroke-width=\"2.5\" stroke-dasharray=\"6 4\"/><path data-ap-curve fill=\"none\" stroke=\"#6a4ce6\" stroke-width=\"3\"/><line data-ap-secant stroke=\"#2563eb\" stroke-width=\"2.5\"/><line data-ap-tangent stroke=\"#059669\" stroke-width=\"2\" stroke-dasharray=\"6 4\"/><circle data-ap-fixed cx=\"0\" cy=\"0\" r=\"7\" fill=\"#6a4ce6\"/><circle data-ap-moving cx=\"0\" cy=\"0\" r=\"6\" fill=\"#fff\" stroke=\"#2563eb\" stroke-width=\"2.5\"/><text data-ap-lbl-rise font-size=\"12\" fill=\"#2563eb\" font-weight=\"600\"></text><text data-ap-lbl-run font-size=\"12\" fill=\"#ea580c\" font-weight=\"600\" text-anchor=\"middle\"></text></svg><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Orange <strong>h</strong> (run) and blue <strong>Δs</strong> (rise) form a slope triangle. As h → 0, secant → tangent (green), rate → <strong>4</strong>.</p></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/secants_t2_11.svg\" alt=\"Static view: secants for h = 1, 0.5, 0.1 and tangent slope 4\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Static view: secants for h = 1, 0.5, 0.1 and tangent slope 4</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Secant slopes 5, 4.5, 4.1 → 4.</p></figure>",
           "kind": "lesson",
           "group": "learn",
           "section": "1.1",
@@ -76,7 +76,7 @@
         {
           "index": 7,
           "title": "The difference quotient",
-          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Concept & Definition\"><span class=\"ap-phase-label\">Concept & Definition</span><h3 class=\"ap-phase-title\">Difference quotient</h3><p class=\"ap-phase-sub\">Difference quotient</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Difference quotient at t = a</span><div class=\"ap-box-body\"><div class=\"stem-math-block cm-math-block ap-math-block\">\\[\\frac{s(a+h)-s(a)}{h}\\]</div><ul class='stem-itemize'><li><strong>s(a+h) − s(a)</strong> — change in position</li><li><strong>h</strong> — change in time (length of interval)</li><li><strong>Quotient</strong> — slope of secant from a to a+h</li></ul></div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Preview only</span><div class=\"ap-box-body\">We will formalize “approach” in Section 1.2. Here: shorter intervals → secant slope → instantaneous rate.</div></div>",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Concept & Definition\"><span class=\"ap-phase-label\">Concept & Definition</span><h3 class=\"ap-phase-title\">Difference quotient</h3><p class=\"ap-phase-sub\">Difference quotient</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Difference quotient at t = a</span><div class=\"ap-box-body\"><div class=\"stem-math-block cm-math-block ap-math-block\">\\[\\frac{s(a+h)-s(a)}{h}\\]</div><ul class='stem-itemize'><li><strong>s(a+h) − s(a)</strong> — vertical rise Δs on the graph</li><li><strong>h</strong> — horizontal run (time interval)</li><li><strong>Quotient</strong> — secant slope = rise ÷ run</li></ul></div></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/diff_quotient_11.svg\" alt=\"Geometric meaning of the difference quotient\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Geometric meaning of the difference quotient</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Δs is rise; h is run; quotient = secant slope.</p></figure><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Preview only</span><div class=\"ap-box-body\">We will formalize “approach” in Section 1.2. Here: shorter intervals → secant slope → instantaneous rate.</div></div>",
           "kind": "lesson",
           "group": "learn",
           "section": "1.1",
@@ -184,52 +184,181 @@
       "next_lesson_slug": "ap-1-2-defining-limits",
       "knowledge_map": [
         {
-          "label": "Launch",
-          "slide_index": 1
+          "title": "Launch",
+          "start_index": 2,
+          "items": [
+            {
+              "index": 2,
+              "kind": "lesson",
+              "title": "Why we need calculus",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Visual Investigation",
-          "slide_index": 3
+          "title": "Visual Investigation",
+          "start_index": 3,
+          "items": [
+            {
+              "index": 3,
+              "kind": "lesson",
+              "title": "Position graph s(t) = t² + 1",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Concept & Definition",
-          "slide_index": 4
+          "title": "Concept & Definition",
+          "start_index": 4,
+          "items": [
+            {
+              "index": 4,
+              "kind": "lesson",
+              "title": "Average rate of change",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Visual Investigation",
-          "slide_index": 5
+          "title": "Visual Investigation",
+          "start_index": 5,
+          "items": [
+            {
+              "index": 5,
+              "kind": "lesson",
+              "title": "Shrinking the interval — numeric evidence",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 6,
+              "kind": "lesson",
+              "title": "Secant → tangent",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Concept & Definition",
-          "slide_index": 7
+          "title": "Concept & Definition",
+          "start_index": 7,
+          "items": [
+            {
+              "index": 7,
+              "kind": "lesson",
+              "title": "The difference quotient",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Why It Works",
-          "slide_index": 8
+          "title": "Why It Works",
+          "start_index": 8,
+          "items": [
+            {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Why shrinking the interval works",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Worked Example",
-          "slide_index": 9
+          "title": "Worked Example",
+          "start_index": 9,
+          "items": [
+            {
+              "index": 9,
+              "kind": "lesson",
+              "title": "Worked example: simplify the difference quotient",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Contrast / Error Analysis",
-          "slide_index": 10
+          "title": "Contrast / Error Analysis",
+          "start_index": 10,
+          "items": [
+            {
+              "index": 10,
+              "kind": "lesson",
+              "title": "Error analysis: plugging in h = 0",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Guided Example",
-          "slide_index": 11
+          "title": "Guided Example",
+          "start_index": 11,
+          "items": [
+            {
+              "index": 11,
+              "kind": "lesson",
+              "title": "Guided: average rate from a table",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "AP Practice",
-          "slide_index": 12
+          "title": "AP Practice",
+          "start_index": 12,
+          "items": [
+            {
+              "index": 12,
+              "kind": "question",
+              "title": "Practice: compute an average rate",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 13,
+              "kind": "question",
+              "title": "Practice: interpret a difference quotient",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 14,
+              "kind": "question",
+              "title": "Practice: instantaneous rate setup",
+              "interactive": true,
+              "has_mcq": true
+            }
+          ]
         },
         {
-          "label": "Exit Ticket",
-          "slide_index": 15
+          "title": "Exit Ticket",
+          "start_index": 15,
+          "items": [
+            {
+              "index": 15,
+              "kind": "lesson",
+              "title": "Exit ticket · 1.1",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Packet",
-          "slide_index": 16
+          "title": "Packet",
+          "start_index": 16,
+          "items": [
+            {
+              "index": 16,
+              "kind": "lesson",
+              "title": "Practice packet · 1.1",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         }
       ]
     },
@@ -274,7 +403,7 @@
         {
           "index": 4,
           "title": "Four contrast cases",
-          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Visual Investigation\"><span class=\"ap-phase-label\">Visual Investigation</span><h3 class=\"ap-phase-title\">Limit vs function value</h3><p class=\"ap-phase-sub\">Limit vs function value</p></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Visual</span><strong>Four possibilities</strong><p>Same limit language — different graphs.</p></div><div class=\"ap-graph-grid ap-graph-grid--2x2\"><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_a.svg\" alt=\"A · Continuous\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">A · Continuous</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit = f(c).</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_b.svg\" alt=\"B · Limit ≠ value\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">B · Limit ≠ value</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit 5, f(3)=10.</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_c.svg\" alt=\"C · Undefined at c\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">C · Undefined at c</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit exists; f(c) missing.</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_d.svg\" alt=\"D · Limit DNE\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">D · Limit DNE</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Jump; f(c) may still be defined.</p></figure></div>",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Visual Investigation\"><span class=\"ap-phase-label\">Visual Investigation</span><h3 class=\"ap-phase-title\">Limit vs function value</h3><p class=\"ap-phase-sub\">Limit vs function value</p></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Visual</span><strong>Four possibilities</strong><p>Same limit language — different graphs.</p></div><div class=\"ap-graph-grid ap-graph-grid--2x2\"><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_a.svg\" alt=\"A · Continuous\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">A · Continuous</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit = f(c).</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_b.svg\" alt=\"B · Limit ≠ value\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">B · Limit ≠ value</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit 5, f(3)=10.</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_c.svg\" alt=\"C · Undefined at c\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">C · Undefined at c</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit exists; f(c) missing.</p></figure><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/limit_case_d.svg\" alt=\"D · Limit DNE\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">D · Limit DNE</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Jump; f(c) may still be defined.</p></figure></div><div class=\"ap-interactive ap-limit-demo\" data-ap-limit-demo data-c=\"3\"><div class=\"ap-interactive__header\"><span class=\"ap-interactive__badge\">Interactive</span><p class=\"ap-interactive__lead\">Slide <strong>x</strong> toward 3. Watch outputs approach <strong>L = 5</strong> — even when \\(f(3)\\neq 5\\).</p></div><div class=\"ap-secant-controls\"><label for=\"ap-limit-x\">Position x = <strong data-ap-x-read>2.50</strong></label><input type=\"range\" id=\"ap-limit-x\" class=\"ap-range\" min=\"2.5\" max=\"3.5\" step=\"0.05\" value=\"2.5\" data-ap-limit-slider/></div><div class=\"ap-secant-metrics\"><div class=\"ap-metric\"><span>f(x)</span><strong data-ap-y-read>4.50</strong></div><div class=\"ap-metric ap-metric--wide\"><span>Interpretation</span><strong data-ap-limit-msg class=\"ap-metric-msg\">From the left…</strong></div></div><svg class=\"ap-limit-svg\" viewBox=\"0 0 520 300\" aria-label=\"Limit approach visualization\"><rect width=\"520\" height=\"300\" fill=\"#faf8ff\" rx=\"12\"/><path data-ap-curve fill=\"none\" stroke=\"#6a4ce6\" stroke-width=\"3\"/><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"0\" stroke=\"rgba(108,78,230,0.2)\" stroke-width=\"1.5\" stroke-dasharray=\"4 4\" data-ap-vline style=\"display:none\"/><circle data-ap-open cx=\"0\" cy=\"0\" r=\"6\" fill=\"#fff\" stroke=\"#6a4ce6\" stroke-width=\"2.5\"/><circle data-ap-filled cx=\"0\" cy=\"0\" r=\"6\" fill=\"#6a4ce6\"/><circle data-ap-tracer cx=\"0\" cy=\"0\" r=\"8\" fill=\"#ea580c\" stroke=\"#fff\" stroke-width=\"2\"/></svg><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Open circle at (3, 5) shows the limit. Filled dot at (3, 10) is \\(f(3)\\) — approach and value can differ.</p></div>",
           "kind": "lesson",
           "group": "learn",
           "section": "1.2",
@@ -411,44 +540,175 @@
       "next_lesson_slug": "ap-1-3-limits-from-graphs",
       "knowledge_map": [
         {
-          "label": "Launch",
-          "slide_index": 2
+          "title": "Launch",
+          "start_index": 2,
+          "items": [
+            {
+              "index": 2,
+              "kind": "lesson",
+              "title": "Limits describe approach, not always value",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Concept & Definition",
-          "slide_index": 3
+          "title": "Concept & Definition",
+          "start_index": 3,
+          "items": [
+            {
+              "index": 3,
+              "kind": "lesson",
+              "title": "Reading limit notation",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Visual Investigation",
-          "slide_index": 4
+          "title": "Visual Investigation",
+          "start_index": 4,
+          "items": [
+            {
+              "index": 4,
+              "kind": "lesson",
+              "title": "Four contrast cases",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Representation Transfer",
-          "slide_index": 5
+          "title": "Representation Transfer",
+          "start_index": 5,
+          "items": [
+            {
+              "index": 5,
+              "kind": "lesson",
+              "title": "Representation transfer: graph, table, words",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Worked Example",
-          "slide_index": 6
+          "title": "Worked Example",
+          "start_index": 6,
+          "items": [
+            {
+              "index": 6,
+              "kind": "lesson",
+              "title": "Worked example: limit vs f(c)",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Contrast / Error Analysis",
-          "slide_index": 7
+          "title": "Contrast / Error Analysis",
+          "start_index": 7,
+          "items": [
+            {
+              "index": 7,
+              "kind": "lesson",
+              "title": "Contrast: common mis-readings",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Guided Example",
-          "slide_index": 8
+          "title": "Guided Example",
+          "start_index": 8,
+          "items": [
+            {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Guided: write the verbal statement",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "AP Practice",
-          "slide_index": 9
+          "title": "AP Practice",
+          "start_index": 9,
+          "items": [
+            {
+              "index": 9,
+              "kind": "question",
+              "title": "Practice: table to limit statement",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 10,
+              "kind": "question",
+              "title": "Practice: words to symbols",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 11,
+              "kind": "question",
+              "title": "Practice: best interpretation",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 12,
+              "kind": "question",
+              "title": "Practice: limit vs value from graph",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 13,
+              "kind": "question",
+              "title": "Practice: identify the error",
+              "interactive": true,
+              "has_mcq": true
+            }
+          ]
         },
         {
-          "label": "Optional",
-          "slide_index": 14
+          "title": "Optional",
+          "start_index": 14,
+          "items": [
+            {
+              "index": 14,
+              "kind": "lesson",
+              "title": "Optional: ε–δ definition",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Exit Ticket",
-          "slide_index": 15
+          "title": "Exit Ticket",
+          "start_index": 15,
+          "items": [
+            {
+              "index": 15,
+              "kind": "lesson",
+              "title": "Exit ticket · 1.2",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Lesson flow",
+          "start_index": 16,
+          "items": [
+            {
+              "index": 16,
+              "kind": "lesson",
+              "title": "Practice packet · 1.2",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         }
       ]
     },
@@ -503,7 +763,7 @@
         {
           "index": 5,
           "title": "Worked example: piecewise at x = 2",
-          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Worked Example</span><strong>Read limits at x = 2</strong><p>Teacher model — follow strategy, algebra, and verification.</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Understand</span><div class=\"ap-box-body\"><p>Find \\(\\lim_{x\\to 2} f(x)\\), \\(f(2)\\), and continuity at x=2.</p></div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Graph: left branch y = x+1, right branch y = −x+5.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Left trace: as x→2⁻, y→3.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Right trace: as x→2⁺, y→3.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Compare: both sides → 3, so \\(\\lim_{x\\to 2} f(x)=3\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"4\"><p><strong>Step 4.</strong> Filled dot at (2, 1.5) gives \\(f(2)=1.5\\neq 3\\) → not continuous.</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\), \\(f(2)=1.5\\), not continuous at 2.</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Open circle at height 3; filled dot at 1.5.</p></div></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/piecewise_limit_2.svg\" alt=\"f(x) piecewise at x = 2\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">f(x) piecewise at x = 2</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Both branches approach y=3; f(2)=1.5.</p></figure>",
+          "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Worked Example</span><strong>Read limits at x = 2</strong><p>Teacher model — follow strategy, algebra, and verification.</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Understand</span><div class=\"ap-box-body\"><p>Find \\(\\lim_{x\\to 2} f(x)\\), \\(f(2)\\), and continuity at x=2.</p></div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Graph: left branch y = x+1, right branch y = −x+5.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Left trace: as x→2⁻, y→3.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Right trace: as x→2⁺, y→3.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Compare: both sides → 3, so \\(\\lim_{x\\to 2} f(x)=3\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"4\"><p><strong>Step 4.</strong> Filled dot at (2, 1.5) gives \\(f(2)=1.5\\neq 3\\) → not continuous.</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\), \\(f(2)=1.5\\), not continuous at 2.</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Open circle at height 3; filled dot at 1.5.</p></div></div><div class=\"ap-interactive ap-trace-demo\" data-ap-trace-demo data-c=\"2\"><div class=\"ap-interactive__header\"><span class=\"ap-interactive__badge\">Interactive</span><p class=\"ap-interactive__lead\">Drag along the graph: <strong>Left → Right → Compare → Value</strong>.</p></div><div class=\"ap-secant-controls\"><label for=\"ap-trace-x\">Trace at x = <strong data-ap-trace-x>0.50</strong></label><input type=\"range\" id=\"ap-trace-x\" class=\"ap-range\" min=\"0.5\" max=\"3.8\" step=\"0.05\" value=\"0.5\" data-ap-trace-slider/></div><div class=\"ap-secant-metrics\"><div class=\"ap-metric\"><span>y on graph</span><strong data-ap-trace-y>1.50</strong></div><div class=\"ap-metric ap-metric--wide\"><span>Branch</span><strong data-ap-trace-side class=\"ap-metric-msg\">Left branch</strong></div><div class=\"ap-metric ap-metric--wide\"><span>Limit read</span><strong data-ap-trace-limit class=\"ap-metric-msg\">L⁻ = 3</strong></div></div><svg class=\"ap-trace-svg\" viewBox=\"0 0 520 300\" aria-label=\"Graph limit tracer\"><rect width=\"520\" height=\"300\" fill=\"#faf8ff\" rx=\"12\"/><line data-ap-vline stroke=\"rgba(108,78,230,0.35)\" stroke-width=\"1.5\" stroke-dasharray=\"4 4\"/><path data-ap-left fill=\"none\" stroke=\"#2563eb\" stroke-width=\"3\"/><path data-ap-right fill=\"none\" stroke=\"#ea580c\" stroke-width=\"3\"/><circle data-ap-open cx=\"0\" cy=\"0\" r=\"6\" fill=\"#fff\" stroke=\"#6a4ce6\" stroke-width=\"2.5\"/><text x=\"0\" y=\"0\" font-size=\"11\" fill=\"#6a4ce6\" data-ap-open-lbl>limit 3</text><circle data-ap-filled cx=\"0\" cy=\"0\" r=\"6\" fill=\"#6a4ce6\"/><circle data-ap-tracer cx=\"0\" cy=\"0\" r=\"8\" fill=\"#059669\" stroke=\"#fff\" stroke-width=\"2\"/></svg><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Both branches approach y = 3. The filled point at y = 1.5 is \\(f(2)\\), not the limit.</p></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/piecewise_limit_2.svg\" alt=\"Reference graph\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Reference graph</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Both branches approach y=3; f(2)=1.5.</p></figure>",
           "kind": "lesson",
           "group": "learn",
           "section": "1.3",
@@ -670,48 +930,209 @@
       "next_lesson_slug": null,
       "knowledge_map": [
         {
-          "label": "Launch",
-          "slide_index": 2
+          "title": "Launch",
+          "start_index": 2,
+          "items": [
+            {
+              "index": 2,
+              "kind": "lesson",
+              "title": "The four-step graph procedure",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Concept & Definition",
-          "slide_index": 3
+          "title": "Concept & Definition",
+          "start_index": 3,
+          "items": [
+            {
+              "index": 3,
+              "kind": "lesson",
+              "title": "One-sided limits",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Why It Works",
-          "slide_index": 4
+          "title": "Why It Works",
+          "start_index": 4,
+          "items": [
+            {
+              "index": 4,
+              "kind": "lesson",
+              "title": "Two-sided limit exists when sides agree",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Worked Example",
-          "slide_index": 5
+          "title": "Worked Example",
+          "start_index": 5,
+          "items": [
+            {
+              "index": 5,
+              "kind": "lesson",
+              "title": "Worked example: piecewise at x = 2",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Visual Investigation",
-          "slide_index": 6
+          "title": "Visual Investigation",
+          "start_index": 6,
+          "items": [
+            {
+              "index": 6,
+              "kind": "lesson",
+              "title": "Case gallery: continuity types",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Representation Transfer",
-          "slide_index": 7
+          "title": "Representation Transfer",
+          "start_index": 7,
+          "items": [
+            {
+              "index": 7,
+              "kind": "lesson",
+              "title": "Endpoint and one-sided domain",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Worked Example",
-          "slide_index": 8
+          "title": "Worked Example",
+          "start_index": 8,
+          "items": [
+            {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Worked example: jump discontinuity",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Guided Example",
-          "slide_index": 9
+          "title": "Guided Example",
+          "start_index": 9,
+          "items": [
+            {
+              "index": 9,
+              "kind": "lesson",
+              "title": "Guided: trace from the left",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 10,
+              "kind": "lesson",
+              "title": "Guided: compare sides",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 11,
+              "kind": "lesson",
+              "title": "Guided: sketch with constraints",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "AP Practice",
-          "slide_index": 12
+          "title": "AP Practice",
+          "start_index": 12,
+          "items": [
+            {
+              "index": 12,
+              "kind": "question",
+              "title": "Practice: jump discontinuity",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 13,
+              "kind": "question",
+              "title": "Practice: read piecewise graph",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 14,
+              "kind": "question",
+              "title": "Practice: filled dot trap",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 15,
+              "kind": "question",
+              "title": "Practice: infinite behavior",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 16,
+              "kind": "question",
+              "title": "Practice: endpoint one-sided limit",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 17,
+              "kind": "question",
+              "title": "Practice: classify discontinuity",
+              "interactive": true,
+              "has_mcq": true
+            }
+          ]
         },
         {
-          "label": "Contrast / Error Analysis",
-          "slide_index": 18
+          "title": "Contrast / Error Analysis",
+          "start_index": 18,
+          "items": [
+            {
+              "index": 18,
+              "kind": "lesson",
+              "title": "Error analysis: skipping a side",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         },
         {
-          "label": "Exit Ticket",
-          "slide_index": 19
+          "title": "Exit Ticket",
+          "start_index": 19,
+          "items": [
+            {
+              "index": 19,
+              "kind": "lesson",
+              "title": "Exit ticket · 1.3",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Lesson flow",
+          "start_index": 20,
+          "items": [
+            {
+              "index": 20,
+              "kind": "lesson",
+              "title": "Practice packet · 1.3",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
         }
       ]
     }
