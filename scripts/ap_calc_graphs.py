@@ -74,14 +74,31 @@ def _y_map(y: float, spec: GraphSpec, h: int, pad_t: int, pad_b: int) -> float:
     return h - pad_b - (y - spec.y_min) / (spec.y_max - spec.y_min) * (h - pad_t - pad_b)
 
 
-def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
-    pad_l, pad_r, pad_t, pad_b = 58, 28, 52, 48
+def render_graph(
+    spec: GraphSpec,
+    width: int = 520,
+    height: int = 340,
+    compact: bool = False,
+) -> str:
+    if compact:
+        pad_l, pad_r, pad_t, pad_b = 26, 10, 14, 22
+        stroke_w = 2
+        pt_r = 4
+        font_pt = 9
+        rx = 8
+    else:
+        pad_l, pad_r, pad_t, pad_b = 58, 28, 52, 48
+        stroke_w = 3
+        pt_r = 6
+        font_pt = 12
+        rx = 12
     parts: list[str] = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-        f'role="img" aria-label="{spec.title}" class="ap-graph-svg">',
-        f'<rect width="{width}" height="{height}" fill="{BG}" rx="12"/>',
+        f'role="img" aria-label="{spec.title}" class="ap-graph-svg'
+        f'{" ap-graph-svg--compact" if compact else ""}">',
+        f'<rect width="{width}" height="{height}" fill="{BG}" rx="{rx}"/>',
     ]
-    if spec.title:
+    if spec.title and not compact:
         parts.append(
             f'<text x="{width / 2:.1f}" y="24" text-anchor="middle" font-size="14" '
             f'font-weight="700" fill="{PURPLE_DARK}">{spec.title}</text>'
@@ -96,15 +113,17 @@ def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
     # axes
     parts.append(f'<line x1="{pad_l}" y1="{height-pad_b}" x2="{width-pad_r}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
     parts.append(f'<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
-    parts.append(
-        f'<text x="{width - pad_r + 2:.1f}" y="{height - pad_b + 18:.1f}" text-anchor="end" '
-        f'font-size="12" fill="{PURPLE_DARK}">{spec.x_label}</text>'
-    )
-    parts.append(
-        f'<text x="16" y="{(pad_t + height - pad_b) / 2:.1f}" text-anchor="middle" '
-        f'font-size="12" fill="{PURPLE_DARK}" transform="rotate(-90 16 {(pad_t + height - pad_b) / 2:.1f})">'
-        f'{spec.y_label}</text>'
-    )
+    if not compact:
+        parts.append(
+            f'<text x="{width - pad_r + 2:.1f}" y="{height - pad_b + 18:.1f}" text-anchor="end" '
+            f'font-size="{font_pt}" fill="{PURPLE_DARK}">{spec.x_label}</text>'
+        )
+        parts.append(
+            f'<text x="16" y="{(pad_t + height - pad_b) / 2:.1f}" text-anchor="middle" '
+            f'font-size="{font_pt}" fill="{PURPLE_DARK}" '
+            f'transform="rotate(-90 16 {(pad_t + height - pad_b) / 2:.1f})">'
+            f'{spec.y_label}</text>'
+        )
 
     for va in spec.v_asymptotes:
         vx = _x_map(va, spec, width, pad_l, pad_r)
@@ -127,9 +146,10 @@ def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
             x += step
         if len(pts) >= 2:
             dash = ' stroke-dasharray="6 4"' if seg.dashed else ""
+            sw = seg.width if not compact else stroke_w
             parts.append(
                 f'<polyline points="{" ".join(pts)}" fill="none" stroke="{seg.color}" '
-                f'stroke-width="{seg.width}"{dash} stroke-linecap="round"/>'
+                f'stroke-width="{sw}"{dash} stroke-linecap="round"/>'
             )
 
     for ln in spec.lines:
@@ -143,14 +163,21 @@ def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
             continue
         cx = _x_map(pt.x, spec, width, pad_l, pad_r)
         cy = _y_map(pt.y, spec, height, pad_t, pad_b)
+        r = pt.r if not compact else pt_r
         if pt.style == "open":
-            parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{pt.r}" fill="#fff" stroke="{PURPLE}" stroke-width="2.5"/>')
+            parts.append(
+                f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="#fff" '
+                f'stroke="{PURPLE}" stroke-width="2"/>'
+            )
         else:
-            parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{pt.r}" fill="{PURPLE}"/>')
-        if pt.label:
-            parts.append(f'<text x="{cx+10:.1f}" y="{cy-8:.1f}" font-size="12" fill="{PURPLE_DARK}">{pt.label}</text>')
+            parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{PURPLE}"/>')
+        if pt.label and not compact:
+            parts.append(
+                f'<text x="{cx+10:.1f}" y="{cy-8:.1f}" font-size="{font_pt}" '
+                f'fill="{PURPLE_DARK}">{pt.label}</text>'
+            )
 
-    if spec.notice:
+    if spec.notice and not compact:
         parts.append(
             f'<text x="{pad_l}" y="{height-8}" font-size="11" fill="#5b5380" font-style="italic">'
             f'Notice: {spec.notice}</text>'
@@ -159,12 +186,15 @@ def render_graph(spec: GraphSpec, width: int = 520, height: int = 340) -> str:
     return "\n".join(parts)
 
 
-def write_graph(spec: GraphSpec) -> str:
+def write_graph(spec: GraphSpec, compact: bool = False) -> str:
     os.makedirs(FIG_DIR, exist_ok=True)
-    path = os.path.join(FIG_DIR, f"{spec.graph_id}.svg")
+    suffix = "_thumb" if compact else ""
+    graph_id = f"{spec.graph_id}{suffix}"
+    w, h = (216, 128) if compact else (520, 340)
+    path = os.path.join(FIG_DIR, f"{graph_id}.svg")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(render_graph(spec))
-    return f"/static/ap_calc/figures/{spec.graph_id}.svg"
+        f.write(render_graph(spec, width=w, height=h, compact=compact))
+    return f"/static/ap_calc/figures/{graph_id}.svg"
 
 
 def build_all_graphs() -> dict[str, str]:
@@ -224,49 +254,50 @@ def build_all_graphs() -> dict[str, str]:
         notice="Blue secant (h=0.1) is closest to tangent slope 4.",
     ))
 
-    # 1.2 Case A: continuous f(x)=x+1 at x=2, f(2)=3
-    paths["limit_case_a"] = write_graph(GraphSpec(
+    # 1.2 Four contrast cases (aligned with interactive lab specs at x = 3)
+    case_a = GraphSpec(
         graph_id="limit_case_a",
         title="Case A: limit exists and equals f(c)",
-        x_min=-1, x_max=5, y_min=-1, y_max=6,
-        segments=[PlotSegment(lambda x: x + 1, -0.5, 4.5)],
-        points=[PlotPoint(2, 3, "filled", "f(2)=3")],
-        notice="lim x→2 f(x) = 3 = f(2).",
-    ))
-
-    # Case B: limit 5, f(3)=10 piecewise
-    paths["limit_case_b"] = write_graph(GraphSpec(
+        x_min=0, x_max=6, y_min=0, y_max=10,
+        segments=[PlotSegment(lambda x: x + 2, 0.5, 5.5)],
+        points=[PlotPoint(3, 5, "filled")],
+        notice="lim x→3 f(x) = 5 = f(3).",
+    )
+    case_b = GraphSpec(
         graph_id="limit_case_b",
         title="Case B: limit exists but f(c) differs",
         x_min=0, x_max=6, y_min=0, y_max=12,
         segments=[PlotSegment(lambda x: x + 2, 0.5, 5.5)],
-        points=[PlotPoint(3, 5, "open", "→5"), PlotPoint(3, 10, "filled", "f(3)=10")],
+        points=[PlotPoint(3, 5, "open"), PlotPoint(3, 10, "filled")],
         notice="lim x→3 f(x)=5 while f(3)=10.",
-    ))
-
-    # Case C: hole at (2,4), undefined at 2
-    paths["limit_case_c"] = write_graph(GraphSpec(
+    )
+    case_c = GraphSpec(
         graph_id="limit_case_c",
         title="Case C: limit exists, f(c) undefined",
-        x_min=0, x_max=5, y_min=0, y_max=7,
-        segments=[PlotSegment(lambda x: 2 * x, 0.5, 1.9, color=PURPLE),
-                  PlotSegment(lambda x: 2 * x, 2.1, 4.5, color=PURPLE)],
-        points=[PlotPoint(2, 4, "open", "lim=4")],
-        notice="f(2) is undefined; limit is 4.",
-    ))
-
-    # Case D: jump, f(c) defined
-    paths["limit_case_d"] = write_graph(GraphSpec(
+        x_min=0, x_max=6, y_min=0, y_max=10,
+        segments=[PlotSegment(lambda x: x + 2, 0.5, 5.5)],
+        points=[PlotPoint(3, 5, "open")],
+        notice="f(3) is undefined; limit is 5.",
+    )
+    case_d = GraphSpec(
         graph_id="limit_case_d",
         title="Case D: limit DNE, f(c) defined",
-        x_min=0, x_max=6, y_min=-2, y_max=5,
+        x_min=0, x_max=6, y_min=-2, y_max=6,
         segments=[
-            PlotSegment(lambda x: -1.0, 0, 2.9, color=LEFT_COLOR),
-            PlotSegment(lambda x: 2.0, 3.1, 5.5, color=RIGHT_COLOR),
+            PlotSegment(lambda x: x - 4, 0.5, 2.98, color=LEFT_COLOR),
+            PlotSegment(lambda x: x + 1, 3.02, 5.5, color=RIGHT_COLOR),
         ],
-        points=[PlotPoint(3, 0, "filled", "f(3)=0")],
-        notice="Left → −1, right → 2; two-sided limit DNE.",
-    ))
+        points=[PlotPoint(3, 0, "filled")],
+        notice="Left → −1, right → 4; two-sided limit DNE.",
+    )
+    for spec, key in (
+        (case_a, "limit_case_a"),
+        (case_b, "limit_case_b"),
+        (case_c, "limit_case_c"),
+        (case_d, "limit_case_d"),
+    ):
+        paths[key] = write_graph(spec)
+        paths[f"{key}_thumb"] = write_graph(spec, compact=True)
 
     # 1.3 piecewise from tex: x+1 for x<2, -x+5 for x>2, open (2,3), filled (2,1.5)
     paths["piecewise_limit_2"] = write_graph(GraphSpec(

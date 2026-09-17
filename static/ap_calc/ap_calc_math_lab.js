@@ -96,61 +96,112 @@
 
   function SVGPlot(svg, opts) {
     this.svg = svg;
-    this.padL = opts.padL || 56;
-    this.padR = opts.padR || 24;
-    this.padT = opts.padT || 28;
-    this.padB = opts.padB || 44;
-    this.W = opts.W || 520;
-    this.H = opts.H || 300;
+    this.padL = opts.padL || 42;
+    this.padR = opts.padR || 16;
+    this.padT = opts.padT || 18;
+    this.padB = opts.padB || 30;
+    this.W = opts.W || 400;
+    this.H = opts.H || 220;
     this.xMin = opts.xMin;
     this.xMax = opts.xMax;
     this.yMin = opts.yMin;
     this.yMax = opts.yMax;
+    this.plotLeft = this.padL;
+    this.plotRight = this.W - this.padR;
+    this.plotTop = this.padT;
+    this.plotBottom = this.H - this.padB;
     this._ensureGrid();
+    this._drawAxes();
   }
 
   SVGPlot.prototype.mapX = function (x) {
-    return this.padL + (x - this.xMin) / (this.xMax - this.xMin) * (this.W - this.padL - this.padR);
+    return this.plotLeft + (x - this.xMin) / (this.xMax - this.xMin) * (this.plotRight - this.plotLeft);
   };
 
   SVGPlot.prototype.mapY = function (y) {
-    return this.H - this.padB - (y - this.yMin) / (this.yMax - this.yMin) * (this.H - this.padT - this.padB);
+    return this.plotBottom - (y - this.yMin) / (this.yMax - this.yMin) * (this.plotBottom - this.plotTop);
   };
 
   SVGPlot.prototype._ensureGrid = function () {
-    if (this.svg.querySelector("[data-ap-grid]")) return;
+    var existing = this.svg.querySelector("[data-ap-grid]");
+    if (existing) existing.remove();
     var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute("data-ap-grid", "");
-    var x0 = this.padL, y0 = this.padT, x1 = this.W - this.padR, y1 = this.H - this.padB;
-    for (var i = 0; i <= 5; i++) {
-      var x = x0 + (x1 - x0) * i / 5;
+    var x0 = this.plotLeft, y0 = this.plotTop, x1 = this.plotRight, y1 = this.plotBottom;
+    for (var i = 0; i <= 4; i++) {
+      var x = x0 + (x1 - x0) * i / 4;
       var ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
       ln.setAttribute("x1", x); ln.setAttribute("y1", y0);
       ln.setAttribute("x2", x); ln.setAttribute("y2", y1);
       ln.setAttribute("stroke", COLORS.grid); ln.setAttribute("stroke-width", "1");
       g.appendChild(ln);
     }
-    for (var j = 0; j <= 4; j++) {
-      var y = y0 + (y1 - y0) * j / 4;
+    for (var j = 0; j <= 3; j++) {
+      var y = y0 + (j * (y1 - y0)) / 3;
       var ln2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
       ln2.setAttribute("x1", x0); ln2.setAttribute("y1", y);
       ln2.setAttribute("x2", x1); ln2.setAttribute("y2", y);
       ln2.setAttribute("stroke", COLORS.grid); ln2.setAttribute("stroke-width", "1");
       g.appendChild(ln2);
     }
-    this.svg.insertBefore(g, this.svg.firstChild.nextSibling);
+    var layer = this.svg.querySelector("[data-ap-plot-layer]");
+    if (layer) layer.insertBefore(g, layer.firstChild);
+    else this.svg.insertBefore(g, this.svg.firstChild.nextSibling);
+  };
+
+  SVGPlot.prototype._drawAxes = function () {
+    var ax = this.svg.querySelector("[data-ap-axis-x]");
+    var ay = this.svg.querySelector("[data-ap-axis-y]");
+    if (ax) {
+      ax.setAttribute("x1", this.plotLeft);
+      ax.setAttribute("y1", this.plotBottom);
+      ax.setAttribute("x2", this.plotRight);
+      ax.setAttribute("y2", this.plotBottom);
+    }
+    if (ay) {
+      ay.setAttribute("x1", this.plotLeft);
+      ay.setAttribute("y1", this.plotTop);
+      ay.setAttribute("x2", this.plotLeft);
+      ay.setAttribute("y2", this.plotBottom);
+    }
+  };
+
+  SVGPlot.prototype.drawTargetX = function (targetX) {
+    var line = this.svg.querySelector("[data-ap-target-x]");
+    if (!line || targetX == null) return;
+    var x = this.mapX(targetX);
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", this.plotTop);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", this.plotBottom);
+    line.style.visibility = "visible";
   };
 
   SVGPlot.prototype.pathFromFn = function (fn, x0, x1, step) {
     var pts = [];
-    step = step || 0.06;
+    step = step || 0.05;
     for (var x = x0; x <= x1; x += step) {
       var y = safeEval(fn, x);
       if (!isFinite(y)) continue;
-      pts.push(this.mapX(x).toFixed(1) + "," + this.mapY(y).toFixed(1));
+      var py = this.mapY(y);
+      if (py < this.plotTop - 2 || py > this.plotBottom + 2) continue;
+      pts.push(this.mapX(x).toFixed(1) + "," + py.toFixed(1));
     }
+    if (pts.length < 2) return "";
     return "M" + pts.join(" L");
   };
+
+  function setPoint(svg, sel, x, y, plot, visible) {
+    var pt = svg.querySelector(sel);
+    if (!pt) return;
+    if (!visible || !isFinite(x) || !isFinite(y)) {
+      pt.setAttribute("visibility", "hidden");
+      return;
+    }
+    pt.setAttribute("cx", plot.mapX(x));
+    pt.setAttribute("cy", plot.mapY(y));
+    pt.setAttribute("visibility", "visible");
+  }
 
   function Tutor(root, tags) {
     this.root = root;
@@ -440,7 +491,7 @@
   SecantTangentLab.prototype._draw = function (h, rate, deltaS) {
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var plot = new SVGPlot(svg, { xMin: 0, xMax: 4.2, yMin: 0, yMax: 18 });
+    var plot = new SVGPlot(svg, { xMin: 0, xMax: 4.2, yMin: 0, yMax: 16 });
     var a = this.a;
     var s = this.s.bind(this);
     var curve = svg.querySelector("[data-ap-curve]");
@@ -585,22 +636,23 @@
     var c = this.current();
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var plot = new SVGPlot(svg, { xMin: 0, xMax: 6, yMin: 0, yMax: 12 });
+    var plot = new SVGPlot(svg, { xMin: 0, xMax: 6, yMin: -1, yMax: 11 });
+    plot.drawTargetX(c.targetX);
     c.branches.forEach(function (br, i) {
       var path = svg.querySelector("[data-ap-branch='" + i + "']") || svg.querySelector("[data-ap-curve]");
-      if (path) path.setAttribute("d", plot.pathFromFn(br.fn, br.x0, br.x1));
-      if (path) path.setAttribute("stroke", br.color || COLORS.curve);
+      if (!path) return;
+      var d = plot.pathFromFn(br.fn, br.x0, br.x1);
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", br.color || COLORS.curve);
+      path.style.display = d ? "" : "none";
     });
-    (c.openPoints || []).forEach(function (p, i) {
-      var pt = svg.querySelector("[data-ap-open-" + i + "]");
-      if (pt) { pt.setAttribute("cx", plot.mapX(p.x)); pt.setAttribute("cy", plot.mapY(p.y)); }
-    });
-    (c.closedPoints || []).forEach(function (p, i) {
-      var pt = svg.querySelector("[data-ap-filled-" + i + "]");
-      if (pt) { pt.setAttribute("cx", plot.mapX(p.x)); pt.setAttribute("cy", plot.mapY(p.y)); }
-    });
-    var tracer = svg.querySelector("[data-ap-tracer]");
-    if (tracer && isFinite(y)) { tracer.setAttribute("cx", plot.mapX(x)); tracer.setAttribute("cy", plot.mapY(y)); }
+    var branch1 = svg.querySelector("[data-ap-branch='1']");
+    if (branch1 && c.branches.length < 2) branch1.style.display = "none";
+    var open0 = (c.openPoints || [])[0];
+    var closed0 = (c.closedPoints || [])[0];
+    setPoint(svg, "[data-ap-open-0]", open0 ? open0.x : NaN, open0 ? open0.y : NaN, plot, !!open0);
+    setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
+    setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
   };
 
   function OneSidedLimitTracer(root, spec) {
@@ -728,21 +780,24 @@
     var sc = this.scenario();
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
-    var plot = new SVGPlot(svg, { xMin: -0.5, xMax: 4.5, yMin: -1, yMax: 6 });
+    var xMin = sc.domainMin != null ? sc.domainMin - 0.3 : -0.5;
+    var plot = new SVGPlot(svg, { xMin: xMin, xMax: 4.5, yMin: -1.5, yMax: 6 });
+    plot.drawTargetX(sc.targetX);
     sc.branches.forEach(function (br, i) {
       var path = svg.querySelector("[data-ap-branch='" + i + "']");
-      if (path) path.setAttribute("d", plot.pathFromFn(br.fn, br.x0, br.x1));
+      if (!path) return;
+      var d = plot.pathFromFn(br.fn, br.x0, br.x1);
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", br.color || COLORS.curve);
+      path.style.display = d ? "" : "none";
     });
-    (sc.openPoints || []).forEach(function (p, i) {
-      var pt = svg.querySelector("[data-ap-open-" + i + "]");
-      if (pt) { pt.setAttribute("cx", plot.mapX(p.x)); pt.setAttribute("cy", plot.mapY(p.y)); }
-    });
-    (sc.closedPoints || []).forEach(function (p, i) {
-      var pt = svg.querySelector("[data-ap-filled-" + i + "]");
-      if (pt) { pt.setAttribute("cx", plot.mapX(p.x)); pt.setAttribute("cy", plot.mapY(p.y)); }
-    });
-    var tracer = svg.querySelector("[data-ap-tracer]");
-    if (tracer && isFinite(y)) { tracer.setAttribute("cx", plot.mapX(x)); tracer.setAttribute("cy", plot.mapY(y)); }
+    var branch1 = svg.querySelector("[data-ap-branch='1']");
+    if (branch1 && sc.branches.length < 2) branch1.style.display = "none";
+    var open0 = (sc.openPoints || [])[0];
+    var closed0 = (sc.closedPoints || [])[0];
+    setPoint(svg, "[data-ap-open-0]", open0 ? open0.x : NaN, open0 ? open0.y : NaN, plot, !!open0);
+    setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
+    setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
   };
 
   function initMathLab(root) {

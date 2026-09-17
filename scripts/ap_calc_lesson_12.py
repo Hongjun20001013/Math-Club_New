@@ -84,11 +84,11 @@ def build(graphs: dict[str, str]) -> dict:
         "Four contrast cases",
         phase_divider("Visual Investigation", "Limit vs function value")
         + role("Visual", "Four possibilities", "Same limit language — different graphs.")
-        + '<div class="ap-graph-grid ap-graph-grid--2x2 ap-graph-grid--thumb">'
-        + fig(g["limit_case_a"], "A · Continuous", cls="ap-fig--thumb", notice="Limit = f(c).")
-        + fig(g["limit_case_b"], "B · Limit ≠ value", cls="ap-fig--thumb", notice="Limit 5, f(3)=10.")
-        + fig(g["limit_case_c"], "C · Undefined at c", cls="ap-fig--thumb", notice="Limit exists; f(c) missing.")
-        + fig(g["limit_case_d"], "D · Limit DNE", cls="ap-fig--thumb", notice="Jump; f(c) may still be defined.")
+        + '<div class="ap-graph-grid ap-graph-grid--cases">'
+        + fig(g["limit_case_a_thumb"], "A · Continuous", cls="ap-fig--case", notice="Limit = f(c).")
+        + fig(g["limit_case_b_thumb"], "B · Limit ≠ value", cls="ap-fig--case", notice="Limit 5, f(3)=10.")
+        + fig(g["limit_case_c_thumb"], "C · Undefined at c", cls="ap-fig--case", notice="Limit exists; f(c) missing.")
+        + fig(g["limit_case_d_thumb"], "D · Limit DNE", cls="ap-fig--case", notice="Jump; f(c) may still be defined.")
         + "</div>"
         + limit_approach_embed(),
         path_phase="Visual Investigation",
