@@ -118,6 +118,18 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
+        "Endpoint and one-sided domain",
+        phase_divider("Representation Transfer", "When only one side exists")
+        + role("Transfer", "Domain matters", "At an endpoint, a left-hand limit may be undefined.")
+        + fig(g["endpoint_sqrt_13"], "f(x) = √x on [0, 4]", notice="At x=0 only x→0⁺ is in the domain.")
+        + key_point(
+            "At x = 0",
+            "<p>\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\). There is <strong>no</strong> left-hand approach on this domain.</p>",
+        ),
+        path_phase="Representation Transfer",
+    )
+
+    s.add(
         "Worked example: jump discontinuity",
         worked_example(
             "Jump at x = 3",
@@ -200,6 +212,58 @@ def build(graphs: dict[str, str]) -> dict:
             "B",
             "Filled dot gives f(c); limits come from approach.",
             "<p><strong>B</strong> — must trace left and right branches first.</p>",
+        ),
+        kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
+        "Practice: infinite behavior",
+        mcq_reveal(
+            "<p>Near \\(x=0\\), the graph of \\(f(x)=\\dfrac{1}{x}\\) shows \\(|y|\\) growing without bound. "
+            "What is \\(\\displaystyle\\lim_{x\\to 0} f(x)\\)?</p>",
+            [
+                "0",
+                "1",
+                "The limit does not exist (infinite behavior)",
+                "The limit is ∞ only from the right",
+            ],
+            "C",
+            "Infinite oscillation/growth means the two-sided limit DNE in the real-number sense.",
+            "<p><strong>C</strong> — AP treats unbounded behavior as “limit DNE.” "
+            "<strong>D</strong> describes one side only; the question asks about the two-sided limit.</p>",
+        )
+        + fig(g["infinite_limit_13"], "Reference: 1/x near 0", notice="Left and right diverge to −∞ and +∞."),
+        kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
+        "Practice: endpoint one-sided limit",
+        mcq_reveal(
+            "<p>For \\(f(x)=\\sqrt{x}\\) on \\([0,4]\\), which statement is correct at \\(x=0\\)?</p>",
+            [
+                "\\(\\displaystyle\\lim_{x\\to 0^-} f(x)=0\\)",
+                "\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\)",
+                "\\(\\displaystyle\\lim_{x\\to 0} f(x)=0\\) with both sides in domain",
+                "\\(f(0)\\) is undefined",
+            ],
+            "B",
+            "Domain starts at 0; only right-hand approach exists.",
+            "<p><strong>B</strong> — right-hand limit is 0. <strong>A</strong> is outside the domain. "
+            "<strong>C</strong> incorrectly claims a two-sided approach. <strong>D</strong> — f(0)=0 is defined.</p>",
+        ),
+        kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
+        "Practice: classify discontinuity",
+        mcq_reveal(
+            "<p>\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\) but \\(f(2)\\) is undefined (open circle only). "
+            "What type of discontinuity?</p>",
+            ["Jump", "Removable", "Infinite", "Continuous"],
+            "B",
+            "Limit exists but function value is missing — removable hole.",
+            "<p><strong>B</strong> — a hole at x=2. <strong>A</strong> needs unequal one-sided limits. "
+            "<strong>C</strong> involves unbounded behavior. <strong>D</strong> requires f(2)=limit.</p>",
         ),
         kind="question", group="practice", path_phase="AP Practice",
     )

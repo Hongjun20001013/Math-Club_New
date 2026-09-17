@@ -157,6 +157,43 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
+        "Practice: table to limit statement",
+        mcq_reveal(
+            "<p>A table shows \\(f(x)\\) near \\(x=2\\): 1.9→4.8, 1.99→4.98, 2.01→5.02, 2.1→5.2. "
+            "Which limit statement is best supported?</p>",
+            [
+                "\\(\\displaystyle\\lim_{x\\to 2} f(x)=5\\)",
+                "\\(\\displaystyle\\lim_{x\\to 5} f(x)=2\\)",
+                "\\(f(2)=5\\) is guaranteed",
+                "\\(\\displaystyle\\lim_{x\\to 2} f(x)\\) does not exist",
+            ],
+            "A",
+            "Table values near x=2 approach 5 from both sides.",
+            "<p><strong>A</strong> matches the table trend. <strong>B</strong> swaps 2 and 5. "
+            "<strong>C</strong> confuses limit with value. <strong>D</strong> contradicts agreeing sides.</p>",
+        ),
+        kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
+        "Practice: words to symbols",
+        mcq_reveal(
+            "<p>Which expression matches: “As \\(x\\) approaches \\(-2\\), \\(f(x)\\) approaches \\(7\\)”?</p>",
+            [
+                "\\(\\displaystyle\\lim_{x\\to -2} f(x)=7\\)",
+                "\\(\\displaystyle\\lim_{x\\to 7} f(x)=-2\\)",
+                "\\(f(-2)=7\\)",
+                "\\(\\displaystyle\\lim_{x\\to -2} f(x)=-2\\)",
+            ],
+            "A",
+            "Input approaches c; outputs approach L.",
+            "<p><strong>A</strong> is correct notation. <strong>B</strong> swaps input and output targets. "
+            "<strong>C</strong> is a function value, not a limit. <strong>D</strong> uses the wrong limit value.</p>",
+        ),
+        kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
         "Practice: best interpretation",
         mcq_reveal(
             "<p>Best interpretation of \\(\\displaystyle\\lim_{x\\to 4} f(x)=8\\)?</p>",

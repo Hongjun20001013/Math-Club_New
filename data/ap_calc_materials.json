@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T01:49:35.933890Z",
+  "generated_at": "2026-09-17T02:03:31.612592Z",
   "track": "ap_calc",
   "total": 3,
   "available": 3,
@@ -11,7 +11,7 @@
       "section": "1.1",
       "title": "Introducing Calculus: Can Change Occur at an Instant?",
       "deck_title": "AP Unit 1.1 · Instantaneous change",
-      "slide_count": 14,
+      "slide_count": 16,
       "slides": [
         {
           "index": 1,
@@ -85,6 +85,16 @@
         },
         {
           "index": 8,
+          "title": "Why shrinking the interval works",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Why It Works\"><span class=\"ap-phase-label\">Why It Works</span><h3 class=\"ap-phase-title\">From average to instantaneous</h3><p class=\"ap-phase-sub\">From average to instantaneous</p></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Reason</span><strong>Same idea on both sides</strong><p>Average rates stabilize when the interval is tiny.</p></div><div class=\"ap-box ap-box--big-idea\"><span class=\"ap-box-label\">Big Idea</span><div class=\"ap-box-body\"><p>When \\(h\\) is small, the secant slope \\(\\dfrac{s(a+h)-s(a)}{h}\\) measures change over a <strong>short</strong> interval — closer to what happens <em>at</em> \\(t=a\\).</p><p>If left-side (\\(h&lt;0\\)) and right-side (\\(h&gt;0\\)) averages approach the <strong>same number</strong>, that common value is the instantaneous rate.</p></div></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\">We are not claiming \\(h=0\\). We observe a <em>pattern</em> as \\(h\\to 0\\).</div></div>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "1.1",
+          "study_tip": "",
+          "path_phase": "Why It Works"
+        },
+        {
+          "index": 9,
           "title": "Worked example: simplify the difference quotient",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Worked Example</span><strong>s(t) = t² + 1 at t = 2</strong><p>Teacher model — follow strategy, algebra, and verification.</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Understand</span><div class=\"ap-box-body\"><p>Find the instantaneous rate at t = 2 by simplifying the difference quotient.</p></div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Algebra + table + secant graph all describe the same limiting slope.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Build: \\(\\dfrac{s(2+h)-s(2)}{h}=\\dfrac{(2+h)^2+1-5}{h}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Expand: \\((2+h)^2+1-5 = 4+4h+h^2\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Simplify: \\(\\dfrac{4h+h^2}{h}=4+h\\) for \\(h\\neq 0\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"4\"><p><strong>Step 4.</strong> Interpret: as \\(h\\to 0\\), the rate approaches \\(4\\) m/s.</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> The instantaneous rate of change of s at t = 2 is <strong>4 m/s</strong>.</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Secant slope on [2, 2.01] ≈ 4.01; tangent slope matches 4.</p></div></div>",
           "kind": "lesson",
@@ -94,7 +104,7 @@
           "path_phase": "Worked Example"
         },
         {
-          "index": 9,
+          "index": 10,
           "title": "Error analysis: plugging in h = 0",
           "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Contrast / Error Analysis\"><span class=\"ap-phase-label\">Contrast / Error Analysis</span><h3 class=\"ap-phase-title\">Why h = 0 is not allowed yet</h3><p class=\"ap-phase-sub\">Why h = 0 is not allowed yet</p></div><div class=\"ap-box ap-box--warning\"><span class=\"ap-box-label\">Common Mistake</span><div class=\"ap-box-body\"><p>Substituting \\(h=0\\) gives \\(\\dfrac{s(2)-s(2)}{0}=\\dfrac{0}{0}\\), which is <strong>undefined</strong>.</p><p><strong>Why wrong:</strong> \\(h=0\\) means “no interval,” so the difference quotient does not describe a secant slope.</p><p><strong>Correct move:</strong> simplify algebraically first, <em>then</em> let \\(h\\to 0\\).</p></div></div>",
           "kind": "lesson",
@@ -104,7 +114,7 @@
           "path_phase": "Contrast / Error Analysis"
         },
         {
-          "index": 10,
+          "index": 11,
           "title": "Guided: average rate from a table",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p>For \\(s(t)=t^2+1\\), use the table to estimate the instantaneous rate at \\(t=2\\).</p><table class=\"ap-data-table\"><thead><tr><th>h</th><th>Avg rate</th></tr></thead><tbody><tr><td>0.1</td><td>4.1</td></tr><tr><td>0.01</td><td>4.01</td></tr><tr><td>−0.01</td><td>3.99</td></tr></tbody></table></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> What value are the average rates approaching?</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Does the left side (negative h) agree with the right side?</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> State the instantaneous rate with units.</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>Solution:</strong> Rates approach <strong>4 m/s</strong>. Left and right agree → instantaneous rate ≈ 4 m/s.</p></div>",
           "kind": "lesson",
@@ -114,7 +124,17 @@
           "path_phase": "Guided Example"
         },
         {
-          "index": 11,
+          "index": 12,
+          "title": "Practice: compute an average rate",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Use (change in output) / (change in input) on [1, 4].</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>For \\(s(t)=t^2+1\\), what is the average rate of change on \\([1,4]\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\dfrac{s(4)-s(1)}{3}=5\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\dfrac{s(4)-s(1)}{4}=\\dfrac{15}{4}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(s(4)-s(1)=16\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\dfrac{s(1)-s(4)}{3}=-5\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p>\\(s(4)=17\\), \\(s(1)=2\\), so average rate \\(=\\dfrac{17-2}{4-1}=5\\). <strong>B</strong> uses wrong denominator. <strong>C</strong> omits division by time. <strong>D</strong> reverses the interval sign. <strong>A</strong> is correct.</p></div></div></div>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.1",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 13,
           "title": "Practice: interpret a difference quotient",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Interval in denominator → average, not instantaneous.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Buffalo population \\(b(t)\\), \\(t\\) years since 1800. What does \\(\\dfrac{b(50)-b(0)}{50}\\) represent?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">Population in year 1850</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">Average rate of change of population from 1800 to 1850</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Instantaneous rate in 1800</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Total change only at t = 50</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> confuses a rate with a population value. <strong>C</strong> needs a limit of a difference quotient. <strong>D</strong> misreads “average over 50 years.” <strong>B</strong> is correct: average rate on [0, 50].</p></div></div></div>",
           "kind": "question",
@@ -124,7 +144,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 12,
+          "index": 14,
           "title": "Practice: instantaneous rate setup",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Instantaneous requires a limiting process, not one finite interval.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Which expression represents the instantaneous rate of \\(s(t)=t^2+1\\) at \\(t=2\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\dfrac{s(3)-s(2)}{1}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{h\\to 0}\\dfrac{s(2+h)-s(2)}{h}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(s(2)\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\dfrac{s(2.1)-s(2)}{0.1}\\) only</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A, D</strong> are average rates on one interval. <strong>C</strong> is position, not rate. <strong>B</strong> is the definition of instantaneous rate.</p></div></div></div>",
           "kind": "question",
@@ -134,7 +154,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 13,
+          "index": 15,
           "title": "Exit ticket · 1.1",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Exit Ticket</span><strong>Check your learning</strong><p>Answer each item before revealing.</p></div><ol class=\"ap-exit-list\"><li><span class=\"ap-exit-num\">1</span><div class=\"ap-exit-body\">State the average rate of \\(s(t)=t^2+1\\) on \\([2,3]\\) and interpret it.<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>\\(\\dfrac{s(3)-s(2)}{1}=5\\) m/s — average velocity from t=2 to t=3.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">2</span><div class=\"ap-exit-body\">Simplify \\(\\dfrac{s(2+h)-s(2)}{h}\\) and state the instantaneous rate at \\(t=2\\).<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>Simplifies to \\(4+h\\); instantaneous rate is <strong>4</strong> m/s.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">3</span><div class=\"ap-exit-body\">Why can't we substitute \\(h=0\\) into the difference quotient before simplifying?<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>It gives \\(0/0\\) — undefined. We need \\(h\\neq 0\\) for a secant slope.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li></ol>",
           "kind": "lesson",
@@ -144,7 +164,7 @@
           "path_phase": "Exit Ticket"
         },
         {
-          "index": 14,
+          "index": 16,
           "title": "Practice packet · 1.1",
           "html": "<div class=\"ap-calc-packet-card glass-panel np-glass\"><p class=\"np-atelier-kicker\">Practice packet</p><h2>Unit 1.1 · Can change occur at an instant?</h2><p>Download the worksheet and solution key for additional practice beyond this deck.</p><div class=\"ap-calc-packet-actions\"><a class=\"np-atelier-btn np-atelier-btn--primary\" href=\"/ap/calc/practice/1.1/packet.pdf\" target=\"_blank\" rel=\"noopener\">Open packet PDF</a><a class=\"np-atelier-btn np-atelier-btn--ghost\" href=\"/ap/calc/practice/1.1/solutions.pdf\" target=\"_blank\" rel=\"noopener\">Open solutions PDF</a></div></div>",
           "kind": "lesson",
@@ -155,8 +175,8 @@
         }
       ],
       "practice_section": "1.1",
-      "interactive_count": 2,
-      "checkpoint_count": 2,
+      "interactive_count": 3,
+      "checkpoint_count": 3,
       "tex_available": true,
       "pdf_available": false,
       "phase": 1,
@@ -184,28 +204,32 @@
           "slide_index": 7
         },
         {
-          "label": "Worked Example",
+          "label": "Why It Works",
           "slide_index": 8
         },
         {
-          "label": "Contrast / Error Analysis",
+          "label": "Worked Example",
           "slide_index": 9
         },
         {
-          "label": "Guided Example",
+          "label": "Contrast / Error Analysis",
           "slide_index": 10
         },
         {
-          "label": "AP Practice",
+          "label": "Guided Example",
           "slide_index": 11
         },
         {
+          "label": "AP Practice",
+          "slide_index": 12
+        },
+        {
           "label": "Exit Ticket",
-          "slide_index": 13
+          "slide_index": 15
         },
         {
           "label": "Packet",
-          "slide_index": 14
+          "slide_index": 16
         }
       ]
     },
@@ -216,7 +240,7 @@
       "section": "1.2",
       "title": "Defining Limits and Using Limit Notation",
       "deck_title": "AP Unit 1.2 · Defining limits",
-      "slide_count": 14,
+      "slide_count": 16,
       "slides": [
         {
           "index": 1,
@@ -299,6 +323,26 @@
         },
         {
           "index": 9,
+          "title": "Practice: table to limit statement",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Table values near x=2 approach 5 from both sides.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>A table shows \\(f(x)\\) near \\(x=2\\): 1.9→4.8, 1.99→4.98, 2.01→5.02, 2.1→5.2. Which limit statement is best supported?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 2} f(x)=5\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 5} f(x)=2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(2)=5\\) is guaranteed</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 2} f(x)\\) does not exist</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> matches the table trend. <strong>B</strong> swaps 2 and 5. <strong>C</strong> confuses limit with value. <strong>D</strong> contradicts agreeing sides.</p></div></div></div>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.2",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 10,
+          "title": "Practice: words to symbols",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Input approaches c; outputs approach L.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Which expression matches: “As \\(x\\) approaches \\(-2\\), \\(f(x)\\) approaches \\(7\\)”?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to -2} f(x)=7\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 7} f(x)=-2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(f(-2)=7\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to -2} f(x)=-2\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> is correct notation. <strong>B</strong> swaps input and output targets. <strong>C</strong> is a function value, not a limit. <strong>D</strong> uses the wrong limit value.</p></div></div></div>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.2",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 11,
           "title": "Practice: best interpretation",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Match input approach with output approach.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Best interpretation of \\(\\displaystyle\\lim_{x\\to 4} f(x)=8\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">f(4)=8</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">f(8)=4</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">As x→4, f(x)→8</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">As x→8, f(x)→4</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> confuses limit with value. <strong>B,D</strong> swap 4 and 8. <strong>C</strong> is correct.</p></div></div></div>",
           "kind": "question",
@@ -308,7 +352,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 10,
+          "index": 12,
           "title": "Practice: limit vs value from graph",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Both statements can be true simultaneously.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\) but \\(f(2)=1.5\\). Which is true?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">The limit does not exist</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">f is continuous at x=2</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">The limit exists but ≠ f(2)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Cannot tell from the information</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p>Limit 3 and value 1.5 can coexist (Case B). <strong>C</strong> is correct.</p></div></div></div>",
           "kind": "question",
@@ -318,7 +362,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 11,
+          "index": 13,
           "title": "Practice: identify the error",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Counterexample: piecewise with f(1) defined differently.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>A student says: “Because \\(\\lim_{x\\to 1} f(x)=4\\), we know \\(f(1)=4\\) in all cases.” True?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">True — always</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">False — removable holes exist</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">True only if f is linear</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">False — limits never equal values</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> is correct. Case B shows limit 5 with f(3)=10. Limits do not force f(c)=L.</p></div></div></div>",
           "kind": "question",
@@ -328,7 +372,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 12,
+          "index": 14,
           "title": "Optional: ε–δ definition",
           "html": "<details class=\"ap-box ap-box--optional\"><summary class=\"ap-box-label\">Optional enrichment</summary><div class=\"ap-box-body\"><div class=\"stem-math-block cm-math-block ap-math-block\">\\[\\forall\\varepsilon>0,\\ \\exists\\delta>0:\\ 0<|x-c|<\\delta\\Rightarrow|f(x)-L|<\\varepsilon\\]</div><p>Precision for “arbitrarily close.” Not required for AP computation at this stage.</p></div></details>",
           "kind": "lesson",
@@ -338,7 +382,7 @@
           "path_phase": "Optional"
         },
         {
-          "index": 13,
+          "index": 15,
           "title": "Exit ticket · 1.2",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Exit Ticket</span><strong>Check your learning</strong><p>Answer each item before revealing.</p></div><ol class=\"ap-exit-list\"><li><span class=\"ap-exit-num\">1</span><div class=\"ap-exit-body\">Write \\(\\displaystyle\\lim_{x\\to 5} f(x)=-2\\) in words.<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>As x approaches 5, f(x) approaches −2.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">2</span><div class=\"ap-exit-body\">True or false: \\(f(1)=\\lim_{x\\to 1} f(x)\\) in all cases.<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p><strong>False.</strong> Counterexample: removable hole or jump.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">3</span><div class=\"ap-exit-body\">Name two things that can differ when \\(\\lim_{x\\to c} f(x)=L\\).<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>\\(f(c)\\) may be undefined or may equal a value different from L.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li></ol>",
           "kind": "lesson",
@@ -348,7 +392,7 @@
           "path_phase": "Exit Ticket"
         },
         {
-          "index": 14,
+          "index": 16,
           "title": "Practice packet · 1.2",
           "html": "<div class=\"ap-calc-packet-card glass-panel np-glass\"><p class=\"np-atelier-kicker\">Practice packet</p><h2>Unit 1.2 · Defining limits</h2><p>Download the worksheet and solution key for additional practice beyond this deck.</p><div class=\"ap-calc-packet-actions\"><a class=\"np-atelier-btn np-atelier-btn--primary\" href=\"/ap/calc/practice/1.2/packet.pdf\" target=\"_blank\" rel=\"noopener\">Open packet PDF</a><a class=\"np-atelier-btn np-atelier-btn--ghost\" href=\"/ap/calc/practice/1.2/solutions.pdf\" target=\"_blank\" rel=\"noopener\">Open solutions PDF</a></div></div>",
           "kind": "lesson",
@@ -358,8 +402,8 @@
         }
       ],
       "practice_section": "1.2",
-      "interactive_count": 3,
-      "checkpoint_count": 3,
+      "interactive_count": 5,
+      "checkpoint_count": 5,
       "tex_available": true,
       "pdf_available": false,
       "phase": 1,
@@ -400,11 +444,11 @@
         },
         {
           "label": "Optional",
-          "slide_index": 12
+          "slide_index": 14
         },
         {
           "label": "Exit Ticket",
-          "slide_index": 13
+          "slide_index": 15
         }
       ]
     },
@@ -415,7 +459,7 @@
       "section": "1.3",
       "title": "Estimating Limit Values from Graphs",
       "deck_title": "AP Unit 1.3 · Limits from graphs",
-      "slide_count": 16,
+      "slide_count": 20,
       "slides": [
         {
           "index": 1,
@@ -478,6 +522,16 @@
         },
         {
           "index": 7,
+          "title": "Endpoint and one-sided domain",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Representation Transfer\"><span class=\"ap-phase-label\">Representation Transfer</span><h3 class=\"ap-phase-title\">When only one side exists</h3><p class=\"ap-phase-sub\">When only one side exists</p></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Transfer</span><strong>Domain matters</strong><p>At an endpoint, a left-hand limit may be undefined.</p></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/endpoint_sqrt_13.svg\" alt=\"f(x) = √x on [0, 4]\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">f(x) = √x on [0, 4]</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> At x=0 only x→0⁺ is in the domain.</p></figure><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · At x = 0</span><div class=\"ap-box-body\"><p>\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\). There is <strong>no</strong> left-hand approach on this domain.</p></div></div>",
+          "kind": "lesson",
+          "group": "learn",
+          "section": "1.3",
+          "study_tip": "",
+          "path_phase": "Representation Transfer"
+        },
+        {
+          "index": 8,
           "title": "Worked example: jump discontinuity",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Worked Example</span><strong>Jump at x = 3</strong><p>Teacher model — follow strategy, algebra, and verification.</p></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Understand</span><div class=\"ap-box-body\"><p>Determine \\(\\lim_{x\\to 3} f(x)\\) from the jump graph.</p></div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Use left trace, right trace, compare.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Left: \\(\\lim_{x\\to 3^-} f(x)=-1\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Right: \\(\\lim_{x\\to 3^+} f(x)=2\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Compare: −1 ≠ 2.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"4\"><p><strong>Step 4.</strong> Conclusion: \\(\\displaystyle\\lim_{x\\to 3} f(x)\\) does not exist.</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> Two-sided limit DNE because one-sided limits disagree.</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>A filled dot at f(3) would not repair the jump.</p></div></div>",
           "kind": "lesson",
@@ -487,7 +541,7 @@
           "path_phase": "Worked Example"
         },
         {
-          "index": 8,
+          "index": 9,
           "title": "Guided: trace from the left",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p>Use the piecewise graph at x=2. What is \\(\\displaystyle\\lim_{x\\to 2^-} f(x)\\)?</p><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/piecewise_limit_2.svg\" alt=\"Reference graph\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Reference graph</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Follow left branch only.</p></figure></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Start at x < 2 on the left branch.</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Move toward x = 2 along that branch.</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> Record the y-value approached.</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>Solution:</strong> Left branch y = x+1 approaches <strong>3</strong>.</p></div>",
           "kind": "lesson",
@@ -497,7 +551,7 @@
           "path_phase": "Guided Example"
         },
         {
-          "index": 9,
+          "index": 10,
           "title": "Guided: compare sides",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p>For the jump graph at x=3, find \\(\\lim_{x\\to 3^-} f(x)\\), \\(\\lim_{x\\to 3^+} f(x)\\), and \\(\\lim_{x\\to 3} f(x)\\).</p><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/jump_at_3.svg\" alt=\"Jump graph\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Jump graph</figcaption></figure></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Trace left branch to x=3.</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Trace right branch to x=3.</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> Are the heights equal?</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p>L⁻ = −1, L⁺ = 2, two-sided limit <strong>DNE</strong>.</p></div>",
           "kind": "lesson",
@@ -507,7 +561,7 @@
           "path_phase": "Guided Example"
         },
         {
-          "index": 10,
+          "index": 11,
           "title": "Guided: sketch with constraints",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p>Sketch a graph such that \\(\\lim_{x\\to 2^-} f(x)=3\\), \\(\\lim_{x\\to 2^+} f(x)=3\\), but \\(f(2)=-1\\).</p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Draw open circle at (2, 3).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Draw branches approaching that open circle.</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> Place filled dot at (2, −1).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/sketch_task_13.svg\" alt=\"One valid sketch\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">One valid sketch</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Limit 3; value −1.</p></figure><p>Your sketch may differ in shape — check open vs filled points and branch heights.</p></div>",
           "kind": "lesson",
@@ -517,7 +571,7 @@
           "path_phase": "Guided Example"
         },
         {
-          "index": 11,
+          "index": 12,
           "title": "Practice: jump discontinuity",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Unequal one-sided limits → DNE.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Left limit 3, right limit 5 at x=b. Which is true?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\lim_{x\\to b} f(x)=4\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\lim_{x\\to b} f(x)=5\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Limit DNE</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\lim_{x\\to b} f(x)=3\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>C</strong> — cannot average 3 and 5. Jump means two-sided limit does not exist.</p></div></div></div>",
           "kind": "question",
@@ -527,7 +581,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 12,
+          "index": 13,
           "title": "Practice: read piecewise graph",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Continuity requires limit = value.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>On the x=2 graph, \\(\\lim_{x\\to 2} f(x)=3\\) and \\(f(2)=1.5\\). Is f continuous at 2?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">Yes</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">No</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Cannot tell</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Yes if we redefine f(2)=3</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> — limit exists but ≠ f(2). Redefining would be “removing” discontinuity (topic 1.13).</p></div></div></div>",
           "kind": "question",
@@ -537,7 +591,7 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 13,
+          "index": 14,
           "title": "Practice: filled dot trap",
           "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Filled dot gives f(c); limits come from approach.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>A student reads f(2)=−1 from a filled dot and concludes \\(\\lim_{x\\to 2} f(x)=-1\\). Error?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">No error</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">Yes — limit comes from branches, not the dot</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Yes — limits never equal −1</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Cannot tell</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> — must trace left and right branches first.</p></div></div></div>",
           "kind": "question",
@@ -547,7 +601,37 @@
           "path_phase": "AP Practice"
         },
         {
-          "index": 14,
+          "index": 15,
+          "title": "Practice: infinite behavior",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Infinite oscillation/growth means the two-sided limit DNE in the real-number sense.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>Near \\(x=0\\), the graph of \\(f(x)=\\dfrac{1}{x}\\) shows \\(|y|\\) growing without bound. What is \\(\\displaystyle\\lim_{x\\to 0} f(x)\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">0</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">1</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">The limit does not exist (infinite behavior)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">The limit is ∞ only from the right</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>C</strong> — AP treats unbounded behavior as “limit DNE.” <strong>D</strong> describes one side only; the question asks about the two-sided limit.</p></div></div></div><figure class=\"ap-fig \"><img src=\"/static/ap_calc/figures/infinite_limit_13.svg\" alt=\"Reference: 1/x near 0\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Reference: 1/x near 0</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> Left and right diverge to −∞ and +∞.</p></figure>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.3",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 16,
+          "title": "Practice: endpoint one-sided limit",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Domain starts at 0; only right-hand approach exists.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>For \\(f(x)=\\sqrt{x}\\) on \\([0,4]\\), which statement is correct at \\(x=0\\)?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 0^-} f(x)=0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 0^+} f(x)=0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\displaystyle\\lim_{x\\to 0} f(x)=0\\) with both sides in domain</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(f(0)\\) is undefined</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> — right-hand limit is 0. <strong>A</strong> is outside the domain. <strong>C</strong> incorrectly claims a two-sided approach. <strong>D</strong> — f(0)=0 is defined.</p></div></div></div>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.3",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 17,
+          "title": "Practice: classify discontinuity",
+          "html": "<div class=\"cm-question-workspace\"><div class=\"cm-question-stem\"><div class=\"cm-strategy-chip\"><span class=\"cm-strategy-chip-label\">Strategy</span><p>Limit exists but function value is missing — removable hole.</p></div><div class=\"cm-slide-role cm-slide-role--question\"><span class=\"cm-slide-role-label\">AP Practice</span><strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div><p>\\(\\displaystyle\\lim_{x\\to 2} f(x)=3\\) but \\(f(2)\\) is undefined (open circle only). What type of discontinuity?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">Jump</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">Removable</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Infinite</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Continuous</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> — a hole at x=2. <strong>A</strong> needs unequal one-sided limits. <strong>C</strong> involves unbounded behavior. <strong>D</strong> requires f(2)=limit.</p></div></div></div>",
+          "kind": "question",
+          "group": "practice",
+          "section": "1.3",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 18,
           "title": "Error analysis: skipping a side",
           "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Contrast / Error Analysis\"><span class=\"ap-phase-label\">Contrast / Error Analysis</span><h3 class=\"ap-phase-title\">Incomplete traces</h3><p class=\"ap-phase-sub\">Incomplete traces</p></div><div class=\"ap-box ap-box--warning\"><span class=\"ap-box-label\">Common Mistake</span><div class=\"ap-box-body\"><p><strong>Mistake:</strong> checking only the left branch because it “looks closer.”</p><p><strong>Fix:</strong> always record <em>both</em> \\(L^{-}\\) and \\(L^{+}\\) before deciding.</p></div></div>",
           "kind": "lesson",
@@ -557,7 +641,7 @@
           "path_phase": "Contrast / Error Analysis"
         },
         {
-          "index": 15,
+          "index": 19,
           "title": "Exit ticket · 1.3",
           "html": "<div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Exit Ticket</span><strong>Check your learning</strong><p>Answer each item before revealing.</p></div><ol class=\"ap-exit-list\"><li><span class=\"ap-exit-num\">1</span><div class=\"ap-exit-body\">State the four-step graph procedure in order.<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>Left trace → right trace → compare → inspect filled point.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">2</span><div class=\"ap-exit-body\">If \\(\\lim_{x\\to 3^-} f(x)=-1\\) and \\(\\lim_{x\\to 3^+} f(x)=2\\), does \\(\\lim_{x\\to 3} f(x)\\) exist?<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p><strong>No</strong> — one-sided limits differ.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">3</span><div class=\"ap-exit-body\">On the x=2 piecewise graph, find \\(\\lim_{x\\to 2} f(x)\\) and \\(f(2)\\).<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>Limit = 3; f(2) = 1.5.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li></ol>",
           "kind": "lesson",
@@ -567,7 +651,7 @@
           "path_phase": "Exit Ticket"
         },
         {
-          "index": 16,
+          "index": 20,
           "title": "Practice packet · 1.3",
           "html": "<div class=\"ap-calc-packet-card glass-panel np-glass\"><p class=\"np-atelier-kicker\">Practice packet</p><h2>Unit 1.3 · Limits from graphs</h2><p>Download the worksheet and solution key for additional practice beyond this deck.</p><div class=\"ap-calc-packet-actions\"><a class=\"np-atelier-btn np-atelier-btn--primary\" href=\"/ap/calc/practice/1.3/packet.pdf\" target=\"_blank\" rel=\"noopener\">Open packet PDF</a><a class=\"np-atelier-btn np-atelier-btn--ghost\" href=\"/ap/calc/practice/1.3/solutions.pdf\" target=\"_blank\" rel=\"noopener\">Open solutions PDF</a></div></div>",
           "kind": "lesson",
@@ -577,8 +661,8 @@
         }
       ],
       "practice_section": "1.3",
-      "interactive_count": 3,
-      "checkpoint_count": 3,
+      "interactive_count": 6,
+      "checkpoint_count": 6,
       "tex_available": true,
       "pdf_available": false,
       "phase": 1,
@@ -606,24 +690,28 @@
           "slide_index": 6
         },
         {
-          "label": "Worked Example",
+          "label": "Representation Transfer",
           "slide_index": 7
         },
         {
-          "label": "Guided Example",
+          "label": "Worked Example",
           "slide_index": 8
         },
         {
+          "label": "Guided Example",
+          "slide_index": 9
+        },
+        {
           "label": "AP Practice",
-          "slide_index": 11
+          "slide_index": 12
         },
         {
           "label": "Contrast / Error Analysis",
-          "slide_index": 14
+          "slide_index": 18
         },
         {
           "label": "Exit Ticket",
-          "slide_index": 15
+          "slide_index": 19
         }
       ]
     }

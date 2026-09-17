@@ -128,6 +128,20 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
+        "Why shrinking the interval works",
+        phase_divider("Why It Works", "From average to instantaneous")
+        + role("Reason", "Same idea on both sides", "Average rates stabilize when the interval is tiny.")
+        + big_idea(
+            "<p>When \\(h\\) is small, the secant slope \\(\\dfrac{s(a+h)-s(a)}{h}\\) measures change over a "
+            "<strong>short</strong> interval — closer to what happens <em>at</em> \\(t=a\\).</p>"
+            "<p>If left-side (\\(h&lt;0\\)) and right-side (\\(h&gt;0\\)) averages approach the <strong>same number</strong>, "
+            "that common value is the instantaneous rate.</p>"
+        )
+        + checkpoint("We are not claiming \\(h=0\\). We observe a <em>pattern</em> as \\(h\\to 0\\)."),
+        path_phase="Why It Works",
+    )
+
+    s.add(
         "Worked example: simplify the difference quotient",
         worked_example(
             "s(t) = t² + 1 at t = 2",
@@ -170,6 +184,25 @@ def build(graphs: dict[str, str]) -> dict:
         ),
         path_phase="Guided Example",
         group="practice",
+    )
+
+    s.add(
+        "Practice: compute an average rate",
+        mcq_reveal(
+            "<p>For \\(s(t)=t^2+1\\), what is the average rate of change on \\([1,4]\\)?</p>",
+            [
+                "\\(\\dfrac{s(4)-s(1)}{3}=5\\)",
+                "\\(\\dfrac{s(4)-s(1)}{4}=\\dfrac{15}{4}\\)",
+                "\\(s(4)-s(1)=16\\)",
+                "\\(\\dfrac{s(1)-s(4)}{3}=-5\\)",
+            ],
+            "A",
+            "Use (change in output) / (change in input) on [1, 4].",
+            "<p>\\(s(4)=17\\), \\(s(1)=2\\), so average rate \\(=\\dfrac{17-2}{4-1}=5\\). "
+            "<strong>B</strong> uses wrong denominator. <strong>C</strong> omits division by time. "
+            "<strong>D</strong> reverses the interval sign. <strong>A</strong> is correct.</p>",
+        ),
+        kind="question", group="practice", path_phase="AP Practice",
     )
 
     s.add(

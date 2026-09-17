@@ -302,6 +302,16 @@ def build_all_graphs() -> dict[str, str]:
         notice="A single point can be removed without changing the limit.",
     ))
 
+    # Endpoint / one-sided domain: f(x)=sqrt(x) on [0,4]
+    paths["endpoint_sqrt_13"] = write_graph(GraphSpec(
+        graph_id="endpoint_sqrt_13",
+        title="Endpoint: domain starts at x = 0",
+        x_min=-0.5, x_max=4.5, y_min=-0.5, y_max=3.5,
+        segments=[PlotSegment(lambda x: math.sqrt(x), 0, 4.2, color=PURPLE)],
+        points=[PlotPoint(0, 0, "filled", "f(0)=0")],
+        notice="Only a right-hand approach exists at x=0; lim x→0⁻ f(x) is undefined on this domain.",
+    ))
+
     return paths
 
 
