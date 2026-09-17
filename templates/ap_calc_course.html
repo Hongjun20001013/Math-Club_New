@@ -3,47 +3,74 @@
 
 {% block late_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
-<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_catalog.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cmx np-ap-calc np-ap-calc--quiet">
-  <div class="np-cmx-stage" aria-hidden="true"><div class="np-cmx-stage__wash"></div></div>
+<div class="np-cmx">
+  <div class="np-cmx-stage" aria-hidden="true">
+    <div class="np-cmx-stage__wash"></div>
+  </div>
 
-  <div class="ap-quiet-shell">
-    <nav class="ap-quiet-nav">
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb">
       <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
       <span>/</span>
       <em>Course materials</em>
     </nav>
 
-    <header class="ap-quiet-hero">
-      <p class="ap-quiet-hero__kicker">10 units</p>
-      <h1>Course materials</h1>
-      <p class="ap-quiet-hero__sub">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC</p>
+    <header class="np-cmx-phase">
+      <div class="np-cmx-phase__mark" aria-hidden="true">10</div>
+      <div class="np-cmx-phase__copy">
+        <a href="{{ url_for('ap_calc_hub') }}" class="np-cmx-back">← AP Calculus</a>
+        <p class="np-cmx-eyebrow">AB + BC</p>
+        <h1 class="np-cmx-phase__title">Course materials</h1>
+        <p class="np-cmx-lede">Units 1–8 · AB &nbsp;·&nbsp; Units 9–10 · BC extension</p>
+        <div class="np-cmx-stats">
+          <div><strong>1</strong><span>live unit</span></div>
+          <div><strong>10</strong><span>total</span></div>
+        </div>
+      </div>
     </header>
 
-    <ol class="ap-quiet-list" role="list">
+    <div class="np-cmx-grid" role="list">
       {% for unit in catalog.units %}
-      <li class="ap-quiet-list__item{% if not unit.live and not unit.chapters %} is-soon{% endif %}">
+      <article class="np-cmx-deck{% if not unit.live and not unit.chapters %} is-soon{% elif unit.live %} is-active{% endif %}"
+               role="listitem" style="--deck-i: {{ loop.index0 }};">
         {% if unit.live or unit.chapters %}
-        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="ap-quiet-list__link">
-          <span class="ap-quiet-list__num">{{ '%02d'|format(unit.unit) }}</span>
-          <span class="ap-quiet-list__title">{{ unit.title }}</span>
-          <span class="ap-quiet-list__meta">
-            {% if unit.live %}{{ unit.chapters|selectattr('live')|list|length }} live{% else %}{{ unit.chapters|length }} ch{% endif %}
-          </span>
+        <a href="{{ url_for('ap_calc_course_unit', unit_num=unit.unit) }}" class="np-cmx-deck__link">
+          <div class="np-cmx-deck__top" aria-hidden="true">
+            <span class="np-cmx-deck__code">{{ unit.unit }}</span>
+            <span class="np-cmx-deck__mark">∫</span>
+          </div>
+          <div class="np-cmx-deck__body">
+            <div class="np-cmx-deck__badges">
+              {% if unit.live %}<span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span>{% endif %}
+              <span class="np-cmx-chip">{{ unit.track_label }}</span>
+            </div>
+            <h3>{{ unit.title }}</h3>
+            <p>
+              {% if unit.chapters %}
+              {{ unit.chapters|length }} chapters{% if unit.live %} · {{ unit.chapters|selectattr('live')|list|length }} live{% endif %}
+              {% else %}Preview{% endif %}
+            </p>
+            <span class="np-cmx-deck__cta">Open unit <em aria-hidden="true">→</em></span>
+          </div>
         </a>
         {% else %}
-        <div class="ap-quiet-list__row is-soon">
-          <span class="ap-quiet-list__num">{{ '%02d'|format(unit.unit) }}</span>
-          <span class="ap-quiet-list__title">{{ unit.title }}</span>
-          <span class="ap-quiet-list__meta">Soon</span>
+        <div class="np-cmx-deck__link is-static">
+          <div class="np-cmx-deck__top is-muted" aria-hidden="true">
+            <span class="np-cmx-deck__code">{{ unit.unit }}</span>
+          </div>
+          <div class="np-cmx-deck__body">
+            <div class="np-cmx-deck__badges"><span class="np-cmx-chip">Soon</span></div>
+            <h3>{{ unit.title }}</h3>
+            <p>{{ unit.track_label }} · Coming soon</p>
+          </div>
         </div>
         {% endif %}
-      </li>
+      </article>
       {% endfor %}
-    </ol>
+    </div>
   </div>
 </div>
 {% endblock %}
