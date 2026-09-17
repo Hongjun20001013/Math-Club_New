@@ -3,50 +3,34 @@
 
 {% block late_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
-<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_catalog.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cmx np-ap-calc">
-  <div class="np-cmx-shell">
-    <nav class="np-cmx-crumb">
-      <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
-      <span>/</span>
-      <a href="{{ url_for('ap_calc_course') }}">Course</a>
-      <span>/</span>
-      <em>Unit {{ unit.unit }}</em>
-    </nav>
+<div class="np-cmx np-ap-calc np-ap-calc--quiet">
+  <div class="ap-quiet-shell">
+    <a href="{{ url_for('ap_calc_course') }}" class="ap-quiet-back">← Course materials</a>
 
-    <header class="np-ap-unit-hero">
-      <a href="{{ url_for('ap_calc_course') }}" class="np-ap-unit-hero__back">← All units</a>
-      <div class="np-ap-unit-hero__row">
-        <span class="np-ap-unit-hero__num" aria-hidden="true">{{ unit.unit }}</span>
-        <div>
-          <p class="np-ap-unit-hero__track">{{ unit.track_label }}</p>
-          <h1 class="np-ap-unit-hero__title">{{ unit.title }}</h1>
-          <p class="np-ap-unit-hero__meta">
-            <strong>{{ unit.chapters|selectattr('live')|list|length }}</strong> live ·
-            <strong>{{ unit.chapters|length }}</strong> chapters
-          </p>
-        </div>
-      </div>
+    <header class="ap-quiet-hero">
+      <p class="ap-quiet-hero__kicker">Unit {{ unit.unit }} · {{ unit.track_label }}</p>
+      <h1>{{ unit.title }}</h1>
+      <p class="ap-quiet-hero__sub">{{ unit.chapters|selectattr('live')|list|length }} live · {{ unit.chapters|length }} chapters</p>
     </header>
 
-    <ol class="np-ap-chapter-list">
+    <ol class="ap-quiet-list ap-quiet-list--chapters" role="list">
       {% for ch in unit.chapters %}
-      <li class="np-ap-chapter{% if ch.live %} is-live{% else %} is-soon{% endif %}">
+      <li class="ap-quiet-list__item{% if ch.live %} is-live{% else %} is-soon{% endif %}">
         {% if ch.live and ch.slug %}
-        <a href="{{ url_for('ap_calc_material_view', slug=ch.slug) }}" class="np-ap-chapter__link">
-          <span class="np-ap-chapter__section">{{ ch.section }}</span>
-          <span class="np-ap-chapter__title">{{ ch.title }}</span>
-          <span class="np-ap-chapter__badge np-cmx-chip np-cmx-chip--live"><i></i>Live</span>
-          <span class="np-ap-chapter__arrow" aria-hidden="true">→</span>
+        <a href="{{ url_for('ap_calc_material_view', slug=ch.slug) }}" class="ap-quiet-list__link">
+          <span class="ap-quiet-list__num">{{ ch.section }}</span>
+          <span class="ap-quiet-list__title">{{ ch.title }}</span>
+          <span class="ap-quiet-portal__arrow" aria-hidden="true">→</span>
         </a>
         {% else %}
-        <div class="np-ap-chapter__link np-ap-chapter__link--disabled">
-          <span class="np-ap-chapter__section">{{ ch.section }}</span>
-          <span class="np-ap-chapter__title">{{ ch.title }}</span>
-          <span class="np-ap-chapter__badge">Soon</span>
+        <div class="ap-quiet-list__row">
+          <span class="ap-quiet-list__num">{{ ch.section }}</span>
+          <span class="ap-quiet-list__title">{{ ch.title }}</span>
+          <span class="ap-quiet-list__meta">Soon</span>
         </div>
         {% endif %}
       </li>

@@ -1,0 +1,264 @@
+/* AP Calculus catalog pages — quiet editorial layout */
+
+.np-ap-calc--quiet {
+  --ap-quiet-bg: #fbfbfc;
+  --ap-quiet-ink: #0f0e12;
+  --ap-quiet-muted: #6b6578;
+  --ap-quiet-line: rgba(15, 14, 18, 0.08);
+  --ap-quiet-accent: #5b4ae6;
+  --ap-quiet-max: 40rem;
+  min-height: 100vh;
+  background: var(--ap-quiet-bg);
+  color: var(--ap-quiet-ink);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.np-ap-calc--quiet .np-cmx-stage,
+.np-ap-calc--quiet .np-cmx-foot {
+  display: none;
+}
+
+.ap-quiet-shell {
+  max-width: var(--ap-quiet-max);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 5rem;
+}
+
+.ap-quiet-nav {
+  font-size: 0.8125rem;
+  color: var(--ap-quiet-muted);
+  margin-bottom: 4rem;
+}
+
+.ap-quiet-nav a {
+  color: var(--ap-quiet-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.ap-quiet-nav a:hover {
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-nav em {
+  font-style: normal;
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-nav span {
+  margin: 0 0.35rem;
+  opacity: 0.35;
+}
+
+/* ── Hero ── */
+.ap-quiet-hero {
+  margin-bottom: 3.5rem;
+}
+
+.ap-quiet-hero__kicker {
+  margin: 0 0 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ap-quiet-muted);
+}
+
+.ap-quiet-hero h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 3.75rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-hero__sub {
+  margin: 1rem 0 0;
+  font-size: 1.0625rem;
+  color: var(--ap-quiet-muted);
+  font-weight: 400;
+}
+
+/* ── Portal links (hub) ── */
+.ap-quiet-portals {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--ap-quiet-line);
+}
+
+.ap-quiet-portal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1.5rem;
+  align-items: baseline;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--ap-quiet-line);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.15s;
+}
+
+.ap-quiet-portal:hover {
+  opacity: 0.72;
+}
+
+.ap-quiet-portal__title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-portal__desc {
+  grid-column: 1;
+  font-size: 0.875rem;
+  color: var(--ap-quiet-muted);
+}
+
+.ap-quiet-portal__arrow {
+  font-size: 1.125rem;
+  color: var(--ap-quiet-muted);
+  transition: transform 0.2s;
+}
+
+.ap-quiet-portal:hover .ap-quiet-portal__arrow {
+  transform: translateX(3px);
+  color: var(--ap-quiet-ink);
+}
+
+/* Resume */
+.ap-quiet-resume {
+  display: block;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ap-quiet-line);
+  text-decoration: none;
+  color: inherit;
+}
+
+.ap-quiet-resume__label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ap-quiet-muted);
+  margin-bottom: 0.35rem;
+}
+
+.ap-quiet-resume__title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-resume__meta {
+  font-size: 0.8125rem;
+  color: var(--ap-quiet-muted);
+  margin-top: 0.2rem;
+}
+
+/* ── Unit / chapter lists ── */
+.ap-quiet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ap-quiet-line);
+}
+
+.ap-quiet-list__item {
+  border-bottom: 1px solid var(--ap-quiet-line);
+}
+
+.ap-quiet-list__link,
+.ap-quiet-list__row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  gap: 0 1rem;
+  align-items: center;
+  padding: 1.1rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ap-quiet-list__link {
+  transition: opacity 0.15s;
+}
+
+.ap-quiet-list__link:hover {
+  opacity: 0.7;
+}
+
+.ap-quiet-list__num {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-quiet-muted);
+  letter-spacing: 0.02em;
+}
+
+.ap-quiet-list__title {
+  font-size: 1rem;
+  font-weight: 450;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: var(--ap-quiet-ink);
+}
+
+.ap-quiet-list__meta {
+  font-size: 0.75rem;
+  color: var(--ap-quiet-muted);
+  text-align: right;
+}
+
+.ap-quiet-list__item.is-soon .ap-quiet-list__title,
+.ap-quiet-list__item.is-soon .ap-quiet-list__num {
+  color: rgba(107, 101, 120, 0.55);
+}
+
+.ap-quiet-list__item.is-soon .ap-quiet-list__meta {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ap-quiet-list--chapters .ap-quiet-list__num {
+  width: 2.5rem;
+}
+
+.ap-quiet-back {
+  display: inline-block;
+  margin-bottom: 2.5rem;
+  font-size: 0.8125rem;
+  color: var(--ap-quiet-muted);
+  text-decoration: none;
+}
+
+.ap-quiet-back:hover {
+  color: var(--ap-quiet-ink);
+}
+
+@media (max-width: 520px) {
+  .ap-quiet-shell {
+    padding: 2.5rem 1.15rem 4rem;
+  }
+
+  .ap-quiet-nav {
+    margin-bottom: 2.5rem;
+  }
+
+  .ap-quiet-list__link,
+  .ap-quiet-list__row {
+    grid-template-columns: 2.75rem 1fr;
+    gap: 0.15rem 0.75rem;
+  }
+
+  .ap-quiet-list__meta {
+    grid-column: 2;
+    text-align: left;
+    margin-top: -0.1rem;
+  }
+}

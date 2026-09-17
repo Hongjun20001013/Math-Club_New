@@ -3,92 +3,52 @@
 
 {% block late_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
-<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_catalog.css') }}?v={{ style_css_revision }}" type="text/css">
 {% endblock %}
 
 {% block content %}
-<div class="np-cmx np-ap-calc" data-ap-calc-hub>
-  <div class="np-cmx-stage" aria-hidden="true">
-    <div class="np-cmx-stage__wash"></div>
-    <div class="np-cmx-stage__orb np-cmx-stage__orb--a"></div>
-    <div class="np-cmx-stage__orb np-cmx-stage__orb--b np-ap-calc-orb"></div>
-  </div>
+<div class="np-cmx np-ap-calc np-ap-calc--quiet" data-ap-calc-hub>
+  <div class="np-cmx-stage" aria-hidden="true"><div class="np-cmx-stage__wash"></div></div>
 
-  <div class="np-cmx-shell">
-    <nav class="np-cmx-crumb" aria-label="AP Calculus navigation">
+  <div class="ap-quiet-shell">
+    <nav class="ap-quiet-nav" aria-label="Breadcrumb">
       <a href="{{ url_for('index') }}">Home</a>
       <span>/</span>
-      <em>AP Calculus AB / BC</em>
+      <em>AP Calculus</em>
     </nav>
 
-    <header class="np-ap-hub-hero">
-      <div class="np-ap-hub-hero__main">
-        <p class="np-ap-hub-hero__brand">{{ site_brand_name }}</p>
-        <h1 class="np-ap-hub-hero__title">AP Calculus</h1>
-        <p class="np-ap-hub-hero__sub">AB · 8 units &nbsp;·&nbsp; BC · +2 units &nbsp;·&nbsp; Interactive slides, graphs &amp; practice packets</p>
-      </div>
-      <div class="np-ap-hub-stats" aria-label="Course stats">
-        <div class="np-ap-hub-stat"><strong>{{ live_chapters }}</strong><span>Live chapters</span></div>
-        <div class="np-ap-hub-stat"><strong>10</strong><span>Units</span></div>
-        <div class="np-ap-hub-stat"><strong>{{ live_packets }}</strong><span>Packets</span></div>
-      </div>
+    <header class="ap-quiet-hero">
+      <p class="ap-quiet-hero__kicker">{{ site_brand_name }}</p>
+      <h1>AP Calculus</h1>
+      <p class="ap-quiet-hero__sub">AB · 8 units &nbsp;·&nbsp; BC · 2 units</p>
     </header>
 
-    <section class="np-ap-portals" aria-labelledby="ap-portals-title">
-      <div class="np-ap-section-head">
-        <h2 id="ap-portals-title">Choose your workspace</h2>
-        <p>Courseware, practice, or full curriculum map</p>
-      </div>
-      <div class="np-ap-portal-grid" role="list">
-        <a href="{{ url_for('ap_calc_course') }}" class="np-ap-portal np-ap-portal--course" role="listitem">
-          <span class="np-ap-portal__glyph" aria-hidden="true">§</span>
-          <div class="np-ap-portal__body">
-            <span class="np-ap-portal__tag">Course materials</span>
-            <h3>Slide decks &amp; lessons</h3>
-            <p>10 units · Unit 1 has 15 chapters. Sections 1.1–1.3 are live with graphs, definitions, and AP checks.</p>
-            <span class="np-ap-portal__cta">Browse units →</span>
-          </div>
-        </a>
-        <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-ap-portal np-ap-portal--practice" role="listitem">
-          <span class="np-ap-portal__glyph" aria-hidden="true">✎</span>
-          <div class="np-ap-portal__body">
-            <span class="np-ap-portal__tag">Practice</span>
-            <h3>Packets &amp; solutions</h3>
-            <p>Printable worksheets aligned to each chapter — packet PDF + full solution key.</p>
-            <span class="np-ap-portal__cta">Open practice →</span>
-          </div>
-        </a>
-        <a href="{{ url_for('ap_calc_overview') }}" class="np-ap-portal np-ap-portal--overview" role="listitem">
-          <span class="np-ap-portal__glyph" aria-hidden="true">∞</span>
-          <div class="np-ap-portal__body">
-            <span class="np-ap-portal__tag">Curriculum map</span>
-            <h3>AB / BC overview</h3>
-            <p>Full topic map: which units are AB-only vs BC extensions, and what is coming next.</p>
-            <span class="np-ap-portal__cta">View roadmap →</span>
-          </div>
-        </a>
-      </div>
-    </section>
+    <nav class="ap-quiet-portals" aria-label="Workspaces">
+      <a href="{{ url_for('ap_calc_course') }}" class="ap-quiet-portal">
+        <span class="ap-quiet-portal__title">Course materials</span>
+        <span class="ap-quiet-portal__desc">Slide decks &amp; lessons</span>
+        <span class="ap-quiet-portal__arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="{{ url_for('ap_calc_practice_hub') }}" class="ap-quiet-portal">
+        <span class="ap-quiet-portal__title">Practice</span>
+        <span class="ap-quiet-portal__desc">Packets &amp; solution keys</span>
+        <span class="ap-quiet-portal__arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="{{ url_for('ap_calc_overview') }}" class="ap-quiet-portal">
+        <span class="ap-quiet-portal__title">Curriculum</span>
+        <span class="ap-quiet-portal__desc">AB / BC topic map</span>
+        <span class="ap-quiet-portal__arrow" aria-hidden="true">→</span>
+      </a>
+    </nav>
 
     {% if continue_material %}
     <a href="{{ url_for('ap_calc_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide|default(1) }}"
-       class="np-cmx-feature np-ap-calc-feature">
-      <div class="np-cmx-feature__rail" aria-hidden="true"></div>
-      <div class="np-cmx-feature__copy">
-        <p class="np-cmx-feature__kicker">Continue where you left off</p>
-        <h2>{{ continue_material.section }} · {{ continue_material.title }}</h2>
-        <p>Slide {{ continue_material.continue_slide|default(1) }} / {{ continue_material.slide_count }}</p>
-      </div>
-      <span class="np-cmx-feature__cta">Resume →</span>
+       class="ap-quiet-resume">
+      <span class="ap-quiet-resume__label">Continue</span>
+      <span class="ap-quiet-resume__title">{{ continue_material.section }} · {{ continue_material.title }}</span>
+      <span class="ap-quiet-resume__meta">Slide {{ continue_material.continue_slide|default(1) }} of {{ continue_material.slide_count }}</span>
     </a>
     {% endif %}
-
-    <footer class="np-cmx-foot">
-      <span>Graph · Table · Algebra</span>
-      <span>Interactive slides</span>
-      <span>Practice PDFs</span>
-      <span>Desmos &amp; board</span>
-    </footer>
   </div>
 </div>
 {% endblock %}
