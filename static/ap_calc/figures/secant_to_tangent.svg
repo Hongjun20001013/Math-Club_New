@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Secant lines approaching tangent on parabola">
+  <rect width="480" height="300" fill="#faf8ff" rx="12"/>
+  <line x1="50" y1="250" x2="430" y2="250" stroke="#4c3d99" stroke-width="2"/>
+  <line x1="80" y1="40" x2="80" y2="250" stroke="#4c3d99" stroke-width="2"/>
+  <path d="M 100 230 Q 200 40 380 200" fill="none" stroke="#6a4ce6" stroke-width="3"/>
+  <!-- secants -->
+  <line x1="140" y1="250" x2="300" y2="90" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="160" y1="250" x2="260" y2="110" stroke="#a78bfa" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="175" y1="250" x2="235" y2="130" stroke="#7c3aed" stroke-width="2.5"/>
+  <circle cx="200" cy="145" r="6" fill="#6a4ce6"/>
+  <text x="205" y="140" font-size="12" fill="#4c3d99">t = 2</text>
+  <text x="90" y="30" font-size="13" fill="#4c3d99">s(t) = t² + 1</text>
+  <text x="250" y="280" font-size="12" fill="#666">h ’ 0: secant slope ’ tangent slope</text>
+</svg>

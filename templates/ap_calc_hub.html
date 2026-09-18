@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}AP Calculus AB / BC · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_violet_v2.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_studio.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+{% set coverage_pct = ((materials_ready / materials_total * 100) if materials_total else 0)|round|int %}
+{% set featured = continue_material or (materials[0] if materials else none) %}
+<div class="np-cm-vio np-cm-vio--v3 np-ap-calc" data-ap-calc-hub>
+  <div class="np-cm-vio__canvas" aria-hidden="true">
+    <div class="np-cm-vio__orb np-cm-vio__orb--1"></div>
+    <div class="np-cm-vio__orb np-cm-vio__orb--2"></div>
+    <div class="np-cm-vio__orb np-cm-vio__orb--3"></div>
+    <div class="np-cm-vio__noise"></div>
+    <div class="np-cm-vio__sheen"></div>
+  </div>
+
+  <div class="np-cm-vio__frame">
+    <nav class="np-cm-vio__rail" aria-label="AP Calculus navigation">
+      <a href="{{ url_for('index') }}">Home</a>
+      <span aria-hidden="true">·</span>
+      <span>AP Calculus</span>
+    </nav>
+
+    <header class="np-cm-vio-hero np-cm-vio-hero--cinema">
+      <div class="np-cm-vio-hero__copy">
+        <p class="np-cm-vio-brand np-cm-vio-brand--xl">{{ site_brand_name }}</p>
+        <p class="np-cm-vio-eyebrow">AB · 8 units &nbsp;·&nbsp; BC · +2</p>
+        <h1 class="np-cm-vio-title">AP Calculus</h1>
+        <p class="np-cm-vio-lede">Interactive slide decks with graphs, limit demos, study mode, and printable practice packets — built for the classroom.</p>
+        <div class="np-cm-vio-hero__actions">
+          <a href="{{ url_for('ap_calc_course') }}" class="np-cm-vio-hero__cta">Browse course materials</a>
+          <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-cm-vio-hero__cta np-cm-vio-hero__cta--ghost">Practice packets</a>
+        </div>
+      </div>
+      <aside class="np-cm-vio-hero-panel np-cm-vio-hero-panel--rich" aria-label="Course progress">
+        <div class="np-cm-vio-hero-panel__glow" aria-hidden="true"></div>
+        <div class="np-cm-vio-hero-panel__stack" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="np-cm-vio-hero-panel__copy">
+          <strong>{{ materials_ready }} / {{ materials_total }}</strong>
+          <span>lessons online · {{ live_chapters }} live in Unit 1 · {{ live_packets }} practice packets</span>
+        </div>
+      </aside>
+    </header>
+
+    <div class="np-cm-vio-meter" role="list">
+      <div class="np-cm-vio-meter__item" role="listitem"><em>{{ live_chapters }}</em><span>Live lessons</span></div>
+      <div class="np-cm-vio-meter__item" role="listitem"><em>10</em><span>Units</span></div>
+      <div class="np-cm-vio-meter__item" role="listitem"><em>{{ coverage_pct }}%</em><span>Coverage</span></div>
+      <div class="np-cm-vio-meter__bar" aria-hidden="true"><i style="width: {{ coverage_pct }}%;"></i></div>
+    </div>
+
+    {% if continue_material %}
+    <a href="{{ url_for('ap_calc_material_view', slug=continue_material.slug) }}?slide={{ continue_material.continue_slide|default(1) }}"
+       class="np-cm-vio-spotlight np-cm-vio-spotlight--v3">
+      <div class="np-cm-vio-spotlight__visual" aria-hidden="true">
+        <div class="np-cm-vio-spotlight__orb"></div>
+        <span class="np-cm-vio-spotlight__mark">▶</span>
+      </div>
+      <div class="np-cm-vio-spotlight__copy">
+        <p class="np-cm-vio-spotlight__kicker">Continue learning</p>
+        <h2>{{ continue_material.section }} — {{ continue_material.title }}</h2>
+        <p>Slide {{ continue_material.continue_slide|default(1) }} of {{ continue_material.slide_count }}</p>
+      </div>
+      <span class="np-cm-vio-spotlight__cta">Resume →</span>
+    </a>
+    {% elif featured %}
+    <a href="{{ url_for('ap_calc_material_view', slug=featured.slug) }}" class="np-cm-vio-spotlight np-cm-vio-spotlight--v3">
+      <div class="np-cm-vio-spotlight__visual" aria-hidden="true">
+        <div class="np-cm-vio-spotlight__orb"></div>
+        <span class="np-cm-vio-spotlight__mark">∫</span>
+      </div>
+      <div class="np-cm-vio-spotlight__copy">
+        <p class="np-cm-vio-spotlight__kicker">Start here</p>
+        <h2>{{ featured.section }} — {{ featured.title }}</h2>
+        <p>{{ featured.slide_count or '—' }} slides · interactive graphs</p>
+      </div>
+      <span class="np-cm-vio-spotlight__cta">Open deck →</span>
+    </a>
+    {% endif %}
+
+    {% if materials %}
+    <section class="np-cm-vio-collection" aria-label="Live lessons">
+      <div class="np-cm-vio-collection__head">
+        <div>
+          <p>Unit 1 · Limits</p>
+          <h2>Live now</h2>
+        </div>
+        <span class="np-cm-vio-collection__count">{{ materials|length }} decks</span>
+      </div>
+      <div class="np-ap-live-rail">
+        {% for m in materials %}
+        <a href="{{ url_for('ap_calc_material_view', slug=m.slug) }}" class="np-ap-live-chip{% if loop.first %} is-featured{% endif %}">
+          <span class="np-ap-live-chip__unit">Unit {{ m.unit|default(1) }}</span>
+          <strong>{{ m.section }}</strong>
+          <em>{{ m.title }}</em>
+          <span>{{ m.slide_count or '—' }} slides · packet</span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="np-cm-vio-portals-wrap" aria-labelledby="ap-portals-title">
+      <div class="np-cm-vio-section-head">
+        <h2 id="ap-portals-title">Choose your workspace</h2>
+        <p>Courseware, practice worksheets, or the full AB / BC roadmap.</p>
+      </div>
+      <div class="np-cm-vio-portals">
+        <a href="{{ url_for('ap_calc_course') }}" class="np-cm-vio-portal" style="--portal-i: 0">
+          <div class="np-cm-vio-portal__banner">
+            <div class="np-cm-vio-portal__shimmer" aria-hidden="true"></div>
+            <span class="np-cm-vio-portal__num">01</span>
+            <span class="np-cm-vio-portal__glyph" aria-hidden="true">∫</span>
+          </div>
+          <div class="np-cm-vio-portal__body">
+            <div class="np-cm-vio-portal__meta">
+              <span class="np-cm-vio-portal__index">Slide decks</span>
+              <span class="np-cm-vio-portal__live"><i></i>Live</span>
+            </div>
+            <h3>Course materials</h3>
+            <p class="np-cm-vio-portal__tag">Units 1–10</p>
+            <p class="np-cm-vio-portal__desc">Interactive lessons with graphs, AP checks, and study mode.</p>
+            <span class="np-cm-vio-portal__cta">Browse units →</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_practice_hub') }}" class="np-cm-vio-portal np-cm-vio-portal--p2" style="--portal-i: 1">
+          <div class="np-cm-vio-portal__banner">
+            <div class="np-cm-vio-portal__shimmer" aria-hidden="true"></div>
+            <span class="np-cm-vio-portal__num">02</span>
+            <span class="np-cm-vio-portal__glyph" aria-hidden="true">✎</span>
+          </div>
+          <div class="np-cm-vio-portal__body">
+            <div class="np-cm-vio-portal__meta">
+              <span class="np-cm-vio-portal__index">Worksheets</span>
+              <span class="np-cm-vio-portal__live"><i></i>Live</span>
+            </div>
+            <h3>Practice</h3>
+            <p class="np-cm-vio-portal__tag">PDF packets</p>
+            <p class="np-cm-vio-portal__desc">Printable problem sets and full solution keys.</p>
+            <span class="np-cm-vio-portal__cta">Open practice →</span>
+          </div>
+        </a>
+        <a href="{{ url_for('ap_calc_overview') }}" class="np-cm-vio-portal np-cm-vio-portal--p3" style="--portal-i: 2">
+          <div class="np-cm-vio-portal__banner">
+            <div class="np-cm-vio-portal__shimmer" aria-hidden="true"></div>
+            <span class="np-cm-vio-portal__num">03</span>
+            <span class="np-cm-vio-portal__glyph" aria-hidden="true">∞</span>
+          </div>
+          <div class="np-cm-vio-portal__body">
+            <div class="np-cm-vio-portal__meta">
+              <span class="np-cm-vio-portal__index">Roadmap</span>
+              <span class="np-cm-vio-portal__soon">Map</span>
+            </div>
+            <h3>Curriculum</h3>
+            <p class="np-cm-vio-portal__tag">AB + BC</p>
+            <p class="np-cm-vio-portal__desc">Full topic map — shared units and BC extensions.</p>
+            <span class="np-cm-vio-portal__cta">View roadmap →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <ul class="np-cm-vio-trust">
+      <li>Graph · Table · Algebra</li>
+      <li>Interactive slides</li>
+      <li>Practice PDFs</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{
+  "track": "ap_calc",
+  "ab_units": [1, 2, 3, 4, 5, 6, 7, 8],
+  "bc_units": [9, 10],
+  "units": [
+    {
+      "unit": 1,
+      "title": "Limits and Continuity",
+      "track_label": "AB + BC",
+      "live": true,
+      "chapters": [
+        {"section": "1.1", "title": "Introducing Calculus: Can Change Occur at an Instant?", "slug": "ap-1-1-instantaneous-change", "live": true},
+        {"section": "1.2", "title": "Defining Limits and Using Limit Notation", "slug": "ap-1-2-defining-limits", "live": true},
+        {"section": "1.3", "title": "Estimating Limit Values from Graphs", "slug": "ap-1-3-limits-from-graphs", "live": true},
+        {"section": "1.4", "title": "Estimating Limit Values from Tables", "slug": null, "live": false},
+        {"section": "1.5", "title": "Determining Limits Using Algebraic Properties", "slug": null, "live": false},
+        {"section": "1.6", "title": "Determining Limits Using Algebraic Manipulation", "slug": null, "live": false},
+        {"section": "1.7", "title": "Selecting Procedures for Determining Limits", "slug": null, "live": false},
+        {"section": "1.8", "title": "Determining Limits Using the Squeeze Theorem", "slug": null, "live": false},
+        {"section": "1.9", "title": "Connecting Multiple Representations of Limits", "slug": null, "live": false},
+        {"section": "1.10", "title": "Exploring Types of Discontinuities", "slug": null, "live": false},
+        {"section": "1.11", "title": "Defining Continuity at a Point", "slug": null, "live": false},
+        {"section": "1.12", "title": "Confirming Continuity over an Interval", "slug": null, "live": false},
+        {"section": "1.13", "title": "Removing Discontinuities", "slug": null, "live": false},
+        {"section": "1.14", "title": "Infinite Limits and Vertical Asymptotes", "slug": null, "live": false},
+        {"section": "1.15", "title": "Limits at Infinity and Horizontal Asymptotes", "slug": null, "live": false}
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Differentiation: Definition and Basic Rules",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 3,
+      "title": "Differentiation: Composite, Implicit, and Inverse",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 4,
+      "title": "Contextual Applications of Differentiation",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 5,
+      "title": "Analytical Applications of Differentiation",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 6,
+      "title": "Integration and Accumulation of Change",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 7,
+      "title": "Differential Equations",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 8,
+      "title": "Applications of Integration",
+      "track_label": "AB + BC",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 9,
+      "title": "Parametric Equations, Polar Coordinates, and Vector-Valued Functions",
+      "track_label": "BC only",
+      "live": false,
+      "chapters": []
+    },
+    {
+      "unit": 10,
+      "title": "Infinite Sequences and Series",
+      "track_label": "BC only",
+      "live": false,
+      "chapters": []
+    }
+  ]
+}

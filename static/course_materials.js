@@ -4196,6 +4196,9 @@
     bodyEl.querySelectorAll("[data-cm-mcq]").forEach(initMcq);
     bodyEl.querySelectorAll("[data-cm-grid-in]").forEach(initGridIn);
     restoreLockedAnswerOnSlide(slide);
+    if (typeof window.initApCalcLesson === "function") {
+      window.initApCalcLesson(bodyEl);
+    }
 
     if ((slide.kind === "question" || slide.kind === "practice") && studyMode && !getLockedAnswer(slide.index)) {
       var focusInput = bodyEl.querySelector(".cm-grid-in-input:not(.is-locked)");
