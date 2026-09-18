@@ -2,6 +2,11 @@
 
 Graph, table, formula, and AI context are generated from these specs —
 never duplicated in lesson HTML or JS literals.
+
+Design principles (student-first, spec-driven):
+- Interactive smart graphs: draggable tracers/sliders so students *see* approach behavior.
+- Mathematical accuracy is mandatory — branch formulas, limits, and f(c) must match the spec.
+- One source of truth: lesson visuals, static SVGs, and JS labs all derive from these specs.
 """
 from __future__ import annotations
 

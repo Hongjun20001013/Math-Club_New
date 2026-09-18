@@ -1,4 +1,10 @@
-"""HTML slide building blocks for AP Calculus course materials."""
+"""HTML slide building blocks for AP Calculus course materials.
+
+AP Calc visual design rules:
+- Prefer interactive/draggable smart graphs for student understanding.
+- Static figures supplement labs; never contradict spec math.
+- Limits, L±, and f(c) are generated from ``ap_calc_math_lab_specs`` — do not hardcode twice.
+"""
 from __future__ import annotations
 
 FIG = "/static/ap_calc/figures"
@@ -148,6 +154,82 @@ def visual_limit_vs_value(
         + fc_inner
         + "</div></div>"
     )
+
+
+def visual_jump_case(
+    c: str,
+    left: str,
+    right: str,
+    fc_val: str | None = None,
+    fc_undefined: bool = False,
+) -> str:
+    """Jump discontinuity: unequal one-sided limits, two-sided DNE, optional f(c)."""
+    x_to = f"x\\to {c}"
+    if fc_undefined:
+        fc_inner = math_block(f"\\[\\displaystyle f({c})\\ \\text{{undefined}}\\]")
+    elif fc_val is not None:
+        fc_inner = math_block(f"\\[\\displaystyle f({c}) = {fc_val}\\]")
+    else:
+        fc_inner = '<p class="ap-visual-pair__na">Inspect the filled point on the graph.</p>'
+    return (
+        '<div class="ap-visual-pair ap-visual-pair--jump">'
+        '<div class="ap-visual-pair__col">'
+        '<span class="ap-visual-pair__tag">From the left</span>'
+        + math_block(f"\\[\\displaystyle L^{{-}} = {left}\\]")
+        + "</div>"
+        '<div class="ap-visual-pair__col">'
+        '<span class="ap-visual-pair__tag">From the right</span>'
+        + math_block(f"\\[\\displaystyle L^{{+}} = {right}\\]")
+        + "</div>"
+        '<div class="ap-visual-pair__col ap-visual-pair__col--full">'
+        '<span class="ap-visual-pair__tag">Two-sided limit</span>'
+        + math_block(f"\\[\\displaystyle\\lim_{{{x_to}}} f(x)\\ \\text{{DNE}}\\]")
+        + "</div>"
+        '<div class="ap-visual-pair__col ap-visual-pair__col--full">'
+        '<span class="ap-visual-pair__tag">At the point (value)</span>'
+        + fc_inner
+        + "</div></div>"
+    )
+
+
+def case_model_from_spec(case: dict) -> str:
+    """Build limit-vs-value (or jump) visual model from a limit-cases lab case dict."""
+    c = str(case["targetX"])
+    left = case.get("leftLimit")
+    right = case.get("rightLimit")
+    two = case.get("twoSidedLimit")
+    fc = case.get("functionValue")
+    if two is None and left is not None and right is not None and left != right:
+        return visual_jump_case(
+            c,
+            str(left),
+            str(right),
+            fc_val=str(fc) if fc is not None else None,
+            fc_undefined=fc is None,
+        )
+    limit_str = str(two) if two is not None else "—"
+    return visual_limit_vs_value(
+        c,
+        limit_str,
+        fc_val=str(fc) if fc is not None else None,
+        fc_undefined=fc is None and two is not None,
+    )
+
+
+def visual_cases_gallery_12() -> str:
+    """2×2 grid of limit-vs-value models for §1.2 Cases A–D (spec-driven)."""
+    from ap_calc_math_lab_specs import limit_cases_lab_12
+
+    cards = []
+    for case in limit_cases_lab_12()["cases"]:
+        cards.append(
+            '<div class="ap-cases-gallery__card">'
+            f'<span class="ap-cases-gallery__label">Case {case["label"]}</span>'
+            f'<p class="ap-cases-gallery__title">{case["title"]}</p>'
+            + case_model_from_spec(case)
+            + "</div>"
+        )
+    return '<div class="ap-cases-gallery">' + "".join(cards) + "</div>"
 
 
 # Standard figure notices (LaTeX)
@@ -409,6 +491,13 @@ def secant_math_lab_embed(spec_json: str) -> str:
 
 
 def limit_cases_math_lab_embed(spec_json: str) -> str:
+    from ap_calc_math_lab_specs import limit_cases_lab_12
+
+    case_models = "".join(
+        f'<div class="ap-lab-case-model" data-ap-case-model="{i}"{" hidden" if i else ""}>'
+        f"{case_model_from_spec(case)}</div>"
+        for i, case in enumerate(limit_cases_lab_12()["cases"])
+    )
     inner = (
         '<div class="ap-lab-case-tabs">'
         '<button type="button" class="ap-lab-case-tab is-active" data-ap-case="0">A</button>'
@@ -417,6 +506,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<button type="button" class="ap-lab-case-tab" data-ap-case="3">D</button>'
         "</div>"
         '<h3 class="ap-lab-case-title" data-ap-case-title></h3>'
+        f'<div class="ap-lab-case-models">{case_models}</div>'
         '<div class="ap-lab-phase ap-lab-phase--predict">'
         '<p class="ap-lab-phase__label">Predict → Explore → Explain</p>'
         '<p class="ap-lab-phase__prompt">Before tracing, predict whether left and right approach heights agree.</p>'

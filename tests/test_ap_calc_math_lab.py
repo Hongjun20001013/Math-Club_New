@@ -17,6 +17,7 @@ from ap_calc_math_lab_specs import (  # noqa: E402
     spec_json,
     tracer_lab_13,
 )
+from ap_calc_slide_helpers import case_model_from_spec, visual_cases_gallery_12  # noqa: E402
 
 
 def s(t: float) -> float:
@@ -74,6 +75,25 @@ class LimitCaseTests(unittest.TestCase):
         endpoint = next(s for s in scenarios if s["id"] == "endpoint")
         self.assertIsNone(endpoint["leftLimit"])
         self.assertEqual(endpoint["rightLimit"], 0)
+
+
+class CaseModelTests(unittest.TestCase):
+    def test_case_a_model_shows_limit_and_fc(self):
+        case_a = next(c for c in limit_cases_lab_12()["cases"] if c["id"] == "case-a")
+        html = case_model_from_spec(case_a)
+        self.assertIn("lim", html)
+        self.assertIn("f(3) = 5", html)
+
+    def test_case_d_model_is_jump_layout(self):
+        case_d = next(c for c in limit_cases_lab_12()["cases"] if c["id"] == "case-d")
+        html = case_model_from_spec(case_d)
+        self.assertIn("ap-visual-pair--jump", html)
+        self.assertIn("DNE", html)
+        self.assertIn("f(3) = 0", html)
+
+    def test_gallery_has_four_cards(self):
+        html = visual_cases_gallery_12()
+        self.assertEqual(html.count("ap-cases-gallery__card"), 4)
 
 
 class SpecSerializationTests(unittest.TestCase):

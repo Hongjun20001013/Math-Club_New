@@ -20,6 +20,7 @@ from ap_calc_slide_helpers import (
     NOTICE_JUMP_DNE,
     NOTICE_HOLE,
     NOTICE_INFINITE,
+    visual_cases_gallery_12,
     visual_limit_vs_value,
     mcq_reveal,
     optional_note,
@@ -100,6 +101,7 @@ def build(graphs: dict[str, str]) -> dict:
         + fig(g["limit_case_c_thumb"], "C · Undefined at c", cls="ap-fig--case", notice=NOTICE_HOLE)
         + fig(g["limit_case_d_thumb"], "D · Limit DNE", cls="ap-fig--case", notice=NOTICE_JUMP_DNE)
         + "</div>"
+        + visual_cases_gallery_12()
         + limit_approach_embed(),
         path_phase="Visual Investigation",
     )

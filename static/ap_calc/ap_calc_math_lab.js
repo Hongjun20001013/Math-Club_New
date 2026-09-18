@@ -599,9 +599,30 @@
     if (action === "reset") { slider.value = (c.targetX - 0.5).toFixed(2); this.leftDone = false; this.rightDone = false; this._renderCase(); }
   };
 
+  GraphCaseSwitcher.prototype._yAt = function (x) {
+    var c = this.current();
+    for (var i = 0; i < c.branches.length; i++) {
+      var br = c.branches[i];
+      if (x >= br.x0 && x <= br.x1) return safeEval(br.fn, x);
+    }
+    if (Math.abs(x - c.targetX) < 0.03 && c.functionValue != null) return c.functionValue;
+    return NaN;
+  };
+
+  GraphCaseSwitcher.prototype._syncCaseModel = function () {
+    var self = this;
+    this.root.querySelectorAll("[data-ap-case-model]").forEach(function (panel) {
+      var idx = parseInt(panel.getAttribute("data-ap-case-model"), 10) || 0;
+      panel.hidden = idx !== self.caseIndex;
+    });
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([this.root]).catch(function () {});
+    }
+  };
+
   GraphCaseSwitcher.prototype._trace = function (x) {
     var c = this.current();
-    var y = branchY(c, c.branches[0], x);
+    var y = this._yAt(x);
     this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) { n.textContent = x.toFixed(2); });
     this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = isFinite(y) ? y.toFixed(2) : "—"; });
     if (x < c.targetX - 0.02) {
@@ -657,6 +678,7 @@
     this.root.querySelector("[data-ap-right-obs]").textContent = "______";
     this.leftDone = false;
     this.rightDone = false;
+    this._syncCaseModel();
     this._trace(parseFloat(slider.value));
   };
 

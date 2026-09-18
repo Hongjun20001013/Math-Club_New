@@ -658,6 +658,63 @@ html[data-exam-theme="dark"] .ap-data-table td {
   background: rgba(108, 78, 255, 0.06);
 }
 
+.ap-visual-pair--jump .ap-visual-pair__col--full {
+  grid-column: 1 / -1;
+}
+
+.ap-cases-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .ap-cases-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-cases-gallery__card {
+  padding: 0.75rem 0.85rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(108, 78, 255, 0.14);
+  background: rgba(250, 248, 255, 0.92);
+}
+
+.ap-cases-gallery__label {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6c4eff;
+  border-radius: 999px;
+  background: rgba(108, 78, 255, 0.1);
+}
+
+.ap-cases-gallery__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #3d3558;
+}
+
+.ap-cases-gallery__card .ap-visual-pair {
+  margin: 0.35rem 0 0;
+  gap: 0.5rem;
+}
+
+.ap-lab-case-models {
+  margin: 0.5rem 0 0.85rem;
+}
+
+.ap-lab-case-model .ap-visual-pair {
+  margin: 0;
+}
+
 .ap-fig-notice-math mjx-container {
   font-size: 0.95em;
 }
