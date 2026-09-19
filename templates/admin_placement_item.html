@@ -82,6 +82,31 @@
       <div class="np-explain-body np-explain-body--rich question-panel">{{ explanation_en | safe }}</div>
     </article>
     {% endif %}
+
+    {% if can_override %}
+    <section class="np-admin-pl-override glass-panel np-glass" aria-label="Supervisor score override">
+      <p class="np-summary-sheet-kicker">Supervisor</p>
+      <h2 class="np-summary-sheet-title">Adjust score for this item</h2>
+      <p class="np-summary-sheet-lead">
+        If the student’s work is correct but auto-grading marked it wrong (format, units, etc.),
+        mark it correct here. The report score updates immediately.
+      </p>
+      <p class="np-admin-pl-override-meta">
+        Auto-grade: <strong>{% if auto_is_correct == 1 %}Correct{% elif auto_is_correct == 0 %}Incorrect{% else %}—{% endif %}</strong>
+        {% if supervisor_is_correct is not none %}
+        · Your override: <strong>{% if supervisor_is_correct == 1 %}Correct{% else %}Incorrect{% endif %}</strong>
+        {% endif %}
+      </p>
+      <form method="post" action="{{ url_for('admin_placement_response_override', attempt_id=attempt.id, q_index=q_index) }}" class="np-admin-pl-override-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" name="override" value="correct" class="np-pw-btn np-pw-btn--primary">Mark correct</button>
+        <button type="submit" name="override" value="incorrect" class="np-pw-btn np-pw-btn--ghost">Mark incorrect</button>
+        {% if supervisor_is_correct is not none %}
+        <button type="submit" name="override" value="clear" class="np-pw-btn np-pw-btn--ghost">Clear override</button>
+        {% endif %}
+      </form>
+    </section>
+    {% endif %}
   </div>
 
   <nav class="np-session-item-nav" aria-label="Question navigation">

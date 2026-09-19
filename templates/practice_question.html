@@ -309,13 +309,41 @@
                 </div>
                 {% elif q.question_kind|default('mcq') == 'free_response' %}
                 <div class="sat-response-scroll">
+                {% if placement_mode and topic == 'middle_level' %}
+                <aside class="sat-placement-entry-guide" aria-label="How to type your answer">
+                    <p class="sat-placement-entry-guide__title">How to type your answer</p>
+                    {% if placement_global_hints_en %}
+                    <ul class="sat-placement-entry-guide__list">
+                        {% for hint in placement_global_hints_en %}
+                        <li>{{ hint }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if q.entry_hints_en %}
+                    <p class="sat-placement-entry-guide__q">This question</p>
+                    <ul class="sat-placement-entry-guide__list sat-placement-entry-guide__list--q">
+                        {% for hint in q.entry_hints_en %}
+                        <li>{{ hint }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if q.entry_hints_zh %}
+                    <p class="sat-placement-entry-guide__zh" lang="zh">提示</p>
+                    <ul class="sat-placement-entry-guide__list sat-placement-entry-guide__list--zh" lang="zh">
+                        {% for hint in q.entry_hints_zh %}
+                        <li>{{ hint }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </aside>
+                {% endif %}
                 <div class="sat-spr-panel sat-response-studio sat-response-studio--spr">
                     <label class="sat-spr-label" for="spr-answer-input">Answer</label>
                     <div class="sat-spr-input-wrap">
                         <div class="sat-spr-input-math" id="spr-answer-math" aria-hidden="true"></div>
                         <input type="text" class="sat-spr-input" name="selected_answer" id="spr-answer-input" autocomplete="off" placeholder="e.g. 3/4, x^2, sqrt(2), pi" aria-describedby="spr-hint" value="{{ saved_selected_answer|default('') }}"{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} readonly{% endif %}>
                     </div>
-                    <p id="spr-hint" class="sat-spr-hint">{% if placement_mode %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>2e-3</strong>, or <strong>pi</strong>.{% else %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>pi</strong>.{% endif %}</p>
+                    <p id="spr-hint" class="sat-spr-hint">{% if placement_mode and topic == 'middle_level' %}Type your answer above using the tips on the left. Examples: <strong>3 1/6</strong>, <strong>75</strong>, <strong>2:15</strong>, <strong>632.500</strong>.{% elif placement_mode %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>2e-3</strong>, or <strong>pi</strong>.{% else %}Answers render as math in the box — try <strong>3/4</strong>, <strong>x^2</strong>, <strong>sqrt(2)</strong>, <strong>pi</strong>.{% endif %}</p>
                     <div class="sat-spr-assist" aria-label="Accepted response formats">
                         <span class="sat-spr-assist-kicker">Accepted formats</span>
                         <div class="sat-spr-assist-grid">

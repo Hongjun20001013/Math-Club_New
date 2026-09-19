@@ -2538,6 +2538,64 @@ html[data-exam-theme="dark"] .np-pl-tier__panel {
     color: #5f5778;
 }
 
+.sat-placement-entry-guide {
+    margin: 0 0 0.85rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    border: 1px solid rgba(108, 78, 255, 0.18);
+    background: linear-gradient(180deg, rgba(250, 248, 255, 0.98), rgba(244, 240, 255, 0.92));
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #3d3558;
+}
+
+.sat-placement-entry-guide__title {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6c4eff;
+}
+
+.sat-placement-entry-guide__q,
+.sat-placement-entry-guide__zh {
+    margin: 0.55rem 0 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6f658c;
+}
+
+.sat-placement-entry-guide__list {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+.sat-placement-entry-guide__list--q li {
+    color: #2d1b69;
+}
+
+.sat-placement-entry-guide__list--zh {
+    color: #5f5778;
+}
+
+.np-admin-pl-override {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+}
+
+.np-admin-pl-override-meta {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    color: #5f5778;
+}
+
+.np-admin-pl-override-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 @media (max-width: 719px) {
     .np-pl-report-hero {
         grid-template-columns: 1fr;

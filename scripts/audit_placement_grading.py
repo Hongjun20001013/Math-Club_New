@@ -37,6 +37,12 @@ MIDDLE_LEVEL_CASES = [
     (99, "5.17×10^-6", True),
     (13, "632 R3", True),
     (13, "632R3", True),
+    (13, "632.5", True),
+    (13, "632.500", True),
+    (30, "607 R5", True),
+    (30, "607.83333", True),
+    (4, "2:15", True),
+    (4, "2:15 PM", True),
     (26, "818080", True),
     (38, "3000,3100,3200", True),
     # Must stay wrong
@@ -97,7 +103,11 @@ def main() -> int:
 
     ml = bank["placement"]["middle_level"]
     for qnum, student, expect in MIDDLE_LEVEL_CASES:
-        got = response_is_correct(ml[qnum - 1], student)
+        q = ml[qnum - 1]
+        from placement_middle_level_hints import enrich_middle_level_question
+
+        q = enrich_middle_level_question(q, qnum)
+        got = response_is_correct(q, student)
         if got is not expect:
             errors.append(
                 f"middle_level Q{qnum}: student {student!r} expected {expect}, got {got}"

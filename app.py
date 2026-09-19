@@ -12,6 +12,7 @@ from answer_grader import (
     placement_apply_paper_grades,
     placement_paper_rubric,
     placement_recorded_paper_answer,
+    placement_effective_is_correct,
     placement_result_status,
     response_is_correct,
 )
@@ -1161,6 +1162,11 @@ def init_db():
     )
     ensure_repair_tables(db)
     ensure_placement_public_tables(db)
+    pcr_cols = _table_columns(db, "placement_candidate_responses")
+    if "supervisor_is_correct" not in pcr_cols:
+        db.execute(
+            "ALTER TABLE placement_candidate_responses ADD COLUMN supervisor_is_correct INTEGER"
+        )
     db.execute(
         """
         UPDATE users
@@ -2472,6 +2478,24 @@ def apply_placement_calculator_flags(questions: List[dict], topic: str | None = 
         qc["calculator_allowed"] = allowed
         out.append(qc)
     return out
+
+
+def _apply_middle_level_entry_hints(questions: List[dict]) -> List[dict]:
+    from placement_middle_level_hints import enrich_middle_level_questions
+
+    return enrich_middle_level_questions(questions)
+
+
+def _placement_hint_template_ctx(topic: str) -> dict:
+    if topic != "middle_level":
+        return {}
+    from placement_middle_level_hints import global_entry_hints
+
+    g = global_entry_hints()
+    return {
+        "placement_global_hints_en": g["en"],
+        "placement_global_hints_zh": g["zh"],
+    }
 
 
 def load_compiled_bank() -> Dict[str, Dict[str, List[dict]]]:
@@ -4357,7 +4381,10 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         topic_questions = compiled.get(domain, {}).get(topic)
         if isinstance(topic_questions, list) and topic_questions:
             if domain == "placement":
-                return apply_placement_calculator_flags([dict(q) for q in topic_questions], topic)
+                qs = apply_placement_calculator_flags([dict(q) for q in topic_questions], topic)
+                if topic == "middle_level":
+                    qs = _apply_middle_level_entry_hints(qs)
+                return qs
             return _finalize_questions(domain, topic, topic_questions)
 
         full_path = os.path.join(APP_DIR, file_path)
@@ -4375,7 +4402,10 @@ def get_questions_for_topic(domain: str, topic: str, file_path: str) -> List[dic
         else:
             qs = parse_tex_file(full_path)
         if domain == "placement":
-            return apply_placement_calculator_flags(qs, topic)
+            qs = apply_placement_calculator_flags(qs, topic)
+            if topic == "middle_level":
+                qs = _apply_middle_level_entry_hints(qs)
+            return qs
         return _finalize_questions(domain, topic, qs)
     except Exception as exc:
         app.logger.warning("Question load failed for %s/%s: %s", domain, topic, exc)
@@ -10305,6 +10335,7 @@ def placement_public_item(public_id: str, qnum: int):
         paper_upload_next=_placement_paper_upload_banner(topic, qnum),
         **_placement_exam_nav_ctx(topic, int(att["id"])),
         **_placement_recovery_ctx(),
+        **_placement_hint_template_ctx(topic),
     )
 
 
@@ -10434,7 +10465,7 @@ def placement_public_finish(public_id: str):
     responses = {
         int(r["question_index"]): r
         for r in db.execute(
-            "SELECT question_index, selected_answer, is_correct FROM placement_candidate_responses WHERE attempt_id = ?",
+            "SELECT question_index, selected_answer, is_correct, supervisor_is_correct FROM placement_candidate_responses WHERE attempt_id = ?",
             (att["id"],),
         ).fetchall()
     }
@@ -10449,7 +10480,9 @@ def placement_public_finish(public_id: str):
         row = responses.get(i)
         if row is None:
             continue
-        is_correct_by_index[i] = row["is_correct"]
+        is_correct_by_index[i] = placement_effective_is_correct(
+            row["is_correct"], row["supervisor_is_correct"]
+        )
     score = placement_auto_score_breakdown(
         questions, selected_by_index, is_correct_by_index, topic=str(att["topic"])
     )
@@ -14328,6 +14361,7 @@ def practice_question(domain, topic, qnum):
         paper_upload_next=_placement_paper_upload_banner(topic, question_index) if placement_mode else None,
         **(_placement_exam_nav_ctx(topic) if placement_mode else {}),
         **(_placement_recovery_ctx() if placement_mode else {}),
+        **(_placement_hint_template_ctx(topic) if placement_mode else {}),
     )
 
 
@@ -18107,12 +18141,22 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         selected = str(resp.get("selected_answer") or "")
         selected_by_index[i] = selected
         stored_correct = resp.get("is_correct") if i in responses else None
+        supervisor_override = resp.get("supervisor_is_correct") if i in responses else None
+        effective_correct = placement_effective_is_correct(
+            stored_correct, supervisor_override
+        )
         if i in responses:
-            is_correct_by_index[i] = stored_correct
-        label = placement_result_status(q, stored_correct, selected, topic=str(att["topic"]))
-        if label == "auto correct":
+            is_correct_by_index[i] = effective_correct
+        label = placement_result_status(
+            q,
+            stored_correct,
+            selected,
+            topic=str(att["topic"]),
+            supervisor_is_correct=supervisor_override,
+        )
+        if label in ("auto correct", "advisor correct", "advisor corrected"):
             status = "correct"
-        elif label == "auto incorrect":
+        elif label in ("auto incorrect", "advisor incorrect", "advisor marked wrong"):
             status = "incorrect"
         elif label == "submitted":
             status = "submitted"
@@ -18139,6 +18183,8 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                 "selected": selected,
                 "correct": key,
                 "is_correct": stored_correct,
+                "supervisor_is_correct": supervisor_override,
+                "effective_is_correct": effective_correct,
                 "result_label": label,
                 "status": status,
                 "yours_display": selected or "—",
@@ -18426,6 +18472,10 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
         result_choices=result_choices,
         explanation_en=qobj.get("explanation_en") or qobj.get("solution_en") or "",
         summary_href=summary_href,
+        supervisor_is_correct=row.get("supervisor_is_correct"),
+        effective_is_correct=row.get("effective_is_correct"),
+        auto_is_correct=row.get("is_correct"),
+        can_override=not is_mcq_item(qobj) and str(ctx["attempt"].get("topic") or "") == "middle_level",
         prev_href=(
             url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index - 1)
             if q_index > 0
@@ -18436,6 +18486,50 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
             if q_index + 1 < len(questions)
             else None
         ),
+    )
+
+
+@app.route(
+    "/admin/placement-candidates/<int:attempt_id>/item/<int:q_index>/override",
+    methods=["POST"],
+)
+def admin_placement_response_override(attempt_id: int, q_index: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not placement_public_enabled():
+        abort(404)
+    db = get_db()
+    att = db.execute(
+        "SELECT id, topic FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    if att is None or str(att["topic"]) != "middle_level":
+        abort(404)
+    raw = (request.form.get("override") or "").strip().lower()
+    if raw == "correct":
+        val = 1
+    elif raw == "incorrect":
+        val = 0
+    elif raw in ("clear", "reset", ""):
+        val = None
+    else:
+        flash("Choose Mark correct, Mark incorrect, or Clear override.")
+        return redirect(
+            url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index)
+        )
+    placement_public_mod.save_supervisor_override(db, attempt_id, q_index, val)
+    db.commit()
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx:
+        db.execute(
+            "UPDATE placement_candidate_attempts SET score_json = ? WHERE id = ?",
+            (json.dumps(ctx["score"]), attempt_id),
+        )
+        db.commit()
+    flash("Score override saved." if val is not None else "Score override cleared.")
+    return redirect(
+        url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index)
     )
 
 

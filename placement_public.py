@@ -628,6 +628,44 @@ def save_response(
     _refresh_answered_count(db, attempt_id)
 
 
+def save_supervisor_override(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    q_index: int,
+    is_correct: int | None,
+) -> None:
+    """Set or clear supervisor score override (1=correct, 0=wrong, None=clear)."""
+    row = _row(
+        db,
+        """
+        SELECT attempt_id FROM placement_candidate_responses
+        WHERE attempt_id = ? AND question_index = ?
+        """,
+        (attempt_id, q_index),
+    )
+    if row is None:
+        return
+    if is_correct is None:
+        db.execute(
+            """
+            UPDATE placement_candidate_responses
+            SET supervisor_is_correct = NULL
+            WHERE attempt_id = ? AND question_index = ?
+            """,
+            (attempt_id, q_index),
+        )
+        return
+    val = 1 if int(is_correct) else 0
+    db.execute(
+        """
+        UPDATE placement_candidate_responses
+        SET supervisor_is_correct = ?
+        WHERE attempt_id = ? AND question_index = ?
+        """,
+        (val, attempt_id, q_index),
+    )
+
+
 def clear_response(db: sqlite3.Connection, attempt_id: int, q_index: int) -> None:
     db.execute(
         "DELETE FROM placement_candidate_responses WHERE attempt_id = ? AND question_index = ?",

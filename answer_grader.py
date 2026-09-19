@@ -142,6 +142,48 @@ def _remainder_parts(s: str) -> Optional[tuple[str, str]]:
     return m.group(1), m.group(2)
 
 
+def _parse_clock(s: str) -> Optional[tuple[int, int]]:
+    """Parse h:mm with optional AM/PM (units not required for match)."""
+    t = _clean_answer_text(s)
+    m = re.fullmatch(r"(\d{1,2}):(\d{2})\s*(?:A\.?M\.?|P\.?M\.?)?", t, flags=re.I)
+    if not m:
+        return None
+    return int(m.group(1)), int(m.group(2))
+
+
+def _time_match(student: str, canonical: str, alternates: List[str]) -> bool:
+    refs = [canonical, *alternates]
+    clocks: set[tuple[int, int]] = set()
+    for ref in refs:
+        c = _parse_clock(str(ref))
+        if c is not None:
+            clocks.add(c)
+    if not clocks:
+        return False
+    stu = _parse_clock(student)
+    return stu is not None and stu in clocks
+
+
+def _decimal_quotient_match(student: str, question: dict | None) -> bool:
+    """Accept rounded decimal for division items (e.g. 632.500 instead of 632 R3)."""
+    if not question:
+        return False
+    dq = question.get("accept_decimal_quotient")
+    if not isinstance(dq, dict):
+        return False
+    sn = _try_numeric_value(student)
+    if sn is None:
+        return False
+    try:
+        target = float(dq["value"])
+        places = int(dq["places"])
+    except (TypeError, ValueError, KeyError):
+        return False
+    if round(sn, places) == round(target, places):
+        return True
+    return numeric_match(sn, target, tol=10 ** (-places))
+
+
 def _answer_variants(s: str) -> Set[str]:
     """Comparable forms for a reference or student answer."""
     variants: Set[str] = set()
@@ -247,20 +289,33 @@ def _extract_math_pieces(student: str) -> List[str]:
     return [p.strip() for p in pieces if p.strip()]
 
 
-def free_response_matches(student: str, canonical: str, alternates: List[str], tol: float = 0.002) -> bool:
+def free_response_matches(
+    student: str,
+    canonical: str,
+    alternates: List[str],
+    tol: float = 0.002,
+    question: dict | None = None,
+) -> bool:
     """True if student answer matches canonical or any alternate (numeric tolerance or normalized text)."""
     if not _strip_input(student):
         return False
 
-    # Remainder answers must keep both quotient and remainder.
+    if _decimal_quotient_match(student, question):
+        return True
+
+    if _time_match(student, canonical, alternates):
+        return True
+
+    # Remainder answers must keep both quotient and remainder (or decimal path above).
     can_rem = _remainder_parts(_clean_answer_text(canonical))
     stu_rem = _remainder_parts(_clean_answer_text(student))
     if can_rem is not None:
         if stu_rem is None:
-            return False
-        if can_rem == stu_rem:
+            bare = _try_numeric_value(student)
+            if bare is not None and abs(bare - float(can_rem[0])) < tol:
+                return False
+        elif can_rem == stu_rem:
             return True
-        # Still allow exact alternate remainder strings below.
 
     student_vars = _answer_variants(student)
     refs = [canonical, *alternates]
@@ -359,7 +414,7 @@ def response_is_correct(question: dict, student_raw: str) -> Optional[bool]:
         raw_alts = question.get("answer_alternates")
         if isinstance(raw_alts, list):
             alts = [str(x) for x in raw_alts]
-        return free_response_matches(s, str(key), alts)
+        return free_response_matches(s, str(key), alts, question=question)
 
     allowed = {"A", "B", "C", "D", "E"} if kind == "mcq5" else {"A", "B", "C", "D"}
     letter = s[:1].upper()
@@ -535,19 +590,36 @@ def placement_apply_paper_grades(score: dict, grades: dict[int, int], rubric: li
     return out
 
 
+def placement_effective_is_correct(
+    auto_is_correct: Optional[int],
+    supervisor_is_correct: Optional[int],
+) -> Optional[int]:
+    """Supervisor override wins when set (0 or 1)."""
+    if supervisor_is_correct in (0, 1):
+        return int(supervisor_is_correct)
+    return auto_is_correct
+
+
 def placement_result_status(
-    question: dict, is_correct: Optional[int], selected: str, topic: str | None = None
+    question: dict,
+    is_correct: Optional[int],
+    selected: str,
+    topic: str | None = None,
+    supervisor_is_correct: Optional[int] = None,
 ) -> str:
     """Staff-facing label for one placement item."""
     has = bool((selected or "").strip())
+    effective = placement_effective_is_correct(is_correct, supervisor_is_correct)
     if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
         return "paper"
     if is_placement_graphing_item(question):
         return "submitted" if has else "unscored"
-    if is_correct == 1:
-        return "auto correct"
-    if is_correct == 0:
-        return "auto incorrect"
+    if supervisor_is_correct in (0, 1) and supervisor_is_correct != is_correct:
+        return "advisor corrected" if effective == 1 else "advisor marked wrong"
+    if effective == 1:
+        return "auto correct" if supervisor_is_correct is None else "advisor correct"
+    if effective == 0:
+        return "auto incorrect" if supervisor_is_correct is None else "advisor incorrect"
     if has:
         return "awaiting review"
     return "skipped"
