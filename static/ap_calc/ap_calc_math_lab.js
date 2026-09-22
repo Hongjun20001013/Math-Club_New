@@ -159,12 +159,38 @@
     if (live) live.textContent = msg;
   }
 
+  function niceStep(span, target) {
+    target = target || 5;
+    if (span <= 0) return 1;
+    var raw = span / target;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var norm = raw / mag;
+    var nice = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+    return nice * mag;
+  }
+
+  function tickValues(vmin, vmax, target) {
+    target = target || 5;
+    if (vmax <= vmin) return [vmin];
+    var step = niceStep(vmax - vmin, target);
+    var start = Math.ceil(vmin / step - 1e-9) * step;
+    var ticks = [];
+    for (var v = start; v <= vmax + step * 0.001; v += step) ticks.push(v);
+    return ticks;
+  }
+
+  function formatTick(v) {
+    if (Math.abs(v) < 1e-9) return "0";
+    if (Math.abs(v - Math.round(v)) < 1e-6) return String(Math.round(v));
+    return String(parseFloat(v.toPrecision(2)));
+  }
+
   function SVGPlot(svg, opts) {
     this.svg = svg;
-    this.padL = opts.padL || 42;
+    this.padL = opts.padL || 48;
     this.padR = opts.padR || 16;
     this.padT = opts.padT || 18;
-    this.padB = opts.padB || 30;
+    this.padB = opts.padB || 38;
     this.W = opts.W || 480;
     this.H = opts.H || 280;
     this.xMin = opts.xMin;
@@ -222,13 +248,61 @@
       ax.setAttribute("y1", this.plotBottom);
       ax.setAttribute("x2", this.plotRight);
       ax.setAttribute("y2", this.plotBottom);
+      ax.setAttribute("stroke-width", "1.25");
     }
     if (ay) {
       ay.setAttribute("x1", this.plotLeft);
       ay.setAttribute("y1", this.plotTop);
       ay.setAttribute("x2", this.plotLeft);
       ay.setAttribute("y2", this.plotBottom);
+      ay.setAttribute("stroke-width", "1.25");
     }
+    this._drawTickLabels();
+  };
+
+  SVGPlot.prototype._drawTickLabels = function () {
+    var old = this.svg.querySelector("[data-ap-ticks]");
+    if (old) old.remove();
+    var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("data-ap-ticks", "");
+    var self = this;
+    var tickLen = 5;
+    var fs = 10;
+    tickValues(this.xMin, this.xMax, 5).forEach(function (xv) {
+      var px = self.mapX(xv);
+      var t1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      t1.setAttribute("x1", px); t1.setAttribute("y1", self.plotBottom);
+      t1.setAttribute("x2", px); t1.setAttribute("y2", self.plotBottom + tickLen);
+      t1.setAttribute("stroke", COLORS.axis); t1.setAttribute("stroke-width", "1");
+      g.appendChild(t1);
+      var txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      txt.setAttribute("x", px);
+      txt.setAttribute("y", self.plotBottom + tickLen + 13);
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("font-size", fs);
+      txt.setAttribute("fill", COLORS.axis);
+      txt.textContent = formatTick(xv);
+      g.appendChild(txt);
+    });
+    tickValues(this.yMin, this.yMax, 5).forEach(function (yv) {
+      var py = self.mapY(yv);
+      var t2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      t2.setAttribute("x1", self.plotLeft - tickLen); t2.setAttribute("y1", py);
+      t2.setAttribute("x2", self.plotLeft); t2.setAttribute("y2", py);
+      t2.setAttribute("stroke", COLORS.axis); t2.setAttribute("stroke-width", "1");
+      g.appendChild(t2);
+      var txt2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      txt2.setAttribute("x", self.plotLeft - 7);
+      txt2.setAttribute("y", py + 3);
+      txt2.setAttribute("text-anchor", "end");
+      txt2.setAttribute("font-size", fs);
+      txt2.setAttribute("fill", COLORS.axis);
+      txt2.textContent = formatTick(yv);
+      g.appendChild(txt2);
+    });
+    var layer = this.svg.querySelector("[data-ap-plot-layer]");
+    if (layer) layer.insertBefore(g, layer.firstChild);
+    else this.svg.appendChild(g);
   };
 
   SVGPlot.prototype.drawTargetX = function (targetX) {
@@ -1291,6 +1365,8 @@
     parseLimitValue: parseLimitValue,
     limitsMatch: limitsMatch,
     resolveScenarioIndex: resolveScenarioIndex,
+    tickValues: tickValues,
+    formatTick: formatTick,
     TRACER_EPS: TRACER_EPS,
     onStateChange: null,
   };

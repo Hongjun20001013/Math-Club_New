@@ -75,6 +75,85 @@ def _y_map(y: float, spec: GraphSpec, h: int, pad_t: int, pad_b: int) -> float:
     return h - pad_b - (y - spec.y_min) / (spec.y_max - spec.y_min) * (h - pad_t - pad_b)
 
 
+def _nice_step(span: float, target: int = 5) -> float:
+    if span <= 0:
+        return 1.0
+    raw = span / max(target, 1)
+    mag = 10 ** math.floor(math.log10(raw))
+    norm = raw / mag
+    if norm <= 1:
+        nice = 1
+    elif norm <= 2:
+        nice = 2
+    elif norm <= 5:
+        nice = 5
+    else:
+        nice = 10
+    return nice * mag
+
+
+def _tick_values(vmin: float, vmax: float, target: int = 5) -> list[float]:
+    if vmax <= vmin:
+        return [vmin]
+    step = _nice_step(vmax - vmin, target)
+    start = math.ceil(vmin / step - 1e-9) * step
+    ticks: list[float] = []
+    v = start
+    while v <= vmax + step * 0.001:
+        ticks.append(v)
+        v += step
+    return ticks
+
+
+def _format_tick(v: float) -> str:
+    if abs(v) < 1e-9:
+        return "0"
+    if abs(v - round(v)) < 1e-6:
+        return str(int(round(v)))
+    return f"{v:.2g}"
+
+
+def _append_axis_ticks(
+    parts: list[str],
+    spec: GraphSpec,
+    width: int,
+    height: int,
+    pad_l: int,
+    pad_r: int,
+    pad_t: int,
+    pad_b: int,
+    font_pt: int,
+    compact: bool,
+) -> None:
+    target = 3 if compact else 5
+    tick_len = 4 if compact else 6
+    label_fs = max(8, font_pt - 2) if compact else font_pt
+    axis_y = height - pad_b
+    axis_x = pad_l
+    x_ticks = _tick_values(spec.x_min, spec.x_max, target)
+    y_ticks = _tick_values(spec.y_min, spec.y_max, target)
+    for xv in x_ticks:
+        px = _x_map(xv, spec, width, pad_l, pad_r)
+        parts.append(
+            f'<line x1="{px:.1f}" y1="{axis_y:.1f}" x2="{px:.1f}" y2="{axis_y + tick_len:.1f}" '
+            f'stroke="{PURPLE_DARK}" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{px:.1f}" y="{axis_y + tick_len + (14 if not compact else 11):.1f}" '
+            f'text-anchor="middle" font-size="{label_fs}" fill="{PURPLE_DARK}">{_format_tick(xv)}</text>'
+        )
+    for yv in y_ticks:
+        py = _y_map(yv, spec, height, pad_t, pad_b)
+        parts.append(
+            f'<line x1="{axis_x - tick_len:.1f}" y1="{py:.1f}" x2="{axis_x:.1f}" y2="{py:.1f}" '
+            f'stroke="{PURPLE_DARK}" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{axis_x - 6:.1f}" y="{py + 4:.1f}" text-anchor="end" '
+            f'font-size="{label_fs}" fill="{PURPLE_DARK}">{_format_tick(yv)}</text>'
+        )
+
+
 def render_graph(
     spec: GraphSpec,
     width: int = 520,
@@ -112,8 +191,16 @@ def render_graph(
         gy = pad_t + i * (height - pad_t - pad_b) / 4
         parts.append(f'<line x1="{pad_l}" y1="{gy:.1f}" x2="{width-pad_r}" y2="{gy:.1f}" stroke="{GRID}" stroke-width="1"/>')
     # axes
-    parts.append(f'<line x1="{pad_l}" y1="{height-pad_b}" x2="{width-pad_r}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
-    parts.append(f'<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{height-pad_b}" stroke="{PURPLE_DARK}" stroke-width="2"/>')
+    axis_w = "1.25" if compact else "1.5"
+    parts.append(
+        f'<line x1="{pad_l}" y1="{height-pad_b}" x2="{width-pad_r}" y2="{height-pad_b}" '
+        f'stroke="{PURPLE_DARK}" stroke-width="{axis_w}"/>'
+    )
+    parts.append(
+        f'<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{height-pad_b}" '
+        f'stroke="{PURPLE_DARK}" stroke-width="{axis_w}"/>'
+    )
+    _append_axis_ticks(parts, spec, width, height, pad_l, pad_r, pad_t, pad_b, font_pt, compact)
     if not compact:
         parts.append(
             f'<text x="{width - pad_r + 2:.1f}" y="{height - pad_b + 18:.1f}" text-anchor="end" '
