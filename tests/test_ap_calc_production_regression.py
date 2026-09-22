@@ -29,11 +29,59 @@ MATERIALS_PATH = ROOT / "data" / "ap_calc_materials.json"
 MATH_LAB_JS = ROOT / "static" / "ap_calc" / "ap_calc_math_lab.js"
 
 
+def _node_eval_probe() -> dict:
+    script = r"""
+const fs = require('fs');
+const vm = require('vm');
+const code = fs.readFileSync(process.argv[process.argv.length - 1], 'utf8');
+const sandbox = {
+  window: {},
+  global: {},
+  document: { readyState: 'complete', addEventListener: function () {} },
+  matchMedia: () => ({ matches: true }),
+};
+sandbox.window = sandbox.global = sandbox;
+vm.runInNewContext(code, sandbox);
+const lab = sandbox.ApCalcMathLab;
+const ev = lab.evaluateHoleWithValue;
+const scenarios = [
+  { id: 'continuous', targetX: 2, infinite: false, functionValue: 2,
+    branches: [{ fn: '0.5*x + 1', x0: -0.5, x1: 4.5 }] },
+  { id: 'hole-with-value', targetX: 2, infinite: false, functionValue: 1.5,
+    branches: [{ fn: 'x + 1', x0: -0.5, x1: 1.98 }, { fn: '-x + 5', x0: 2.02, x1: 4.5 }] },
+  { id: 'jump', targetX: 3, infinite: false, functionValue: 0,
+    branches: [{ fn: 'x - 4', x0: -0.5, x1: 2.98 }, { fn: 'x + 1', x0: 3.02, x1: 4.5 }] },
+];
+function finiteNearC(sc) {
+  const c = sc.targetX;
+  const pts = [c - 0.01, c - 0.001, c + 0.01, c + 0.001];
+  return pts.map((x) => lab.evaluateScenarioY(sc, x, false)).every((y) => Number.isFinite(y));
+}
+console.log(JSON.stringify({
+  y199: ev(1.99),
+  y1999: ev(1.999),
+  y201: ev(2.01),
+  y2001: ev(2.001),
+  leftPresetLabels: lab.nearTracerPresets([1, 1.5, 1.9, 1.99, 1.999], 2, 'left').map(lab.formatPresetLabel),
+  rightPresetLabels: lab.nearTracerPresets([3, 2.5, 2.1, 2.01, 2.001], 2, 'right').map(lab.formatPresetLabel),
+  finiteNearC: scenarios.map((sc) => ({ id: sc.id, ok: finiteNearC(sc) })),
+}));
+"""
+    out = subprocess.run(
+        ["node", "-e", script, str(MATH_LAB_JS)],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd=ROOT,
+    )
+    return json.loads(out.stdout.strip())
+
+
 def _node_tracer_probe() -> dict:
     script = r"""
 const fs = require('fs');
 const vm = require('vm');
-const code = fs.readFileSync(process.argv[1], 'utf8');
+const code = fs.readFileSync(process.argv[process.argv.length - 1], 'utf8');
 const sandbox = {
   window: {},
   global: {},
@@ -108,6 +156,23 @@ class ProductionRegressionTests(unittest.TestCase):
         probe = _node_tracer_probe()
         self.assertAlmostEqual(probe["leftX"] + 1, 3, places=2)
         self.assertAlmostEqual(-probe["rightX"] + 5, 3, places=2)
+
+    def test_evaluate_hole_with_value_near_c(self):
+        probe = _node_eval_probe()
+        self.assertAlmostEqual(probe["y199"], 2.99, places=3)
+        self.assertAlmostEqual(probe["y1999"], 2.999, places=4)
+        self.assertAlmostEqual(probe["y201"], 2.99, places=3)
+        self.assertAlmostEqual(probe["y2001"], 2.999, places=4)
+
+    def test_preset_labels_distinct_near_c(self):
+        probe = _node_eval_probe()
+        self.assertEqual(probe["leftPresetLabels"], ["x = 1.99", "x = 1.999"])
+        self.assertEqual(probe["rightPresetLabels"], ["x = 2.001", "x = 2.01"])
+
+    def test_finite_cases_never_infinity_near_c(self):
+        probe = _node_eval_probe()
+        for row in probe["finiteNearC"]:
+            self.assertTrue(row["ok"], msg=row["id"])
 
     def test_hints_12_and_13_no_h_zero(self):
         for lesson_id in ("1.2", "1.3"):

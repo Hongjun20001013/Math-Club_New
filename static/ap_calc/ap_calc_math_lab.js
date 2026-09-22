@@ -81,6 +81,84 @@
     return clampTracerX(side === "left" ? c - TRACER_EPS : c + TRACER_EPS, c, side, domainMin);
   }
 
+  function branchForApproach(sc, x) {
+    var c = sc.targetX;
+    var i, br;
+    for (i = 0; i < sc.branches.length; i++) {
+      br = sc.branches[i];
+      if (x >= br.x0 && x <= br.x1) return br;
+    }
+    if (x < c) {
+      var bestLeft = null;
+      for (i = 0; i < sc.branches.length; i++) {
+        br = sc.branches[i];
+        if (br.x1 <= c && (!bestLeft || br.x1 > bestLeft.x1)) bestLeft = br;
+      }
+      return bestLeft || sc.branches[0];
+    }
+    if (x > c) {
+      var bestRight = null;
+      for (i = 0; i < sc.branches.length; i++) {
+        br = sc.branches[i];
+        if (br.x0 >= c && (!bestRight || br.x0 < bestRight.x0)) bestRight = br;
+      }
+      return bestRight || sc.branches[sc.branches.length - 1];
+    }
+    return null;
+  }
+
+  function evaluateScenarioY(sc, x, allowFc) {
+    var c = sc.targetX;
+    if (allowFc && Math.abs(x - c) < 0.03 && sc.functionValue != null) {
+      return sc.functionValue;
+    }
+    if (!allowFc && Math.abs(x - c) < TRACER_EPS / 2) return NaN;
+    var br = branchForApproach(sc, x);
+    if (!br) return NaN;
+    var y = safeEval(br.fn, x);
+    if (!isFinite(y)) return sc.infinite ? y : NaN;
+    return y;
+  }
+
+  function formatTracerY(y, sc) {
+    if (y == null || isNaN(y)) return "—";
+    if (!isFinite(y)) return sc && sc.infinite ? "∞" : "—";
+    return y.toFixed(2);
+  }
+
+  function formatPresetLabel(x) {
+    var s = String(x);
+    var decimals = 0;
+    if (s.indexOf(".") >= 0) {
+      decimals = s.split(".")[1].length;
+    }
+    if (decimals < 2) decimals = 2;
+    return "x = " + parseFloat(x.toFixed(decimals));
+  }
+
+  function nearTracerPresets(presets, c, side) {
+    var valid = presets.filter(function (x) {
+      return side === "left" ? x < c - TRACER_EPS : x > c + TRACER_EPS;
+    });
+    valid.sort(function (a, b) { return Math.abs(a - c) - Math.abs(b - c); });
+    var picked = valid.slice(0, 2);
+    picked.sort(function (a, b) { return a - b; });
+    return picked;
+  }
+
+  function evaluateHoleWithValue(x) {
+    return evaluateScenarioY({
+      id: "hole-with-value",
+      targetX: 2,
+      infinite: false,
+      functionValue: 1.5,
+      branches: [
+        { fn: "x + 1", x0: -0.5, x1: 1.98 },
+        { fn: "-x + 5", x0: 2.02, x1: 4.5 },
+      ],
+    }, x, false);
+  }
+
   function parseLimitValue(raw) {
     if (raw == null || raw === "") return null;
     var t = String(raw).trim().toLowerCase();
@@ -866,13 +944,7 @@
   };
 
   GraphCaseSwitcher.prototype._yAt = function (x) {
-    var c = this.current();
-    if (Math.abs(x - c.targetX) < TRACER_EPS) return NaN;
-    for (var i = 0; i < c.branches.length; i++) {
-      var br = c.branches[i];
-      if (x >= br.x0 && x <= br.x1) return safeEval(br.fn, x);
-    }
-    return NaN;
+    return evaluateScenarioY(this.current(), x, false);
   };
 
   GraphCaseSwitcher.prototype._syncCaseModel = function () {
@@ -899,7 +971,7 @@
     this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) {
       n.textContent = formatApproachX(x, c.targetX, side).replace("x = ", "").replace("x → ", "");
     });
-    this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = isFinite(y) ? y.toFixed(2) : "—"; });
+    this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = formatTracerY(y, c); });
     if (side === "left") {
       this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the left toward x = " + c.targetX;
     } else {
@@ -1090,14 +1162,7 @@
   };
 
   OneSidedLimitTracer.prototype._yAt = function (x, allowFc) {
-    var sc = this.scenario();
-    if (!allowFc && Math.abs(x - sc.targetX) < TRACER_EPS) return NaN;
-    for (var i = 0; i < sc.branches.length; i++) {
-      var br = sc.branches[i];
-      if (x >= br.x0 && x <= br.x1) return safeEval(br.fn, x);
-    }
-    if (allowFc && Math.abs(x - sc.targetX) < 0.03 && sc.functionValue != null) return sc.functionValue;
-    return NaN;
+    return evaluateScenarioY(this.scenario(), x, allowFc);
   };
 
   OneSidedLimitTracer.prototype._submitPredict = function () {
@@ -1271,7 +1336,7 @@
     var yEl = this.root.querySelector("[data-ap-trace-left-y]");
     var distEl = this.root.querySelector("[data-ap-trace-left-dist]");
     if (read) read.textContent = formatApproachX(x, sc.targetX, "left");
-    if (yEl) yEl.textContent = isFinite(y) ? y.toFixed(2) : "∞";
+    if (yEl) yEl.textContent = formatTracerY(y, sc);
     if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
     if (this.predictDone && Math.abs(x - sc.targetX) <= 0.11) {
       this.step = Math.max(this.step, 2);
@@ -1297,7 +1362,7 @@
     var yEl = this.root.querySelector("[data-ap-trace-right-y]");
     var distEl = this.root.querySelector("[data-ap-trace-right-dist]");
     if (read) read.textContent = formatApproachX(x, sc.targetX, "right");
-    if (yEl) yEl.textContent = isFinite(y) ? y.toFixed(2) : "∞";
+    if (yEl) yEl.textContent = formatTracerY(y, sc);
     if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
     if (this.leftLocked != null && Math.abs(x - sc.targetX) <= 0.11) {
       this.step = Math.max(this.step, 4);
@@ -1359,14 +1424,13 @@
   OneSidedLimitTracer.prototype._buildPresets = function (side) {
     var sc = this.scenario();
     var presets = (sc.allowedTracerValues && sc.allowedTracerValues[side]) || [];
+    presets = nearTracerPresets(presets, sc.targetX, side);
     var container = this.root.querySelector(side === "left" ? "[data-ap-left-presets]" : "[data-ap-right-presets]");
     if (!container) return;
     container.innerHTML = "";
     var self = this;
     presets.forEach(function (x) {
-      var valid = side === "left" ? x < sc.targetX - TRACER_EPS : x > sc.targetX + TRACER_EPS;
-      if (!valid) return;
-      var btn = el("button", "ap-lab-btn ap-lab-btn--preset", formatApproachX(x, sc.targetX, side));
+      var btn = el("button", "ap-lab-btn ap-lab-btn--preset", formatPresetLabel(x));
       btn.type = "button";
       btn.addEventListener("click", function () {
         if (side === "left") {
@@ -1478,6 +1542,12 @@
     limitsMatch: limitsMatch,
     resolveScenarioIndex: resolveScenarioIndex,
     approachEndpoint: approachEndpoint,
+    branchForApproach: branchForApproach,
+    evaluateScenarioY: evaluateScenarioY,
+    evaluateHoleWithValue: evaluateHoleWithValue,
+    formatPresetLabel: formatPresetLabel,
+    formatTracerY: formatTracerY,
+    nearTracerPresets: nearTracerPresets,
     tickValues: tickValues,
     formatTick: formatTick,
     TRACER_EPS: TRACER_EPS,
