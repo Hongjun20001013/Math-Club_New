@@ -124,6 +124,77 @@ def limit_inline(x_to: str, expr: str = "f(x)", equals: str | None = None) -> st
     return f"\\(\\displaystyle\\lim_{{{x_to}}} {expr}{eq}\\)"
 
 
+def limit_cards_row(
+    specs: list[tuple[str, str | None, str]],
+    *,
+    layout: str = "row",
+) -> str:
+    """Display limit cards in a row — avoids cramped inline \\lim in running text.
+
+    Each spec: (label, equals_or_none, x_to) e.g. ("From the left", "-1", "x\\\\to 3^-").
+    Pass equals_or_none=None for a limit that DNE / is being asked about.
+    """
+    cells = []
+    for label, equals, x_to in specs:
+        if equals is None:
+            inner = math_block(f"\\[\\displaystyle\\lim_{{{x_to}}} f(x)\\]")
+        else:
+            inner = limit_card(x_to, equals=equals)
+        cells.append(
+            f'<div class="ap-limit-card-cell">'
+            f'<span class="ap-limit-card-cell__label">{label}</span>{inner}</div>'
+        )
+    cls = "ap-limit-cards-row"
+    if layout == "stack":
+        cls += " ap-limit-cards-row--stack"
+    return f'<div class="{cls}">' + "".join(cells) + "</div>"
+
+
+def one_sided_limits_panel(
+    c: str,
+    left: str,
+    right: str,
+    *,
+    two_sided: str | None = None,
+    two_sided_dne: bool = False,
+) -> str:
+    """Left / right limit cards + optional two-sided conclusion (display style)."""
+    specs = [
+        ("From the left", left, f"x\\to {c}^-"),
+        ("From the right", right, f"x\\to {c}^+"),
+    ]
+    html = limit_cards_row(specs)
+    if two_sided_dne:
+        html += (
+            '<div class="ap-limit-two-sided">'
+            '<span class="ap-limit-card-cell__label">Two-sided limit</span>'
+            + math_block(f"\\[\\displaystyle\\lim_{{x\\to {c}}} f(x)\\ \\text{{does not exist}}\\]")
+            + "</div>"
+        )
+    elif two_sided is not None:
+        html += (
+            '<div class="ap-limit-two-sided">'
+            '<span class="ap-limit-card-cell__label">Two-sided limit</span>'
+            + limit_card(f"x\\to {c}", equals=two_sided)
+            + "</div>"
+        )
+    return html
+
+
+def limit_compare_note(left: str, right: str, c: str) -> str:
+    """Short prose after one-sided cards — when sides agree or disagree."""
+    if left == right:
+        return (
+            f"<p>Both one-sided limits equal <strong>{left}</strong>, so the two-sided limit "
+            f"at <em>x = {c}</em> exists and equals <strong>{left}</strong>.</p>"
+        )
+    return (
+        f"<p>The left approach gives <strong>{left}</strong> but the right gives "
+        f"<strong>{right}</strong>. Because \\(L^{{-}} \\neq L^{{+}}\\), "
+        f"the two-sided limit at <em>x = {c}</em> <strong>does not exist</strong>.</p>"
+    )
+
+
 def rate_card(formula: str, label: str = "") -> str:
     cap = f'<span class="ap-math-display__label">{label}</span>' if label else ""
     return f'<div class="ap-math-display ap-math-display--rate">{cap}{math_block(f"\\[\\displaystyle {formula}\\]")}</div>'
@@ -175,11 +246,11 @@ def visual_jump_case(
         '<div class="ap-visual-pair ap-visual-pair--jump">'
         '<div class="ap-visual-pair__col">'
         '<span class="ap-visual-pair__tag">From the left</span>'
-        + math_block(f"\\[\\displaystyle L^{{-}} = {left}\\]")
+        + limit_card(f"x\\to {c}^-", equals=left)
         + "</div>"
         '<div class="ap-visual-pair__col">'
         '<span class="ap-visual-pair__tag">From the right</span>'
-        + math_block(f"\\[\\displaystyle L^{{+}} = {right}\\]")
+        + limit_card(f"x\\to {c}^+", equals=right)
         + "</div>"
         '<div class="ap-visual-pair__col ap-visual-pair__col--full">'
         '<span class="ap-visual-pair__tag">Two-sided limit</span>'

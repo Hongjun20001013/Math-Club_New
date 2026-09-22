@@ -662,6 +662,55 @@ html[data-exam-theme="dark"] .ap-data-table td {
   grid-column: 1 / -1;
 }
 
+.ap-limit-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.85rem 0 1rem;
+}
+
+.ap-limit-cards-row--stack {
+  grid-template-columns: 1fr;
+  max-width: 22rem;
+}
+
+.ap-limit-card-cell__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f658c;
+  text-align: center;
+}
+
+.ap-limit-card-cell .ap-math-display {
+  margin: 0;
+}
+
+.ap-limit-two-sided {
+  margin: 0.5rem 0 1rem;
+  max-width: 24rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ap-limit-two-sided .ap-math-display {
+  margin: 0.35rem 0 0;
+}
+
+.ap-exit-limit-prompt {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.ap-prose-after-math {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #3d3558;
+}
+
 .ap-cases-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
