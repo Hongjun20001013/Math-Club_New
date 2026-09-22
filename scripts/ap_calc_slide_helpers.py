@@ -561,6 +561,20 @@ def secant_math_lab_embed(spec_json: str) -> str:
     ), lab_mod="secant")
 
 
+def _explore_phase_gate(explore_html: str, cta: str = "Start investigation") -> str:
+    return (
+        '<div class="ap-slide-phase ap-slide-phase--explore" data-ap-explore-phase>'
+        '<div class="ap-explore-gate" data-ap-explore-gate>'
+        '<p class="ap-explore-gate__label">Phase B · Explore</p>'
+        '<p class="ap-explore-gate__prompt">Use the graph to trace one-sided limits, lock observations, and compare.</p>'
+        f'<button type="button" class="ap-lab-btn ap-lab-btn--primary ap-explore-gate__btn" '
+        f'data-ap-start-investigation>{cta}</button>'
+        "</div>"
+        f'<div class="ap-explore-panel ap-elevation-panel" data-ap-explore-panel hidden>{explore_html}</div>'
+        "</div>"
+    )
+
+
 def limit_cases_math_lab_embed(spec_json: str) -> str:
     from ap_calc_math_lab_specs import limit_cases_lab_12
 
@@ -578,10 +592,13 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         "</div>"
         '<h3 class="ap-lab-case-title" data-ap-case-title></h3>'
         f'<div class="ap-lab-case-models">{case_models}</div>'
+        '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
         '<div class="ap-lab-phase ap-lab-phase--predict">'
-        '<p class="ap-lab-phase__label">Predict → Explore → Explain</p>'
-        '<p class="ap-lab-phase__prompt">Before tracing, predict whether left and right approach heights agree.</p>'
-        "</div>"
+        '<p class="ap-lab-phase__label">Phase A · Learn</p>'
+        '<p class="ap-lab-phase__prompt">Read the case model. Before tracing, predict whether left and right approach heights agree.</p>'
+        "</div></div>"
+    )
+    explore = (
         '<div class="ap-lab-explore">'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
@@ -617,6 +634,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         "</div></div>"
         + _tracer_tutor_panel()
     )
+    inner = inner + _explore_phase_gate(explore)
     return _math_lab_shell(spec_json, inner, lab_mod="limit")
 
 
@@ -638,8 +656,11 @@ def _tracer_tutor_panel() -> str:
     )
 
 
-def tracer_math_lab_embed(spec_json: str) -> str:
-    inner = (
+def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bool = False) -> str:
+    learn = ""
+    if not minimal_learn:
+        learn = (
+        '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
         '<div class="ap-lab-scenario-tabs" data-ap-scenario-tabs>'
         '<button type="button" class="ap-lab-scenario-tab is-active" data-ap-scenario="0">Continuous</button>'
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="1">Hole</button>'
@@ -649,6 +670,9 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="5">Infinite</button>'
         "</div>"
         '<p class="ap-lab-scenario-note" data-ap-scenario-note></p>'
+        "</div>"
+        )
+    explore = (
         '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
         '<p class="ap-lab-phase__label">0 · Predict</p>'
         '<p class="ap-lab-phase__prompt">Before tracing: estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
@@ -759,6 +783,7 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<div class="ap-box-body" data-ap-conclusion-body>Use Left → Right → Compare → Value on every graph.</div></div>'
         + _tracer_tutor_panel()
     )
+    inner = learn + (_explore_phase_gate(explore) if gated else explore)
     return _math_lab_shell(spec_json, inner, lab_mod="tracer")
 
 
@@ -776,7 +801,7 @@ def limit_tracer_embed(worked_example: bool = False) -> str:
     from ap_calc_math_lab_specs import tracer_lab_13, tracer_lab_13_worked_example, spec_json as _sj
 
     spec = tracer_lab_13_worked_example() if worked_example else tracer_lab_13()
-    return tracer_math_lab_embed(_sj(spec))
+    return tracer_math_lab_embed(_sj(spec), gated=True, minimal_learn=worked_example)
 
 
 def practice_packet(section: str, title: str) -> str:

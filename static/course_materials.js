@@ -1259,11 +1259,29 @@
     return s ? (s.title || ("Slide " + n)) : ("Slide " + n);
   }
 
+  var resumeOffered = false;
+
+  function consumeResumeBanner() {
+    resumeOffered = false;
+    hideResumeBanner();
+    if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI) {
+      window.ApCalcLessonUI.consumeResumeBanner();
+    } else {
+      try {
+        sessionStorage.setItem(resumeDismissKey, "1");
+      } catch (e) {}
+    }
+  }
+
   function showResumeBanner() {
     if (!resumeEl) return;
+    if (resumeOffered) return;
     try {
       if (sessionStorage.getItem(resumeDismissKey) === "1") return;
     } catch (e) {}
+    if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI && window.ApCalcLessonUI.isResumeConsumed()) {
+      return;
+    }
     var target = parseInt(progress.last_slide_index, 10) || 0;
     var initialSlide = parseInitialSlide();
     if (initialSlide > 0) return;
@@ -1275,6 +1293,7 @@
         "You were on slide " + target + " (" + slideTitleByIndex(target) + "). Pick up there or start from the beginning.";
     }
     resumeEl.hidden = false;
+    resumeOffered = true;
   }
 
   function hideResumeBanner() {
@@ -3764,7 +3783,13 @@
 
   function goToIndex(targetIdx, options) {
     if (targetIdx >= 0 && targetIdx < slides.length) {
+      if (resumeOffered || (resumeEl && !resumeEl.hidden)) {
+        consumeResumeBanner();
+      }
       idx = targetIdx;
+      if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI) {
+        window.ApCalcLessonUI.markLessonStarted();
+      }
       render();
     }
   }
@@ -4273,6 +4298,10 @@
     bodyEl.querySelectorAll("[data-cm-mcq]").forEach(initMcq);
     bodyEl.querySelectorAll("[data-cm-grid-in]").forEach(initGridIn);
     restoreLockedAnswerOnSlide(slide);
+    if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI) {
+      window.ApCalcLessonUI.markLessonStarted();
+    }
+    document.dispatchEvent(new CustomEvent("np-cm-slide-rendered", { detail: { index: slide.index } }));
     if (typeof window.initApCalcLesson === "function") {
       window.initApCalcLesson(bodyEl);
     }
@@ -4333,6 +4362,9 @@
     if (stageEl) stageEl.scrollTop = 0;
 
     markViewed(slide.index);
+    if (idx > 0 && resumeEl && !resumeEl.hidden) {
+      consumeResumeBanner();
+    }
 
     outlineBtns.forEach(function (btn) {
       var active = String(btn.getAttribute("data-cm-index")) === String(slide.index);
@@ -4457,16 +4489,13 @@
   if (resumeGoBtn) {
     resumeGoBtn.addEventListener("click", function () {
       var target = parseInt(progress.last_slide_index, 10) || 1;
-      hideResumeBanner();
+      consumeResumeBanner();
       goToSlideNumber(target);
     });
   }
   if (resumeDismissBtn) {
     resumeDismissBtn.addEventListener("click", function () {
-      hideResumeBanner();
-      try {
-        sessionStorage.setItem(resumeDismissKey, "1");
-      } catch (e) {}
+      consumeResumeBanner();
     });
   }
 

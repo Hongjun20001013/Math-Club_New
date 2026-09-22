@@ -1,0 +1,502 @@
+/**
+ * AP Calculus lesson viewer — density, projection, and classroom layout.
+ * Scoped to .np-cm-viewer--ap-calc — does not affect SAT course materials.
+ */
+
+.np-cm-viewer--ap-calc {
+  --ap-cm-rail-h: 4.75rem;
+  --ap-cm-path-expanded: 220px;
+  --ap-cm-path-compact: 72px;
+  --ap-elev-bg: #f3f0ff;
+  --ap-elev-card: #ffffff;
+  --ap-elev-panel: #faf8ff;
+  gap: 6px;
+}
+
+/* ── 1. Compact header (~30% less vertical space) ── */
+.np-cm-viewer--ap-calc .np-cm-hero {
+  padding: 8px 14px 10px;
+  border-radius: 14px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-hero-top {
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  min-height: 0;
+}
+
+.np-cm-viewer--ap-calc .np-cm-hero-main {
+  gap: 10px;
+  align-items: center;
+}
+
+.np-cm-viewer--ap-calc .np-cm-hero-copy h1 {
+  margin: 2px 0 0;
+  font-size: clamp(1rem, 1.8vw, 1.28rem);
+  line-height: 1.2;
+}
+
+.np-cm-viewer--ap-calc .np-cm-cinema-kicker {
+  font-size: 0.68rem;
+  margin: 0;
+}
+
+.np-cm-viewer--ap-calc .np-cm-mastery {
+  width: 44px;
+  height: 44px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-mastery-ring {
+  width: 44px;
+  height: 44px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-lesson-nav {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-lesson-nav-link {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+/* Course switcher → dropdown */
+.np-cm-viewer--ap-calc .np-cm-course-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 77, 255, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #43318f;
+  cursor: pointer;
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__toggle:focus-visible {
+  outline: 2px solid #5b4dff;
+  outline-offset: 2px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(91, 77, 255, 0.16);
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(49, 38, 130, 0.14);
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__menu[hidden] {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__menu a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #43318f;
+  text-decoration: none;
+}
+
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__menu a:hover,
+.np-cm-viewer--ap-calc .np-cm-course-dropdown__menu a:focus-visible {
+  background: rgba(91, 77, 255, 0.08);
+  outline: none;
+}
+
+.np-cm-viewer--ap-calc .np-cm-hero-actions .np-cm-btn--ghost {
+  display: none;
+}
+
+@media (min-width: 1101px) {
+  .np-cm-viewer--ap-calc .np-cm-hero-actions .np-cm-btn--ghost {
+    display: inline-flex;
+  }
+}
+
+/* ── 2. Workspace height (content in first viewport) ── */
+.np-cm-viewer--ap-calc .np-cm-workspace {
+  min-height: calc(100dvh - 118px);
+  height: calc(100dvh - 118px);
+}
+
+.np-cm-viewer--ap-calc.is-path-open .np-cm-workspace {
+  grid-template-columns: var(--ap-cm-path-w, var(--ap-cm-path-expanded)) minmax(0, 1fr);
+}
+
+/* ── 4. Knowledge map widths ── */
+.np-cm-viewer--ap-calc .np-cm-knowledge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0 12px 6px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-knowledge-head .np-cm-knowledge-label {
+  margin: 0;
+}
+
+.np-cm-viewer--ap-calc .np-cm-km-drawer-open {
+  display: none;
+  margin: 0 12px 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(91, 77, 255, 0.2);
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #43318f;
+  cursor: pointer;
+}
+
+.np-cm-viewer--ap-calc .np-cm-knowledge-toggle {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.np-cm-viewer--ap-calc .np-cm-km-mode-btn {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  border: 1px solid rgba(91, 77, 255, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.np-cm-viewer--ap-calc .np-cm-km-mode-btn.is-active {
+  background: rgba(91, 77, 255, 0.12);
+  color: #43318f;
+  border-color: rgba(91, 77, 255, 0.28);
+}
+
+.np-cm-viewer--ap-calc .np-cm-km-mode-btn:focus-visible {
+  outline: 2px solid #5b4dff;
+  outline-offset: 1px;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact {
+  --ap-cm-path-w: var(--ap-cm-path-compact);
+}
+
+.np-cm-viewer--ap-calc.is-km-expanded {
+  --ap-cm-path-w: var(--ap-cm-path-expanded);
+}
+
+.np-cm-viewer--ap-calc.is-km-collapsed .np-cm-knowledge {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-knowledge-name,
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-knowledge-bar {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-knowledge-btn {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 6px 4px;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-knowledge-pct {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 0.65rem;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-outline-title,
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-outline-kind {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-km-compact .np-cm-outline-btn {
+  justify-content: center;
+  padding: 6px 4px;
+}
+
+@media (max-width: 1023px) {
+  .np-cm-viewer--ap-calc .np-cm-knowledge-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(18, 12, 48, 0.35);
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-knowledge-drawer-backdrop[hidden] {
+    display: none;
+  }
+
+  .np-cm-viewer--ap-calc.is-km-mobile-open .np-cm-knowledge {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    width: min(280px, 88vw);
+    margin: 0;
+    padding: 14px;
+    overflow-y: auto;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* ── 3. Sticky nav — never cover slide content ── */
+.np-cm-viewer--ap-calc .np-cm-deck {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.np-cm-viewer--ap-calc .np-cm-slide-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: var(--ap-cm-rail-h);
+  scroll-padding-bottom: calc(var(--ap-cm-rail-h) + 12px);
+}
+
+.np-cm-viewer--ap-calc .np-cm-deck-rail {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto;
+  min-height: var(--ap-cm-rail-h);
+  box-sizing: border-box;
+}
+
+.np-cm-viewer--ap-calc .ap-math-lab,
+.np-cm-viewer--ap-calc .ap-lab-body--split {
+  margin-bottom: 0.25rem;
+}
+
+/* ── 5. Progressive disclosure phases ── */
+.np-cm-viewer--ap-calc .ap-slide-phase--learn {
+  margin-bottom: 1rem;
+}
+
+.np-cm-viewer--ap-calc .ap-explore-gate {
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(108, 78, 255, 0.35);
+  background: var(--ap-elev-panel);
+  text-align: center;
+}
+
+.np-cm-viewer--ap-calc .ap-explore-gate__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.np-cm-viewer--ap-calc .ap-explore-gate__prompt {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.np-cm-viewer--ap-calc .ap-explore-panel[hidden] {
+  display: none !important;
+}
+
+/* ── 6. Three elevation levels + quieter chrome ── */
+.np-cm-viewer--ap-calc .np-cm-cinema {
+  background: var(--ap-elev-bg);
+}
+
+.np-cm-viewer--ap-calc .np-cm-workspace,
+.np-cm-viewer--ap-calc .np-cm-slide {
+  background: var(--ap-elev-card);
+  box-shadow: 0 1px 0 rgba(91, 77, 255, 0.06);
+}
+
+.np-cm-viewer--ap-calc .ap-elevation-panel,
+.np-cm-viewer--ap-calc .ap-math-lab,
+.np-cm-viewer--ap-calc .ap-explore-panel .ap-math-lab {
+  background: var(--ap-elev-panel);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.np-cm-viewer--ap-calc .np-cm-coach {
+  padding: 6px 12px;
+  margin: 0 12px 8px;
+  background: rgba(248, 246, 255, 0.7);
+  border: 1px solid rgba(91, 77, 255, 0.06);
+  box-shadow: none;
+}
+
+.np-cm-viewer--ap-calc .np-cm-coach-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.np-cm-viewer--ap-calc .np-cm-coach-tip {
+  font-size: 0.88rem;
+  color: #6b7280;
+}
+
+.np-cm-viewer--ap-calc .np-cm-coach-icon {
+  opacity: 0.55;
+  font-size: 0.95rem;
+}
+
+.np-cm-viewer--ap-calc .ap-box {
+  box-shadow: none;
+}
+
+.np-cm-viewer--ap-calc .ap-lab-btn--primary,
+.np-cm-viewer--ap-calc .np-cm-rail-btn--accent,
+.np-cm-viewer--ap-calc .ap-explore-gate__btn {
+  background: linear-gradient(180deg, #7c4dff 0%, #5b4dff 50%, #4f32f0 100%);
+  box-shadow: 0 8px 20px rgba(79, 50, 240, 0.28);
+}
+
+.np-cm-viewer--ap-calc .ap-lab-scenario-tab.is-active,
+.np-cm-viewer--ap-calc .ap-lab-case-tab.is-active {
+  background: linear-gradient(180deg, #7c4dff 0%, #5b4dff 100%);
+  color: #fff;
+}
+
+.np-cm-viewer--ap-calc .np-cm-resume {
+  margin: 0 12px 8px;
+  padding: 10px 12px;
+}
+
+/* Body text minimum 16px on student content */
+.np-cm-viewer--ap-calc .np-cm-slide-body,
+.np-cm-viewer--ap-calc .ap-prose-after-math,
+.np-cm-viewer--ap-calc .ap-box-body {
+  font-size: max(1rem, 16px);
+  line-height: 1.55;
+}
+
+.np-cm-viewer--ap-calc .np-cm-rail-btn:focus-visible,
+.np-cm-viewer--ap-calc .ap-lab-btn:focus-visible,
+.np-cm-viewer--ap-calc .np-cm-outline-btn:focus-visible {
+  outline: 2px solid #5b4dff;
+  outline-offset: 2px;
+}
+
+/* ── 7. Projector / focus mode ── */
+body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-hero,
+body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-path,
+body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-coach,
+body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-resume {
+  display: none !important;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .np-cm-workspace {
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-math-display,
+.np-cm-viewer--ap-calc.is-focus-mode .ap-box-body mjx-container {
+  font-size: 1.12em !important;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-graph-wrap,
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-svg {
+  min-height: min(42vh, 380px);
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-body--split {
+  grid-template-columns: 1fr;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-dashboard {
+  font-size: 0.95rem;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .np-cm-slide-stage {
+  padding-bottom: var(--ap-cm-rail-h);
+}
+
+/* ── 8. Responsive QA ── */
+@media (max-width: 1023px) {
+  .np-cm-viewer--ap-calc .np-cm-workspace {
+    min-height: calc(100dvh - 108px);
+    height: calc(100dvh - 108px);
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-hero-actions .np-cm-btn-label {
+    display: none;
+  }
+
+  .np-cm-viewer--ap-calc .ap-lab-body--split {
+    grid-template-columns: 1fr;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-km-drawer-open {
+    display: inline-flex;
+  }
+
+  .np-cm-viewer--ap-calc.is-km-mobile-open .np-cm-knowledge-drawer-backdrop {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .np-cm-viewer--ap-calc .np-cm-hero-stats {
+    display: none;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-slide:not(.np-cm-slide--canvas) {
+    padding: 14px 14px 18px;
+  }
+
+  .np-cm-viewer--ap-calc {
+    --ap-cm-rail-h: 5.25rem;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-rail-shell {
+    width: 100%;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-rail-btn span:not(.np-cm-rail-chevron) {
+    display: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .np-cm-viewer--ap-calc .np-cm-slide-stage {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 1920px) {
+  .np-cm-viewer--ap-calc.is-focus-mode .ap-lab-graph-wrap {
+    min-height: min(48vh, 440px);
+  }
+}

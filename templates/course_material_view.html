@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_ink.css') }}?v={{ style_css_revision }}">
 {% if cm_track_class == 'ap-calc' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc_lesson_ui.css') }}?v={{ style_css_revision }}">
 {% endif %}
 <script defer src="{{ url_for('static', filename='course_materials_ink_smart.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}
@@ -22,6 +23,19 @@
 
   <header class="np-cm-hero glass-panel np-glass mp-animate-in">
     <div class="np-cm-hero-top">
+      {% if cm_track_class == 'ap-calc' %}
+      <div class="np-cm-course-dropdown">
+        <button type="button" class="np-cm-course-dropdown__toggle" data-cm-course-menu-toggle aria-expanded="false" aria-haspopup="true">
+          {{ cm_nav_hub_label|default('AP Calculus') }} · {{ material.section }}
+          <span aria-hidden="true">▾</span>
+        </button>
+        <div class="np-cm-course-dropdown__menu" data-cm-course-menu hidden>
+          <a href="{{ cm_nav_hub_href|default(url_for('practice')) }}">{{ cm_nav_hub_label|default('AP Calculus') }}</a>
+          <a href="{{ cm_nav_library_href|default(url_for('practice_course_materials')) }}">{{ cm_nav_library_label|default('Course materials') }}</a>
+          <a href="{{ cm_all_lessons_href|default(url_for('practice_course_materials')) }}">All lessons</a>
+        </div>
+      </div>
+      {% else %}
       <nav class="np-cm-cinema-rail" aria-label="{{ cm_nav_aria_label|default('SAT navigation') }}">
         <a href="{{ cm_nav_hub_href|default(url_for('practice')) }}">{{ cm_nav_hub_label|default('SAT modules') }}</a>
         <span aria-hidden="true">·</span>
@@ -29,6 +43,7 @@
         <span aria-hidden="true">·</span>
         <span>{{ material.section }}</span>
       </nav>
+      {% endif %}
       <div class="np-cm-hero-actions">
         <button type="button" class="np-cm-btn np-cm-btn--board" data-np-board-toggle aria-pressed="false" title="Teaching Board (Shift+B). Shift+P for pen.">
           <svg class="np-cm-board-btn-icon" viewBox="0 0 20 20" aria-hidden="true">
@@ -122,8 +137,21 @@
       </div>
       <p class="np-cm-path-current" data-cm-path-current>Introduction</p>
       {% if material.knowledge_map %}
-      <div class="np-cm-knowledge" data-cm-knowledge aria-label="Knowledge map">
+      <div class="np-cm-knowledge-head">
         <p class="np-cm-knowledge-label">Knowledge map</p>
+        {% if cm_track_class == 'ap-calc' %}
+        <div class="np-cm-knowledge-toggle" role="group" aria-label="Knowledge map size">
+          <button type="button" class="np-cm-km-mode-btn" data-cm-km-mode="expanded" title="Expanded">Exp</button>
+          <button type="button" class="np-cm-km-mode-btn is-active" data-cm-km-mode="compact" title="Compact">Cmp</button>
+          <button type="button" class="np-cm-km-mode-btn" data-cm-km-mode="collapsed" title="Collapsed">—</button>
+        </div>
+        {% endif %}
+      </div>
+      {% if cm_track_class == 'ap-calc' %}
+      <button type="button" class="np-cm-km-drawer-open" data-cm-km-drawer-open>Map</button>
+      <div class="np-cm-knowledge-drawer-backdrop" data-cm-km-drawer-backdrop hidden></div>
+      {% endif %}
+      <div class="np-cm-knowledge" data-cm-knowledge aria-label="Knowledge map">
         <ul class="np-cm-knowledge-list" data-cm-knowledge-list></ul>
       </div>
       {% endif %}
@@ -355,6 +383,7 @@
 {% if cm_track_class == 'ap-calc' %}
 <script defer src="{{ url_for('static', filename='ap_calc/ap_calc_math_lab.js') }}?v={{ style_css_revision }}"></script>
 <script defer src="{{ url_for('static', filename='ap_calc/ap_calc_lesson.js') }}?v={{ style_css_revision }}"></script>
+<script defer src="{{ url_for('static', filename='ap_calc/ap_calc_lesson_ui.js') }}?v={{ style_css_revision }}"></script>
 {% endif %}
 <script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}

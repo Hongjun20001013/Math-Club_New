@@ -1519,8 +1519,10 @@
   };
 
   function initMathLab(root) {
+    if (root._apMathLabInit) return;
     var spec = parseSpec(root);
     if (!spec) return;
+    root._apMathLabInit = true;
     var type = spec.labType;
     if (type === "SecantTangentLab") new SecantTangentLab(root, spec);
     else if (type === "GraphCaseSwitcher") new GraphCaseSwitcher(root, spec);
