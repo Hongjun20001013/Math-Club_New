@@ -776,10 +776,23 @@ body.is-ap-calc-lesson .np-app-container {
   display: none;
 }
 
+.np-cm-viewer--ap-calc .np-cm-slide--intro .np-cm-slide-body,
+.np-cm-viewer--ap-calc .np-cm-slide.np-cm-slide--canvas .np-cm-slide-body {
+  max-width: none;
+  width: 100%;
+}
+
+.np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-canvas {
+  width: 100%;
+  min-height: 100%;
+}
+
 .np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-content {
-  max-width: 42rem;
+  width: min(100%, 52rem);
+  max-width: none;
   margin: 0 auto;
   padding: var(--space-4) var(--space-3);
+  box-sizing: border-box;
 }
 
 .np-cm-viewer--ap-calc .ap-slide-template--concept .ap-phase-divider,

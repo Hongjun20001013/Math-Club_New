@@ -1454,6 +1454,8 @@
     if (compare) compare.hidden = this.step !== 5;
     if (fc) fc.hidden = this.step !== 6;
     if (explain) explain.hidden = this.step < 7;
+    var graphWrap = this.root.querySelector(".ap-trace-svg")?.closest(".ap-lab-graph-wrap");
+    if (graphWrap) graphWrap.hidden = !this.predictDone && this.step === 0;
     this._updateDashboard();
   };
 
@@ -1531,10 +1533,18 @@
     }
     this._buildPresets("left");
     this._buildPresets("right");
-    if (leftSlider) this._traceLeft(parseFloat(leftSlider.value));
-    if (rightSlider) this._traceRight(parseFloat(rightSlider.value));
+    if (this.predictDone || this.step > 0) {
+      if (leftSlider) this._traceLeft(parseFloat(leftSlider.value));
+      if (rightSlider) this._traceRight(parseFloat(rightSlider.value));
+    } else {
+      this.leftX = null;
+      this.rightX = null;
+      this._draw();
+    }
     var fcRead = this.root.querySelector("[data-ap-fc-read]");
-    if (fcRead) fcRead.textContent = sc.functionValue != null ? sc.functionValue : "undefined";
+    if (fcRead) {
+      fcRead.textContent = this.step >= 6 && sc.functionValue != null ? sc.functionValue : "—";
+    }
     if (this.step === 2 || this.leftLocked != null) this.step = Math.max(this.step, 2);
     this._syncPanels();
   };
@@ -1557,19 +1567,20 @@
     });
     var branch1 = svg.querySelector("[data-ap-branch='1']");
     if (branch1 && sc.branches.length < 2) branch1.style.display = "none";
+    var showMarkers = this.predictDone || this.step > 0;
+    var showFc = this.step >= 6;
+    var closed0 = (sc.closedPoints || [])[0];
     var j;
     for (j = 0; j < 2; j++) {
       var op2 = (sc.openPoints || [])[j];
       var sel2 = "[data-ap-open-" + j + "]";
-      setPoint(svg, sel2, op2 ? op2.x : NaN, op2 ? op2.y : NaN, plot, !!op2);
+      setPoint(svg, sel2, op2 ? op2.x : NaN, op2 ? op2.y : NaN, plot, showMarkers && !!op2);
       var ptEl2 = svg.querySelector(sel2);
       if (ptEl2 && op2) {
         var brCol = sc.branches[j] ? sc.branches[j].color : COLORS.curve;
         ptEl2.setAttribute("stroke", brCol || COLORS.curve);
       }
     }
-    var closed0 = (sc.closedPoints || [])[0];
-    var showFc = this.step >= 6;
     setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, showFc && !!closed0);
     var yL = this.leftX != null ? this._yAt(this.leftX, false) : NaN;
     var yR = this.rightX != null ? this._yAt(this.rightX, false) : NaN;

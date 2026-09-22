@@ -184,6 +184,16 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("syncPhaseStepperVisibility", js)
         self.assertIn("phaseStepper.hidden", js)
 
+    def test_intro_slide_body_full_width(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        self.assertIn(".np-cm-slide--intro .np-cm-slide-body", css)
+        self.assertIn("max-width: none", css)
+
+    def test_tracer_graph_gated_before_predict(self) -> None:
+        js = MATH_LAB_JS.read_text(encoding="utf-8")
+        self.assertIn("graphWrap.hidden = !this.predictDone", js)
+        self.assertIn("showMarkers = this.predictDone", js)
+
     def test_mastery_tooltip_on_ring(self) -> None:
         html = _lesson_html("ap-1-1-instantaneous-change")
         self.assertIn("Mastery is based on scored work", html)
