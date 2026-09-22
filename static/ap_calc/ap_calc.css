@@ -1800,6 +1800,74 @@ html[data-exam-theme="dark"] .ap-data-table td {
   border-top: 1px dashed rgba(108, 78, 255, 0.2);
 }
 
+.ap-lab-tutor__status {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4f2fd8;
+}
+
+.ap-lab-tutor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.ap-lab-input {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(108, 78, 255, 0.22);
+  font-size: 0.86rem;
+  max-width: 100%;
+}
+
+.ap-lab-textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+.ap-lab-predict-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.ap-lab-trace-side__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4f2fd8;
+}
+
+.ap-lab-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.ap-lab-btn--preset {
+  font-size: 0.72rem;
+  padding: 0.3rem 0.55rem;
+  min-height: 2rem;
+}
+
+.ap-lab-lock-panel,
+.ap-lab-compare-panel,
+.ap-lab-fc-panel,
+.ap-lab-explain-panel {
+  margin: 0.65rem 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.55rem;
+  background: rgba(108, 78, 255, 0.05);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ap-math-lab * {
     animation: none !important;

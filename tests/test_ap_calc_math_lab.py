@@ -16,7 +16,9 @@ from ap_calc_math_lab_specs import (  # noqa: E402
     secant_lab_11,
     spec_json,
     tracer_lab_13,
+    tracer_lab_13_worked_example,
 )
+from ap_calc_tutor_engine import tracer_presets  # noqa: E402
 from ap_calc_slide_helpers import case_model_from_spec, visual_cases_gallery_12  # noqa: E402
 
 
@@ -56,6 +58,11 @@ class SecantMathTests(unittest.TestCase):
         spec = secant_lab_11()
         self.assertIn(0, spec["excludedValues"])
         self.assertNotIn(0, spec["allowedValues"])
+
+    def test_h_includes_thousandths(self):
+        spec = secant_lab_11()
+        self.assertIn(-0.001, spec["allowedValues"])
+        self.assertIn(0.001, spec["allowedValues"])
 
 
 class LimitCaseTests(unittest.TestCase):
@@ -98,10 +105,24 @@ class CaseModelTests(unittest.TestCase):
 
 class SpecSerializationTests(unittest.TestCase):
     def test_specs_are_json_serializable(self):
-        for spec in (secant_lab_11(), limit_cases_lab_12(), tracer_lab_13()):
+        for spec in (secant_lab_11(), limit_cases_lab_12(), tracer_lab_13(), tracer_lab_13_worked_example()):
             payload = spec_json(spec)
             parsed = json.loads(payload)
             self.assertEqual(parsed["id"], spec["id"])
+
+    def test_tracer_presets_never_equal_c(self):
+        c = 2.0
+        presets = tracer_presets(c)
+        for x in presets["left"]:
+            self.assertLess(x, c)
+        for x in presets["right"]:
+            self.assertGreater(x, c)
+
+    def test_worked_example_matches_piecewise_graph(self):
+        spec = tracer_lab_13_worked_example()
+        sc = next(s for s in spec["scenarios"] if s["id"] == "hole-filled")
+        self.assertEqual(sc["openPoints"][0], {"x": 2, "y": 3})
+        self.assertEqual(sc["closedPoints"][0], {"x": 2, "y": 1.5})
 
 
 if __name__ == "__main__":

@@ -623,9 +623,27 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
     return _math_lab_shell(spec_json, inner, lab_mod="limit")
 
 
+def _tracer_tutor_panel() -> str:
+    return (
+        '<div class="ap-lab-tutor" data-ap-tutor>'
+        '<p class="ap-lab-tutor__status" data-ap-tutor-status>Try first — then ask for help.</p>'
+        '<p data-ap-tutor-text data-ap-tutor-tag=""></p>'
+        '<div class="ap-lab-tutor-actions">'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="hint">Need a hint?</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="mistake">Explain my mistake</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="why">Ask why</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="similar">Similar problem</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="check-explain">Check my explanation</button>'
+        "</div>"
+        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
+        '<strong>Reflection:</strong> In your own words, explain why the filled point does not change the limit.</p>'
+        "</div>"
+    )
+
+
 def tracer_math_lab_embed(spec_json: str) -> str:
     inner = (
-        '<div class="ap-lab-scenario-tabs">'
+        '<div class="ap-lab-scenario-tabs" data-ap-scenario-tabs>'
         '<button type="button" class="ap-lab-scenario-tab is-active" data-ap-scenario="0">Continuous</button>'
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="1">Hole</button>'
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="2">Hole + value</button>'
@@ -634,20 +652,77 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="5">Infinite</button>'
         "</div>"
         '<p class="ap-lab-scenario-note" data-ap-scenario-note></p>'
+        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
+        '<p class="ap-lab-phase__label">0 · Predict</p>'
+        '<p class="ap-lab-phase__prompt">Before tracing: estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
+        '<div class="ap-lab-predict-grid">'
+        '<label>L⁻ ≈ <input type="text" class="ap-lab-input" data-ap-predict-left placeholder="?" inputmode="decimal"/></label>'
+        '<label>L⁺ ≈ <input type="text" class="ap-lab-input" data-ap-predict-right placeholder="?" inputmode="decimal"/></label>'
+        '<label>Two-sided exists? '
+        '<select class="ap-lab-input" data-ap-predict-two><option value="">—</option>'
+        '<option value="yes">Yes</option><option value="no">No</option><option value="unsure">Unsure</option></select></label>'
+        '<label>f(c) affects limit? '
+        '<select class="ap-lab-input" data-ap-predict-fc><option value="">—</option>'
+        '<option value="no">No — branches decide</option><option value="yes">Yes</option></select></label>'
+        "</div>"
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict-submit>Submit prediction</button>'
+        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
+        "</div>"
         '<div class="ap-lab-body ap-lab-body--split">'
         '<div class="ap-lab-main">'
         '<div class="ap-lab-controls">'
-        '<button type="button" class="ap-lab-btn" data-ap-action="left">Trace left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="right">Trace right</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right</button>'
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-lock-compare>Compare</button>'
         "</div>"
-        '<label class="ap-lab-slider-label" for="ap-trace-x">'
-        'x = <strong data-ap-trace-x>0.50</strong> · y = <strong data-ap-trace-y>—</strong></label>'
-        '<input type="range" id="ap-trace-x" class="ap-range ap-lab-range" data-ap-trace-slider '
-        'aria-label="Trace x on graph"/>'
+        '<div class="ap-lab-trace-side" data-ap-trace-left-panel>'
+        '<p class="ap-lab-trace-side__label">Explore left (x &lt; c)</p>'
+        '<div class="ap-lab-preset-row" data-ap-left-presets></div>'
+        '<label class="ap-lab-slider-label" for="ap-trace-left">'
+        '<span data-ap-trace-left-read>x → c⁻</span> · y = <strong data-ap-trace-left-y>—</strong> · |x−c| = <strong data-ap-trace-left-dist>—</strong></label>'
+        '<input type="range" id="ap-trace-left" class="ap-range ap-lab-range" data-ap-trace-left-slider '
+        'aria-label="Trace x from the left toward c"/>'
+        "</div>"
+        '<div class="ap-lab-trace-side" data-ap-trace-right-panel hidden>'
+        '<p class="ap-lab-trace-side__label">Explore right (x &gt; c)</p>'
+        '<div class="ap-lab-preset-row" data-ap-right-presets></div>'
+        '<label class="ap-lab-slider-label" for="ap-trace-right">'
+        '<span data-ap-trace-right-read>x → c⁺</span> · y = <strong data-ap-trace-right-y>—</strong> · |x−c| = <strong data-ap-trace-right-dist>—</strong></label>'
+        '<input type="range" id="ap-trace-right" class="ap-range ap-lab-range" data-ap-trace-right-slider '
+        'aria-label="Trace x from the right toward c"/>'
+        "</div>"
+        '<div class="ap-lab-lock-panel" data-ap-lock-left-panel hidden>'
+        '<label>Lock L⁻ = <input type="text" class="ap-lab-input" data-ap-lock-left-input placeholder="?" inputmode="decimal"/></label>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-lock-left-submit>Lock left</button>'
+        '<p class="ap-lab-feedback" data-ap-lock-left-feedback hidden></p>'
+        "</div>"
+        '<div class="ap-lab-lock-panel" data-ap-lock-right-panel hidden>'
+        '<label>Lock L⁺ = <input type="text" class="ap-lab-input" data-ap-lock-right-input placeholder="?" inputmode="decimal"/></label>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-lock-right-submit>Lock right</button>'
+        '<p class="ap-lab-feedback" data-ap-lock-right-feedback hidden></p>'
+        "</div>"
+        '<div class="ap-lab-compare-panel" data-ap-compare-panel hidden>'
+        '<label>Compare one-sided limits: '
+        '<select class="ap-lab-input" data-ap-compare-select>'
+        '<option value="">Choose…</option>'
+        '<option value="same">Same height</option>'
+        '<option value="different">Different heights</option>'
+        '<option value="one-side">One side unavailable</option>'
+        '<option value="unbounded">Unbounded</option>'
+        '<option value="oscillatory">Oscillatory</option>'
+        "</select></label>"
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-compare-submit>Submit comparison</button>'
+        '<p class="ap-lab-feedback" data-ap-compare-feedback hidden></p>'
+        "</div>"
+        '<div class="ap-lab-fc-panel" data-ap-fc-panel hidden>'
+        '<p>Read the filled point: f(c) = <strong data-ap-fc-read>—</strong></p>'
+        '<button type="button" class="ap-lab-btn" data-ap-fc-confirm>Confirm f(c)</button>'
+        "</div>"
+        '<div class="ap-lab-explain-panel" data-ap-explain-panel hidden>'
+        '<label>The two-sided limit ______ because ______'
+        '<textarea class="ap-lab-input ap-lab-textarea" data-ap-explain-input maxlength="500" '
+        'placeholder="Both branches approach…; f(c) is separate…"></textarea></label>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain-submit>Check explanation</button>'
+        '<p class="ap-lab-feedback" data-ap-explain-feedback hidden></p>'
+        "</div>"
         '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
         f'<svg class="ap-lab-svg ap-trace-svg" viewBox="{_LAB_VIEWBOX}" role="img">'
         f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
@@ -660,16 +735,19 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
-        '<circle data-ap-tracer r="6" fill="#059669" stroke="#fff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div></div>"
         '<aside class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
         '<p class="ap-lab-dashboard__title">Observation dashboard</p>'
-        '<p data-ap-step="1" class="ap-lab-step is-active">1 · Trace from the left</p>'
-        '<p data-ap-step="2" class="ap-lab-step">2 · Lock left-hand result</p>'
-        '<p data-ap-step="3" class="ap-lab-step">3 · Trace from the right</p>'
-        '<p data-ap-step="4" class="ap-lab-step">4 · Lock right-hand result</p>'
+        '<p data-ap-step="0" class="ap-lab-step is-active">0 · Predict</p>'
+        '<p data-ap-step="1" class="ap-lab-step">1 · Explore left</p>'
+        '<p data-ap-step="2" class="ap-lab-step">2 · Lock L⁻</p>'
+        '<p data-ap-step="3" class="ap-lab-step">3 · Explore right</p>'
+        '<p data-ap-step="4" class="ap-lab-step">4 · Lock L⁺</p>'
         '<p data-ap-step="5" class="ap-lab-step">5 · Compare</p>'
-        '<p data-ap-step="6" class="ap-lab-step">6 · Inspect filled point</p>'
+        '<p data-ap-step="6" class="ap-lab-step">6 · Inspect f(c)</p>'
+        '<p data-ap-step="7" class="ap-lab-step">7 · Explain</p>'
         '<dl class="ap-lab-dash-stats">'
         '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
         '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
@@ -679,11 +757,8 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         "</dl></aside></div>"
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'
-        '<div class="ap-box-body">Use Left → Right → Compare → Value on every graph.</div></div>'
-        '<div class="ap-lab-tutor" data-ap-tutor><p data-ap-tutor-text>Need a nudge? Tap for a hint.</p>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
-        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
-        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
+        '<div class="ap-box-body" data-ap-conclusion-body>Use Left → Right → Compare → Value on every graph.</div></div>'
+        + _tracer_tutor_panel()
     )
     return _math_lab_shell(spec_json, inner, lab_mod="tracer")
 
@@ -698,9 +773,11 @@ def limit_approach_embed() -> str:
     return limit_cases_math_lab_embed(_sj(limit_cases_lab_12()))
 
 
-def limit_tracer_embed() -> str:
-    from ap_calc_math_lab_specs import tracer_lab_13, spec_json as _sj
-    return tracer_math_lab_embed(_sj(tracer_lab_13()))
+def limit_tracer_embed(worked_example: bool = False) -> str:
+    from ap_calc_math_lab_specs import tracer_lab_13, tracer_lab_13_worked_example, spec_json as _sj
+
+    spec = tracer_lab_13_worked_example() if worked_example else tracer_lab_13()
+    return tracer_math_lab_embed(_sj(spec))
 
 
 def practice_packet(section: str, title: str) -> str:

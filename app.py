@@ -17,6 +17,7 @@ from answer_grader import (
     response_is_correct,
 )
 from course_materials_progress import (
+    ap_calc_mastery_from_progress,
     build_coach_system_prompt,
     build_coach_user_message,
     mastery_pct_from_progress,
@@ -2772,7 +2773,7 @@ def _ap_calc_materials_user_progress(materials: list[dict[str, Any]]) -> dict[st
     for m in materials:
         slug = str(m.get("slug") or "")
         prog = user_progress.get(slug) or {}
-        m["user_mastery_pct"] = mastery_pct_from_progress(
+        m["user_mastery_pct"] = ap_calc_mastery_from_progress(
             prog,
             int(m.get("slide_count") or 0),
             int(m.get("checkpoint_count") or 0),

@@ -27,12 +27,73 @@
     "approach-means-equality": "Near c is not the same as at c.",
     "notation-direction-error": "x → c⁻ means x stays less than c; x → c⁺ means x stays greater than c.",
     "filled-point-first": "Trace both branches before reading f(c) from the filled dot.",
-    "checks-one-side-only": "Complete a left trace and a right trace before comparing.",
+    "checks-left-only": "Complete a right trace before comparing.",
+    "checks-right-only": "Complete a left trace before comparing.",
     "averages-unequal-one-sided-limits": "Do not average L⁻ and L⁺ — they must match exactly.",
-    "endpoint-requires-two-sides": "At a domain endpoint, only the valid one-sided limit exists.",
-    "infinite-limit-treated-as-finite": "If |y| grows without bound, the finite limit does not exist.",
+    "endpoint-needs-two-sides": "At a domain endpoint, only the valid one-sided limit exists.",
+    "infinite-treated-as-finite": "If |y| grows without bound, the finite limit does not exist.",
     "open-closed-point-confusion": "Open circle = approach height; filled dot = function value.",
+    "tracer-at-target": "The tracer cannot sit at x = c — limits describe approach, not the point itself.",
+    "DNE-without-reason": "State why the limit DNE: unequal sides, unbounded, or oscillatory.",
+    "filled-point-determines-limit": "Branches determine the limit; the filled dot shows f(c) only.",
+    "rise-run-reversed": "Secant slope = rise Δs divided by run h.",
   };
+
+  var TRACER_EPS = 0.0005;
+
+  function resolveScenarioIndex(spec) {
+    if (spec.initialScenarioId && spec.scenarios) {
+      for (var i = 0; i < spec.scenarios.length; i++) {
+        if (spec.scenarios[i].id === spec.initialScenarioId) return i;
+      }
+    }
+    return 0;
+  }
+
+  function formatApproachX(x, c, side) {
+    if (Math.abs(x - c) < 0.05) {
+      return side === "left" ? "x → " + c + "⁻" : "x → " + c + "⁺";
+    }
+    var decimals = Math.abs(x - c) < 0.1 ? 3 : 2;
+    var rounded = parseFloat(x.toFixed(decimals));
+    if (side === "left" && rounded >= c - TRACER_EPS) {
+      decimals += 1;
+      rounded = parseFloat(x.toFixed(decimals));
+    }
+    if (side === "right" && rounded <= c + TRACER_EPS) {
+      decimals += 1;
+      rounded = parseFloat(x.toFixed(decimals));
+    }
+    return "x = " + rounded;
+  }
+
+  function parseLimitValue(raw) {
+    if (raw == null || raw === "") return null;
+    var t = String(raw).trim().toLowerCase();
+    if (t === "dne" || t === "undefined" || t === "none" || t === "n/a") return null;
+    if (t === "inf" || t === "infinity" || t === "∞") return Infinity;
+    if (t === "-inf" || t === "-infinity" || t === "-∞") return -Infinity;
+    var n = parseFloat(t);
+    return isNaN(n) ? null : n;
+  }
+
+  function limitsMatch(a, b, tol) {
+    tol = tol == null ? 0.2 : tol;
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    if (!isFinite(a) || !isFinite(b)) return a === b;
+    return Math.abs(a - b) < tol;
+  }
+
+  function clampTracerX(x, c, side, domainMin) {
+    if (side === "left") {
+      var maxL = c - TRACER_EPS;
+      var minL = domainMin != null ? domainMin : c - 2;
+      return Math.min(maxL, Math.max(minL, x));
+    }
+    var minR = c + TRACER_EPS;
+    return Math.max(minR, x);
+  }
 
   function prefersReducedMotion() {
     return global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -67,11 +128,15 @@
     }
   }
 
-  function emitLearningState(payload) {
-    var detail = Object.assign({ timestamp: Date.now() }, payload);
-    try {
-      rootDispatch(rootFromPayload(payload), detail);
-    } catch (e) { /* noop */ }
+  function emitLearningState(root, payload) {
+    var detail = Object.assign({
+      timestamp: Date.now(),
+      courseId: "ap-calc",
+    }, payload);
+    if (root) {
+      _lastRoot = root;
+      rootDispatch(root, detail);
+    }
     if (global.ApCalcMathLab && global.ApCalcMathLab.onStateChange) {
       global.ApCalcMathLab.onStateChange(detail);
     }
@@ -231,55 +296,114 @@
     pt.setAttribute("visibility", "visible");
   }
 
-  function Tutor(root, tags) {
+  function ContextualTutor(root, spec) {
     this.root = root;
-    this.tags = tags || [];
+    this.spec = spec || {};
+    this.lessonId = spec.lessonId || "1.3";
     this.level = 0;
-    this.panel = root.querySelector("[data-ap-tutor]");
+    this.hintsUsed = 0;
+    this.lastMisconception = null;
     this.text = root.querySelector("[data-ap-tutor-text]");
-    this.btn = root.querySelector("[data-ap-tutor-next]");
+    this.tagEl = root.querySelector("[data-ap-tutor-tag]") || this.text;
+    this.status = root.querySelector("[data-ap-tutor-status]");
+    this.hintLevels = spec.hintLevels || [];
+    this.misconceptions = spec.misconceptions || {};
     var self = this;
-    if (this.btn) {
-      this.btn.addEventListener("click", function () { self.nextHint(); });
+    this.root.querySelectorAll("[data-ap-tutor-action]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        self.handleAction(btn.getAttribute("data-ap-tutor-action"));
+      });
+    });
+    var legacyBtn = root.querySelector("[data-ap-tutor-next]");
+    if (legacyBtn) {
+      legacyBtn.addEventListener("click", function () { self.handleAction("hint"); });
     }
   }
 
-  Tutor.prototype.nextHint = function (context) {
+  ContextualTutor.prototype.misconception = function (tag) {
+    var m = this.misconceptions[tag];
+    if (m && m.studentFacingMessage) return m.studentFacingMessage;
+    return MISCONCEPTION_HINTS[tag] || "Re-read the graph and compare left vs right.";
+  };
+
+  ContextualTutor.prototype.level1For = function (tag) {
+    var m = this.misconceptions[tag];
+    if (m && m.level1Hint) return m.level1Hint;
+    return this.misconception(tag);
+  };
+
+  ContextualTutor.prototype.reset = function () {
+    this.level = 0;
+    this.hintsUsed = 0;
+    this.lastMisconception = null;
+    if (this.status) this.status.textContent = "Try first — then ask for help.";
+    if (this.text) this.text.textContent = "";
+    var reflect = this.root.querySelector("[data-ap-reflection]");
+    if (reflect) reflect.hidden = true;
+  };
+
+  ContextualTutor.prototype.show = function (typeLabel, message) {
+    if (this.tagEl && this.tagEl !== this.text) {
+      this.tagEl.textContent = typeLabel ? "[" + typeLabel + "] " : "";
+    }
+    if (this.text) {
+      this.text.textContent = (typeLabel ? typeLabel + ": " : "") + message;
+    }
+  };
+
+  ContextualTutor.prototype.nextHint = function (ctx) {
     this.level = Math.min(5, this.level + 1);
-    var msg = this._message(context);
-    if (this.text) this.text.textContent = msg;
+    this.hintsUsed += 1;
+    var entry = this.hintLevels[this.level - 1];
+    if (entry) {
+      this.show(entry.type, entry.text);
+    } else if (this.lessonId === "1.1") {
+      this._secantFallback(this.level, ctx);
+    } else {
+      this.show("Observation hint", this.level1For("filled-point-first"));
+    }
     if (this.level >= 5) {
-      if (this.btn) this.btn.textContent = "Full solution shown";
       var reflect = this.root.querySelector("[data-ap-reflection]");
       if (reflect) reflect.hidden = false;
     }
     return this.level;
   };
 
-  Tutor.prototype.reset = function () {
-    this.level = 0;
-    if (this.text) this.text.textContent = "Need a nudge? Tap for a hint (Level 1).";
-    if (this.btn) this.btn.textContent = "Get hint";
-    var reflect = this.root.querySelector("[data-ap-reflection]");
-    if (reflect) reflect.hidden = true;
-  };
-
-  Tutor.prototype.misconception = function (tag) {
-    return MISCONCEPTION_HINTS[tag] || "Re-read the graph/table and compare left vs right.";
-  };
-
-  Tutor.prototype._message = function (ctx) {
+  ContextualTutor.prototype._secantFallback = function (L, ctx) {
     ctx = ctx || {};
-    var L = this.level;
-    if (L === 1) return "Focus on what changes as you approach the target — do not jump to h = 0 or the filled dot yet.";
-    if (L === 2) return "Use the slope triangle: orange run h, blue rise Δs, gray secant, green tangent.";
-    if (L === 3) return ctx.setup || "Setup: secant slope = (s(a+h)−s(a))/h. For s(t)=t²+1 at t=2, slope = 4+h.";
-    if (L === 4) return ctx.step || "With h=0.1, Δs=0.41 and slope=4.1. Both sides approach 4.";
-    if (L === 5) {
-      return (ctx.solution || "Instantaneous rate ≈ 4 m/s. Left and right secant slopes agree → tangent slope 4.")
-        + " Reflection: explain in your own words why the answer holds.";
+    if (L === 1) this.show("Observation hint", "Watch how Δs and h change as you move the slider.");
+    else if (L === 2) this.show("Strategy hint", "Use the slope triangle: orange run h, blue rise Δs.");
+    else if (L === 3) this.show("Representation hint", ctx.setup || "Secant slope = Δs/h = 4+h at t=2.");
+    else if (L === 4) this.show("Partial step", ctx.step || "h=0.1 → slope 4.1; h=−0.1 → slope 3.9.");
+    else this.show("Full solution", ctx.solution || "Instantaneous rate ≈ 4 m/s.");
+  };
+
+  ContextualTutor.prototype.handleAction = function (action) {
+    if (action === "hint") {
+      return this.nextHint();
     }
-    return ctx.solution || "Instantaneous rate ≈ 4 m/s. Left and right secant slopes agree → tangent slope 4.";
+    if (action === "mistake" && this.lastMisconception) {
+      this.show("Error diagnosis", this.misconception(this.lastMisconception));
+      return;
+    }
+    if (action === "why") {
+      this.show("Strategy hint", this.lessonId === "1.1"
+        ? "We approach h → 0 with h ≠ 0 because h = 0 gives no interval."
+        : "Branches determine the limit; f(c) is read separately from the filled dot.");
+      return;
+    }
+    if (action === "similar") {
+      this.show("Strategy hint", "Similar problem: same structure with a different target x — trace both sides first.");
+      return;
+    }
+    if (action === "check-explain") {
+      this.show("Reflection", "Include left behavior, right behavior, whether they agree, and that f(c) is separate.");
+    }
+  };
+
+  ContextualTutor.prototype.recordMisconception = function (tag) {
+    this.lastMisconception = tag;
+    this.show("Error diagnosis", this.misconception(tag));
   };
 
   function buildControls(root, buttons) {
@@ -312,7 +436,7 @@
     this.leftEst = null;
     this.rightEst = null;
     this.animTimer = null;
-    this.tutor = new Tutor(root, spec.misconceptionTags);
+    this.tutor = new ContextualTutor(root, spec);
     this._bind();
     this._render();
   }
@@ -358,17 +482,6 @@
         self._explain(btn.getAttribute("data-ap-explain"));
       });
     });
-    var tutorBtn = this.root.querySelector("[data-ap-tutor-next]");
-    if (tutorBtn) {
-      tutorBtn.addEventListener("click", function () {
-        var lvl = self.tutor.nextHint({
-          setup: "Secant slope = (s(a+h)−s(a))/h. At t=2 with s(t)=t²+1, slope = 4+h.",
-          step: "h=0.1 → Δs=0.41, slope=4.1. h=−0.1 → slope=3.9.",
-          solution: "Instantaneous rate = 4 m/s (tangent slope 4).",
-        });
-        emitLearningState({ lessonId: self.spec.lessonId, labId: self.spec.id, hintsUsed: lvl });
-      });
-    }
   };
 
   SecantTangentLab.prototype._action = function (action) {
@@ -421,7 +534,8 @@
         ? "Prediction recorded. Explore with h → 0 to verify."
         : this.tutor.misconception("average-vs-instantaneous");
     }
-    emitLearningState({
+    emitLearningState(this.root, {
+      eventType: "prediction_submitted",
       lessonId: this.spec.lessonId,
       labId: this.spec.id,
       prediction: val,
@@ -441,10 +555,11 @@
     }
     var conclusion = this.root.querySelector("[data-ap-conclusion]");
     if (conclusion && correct) conclusion.hidden = false;
-    emitLearningState({
+    emitLearningState(this.root, {
+      eventType: "explanation_submitted",
       lessonId: this.spec.lessonId,
       labId: this.spec.id,
-      studentAnswer: val,
+      answer: val,
       correct: correct,
       misconceptionTags: correct ? [] : ["substitute-h-zero-too-early"],
     });
@@ -493,11 +608,11 @@
       "h equals " + h + " " + (units.input || "") + ". Delta s equals " + deltaS.toFixed(2) + " " + (units.output || "") +
       ". Average rate equals " + rate.toFixed(2) + " " + (units.rate || "") + ". Secant slope approaching 4.");
 
-    emitLearningState({
+    emitLearningState(this.root, {
+      eventType: "tracer_moved",
       lessonId: this.spec.lessonId,
       labId: this.spec.id,
       graphState: { h: h, rate: rate, deltaS: deltaS },
-      sliderValue: h,
     });
   };
 
@@ -560,7 +675,7 @@
     this.rightDone = false;
     this.leftObs = "";
     this.rightObs = "";
-    this.tutor = new Tutor(root, spec.misconceptionTags);
+    this.tutor = new ContextualTutor(root, spec);
     this._bind();
     this._renderCase();
   }
@@ -601,11 +716,11 @@
 
   GraphCaseSwitcher.prototype._yAt = function (x) {
     var c = this.current();
+    if (Math.abs(x - c.targetX) < TRACER_EPS) return NaN;
     for (var i = 0; i < c.branches.length; i++) {
       var br = c.branches[i];
       if (x >= br.x0 && x <= br.x1) return safeEval(br.fn, x);
     }
-    if (Math.abs(x - c.targetX) < 0.03 && c.functionValue != null) return c.functionValue;
     return NaN;
   };
 
@@ -622,8 +737,13 @@
 
   GraphCaseSwitcher.prototype._trace = function (x) {
     var c = this.current();
+    if (x < c.targetX) x = clampTracerX(x, c.targetX, "left", c.domainMin);
+    else x = clampTracerX(x, c.targetX, "right", c.domainMin);
     var y = this._yAt(x);
-    this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) { n.textContent = x.toFixed(2); });
+    var side = x < c.targetX ? "left" : "right";
+    this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) {
+      n.textContent = formatApproachX(x, c.targetX, side).replace("x = ", "").replace("x → ", "");
+    });
     this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = isFinite(y) ? y.toFixed(2) : "—"; });
     if (x < c.targetX - 0.02) {
       this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the left toward x = " + c.targetX;
@@ -669,8 +789,8 @@
     if (slider) {
       slider.min = c.targetX - 0.5;
       slider.max = c.targetX + 0.5;
-      slider.step = 0.05;
-      slider.value = c.targetX - 0.4;
+      slider.step = 0.001;
+      slider.value = clampTracerX(c.targetX - 0.4, c.targetX, "left", c.domainMin);
     }
     var panel = this.root.querySelector("[data-ap-limit-panel]");
     if (panel) panel.hidden = true;
@@ -716,17 +836,28 @@
     _lastRoot = root;
     this.root = root;
     this.spec = spec;
-    this.scenarioIndex = 0;
-    this.step = 1;
+    this.scenarioIndex = resolveScenarioIndex(spec);
+    this.step = 0;
+    this.leftX = null;
+    this.rightX = null;
     this.leftLocked = null;
     this.rightLocked = null;
-    this.tutor = new Tutor(root, spec.misconceptionTags);
+    this.predictDone = false;
+    this.fcConfirmed = false;
+    this.tutor = new ContextualTutor(root, spec);
     this._bind();
+    this._applyScenarioTabsVisibility();
     this._renderScenario();
+    this._syncPanels();
   }
 
   OneSidedLimitTracer.prototype.scenario = function () {
     return this.spec.scenarios[this.scenarioIndex];
+  };
+
+  OneSidedLimitTracer.prototype._applyScenarioTabsVisibility = function () {
+    var tabs = this.root.querySelector("[data-ap-scenario-tabs]");
+    if (tabs && this.spec.showScenarioTabs === false) tabs.hidden = true;
   };
 
   OneSidedLimitTracer.prototype._bind = function () {
@@ -734,67 +865,286 @@
     this.root.querySelectorAll("[data-ap-scenario]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         self.scenarioIndex = parseInt(btn.getAttribute("data-ap-scenario"), 10) || 0;
-        self.step = 1;
-        self.leftLocked = null;
-        self.rightLocked = null;
+        self._resetFlow();
         self._renderScenario();
       });
     });
-    var slider = this.root.querySelector("[data-ap-trace-slider]");
-    if (slider) slider.addEventListener("input", function () { self._trace(parseFloat(slider.value)); });
+    var leftSlider = this.root.querySelector("[data-ap-trace-left-slider]");
+    var rightSlider = this.root.querySelector("[data-ap-trace-right-slider]");
+    if (leftSlider) {
+      leftSlider.addEventListener("input", function () { self._traceLeft(parseFloat(leftSlider.value)); });
+    }
+    if (rightSlider) {
+      rightSlider.addEventListener("input", function () { self._traceRight(parseFloat(rightSlider.value)); });
+    }
     this.root.querySelectorAll("[data-ap-action]").forEach(function (btn) {
       btn.addEventListener("click", function () { self._action(btn.getAttribute("data-ap-action")); });
     });
-    this.root.querySelector("[data-ap-lock-left]")?.addEventListener("click", function () { self._lock("left"); });
-    this.root.querySelector("[data-ap-lock-right]")?.addEventListener("click", function () { self._lock("right"); });
-    this.root.querySelector("[data-ap-lock-compare]")?.addEventListener("click", function () { self._compare(); });
+    this.root.querySelector("[data-ap-predict-submit]")?.addEventListener("click", function () { self._submitPredict(); });
+    this.root.querySelector("[data-ap-lock-left-submit]")?.addEventListener("click", function () { self._submitLock("left"); });
+    this.root.querySelector("[data-ap-lock-right-submit]")?.addEventListener("click", function () { self._submitLock("right"); });
+    this.root.querySelector("[data-ap-compare-submit]")?.addEventListener("click", function () { self._submitCompare(); });
+    this.root.querySelector("[data-ap-fc-confirm]")?.addEventListener("click", function () { self._confirmFc(); });
+    this.root.querySelector("[data-ap-explain-submit]")?.addEventListener("click", function () { self._submitExplain(); });
+  };
+
+  OneSidedLimitTracer.prototype._resetFlow = function () {
+    this.step = 0;
+    this.leftLocked = null;
+    this.rightLocked = null;
+    this.predictDone = false;
+    this.fcConfirmed = false;
+    this.tutor.reset();
+    this._syncPanels();
   };
 
   OneSidedLimitTracer.prototype._action = function (action) {
-    var sc = this.scenario();
-    var slider = this.root.querySelector("[data-ap-trace-slider]");
-    if (!slider) return;
-    if (action === "left") { slider.value = (sc.targetX - 0.4).toFixed(2); this._trace(parseFloat(slider.value)); }
-    if (action === "right") { slider.value = (sc.targetX + 0.4).toFixed(2); this._trace(parseFloat(slider.value)); }
-    if (action === "reset") { this.step = 1; this.leftLocked = null; this.rightLocked = null; this._renderScenario(); }
+    if (action === "reset") {
+      this._resetFlow();
+      this._renderScenario();
+    }
   };
 
-  OneSidedLimitTracer.prototype._trace = function (x) {
+  OneSidedLimitTracer.prototype._yAt = function (x, allowFc) {
     var sc = this.scenario();
-    var y = this._yAt(x);
-    this.root.querySelector("[data-ap-trace-x]").textContent = x.toFixed(2);
-    this.root.querySelector("[data-ap-trace-y]").textContent = isFinite(y) ? y.toFixed(2) : "∞";
-    this._draw(x, y);
-    this._updateDashboard();
-  };
-
-  OneSidedLimitTracer.prototype._yAt = function (x) {
-    var sc = this.scenario();
+    if (!allowFc && Math.abs(x - sc.targetX) < TRACER_EPS) return NaN;
     for (var i = 0; i < sc.branches.length; i++) {
       var br = sc.branches[i];
       if (x >= br.x0 && x <= br.x1) return safeEval(br.fn, x);
     }
-    if (Math.abs(x - sc.targetX) < 0.03 && sc.functionValue != null) return sc.functionValue;
+    if (allowFc && Math.abs(x - sc.targetX) < 0.03 && sc.functionValue != null) return sc.functionValue;
     return NaN;
   };
 
-  OneSidedLimitTracer.prototype._lock = function (side) {
+  OneSidedLimitTracer.prototype._submitPredict = function () {
     var sc = this.scenario();
-    if (side === "left") {
-      this.leftLocked = sc.leftLimit;
-      this.step = Math.max(this.step, 2);
-    } else {
-      this.rightLocked = sc.rightLimit;
-      this.step = Math.max(this.step, 4);
+    var leftVal = this.root.querySelector("[data-ap-predict-left]")?.value;
+    var rightVal = this.root.querySelector("[data-ap-predict-right]")?.value;
+    var twoVal = this.root.querySelector("[data-ap-predict-two]")?.value;
+    var fcVal = this.root.querySelector("[data-ap-predict-fc]")?.value;
+    if (!leftVal || !rightVal || !twoVal || !fcVal) {
+      var panel = this.root.querySelector("[data-ap-predict-result]");
+      if (panel) { panel.hidden = false; panel.textContent = "Complete all four predictions first."; }
+      return;
     }
-    this._updateDashboard();
+    this.predictDone = true;
+    this.step = 1;
+    var panel = this.root.querySelector("[data-ap-predict-result]");
+    if (panel) {
+      panel.hidden = false;
+      panel.textContent = "Prediction recorded. Explore the left branch (x < " + sc.targetX + ").";
+    }
+    this._syncPanels();
+    emitLearningState(this.root, {
+      eventType: "prediction_submitted",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      prediction: { left: leftVal, right: rightVal, two: twoVal, fcAffects: fcVal },
+    });
   };
 
-  OneSidedLimitTracer.prototype._compare = function () {
-    this.step = 5;
+  OneSidedLimitTracer.prototype._submitLock = function (side) {
+    var sc = this.scenario();
+    var input = this.root.querySelector(side === "left" ? "[data-ap-lock-left-input]" : "[data-ap-lock-right-input]");
+    var feedback = this.root.querySelector(side === "left" ? "[data-ap-lock-left-feedback]" : "[data-ap-lock-right-feedback]");
+    var expected = side === "left" ? sc.leftLimit : sc.rightLimit;
+    var parsed = parseLimitValue(input ? input.value : "");
+    var correct = limitsMatch(parsed, expected);
+    if (feedback) feedback.hidden = false;
+    if (correct) {
+      if (side === "left") {
+        this.leftLocked = expected;
+        this.step = 3;
+        if (feedback) feedback.textContent = "L⁻ locked.";
+      } else {
+        this.rightLocked = expected;
+        this.step = 5;
+        if (feedback) feedback.textContent = "L⁺ locked.";
+      }
+      this._syncPanels();
+      emitLearningState(this.root, {
+        eventType: side === "left" ? "left_observation_locked" : "right_observation_locked",
+        lessonId: this.spec.lessonId,
+        labId: this.spec.id,
+        caseId: sc.id,
+        answer: input ? input.value : "",
+        correct: true,
+      });
+      return;
+    }
+    var tag = side === "left" ? "checks-left-only" : "checks-right-only";
+    if (parsed != null && expected != null && sc.functionValue != null && Math.abs(parsed - sc.functionValue) < 0.2) {
+      tag = "filled-point-first";
+    }
+    if (feedback) feedback.textContent = this.tutor.misconception(tag);
+    this.tutor.recordMisconception(tag);
+    emitLearningState(this.root, {
+      eventType: "answer_checked",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      answer: input ? input.value : "",
+      correct: false,
+      misconceptionTags: [tag],
+    });
+  };
+
+  OneSidedLimitTracer.prototype._expectedComparison = function () {
+    var sc = this.scenario();
+    if (sc.infinite) return "unbounded";
+    if (sc.leftLimit == null && sc.rightLimit == null) return "unbounded";
+    if (sc.leftLimit == null || sc.rightLimit == null) return "one-side";
+    if (sc.leftLimit === sc.rightLimit) return "same";
+    return "different";
+  };
+
+  OneSidedLimitTracer.prototype._submitCompare = function () {
+    var sc = this.scenario();
+    var sel = this.root.querySelector("[data-ap-compare-select]");
+    var val = sel ? sel.value : "";
+    var feedback = this.root.querySelector("[data-ap-compare-feedback]");
+    var expected = this._expectedComparison();
+    var correct = val === expected;
+    if (feedback) feedback.hidden = false;
+    if (correct) {
+      this.step = Math.max(this.step, 6);
+      if (feedback) feedback.textContent = "Comparison locked. Two-sided: " + (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE");
+      var conclusion = this.root.querySelector("[data-ap-conclusion]");
+      if (conclusion) conclusion.hidden = false;
+      var body = this.root.querySelector("[data-ap-conclusion-body]");
+      if (body) {
+        body.textContent = "L⁻ = " + (sc.leftLimit != null ? sc.leftLimit : "n/a") +
+          ", L⁺ = " + (sc.rightLimit != null ? sc.rightLimit : "n/a") +
+          ". Two-sided limit: " + (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE") + ".";
+      }
+      this._syncPanels();
+      emitLearningState(this.root, {
+        eventType: "comparison_submitted",
+        lessonId: this.spec.lessonId,
+        labId: this.spec.id,
+        caseId: sc.id,
+        answer: val,
+        correct: true,
+      });
+      return;
+    }
+    var tag = val === "same" && expected === "different" ? "averages-unequal-one-sided-limits" : "DNE-without-reason";
+    if (feedback) feedback.textContent = this.tutor.misconception(tag);
+    this.tutor.recordMisconception(tag);
+  };
+
+  OneSidedLimitTracer.prototype._confirmFc = function () {
+    var sc = this.scenario();
+    this.fcConfirmed = true;
+    this.step = Math.max(this.step, 7);
+    var read = this.root.querySelector("[data-ap-fc-read]");
+    if (read) read.textContent = sc.functionValue != null ? sc.functionValue : "undefined";
+    this._syncPanels();
+    emitLearningState(this.root, {
+      eventType: "function_value_submitted",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      answer: sc.functionValue,
+      correct: true,
+    });
+  };
+
+  OneSidedLimitTracer.prototype._submitExplain = function () {
+    var sc = this.scenario();
+    var text = (this.root.querySelector("[data-ap-explain-input]")?.value || "").toLowerCase();
+    var feedback = this.root.querySelector("[data-ap-explain-feedback]");
+    var hasLeft = text.indexOf("left") >= 0 || text.indexOf("l⁻") >= 0 || text.indexOf("l-") >= 0;
+    var hasRight = text.indexOf("right") >= 0 || text.indexOf("l⁺") >= 0 || text.indexOf("l+") >= 0;
+    var hasAgree = text.indexOf("same") >= 0 || text.indexOf("equal") >= 0 || text.indexOf("agree") >= 0 || text.indexOf("dne") >= 0 || text.indexOf("not exist") >= 0;
+    var hasFc = text.indexOf("f(c)") >= 0 || text.indexOf("filled") >= 0 || text.indexOf("dot") >= 0 || text.indexOf("separate") >= 0;
+    var correct = hasLeft && hasRight && hasAgree && hasFc;
+    if (feedback) {
+      feedback.hidden = false;
+      feedback.innerHTML = correct
+        ? "<strong>Strong explanation.</strong> You separated branch behavior from f(c)."
+        : "<strong>Add more detail:</strong> mention left behavior, right behavior, whether they agree, and that f(c) is separate.";
+    }
+    if (!correct) this.tutor.recordMisconception("filled-point-determines-limit");
+    emitLearningState(this.root, {
+      eventType: "explanation_submitted",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      answer: text.slice(0, 500),
+      correct: correct,
+    });
+  };
+
+  OneSidedLimitTracer.prototype._traceLeft = function (x) {
+    var sc = this.scenario();
+    x = clampTracerX(x, sc.targetX, "left", sc.domainMin);
+    this.leftX = x;
+    var y = this._yAt(x, false);
+    var read = this.root.querySelector("[data-ap-trace-left-read]");
+    var yEl = this.root.querySelector("[data-ap-trace-left-y]");
+    var distEl = this.root.querySelector("[data-ap-trace-left-dist]");
+    if (read) read.textContent = formatApproachX(x, sc.targetX, "left");
+    if (yEl) yEl.textContent = isFinite(y) ? y.toFixed(2) : "∞";
+    if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
+    if (this.predictDone && Math.abs(x - sc.targetX) <= 0.11) {
+      this.step = Math.max(this.step, 2);
+      this._syncPanels();
+    }
+    this._draw();
+    emitLearningState(this.root, {
+      eventType: "tracer_moved",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      graphState: { side: "left", x: x, y: y },
+    });
+  };
+
+  OneSidedLimitTracer.prototype._traceRight = function (x) {
+    var sc = this.scenario();
+    x = clampTracerX(x, sc.targetX, "right", sc.domainMin);
+    this.rightX = x;
+    var y = this._yAt(x, false);
+    var read = this.root.querySelector("[data-ap-trace-right-read]");
+    var yEl = this.root.querySelector("[data-ap-trace-right-y]");
+    var distEl = this.root.querySelector("[data-ap-trace-right-dist]");
+    if (read) read.textContent = formatApproachX(x, sc.targetX, "right");
+    if (yEl) yEl.textContent = isFinite(y) ? y.toFixed(2) : "∞";
+    if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
+    if (this.leftLocked != null && Math.abs(x - sc.targetX) <= 0.11) {
+      this.step = Math.max(this.step, 4);
+      this._syncPanels();
+    }
+    this._draw();
+    emitLearningState(this.root, {
+      eventType: "tracer_moved",
+      lessonId: this.spec.lessonId,
+      labId: this.spec.id,
+      caseId: sc.id,
+      graphState: { side: "right", x: x, y: y },
+    });
+  };
+
+  OneSidedLimitTracer.prototype._syncPanels = function () {
+    var predictPanel = this.root.querySelector("[data-ap-predict-panel]");
+    var leftPanel = this.root.querySelector("[data-ap-trace-left-panel]");
+    var rightPanel = this.root.querySelector("[data-ap-trace-right-panel]");
+    var lockLeft = this.root.querySelector("[data-ap-lock-left-panel]");
+    var lockRight = this.root.querySelector("[data-ap-lock-right-panel]");
+    var compare = this.root.querySelector("[data-ap-compare-panel]");
+    var fc = this.root.querySelector("[data-ap-fc-panel]");
+    var explain = this.root.querySelector("[data-ap-explain-panel]");
+    if (predictPanel) predictPanel.hidden = this.step > 0;
+    if (leftPanel) leftPanel.hidden = this.step < 1 || this.step > 2;
+    if (lockLeft) lockLeft.hidden = this.step !== 2;
+    if (rightPanel) rightPanel.hidden = this.step < 3 || this.step > 4;
+    if (lockRight) lockRight.hidden = this.step !== 4;
+    if (compare) compare.hidden = this.step !== 5;
+    if (fc) fc.hidden = this.step !== 6;
+    if (explain) explain.hidden = this.step < 7;
     this._updateDashboard();
-    var conclusion = this.root.querySelector("[data-ap-conclusion]");
-    if (conclusion) conclusion.hidden = false;
   };
 
   OneSidedLimitTracer.prototype._updateDashboard = function () {
@@ -810,7 +1160,7 @@
     dash.querySelector("[data-d-two]").textContent = this.step >= 5
       ? (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE")
       : "—";
-    dash.querySelector("[data-d-fc]").textContent = this.step >= 6
+    dash.querySelector("[data-d-fc]").textContent = this.fcConfirmed
       ? (sc.functionValue != null ? sc.functionValue : "undefined")
       : "—";
     dash.querySelectorAll("[data-ap-step]").forEach(function (node) {
@@ -818,6 +1168,31 @@
       node.classList.toggle("is-done", n < this.step);
       node.classList.toggle("is-active", n === this.step);
     }.bind(this));
+  };
+
+  OneSidedLimitTracer.prototype._buildPresets = function (side) {
+    var sc = this.scenario();
+    var presets = (sc.allowedTracerValues && sc.allowedTracerValues[side]) || [];
+    var container = this.root.querySelector(side === "left" ? "[data-ap-left-presets]" : "[data-ap-right-presets]");
+    if (!container) return;
+    container.innerHTML = "";
+    var self = this;
+    presets.forEach(function (x) {
+      var valid = side === "left" ? x < sc.targetX - TRACER_EPS : x > sc.targetX + TRACER_EPS;
+      if (!valid) return;
+      var btn = el("button", "ap-lab-btn ap-lab-btn--preset", formatApproachX(x, sc.targetX, side));
+      btn.type = "button";
+      btn.addEventListener("click", function () {
+        if (side === "left") {
+          var slider = self.root.querySelector("[data-ap-trace-left-slider]");
+          if (slider) { slider.value = x; self._traceLeft(x); }
+        } else {
+          var sliderR = self.root.querySelector("[data-ap-trace-right-slider]");
+          if (sliderR) { sliderR.value = x; self._traceRight(x); }
+        }
+      });
+      container.appendChild(btn);
+    });
   };
 
   OneSidedLimitTracer.prototype._renderScenario = function () {
@@ -829,17 +1204,33 @@
     });
     var note = this.root.querySelector("[data-ap-scenario-note]");
     if (note) note.textContent = sc.previewNote || "";
-    var slider = this.root.querySelector("[data-ap-trace-slider]");
-    if (slider) {
-      var x0 = sc.domainMin != null ? sc.domainMin : (sc.targetX - 1);
-      slider.min = x0;
-      slider.max = sc.targetX + 1.5;
-      slider.value = x0 + 0.3;
+    var c = sc.targetX;
+    var domainMin = sc.domainMin != null ? sc.domainMin : c - 2;
+    var leftSlider = this.root.querySelector("[data-ap-trace-left-slider]");
+    var rightSlider = this.root.querySelector("[data-ap-trace-right-slider]");
+    if (leftSlider) {
+      leftSlider.min = domainMin;
+      leftSlider.max = c - TRACER_EPS;
+      leftSlider.step = 0.001;
+      leftSlider.value = clampTracerX(c - 0.3, c, "left", sc.domainMin);
     }
-    this._trace(parseFloat(slider.value));
+    if (rightSlider) {
+      rightSlider.min = c + TRACER_EPS;
+      rightSlider.max = c + 2;
+      rightSlider.step = 0.001;
+      rightSlider.value = c + 0.3;
+    }
+    this._buildPresets("left");
+    this._buildPresets("right");
+    if (leftSlider) this._traceLeft(parseFloat(leftSlider.value));
+    if (rightSlider) this._traceRight(parseFloat(rightSlider.value));
+    var fcRead = this.root.querySelector("[data-ap-fc-read]");
+    if (fcRead) fcRead.textContent = sc.functionValue != null ? sc.functionValue : "undefined";
+    if (this.step === 2 || this.leftLocked != null) this.step = Math.max(this.step, 2);
+    this._syncPanels();
   };
 
-  OneSidedLimitTracer.prototype._draw = function (x, y) {
+  OneSidedLimitTracer.prototype._draw = function () {
     var sc = this.scenario();
     var svg = this.root.querySelector(".ap-lab-svg");
     if (!svg) return;
@@ -869,8 +1260,12 @@
       }
     }
     var closed0 = (sc.closedPoints || [])[0];
-    setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
-    setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
+    var showFc = this.step >= 6;
+    setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, showFc && !!closed0);
+    var yL = this.leftX != null ? this._yAt(this.leftX, false) : NaN;
+    var yR = this.rightX != null ? this._yAt(this.rightX, false) : NaN;
+    setPoint(svg, "[data-ap-tracer-left]", this.leftX, yL, plot, isFinite(yL));
+    setPoint(svg, "[data-ap-tracer-right]", this.rightX, yR, plot, isFinite(yR));
   };
 
   function initMathLab(root) {
@@ -891,6 +1286,12 @@
     initLab: initMathLab,
     MISCONCEPTION_HINTS: MISCONCEPTION_HINTS,
     safeEval: safeEval,
+    formatApproachX: formatApproachX,
+    clampTracerX: clampTracerX,
+    parseLimitValue: parseLimitValue,
+    limitsMatch: limitsMatch,
+    resolveScenarioIndex: resolveScenarioIndex,
+    TRACER_EPS: TRACER_EPS,
     onStateChange: null,
   };
 

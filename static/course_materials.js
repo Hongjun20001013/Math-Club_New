@@ -3279,6 +3279,44 @@
       .catch(function () {});
   }
 
+  function mergeApCalcLabEvent(detail) {
+    if (!detail || !detail.eventType || !root.classList.contains("np-cm-viewer--ap-calc")) return;
+    progress.lab = progress.lab || { events: [], objectives: {} };
+    var events = progress.lab.events || [];
+    events.push({
+      eventType: detail.eventType,
+      lessonId: detail.lessonId,
+      labId: detail.labId,
+      caseId: detail.caseId,
+      correct: detail.correct,
+      misconceptionTags: detail.misconceptionTags || [],
+      timestamp: detail.timestamp || Date.now()
+    });
+    if (events.length > 120) events = events.slice(-120);
+    progress.lab.events = events;
+    var objId = String(detail.lessonId || "lab") + "-" + String(detail.caseId || detail.labId || "main");
+    var obj = progress.lab.objectives[objId] || {};
+    if (detail.eventType === "prediction_submitted") {
+      obj.exposure = Math.min(10, (obj.exposure || 0) + 3);
+    }
+    if (detail.eventType === "tracer_moved") {
+      obj.interaction = Math.min(20, (obj.interaction || 0) + 1);
+    }
+    if (detail.correct) {
+      if (detail.eventType && detail.eventType.indexOf("locked") !== -1) {
+        obj.guidedSuccess = Math.min(20, (obj.guidedSuccess || 0) + 5);
+      }
+      if (detail.eventType === "answer_checked") {
+        obj.independentSuccess = Math.min(30, (obj.independentSuccess || 0) + 6);
+      }
+      if (detail.eventType === "explanation_submitted") {
+        obj.explanationQuality = Math.min(20, (obj.explanationQuality || 0) + 10);
+      }
+    }
+    progress.lab.objectives[objId] = obj;
+    saveProgress();
+  }
+
   function saveProgress() {
     var slide = slides[idx];
     if (slide) {
@@ -3776,6 +3814,28 @@
     studyStatEl.textContent = done + " / " + total + " challenges";
   }
 
+  function apCalcMasteryPct(total, viewed, done) {
+    var exposure = Math.min(10, Math.round(10 * viewed / total));
+    var lab = progress.lab || {};
+    var objectives = lab.objectives || {};
+    var keys = Object.keys(objectives);
+    var labTotal = 0;
+    if (keys.length) {
+      keys.forEach(function (k) {
+        var o = objectives[k] || {};
+        labTotal += Math.min(10, o.exposure || 0) + Math.min(20, o.interaction || 0)
+          + Math.min(20, o.guidedSuccess || 0) + Math.min(30, o.independentSuccess || 0)
+          + Math.min(20, o.explanationQuality || 0);
+      });
+      labTotal = Math.round(labTotal / keys.length);
+    }
+    var cpRec = loadCheckpointRecord();
+    var cpPct = cpRec.last_run ? Math.min(30, Math.round(cpRec.last_run.pct * 0.3)) : 0;
+    var raw = exposure + labTotal + cpPct;
+    var browseCap = Math.min(40, exposure + Math.min(30, Math.round(100 * viewed / total * 0.3)));
+    return labTotal < 15 ? Math.min(browseCap, raw) : Math.min(100, raw);
+  }
+
   function updateMastery() {
     var total = slides.filter(function (s) { return s.kind !== "section"; }).length;
     if (!total) return;
@@ -3787,9 +3847,11 @@
     var slidePct = Math.min(100, Math.round(100 * (viewed * 0.35 + done * 0.45) / total));
     var cpRec = loadCheckpointRecord();
     var cpPct = cpRec.last_run ? cpRec.last_run.pct : (cpRec.best_total ? Math.round(100 * cpRec.best_score / cpRec.best_total) : 0);
-    var pct = checkpointItems.length
-      ? Math.min(100, Math.round(slidePct * 0.65 + cpPct * 0.35))
-      : slidePct;
+    var pct = root.classList.contains("np-cm-viewer--ap-calc")
+      ? apCalcMasteryPct(total, viewed, done)
+      : (checkpointItems.length
+        ? Math.min(100, Math.round(slidePct * 0.65 + cpPct * 0.35))
+        : slidePct);
     if (masteryPctEl) masteryPctEl.textContent = pct + "%";
     if (masteryRingEl) {
       var circ = 2 * Math.PI * 18;
@@ -4199,6 +4261,9 @@
     if (typeof window.initApCalcLesson === "function") {
       window.initApCalcLesson(bodyEl);
     }
+    bodyEl.addEventListener("ap-math-lab-state", function (ev) {
+      mergeApCalcLabEvent(ev.detail || {});
+    });
 
     if ((slide.kind === "question" || slide.kind === "practice") && studyMode && !getLockedAnswer(slide.index)) {
       var focusInput = bodyEl.querySelector(".cm-grid-in-input:not(.is-locked)");

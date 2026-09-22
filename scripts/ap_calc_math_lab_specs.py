@@ -13,7 +13,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
-SECANT_H_VALUES = [-1, -0.5, -0.1, -0.01, 0.01, 0.1, 0.5, 1]
+from ap_calc_tutor_engine import enrich_scenario, tutor_context_for_spec
+
+SECANT_H_VALUES = [-1, -0.5, -0.1, -0.01, -0.001, 0.001, 0.01, 0.1, 0.5, 1]
 
 
 def secant_lab_11() -> dict[str, Any]:
@@ -51,6 +53,7 @@ def secant_lab_11() -> dict[str, Any]:
         ],
         "predictPrompt": "As h → 0 from both sides, does the secant slope increase, decrease, or stabilize? What tangent slope do you predict?",
         "explainPrompt": "Why can we use h → 0 but not h = 0 in the difference quotient?",
+        **tutor_context_for_spec({"lessonId": "1.1"}),
     }
 
 
@@ -138,6 +141,7 @@ def limit_cases_lab_12() -> dict[str, Any]:
         ],
         "predictPrompt": "Before tracing, predict: will the left and right approach heights agree?",
         "explainPrompt": "How is the limit different from f(c) in this case?",
+        **tutor_context_for_spec({"lessonId": "1.2"}),
     }
 
 
@@ -231,23 +235,36 @@ def tracer_lab_13() -> dict[str, Any]:
             "previewNote": "Optional extension — |y| grows without bound near x = 2.",
         },
     ]
+    enriched = [enrich_scenario(s) for s in scenarios]
     return {
         "id": "one-sided-tracer-13",
         "lessonId": "1.3",
         "labType": "OneSidedLimitTracer",
         "learningObjective": "Estimate left-hand, right-hand, and two-sided limits from a graph.",
-        "scenarios": scenarios,
+        "scenarios": enriched,
         "misconceptionTags": [
             "filled-point-first",
-            "checks-one-side-only",
+            "checks-left-only",
+            "checks-right-only",
             "averages-unequal-one-sided-limits",
-            "endpoint-requires-two-sides",
-            "infinite-limit-treated-as-finite",
+            "endpoint-needs-two-sides",
+            "infinite-treated-as-finite",
             "open-closed-point-confusion",
+            "tracer-at-target",
+            "DNE-without-reason",
         ],
         "predictPrompt": "Before tracing, predict whether L⁻ and L⁺ will match.",
         "explainPrompt": "Explain why the two-sided limit does or does not exist.",
+        **tutor_context_for_spec({"lessonId": "1.3"}),
     }
+
+
+def tracer_lab_13_worked_example() -> dict[str, Any]:
+    """Focused lab for Worked Example slide — defaults to hole + value at x=2."""
+    spec = tracer_lab_13()
+    spec["initialScenarioId"] = "hole-filled"
+    spec["showScenarioTabs"] = False
+    return spec
 
 
 def spec_json(spec: dict[str, Any]) -> str:

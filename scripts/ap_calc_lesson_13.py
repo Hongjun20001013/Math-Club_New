@@ -134,7 +134,7 @@ def build(graphs: dict[str, str]) -> dict:
             "Two-sided limit is 3; function value is 1.5 — limit exists but graph is not continuous.",
             "Open circle shows approach height 3; filled dot shows \\(f(2)=1.5\\).",
         )
-        + limit_tracer_embed(),
+        + limit_tracer_embed(worked_example=True),
         path_phase="Worked Example",
     )
 
@@ -147,7 +147,10 @@ def build(graphs: dict[str, str]) -> dict:
         + fig(g["removable_hole_gallery"], "Removable hole", cls="ap-fig--gallery", notice=NOTICE_HOLE)
         + fig(g["jump_at_3_gallery"], "Jump", cls="ap-fig--gallery", notice=NOTICE_JUMP_DNE)
         + fig(g["infinite_limit_13_gallery"], "Infinite (extension)", cls="ap-fig--gallery", notice=NOTICE_INFINITE)
-        + "</div>",
+        + "</div>"
+        + '<p class="ap-prose-after-math"><em>Discontinuity preview</em> — formal classification in Section 1.10. '
+        "Use the interactive lab below to trace each case.</p>"
+        + limit_tracer_embed(),
         path_phase="Visual Investigation",
     )
 

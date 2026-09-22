@@ -126,6 +126,48 @@ def mastery_pct_from_progress(progress: dict[str, Any], slide_count: int, checkp
     return slide_pct
 
 
+def ap_calc_mastery_from_progress(progress: dict[str, Any], slide_count: int, checkpoint_count: int) -> int:
+    """AP Calc mastery: exposure capped; interaction/practice/explanation weighted."""
+    if slide_count <= 0:
+        return 0
+    viewed = len(progress.get("viewed") or [])
+    exposure = min(10, round(10 * viewed / slide_count))
+    lab = progress.get("lab") or {}
+    objectives = lab.get("objectives") or {}
+    if objectives:
+        obj_scores = []
+        for obj in objectives.values():
+            if not isinstance(obj, dict):
+                continue
+            obj_scores.append(
+                min(10, int(obj.get("exposure", 0)))
+                + min(20, int(obj.get("interaction", 0)))
+                + min(20, int(obj.get("guidedSuccess", 0)))
+                + min(30, int(obj.get("independentSuccess", 0)))
+                + min(20, int(obj.get("explanationQuality", 0)))
+            )
+        lab_total = round(sum(obj_scores) / len(obj_scores)) if obj_scores else 0
+    else:
+        events = lab.get("events") or []
+        interaction = min(20, len([e for e in events if e.get("eventType") == "tracer_moved"]) // 3)
+        guided = min(20, len([e for e in events if e.get("correct")]) * 4)
+        indep = min(30, len([e for e in events if e.get("eventType") == "answer_checked" and e.get("correct")]) * 6)
+        explain = min(20, len([e for e in events if e.get("eventType") == "explanation_submitted" and e.get("correct")]) * 10)
+        lab_total = interaction + guided + indep + explain
+    cp = progress.get("checkpoint") or {}
+    cp_pct = 0
+    if cp.get("last_run") and isinstance(cp["last_run"], dict):
+        cp_pct = min(30, int(cp["last_run"].get("pct") or 0) * 0.3)
+    elif cp.get("best_total"):
+        cp_pct = min(30, round(30 * int(cp.get("best_score") or 0) / int(cp["best_total"])))
+    raw = exposure + lab_total + cp_pct
+    # Browsing alone cannot exceed ~40%
+    browse_cap = min(40, exposure + min(30, round(100 * viewed / slide_count * 0.3)))
+    if lab_total < 15:
+        return min(browse_cap, raw)
+    return min(100, raw)
+
+
 def build_coach_system_prompt() -> str:
     return (
         "You are a SAT Math study coach for Novel Prep. "
