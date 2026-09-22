@@ -189,11 +189,41 @@ def enrich_scenario(scenario: dict[str, Any]) -> dict[str, Any]:
     return scenario
 
 
+def contextual_hints_for_spec(spec: dict[str, Any]) -> dict[str, Any]:
+    """Slide-specific hint sequences (lesson 1.2 #4 and 1.3 #5). No h = 0 outside 1.1."""
+    slide_id = spec.get("slideId", "")
+    if slide_id == "1.2-4":
+        return {
+            "sequence": [
+                {"type": "Observation hint", "text": "Predict whether the left and right approach heights will agree."},
+                {"type": "Strategy hint", "text": "Now approach x = 3 from the other side."},
+                {"type": "Representation hint", "text": "Record the y-value the graph is approaching, not the value at x = 3."},
+            ],
+            "caseOverrides": {
+                "case-b": {"type": "Case B", "text": "The limit is determined by nearby values; the filled point determines f(3)."},
+                "case-d": {"type": "Case D", "text": "Compare L− and L+. A two-sided limit exists only when they agree."},
+            },
+        }
+    if slide_id == "1.3-5":
+        return {
+            "sequence": [
+                {"type": "Left branch", "text": "Follow the left branch toward x = 2. What height is it approaching?"},
+                {"type": "Right branch", "text": "Now follow the right branch toward x = 2."},
+                {"type": "Two-sided limit", "text": "If both sides approach 3, the two-sided limit is 3."},
+                {"type": "Inspect f(c)", "text": "Only after finding the limit should you inspect the filled point."},
+                {"type": "Open vs filled", "text": "The open circle describes the approached value; the filled point describes f(2)."},
+            ],
+        }
+    return {}
+
+
 def tutor_context_for_spec(spec: dict[str, Any]) -> dict[str, Any]:
     lesson_id = spec.get("lessonId", "")
     return {
         "lessonId": lesson_id,
+        "slideId": spec.get("slideId", ""),
         "hintLevels": TUTOR_HINT_LEVELS.get(lesson_id, TUTOR_HINT_LEVELS["1.3"]),
+        "contextualHints": contextual_hints_for_spec(spec),
         "misconceptions": {
             k: v for k, v in MISCONCEPTIONS.items()
             if lesson_id in v.get("lessonIds", [])

@@ -120,7 +120,7 @@ class SpecSerializationTests(unittest.TestCase):
 
     def test_worked_example_matches_piecewise_graph(self):
         spec = tracer_lab_13_worked_example()
-        sc = next(s for s in spec["scenarios"] if s["id"] == "hole-filled")
+        sc = next(s for s in spec["scenarios"] if s["id"] == "hole-with-value")
         self.assertEqual(sc["openPoints"][0], {"x": 2, "y": 3})
         self.assertEqual(sc["closedPoints"][0], {"x": 2, "y": 1.5})
 

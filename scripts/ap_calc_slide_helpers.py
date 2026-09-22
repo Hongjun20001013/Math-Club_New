@@ -584,8 +584,8 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         "</div>"
         '<div class="ap-lab-explore">'
         '<div class="ap-lab-controls">'
-        '<button type="button" class="ap-lab-btn" data-ap-action="left">Approach from left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="right">Approach from right</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
         "</div>"
         '<label for="ap-limit-x">x = <strong data-ap-x-read>2.60</strong></label>'
@@ -615,10 +615,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<div class="ap-lab-limit-panel" data-ap-limit-panel hidden>'
         '<p>Compare: <strong data-ap-compare>—</strong> · Limit: <strong data-ap-limit-val>—</strong> · f(c): <strong data-ap-fc-val>—</strong></p>'
         "</div></div>"
-        '<div class="ap-lab-tutor" data-ap-tutor><p data-ap-tutor-text>Need a nudge? Tap for a hint.</p>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
-        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
-        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p></div>'
+        + _tracer_tutor_panel()
     )
     return _math_lab_shell(spec_json, inner, lab_mod="limit")
 
@@ -671,6 +668,8 @@ def tracer_math_lab_embed(spec_json: str) -> str:
         '<div class="ap-lab-body ap-lab-body--split">'
         '<div class="ap-lab-main">'
         '<div class="ap-lab-controls">'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
         "</div>"
         '<div class="ap-lab-trace-side" data-ap-trace-left-panel>'

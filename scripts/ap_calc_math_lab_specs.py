@@ -127,9 +127,10 @@ def limit_cases_lab_12() -> dict[str, Any]:
             "whatToNotice": "Unequal one-sided limits ⇒ two-sided limit DNE.",
         },
     ]
-    return {
+    base: dict[str, Any] = {
         "id": "limit-cases-12",
         "lessonId": "1.2",
+        "slideId": "1.2-4",
         "labType": "GraphCaseSwitcher",
         "learningObjective": "Distinguish limit behavior from function value in four contrast cases.",
         "cases": cases,
@@ -141,8 +142,8 @@ def limit_cases_lab_12() -> dict[str, Any]:
         ],
         "predictPrompt": "Before tracing, predict: will the left and right approach heights agree?",
         "explainPrompt": "How is the limit different from f(c) in this case?",
-        **tutor_context_for_spec({"lessonId": "1.2"}),
     }
+    return {**base, **tutor_context_for_spec(base)}
 
 
 def tracer_lab_13() -> dict[str, Any]:
@@ -174,8 +175,8 @@ def tracer_lab_13() -> dict[str, Any]:
             "previewNote": "Visual preview only — formal classification in §1.10.",
         },
         {
-            "id": "hole-filled",
-            "title": "Hole with different filled value",
+            "id": "hole-with-value",
+            "title": "Hole + value",
             "branches": [
                 {"fn": "x + 1", "x0": -0.5, "x1": 1.98, "color": "#2563eb"},
                 {"fn": "-x + 5", "x0": 2.02, "x1": 4.5, "color": "#ea580c"},
@@ -187,7 +188,7 @@ def tracer_lab_13() -> dict[str, Any]:
             "rightLimit": 3,
             "twoSidedLimit": 3,
             "functionValue": 1.5,
-            "previewNote": "Limit comes from branches, not the filled dot.",
+            "previewNote": "The limit exists (3) but differs from f(2) = 1.5 — discontinuous at x = 2.",
         },
         {
             "id": "jump",
@@ -262,7 +263,8 @@ def tracer_lab_13() -> dict[str, Any]:
 def tracer_lab_13_worked_example() -> dict[str, Any]:
     """Focused lab for Worked Example slide — defaults to hole + value at x=2."""
     spec = tracer_lab_13()
-    spec["initialScenarioId"] = "hole-filled"
+    spec["slideId"] = "1.3-5"
+    spec["initialScenarioId"] = "hole-with-value"
     spec["showScenarioTabs"] = False
     return spec
 

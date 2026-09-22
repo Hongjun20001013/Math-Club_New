@@ -41,30 +41,44 @@
 
   var TRACER_EPS = 0.0005;
 
+  var SCENARIO_ID_ALIASES = { "hole-filled": "hole-with-value" };
+
   function resolveScenarioIndex(spec) {
     if (spec.initialScenarioId && spec.scenarios) {
+      var want = SCENARIO_ID_ALIASES[spec.initialScenarioId] || spec.initialScenarioId;
       for (var i = 0; i < spec.scenarios.length; i++) {
-        if (spec.scenarios[i].id === spec.initialScenarioId) return i;
+        var sid = spec.scenarios[i].id;
+        if (sid === want || sid === spec.initialScenarioId) return i;
       }
     }
     return 0;
   }
 
   function formatApproachX(x, c, side) {
+    if (side === "left" && x >= c - TRACER_EPS) {
+      return "x → " + c + "⁻";
+    }
+    if (side === "right" && x <= c + TRACER_EPS) {
+      return "x → " + c + "⁺";
+    }
+    var decimals = Math.abs(x - c) < 0.15 ? 3 : 2;
+    var rounded = parseFloat(x.toFixed(decimals));
+    while (side === "left" && rounded >= c) {
+      decimals += 1;
+      rounded = parseFloat(x.toFixed(decimals));
+    }
+    while (side === "right" && rounded <= c) {
+      decimals += 1;
+      rounded = parseFloat(x.toFixed(decimals));
+    }
     if (Math.abs(x - c) < 0.05) {
       return side === "left" ? "x → " + c + "⁻" : "x → " + c + "⁺";
     }
-    var decimals = Math.abs(x - c) < 0.1 ? 3 : 2;
-    var rounded = parseFloat(x.toFixed(decimals));
-    if (side === "left" && rounded >= c - TRACER_EPS) {
-      decimals += 1;
-      rounded = parseFloat(x.toFixed(decimals));
-    }
-    if (side === "right" && rounded <= c + TRACER_EPS) {
-      decimals += 1;
-      rounded = parseFloat(x.toFixed(decimals));
-    }
     return "x = " + rounded;
+  }
+
+  function approachEndpoint(c, side, domainMin) {
+    return clampTracerX(side === "left" ? c - TRACER_EPS : c + TRACER_EPS, c, side, domainMin);
   }
 
   function parseLimitValue(raw) {
@@ -374,9 +388,11 @@
     this.root = root;
     this.spec = spec || {};
     this.lessonId = spec.lessonId || "1.3";
+    this.slideId = spec.slideId || "";
     this.level = 0;
     this.hintsUsed = 0;
     this.lastMisconception = null;
+    this._ctx = {};
     this.text = root.querySelector("[data-ap-tutor-text]");
     this.tagEl = root.querySelector("[data-ap-tutor-tag]") || this.text;
     this.status = root.querySelector("[data-ap-tutor-status]");
@@ -425,16 +441,41 @@
     }
   };
 
+  ContextualTutor.prototype.setContext = function (ctx) {
+    this._ctx = ctx || {};
+  };
+
+  ContextualTutor.prototype._contextualEntry = function () {
+    var ch = this.spec.contextualHints;
+    if (!ch || !ch.sequence || !ch.sequence.length) return null;
+    var ctx = this._ctx || {};
+    var entry = ch.sequence[Math.min(this.level, ch.sequence.length) - 1];
+    if (ch.caseOverrides && ctx.caseId && this.level >= 2) {
+      var ov = ch.caseOverrides[ctx.caseId];
+      if (ov && (this.level === 2 || this.level === 4)) entry = ov;
+    }
+    if (this.slideId === "1.2-4" && ctx.leftDone && !ctx.rightDone && this.level === 2) {
+      entry = ch.sequence[1];
+    }
+    return entry;
+  };
+
   ContextualTutor.prototype.nextHint = function (ctx) {
+    if (ctx) this.setContext(ctx);
     this.level = Math.min(5, this.level + 1);
     this.hintsUsed += 1;
-    var entry = this.hintLevels[this.level - 1];
-    if (entry) {
-      this.show(entry.type, entry.text);
-    } else if (this.lessonId === "1.1") {
-      this._secantFallback(this.level, ctx);
+    var contextual = this._contextualEntry();
+    if (contextual) {
+      this.show(contextual.type, contextual.text);
     } else {
-      this.show("Observation hint", this.level1For("filled-point-first"));
+      var entry = this.hintLevels[this.level - 1];
+      if (entry) {
+        this.show(entry.type, entry.text);
+      } else if (this.lessonId === "1.1") {
+        this._secantFallback(this.level, ctx);
+      } else {
+        this.show("Observation hint", this.level1For("filled-point-first"));
+      }
     }
     if (this.level >= 5) {
       var reflect = this.root.querySelector("[data-ap-reflection]");
@@ -783,9 +824,45 @@
     var c = this.current();
     var slider = this.root.querySelector("[data-ap-x-slider]");
     if (!slider) return;
-    if (action === "left") { slider.value = (c.targetX - 0.35).toFixed(2); this._trace(parseFloat(slider.value)); }
-    if (action === "right") { slider.value = (c.targetX + 0.35).toFixed(2); this._trace(parseFloat(slider.value)); }
-    if (action === "reset") { slider.value = (c.targetX - 0.5).toFixed(2); this.leftDone = false; this.rightDone = false; this._renderCase(); }
+    var self = this;
+    if (action === "trace-left" || action === "left") {
+      this._animateTrace("left", approachEndpoint(c.targetX, "left", c.domainMin), function (x) {
+        slider.value = x;
+        self._trace(x);
+      });
+    }
+    if (action === "trace-right" || action === "right") {
+      this._animateTrace("right", approachEndpoint(c.targetX, "right", c.domainMin), function (x) {
+        slider.value = x;
+        self._trace(x);
+      });
+    }
+    if (action === "reset") {
+      this.leftDone = false;
+      this.rightDone = false;
+      this.tutor.reset();
+      this._renderCase();
+    }
+  };
+
+  GraphCaseSwitcher.prototype._animateTrace = function (side, endX, onFrame) {
+    var c = this.current();
+    var startX = side === "left" ? c.targetX - 0.4 : c.targetX + 0.4;
+    startX = clampTracerX(startX, c.targetX, side, c.domainMin);
+    if (prefersReducedMotion()) {
+      onFrame(endX);
+      return;
+    }
+    var frames = 12;
+    var step = 0;
+    var timer = setInterval(function () {
+      step += 1;
+      var t = step / frames;
+      var x = startX + (endX - startX) * t;
+      x = clampTracerX(x, c.targetX, side, c.domainMin);
+      onFrame(x);
+      if (step >= frames) clearInterval(timer);
+    }, 40);
   };
 
   GraphCaseSwitcher.prototype._yAt = function (x) {
@@ -811,20 +888,22 @@
 
   GraphCaseSwitcher.prototype._trace = function (x) {
     var c = this.current();
-    if (x < c.targetX) x = clampTracerX(x, c.targetX, "left", c.domainMin);
-    else x = clampTracerX(x, c.targetX, "right", c.domainMin);
-    var y = this._yAt(x);
     var side = x < c.targetX ? "left" : "right";
+    if (Math.abs(x - c.targetX) < TRACER_EPS) {
+      x = approachEndpoint(c.targetX, side, c.domainMin);
+    } else {
+      x = clampTracerX(x, c.targetX, side, c.domainMin);
+    }
+    var y = this._yAt(x);
+    this.tutor.setContext({ caseId: c.id, caseIndex: this.caseIndex, leftDone: this.leftDone, rightDone: this.rightDone });
     this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) {
       n.textContent = formatApproachX(x, c.targetX, side).replace("x = ", "").replace("x → ", "");
     });
     this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = isFinite(y) ? y.toFixed(2) : "—"; });
-    if (x < c.targetX - 0.02) {
+    if (side === "left") {
       this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the left toward x = " + c.targetX;
-    } else if (x > c.targetX + 0.02) {
-      this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the right toward x = " + c.targetX;
     } else {
-      this.root.querySelector("[data-ap-side-msg]").textContent = "At x = " + c.targetX + " — compare approach vs filled point.";
+      this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the right toward x = " + c.targetX;
     }
     this._drawCase(x, y);
   };
@@ -972,7 +1051,38 @@
     this._syncPanels();
   };
 
+  OneSidedLimitTracer.prototype._animateTrace = function (side, endX) {
+    var sc = this.scenario();
+    var c = sc.targetX;
+    var startX = side === "left" ? c - 0.4 : c + 0.4;
+    startX = clampTracerX(startX, c, side, sc.domainMin);
+    var self = this;
+    if (prefersReducedMotion()) {
+      if (side === "left") self._traceLeft(endX);
+      else self._traceRight(endX);
+      return;
+    }
+    var frames = 12;
+    var step = 0;
+    var timer = setInterval(function () {
+      step += 1;
+      var t = step / frames;
+      var x = startX + (endX - startX) * t;
+      x = clampTracerX(x, c, side, sc.domainMin);
+      if (side === "left") self._traceLeft(x);
+      else self._traceRight(x);
+      if (step >= frames) clearInterval(timer);
+    }, 40);
+  };
+
   OneSidedLimitTracer.prototype._action = function (action) {
+    var sc = this.scenario();
+    if (action === "trace-left") {
+      this._animateTrace("left", approachEndpoint(sc.targetX, "left", sc.domainMin));
+    }
+    if (action === "trace-right") {
+      this._animateTrace("right", approachEndpoint(sc.targetX, "right", sc.domainMin));
+    }
     if (action === "reset") {
       this._resetFlow();
       this._renderScenario();
@@ -1154,6 +1264,7 @@
   OneSidedLimitTracer.prototype._traceLeft = function (x) {
     var sc = this.scenario();
     x = clampTracerX(x, sc.targetX, "left", sc.domainMin);
+    this.tutor.setContext({ caseId: sc.id, step: this.step, leftDone: this.leftLocked != null, rightDone: this.rightLocked != null });
     this.leftX = x;
     var y = this._yAt(x, false);
     var read = this.root.querySelector("[data-ap-trace-left-read]");
@@ -1179,6 +1290,7 @@
   OneSidedLimitTracer.prototype._traceRight = function (x) {
     var sc = this.scenario();
     x = clampTracerX(x, sc.targetX, "right", sc.domainMin);
+    this.tutor.setContext({ caseId: sc.id, step: this.step, leftDone: this.leftLocked != null, rightDone: this.rightLocked != null });
     this.rightX = x;
     var y = this._yAt(x, false);
     var read = this.root.querySelector("[data-ap-trace-right-read]");
@@ -1365,6 +1477,7 @@
     parseLimitValue: parseLimitValue,
     limitsMatch: limitsMatch,
     resolveScenarioIndex: resolveScenarioIndex,
+    approachEndpoint: approachEndpoint,
     tickValues: tickValues,
     formatTick: formatTick,
     TRACER_EPS: TRACER_EPS,

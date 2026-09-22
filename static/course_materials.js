@@ -3614,9 +3614,21 @@
     var done = 0;
     items.forEach(function (item) {
       if (progress.done.indexOf(item.index) !== -1) done += 1;
-      else if ((progress.viewed || []).indexOf(item.index) !== -1) done += 0.4;
     });
     return Math.round(100 * done / items.length);
+  }
+
+  function apCalcProgressPct() {
+    var challenges = slides.filter(function (s) {
+      return s.interactive || s.kind === "question" || s.kind === "practice" || s.kind === "example";
+    });
+    var total = challenges.length || slides.filter(function (s) { return s.kind !== "section"; }).length;
+    if (!total) return 0;
+    var done = progress.done.filter(function (n) {
+      var s = slideByIndex(n);
+      return s && (s.interactive || s.kind === "question" || s.kind === "practice" || s.kind === "example");
+    }).length;
+    return Math.min(100, Math.round(100 * done / total));
   }
 
   function updateKnowledgeMap() {
@@ -3814,26 +3826,23 @@
     studyStatEl.textContent = done + " / " + total + " challenges";
   }
 
-  function apCalcMasteryPct(total, viewed, done) {
-    var exposure = Math.min(10, Math.round(10 * viewed / total));
-    var lab = progress.lab || {};
-    var objectives = lab.objectives || {};
-    var keys = Object.keys(objectives);
-    var labTotal = 0;
-    if (keys.length) {
-      keys.forEach(function (k) {
-        var o = objectives[k] || {};
-        labTotal += Math.min(10, o.exposure || 0) + Math.min(20, o.interaction || 0)
-          + Math.min(20, o.guidedSuccess || 0) + Math.min(30, o.independentSuccess || 0)
-          + Math.min(20, o.explanationQuality || 0);
-      });
-      labTotal = Math.round(labTotal / keys.length);
-    }
+  function apCalcMasteryPct() {
     var cpRec = loadCheckpointRecord();
-    var cpPct = cpRec.last_run ? Math.min(30, Math.round(cpRec.last_run.pct * 0.3)) : 0;
-    var raw = exposure + labTotal + cpPct;
-    var browseCap = Math.min(40, exposure + Math.min(30, Math.round(100 * viewed / total * 0.3)));
-    return labTotal < 15 ? Math.min(browseCap, raw) : Math.min(100, raw);
+    if (cpRec.last_run && cpRec.last_run.pct != null) {
+      return Math.min(100, Math.round(cpRec.last_run.pct));
+    }
+    if (cpRec.best_total) {
+      return Math.min(100, Math.round(100 * cpRec.best_score / cpRec.best_total));
+    }
+    var challenges = slides.filter(function (s) {
+      return s.interactive || s.kind === "question" || s.kind === "practice" || s.kind === "example";
+    });
+    var done = progress.done.filter(function (n) {
+      var s = slideByIndex(n);
+      return s && (s.interactive || s.kind === "question" || s.kind === "practice" || s.kind === "example");
+    }).length;
+    if (challenges.length && done === 0) return null;
+    return 0;
   }
 
   function updateMastery() {
@@ -3847,16 +3856,22 @@
     var slidePct = Math.min(100, Math.round(100 * (viewed * 0.35 + done * 0.45) / total));
     var cpRec = loadCheckpointRecord();
     var cpPct = cpRec.last_run ? cpRec.last_run.pct : (cpRec.best_total ? Math.round(100 * cpRec.best_score / cpRec.best_total) : 0);
-    var pct = root.classList.contains("np-cm-viewer--ap-calc")
-      ? apCalcMasteryPct(total, viewed, done)
-      : (checkpointItems.length
-        ? Math.min(100, Math.round(slidePct * 0.65 + cpPct * 0.35))
-        : slidePct);
-    if (masteryPctEl) masteryPctEl.textContent = pct + "%";
+    var isApCalc = root.classList.contains("np-cm-viewer--ap-calc");
+    var pct = isApCalc ? apCalcMasteryPct() : (checkpointItems.length
+      ? Math.min(100, Math.round(slidePct * 0.65 + cpPct * 0.35))
+      : slidePct);
+    var progressPct = isApCalc ? apCalcProgressPct() : slidePct;
+    if (masteryPctEl) {
+      masteryPctEl.textContent = pct == null ? "Not yet assessed" : (pct + "%");
+    }
     if (masteryRingEl) {
+      var ringPct = pct == null ? 0 : pct;
       var circ = 2 * Math.PI * 18;
       masteryRingEl.style.strokeDasharray = circ;
-      masteryRingEl.style.strokeDashoffset = circ - (pct / 100) * circ;
+      masteryRingEl.style.strokeDashoffset = circ - (ringPct / 100) * circ;
+    }
+    if (sectionLabelEl && isApCalc) {
+      sectionLabelEl.textContent = progressPct + "% progress · " + total + " slides";
     }
   }
 

@@ -26,10 +26,11 @@ from ap_calc_tutor_engine import (  # noqa: E402
 
 
 class TutorHintTests(unittest.TestCase):
-    def test_13_hints_never_mention_h_zero(self):
-        for entry in TUTOR_HINT_LEVELS["1.3"]:
-            self.assertNotIn("h = 0", entry["text"].lower())
-            self.assertNotIn("h=0", entry["text"].lower())
+    def test_12_and_13_hints_never_mention_h_zero(self):
+        for lesson_id in ("1.2", "1.3"):
+            for entry in TUTOR_HINT_LEVELS[lesson_id]:
+                self.assertNotIn("h = 0", entry["text"].lower())
+                self.assertNotIn("h=0", entry["text"].lower())
 
     def test_11_hints_may_mention_h_zero_context(self):
         texts = " ".join(e["text"] for e in TUTOR_HINT_LEVELS["1.1"]).lower()
@@ -42,11 +43,11 @@ class TutorHintTests(unittest.TestCase):
 
 
 class TracerSpecTests(unittest.TestCase):
-    def test_worked_example_defaults_hole_filled(self):
+    def test_worked_example_defaults_hole_with_value(self):
         spec = tracer_lab_13_worked_example()
-        self.assertEqual(spec["initialScenarioId"], "hole-filled")
+        self.assertEqual(spec["initialScenarioId"], "hole-with-value")
         self.assertFalse(spec["showScenarioTabs"])
-        idx = next(i for i, s in enumerate(spec["scenarios"]) if s["id"] == "hole-filled")
+        idx = next(i for i, s in enumerate(spec["scenarios"]) if s["id"] == "hole-with-value")
         sc = spec["scenarios"][idx]
         self.assertEqual(sc["leftLimit"], 3)
         self.assertEqual(sc["rightLimit"], 3)
@@ -54,19 +55,19 @@ class TracerSpecTests(unittest.TestCase):
         self.assertEqual(sc["twoSidedLimit"], 3)
 
     def test_left_presets_stay_below_c(self):
-        sc = enrich_scenario(next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-filled"))
+        sc = enrich_scenario(next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-with-value"))
         c = sc["targetX"]
         for x in sc["allowedTracerValues"]["left"]:
             self.assertLess(x, c)
 
     def test_right_presets_stay_above_c(self):
-        sc = enrich_scenario(next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-filled"))
+        sc = enrich_scenario(next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-with-value"))
         c = sc["targetX"]
         for x in sc["allowedTracerValues"]["right"]:
             self.assertGreater(x, c)
 
     def test_filled_point_does_not_change_limit(self):
-        sc = next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-filled")
+        sc = next(s for s in tracer_lab_13()["scenarios"] if s["id"] == "hole-with-value")
         self.assertEqual(sc["twoSidedLimit"], 3)
         self.assertEqual(sc["functionValue"], 1.5)
 
@@ -99,10 +100,10 @@ class MasteryTests(unittest.TestCase):
         result = mastery_from_lab_progress({"slidesViewed": 5})
         self.assertLessEqual(result["total"], 40)
 
-    def test_interaction_raises_mastery(self):
+    def test_lab_objectives_can_score_high(self):
         result = mastery_from_lab_progress({
             "objectives": {
-                "1.3-hole-filled": {
+                "1.3-hole-with-value": {
                     "exposure": 10,
                     "interaction": 20,
                     "guidedSuccess": 20,
@@ -118,7 +119,7 @@ class SpecJsonTests(unittest.TestCase):
     def test_worked_example_spec_serializes(self):
         payload = json.dumps(tracer_lab_13_worked_example())
         parsed = json.loads(payload)
-        self.assertEqual(parsed["initialScenarioId"], "hole-filled")
+        self.assertEqual(parsed["initialScenarioId"], "hole-with-value")
 
 
 if __name__ == "__main__":
