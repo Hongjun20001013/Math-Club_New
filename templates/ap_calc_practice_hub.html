@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}AP Calculus · Practice · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="np-cmx np-ap-calc">
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb">
+      <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
+      <span>/</span>
+      <em>Practice</em>
+    </nav>
+
+    <header class="np-cmx-hero np-ap-calc-hero np-ap-calc-hero--compact">
+      <div class="np-cmx-hero__copy">
+        <h1 class="np-cmx-display">Practice Packets</h1>
+        <p class="np-cmx-lede">Worksheets + solution keys — organized by unit and chapter</p>
+      </div>
+    </header>
+
+    {% for unit in catalog.units if unit.chapters %}
+    <section class="np-ap-practice-unit" aria-labelledby="practice-u{{ unit.unit }}">
+      <h2 id="practice-u{{ unit.unit }}">Unit {{ unit.unit }} · {{ unit.title }}</h2>
+      <div class="np-ap-practice-grid">
+        {% for ch in unit.chapters if ch.live %}
+        <article class="np-ap-practice-card glass-panel np-glass">
+          <span class="np-ap-practice-card__section">{{ ch.section }}</span>
+          <h3>{{ ch.title }}</h3>
+          <div class="ap-calc-packet-actions">
+            <a class="np-atelier-btn np-atelier-btn--primary" href="{{ url_for('ap_calc_practice_pdf', section=ch.section, kind='packet') }}" target="_blank" rel="noopener">Packet PDF</a>
+            <a class="np-atelier-btn np-atelier-btn--ghost" href="{{ url_for('ap_calc_practice_pdf', section=ch.section, kind='solutions') }}" target="_blank" rel="noopener">Solutions</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Jump discontinuity at x equals 3">
+  <rect width="480" height="300" fill="#faf8ff" rx="12"/>
+  <line x1="50" y1="250" x2="430" y2="250" stroke="#4c3d99" stroke-width="2"/>
+  <line x1="80" y1="40" x2="80" y2="250" stroke="#4c3d99" stroke-width="2"/>
+  <line x1="80" y1="200" x2="248" y2="200" stroke="#6a4ce6" stroke-width="3"/>
+  <line x1="252" y1="120" x2="400" y2="120" stroke="#6a4ce6" stroke-width="3"/>
+  <circle cx="250" cy="200" r="7" fill="#fff" stroke="#6a4ce6" stroke-width="3"/>
+  <circle cx="250" cy="120" r="7" fill="#fff" stroke="#6a4ce6" stroke-width="3"/>
+  <line x1="250" y1="40" x2="250" y2="250" stroke="#ddd" stroke-dasharray="4 4"/>
+  <text x="255" y="70" font-size="12" fill="#4c3d99">x = 3</text>
+  <text x="120" y="190" font-size="12" fill="#4c3d99">lim x’3{ = 1</text>
+  <text x="300" y="110" font-size="12" fill="#4c3d99">lim x’3z = 2</text>
+  <text x="120" y="280" font-size="12" fill="#b91c1c">Two-sided limit DNE</text>
+</svg>

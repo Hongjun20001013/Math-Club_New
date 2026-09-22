@@ -4,6 +4,9 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_premium.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='course_materials_ink.css') }}?v={{ style_css_revision }}">
+{% if cm_track_class == 'ap-calc' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}">
+{% endif %}
 <script defer src="{{ url_for('static', filename='course_materials_ink_smart.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}
 
@@ -15,14 +18,14 @@
 <div class="np-cm-cinema">
 <div class="np-cm-cinema-ambient" aria-hidden="true"></div>
 <div class="np-page-shell np-page-shell--cm">
-<div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}"{% if pace_training %} data-cm-pace="1" data-cm-pace-seconds="{{ pace_seconds|int }}" data-cm-sat-score-api="{{ url_for('practice_phase3_sat_score_api') }}" data-cm-my-sat-score-api="{{ url_for('practice_course_material_classroom_my_sat_score_api', slug=material.slug) }}"{% endif %}{% if user_logged_in %} data-cm-sync="1" data-cm-progress-api="{{ cm_progress_api }}" data-cm-classroom-active-api="{{ cm_classroom_active_api }}" data-cm-classroom-response-api="{{ cm_classroom_response_api }}" data-cm-classroom-ink-api="{{ cm_classroom_ink_api }}"{% endif %}{% if cm_classroom_summary_api %} data-cm-classroom-summary-api="{{ cm_classroom_summary_api }}" data-cm-classroom-start-api="{{ cm_classroom_start_api }}"{% endif %}{% if cm_classroom_slide_api %} data-cm-classroom-slide-api="{{ cm_classroom_slide_api }}"{% endif %}>
+<div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }}{% if cm_track_class %} np-cm-viewer--{{ cm_track_class }}{% endif %} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}"{% if pace_training %} data-cm-pace="1" data-cm-pace-seconds="{{ pace_seconds|int }}" data-cm-sat-score-api="{{ url_for('practice_phase3_sat_score_api') }}" data-cm-my-sat-score-api="{{ url_for('practice_course_material_classroom_my_sat_score_api', slug=material.slug) }}"{% endif %}{% if user_logged_in %} data-cm-sync="1" data-cm-progress-api="{{ cm_progress_api }}" data-cm-classroom-active-api="{{ cm_classroom_active_api }}" data-cm-classroom-response-api="{{ cm_classroom_response_api }}" data-cm-classroom-ink-api="{{ cm_classroom_ink_api }}"{% endif %}{% if cm_classroom_summary_api %} data-cm-classroom-summary-api="{{ cm_classroom_summary_api }}" data-cm-classroom-start-api="{{ cm_classroom_start_api }}"{% endif %}{% if cm_classroom_slide_api %} data-cm-classroom-slide-api="{{ cm_classroom_slide_api }}"{% endif %}>
 
   <header class="np-cm-hero glass-panel np-glass mp-animate-in">
     <div class="np-cm-hero-top">
-      <nav class="np-cm-cinema-rail" aria-label="SAT navigation">
-        <a href="{{ url_for('practice') }}">SAT modules</a>
+      <nav class="np-cm-cinema-rail" aria-label="{{ cm_nav_aria_label|default('SAT navigation') }}">
+        <a href="{{ cm_nav_hub_href|default(url_for('practice')) }}">{{ cm_nav_hub_label|default('SAT modules') }}</a>
         <span aria-hidden="true">·</span>
-        <a href="{{ url_for('practice_course_materials') }}">Course materials</a>
+        <a href="{{ cm_nav_library_href|default(url_for('practice_course_materials')) }}">{{ cm_nav_library_label|default('Course materials') }}</a>
         <span aria-hidden="true">·</span>
         <span>{{ material.section }}</span>
       </nav>
@@ -61,7 +64,7 @@
         {% if pdf_href %}
         <a href="{{ pdf_href }}" class="np-cm-btn np-cm-btn--pdf">PDF</a>
         {% endif %}
-        <a href="{{ url_for('practice_course_materials') }}" class="np-cm-btn np-cm-btn--ghost">All lessons</a>
+        <a href="{{ cm_all_lessons_href|default(url_for('practice_course_materials')) }}" class="np-cm-btn np-cm-btn--ghost">All lessons</a>
       </div>
     </div>
     <div class="np-cm-hero-main">
@@ -88,13 +91,13 @@
     {% if prev_material or next_material %}
     <nav class="np-cm-lesson-nav" aria-label="Adjacent lessons">
       {% if prev_material %}
-      <a href="{{ url_for('practice_course_material_view', slug=prev_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--prev" title="{{ prev_material.title }}">
+      <a href="{{ url_for(cm_view_route|default('practice_course_material_view'), slug=prev_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--prev" title="{{ prev_material.title }}">
         <span class="np-cm-lesson-nav-dir">← {{ prev_material.section }}</span>
         <span class="np-cm-lesson-nav-title">{{ prev_material.title }}</span>
       </a>
       {% endif %}
       {% if next_material %}
-      <a href="{{ url_for('practice_course_material_view', slug=next_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--next" title="{{ next_material.title }}">
+      <a href="{{ url_for(cm_view_route|default('practice_course_material_view'), slug=next_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--next" title="{{ next_material.title }}">
         <span class="np-cm-lesson-nav-dir">{{ next_material.section }} →</span>
         <span class="np-cm-lesson-nav-title">{{ next_material.title }}</span>
       </a>
@@ -349,5 +352,9 @@
   'interactive_count': material.interactive_count|default(0),
   'slide_count': material.slide_count|default(0)
 }|tojson }}</script>
+{% if cm_track_class == 'ap-calc' %}
+<script defer src="{{ url_for('static', filename='ap_calc/ap_calc_math_lab.js') }}?v={{ style_css_revision }}"></script>
+<script defer src="{{ url_for('static', filename='ap_calc/ap_calc_lesson.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
 <script defer src="{{ url_for('static', filename='course_materials.js') }}?v={{ style_css_revision }}"></script>
 {% endblock %}

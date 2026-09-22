@@ -1,0 +1,241 @@
+/* AP Calculus catalog — Violet Atelier extensions */
+
+.np-ap-calc .np-cm-vio__frame {
+  padding-top: clamp(12px, 2vw, 20px);
+  padding-bottom: clamp(48px, 6vw, 72px);
+}
+
+/* Unit catalog cards — horizontal premium rows */
+.np-ap-unit-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.np-ap-unit-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--vio-glass-strong, rgba(255, 255, 255, 0.88));
+  border: 1px solid var(--vio-line, rgba(26, 18, 48, 0.08));
+  box-shadow: 0 12px 32px rgba(79, 47, 216, 0.08);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s, border-color 0.35s;
+  animation: npCmVioRise 0.65s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--unit-i, 0) * 0.05s) both;
+}
+
+.np-ap-unit-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(108, 78, 255, 0.28);
+  box-shadow: 0 22px 48px rgba(79, 47, 216, 0.14);
+}
+
+.np-ap-unit-card.is-soon {
+  opacity: 0.58;
+}
+
+.np-ap-unit-card__link {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  min-height: 118px;
+  padding: 0 clamp(16px, 2vw, 22px) 0 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.np-ap-unit-card__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+  font-size: clamp(2rem, 3.5vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: #fff;
+  background: linear-gradient(165deg, #4f2fd8, #6c4eff 55%, #9b8cff);
+}
+
+.np-ap-unit-card.is-soon .np-ap-unit-card__num {
+  background: linear-gradient(165deg, #94a3b8, #cbd5e1);
+}
+
+.np-ap-unit-card__copy h3 {
+  margin: 0;
+  font-family: "Fraunces", "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.02rem, 1.8vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--vio-ink, #1a1230);
+}
+
+.np-ap-unit-card__copy p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--vio-muted, #7a7194);
+}
+
+.np-ap-unit-card__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.np-ap-unit-card__track {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--vio-muted, #7a7194);
+}
+
+.np-ap-unit-card__progress {
+  width: 88px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(108, 78, 255, 0.12);
+  overflow: hidden;
+}
+
+.np-ap-unit-card__progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4f2fd8, #9b8cff);
+}
+
+.np-ap-unit-card__go {
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--vio-accent-deep, #4f2fd8);
+}
+
+/* Compact soon list (unit page) */
+.np-ap-soon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.np-ap-soon-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px dashed rgba(108, 78, 255, 0.14);
+}
+
+.np-ap-soon-row__num {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--vio-accent, #6c4eff);
+  text-align: center;
+}
+
+.np-ap-soon-row__title {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--vio-ink-soft, #4a3f66);
+  line-height: 1.35;
+}
+
+.np-ap-soon-row__badge {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+/* Live lesson rail on hub */
+.np-ap-live-rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.np-ap-live-chip {
+  flex: 0 0 min(260px, 78vw);
+  scroll-snap-align: start;
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--vio-glass-strong, rgba(255, 255, 255, 0.88));
+  border: 1px solid rgba(108, 78, 255, 0.14);
+  box-shadow: 0 10px 28px rgba(79, 47, 216, 0.07);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+
+.np-ap-live-chip:hover {
+  transform: translateY(-3px);
+  border-color: rgba(108, 78, 255, 0.3);
+  box-shadow: 0 16px 36px rgba(79, 47, 216, 0.12);
+}
+
+.np-ap-live-chip.is-featured {
+  border-color: rgba(108, 78, 255, 0.32);
+  background: linear-gradient(155deg, rgba(108, 78, 255, 0.1), rgba(255, 255, 255, 0.95));
+}
+
+.np-ap-live-chip__unit {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--vio-accent, #6c4eff);
+}
+
+.np-ap-live-chip strong {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--vio-ink, #1a1230);
+}
+
+.np-ap-live-chip em {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--vio-ink-soft, #4a3f66);
+}
+
+.np-ap-live-chip span {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--vio-muted, #7a7194);
+}
+
+@media (max-width: 720px) {
+  .np-ap-unit-card__link {
+    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    padding-right: 16px;
+  }
+
+  .np-ap-unit-card__meta {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}

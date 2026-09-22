@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}AP Calculus · Curriculum Overview · {{ site_brand_name }}{% endblock %}
+
+{% block late_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='course_materials_cinema_v5.css') }}?v={{ style_css_revision }}" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='ap_calc/ap_calc.css') }}?v={{ style_css_revision }}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="np-cmx np-ap-calc">
+  <div class="np-cmx-shell">
+    <nav class="np-cmx-crumb">
+      <a href="{{ url_for('ap_calc_hub') }}">AP Calculus</a>
+      <span>/</span>
+      <em>Curriculum overview</em>
+    </nav>
+
+    <header class="np-cmx-hero np-ap-calc-hero np-ap-calc-hero--compact">
+      <div class="np-cmx-hero__copy">
+        <h1 class="np-cmx-display">AB / BC Curriculum Map</h1>
+        <p class="np-cmx-lede">Same studio flow as SAT — limits through series, with BC extensions in Units 9–10</p>
+      </div>
+    </header>
+
+    <div class="np-ap-overview-cols">
+      <section class="ap-box ap-box--definition glass-panel np-glass">
+        <span class="ap-box-label">AP Calculus AB</span>
+        <div class="ap-box-body">
+          <p><strong>Units 1–8</strong> cover the full AB exam: limits, differentiation, integration, differential equations, and applications.</p>
+          <ul class="stem-itemize">
+            <li>Unit 1: Limits &amp; Continuity (15 chapters)</li>
+            <li>Units 2–5: Differentiation &amp; applications</li>
+            <li>Units 6–8: Integration &amp; applications</li>
+          </ul>
+        </div>
+      </section>
+      <section class="ap-box ap-box--key glass-panel np-glass">
+        <span class="ap-box-label">BC Extension</span>
+        <div class="ap-box-body">
+          <p><strong>Units 9–10</strong> are BC-only: parametric/polar/vector and infinite series.</p>
+          <ul class="stem-itemize">
+            <li>Unit 9: Parametric, polar, vector-valued functions</li>
+            <li>Unit 10: Sequences &amp; series</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="np-ap-roadmap">
+      <h2>Unit roadmap</h2>
+      <table class="ap-data-table ap-roadmap-table">
+        <thead><tr><th>Unit</th><th>Title</th><th>Track</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for unit in catalog.units %}
+          <tr>
+            <td>{{ unit.unit }}</td>
+            <td>{{ unit.title }}</td>
+            <td>{{ unit.track_label }}</td>
+            <td>{% if unit.live %}<span class="np-cmx-chip np-cmx-chip--live"><i></i>Live</span>{% else %}Soon{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="np-ap-teaching-note ap-box ap-box--checkpoint">
+      <span class="ap-box-label">Teaching philosophy</span>
+      <div class="ap-box-body">
+        <p>Limits are the language of <em>approach behavior</em>. Every major idea appears in four forms: <strong>graph, table, algebra, and words</strong> — matching the optimized Novel Prep Unit 1 design.</p>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

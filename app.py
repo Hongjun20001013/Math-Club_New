@@ -108,6 +108,9 @@ BACKUP_AFTER_WRITE_SECONDS = 3600
 COMPILED_BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 COURSE_MATERIALS_PATH = os.path.join(APP_DIR, "data", "course_materials.json")
 COURSE_MATERIALS_MANIFEST_PATH = os.path.join(APP_DIR, "data", "course_materials_manifest.json")
+AP_CALC_MATERIALS_PATH = os.path.join(APP_DIR, "data", "ap_calc_materials.json")
+AP_CALC_CATALOG_PATH = os.path.join(APP_DIR, "data", "ap_calc_catalog.json")
+AP_CALC_PRACTICE_DIR = os.path.join(APP_DIR, "static", "ap_calc", "practice")
 PLACEMENT_META_PATH = os.path.join(APP_DIR, "data", "placement_meta.json")
 PLACEMENT_CATALOG_PATH = os.path.join(APP_DIR, "data", "placement_catalog.json")
 PLACEMENT_META_BY_TOPIC: Dict[str, str] = {
@@ -213,6 +216,8 @@ COMPILED_BANK_CACHE = None
 COMPILED_BANK_CACHE_MTIME: float | None = None
 COURSE_MATERIALS_CACHE = None
 COURSE_MATERIALS_CACHE_MTIME: float | None = None
+AP_CALC_MATERIALS_CACHE = None
+AP_CALC_MATERIALS_CACHE_MTIME: float | None = None
 
 STATIC_DIR = os.path.join(APP_DIR, "static")
 TEMPLATES_DIR = os.path.join(APP_DIR, "templates")
@@ -1368,6 +1373,12 @@ STUDENT_RESOURCE_GRANTS: tuple[dict[str, str], ...] = (
         "description": "Middle, Integrated, and upper-school placement diagnostics with PDF reports",
         "home_href": "/placement",
     },
+    {
+        "key": "ap_calc",
+        "label": "AP Calculus AB / BC",
+        "description": "Unit slide decks, AP-style checks, and printable practice packets",
+        "home_href": "/ap/calc",
+    },
 )
 STUDENT_GRANT_KEYS = frozenset(g["key"] for g in STUDENT_RESOURCE_GRANTS)
 SAT_STUDENT_DOMAINS = frozenset(
@@ -1529,6 +1540,9 @@ def _path_allowed_for_grants(path: str, grants: set[str] | None, db: sqlite3.Con
 
     if p.startswith("/placement"):
         return "placement" in grants
+
+    if p.startswith("/ap/calc"):
+        return "ap_calc" in grants
 
     if p.startswith("/practice"):
         dom = _practice_domain_from_path(p)
@@ -2684,6 +2698,145 @@ def load_course_materials() -> dict[str, Any]:
     COURSE_MATERIALS_CACHE = payload
     COURSE_MATERIALS_CACHE_MTIME = json_mtime
     return COURSE_MATERIALS_CACHE
+
+
+def load_ap_calc_materials() -> dict[str, Any]:
+    global AP_CALC_MATERIALS_CACHE, AP_CALC_MATERIALS_CACHE_MTIME
+    json_mtime: float | None = None
+    if os.path.isfile(AP_CALC_MATERIALS_PATH):
+        try:
+            json_mtime = os.path.getmtime(AP_CALC_MATERIALS_PATH)
+        except OSError:
+            json_mtime = None
+
+    if AP_CALC_MATERIALS_CACHE is not None and json_mtime == AP_CALC_MATERIALS_CACHE_MTIME:
+        return AP_CALC_MATERIALS_CACHE
+
+    if not os.path.isfile(AP_CALC_MATERIALS_PATH):
+        AP_CALC_MATERIALS_CACHE = {"materials": [], "total": 0, "available": 0, "track": "ap_calc"}
+        AP_CALC_MATERIALS_CACHE_MTIME = json_mtime
+        return AP_CALC_MATERIALS_CACHE
+
+    try:
+        with open(AP_CALC_MATERIALS_PATH, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        payload = {"materials": [], "total": 0, "available": 0, "track": "ap_calc"}
+
+    payload = _sanitize_course_materials_payload(payload)
+    AP_CALC_MATERIALS_CACHE = payload
+    AP_CALC_MATERIALS_CACHE_MTIME = json_mtime
+    return AP_CALC_MATERIALS_CACHE
+
+
+def _ap_calc_material_by_slug(slug: str) -> dict[str, Any] | None:
+    for row in load_ap_calc_materials().get("materials") or []:
+        if row.get("slug") == slug:
+            return row
+    return None
+
+
+def _ap_calc_material_neighbors(material: dict[str, Any]) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    prev_m = next_m = None
+    prev_slug = material.get("prev_lesson_slug")
+    next_slug = material.get("next_lesson_slug")
+    if prev_slug:
+        row = _ap_calc_material_by_slug(str(prev_slug))
+        if row and row.get("tex_available"):
+            prev_m = row
+    if next_slug:
+        row = _ap_calc_material_by_slug(str(next_slug))
+        if row and row.get("tex_available"):
+            next_m = row
+    return prev_m, next_m
+
+
+def _ap_calc_materials_user_progress(materials: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    user_progress: dict[str, dict[str, Any]] = {}
+    uid = session.get("user_id")
+    if uid:
+        db = get_db()
+        rows = db.execute(
+            "SELECT lesson_slug, progress_json FROM course_material_progress WHERE user_id = ?",
+            (uid,),
+        ).fetchall()
+        slug_set = {str(m.get("slug") or "") for m in materials}
+        for row in rows:
+            slug = str(row["lesson_slug"] or "")
+            if slug not in slug_set:
+                continue
+            try:
+                user_progress[slug] = json.loads(row["progress_json"] or "{}")
+            except (json.JSONDecodeError, TypeError):
+                user_progress[slug] = {}
+    for m in materials:
+        slug = str(m.get("slug") or "")
+        prog = user_progress.get(slug) or {}
+        m["user_mastery_pct"] = mastery_pct_from_progress(
+            prog,
+            int(m.get("slide_count") or 0),
+            int(m.get("checkpoint_count") or 0),
+        )
+    return user_progress
+
+
+def load_ap_calc_catalog() -> dict[str, Any]:
+    if not os.path.isfile(AP_CALC_CATALOG_PATH):
+        return {"units": []}
+    try:
+        with open(AP_CALC_CATALOG_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {"units": []}
+
+
+def _ap_calc_catalog_unit(unit_num: int) -> dict[str, Any] | None:
+    for row in load_ap_calc_catalog().get("units") or []:
+        if int(row.get("unit") or 0) == unit_num:
+            return row
+    return None
+
+
+def _ap_calc_live_chapter_count() -> int:
+    n = 0
+    for unit in load_ap_calc_catalog().get("units") or []:
+        for ch in unit.get("chapters") or []:
+            if ch.get("live"):
+                n += 1
+    return n
+
+
+def _ap_calc_hub_context() -> dict[str, Any]:
+    materials = list(load_ap_calc_materials().get("materials") or [])
+    user_progress = _ap_calc_materials_user_progress(materials)
+    ready = sorted(
+        [m for m in materials if m.get("tex_available")],
+        key=lambda m: tuple(int(p) if p.isdigit() else 0 for p in str(m.get("section") or "0").split(".")),
+    )
+    continue_material = _pick_continue_material(ready, user_progress)
+    payload = load_ap_calc_materials()
+    catalog = load_ap_calc_catalog()
+    return {
+        "materials": ready,
+        "materials_total": int(payload.get("total") or len(materials)),
+        "materials_ready": int(payload.get("available") or len(ready)),
+        "continue_material": continue_material,
+        "user_progress_map": user_progress,
+        "catalog": catalog,
+        "live_chapters": _ap_calc_live_chapter_count(),
+        "live_packets": len(ready),
+    }
+
+
+def _ap_calc_practice_pdf_path(section: str, kind: str) -> str | None:
+    safe = str(section or "").strip()
+    if not re.fullmatch(r"\d+\.\d+", safe):
+        return None
+    filename = f"calc_{safe}_{kind}.pdf"
+    path = os.path.join(AP_CALC_PRACTICE_DIR, filename)
+    if os.path.isfile(path):
+        return path
+    return None
 
 
 def _course_material_manifest_row(slug: str) -> dict[str, Any] | None:
@@ -6087,11 +6240,11 @@ LEARNING_TRACKS = [
         "key": "ap_calc",
         "catalog": "school",
         "title": "AP Calculus AB / BC",
-        "level": "Planned",
-        "description": "AP-style calculus from limits through series. Full bank is on the roadmap.",
-        "cta_label": "Preview roadmap",
-        "cta_href": "/learn/ap_calc",
-        "pill": "Roadmap",
+        "level": "Active",
+        "description": "Interactive Unit 1 decks (1.1–1.3) with expanded theory, AP checks, and printable practice packets.",
+        "cta_label": "Enter workspace",
+        "cta_href": "/ap/calc",
+        "pill": "Live",
     },
     {
         "key": "ap_stats",
@@ -7055,8 +7208,12 @@ def learning_track(track_key: str):
             abort(404)
         if track_key == "placement" and "placement" not in grants:
             abort(404)
-        if track_key not in ("sat", "placement"):
+        if track_key == "ap_calc" and "ap_calc" not in grants:
+            abort(404)
+        if track_key not in ("sat", "placement", "ap_calc"):
             return redirect(_student_home_url(grants))
+    if track_key == "ap_calc" and track.get("level") == "Active":
+        return redirect(url_for("ap_calc_hub"))
     session["active_track_label"] = track["title"]
     return render_template("learning_track.html", track=track)
 
@@ -10684,6 +10841,131 @@ def practice_course_material_pdf(slug: str):
     )
 
 
+@app.route("/ap/calc")
+def ap_calc_hub():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    ctx = _ap_calc_hub_context()
+    return render_template("ap_calc_hub.html", **ctx)
+
+
+@app.route("/ap/calc/course")
+def ap_calc_course():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_course.html", catalog=catalog)
+
+
+@app.route("/ap/calc/course/unit/<int:unit_num>")
+def ap_calc_course_unit(unit_num: int):
+    session["active_track_label"] = "AP Calculus AB / BC"
+    unit = _ap_calc_catalog_unit(unit_num)
+    if not unit:
+        abort(404)
+    return render_template("ap_calc_course_unit.html", unit=unit)
+
+
+@app.route("/ap/calc/practice")
+def ap_calc_practice_hub():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_practice_hub.html", catalog=catalog)
+
+
+@app.route("/ap/calc/overview")
+def ap_calc_overview():
+    session["active_track_label"] = "AP Calculus AB / BC"
+    catalog = load_ap_calc_catalog()
+    return render_template("ap_calc_overview.html", catalog=catalog)
+
+
+@app.route("/ap/calc/materials")
+def ap_calc_materials_gate():
+    return redirect(url_for("ap_calc_course"))
+
+
+@app.route("/ap/calc/materials/<slug>")
+def ap_calc_material_view(slug: str):
+    session["active_track_label"] = "AP Calculus AB / BC"
+    material = _ap_calc_material_by_slug(slug)
+    if not material or not material.get("tex_available"):
+        abort(404)
+    prev_material, next_material = _ap_calc_material_neighbors(material)
+    practice_section = str(material.get("practice_section") or material.get("section") or "")
+    packet_href = (
+        url_for("ap_calc_practice_pdf", section=practice_section, kind="packet")
+        if _ap_calc_practice_pdf_path(practice_section, "packet")
+        else None
+    )
+    return render_template(
+        "course_material_view.html",
+        material=material,
+        pdf_href=packet_href,
+        prev_material=prev_material,
+        next_material=next_material,
+        pace_training=False,
+        pace_seconds=0,
+        cm_progress_api=url_for("ap_calc_material_progress_api", slug=slug),
+        cm_classroom_active_api=None,
+        cm_classroom_response_api=None,
+        cm_classroom_summary_api=None,
+        cm_classroom_start_api=None,
+        cm_classroom_slide_api=None,
+        cm_classroom_ink_api=None,
+        cm_classroom_href=None,
+        cm_nav_hub_href=url_for("ap_calc_hub"),
+        cm_nav_hub_label="AP Calculus",
+        cm_nav_library_href=url_for("ap_calc_course"),
+        cm_nav_library_label="Course materials",
+        cm_nav_aria_label="AP Calculus navigation",
+        cm_view_route="ap_calc_material_view",
+        cm_all_lessons_href=url_for("ap_calc_course_unit", unit_num=int(material.get("unit") or 1)),
+        cm_track_class="ap-calc",
+    )
+
+
+@app.route("/ap/calc/materials/api/progress/<slug>", methods=["GET", "POST"])
+def ap_calc_material_progress_api(slug: str):
+    if not require_login():
+        return jsonify({"ok": False, "error": "login required"}), 401
+    material = _ap_calc_material_by_slug(slug)
+    if not material:
+        return jsonify({"ok": False, "error": "lesson not found"}), 404
+    uid = int(session["user_id"])
+    db = get_db()
+    if request.method == "GET":
+        row = _cm_progress_row(db, uid, slug)
+        return jsonify({"ok": True, "progress": (row or {}).get("progress") or {}, "updated_at": (row or {}).get("updated_at")})
+    data = request.get_json(silent=True) or {}
+    progress = data.get("progress")
+    if not isinstance(progress, dict):
+        return jsonify({"ok": False, "error": "invalid progress payload"}), 400
+    try:
+        if not _cm_progress_save(db, uid, slug, progress):
+            return jsonify({"ok": False, "error": "server busy, please try again"}), 503
+    except Exception:
+        app.logger.exception("ap calc material progress save failed slug=%s", slug)
+        return jsonify({"ok": False, "error": "could not save progress"}), 500
+    return jsonify({"ok": True})
+
+
+@app.route("/ap/calc/practice/<section>/<kind>.pdf")
+def ap_calc_practice_pdf(section: str, kind: str):
+    session["active_track_label"] = "AP Calculus AB / BC"
+    if kind not in ("packet", "solutions"):
+        abort(404)
+    path = _ap_calc_practice_pdf_path(section, kind)
+    if not path:
+        abort(404)
+    label = "packet" if kind == "packet" else "solutions"
+    download_name = f"NovelPrep-AP-Calc-{section.replace('.', '-')}-{label}.pdf"
+    return send_file(
+        path,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=download_name,
+    )
+
+
 @app.route("/practice/challenge")
 def practice_challenge():
     session["active_track_label"] = "SAT Math"
@@ -13197,6 +13479,8 @@ def _visible_learning_tracks(grants: set[str] | None) -> list[dict[str, Any]]:
         if key == "sat" and "sat" in grants:
             visible.append(track)
         elif key == "placement" and "placement" in grants:
+            visible.append(track)
+        elif key == "ap_calc" and "ap_calc" in grants:
             visible.append(track)
     return visible
 
@@ -19126,4 +19410,5 @@ def admin_clear_all_records():
 # =====================================================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8888, debug=True)
+    # use_reloader=False avoids connection resets through port-forward tunnels.
+    app.run(host="0.0.0.0", port=8888, debug=True, use_reloader=False)
