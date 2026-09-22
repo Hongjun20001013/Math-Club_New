@@ -41,6 +41,22 @@
 
   var TRACER_EPS = 0.0005;
 
+  function formatSecantNum(x) {
+    if (x === 0) return "0";
+    var abs = Math.abs(x);
+    var decimals = abs >= 10 ? 2 : abs >= 1 ? 3 : 4;
+    var text = x.toFixed(decimals);
+    while (abs < 1 && abs > 0 && parseFloat(text) === 0 && decimals < 6) {
+      decimals += 1;
+      text = x.toFixed(decimals);
+    }
+    return text.replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "");
+  }
+
+  function formatSecantInterval(a, h) {
+    return a + " → " + formatSecantNum(a + h);
+  }
+
   var SCENARIO_ID_ALIASES = { "hole-filled": "hole-with-value" };
 
   function resolveScenarioIndex(spec) {
@@ -804,8 +820,8 @@
     var units = this.spec.annotations.units || {};
 
     this.root.querySelectorAll("[data-ap-h-val]").forEach(function (n) { n.textContent = h; });
-    this.root.querySelectorAll("[data-ap-rate-val]").forEach(function (n) { n.textContent = rate.toFixed(2); });
-    this.root.querySelectorAll("[data-ap-rise-val]").forEach(function (n) { n.textContent = deltaS.toFixed(2); });
+    this.root.querySelectorAll("[data-ap-rate-val]").forEach(function (n) { n.textContent = formatSecantNum(rate); });
+    this.root.querySelectorAll("[data-ap-rise-val]").forEach(function (n) { n.textContent = formatSecantNum(deltaS); });
     this.root.querySelectorAll("[data-ap-run-val]").forEach(function (n) { n.textContent = h; });
 
     if (h < 0) this.leftEst = rate;
@@ -814,25 +830,25 @@
     var leftEl = this.root.querySelector("[data-ap-left-est]");
     var rightEl = this.root.querySelector("[data-ap-right-est]");
     var agreeEl = this.root.querySelector("[data-ap-agree]");
-    if (leftEl) leftEl.textContent = this.leftEst != null ? this.leftEst.toFixed(2) : "—";
-    if (rightEl) rightEl.textContent = this.rightEst != null ? this.rightEst.toFixed(2) : "—";
+    if (leftEl) leftEl.textContent = this.leftEst != null ? formatSecantNum(this.leftEst) : "—";
+    if (rightEl) rightEl.textContent = this.rightEst != null ? formatSecantNum(this.rightEst) : "—";
     if (agreeEl) agreeEl.textContent = agree ? "Yes → 4 m/s" : "Explore both sides";
 
     var formula = this.root.querySelector("[data-ap-formula-val]");
     if (formula) {
-      formula.textContent = "Δs/h = " + deltaS.toFixed(2) + "/" + h + " = " + rate.toFixed(2) + " " + (units.rate || "");
+      formula.textContent = "Δs/h = " + formatSecantNum(deltaS) + "/" + h + " = " + formatSecantNum(rate) + " " + (units.rate || "");
     }
     var secEq = this.root.querySelector("[data-ap-secant-eq]");
-    if (secEq) secEq.textContent = "Secant slope = " + rate.toFixed(2);
+    if (secEq) secEq.textContent = "Secant slope = " + formatSecantNum(rate);
     var tanEq = this.root.querySelector("[data-ap-tangent-eq]");
-    if (tanEq) tanEq.textContent = this.tangentRevealed ? "Tangent slope = 4" : "Tangent hidden — tap Reveal";
+    if (tanEq) tanEq.textContent = this.tangentRevealed ? "Tangent slope = " + formatSecantNum(this.spec.tangent.slope) : "Tangent hidden — tap Reveal";
 
     this._draw(h, rate, deltaS);
     this._updateTable(h);
 
     announce(this.root,
-      "h equals " + h + " " + (units.input || "") + ". Delta s equals " + deltaS.toFixed(2) + " " + (units.output || "") +
-      ". Average rate equals " + rate.toFixed(2) + " " + (units.rate || "") + ". Secant slope approaching 4.");
+      "h equals " + h + " " + (units.input || "") + ". Delta s equals " + formatSecantNum(deltaS) + " " + (units.output || "") +
+      ". Average rate equals " + formatSecantNum(rate) + " " + (units.rate || "") + ".");
 
     emitLearningState(this.root, {
       eventType: "tracer_moved",
@@ -851,8 +867,8 @@
       var tr = document.createElement("tr");
       if (h === activeH) tr.className = "is-active";
       var slope = self.slope(h);
-      tr.innerHTML = "<td>" + h + "</td><td>" + (self.s(self.a + h) - self.s(self.a)).toFixed(2) +
-        "</td><td>" + slope.toFixed(2) + "</td><td>[" + self.a + ", " + (self.a + h) + "]</td>";
+      tr.innerHTML = "<td>" + h + "</td><td>" + formatSecantNum(self.s(self.a + h) - self.s(self.a)) +
+        "</td><td>" + formatSecantNum(slope) + "</td><td>" + formatSecantInterval(self.a, h) + "</td>";
       tbody.appendChild(tr);
     });
   };

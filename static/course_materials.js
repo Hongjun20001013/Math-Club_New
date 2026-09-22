@@ -4010,11 +4010,13 @@
 
   function updateCoach(slide) {
     var kind = slide.kind || "lesson";
+    var isApCalc = root.classList.contains("np-cm-viewer--ap-calc");
+    var hideCoach = isCanvasSlide(slide) || (isApCalc && !slide.study_tip);
     if (coachEl) {
-      coachEl.hidden = isCanvasSlide(slide);
+      coachEl.hidden = hideCoach;
     }
     if (coachTipEl) {
-      coachTipEl.textContent = slide.study_tip || "Work through each slide at your own pace.";
+      coachTipEl.textContent = slide.study_tip || (isApCalc ? "" : "Work through each slide at your own pace.");
     }
     if (hintBtn) {
       if (slide.strategy_hint && studyMode && (kind === "question" || kind === "practice" || kind === "example")) {
@@ -4299,6 +4301,14 @@
     var stepsToolbar = bodyEl.querySelector("[data-cm-steps-toolbar]");
     if (stepsToolbar) initStepBlocks(stepsToolbar);
     bodyEl.querySelectorAll("[data-cm-mcq]").forEach(initMcq);
+    bodyEl.querySelectorAll("[data-cm-strategy-details]").forEach(function (details) {
+      if (details._cmStrategyBound) return;
+      details._cmStrategyBound = true;
+      details.addEventListener("toggle", function () {
+        if (!details.open || !studyMode) return;
+        details.setAttribute("data-cm-strategy-used", "1");
+      });
+    });
     bodyEl.querySelectorAll("[data-cm-grid-in]").forEach(initGridIn);
     restoreLockedAnswerOnSlide(slide);
     if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI) {
@@ -4332,7 +4342,10 @@
     var kind = slide.kind || "lesson";
     var canvas = isCanvasSlide(slide);
 
-    slideEl.className = "np-cm-slide np-cm-slide--" + kind + (canvas ? " np-cm-slide--canvas" : "") + " is-entering";
+    var template = slide.template || "";
+    slideEl.className = "np-cm-slide np-cm-slide--" + kind
+      + (template ? " np-cm-slide--" + template : "")
+      + (canvas ? " np-cm-slide--canvas" : "") + " is-entering";
     if (deckEl) {
       deckEl.classList.toggle("is-canvas-mode", canvas);
     }

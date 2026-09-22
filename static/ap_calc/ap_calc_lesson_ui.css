@@ -108,7 +108,7 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  z-index: 40;
+  z-index: 140;
   min-width: 200px;
   padding: 6px;
   border-radius: 12px;
@@ -548,10 +548,14 @@ body.is-ap-calc-lesson .np-app-container {
 
 /* ══ AP lesson chrome (level 2) ══ */
 .np-cm-viewer--ap-calc .ap-lesson-chrome {
-  max-height: 148px;
-  overflow: hidden;
+  overflow: visible;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--ap-radius-card);
+}
+
+.np-cm-viewer--ap-calc .np-cm-hero-top {
+  position: relative;
+  z-index: 20;
 }
 
 .np-cm-viewer--ap-calc .ap-lesson-breadcrumb {
@@ -705,13 +709,17 @@ body.is-ap-calc-lesson .np-app-container {
   overflow: hidden;
 }
 
-/* ══ Phase 5: Phase stepper ══ */
+/* ══ Phase 5: Phase stepper (investigation slides only) ══ */
 .np-cm-viewer--ap-calc .ap-phase-stepper {
   margin: 0 var(--space-3) var(--space-2);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--ap-radius-control);
   background: rgba(248, 246, 255, 0.6);
   border: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-cm-viewer--ap-calc .ap-phase-stepper[hidden] {
+  display: none !important;
 }
 
 .np-cm-viewer--ap-calc .ap-phase-stepper__list {
@@ -760,6 +768,89 @@ body.is-ap-calc-lesson .np-app-container {
 
 .np-cm-viewer--ap-calc .np-cm-slide-head h2 {
   font-family: "Source Serif 4", Georgia, serif;
+}
+
+/* ══ Six slide templates ══ */
+.np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-lede,
+.np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-meta {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-content {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3);
+}
+
+.np-cm-viewer--ap-calc .ap-slide-template--concept .ap-phase-divider,
+.np-cm-viewer--ap-calc .ap-slide-template--investigation .ap-phase-divider,
+.np-cm-viewer--ap-calc .ap-slide-template--worked-example .cm-slide-role,
+.np-cm-viewer--ap-calc .ap-slide-template--practice .cm-slide-role {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc .ap-slide-template--investigation .ap-lab-side__title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f2fd8;
+}
+
+.np-cm-viewer--ap-calc .ap-lab-body--secant .ap-lab-main--graph,
+.np-cm-viewer--ap-calc .ap-lab-body--limit .ap-lab-main--graph {
+  position: sticky;
+  top: var(--space-2);
+}
+
+.np-cm-viewer--ap-calc .ap-lab-graph-wrap--primary {
+  max-width: none;
+  margin: 0;
+}
+
+.np-cm-viewer--ap-calc .cm-strategy-details {
+  margin-bottom: var(--space-3);
+  border: 1px solid rgba(91, 77, 255, 0.14);
+  border-radius: var(--ap-radius-control);
+  background: rgba(248, 246, 255, 0.7);
+}
+
+.np-cm-viewer--ap-calc .cm-strategy-details summary {
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #43318f;
+  list-style: none;
+}
+
+.np-cm-viewer--ap-calc .cm-strategy-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc .cm-strategy-chip-body {
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: 0.92rem;
+  color: #374151;
+}
+
+.np-cm-viewer--ap-calc .ap-worked-model--collapsible {
+  margin-top: var(--space-3);
+  border: 1px solid rgba(91, 77, 255, 0.12);
+  border-radius: var(--ap-radius-control);
+  padding: var(--space-2) var(--space-3);
+}
+
+.np-cm-viewer--ap-calc .ap-worked-model__toggle {
+  cursor: pointer;
+  font-weight: 700;
+  color: #43318f;
+}
+
+.np-cm-viewer--ap-calc .np-cm-coach[hidden] {
+  display: none !important;
 }
 
 /* ══ Phase 8: Graph design ══ */

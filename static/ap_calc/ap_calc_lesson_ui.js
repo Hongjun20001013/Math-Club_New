@@ -196,10 +196,24 @@
     });
   }
 
-  document.addEventListener("np-cm-slide-rendered", function (ev) {
+  function syncPhaseStepperVisibility(slideEl) {
+    if (!phaseStepper) return;
+    var hasLab = slideEl && slideEl.querySelector("[data-ap-math-lab]");
+    var isInvestigation = slideEl && (
+      slideEl.classList.contains("np-cm-slide--investigation")
+      || slideEl.querySelector(".ap-slide-template--investigation")
+      || hasLab
+    );
+    phaseStepper.hidden = !isInvestigation;
+    if (!isInvestigation) return;
     var kindPill = root.querySelector("[data-cm-kind-pill]");
     var kind = kindPill ? kindPill.textContent.toLowerCase() : "lesson";
     setActivePhase(phaseFromSlideKind(kind));
+  }
+
+  document.addEventListener("np-cm-slide-rendered", function (ev) {
+    var slideEl = root.querySelector("[data-cm-slide]");
+    syncPhaseStepperVisibility(slideEl);
     if (stickyCounter && ev.detail && ev.detail.index) {
       var total = root.getAttribute("data-slide-count") || "?";
       stickyCounter.textContent = ev.detail.index + " / " + total;
@@ -238,6 +252,9 @@
         var panel = phase.querySelector("[data-ap-explore-panel]");
         if (gate) gate.hidden = true;
         if (panel) panel.hidden = false;
+        root.querySelectorAll(".ap-worked-model--collapsible[open]").forEach(function (el) {
+          el.removeAttribute("open");
+        });
         markLessonStarted();
         setActivePhase("investigate");
         window.dispatchEvent(new Event("resize"));
@@ -250,6 +267,7 @@
 
   bindExploreGates(root);
   bindPhaseStepper();
+  syncPhaseStepperVisibility(root.querySelector("[data-cm-slide]"));
 
   /* ── Focus / projector mode ── */
   var focusToggle = root.querySelector("[data-cm-focus-toggle]");
@@ -264,5 +282,4 @@
   }
 
   loadPathMode();
-  setActivePhase("understand");
 })();

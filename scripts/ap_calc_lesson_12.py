@@ -23,7 +23,6 @@ from ap_calc_slide_helpers import (
     visual_cases_gallery_12,
     visual_limit_vs_value,
     mcq_reveal,
-    optional_note,
     phase_divider,
     practice_packet,
     role,
@@ -40,7 +39,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "1.2 · Defining limits and notation",
         intro("1", "1.2", "Defining limits and limit notation", [
-            (2, "Launch"), (5, "Definition"), (10, "Four cases"), (14, "Practice"), (18, "Exit"),
+            (2, "Launch"), (3, "Definition"), (4, "Four cases"), (11, "Practice"), (15, "Exit"),
         ]),
         kind="intro", group="divider",
     )
@@ -90,8 +89,7 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "Four contrast cases",
-        phase_divider("Visual Investigation", "Limit vs function value")
-        + role("Visual", "Four possibilities", "Same limit language — different graphs.")
+        role("Visual", "Four possibilities", "Same limit language — different graphs.")
         + '<div class="ap-graph-grid ap-graph-grid--cases">'
         + fig(g["limit_case_a_thumb"], "A · Continuous", cls="ap-fig--case", notice=NOTICE_LIMIT_EQ_FC)
         + fig(
@@ -103,6 +101,7 @@ def build(graphs: dict[str, str]) -> dict:
         + "</div>"
         + visual_cases_gallery_12()
         + limit_approach_embed(),
+        template="investigation",
         path_phase="Visual Investigation",
     )
 
@@ -127,7 +126,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Worked example: limit vs f(c)",
         worked_example(
             "Piecewise at x = 3",
-            "Find \\(\\lim_{x\\to 3} f(x)\\) and compare to \\(f(3)\\) for the piecewise function.",
+            "Find \\(\\lim_{x\\to 3} f(x)\\) and compare to \\(f(3)\\) for the piecewise function below.",
             "Algebraic rule for x ≠ 3; separate rule at x = 3.",
             solution_steps([
                 "For x ≠ 3, f(x) = x + 2, so near 3 the outputs behave like x + 2.",
@@ -137,8 +136,12 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(\\displaystyle\\lim_{x\\to 3} f(x)=5\\) while \\(f(3)=10\\).",
             "Graph would show open circle at (3,5) and filled dot at (3,10).",
+            stem_math=math_block(
+                "\\[f(x)=\\begin{cases} x+2 & \\text{if } x\\neq 3 \\\\ 10 & \\text{if } x=3\\end{cases}\\]"
+            ),
         )
         + visual_limit_vs_value("3", "5", fc_val="10"),
+        template="worked-example",
         path_phase="Worked Example",
     )
 
@@ -250,13 +253,15 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Optional: ε–δ definition",
-        optional_note(
+        "Extension: ε–δ definition",
+        definition(
+            "Formal precision (extension)",
             math_block(
                 "\\[\\forall\\varepsilon>0,\\ \\exists\\delta>0:\\ 0<|x-c|<\\delta\\Rightarrow|f(x)-L|<\\varepsilon\\]"
             )
-            + "<p>Precision for “arbitrarily close.” Not required for AP computation at this stage.</p>"
+            + "<p>This formalizes “arbitrarily close.” Not required for AP computation at this stage.</p>",
         ),
+        template="concept",
         path_phase="Optional",
     )
 

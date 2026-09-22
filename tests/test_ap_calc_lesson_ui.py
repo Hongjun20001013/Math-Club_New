@@ -59,11 +59,80 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("np-cm-viewer--ap-calc", js)
         self.assertIn("!root.classList.contains(\"np-cm-viewer--ap-calc\")", js)
 
-    def test_phase_stepper_in_template(self) -> None:
+    def test_phase_stepper_hidden_by_default(self) -> None:
         tpl = TEMPLATE.read_text(encoding="utf-8")
-        for phase in ("Understand", "Learn", "Investigate", "Explain"):
-            self.assertIn(phase, tpl)
-        self.assertIn("data-ap-phase-stepper", tpl)
+        self.assertIn('data-ap-phase-stepper', tpl)
+        self.assertIn('data-ap-phase-stepper aria-label="Learning phases" hidden', tpl)
+
+    def test_dropdown_menu_high_z_index(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        self.assertIn("z-index: 140", css)
+
+    def test_chrome_allows_dropdown_overflow(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        self.assertIn(".np-cm-viewer--ap-calc .ap-lesson-chrome", css)
+        self.assertIn("overflow: visible", css)
+        self.assertNotIn("max-height: 148px", css)
+
+    def test_slide_templates_in_materials(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        templates = set()
+        for mat in data["materials"]:
+            for slide in mat["slides"]:
+                templates.add(slide.get("template"))
+        self.assertEqual(
+            templates,
+            {"intro", "concept", "investigation", "worked-example", "practice", "summary"},
+        )
+
+    def test_intro_simplified_without_flow_meta(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
+        intro = lesson["slides"][0]["html"]
+        self.assertNotIn("cm-intro-meta", intro)
+        self.assertIn("ap-slide-template--intro", intro)
+
+    def test_strategy_collapsed_in_practice(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-1-instantaneous-change")
+        practice = next(s for s in lesson["slides"] if s.get("kind") == "question")
+        self.assertIn("cm-strategy-details", practice["html"])
+        self.assertNotIn('cm-strategy-chip"><span', practice["html"])
+
+    def test_secant_interval_directed_notation(self) -> None:
+        js = MATH_LAB_JS.read_text(encoding="utf-8")
+        self.assertIn("formatSecantInterval", js)
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-1-instantaneous-change")
+        slide = next(s for s in lesson["slides"] if s["index"] == 6)
+        self.assertIn("From → To", slide["html"])
+
+    def test_piecewise_in_12_slide_6(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
+        slide = next(s for s in lesson["slides"] if s["index"] == 6)
+        self.assertIn("begin{cases}", slide["html"])
+
+    def test_12_slide_14_not_blank_optional(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
+        slide = next(s for s in lesson["slides"] if s["index"] == 14)
+        self.assertNotIn("ap-box--optional", slide["html"])
+        self.assertIn("varepsilon", slide["html"])
+
+    def test_13_slide_14_mcq_no_yes_conflict(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
+        slide = next(s for s in lesson["slides"] if s["index"] == 14)
+        self.assertIn("What is wrong with that reasoning", slide["html"])
+        self.assertNotIn("Yes — limits come from branches", slide["html"])
+
+    def test_13_slide_15_one_sided_infinite_limits(self) -> None:
+        data = json.loads(MATERIALS.read_text(encoding="utf-8"))
+        lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
+        slide = next(s for s in lesson["slides"] if s["index"] == 15)
+        self.assertIn("L^{-}=-\\infty", slide["html"])
+        self.assertIn("L^{+}=+\\infty", slide["html"])
 
     def test_path_mode_controls(self) -> None:
         tpl = TEMPLATE.read_text(encoding="utf-8")
@@ -108,6 +177,12 @@ class LessonUIAssetTests(unittest.TestCase):
         slide5 = next(s for s in lesson["slides"] if s["index"] == 5)
         self.assertIn("Start investigation", slide5["html"])
         self.assertIn("data-ap-explore-panel", slide5["html"])
+        self.assertEqual(slide5.get("template"), "investigation")
+
+    def test_phase_stepper_sync_in_js(self) -> None:
+        js = LESSON_UI_JS.read_text(encoding="utf-8")
+        self.assertIn("syncPhaseStepperVisibility", js)
+        self.assertIn("phaseStepper.hidden", js)
 
     def test_mastery_tooltip_on_ring(self) -> None:
         html = _lesson_html("ap-1-1-instantaneous-change")

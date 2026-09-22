@@ -328,7 +328,7 @@ def phase_divider(phase: str, subtitle: str = "") -> str:
     )
 
 
-def intro(unit: str, section: str, title: str, chips: list[tuple[str, str]]) -> str:
+def intro(unit: str, section: str, title: str, chips: list[tuple[int, str]]) -> str:
     chip_html = "".join(
         f'<button type="button" class="cm-intro-chip" data-cm-jump-section="{idx}">'
         f'<span class="cm-intro-chip-num">{num}</span>'
@@ -336,7 +336,7 @@ def intro(unit: str, section: str, title: str, chips: list[tuple[str, str]]) -> 
         for num, (idx, label) in enumerate(chips, 1)
     )
     return (
-        '<div class="cm-intro-canvas ap-calc-intro">'
+        '<div class="cm-intro-canvas ap-calc-intro ap-slide-template--intro">'
         '<div class="cm-intro-bg" aria-hidden="true">'
         '<span class="cm-intro-orb cm-intro-orb--1"></span>'
         '<span class="cm-intro-orb cm-intro-orb--2"></span>'
@@ -345,13 +345,8 @@ def intro(unit: str, section: str, title: str, chips: list[tuple[str, str]]) -> 
         '<span class="cm-intro-kicker">Novel Prep · AP Calculus AB / BC</span>'
         f'<p class="cm-intro-unit">Unit {unit} · Section {section}</p>'
         f'<h1 class="cm-intro-title">{title}</h1>'
-        '<p class="cm-intro-lede">Classroom-ready deck: visual investigation → definitions → worked &amp; guided practice → exit ticket.</p>'
-        '<div class="cm-intro-meta">'
-        '<span class="cm-intro-meta-item"><em>Flow</em>Launch · Visual · Concept · Practice</span>'
-        '<span class="cm-intro-meta-item"><em>Tools</em>Study mode · Projector · Packet PDF</span>'
-        "</div>"
         f'<div class="cm-intro-chips">{chip_html}</div>'
-        '<p class="cm-intro-cta">Tap a phase or press <strong>Next</strong> to begin.</p>'
+        '<p class="cm-intro-cta">Jump to a section or press <strong>Next</strong> to begin.</p>'
         "</div></div>"
     )
 
@@ -363,14 +358,29 @@ def worked_example(
     steps_html: str,
     conclusion: str,
     check: str,
+    stem_math: str = "",
+    collapsible_model: bool = False,
 ) -> str:
+    stem_extra = stem_math if stem_math else ""
+    model_open = "" if collapsible_model else " open"
+    model_tag = "details" if collapsible_model else "div"
+    model_end = f"</{model_tag}>"
+    model_start = (
+        f'<{model_tag} class="ap-worked-model{" ap-worked-model--collapsible" if collapsible_model else ""}"'
+        f'{model_open}>'
+    )
+    if collapsible_model:
+        model_start += '<summary class="ap-worked-model__toggle">Show worked model</summary>'
     return (
-        role("Worked Example", title, "Teacher model — follow strategy, algebra, and verification.")
-        + definition("Understand", f"<p>{understand}</p>")
+        '<div class="ap-slide-template--worked-example">'
+        + definition("Problem", f"<p>{understand}</p>{stem_extra}")
+        + model_start
         + key_point("Representation", f"<p>{representation}</p>")
         + steps_html
         + checkpoint(f"<strong>Conclusion:</strong> {conclusion}")
         + key_point("Check", f"<p>{check}</p>")
+        + model_end
+        + "</div>"
     )
 
 
@@ -430,11 +440,10 @@ def mcq_reveal(
         for i, c in enumerate(choices[:4])
     )
     return (
-        '<div class="cm-question-workspace"><div class="cm-question-stem">'
-        f'<div class="cm-strategy-chip"><span class="cm-strategy-chip-label">Strategy</span><p>{strategy}</p></div>'
-        '<div class="cm-slide-role cm-slide-role--question">'
-        '<span class="cm-slide-role-label">AP Practice</span>'
-        "<strong>Try it first</strong><p>Choose an answer, then reveal the full reasoning.</p></div>"
+        '<div class="cm-question-workspace ap-slide-template--practice"><div class="cm-question-stem">'
+        f'<details class="cm-strategy-details" data-cm-strategy-details>'
+        f'<summary class="cm-strategy-chip-label">Strategy hint</summary>'
+        f'<p class="cm-strategy-chip-body">{strategy}</p></details>'
         f"{stem}</div>"
         '<div class="cm-question-interact">'
         f'<div class="cm-mcq-interactive" data-cm-mcq data-cm-correct="{correct}">'
@@ -480,34 +489,8 @@ _LAB_SVG_H = 280
 
 
 def secant_math_lab_embed(spec_json: str) -> str:
-    inner = (
-        '<div class="ap-lab-phase ap-lab-phase--predict">'
-        '<p class="ap-lab-phase__label">Understand</p>'
-        '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize? What tangent slope do you predict?</p>'
-        '<div class="ap-lab-predict-btns">'
-        '<button type="button" class="ap-lab-btn" data-ap-predict="increase">Increases</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-predict="decrease">Decreases</button>'
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict="stabilize-4">Stabilizes near 4</button>'
-        "</div>"
-        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
-        "</div>"
-        '<div class="ap-lab-phase ap-lab-phase--explore">'
-        '<p class="ap-lab-phase__label">Investigate</p>'
-        '<div class="ap-lab-explore">'
-        '<div class="ap-lab-controls" data-ap-controls></div>'
-        '<label class="ap-lab-slider-label" for="ap-secant-h">'
-        'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
-        '<input type="range" id="ap-secant-h" class="ap-range ap-lab-range" '
-        'data-ap-h-slider aria-label="Secant interval h in seconds"/>'
-        '<div class="ap-secant-metrics tex2jax_ignore">'
-        '<div class="ap-metric"><span>Rise Δs</span><strong data-ap-rise-val>—</strong> m</div>'
-        '<div class="ap-metric"><span>Run h</span><strong data-ap-run-val>—</strong> s</div>'
-        '<div class="ap-metric ap-metric--accent"><span>Avg rate</span>'
-        '<strong data-ap-rate-val>—</strong> m/s</div>'
-        "</div>"
-        '<p class="ap-formula-readout" data-ap-formula-val></p>'
-        '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
-        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
+    graph_svg = (
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
         f'<svg class="ap-lab-svg ap-secant-svg" viewBox="{_LAB_VIEWBOX}" role="img" '
         'aria-label="Secant and tangent on s(t)=t²+1">'
         f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
@@ -520,14 +503,47 @@ def secant_math_lab_embed(spec_json: str) -> str:
         '<circle data-ap-fixed r="7" fill="#6c4eff"/>'
         '<circle data-ap-moving r="5" fill="#fff" stroke="#2563eb" stroke-width="2"/>'
         "</svg></div>"
-        '<table class="ap-lab-table"><thead><tr><th>h</th><th>Δs</th><th>Δs/h</th><th>Interval</th></tr></thead>'
+    )
+    inner = (
+        '<div class="ap-lab-phase ap-lab-phase--predict">'
+        '<p class="ap-lab-phase__label">Predict</p>'
+        '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize to one value?</p>'
+        '<div class="ap-lab-predict-btns">'
+        '<button type="button" class="ap-lab-btn" data-ap-predict="increase">Keeps increasing</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-predict="decrease">Keeps decreasing</button>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict="stabilize-4">Stabilizes to one value</button>'
+        "</div>"
+        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
+        "</div>"
+        '<div class="ap-lab-phase ap-lab-phase--explore">'
+        '<p class="ap-lab-phase__label">Investigate</p>'
+        '<div class="ap-lab-explore ap-lab-body ap-lab-body--split ap-lab-body--secant">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        + graph_svg
+        + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
+        "</div>"
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
+        '<p class="ap-lab-side__title">Current action</p>'
+        '<div class="ap-lab-controls" data-ap-controls></div>'
+        '<label class="ap-lab-slider-label" for="ap-secant-h">'
+        'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
+        '<input type="range" id="ap-secant-h" class="ap-range ap-lab-range" '
+        'data-ap-h-slider aria-label="Secant interval h in seconds"/>'
+        '<div class="ap-secant-metrics tex2jax_ignore">'
+        '<div class="ap-metric"><span>Rise Δs</span><strong data-ap-rise-val>—</strong> m</div>'
+        '<div class="ap-metric"><span>Run h</span><strong data-ap-run-val>—</strong> s</div>'
+        '<div class="ap-metric ap-metric--accent"><span>Avg rate</span>'
+        '<strong data-ap-rate-val>—</strong> m/s</div>'
+        "</div>"
+        '<p class="ap-formula-readout" data-ap-formula-val></p>'
+        '<table class="ap-lab-table"><thead><tr><th>h</th><th>Δs</th><th>Δs/h</th><th>From → To</th></tr></thead>'
         '<tbody data-ap-table-body></tbody></table>'
         '<div class="ap-lab-estimates">'
         '<span>Left estimate: <strong data-ap-left-est>—</strong></span>'
         '<span>Right estimate: <strong data-ap-right-est>—</strong></span>'
         '<span>Agreement: <strong data-ap-agree>Explore both sides</strong></span>'
         "</div>"
-        "</div></div>"
+        "</aside></div></div>"
         '<div class="ap-lab-phase ap-lab-phase--explain">'
         '<p class="ap-lab-phase__label">Explain</p>'
         '<p>Why can we use h → 0 but not h = 0?</p>'
@@ -605,19 +621,8 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
             "Left and right branch heights near c determine the limit; open vs filled points show limit vs function value."
         )
     )
-    explore = (
-        '<div class="ap-lab-explore">'
-        '<div class="ap-lab-controls">'
-        '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
-        "</div>"
-        '<label for="ap-limit-x">x = <strong data-ap-x-read>2.60</strong></label>'
-        '<input type="range" id="ap-limit-x" class="ap-range ap-lab-range" data-ap-x-slider '
-        'aria-label="Trace x toward c"/>'
-        '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
-        '<div class="ap-secant-metrics"><div class="ap-metric"><span>f(x)</span><strong data-ap-y-read>—</strong></div></div>'
-        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
+    graph_svg = (
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
         f'<svg class="ap-lab-svg ap-lab-svg--limit" viewBox="{_LAB_VIEWBOX}" role="img" aria-label="Limit case graph">'
         f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
         '<g data-ap-plot-layer>'
@@ -631,6 +636,24 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
         '<circle data-ap-tracer r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div>"
+    )
+    explore = (
+        '<div class="ap-lab-explore ap-lab-body ap-lab-body--split ap-lab-body--limit">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        + graph_svg
+        + '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
+        "</div>"
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
+        '<p class="ap-lab-side__title">Current action</p>'
+        '<div class="ap-lab-controls">'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
+        "</div>"
+        '<label for="ap-limit-x">x = <strong data-ap-x-read>2.60</strong></label>'
+        '<input type="range" id="ap-limit-x" class="ap-range ap-lab-range" data-ap-x-slider '
+        'aria-label="Trace x toward c"/>'
+        '<div class="ap-secant-metrics"><div class="ap-metric"><span>f(x)</span><strong data-ap-y-read>—</strong></div></div>'
         '<div class="ap-lab-lock-row">'
         '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left observation</button>'
         '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right observation</button>'
@@ -638,7 +661,8 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<p>Left: <strong data-ap-left-obs>______</strong> · Right: <strong data-ap-right-obs>______</strong></p>'
         '<div class="ap-lab-limit-panel" data-ap-limit-panel hidden>'
         '<p>Compare: <strong data-ap-compare>—</strong> · Limit: <strong data-ap-limit-val>—</strong> · f(c): <strong data-ap-fc-val>—</strong></p>'
-        "</div></div>"
+        "</div>"
+        "</aside></div>"
         + _tracer_tutor_panel()
     )
     inner = inner + _explore_phase_gate(explore)
@@ -824,6 +848,30 @@ def practice_packet(section: str, title: str) -> str:
     )
 
 
+def infer_slide_template(
+    kind: str,
+    html: str,
+    title: str = "",
+    path_phase: str = "",
+    group: str = "",
+) -> str:
+    if kind == "intro":
+        return "intro"
+    if kind == "question":
+        return "practice"
+    if "data-ap-math-lab" in html:
+        return "investigation"
+    if path_phase == "Worked Example" or "ap-slide-template--worked-example" in html:
+        return "worked-example"
+    if "Exit Ticket" in title or "Practice packet" in html:
+        return "summary"
+    if group == "practice" and kind == "lesson":
+        return "summary"
+    if path_phase in {"Guided Example", "AP Practice", "Exit Ticket"}:
+        return "practice"
+    return "concept"
+
+
 class SlideBuilder:
     def __init__(self, section: str):
         self.section = section
@@ -833,12 +881,19 @@ class SlideBuilder:
     def add(self, title: str, html: str, kind: str = "lesson", **kw) -> int:
         idx = self._idx
         phase = kw.pop("path_phase", "")
+        group = kw.get("group", "learn")
+        template = kw.pop("template", None) or infer_slide_template(
+            kind, html, title=title, path_phase=phase, group=group,
+        )
+        if f"ap-slide-template--{template}" not in html and template != "intro":
+            html = f'<div class="ap-slide-template ap-slide-template--{template}">{html}</div>'
         slide = {
             "index": idx,
             "title": title,
             "html": html,
             "kind": kind,
-            "group": kw.get("group", "learn"),
+            "template": template,
+            "group": group,
             "section": kw.get("section", self.section),
             "study_tip": kw.get("study_tip", ""),
             **{k: v for k, v in kw.items() if k not in ("group", "section", "study_tip")},

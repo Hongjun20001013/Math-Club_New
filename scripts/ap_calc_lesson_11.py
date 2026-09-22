@@ -34,7 +34,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "1.1 · Can change occur at an instant?",
         intro("1", "1.1", "Can change occur at an instant?", [
-            (2, "Launch"), (5, "Visual"), (9, "Concept"), (13, "Practice"), (17, "Exit"),
+            (2, "Launch"), (5, "Visual"), (9, "Concept"), (13, "Practice"), (15, "Exit"),
         ]),
         kind="intro", group="divider", path_phase="Launch",
     )
@@ -113,8 +113,8 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "Secant → tangent",
-        phase_divider("Visual Investigation", "Secant lines approach a tangent")
-        + secant_interactive_embed(),
+        secant_interactive_embed(),
+        template="investigation",
         path_phase="Visual Investigation",
     )
 

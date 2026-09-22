@@ -40,7 +40,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "1.3 · Limits from graphs",
         intro("1", "1.3", "Estimating limits from graphs", [
-            (2, "Procedure"), (6, "One-sided"), (11, "Cases"), (16, "Practice"), (21, "Exit"),
+            (2, "Procedure"), (3, "One-sided"), (6, "Cases"), (12, "Practice"), (19, "Exit"),
         ]),
         kind="intro", group="divider",
     )
@@ -133,8 +133,10 @@ def build(graphs: dict[str, str]) -> dict:
             + math_block("\\[\\displaystyle f(2)=1.5\\]"),
             "Two-sided limit is 3; function value is 1.5 — limit exists but graph is not continuous.",
             "Open circle shows approach height 3; filled dot shows \\(f(2)=1.5\\).",
+            collapsible_model=True,
         )
         + limit_tracer_embed(worked_example=True),
+        template="investigation",
         path_phase="Worked Example",
     )
 
@@ -292,12 +294,12 @@ def build(graphs: dict[str, str]) -> dict:
         "Practice: filled dot trap",
         mcq_reveal(
             "<p>A student reads \\(f(2)=-1\\) from a filled dot and concludes the limit at \\(x=2\\) is \\(-1\\). "
-            "Is that reasoning correct?</p>",
+            "What is wrong with that reasoning?</p>",
             [
-                "No error",
-                "Yes — limits come from branches, not the filled dot",
-                "Yes — limits can never equal \\(-1\\)",
-                "Cannot tell from the graph",
+                "Nothing — the filled dot determines the limit",
+                "Limits come from branch approach, not the filled dot alone",
+                "Limits can never equal \\(-1\\)",
+                "Cannot tell without tracing both branches",
             ],
             "B",
             "Filled dot gives \\(f(c)\\); limits come from approach along branches.",
@@ -310,20 +312,21 @@ def build(graphs: dict[str, str]) -> dict:
         "Practice: infinite behavior",
         mcq_reveal(
             "<p>Near \\(x=0\\), the graph of \\(f(x)=\\dfrac{1}{x}\\) shows \\(|y|\\) growing without bound. "
-            "What can you conclude about the two-sided limit?</p>"
+            "Which statement about one-sided and two-sided limits is correct?</p>"
             + limit_card("x\\to 0", equals="?"),
             [
-                "0",
-                "1",
-                "The limit does not exist (infinite behavior)",
-                "The limit is \\(\\infty\\) only from the right",
+                "Both one-sided limits are 0",
+                "\\(L^{-}=-\\infty\\), \\(L^{+}=+\\infty\\), so the two-sided limit DNE",
+                "The two-sided limit is \\(+\\infty\\)",
+                "The two-sided limit is \\(-\\infty\\)",
             ],
-            "C",
-            "Unbounded behavior → two-sided limit DNE in the real-number sense.",
-            "<p><strong>C</strong> — AP treats unbounded behavior as “limit DNE.” "
-            "<strong>D</strong> describes one side only; the question asks about the two-sided limit.</p>",
+            "B",
+            "Trace each branch: left goes to \\(-\\infty\\), right goes to \\(+\\infty\\).",
+            "<p><strong>B</strong> — as \\(x\\to 0^{-}\\), \\(y\\to -\\infty\\); as \\(x\\to 0^{+}\\), \\(y\\to +\\infty\\). "
+            "Unequal infinite behavior means the two-sided limit does not exist in \\(\\mathbb{R}\\). "
+            "<strong>C</strong> and <strong>D</strong> describe only one side.</p>",
         )
-        + fig(g["infinite_limit_13"], "Reference: \\(1/x\\) near 0", cls="ap-fig--standard", notice="Left and right diverge to \\(-\\infty\\) and \\(+\\infty\\)."),
+        + fig(g["infinite_limit_13"], "Reference: \\(1/x\\) near 0", cls="ap-fig--standard", notice="Left branch → \\(-\\infty\\); right branch → \\(+\\infty\\)."),
         kind="question", group="practice", path_phase="AP Practice",
     )
 
