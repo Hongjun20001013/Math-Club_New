@@ -1297,7 +1297,10 @@
   }
 
   function hideResumeBanner() {
-    if (resumeEl) resumeEl.hidden = true;
+    if (resumeEl) {
+      resumeEl.hidden = true;
+      resumeEl.classList.add("is-dismissed");
+    }
   }
 
   function scheduleProgressSync() {
@@ -4437,7 +4440,13 @@
   }
 
   function go(delta) {
+    if (resumeOffered || (resumeEl && !resumeEl.hidden)) {
+      consumeResumeBanner();
+    }
     idx = (idx + delta + slides.length) % slides.length;
+    if (root.classList.contains("np-cm-viewer--ap-calc") && window.ApCalcLessonUI) {
+      window.ApCalcLessonUI.markLessonStarted();
+    }
     render();
   }
 
@@ -4712,7 +4721,7 @@
     });
   }
   if (window.matchMedia && window.matchMedia("(min-width: 1101px)").matches) {
-    if (!loadFocusMode()) {
+    if (!loadFocusMode() && !root.classList.contains("np-cm-viewer--ap-calc")) {
       setOutlineOpen(true);
     }
   }

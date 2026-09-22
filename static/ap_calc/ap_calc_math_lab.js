@@ -220,11 +220,44 @@
     }
   }
 
+  function phaseFromLabStep(step) {
+    if (step <= 0) return "understand";
+    if (step <= 4) return "investigate";
+    if (step <= 6) return "learn";
+    return "explain";
+  }
+
+  function buildStructuredLessonState(lab) {
+    if (!lab) return {};
+    var sc = lab.scenario ? lab.scenario() : (lab.current ? lab.current() : {});
+    return {
+      lessonId: (lab.spec && lab.spec.lessonId) || "",
+      slideId: (lab.spec && lab.spec.slideId) || "",
+      learningObjective: (lab.spec && lab.spec.learningObjective) || "",
+      currentPhase: phaseFromLabStep(lab.step != null ? lab.step : 0),
+      selectedCase: sc.id || sc.caseId || "",
+      prediction: lab.predictLocked || lab.prediction || null,
+      leftObservation: lab.leftObs || lab.leftLocked || null,
+      rightObservation: lab.rightObs || lab.rightLocked || null,
+      comparison: lab.comparisonChoice || null,
+      functionValue: sc.functionValue != null ? sc.functionValue : null,
+      studentAnswer: lab.studentExplain || null,
+      attemptCount: lab.attemptCount || 0,
+      hintCount: (lab.tutor && lab.tutor.hintsUsed) || 0,
+      misconceptionTags: lab.tutor && lab.tutor.lastMisconception ? [lab.tutor.lastMisconception] : [],
+      labStep: lab.step != null ? lab.step : 0,
+    };
+  }
+
   function emitLearningState(root, payload) {
     var detail = Object.assign({
       timestamp: Date.now(),
       courseId: "ap-calc",
     }, payload);
+    if (payload && payload.labInstance) {
+      detail = Object.assign(detail, buildStructuredLessonState(payload.labInstance));
+      delete detail.labInstance;
+    }
     if (root) {
       _lastRoot = root;
       rootDispatch(root, detail);
@@ -1069,6 +1102,7 @@
     this.rightLocked = null;
     this.predictDone = false;
     this.fcConfirmed = false;
+    this._yCache = {};
     this.tutor = new ContextualTutor(root, spec);
     this._bind();
     this._applyScenarioTabsVisibility();
@@ -1162,7 +1196,11 @@
   };
 
   OneSidedLimitTracer.prototype._yAt = function (x, allowFc) {
-    return evaluateScenarioY(this.scenario(), x, allowFc);
+    var key = this.scenarioIndex + "|" + x + "|" + (allowFc ? 1 : 0);
+    if (this._yCache[key] !== undefined) return this._yCache[key];
+    var y = evaluateScenarioY(this.scenario(), x, allowFc);
+    this._yCache[key] = y;
+    return y;
   };
 
   OneSidedLimitTracer.prototype._submitPredict = function () {
@@ -1190,6 +1228,7 @@
       labId: this.spec.id,
       caseId: sc.id,
       prediction: { left: leftVal, right: rightVal, two: twoVal, fcAffects: fcVal },
+      labInstance: this,
     });
   };
 
@@ -1219,6 +1258,7 @@
         caseId: sc.id,
         answer: input ? input.value : "",
         correct: true,
+        labInstance: this,
       });
       return;
     }
@@ -1275,6 +1315,7 @@
         caseId: sc.id,
         answer: val,
         correct: true,
+        labInstance: this,
       });
       return;
     }
@@ -1316,13 +1357,15 @@
         : "<strong>Add more detail:</strong> mention left behavior, right behavior, whether they agree, and that f(c) is separate.";
     }
     if (!correct) this.tutor.recordMisconception("filled-point-determines-limit");
+    this.studentExplain = text.slice(0, 500);
     emitLearningState(this.root, {
       eventType: "explanation_submitted",
       lessonId: this.spec.lessonId,
       labId: this.spec.id,
       caseId: sc.id,
-      answer: text.slice(0, 500),
+      answer: this.studentExplain,
       correct: correct,
+      labInstance: this,
     });
   };
 
@@ -1536,6 +1579,8 @@
   global.ApCalcMathLab = {
     init: initAll,
     initLab: initMathLab,
+    buildStructuredLessonState: buildStructuredLessonState,
+    phaseFromLabStep: phaseFromLabStep,
     MISCONCEPTION_HINTS: MISCONCEPTION_HINTS,
     safeEval: safeEval,
     formatApproachX: formatApproachX,

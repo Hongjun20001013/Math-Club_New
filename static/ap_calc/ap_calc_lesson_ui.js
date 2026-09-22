@@ -1,5 +1,5 @@
 /**
- * AP Calculus lesson viewer UI: course dropdown, knowledge map modes, resume banner, explore gates.
+ * AP Calculus lesson viewer UI: compact chrome, path modes, phase stepper, resume, gates.
  */
 (function () {
   "use strict";
@@ -8,16 +8,24 @@
   if (!root) return;
 
   var lessonSlug = root.getAttribute("data-lesson-slug") || "lesson";
+  var pathKey = "np-ap-path-mode-" + lessonSlug;
   var kmKey = "np-ap-km-mode-" + lessonSlug;
   var lessonStartedKey = "np-ap-started-" + lessonSlug;
   var resumeDismissKey = "np-cm-resume-dismiss-" + lessonSlug;
 
   var resumeEl = root.querySelector("[data-cm-resume]");
   var resumeConsumed = false;
+  var stickyChrome = root.querySelector("[data-ap-sticky-chrome]");
+  var stickyCounter = root.querySelector("[data-ap-sticky-counter]");
+  var phaseStepper = root.querySelector("[data-ap-phase-stepper]");
+  var lessonChrome = root.querySelector("[data-ap-lesson-chrome]");
 
   function consumeResumeBanner() {
     resumeConsumed = true;
-    if (resumeEl) resumeEl.hidden = true;
+    if (resumeEl) {
+      resumeEl.hidden = true;
+      resumeEl.classList.add("is-dismissed");
+    }
     try {
       sessionStorage.setItem(resumeDismissKey, "1");
     } catch (e) {}
@@ -26,7 +34,10 @@
   try {
     if (sessionStorage.getItem(resumeDismissKey) === "1") {
       resumeConsumed = true;
-      if (resumeEl) resumeEl.hidden = true;
+      if (resumeEl) {
+        resumeEl.hidden = true;
+        resumeEl.classList.add("is-dismissed");
+      }
     }
   } catch (e) {}
 
@@ -53,42 +64,61 @@
     });
   }
 
-  /* ── Knowledge map: expanded | compact | collapsed ── */
-  function setKnowledgeMode(mode) {
-    root.classList.remove("is-km-expanded", "is-km-compact", "is-km-collapsed");
-    if (mode === "expanded") root.classList.add("is-km-expanded");
-    else if (mode === "compact") root.classList.add("is-km-compact");
-    else root.classList.add("is-km-collapsed");
+  /* ── Unified lesson path: expanded | compact | hidden ── */
+  function setPathMode(mode) {
+    root.classList.remove("is-path-expanded", "is-path-compact", "is-path-hidden", "is-km-expanded", "is-km-compact", "is-km-collapsed");
+    if (mode === "expanded") {
+      root.classList.add("is-path-expanded", "is-km-expanded", "is-path-open");
+    } else if (mode === "compact") {
+      root.classList.add("is-path-compact", "is-km-compact", "is-path-open");
+    } else {
+      root.classList.add("is-path-hidden", "is-km-collapsed");
+      root.classList.remove("is-path-open");
+    }
+    root.querySelectorAll("[data-ap-path-mode]").forEach(function (btn) {
+      btn.classList.toggle("is-active", btn.getAttribute("data-ap-path-mode") === mode);
+    });
     root.querySelectorAll("[data-cm-km-mode]").forEach(function (btn) {
-      btn.classList.toggle("is-active", btn.getAttribute("data-cm-km-mode") === mode);
+      var km = mode === "expanded" ? "expanded" : mode === "compact" ? "compact" : "collapsed";
+      btn.classList.toggle("is-active", btn.getAttribute("data-cm-km-mode") === km);
     });
     try {
-      localStorage.setItem(kmKey, mode);
+      localStorage.setItem(pathKey, mode);
+      localStorage.setItem(kmKey, mode === "hidden" ? "collapsed" : mode);
     } catch (e) {}
   }
 
-  function loadKnowledgeMode() {
+  function loadPathMode() {
+    var mobile = window.matchMedia("(max-width: 1099px)").matches;
     var started = false;
     try {
       started = localStorage.getItem(lessonStartedKey) === "1";
     } catch (e) {}
     var mode = "expanded";
     try {
-      mode = localStorage.getItem(kmKey) || (started ? "compact" : "expanded");
+      mode = localStorage.getItem(pathKey) || (mobile ? "hidden" : started ? "compact" : "expanded");
     } catch (e) {}
-    setKnowledgeMode(mode);
+    if (mobile && !localStorage.getItem(pathKey)) mode = "hidden";
+    setPathMode(mode);
   }
+
+  root.querySelectorAll("[data-ap-path-mode]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setPathMode(btn.getAttribute("data-ap-path-mode"));
+    });
+  });
 
   root.querySelectorAll("[data-cm-km-mode]").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      setKnowledgeMode(btn.getAttribute("data-cm-km-mode"));
+      var km = btn.getAttribute("data-cm-km-mode");
+      setPathMode(km === "collapsed" ? "hidden" : km);
     });
   });
 
   var kmBackdrop = root.querySelector("[data-cm-km-drawer-backdrop]");
   if (kmBackdrop) {
     kmBackdrop.addEventListener("click", function () {
-      root.classList.remove("is-km-mobile-open");
+      root.classList.remove("is-km-mobile-open", "is-path-drawer-open");
       kmBackdrop.hidden = true;
     });
   }
@@ -96,7 +126,7 @@
   var kmOpenBtn = root.querySelector("[data-cm-km-drawer-open]");
   if (kmOpenBtn) {
     kmOpenBtn.addEventListener("click", function () {
-      root.classList.add("is-km-mobile-open");
+      root.classList.add("is-km-mobile-open", "is-path-drawer-open");
       if (kmBackdrop) kmBackdrop.hidden = false;
     });
   }
@@ -105,24 +135,103 @@
     try {
       localStorage.setItem(lessonStartedKey, "1");
     } catch (e) {}
-    if (!root.classList.contains("is-km-expanded") && !root.classList.contains("is-km-collapsed")) return;
-    if (localStorage.getItem(kmKey)) return;
-    setKnowledgeMode("compact");
+    if (!localStorage.getItem(pathKey) && root.classList.contains("is-path-expanded")) {
+      setPathMode("compact");
+    }
   }
+
+  /* ── Sticky compact bar on scroll ── */
+  var stageEl = root.querySelector(".np-cm-slide-stage");
+  function syncStickyChrome() {
+    if (!stickyChrome || !lessonChrome) return;
+    var scrolled = (stageEl && stageEl.scrollTop > 48) || window.scrollY > 80;
+    stickyChrome.hidden = !scrolled;
+    root.classList.toggle("is-chrome-stuck", scrolled);
+  }
+  if (stageEl) stageEl.addEventListener("scroll", syncStickyChrome, { passive: true });
+  window.addEventListener("scroll", syncStickyChrome, { passive: true });
+
+  /* ── Phase stepper ── */
+  var PHASES = ["understand", "learn", "investigate", "explain"];
+
+  function setActivePhase(phase) {
+    if (!phaseStepper) return;
+    phaseStepper.querySelectorAll("[data-ap-phase]").forEach(function (btn) {
+      var on = btn.getAttribute("data-ap-phase") === phase;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-current", on ? "step" : "false");
+    });
+  }
+
+  function phaseFromLabStep(step) {
+    if (step <= 0) return "understand";
+    if (step <= 2) return "investigate";
+    if (step <= 6) return "learn";
+    return "explain";
+  }
+
+  function phaseFromSlideKind(kind) {
+    if (kind === "question" || kind === "practice") return "investigate";
+    if (kind === "example" || kind === "solution") return "learn";
+    if (kind === "closing") return "explain";
+    return "understand";
+  }
+
+  function bindPhaseStepper() {
+    if (!phaseStepper) return;
+    phaseStepper.querySelectorAll("[data-ap-phase]").forEach(function (btn) {
+      if (btn._apBound) return;
+      btn._apBound = true;
+      btn.addEventListener("click", function () {
+        consumeResumeBanner();
+        setActivePhase(btn.getAttribute("data-ap-phase"));
+        var panel = root.querySelector("[data-ap-explore-panel]");
+        var gate = root.querySelector("[data-ap-explore-gate]");
+        if (btn.getAttribute("data-ap-phase") === "investigate" && gate && panel) {
+          gate.hidden = true;
+          panel.hidden = false;
+          window.dispatchEvent(new Event("resize"));
+        }
+      });
+    });
+  }
+
+  document.addEventListener("np-cm-slide-rendered", function (ev) {
+    var kindPill = root.querySelector("[data-cm-kind-pill]");
+    var kind = kindPill ? kindPill.textContent.toLowerCase() : "lesson";
+    setActivePhase(phaseFromSlideKind(kind));
+    if (stickyCounter && ev.detail && ev.detail.index) {
+      var total = root.getAttribute("data-slide-count") || "?";
+      stickyCounter.textContent = ev.detail.index + " / " + total;
+    }
+    bindExploreGates(root);
+    bindPhaseStepper();
+  });
+
+  root.addEventListener("ap-math-lab-state", function (ev) {
+    var d = ev.detail || {};
+    if (d.currentPhase) {
+      setActivePhase(d.currentPhase);
+    } else if (typeof d.labStep === "number") {
+      setActivePhase(phaseFromLabStep(d.labStep));
+    }
+  });
 
   /* ── Resume banner: entry only ── */
   window.ApCalcLessonUI = {
     consumeResumeBanner: consumeResumeBanner,
     markLessonStarted: markLessonStarted,
+    setPathMode: setPathMode,
     isResumeConsumed: function () { return resumeConsumed; },
   };
 
-  /* ── Explore phase gates ── */
+  /* ── Explore / investigation gates ── */
   function bindExploreGates(scope) {
     (scope || root).querySelectorAll("[data-ap-start-investigation]").forEach(function (btn) {
       if (btn._apBound) return;
       btn._apBound = true;
       btn.addEventListener("click", function () {
+        consumeResumeBanner();
         var phase = btn.closest("[data-ap-explore-phase]");
         if (!phase) return;
         var gate = phase.querySelector("[data-ap-explore-gate]");
@@ -130,6 +239,7 @@
         if (gate) gate.hidden = true;
         if (panel) panel.hidden = false;
         markLessonStarted();
+        setActivePhase("investigate");
         window.dispatchEvent(new Event("resize"));
         if (window.MathJax && window.MathJax.typesetPromise) {
           window.MathJax.typesetPromise([phase]).catch(function () {});
@@ -139,22 +249,20 @@
   }
 
   bindExploreGates(root);
-  document.addEventListener("np-cm-slide-rendered", function () {
-    bindExploreGates(root);
-  });
+  bindPhaseStepper();
 
-  /* ── Focus mode: collapse knowledge map ── */
+  /* ── Focus / projector mode ── */
   var focusToggle = root.querySelector("[data-cm-focus-toggle]");
   if (focusToggle) {
     focusToggle.addEventListener("click", function () {
       window.setTimeout(function () {
         if (root.classList.contains("is-focus-mode")) {
-          setKnowledgeMode("collapsed");
-          root.classList.remove("is-path-open");
+          setPathMode("hidden");
         }
       }, 0);
     });
   }
 
-  loadKnowledgeMode();
+  loadPathMode();
+  setActivePhase("understand");
 })();

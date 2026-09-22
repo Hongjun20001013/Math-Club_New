@@ -4,13 +4,30 @@
  */
 
 .np-cm-viewer--ap-calc {
-  --ap-cm-rail-h: 4.75rem;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --ap-radius-control: 10px;
+  --ap-radius-card: 16px;
+  --ap-radius-surface: 20px;
+  --ap-cm-rail-h: calc(4.75rem + 24px);
   --ap-cm-path-expanded: 220px;
-  --ap-cm-path-compact: 72px;
+  --ap-cm-path-compact: 68px;
   --ap-elev-bg: #f3f0ff;
   --ap-elev-card: #ffffff;
   --ap-elev-panel: #faf8ff;
-  gap: 6px;
+  --ap-color-left: #2563eb;
+  --ap-color-right: #ea580c;
+  --ap-color-limit: #6c4eff;
+  --ap-color-fc: #15803d;
+  --ap-content-read: 960px;
+  --ap-content-interactive: 1120px;
+  gap: var(--space-2);
 }
 
 /* ── 1. Compact header (~30% less vertical space) ── */
@@ -498,5 +515,340 @@ body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-resume {
 @media (min-width: 1920px) {
   .np-cm-viewer--ap-calc.is-focus-mode .ap-lab-graph-wrap {
     min-height: min(48vh, 440px);
+  }
+}
+
+/* ══ Phase 1: Global compact header on AP lesson pages ══ */
+body.is-ap-calc-lesson .navbar {
+  padding: var(--space-2) var(--space-4);
+  min-height: 0;
+}
+
+body.is-ap-calc-lesson .track-switcher {
+  display: none;
+}
+
+body.is-ap-calc-lesson .nav-subtitle {
+  display: none;
+}
+
+body.is-ap-calc-lesson .nav-title {
+  font-size: 0.95rem;
+}
+
+body.is-ap-calc-lesson .nav-links a,
+body.is-ap-calc-lesson .nav-links button {
+  font-size: 0.82rem;
+  padding: var(--space-2) var(--space-3);
+}
+
+body.is-ap-calc-lesson .np-app-container {
+  padding-top: var(--space-2);
+}
+
+/* ══ AP lesson chrome (level 2) ══ */
+.np-cm-viewer--ap-calc .ap-lesson-chrome {
+  max-height: 148px;
+  overflow: hidden;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--ap-radius-card);
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-breadcrumb {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin: 0 0 var(--space-1);
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-breadcrumb a {
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-breadcrumb a:hover,
+.np-cm-viewer--ap-calc .ap-lesson-breadcrumb a:focus-visible {
+  color: #43318f;
+  outline: none;
+  text-decoration: underline;
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-title {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-adjacent-nav {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-chrome__sticky {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  max-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  margin: var(--space-2) 0 0;
+  border-radius: var(--ap-radius-control);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(91, 77, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(49, 38, 130, 0.08);
+  font-size: 0.85rem;
+}
+
+.np-cm-viewer--ap-calc .ap-lesson-sticky-title {
+  font-weight: 700;
+  color: #43318f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-cm-viewer--ap-calc.is-chrome-stuck .ap-lesson-chrome__title-row {
+  opacity: 0.35;
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ══ Phase 2: Unified path modes ══ */
+.np-cm-viewer--ap-calc.is-path-expanded {
+  --ap-cm-path-w: var(--ap-cm-path-expanded);
+}
+
+.np-cm-viewer--ap-calc.is-path-compact {
+  --ap-cm-path-w: var(--ap-cm-path-compact);
+}
+
+.np-cm-viewer--ap-calc.is-path-hidden .np-cm-path {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-path-hidden .np-cm-workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.np-cm-viewer--ap-calc .ap-path-mode-toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.np-cm-viewer--ap-calc .ap-path-mode-btn {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  border: 1px solid rgba(91, 77, 255, 0.18);
+  border-radius: var(--ap-radius-control);
+  background: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.np-cm-viewer--ap-calc .ap-path-mode-btn.is-active {
+  background: rgba(91, 77, 255, 0.12);
+  color: #43318f;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-title,
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-kind,
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-path-filters,
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-path-current,
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-knowledge-head {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-btn {
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
+}
+
+@media (max-width: 1099px) {
+  .np-cm-viewer--ap-calc .np-cm-path {
+    display: none;
+  }
+
+  .np-cm-viewer--ap-calc.is-path-drawer-open .np-cm-path {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    width: min(300px, 90vw);
+    overflow-y: auto;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.14);
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-workspace {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* ══ Phase 3: Resume banner — no reserved space ══ */
+.np-cm-viewer--ap-calc .ap-resume-banner[hidden],
+.np-cm-viewer--ap-calc .ap-resume-banner.is-dismissed {
+  display: none !important;
+  margin: 0;
+  padding: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ══ Phase 5: Phase stepper ══ */
+.np-cm-viewer--ap-calc .ap-phase-stepper {
+  margin: 0 var(--space-3) var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--ap-radius-control);
+  background: rgba(248, 246, 255, 0.6);
+  border: 1px solid rgba(91, 77, 255, 0.08);
+}
+
+.np-cm-viewer--ap-calc .ap-phase-stepper__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.np-cm-viewer--ap-calc .ap-phase-stepper__btn {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(91, 77, 255, 0.14);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.np-cm-viewer--ap-calc .ap-phase-stepper__btn.is-active {
+  background: linear-gradient(180deg, #7c4dff 0%, #5b4dff 50%, #4f32f0 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(79, 50, 240, 0.24);
+}
+
+.np-cm-viewer--ap-calc .ap-phase-stepper__btn:focus-visible {
+  outline: 2px solid #5b4dff;
+  outline-offset: 2px;
+}
+
+/* ══ Content width + typography ══ */
+.np-cm-viewer--ap-calc .np-cm-slide-body {
+  max-width: var(--ap-content-read);
+  font-size: max(1.0625rem, 17px);
+  line-height: 1.6;
+}
+
+.np-cm-viewer--ap-calc .np-cm-slide:has(.ap-math-lab) .np-cm-slide-body {
+  max-width: var(--ap-content-interactive);
+}
+
+.np-cm-viewer--ap-calc .np-cm-slide-head h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+/* ══ Phase 8: Graph design ══ */
+.np-cm-viewer--ap-calc .ap-lab-graph-wrap {
+  min-height: min(34vh, 320px);
+  margin: var(--space-3) 0;
+}
+
+.np-cm-viewer--ap-calc .ap-lab-svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 280;
+  max-height: none;
+}
+
+.np-cm-viewer--ap-calc .ap-graph-notice {
+  margin: var(--space-2) 0 var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--ap-radius-control);
+  background: var(--ap-elev-panel);
+  font-size: max(1rem, 16px);
+  line-height: 1.55;
+  color: #374151;
+}
+
+.np-cm-viewer--ap-calc .ap-graph-notice strong {
+  color: #43318f;
+}
+
+.np-cm-viewer--ap-calc [data-ap-tracer-left] {
+  fill: var(--ap-color-left) !important;
+}
+
+.np-cm-viewer--ap-calc [data-ap-tracer-right],
+.np-cm-viewer--ap-calc [data-ap-tracer] {
+  fill: var(--ap-color-right) !important;
+}
+
+.np-cm-viewer--ap-calc [data-ap-filled-0] {
+  fill: var(--ap-color-fc) !important;
+}
+
+.np-cm-viewer--ap-calc [data-ap-target-x] {
+  stroke: var(--ap-color-limit) !important;
+}
+
+/* ══ Projector enhancements ══ */
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-phase-stepper {
+  display: none;
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc .np-cm-slide-body {
+  font-size: max(1.125rem, 18px);
+  max-width: none;
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-lab-graph-wrap {
+  min-height: min(44vh, 420px);
+}
+
+/* ══ Reduced motion ══ */
+@media (prefers-reduced-motion: reduce) {
+  .np-cm-viewer--ap-calc .ap-phase-stepper__btn.is-active {
+    box-shadow: none;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-rail-btn--accent {
+    box-shadow: none;
+  }
+}
+
+/* ══ Mobile touch targets ══ */
+@media (max-width: 767px) {
+  .np-cm-viewer--ap-calc .np-cm-btn,
+  .np-cm-viewer--ap-calc .ap-lab-btn,
+  .np-cm-viewer--ap-calc .np-cm-rail-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .np-cm-viewer--ap-calc .ap-phase-stepper__list {
+    flex-direction: column;
+  }
+
+  .np-cm-viewer--ap-calc .ap-lesson-chrome {
+    max-height: none;
+  }
+
+  .np-cm-viewer--ap-calc .np-cm-hero-actions {
+    flex-wrap: wrap;
   }
 }

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block body_class %}{% if cm_track_class == 'ap-calc' %} is-ap-calc-lesson{% endif %}{% endblock %}
 {% block title %}{{ material.section }} · {{ material.title }} · {{ site_brand_name }}{% endblock %}
 
 {% block extra_css %}
@@ -21,9 +22,16 @@
 <div class="np-page-shell np-page-shell--cm">
 <div class="np-sat-atelier np-cm-viewer np-cm-viewer--u{{ material.unit }}{% if cm_track_class %} np-cm-viewer--{{ cm_track_class }}{% endif %} is-study-on" data-cm-viewer data-lesson-slug="{{ material.slug }}" data-slide-count="{{ material.slide_count }}"{% if pace_training %} data-cm-pace="1" data-cm-pace-seconds="{{ pace_seconds|int }}" data-cm-sat-score-api="{{ url_for('practice_phase3_sat_score_api') }}" data-cm-my-sat-score-api="{{ url_for('practice_course_material_classroom_my_sat_score_api', slug=material.slug) }}"{% endif %}{% if user_logged_in %} data-cm-sync="1" data-cm-progress-api="{{ cm_progress_api }}" data-cm-classroom-active-api="{{ cm_classroom_active_api }}" data-cm-classroom-response-api="{{ cm_classroom_response_api }}" data-cm-classroom-ink-api="{{ cm_classroom_ink_api }}"{% endif %}{% if cm_classroom_summary_api %} data-cm-classroom-summary-api="{{ cm_classroom_summary_api }}" data-cm-classroom-start-api="{{ cm_classroom_start_api }}"{% endif %}{% if cm_classroom_slide_api %} data-cm-classroom-slide-api="{{ cm_classroom_slide_api }}"{% endif %}>
 
-  <header class="np-cm-hero glass-panel np-glass mp-animate-in">
-    <div class="np-cm-hero-top">
+  <header class="np-cm-hero glass-panel np-glass mp-animate-in{% if cm_track_class == 'ap-calc' %} ap-lesson-chrome{% endif %}"{% if cm_track_class == 'ap-calc' %} data-ap-lesson-chrome{% endif %}>
+    <div class="np-cm-hero-top ap-lesson-chrome__row2">
       {% if cm_track_class == 'ap-calc' %}
+      <nav class="ap-lesson-breadcrumb" aria-label="Lesson location">
+        <a href="{{ cm_nav_hub_href|default(url_for('practice')) }}">{{ cm_nav_hub_label|default('AP Calculus') }}</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ cm_all_lessons_href|default(url_for('practice_course_materials')) }}">Unit {{ material.unit }}</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ material.section }}</span>
+      </nav>
       <div class="np-cm-course-dropdown">
         <button type="button" class="np-cm-course-dropdown__toggle" data-cm-course-menu-toggle aria-expanded="false" aria-haspopup="true">
           {{ cm_nav_hub_label|default('AP Calculus') }} · {{ material.section }}
@@ -82,13 +90,15 @@
         <a href="{{ cm_all_lessons_href|default(url_for('practice_course_materials')) }}" class="np-cm-btn np-cm-btn--ghost">All lessons</a>
       </div>
     </div>
-    <div class="np-cm-hero-main">
+    <div class="np-cm-hero-main ap-lesson-chrome__title-row">
       <div class="np-cm-hero-copy">
+        {% if cm_track_class != 'ap-calc' %}
         <p class="np-cm-cinema-kicker">Unit {{ material.unit }} · {{ material.unit_name }}</p>
-        <h1>{{ material.section }} — {{ material.title }}</h1>
+        {% endif %}
+        <h1 class="ap-lesson-title">{{ material.section }} — {{ material.title }}</h1>
       </div>
       <div class="np-cm-hero-stats">
-        <div class="np-cm-mastery" aria-label="Lesson mastery">
+        <div class="np-cm-mastery" aria-label="Lesson mastery" title="Mastery is based on scored work, not pages viewed.">
           <svg class="np-cm-mastery-ring" viewBox="0 0 44 44" aria-hidden="true">
             <circle class="np-cm-mastery-track" cx="22" cy="22" r="18"></circle>
             <circle class="np-cm-mastery-fill" cx="22" cy="22" r="18" data-cm-mastery-ring></circle>
@@ -103,8 +113,14 @@
         </div>
       </div>
     </div>
+    {% if cm_track_class == 'ap-calc' %}
+    <div class="ap-lesson-chrome__sticky" data-ap-sticky-chrome hidden>
+      <span class="ap-lesson-sticky-title">{{ material.section }} — {{ material.title }}</span>
+      <span class="ap-lesson-sticky-counter" data-ap-sticky-counter>1 / {{ material.slide_count }}</span>
+    </div>
+    {% endif %}
     {% if prev_material or next_material %}
-    <nav class="np-cm-lesson-nav" aria-label="Adjacent lessons">
+    <nav class="np-cm-lesson-nav{% if cm_track_class == 'ap-calc' %} ap-lesson-adjacent-nav{% endif %}" aria-label="Adjacent lessons">
       {% if prev_material %}
       <a href="{{ url_for(cm_view_route|default('practice_course_material_view'), slug=prev_material.slug) }}" class="np-cm-lesson-nav-link np-cm-lesson-nav-link--prev" title="{{ prev_material.title }}">
         <span class="np-cm-lesson-nav-dir">← {{ prev_material.section }}</span>
@@ -128,6 +144,13 @@
           <span>Lesson path</span>
           <span class="np-cm-path-toggle-icon" aria-hidden="true">☰</span>
         </button>
+        {% if cm_track_class == 'ap-calc' %}
+        <div class="ap-path-mode-toggle" role="group" aria-label="Lesson path size">
+          <button type="button" class="ap-path-mode-btn" data-ap-path-mode="expanded" title="Expanded path">Exp</button>
+          <button type="button" class="ap-path-mode-btn is-active" data-ap-path-mode="compact" title="Compact path">Cmp</button>
+          <button type="button" class="ap-path-mode-btn" data-ap-path-mode="hidden" title="Hide path">—</button>
+        </div>
+        {% endif %}
         <button type="button" class="np-cm-outline-close" data-cm-toggle-outline aria-label="Close lesson path">×</button>
       </div>
       <div class="np-cm-path-filters" role="tablist" aria-label="Filter slides">
@@ -217,6 +240,17 @@
         </div>
       </header>
 
+      {% if cm_track_class == 'ap-calc' %}
+      <nav class="ap-phase-stepper" data-ap-phase-stepper aria-label="Learning phases">
+        <ol class="ap-phase-stepper__list">
+          <li><button type="button" class="ap-phase-stepper__btn is-active" data-ap-phase="understand">Understand</button></li>
+          <li><button type="button" class="ap-phase-stepper__btn" data-ap-phase="learn">Learn</button></li>
+          <li><button type="button" class="ap-phase-stepper__btn" data-ap-phase="investigate">Investigate</button></li>
+          <li><button type="button" class="ap-phase-stepper__btn" data-ap-phase="explain">Explain</button></li>
+        </ol>
+      </nav>
+      {% endif %}
+
       <div class="np-cm-coach" data-cm-coach>
         <div class="np-cm-coach-icon" aria-hidden="true">💡</div>
         <div class="np-cm-coach-body">
@@ -230,7 +264,7 @@
       </div>
       <div class="np-cm-hint-panel" data-cm-hint-panel hidden></div>
 
-      <div class="np-cm-resume" data-cm-resume hidden>
+      <div class="np-cm-resume ap-resume-banner" data-cm-resume hidden>
         <p class="np-cm-resume-text" data-cm-resume-text></p>
         <div class="np-cm-resume-actions">
           <button type="button" class="np-cm-resume-btn np-cm-resume-btn--accent" data-cm-resume-go>Resume</button>

@@ -482,7 +482,7 @@ _LAB_SVG_H = 280
 def secant_math_lab_embed(spec_json: str) -> str:
     inner = (
         '<div class="ap-lab-phase ap-lab-phase--predict">'
-        '<p class="ap-lab-phase__label">A · Predict</p>'
+        '<p class="ap-lab-phase__label">Understand</p>'
         '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize? What tangent slope do you predict?</p>'
         '<div class="ap-lab-predict-btns">'
         '<button type="button" class="ap-lab-btn" data-ap-predict="increase">Increases</button>'
@@ -492,7 +492,7 @@ def secant_math_lab_embed(spec_json: str) -> str:
         '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
         "</div>"
         '<div class="ap-lab-phase ap-lab-phase--explore">'
-        '<p class="ap-lab-phase__label">B · Explore</p>'
+        '<p class="ap-lab-phase__label">Investigate</p>'
         '<div class="ap-lab-explore">'
         '<div class="ap-lab-controls" data-ap-controls></div>'
         '<label class="ap-lab-slider-label" for="ap-secant-h">'
@@ -529,7 +529,7 @@ def secant_math_lab_embed(spec_json: str) -> str:
         "</div>"
         "</div></div>"
         '<div class="ap-lab-phase ap-lab-phase--explain">'
-        '<p class="ap-lab-phase__label">C · Explain</p>'
+        '<p class="ap-lab-phase__label">Explain</p>'
         '<p>Why can we use h → 0 but not h = 0?</p>'
         '<div class="ap-lab-predict-btns">'
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain="h-not-zero">h → 0, h ≠ 0</button>'
@@ -561,11 +561,15 @@ def secant_math_lab_embed(spec_json: str) -> str:
     ), lab_mod="secant")
 
 
+def _graph_notice(text: str) -> str:
+    return f'<p class="ap-graph-notice"><strong>What to notice:</strong> {text}</p>'
+
+
 def _explore_phase_gate(explore_html: str, cta: str = "Start investigation") -> str:
     return (
         '<div class="ap-slide-phase ap-slide-phase--explore" data-ap-explore-phase>'
         '<div class="ap-explore-gate" data-ap-explore-gate>'
-        '<p class="ap-explore-gate__label">Phase B · Explore</p>'
+        '<p class="ap-explore-gate__label">Investigate</p>'
         '<p class="ap-explore-gate__prompt">Use the graph to trace one-sided limits, lock observations, and compare.</p>'
         f'<button type="button" class="ap-lab-btn ap-lab-btn--primary ap-explore-gate__btn" '
         f'data-ap-start-investigation>{cta}</button>'
@@ -594,9 +598,12 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         f'<div class="ap-lab-case-models">{case_models}</div>'
         '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
         '<div class="ap-lab-phase ap-lab-phase--predict">'
-        '<p class="ap-lab-phase__label">Phase A · Learn</p>'
+        '<p class="ap-lab-phase__label">Understand</p>'
         '<p class="ap-lab-phase__prompt">Read the case model. Before tracing, predict whether left and right approach heights agree.</p>'
         "</div></div>"
+        + _graph_notice(
+            "Left and right branch heights near c determine the limit; open vs filled points show limit vs function value."
+        )
     )
     explore = (
         '<div class="ap-lab-explore">'
@@ -674,7 +681,7 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         )
     explore = (
         '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
-        '<p class="ap-lab-phase__label">0 · Predict</p>'
+        '<p class="ap-lab-phase__label">Understand · Predict</p>'
         '<p class="ap-lab-phase__prompt">Before tracing: estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
         '<div class="ap-lab-predict-grid">'
         '<label>L⁻ ≈ <input type="text" class="ap-lab-input" data-ap-predict-left placeholder="?" inputmode="decimal"/></label>'
