@@ -144,14 +144,8 @@ def build(graphs: dict[str, str]) -> dict:
         "Case gallery: continuity types",
         phase_divider("Visual Investigation", "Compare discontinuity types")
         + role("Visual", "Four graph stories", "Same limit language — different pictures.")
-        + '<div class="ap-graph-grid ap-graph-grid--gallery">'
-        + fig(g["limit_case_a_gallery"], "Continuous", cls="ap-fig--gallery", notice=NOTICE_LIMIT_EQ_FC)
-        + fig(g["removable_hole_gallery"], "Removable hole", cls="ap-fig--gallery", notice=NOTICE_HOLE)
-        + fig(g["jump_at_3_gallery"], "Jump", cls="ap-fig--gallery", notice=NOTICE_JUMP_DNE)
-        + fig(g["infinite_limit_13_gallery"], "Infinite (extension)", cls="ap-fig--gallery", notice=NOTICE_INFINITE)
-        + "</div>"
         + '<p class="ap-prose-after-math"><em>Discontinuity preview</em> — formal classification in Section 1.10. '
-        "Use the interactive lab below to trace each case.</p>"
+        "Pick a case tab, predict from the graph beside your answers, then trace each scenario.</p>"
         + limit_tracer_embed(),
         path_phase="Visual Investigation",
     )

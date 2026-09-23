@@ -1848,6 +1848,29 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin-bottom: 0.65rem;
 }
 
+.ap-lab-predict-grid--stacked {
+  grid-template-columns: 1fr;
+}
+
+.ap-lab-body--tracer .ap-lab-predict-grid--stacked label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.84rem;
+}
+
+.ap-lab-body--tracer .ap-lab-predict-grid--stacked .ap-lab-input {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.ap-lab-explore-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
 .ap-lab-trace-side__label {
   margin: 0 0 0.35rem;
   font-size: 0.78rem;

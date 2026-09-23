@@ -1439,6 +1439,7 @@
 
   OneSidedLimitTracer.prototype._syncPanels = function () {
     var predictPanel = this.root.querySelector("[data-ap-predict-panel]");
+    var exploreStack = this.root.querySelector("[data-ap-explore-stack]");
     var leftPanel = this.root.querySelector("[data-ap-trace-left-panel]");
     var rightPanel = this.root.querySelector("[data-ap-trace-right-panel]");
     var lockLeft = this.root.querySelector("[data-ap-lock-left-panel]");
@@ -1446,7 +1447,9 @@
     var compare = this.root.querySelector("[data-ap-compare-panel]");
     var fc = this.root.querySelector("[data-ap-fc-panel]");
     var explain = this.root.querySelector("[data-ap-explain-panel]");
-    if (predictPanel) predictPanel.hidden = this.step > 0;
+    var gatedExplore = !this.predictDone && this.step === 0;
+    if (predictPanel) predictPanel.hidden = !gatedExplore;
+    if (exploreStack) exploreStack.hidden = gatedExplore;
     if (leftPanel) leftPanel.hidden = this.step < 1 || this.step > 2;
     if (lockLeft) lockLeft.hidden = this.step !== 2;
     if (rightPanel) rightPanel.hidden = this.step < 3 || this.step > 4;
@@ -1454,14 +1457,12 @@
     if (compare) compare.hidden = this.step !== 5;
     if (fc) fc.hidden = this.step !== 6;
     if (explain) explain.hidden = this.step < 7;
-    var gatedExplore = !this.predictDone && this.step === 0;
-    var split = this.root.querySelector(".ap-lab-body--split");
-    if (split) split.hidden = gatedExplore;
-    var dash = this.root.querySelector("[data-ap-dashboard]");
-    if (dash) dash.hidden = gatedExplore;
+    var sideTitle = this.root.querySelector("[data-ap-side-title]");
+    if (sideTitle) sideTitle.textContent = gatedExplore ? "Predict" : "Current action";
     var tutor = this.root.querySelector("[data-ap-tutor]");
     if (tutor) tutor.hidden = gatedExplore;
     this._updateDashboard();
+    this._draw();
   };
 
   OneSidedLimitTracer.prototype._updateDashboard = function () {

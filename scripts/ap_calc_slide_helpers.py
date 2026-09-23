@@ -704,22 +704,6 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         "</div>"
         )
     explore = (
-        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
-        '<p class="ap-lab-phase__label">Understand · Predict</p>'
-        '<p class="ap-lab-phase__prompt">Before tracing: estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
-        '<div class="ap-lab-predict-grid">'
-        '<label>L⁻ ≈ <input type="text" class="ap-lab-input" data-ap-predict-left placeholder="?" inputmode="decimal"/></label>'
-        '<label>L⁺ ≈ <input type="text" class="ap-lab-input" data-ap-predict-right placeholder="?" inputmode="decimal"/></label>'
-        '<label>Two-sided exists? '
-        '<select class="ap-lab-input" data-ap-predict-two><option value="">—</option>'
-        '<option value="yes">Yes</option><option value="no">No</option><option value="unsure">Unsure</option></select></label>'
-        '<label>f(c) affects limit? '
-        '<select class="ap-lab-input" data-ap-predict-fc><option value="">—</option>'
-        '<option value="no">No — branches decide</option><option value="yes">Yes</option></select></label>'
-        "</div>"
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict-submit>Submit prediction</button>'
-        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
-        "</div>"
         '<div class="ap-lab-body ap-lab-body--split ap-lab-body--tracer">'
         '<div class="ap-lab-main ap-lab-main--graph">'
         '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
@@ -737,8 +721,25 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div></div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
-        '<p class="ap-lab-side__title">Current action</p>'
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab actions">'
+        '<p class="ap-lab-side__title" data-ap-side-title>Predict</p>'
+        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
+        '<p class="ap-lab-phase__label">Understand · Predict</p>'
+        '<p class="ap-lab-phase__prompt">Use the graph to estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
+        '<div class="ap-lab-predict-grid ap-lab-predict-grid--stacked">'
+        '<label>L⁻ ≈ <input type="text" class="ap-lab-input" data-ap-predict-left placeholder="?" inputmode="decimal"/></label>'
+        '<label>L⁺ ≈ <input type="text" class="ap-lab-input" data-ap-predict-right placeholder="?" inputmode="decimal"/></label>'
+        '<label>Two-sided exists? '
+        '<select class="ap-lab-input" data-ap-predict-two><option value="">—</option>'
+        '<option value="yes">Yes</option><option value="no">No</option><option value="unsure">Unsure</option></select></label>'
+        '<label>f(c) affects limit? '
+        '<select class="ap-lab-input" data-ap-predict-fc><option value="">—</option>'
+        '<option value="no">No — branches decide</option><option value="yes">Yes</option></select></label>'
+        "</div>"
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict-submit>Submit prediction</button>'
+        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
+        "</div>"
+        '<div class="ap-lab-explore-stack" data-ap-explore-stack hidden>'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
@@ -793,7 +794,7 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         'placeholder="Both branches approach…; f(c) is separate…"></textarea></label>'
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain-submit>Check explanation</button>'
         '<p class="ap-lab-feedback" data-ap-explain-feedback hidden></p>'
-        "</div>"
+        "</div></div>"
         '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
         '<p class="ap-lab-dashboard__title">Observation dashboard</p>'
         '<p data-ap-step="0" class="ap-lab-step is-active">0 · Predict</p>'

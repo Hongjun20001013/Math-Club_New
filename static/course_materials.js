@@ -3815,6 +3815,18 @@
   }
 
   function setOutlineOpen(open) {
+    if (root.classList.contains("np-cm-viewer--ap-calc")) {
+      if (open && root.classList.contains("is-path-hidden") && window.ApCalcLessonUI && window.ApCalcLessonUI.setPathMode) {
+        window.ApCalcLessonUI.setPathMode("compact");
+      }
+      var mobilePath = window.matchMedia("(max-width: 1099px)").matches;
+      if (mobilePath) {
+        root.classList.toggle("is-path-drawer-open", open);
+        root.classList.toggle("is-km-mobile-open", open);
+        var kmBackdrop = root.querySelector("[data-cm-km-drawer-backdrop]");
+        if (kmBackdrop) kmBackdrop.hidden = !open;
+      }
+    }
     root.classList.toggle("is-path-open", open);
     outlineToggles.forEach(function (btn) {
       btn.setAttribute("aria-pressed", open ? "true" : "false");

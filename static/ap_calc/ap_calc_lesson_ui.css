@@ -849,6 +849,15 @@ body.is-ap-calc-lesson .np-app-container {
   padding: 0.65rem 0.75rem;
 }
 
+.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-phase--predict {
+  margin-bottom: 0.35rem;
+}
+
+.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-side--action .ap-lab-phase__prompt {
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
 .np-cm-viewer--ap-calc .ap-lab-graph-wrap--primary {
   max-width: none;
   margin: 0;
