@@ -554,233 +554,13 @@ def _secant_dashboard_html() -> str:
     return _lab_protocol_dashboard(protocol, instruments)
 
 
-def _limit_dashboard_html() -> str:
-    protocol = (
-        (0, "Predict"),
-        (1, "Trace left"),
-        (2, "Lock L⁻"),
-        (3, "Trace right"),
-        (4, "Lock L⁺"),
-        (5, "Compare"),
-    )
-    instruments = (
-        "<dt>f(x)</dt><dd data-d-fx>—</dd>"
-        '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
-        '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
-        "<dt>Limit</dt><dd data-d-limit>—</dd>"
-        "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
-    )
-    return _lab_protocol_dashboard(protocol, instruments)
-
-
 _LAB_VIEWBOX = "0 0 480 280"
 _LAB_SVG = 480
 _LAB_SVG_H = 280
 
 
-def secant_math_lab_embed(spec_json: str) -> str:
-    graph_svg = (
-        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
-        f'<svg class="ap-lab-svg ap-secant-svg" viewBox="{_LAB_VIEWBOX}" role="img" '
-        'aria-label="Secant and tangent on s(t)=t²+1">'
-        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
-        '<line data-ap-run stroke="#ea580c" stroke-width="2.5" stroke-dasharray="5 3"/>'
-        '<line data-ap-rise stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5 3"/>'
-        '<path data-ap-curve fill="none" stroke="#6c4eff" stroke-width="2.5"/>'
-        '<line data-ap-secant-halo stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>'
-        '<line data-ap-secant stroke="#475569" stroke-width="4" stroke-linecap="round"/>'
-        '<line data-ap-tangent stroke="#059669" stroke-width="2" stroke-dasharray="6 4"/>'
-        '<circle data-ap-fixed r="7" fill="#6c4eff"/>'
-        '<circle data-ap-moving r="5" fill="#fff" stroke="#2563eb" stroke-width="2"/>'
-        "</svg></div>"
-    )
-    inner = (
-        '<div class="ap-lab-body ap-lab-body--split ap-lab-body--secant">'
-        '<div class="ap-lab-main ap-lab-main--graph">'
-        + graph_svg
-        + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
-        "</div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
-        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
-        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
-        '<p class="ap-lab-phase__label">Predict</p>'
-        '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize to one value?</p>'
-        '<div class="ap-lab-predict-btns">'
-        '<button type="button" class="ap-lab-btn" data-ap-predict="increase">Keeps increasing</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-predict="decrease">Keeps decreasing</button>'
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict="stabilize-4">Stabilizes to one value</button>'
-        "</div>"
-        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
-        "</div>"
-        '<div class="ap-lab-explore-stack" data-ap-explore-stack hidden>'
-        '<div class="ap-lab-controls" data-ap-controls></div>'
-        '<label class="ap-lab-slider-label" for="ap-secant-h">'
-        'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
-        '<input type="range" id="ap-secant-h" class="ap-range ap-lab-range" '
-        'data-ap-h-slider aria-label="Secant interval h in seconds"/>'
-        '<p class="ap-formula-readout" data-ap-formula-val></p>'
-        '<table class="ap-lab-table"><thead><tr><th>h</th><th>Δs</th><th>Δs/h</th><th>From → To</th></tr></thead>'
-        '<tbody data-ap-table-body></tbody></table>'
-        '<div class="ap-lab-explain-panel" data-ap-explain-panel hidden>'
-        '<p class="ap-lab-phase__label">Explain</p>'
-        '<p>Why can we use h → 0 but not h = 0?</p>'
-        '<div class="ap-lab-predict-btns">'
-        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain="h-not-zero">h → 0, h ≠ 0</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-explain="h-zero-ok">h = 0 is fine</button>'
-        "</div>"
-        '<p class="ap-lab-feedback" data-ap-explain-result hidden></p>'
-        '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
-        '<span class="ap-box-label">Formal conclusion</span>'
-        '<div class="ap-box-body">Instantaneous rate at t = 2 is <strong>4 m/s</strong>. '
-        "Left and right secant slopes approach 4; tangent slope 4.</div></div>"
-        "</div></div>"
-        + _secant_dashboard_html()
-        + "</aside></div>"
-        '<div class="ap-lab-tutor" data-ap-tutor>'
-        '<p data-ap-tutor-text>Need a nudge? Tap for a hint (Level 1).</p>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
-        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
-        '<strong>Reflection:</strong> In your own words, explain why the answer holds.</p>'
-        "</div>"
-    )
-    controls_note = (
-        '<button type="button" class="ap-lab-btn" data-ap-action="left">Approach from left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="right">Approach from right</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="animate">Animate h→0</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="reveal-tangent">Reveal tangent</button>'
-    )
-    return _math_lab_shell(spec_json, inner.replace(
-        '<div class="ap-lab-controls" data-ap-controls></div>',
-        '<div class="ap-lab-controls" data-ap-controls>' + controls_note + "</div>",
-    ), lab_mod="secant")
-
-
-def _graph_notice(text: str) -> str:
-    return f'<p class="ap-graph-notice"><strong>What to notice:</strong> {text}</p>'
-
-
-def _explore_phase_gate(explore_html: str, cta: str = "Start investigation") -> str:
+def _tracer_graph_svg_html() -> str:
     return (
-        '<div class="ap-slide-phase ap-slide-phase--explore" data-ap-explore-phase>'
-        '<div class="ap-explore-gate" data-ap-explore-gate>'
-        '<p class="ap-explore-gate__label">Investigate</p>'
-        '<p class="ap-explore-gate__prompt">Use the graph to trace one-sided limits, lock observations, and compare.</p>'
-        f'<button type="button" class="ap-lab-btn ap-lab-btn--primary ap-explore-gate__btn" '
-        f'data-ap-start-investigation>{cta}</button>'
-        "</div>"
-        f'<div class="ap-explore-panel ap-elevation-panel" data-ap-explore-panel hidden>{explore_html}</div>'
-        "</div>"
-    )
-
-
-def limit_cases_math_lab_embed(spec_json: str) -> str:
-    from ap_calc_math_lab_specs import limit_cases_lab_12
-
-    case_models = "".join(
-        f'<div class="ap-lab-case-model" data-ap-case-model="{i}"{" hidden" if i else ""}>'
-        f"{case_model_from_spec(case)}</div>"
-        for i, case in enumerate(limit_cases_lab_12()["cases"])
-    )
-    inner = (
-        '<div class="ap-lab-case-tabs">'
-        '<button type="button" class="ap-lab-case-tab is-active" data-ap-case="0">A</button>'
-        '<button type="button" class="ap-lab-case-tab" data-ap-case="1">B</button>'
-        '<button type="button" class="ap-lab-case-tab" data-ap-case="2">C</button>'
-        '<button type="button" class="ap-lab-case-tab" data-ap-case="3">D</button>'
-        "</div>"
-        '<h3 class="ap-lab-case-title" data-ap-case-title></h3>'
-        f'<div class="ap-lab-case-models">{case_models}</div>'
-        '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
-        '<div class="ap-lab-phase ap-lab-phase--predict">'
-        '<p class="ap-lab-phase__label">Understand</p>'
-        '<p class="ap-lab-phase__prompt">Read the case model. Before tracing, predict whether left and right approach heights agree.</p>'
-        "</div></div>"
-        + _graph_notice(
-            "Left and right branch heights near c determine the limit; open vs filled points show limit vs function value."
-        )
-    )
-    graph_svg = (
-        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
-        f'<svg class="ap-lab-svg ap-lab-svg--limit" viewBox="{_LAB_VIEWBOX}" role="img" aria-label="Limit case graph">'
-        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
-        '<g data-ap-plot-layer>'
-        '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.25"/>'
-        '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.25"/>'
-        '<line data-ap-target-x stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4 3"/>'
-        '<path data-ap-branch="0" data-ap-curve fill="none" stroke-width="2.5"/>'
-        '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
-        '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
-        '<circle data-ap-tracer r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
-        "</g></svg></div>"
-    )
-    explore = (
-        '<div class="ap-lab-explore ap-lab-body ap-lab-body--split ap-lab-body--limit">'
-        '<div class="ap-lab-main ap-lab-main--graph">'
-        + graph_svg
-        + '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
-        "</div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
-        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Trace left</p>'
-        '<div class="ap-lab-controls">'
-        '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
-        "</div>"
-        '<label for="ap-limit-x">x = <strong data-ap-x-read>2.60</strong></label>'
-        '<input type="range" id="ap-limit-x" class="ap-range ap-lab-range" data-ap-x-slider '
-        'aria-label="Trace x toward c"/>'
-        '<div class="ap-lab-lock-row">'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left observation</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right observation</button>'
-        "</div>"
-        + _limit_dashboard_html()
-        + "</aside></div>"
-        + _tracer_tutor_panel()
-    )
-    inner = inner + _explore_phase_gate(explore)
-    return _math_lab_shell(spec_json, inner, lab_mod="limit")
-
-
-def _tracer_tutor_panel() -> str:
-    return (
-        '<div class="ap-lab-tutor" data-ap-tutor>'
-        '<p class="ap-lab-tutor__status" data-ap-tutor-status>Try first — then ask for help.</p>'
-        '<p data-ap-tutor-text data-ap-tutor-tag=""></p>'
-        '<div class="ap-lab-tutor-actions">'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="hint">Need a hint?</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="mistake">Explain my mistake</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="why">Ask why</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="similar">Similar problem</button>'
-        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="check-explain">Check my explanation</button>'
-        "</div>"
-        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
-        '<strong>Reflection:</strong> In your own words, explain why the filled point does not change the limit.</p>'
-        "</div>"
-    )
-
-
-def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bool = False) -> str:
-    learn = ""
-    if not minimal_learn:
-        learn = (
-        '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
-        '<div class="ap-lab-scenario-tabs" data-ap-scenario-tabs>'
-        '<button type="button" class="ap-lab-scenario-tab is-active" data-ap-scenario="0">Continuous</button>'
-        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="1">Hole</button>'
-        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="2">Hole + value</button>'
-        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="3">Jump</button>'
-        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="4">Endpoint</button>'
-        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="5">Infinite</button>'
-        "</div>"
-        '<p class="ap-lab-scenario-note" data-ap-scenario-note></p>'
-        "</div>"
-        )
-    explore = (
-        '<div class="ap-lab-body ap-lab-body--split ap-lab-body--tracer">'
-        '<div class="ap-lab-main ap-lab-main--graph">'
         '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
         f'<svg class="ap-lab-svg ap-trace-svg" viewBox="{_LAB_VIEWBOX}" role="img">'
         f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
@@ -795,12 +575,17 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
         '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
-        "</g></svg></div></div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
-        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
+        "</g></svg></div>"
+    )
+
+
+def _tracer_predict_panel_html(
+    prompt: str = "Use the graph to estimate L⁻, L⁺, and whether f(c) affects the limit.",
+) -> str:
+    return (
         '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
         '<p class="ap-lab-phase__label">Understand · Predict</p>'
-        '<p class="ap-lab-phase__prompt">Use the graph to estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
+        f'<p class="ap-lab-phase__prompt">{prompt}</p>'
         '<div class="ap-lab-predict-grid ap-lab-predict-grid--stacked">'
         '<label>L⁻ ≈ <input type="text" class="ap-lab-input" data-ap-predict-left placeholder="?" inputmode="decimal"/></label>'
         '<label>L⁺ ≈ <input type="text" class="ap-lab-input" data-ap-predict-right placeholder="?" inputmode="decimal"/></label>'
@@ -814,6 +599,11 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict-submit>Submit prediction</button>'
         '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
         "</div>"
+    )
+
+
+def _tracer_explore_stack_html() -> str:
+    return (
         '<div class="ap-lab-explore-stack" data-ap-explore-stack hidden>'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
@@ -870,11 +660,212 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain-submit>Check explanation</button>'
         '<p class="ap-lab-feedback" data-ap-explain-feedback hidden></p>'
         "</div></div>"
+    )
+
+
+def _tracer_explore_aside_html(predict_prompt: str | None = None) -> str:
+    prompt = predict_prompt or "Use the graph to estimate L⁻, L⁺, and whether f(c) affects the limit."
+    return (
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
+        + _tracer_predict_panel_html(prompt)
+        + _tracer_explore_stack_html()
         + _tracer_dashboard_html()
-        + "</aside></div>"
+        + "</aside>"
+    )
+
+
+def _lab_conclusion_html(body: str) -> str:
+    return (
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'
-        '<div class="ap-box-body" data-ap-conclusion-body>Use Left → Right → Compare → Value on every graph.</div></div>'
+        f'<div class="ap-box-body" data-ap-conclusion-body>{body}</div></div>'
+    )
+
+
+def _tracer_explore_split_html(
+    body_mod: str,
+    predict_prompt: str | None = None,
+    side_msg: bool = False,
+) -> str:
+    msg = '<p class="ap-lab-side-msg" data-ap-side-msg></p>' if side_msg else ""
+    return (
+        f'<div class="ap-lab-body ap-lab-body--split {body_mod}">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        + _tracer_graph_svg_html()
+        + msg
+        + "</div>"
+        + _tracer_explore_aside_html(predict_prompt)
+        + "</div>"
+    )
+
+
+def secant_math_lab_embed(spec_json: str) -> str:
+    graph_svg = (
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
+        f'<svg class="ap-lab-svg ap-secant-svg" viewBox="{_LAB_VIEWBOX}" role="img" '
+        'aria-label="Secant and tangent on s(t)=t²+1">'
+        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
+        '<line data-ap-run stroke="#ea580c" stroke-width="2.5" stroke-dasharray="5 3"/>'
+        '<line data-ap-rise stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5 3"/>'
+        '<path data-ap-curve fill="none" stroke="#6c4eff" stroke-width="2.5"/>'
+        '<line data-ap-secant-halo stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>'
+        '<line data-ap-secant stroke="#475569" stroke-width="4" stroke-linecap="round"/>'
+        '<line data-ap-tangent stroke="#059669" stroke-width="2" stroke-dasharray="6 4"/>'
+        '<circle data-ap-fixed r="7" fill="#6c4eff"/>'
+        '<circle data-ap-moving r="5" fill="#fff" stroke="#2563eb" stroke-width="2"/>'
+        "</svg></div>"
+    )
+    inner = (
+        '<div class="ap-lab-body ap-lab-body--split ap-lab-body--secant">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        + graph_svg
+        + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
+        "</div>"
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
+        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
+        '<p class="ap-lab-phase__label">Predict</p>'
+        '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize to one value?</p>'
+        '<div class="ap-lab-predict-btns">'
+        '<button type="button" class="ap-lab-btn" data-ap-predict="increase">Keeps increasing</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-predict="decrease">Keeps decreasing</button>'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict="stabilize-4">Stabilizes to one value</button>'
+        "</div>"
+        '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
+        "</div>"
+        '<div class="ap-lab-explore-stack" data-ap-explore-stack hidden>'
+        '<div class="ap-lab-controls" data-ap-controls></div>'
+        '<div class="ap-lab-preset-row" data-ap-h-presets></div>'
+        '<label class="ap-lab-slider-label" for="ap-secant-h">'
+        'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
+        '<input type="range" id="ap-secant-h" class="ap-range ap-lab-range" '
+        'data-ap-h-slider aria-label="Secant interval h in seconds"/>'
+        '<p class="ap-formula-readout" data-ap-formula-val></p>'
+        '<table class="ap-lab-table"><thead><tr><th>h</th><th>Δs</th><th>Δs/h</th><th>From → To</th></tr></thead>'
+        '<tbody data-ap-table-body></tbody></table>'
+        '<div class="ap-lab-explain-panel" data-ap-explain-panel hidden>'
+        '<p class="ap-lab-phase__label">Explain</p>'
+        '<p>Why can we use h → 0 but not h = 0?</p>'
+        '<div class="ap-lab-predict-btns">'
+        '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain="h-not-zero">h → 0, h ≠ 0</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-explain="h-zero-ok">h = 0 is fine</button>'
+        "</div>"
+        '<p class="ap-lab-feedback" data-ap-explain-result hidden></p>'
+        '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
+        '<span class="ap-box-label">Formal conclusion</span>'
+        '<div class="ap-box-body">Instantaneous rate at t = 2 is <strong>4 m/s</strong>. '
+        "Left and right secant slopes approach 4; tangent slope 4.</div></div>"
+        "</div></div>"
+        + _secant_dashboard_html()
+        + "</aside></div>"
+        + _tracer_tutor_panel()
+    )
+    controls_note = (
+        '<button type="button" class="ap-lab-btn" data-ap-action="left">Approach from left</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="right">Approach from right</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="animate">Animate h→0</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="reset">Reset</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-action="reveal-tangent">Reveal tangent</button>'
+    )
+    return _math_lab_shell(spec_json, inner.replace(
+        '<div class="ap-lab-controls" data-ap-controls></div>',
+        '<div class="ap-lab-controls" data-ap-controls>' + controls_note + "</div>",
+    ), lab_mod="secant")
+
+
+def _graph_notice(text: str) -> str:
+    return f'<p class="ap-graph-notice"><strong>What to notice:</strong> {text}</p>'
+
+
+def _explore_phase_gate(explore_html: str, cta: str = "Start investigation") -> str:
+    return (
+        '<div class="ap-slide-phase ap-slide-phase--explore" data-ap-explore-phase>'
+        '<div class="ap-explore-gate" data-ap-explore-gate>'
+        '<p class="ap-explore-gate__label">Investigate</p>'
+        '<p class="ap-explore-gate__prompt">Use the graph to trace one-sided limits, lock observations, and compare.</p>'
+        f'<button type="button" class="ap-lab-btn ap-lab-btn--primary ap-explore-gate__btn" '
+        f'data-ap-start-investigation>{cta}</button>'
+        "</div>"
+        f'<div class="ap-explore-panel ap-elevation-panel" data-ap-explore-panel hidden>{explore_html}</div>'
+        "</div>"
+    )
+
+
+def limit_cases_math_lab_embed(spec_json: str) -> str:
+    from ap_calc_math_lab_specs import limit_cases_lab_12
+
+    case_models = "".join(
+        f'<div class="ap-lab-case-model" data-ap-case-model="{i}"{" hidden" if i else ""}>'
+        f"{case_model_from_spec(case)}</div>"
+        for i, case in enumerate(limit_cases_lab_12()["cases"])
+    )
+    predict_prompt = (
+        "Read the case model. Estimate L⁻, L⁺, and whether the two-sided limit exists before tracing."
+    )
+    inner = (
+        '<div class="ap-lab-case-tabs">'
+        '<button type="button" class="ap-lab-case-tab is-active" data-ap-case="0">A</button>'
+        '<button type="button" class="ap-lab-case-tab" data-ap-case="1">B</button>'
+        '<button type="button" class="ap-lab-case-tab" data-ap-case="2">C</button>'
+        '<button type="button" class="ap-lab-case-tab" data-ap-case="3">D</button>'
+        "</div>"
+        '<h3 class="ap-lab-case-title" data-ap-case-title></h3>'
+        f'<div class="ap-lab-case-models">{case_models}</div>'
+        + _graph_notice(
+            "Left and right branch heights near c determine the limit; open vs filled points show limit vs function value."
+        )
+    )
+    explore = (
+        _tracer_explore_split_html(
+            "ap-lab-body--limit ap-lab-body--tracer",
+            predict_prompt=predict_prompt,
+            side_msg=True,
+        )
+        + _lab_conclusion_html("Use Left → Right → Compare → Value on every graph.")
+        + _tracer_tutor_panel()
+    )
+    inner = inner + _explore_phase_gate(explore)
+    return _math_lab_shell(spec_json, inner, lab_mod="limit")
+
+
+def _tracer_tutor_panel() -> str:
+    return (
+        '<div class="ap-lab-tutor" data-ap-tutor>'
+        '<p class="ap-lab-tutor__status" data-ap-tutor-status>Try first — then ask for help.</p>'
+        '<p data-ap-tutor-text data-ap-tutor-tag=""></p>'
+        '<div class="ap-lab-tutor-actions">'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="hint">Need a hint?</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="mistake">Explain my mistake</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="why">Ask why</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="similar">Similar problem</button>'
+        '<button type="button" class="ap-lab-btn" data-ap-tutor-action="check-explain">Check my explanation</button>'
+        "</div>"
+        '<p class="ap-lab-reflection" data-ap-reflection hidden>'
+        '<strong>Reflection:</strong> In your own words, explain why the filled point does not change the limit.</p>'
+        "</div>"
+    )
+
+
+def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bool = False) -> str:
+    learn = ""
+    if not minimal_learn:
+        learn = (
+        '<div class="ap-slide-phase ap-slide-phase--learn ap-elevation-card">'
+        '<div class="ap-lab-scenario-tabs" data-ap-scenario-tabs>'
+        '<button type="button" class="ap-lab-scenario-tab is-active" data-ap-scenario="0">Continuous</button>'
+        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="1">Hole</button>'
+        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="2">Hole + value</button>'
+        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="3">Jump</button>'
+        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="4">Endpoint</button>'
+        '<button type="button" class="ap-lab-scenario-tab" data-ap-scenario="5">Infinite</button>'
+        "</div>"
+        '<p class="ap-lab-scenario-note" data-ap-scenario-note></p>'
+        "</div>"
+        )
+    explore = (
+        _tracer_explore_split_html("ap-lab-body--tracer")
+        + _lab_conclusion_html("Use Left → Right → Compare → Value on every graph.")
         + _tracer_tutor_panel()
     )
     inner = learn + (_explore_phase_gate(explore) if gated else explore)

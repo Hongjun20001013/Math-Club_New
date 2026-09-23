@@ -7,6 +7,13 @@ Design principles (student-first, spec-driven):
 - Interactive smart graphs: draggable tracers/sliders so students *see* approach behavior.
 - Mathematical accuracy is mandatory — branch formulas, limits, and f(c) must match the spec.
 - One source of truth: lesson visuals, static SVGs, and JS labs all derive from these specs.
+
+Gold-standard lab pattern (1.1–1.3, reuse for 1.4+):
+- Spec in this file: labType, lessonId, slideId, scenarios/cases, tutor_context_for_spec().
+- HTML via ap_calc_slide_helpers: _math_lab_shell + _tracer_explore_split_html (graph labs)
+  or secant_math_lab_embed (rate labs).
+- Runtime: SecantTangentLab (1.1) or OneSidedLimitTracer (1.2, 1.3) in ap_calc_math_lab.js.
+- Protocol dashboard: predict gate → stepped explore → typed locks → compare → f(c) → explain.
 """
 from __future__ import annotations
 
@@ -127,13 +134,19 @@ def limit_cases_lab_12() -> dict[str, Any]:
             "whatToNotice": "Unequal one-sided limits ⇒ two-sided limit DNE.",
         },
     ]
+    scenarios = [
+        enrich_scenario({**case, "previewNote": case.get("verbal", "")})
+        for case in cases
+    ]
     base: dict[str, Any] = {
         "id": "limit-cases-12",
         "lessonId": "1.2",
         "slideId": "1.2-4",
-        "labType": "GraphCaseSwitcher",
+        "labType": "OneSidedLimitTracer",
         "learningObjective": "Distinguish limit behavior from function value in four contrast cases.",
         "cases": cases,
+        "scenarios": scenarios,
+        "showScenarioTabs": False,
         "misconceptionTags": [
             "limit-equals-function-value",
             "swaps-input-output-targets",

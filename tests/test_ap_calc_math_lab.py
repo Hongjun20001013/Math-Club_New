@@ -66,6 +66,12 @@ class SecantMathTests(unittest.TestCase):
 
 
 class LimitCaseTests(unittest.TestCase):
+    def test_limit_lab_uses_tracer_runtime(self):
+        spec = limit_cases_lab_12()
+        self.assertEqual(spec["labType"], "OneSidedLimitTracer")
+        self.assertEqual(len(spec["scenarios"]), 4)
+        self.assertIn("allowedTracerValues", spec["scenarios"][0])
+
     def test_unequal_one_sided_dne(self):
         cases = limit_cases_lab_12()["cases"]
         case_d = next(c for c in cases if c["id"] == "case-d")

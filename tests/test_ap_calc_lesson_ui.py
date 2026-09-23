@@ -214,7 +214,8 @@ class LessonUIAssetTests(unittest.TestCase):
         js = MATH_LAB_JS.read_text(encoding="utf-8")
         self.assertIn("function updateLabProtocol", js)
         self.assertIn("SECANT_STEP_LABELS", js)
-        self.assertIn("LIMIT_STEP_LABELS", js)
+        self.assertIn("_syncCaseChrome", js)
+        self.assertNotIn("GraphCaseSwitcher", js)
 
     def test_tracer_lab_graph_left_controls_right(self) -> None:
         from ap_calc_slide_helpers import tracer_math_lab_embed
@@ -250,19 +251,27 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("data-d-h", html)
         self.assertIn("data-d-left-est", html)
         self.assertIn("data-d-right-est", html)
+        self.assertIn("data-ap-h-presets", html)
+        self.assertIn("data-ap-tutor-action", html)
         self.assertNotIn("ap-lab-estimates", html)
 
     def test_limit_lab_protocol_dashboard(self) -> None:
         from ap_calc_slide_helpers import limit_cases_math_lab_embed
         from ap_calc_math_lab_specs import limit_cases_lab_12, spec_json
 
-        html = limit_cases_math_lab_embed(spec_json(limit_cases_lab_12()))
+        spec = limit_cases_lab_12()
+        self.assertEqual(spec["labType"], "OneSidedLimitTracer")
+        self.assertEqual(len(spec["scenarios"]), 4)
+        html = limit_cases_math_lab_embed(spec_json(spec))
         explore_idx = html.index("ap-lab-body--limit")
         dash_idx = html.index("data-ap-dashboard", explore_idx)
-        self.assertIn("data-d-fx", html)
-        self.assertIn("data-d-limit", html)
+        self.assertIn("data-ap-predict-panel", html)
+        self.assertIn("data-ap-trace-left-slider", html)
+        self.assertIn("data-ap-lock-left-submit", html)
+        self.assertIn("data-d-left", html)
+        self.assertIn("data-d-two", html)
         self.assertIn("ap-lab-protocol-track", html)
-        self.assertNotIn("data-ap-limit-panel", html)
+        self.assertNotIn("data-ap-x-slider", html)
 
     def test_lab_slide_workstation_mode(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")

@@ -675,15 +675,6 @@
     "Explain",
   ];
 
-  var LIMIT_STEP_LABELS = [
-    "Predict",
-    "Trace left",
-    "Lock L⁻",
-    "Trace right",
-    "Lock L⁺",
-    "Compare",
-  ];
-
   function updateLabProtocol(root, step, labels, instruments) {
     var dash = root.querySelector("[data-ap-dashboard]");
     if (!dash) return;
@@ -721,9 +712,32 @@
     this.animTimer = null;
     this.tutor = new ContextualTutor(root, spec);
     this._bind();
+    this._buildHPresets();
     this._syncPanels();
     this._render();
   }
+
+  SecantTangentLab.prototype._buildHPresets = function () {
+    var container = this.root.querySelector("[data-ap-h-presets]");
+    if (!container) return;
+    var picks = [-1, -0.1, -0.01, 0.01, 0.1, 1];
+    container.innerHTML = "";
+    var self = this;
+    picks.forEach(function (h) {
+      var idx = self.hValues.indexOf(h);
+      if (idx < 0) return;
+      var label = h > 0 ? "+" + h : String(h);
+      var btn = el("button", "ap-lab-btn ap-lab-btn--preset", label);
+      btn.type = "button";
+      btn.addEventListener("click", function () {
+        self.hIndex = idx;
+        var slider = self.root.querySelector("[data-ap-h-slider]");
+        if (slider) slider.value = idx;
+        self._render();
+      });
+      container.appendChild(btn);
+    });
+  };
 
   SecantTangentLab.prototype.s = function (t) {
     return safeEval(this.spec.functionDefinition, t);
@@ -782,6 +796,8 @@
         ? "Controls · Predict"
         : "Controls · " + (SECANT_STEP_LABELS[this.step] || "Explore");
     }
+    var tutor = this.root.querySelector("[data-ap-tutor]");
+    if (tutor) tutor.hidden = gatedExplore;
     this._updateDashboard();
   };
 
@@ -998,242 +1014,6 @@
     if (moving) { moving.setAttribute("cx", cx1); moving.setAttribute("cy", cy1); }
   };
 
-  function branchY(spec, branch, x) {
-    return safeEval(branch.fn, x);
-  }
-
-  function GraphCaseSwitcher(root, spec) {
-    _lastRoot = root;
-    this.root = root;
-    this.spec = spec;
-    this.caseIndex = 0;
-    this.leftDone = false;
-    this.rightDone = false;
-    this.leftObs = "";
-    this.rightObs = "";
-    this.step = 1;
-    this.currentY = null;
-    this.tutor = new ContextualTutor(root, spec);
-    this._bind();
-    this._renderCase();
-  }
-
-  GraphCaseSwitcher.prototype.current = function () {
-    return this.spec.cases[this.caseIndex];
-  };
-
-  GraphCaseSwitcher.prototype._bind = function () {
-    var self = this;
-    this.root.querySelectorAll("[data-ap-case]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        self.caseIndex = parseInt(btn.getAttribute("data-ap-case"), 10) || 0;
-        self.leftDone = false;
-        self.rightDone = false;
-        self._renderCase();
-      });
-    });
-    var slider = this.root.querySelector("[data-ap-x-slider]");
-    if (slider) {
-      slider.addEventListener("input", function () { self._trace(parseFloat(slider.value)); });
-    }
-    this.root.querySelectorAll("[data-ap-action]").forEach(function (btn) {
-      btn.addEventListener("click", function () { self._action(btn.getAttribute("data-ap-action")); });
-    });
-    this.root.querySelector("[data-ap-lock-left]")?.addEventListener("click", function () { self._lockSide("left"); });
-    this.root.querySelector("[data-ap-lock-right]")?.addEventListener("click", function () { self._lockSide("right"); });
-  };
-
-  GraphCaseSwitcher.prototype._updateDashboard = function () {
-    var c = this.current();
-    var same = c.leftLimit != null && c.rightLimit != null && c.leftLimit === c.rightLimit;
-    updateLabProtocol(this.root, this.step, LIMIT_STEP_LABELS, {
-      "[data-d-fx]": this.currentY != null ? formatTracerY(this.currentY, c) : "—",
-      "[data-d-left]": this.leftDone ? this.leftObs : "—",
-      "[data-d-right]": this.rightDone ? this.rightObs : "—",
-      "[data-d-limit]": this.leftDone && this.rightDone
-        ? (c.twoSidedLimit != null ? String(c.twoSidedLimit) : "DNE")
-        : "—",
-      "[data-d-fc]": this.leftDone && this.rightDone
-        ? (c.functionValue != null ? String(c.functionValue) : "undefined")
-        : "—",
-    });
-    var sideTitle = this.root.querySelector("[data-ap-side-title]");
-    if (sideTitle) {
-      sideTitle.textContent = "Controls · " + (LIMIT_STEP_LABELS[this.step] || "Explore");
-    }
-    if (this.step >= 5) {
-      var dash = this.root.querySelector("[data-ap-dashboard]");
-      var sameNode = dash && dash.querySelector("[data-d-limit]");
-      if (sameNode && this.leftDone && this.rightDone) {
-        sameNode.textContent = (c.twoSidedLimit != null ? String(c.twoSidedLimit) : "DNE")
-          + (same ? " (same)" : " (diff)");
-      }
-    }
-  };
-
-  GraphCaseSwitcher.prototype._action = function (action) {
-    var c = this.current();
-    var slider = this.root.querySelector("[data-ap-x-slider]");
-    if (!slider) return;
-    var self = this;
-    if (action === "trace-left" || action === "left") {
-      this.step = Math.max(this.step, 1);
-      this._animateTrace("left", approachEndpoint(c.targetX, "left", c.domainMin), function (x) {
-        slider.value = x;
-        self._trace(x);
-      });
-    }
-    if (action === "trace-right" || action === "right") {
-      this.step = Math.max(this.step, 3);
-      this._animateTrace("right", approachEndpoint(c.targetX, "right", c.domainMin), function (x) {
-        slider.value = x;
-        self._trace(x);
-      });
-    }
-    if (action === "reset") {
-      this.leftDone = false;
-      this.rightDone = false;
-      this.leftObs = "";
-      this.rightObs = "";
-      this.step = 1;
-      this.tutor.reset();
-      this._renderCase();
-    }
-  };
-
-  GraphCaseSwitcher.prototype._animateTrace = function (side, endX, onFrame) {
-    var c = this.current();
-    var startX = side === "left" ? c.targetX - 0.4 : c.targetX + 0.4;
-    startX = clampTracerX(startX, c.targetX, side, c.domainMin);
-    if (prefersReducedMotion()) {
-      onFrame(endX);
-      return;
-    }
-    var frames = 12;
-    var step = 0;
-    var timer = setInterval(function () {
-      step += 1;
-      var t = step / frames;
-      var x = startX + (endX - startX) * t;
-      x = clampTracerX(x, c.targetX, side, c.domainMin);
-      onFrame(x);
-      if (step >= frames) clearInterval(timer);
-    }, 40);
-  };
-
-  GraphCaseSwitcher.prototype._yAt = function (x) {
-    return evaluateScenarioY(this.current(), x, false);
-  };
-
-  GraphCaseSwitcher.prototype._syncCaseModel = function () {
-    var self = this;
-    this.root.querySelectorAll("[data-ap-case-model]").forEach(function (panel) {
-      var idx = parseInt(panel.getAttribute("data-ap-case-model"), 10) || 0;
-      panel.hidden = idx !== self.caseIndex;
-    });
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      window.MathJax.typesetPromise([this.root]).catch(function () {});
-    }
-  };
-
-  GraphCaseSwitcher.prototype._trace = function (x) {
-    var c = this.current();
-    var side = x < c.targetX ? "left" : "right";
-    if (Math.abs(x - c.targetX) < TRACER_EPS) {
-      x = approachEndpoint(c.targetX, side, c.domainMin);
-    } else {
-      x = clampTracerX(x, c.targetX, side, c.domainMin);
-    }
-    var y = this._yAt(x);
-    this.currentY = y;
-    this.tutor.setContext({ caseId: c.id, caseIndex: this.caseIndex, leftDone: this.leftDone, rightDone: this.rightDone });
-    this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) {
-      n.textContent = formatApproachX(x, c.targetX, side).replace("x = ", "").replace("x → ", "");
-    });
-    if (side === "left") {
-      this.step = Math.max(this.step, 1);
-      this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the left toward x = " + c.targetX;
-    } else {
-      this.step = Math.max(this.step, 3);
-      this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the right toward x = " + c.targetX;
-    }
-    this._updateDashboard();
-    this._drawCase(x, y);
-  };
-
-  GraphCaseSwitcher.prototype._lockSide = function (side) {
-    var c = this.current();
-    if (side === "left") {
-      this.leftDone = true;
-      this.leftObs = String(c.leftLimit);
-      this.step = Math.max(this.step, 2);
-    } else {
-      this.rightDone = true;
-      this.rightObs = String(c.rightLimit);
-      this.step = Math.max(this.step, 4);
-    }
-    if (this.leftDone && this.rightDone) {
-      this.step = 5;
-    }
-    this._updateDashboard();
-  };
-
-  GraphCaseSwitcher.prototype._renderCase = function () {
-    var self = this;
-    var c = this.current();
-    this.root.querySelectorAll("[data-ap-case]").forEach(function (btn) {
-      var idx = parseInt(btn.getAttribute("data-ap-case"), 10) || 0;
-      btn.classList.toggle("is-active", idx === self.caseIndex);
-    });
-    var title = this.root.querySelector("[data-ap-case-title]");
-    if (title) title.textContent = "Case " + c.label + ": " + c.title;
-    var slider = this.root.querySelector("[data-ap-x-slider]");
-    if (slider) {
-      slider.min = c.targetX - 0.5;
-      slider.max = c.targetX + 0.5;
-      slider.step = 0.001;
-      slider.value = clampTracerX(c.targetX - 0.4, c.targetX, "left", c.domainMin);
-    }
-    this.leftDone = false;
-    this.rightDone = false;
-    this.leftObs = "";
-    this.rightObs = "";
-    this.step = 1;
-    this._syncCaseModel();
-    this._trace(parseFloat(slider.value));
-    this._updateDashboard();
-  };
-
-  GraphCaseSwitcher.prototype._drawCase = function (x, y) {
-    var c = this.current();
-    var svg = this.root.querySelector(".ap-lab-svg");
-    if (!svg) return;
-    var bounds = computePlotBounds(c.branches, c.openPoints, c.closedPoints, c.targetX);
-    var plot = new SVGPlot(svg, bounds);
-    plot.drawTargetX(c.targetX);
-    c.branches.forEach(function (br, i) {
-      var path = svg.querySelector("[data-ap-branch='" + i + "']") || svg.querySelector("[data-ap-curve]");
-      if (!path) return;
-      var d = plot.pathFromFn(br.fn, br.x0, br.x1);
-      path.setAttribute("d", d);
-      path.setAttribute("stroke", br.color || COLORS.curve);
-      path.style.display = d ? "" : "none";
-    });
-    var branch1 = svg.querySelector("[data-ap-branch='1']");
-    if (branch1 && c.branches.length < 2) branch1.style.display = "none";
-    var i;
-    for (i = 0; i < 2; i++) {
-      var op = (c.openPoints || [])[i];
-      var sel = "[data-ap-open-" + i + "]";
-      setPoint(svg, sel, op ? op.x : NaN, op ? op.y : NaN, plot, !!op);
-      var ptEl = svg.querySelector(sel);
-      if (ptEl && op && c.branches[i]) ptEl.setAttribute("stroke", c.branches[i].color || COLORS.curve);
-    }
-    var closed0 = (c.closedPoints || [])[0];
-    setPoint(svg, "[data-ap-filled-0]", closed0 ? closed0.x : NaN, closed0 ? closed0.y : NaN, plot, !!closed0);
-    setPoint(svg, "[data-ap-tracer]", x, y, plot, isFinite(y));
-  };
-
   function OneSidedLimitTracer(root, spec) {
     _lastRoot = root;
     this.root = root;
@@ -1263,11 +1043,38 @@
     if (tabs && this.spec.showScenarioTabs === false) tabs.hidden = true;
   };
 
+  OneSidedLimitTracer.prototype._syncCaseChrome = function () {
+    var self = this;
+    var sc = this.scenario();
+    this.root.querySelectorAll("[data-ap-case]").forEach(function (btn) {
+      var idx = parseInt(btn.getAttribute("data-ap-case"), 10) || 0;
+      btn.classList.toggle("is-active", idx === self.scenarioIndex);
+    });
+    var title = this.root.querySelector("[data-ap-case-title]");
+    if (title && sc.label) {
+      title.textContent = "Case " + sc.label + ": " + (sc.title || "");
+    }
+    this.root.querySelectorAll("[data-ap-case-model]").forEach(function (panel) {
+      var idx = parseInt(panel.getAttribute("data-ap-case-model"), 10) || 0;
+      panel.hidden = idx !== self.scenarioIndex;
+    });
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([this.root]).catch(function () {});
+    }
+  };
+
   OneSidedLimitTracer.prototype._bind = function () {
     var self = this;
     this.root.querySelectorAll("[data-ap-scenario]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         self.scenarioIndex = parseInt(btn.getAttribute("data-ap-scenario"), 10) || 0;
+        self._resetFlow();
+        self._renderScenario();
+      });
+    });
+    this.root.querySelectorAll("[data-ap-case]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        self.scenarioIndex = parseInt(btn.getAttribute("data-ap-case"), 10) || 0;
         self._resetFlow();
         self._renderScenario();
       });
@@ -1525,6 +1332,8 @@
     if (read) read.textContent = formatApproachX(x, sc.targetX, "left");
     if (yEl) yEl.textContent = formatTracerY(y, sc);
     if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
+    var sideMsg = this.root.querySelector("[data-ap-side-msg]");
+    if (sideMsg) sideMsg.textContent = "Tracing from the left toward x = " + sc.targetX;
     if (this.predictDone && Math.abs(x - sc.targetX) <= 0.11) {
       this.step = Math.max(this.step, 2);
       this._syncPanels();
@@ -1551,6 +1360,8 @@
     if (read) read.textContent = formatApproachX(x, sc.targetX, "right");
     if (yEl) yEl.textContent = formatTracerY(y, sc);
     if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
+    var sideMsgR = this.root.querySelector("[data-ap-side-msg]");
+    if (sideMsgR) sideMsgR.textContent = "Tracing from the right toward x = " + sc.targetX;
     if (this.leftLocked != null && Math.abs(x - sc.targetX) <= 0.11) {
       this.step = Math.max(this.step, 4);
       this._syncPanels();
@@ -1658,7 +1469,8 @@
       btn.classList.toggle("is-active", idx === self.scenarioIndex);
     });
     var note = this.root.querySelector("[data-ap-scenario-note]");
-    if (note) note.textContent = sc.previewNote || "";
+    if (note) note.textContent = sc.previewNote || sc.verbal || "";
+    this._syncCaseChrome();
     var c = sc.targetX;
     var domainMin = sc.domainMin != null ? sc.domainMin : c - 2;
     var leftSlider = this.root.querySelector("[data-ap-trace-left-slider]");
@@ -1739,7 +1551,6 @@
     root._apMathLabInit = true;
     var type = spec.labType;
     if (type === "SecantTangentLab") new SecantTangentLab(root, spec);
-    else if (type === "GraphCaseSwitcher") new GraphCaseSwitcher(root, spec);
     else if (type === "OneSidedLimitTracer") new OneSidedLimitTracer(root, spec);
   }
 
