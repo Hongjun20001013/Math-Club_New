@@ -474,12 +474,57 @@ def exit_ticket(items: list[tuple[str, str]]) -> str:
 
 def _math_lab_shell(spec_json: str, inner: str, lab_mod: str = "") -> str:
     mod_cls = f" ap-math-lab--{lab_mod}" if lab_mod else ""
+    bench_titles = {
+        "secant": "Secant slope experiment",
+        "limit": "One-sided limit experiment",
+        "tracer": "Discontinuity tracer",
+    }
+    bench_title = bench_titles.get(lab_mod, "Math lab")
     return (
-        f'<div class="ap-math-lab tex2jax_ignore{mod_cls}" data-ap-math-lab>'
+        f'<div class="ap-math-lab ap-lab-bench tex2jax_ignore{mod_cls}" data-ap-math-lab>'
         f'<script type="application/json" data-ap-lab-spec>{spec_json}</script>'
-        f"{inner}"
+        '<header class="ap-lab-bench__head">'
+        '<span class="ap-lab-bench__kicker">Interactive lab</span>'
+        f'<span class="ap-lab-bench__title">{bench_title}</span>'
+        '<span class="ap-lab-bench__status" data-ap-bench-status>Ready</span>'
+        "</header>"
+        f'<div class="ap-lab-bench__body">{inner}</div>'
         '<div class="sr-only" data-ap-live aria-live="polite"></div>'
         "</div>"
+    )
+
+
+def _tracer_dashboard_html() -> str:
+    protocol = (
+        (0, "Predict"),
+        (1, "Left"),
+        (2, "Lock L⁻"),
+        (3, "Right"),
+        (4, "Lock L⁺"),
+        (5, "Compare"),
+        (6, "f(c)"),
+        (7, "Explain"),
+    )
+    steps = "".join(
+        f'<li class="ap-lab-step" data-ap-step="{n}" title="{label}">{n}</li>'
+        for n, label in protocol
+    )
+    return (
+        '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Lab instruments">'
+        '<div class="ap-lab-protocol">'
+        '<p class="ap-lab-step-now" data-ap-step-now>'
+        '<span class="ap-lab-step-now__kicker">Current step</span>'
+        '<span class="ap-lab-step-now__text" data-ap-step-now-text>Predict</span>'
+        "</p>"
+        f'<ol class="ap-lab-protocol-track" aria-label="Protocol">{steps}</ol>'
+        "</div>"
+        '<dl class="ap-lab-instruments ap-lab-dash-stats">'
+        '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
+        '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
+        "<dt>Same?</dt><dd data-d-same>—</dd>"
+        "<dt>Two-sided</dt><dd data-d-two>—</dd>"
+        "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
+        "</dl></div>"
     )
 
 
@@ -522,8 +567,8 @@ def secant_math_lab_embed(spec_json: str) -> str:
         + graph_svg
         + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
         "</div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
-        '<p class="ap-lab-side__title">Current action</p>'
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title">Controls</p>'
         '<div class="ap-lab-controls" data-ap-controls></div>'
         '<label class="ap-lab-slider-label" for="ap-secant-h">'
         'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
@@ -643,8 +688,8 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         + graph_svg
         + '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
         "</div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
-        '<p class="ap-lab-side__title">Current action</p>'
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title">Controls</p>'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
@@ -721,8 +766,8 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
         "</g></svg></div></div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab actions">'
-        '<p class="ap-lab-side__title" data-ap-side-title>Predict</p>'
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
         '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
         '<p class="ap-lab-phase__label">Understand · Predict</p>'
         '<p class="ap-lab-phase__prompt">Use the graph to estimate L⁻, L⁺, and whether f(c) affects the limit.</p>'
@@ -795,23 +840,8 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain-submit>Check explanation</button>'
         '<p class="ap-lab-feedback" data-ap-explain-feedback hidden></p>'
         "</div></div>"
-        '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
-        '<p class="ap-lab-dashboard__title">Observation dashboard</p>'
-        '<p data-ap-step="0" class="ap-lab-step is-active">0 · Predict</p>'
-        '<p data-ap-step="1" class="ap-lab-step">1 · Explore left</p>'
-        '<p data-ap-step="2" class="ap-lab-step">2 · Lock L⁻</p>'
-        '<p data-ap-step="3" class="ap-lab-step">3 · Explore right</p>'
-        '<p data-ap-step="4" class="ap-lab-step">4 · Lock L⁺</p>'
-        '<p data-ap-step="5" class="ap-lab-step">5 · Compare</p>'
-        '<p data-ap-step="6" class="ap-lab-step">6 · Inspect f(c)</p>'
-        '<p data-ap-step="7" class="ap-lab-step">7 · Explain</p>'
-        '<dl class="ap-lab-dash-stats">'
-        '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
-        '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
-        "<dt>Same?</dt><dd data-d-same>—</dd>"
-        "<dt>Two-sided</dt><dd data-d-two>—</dd>"
-        "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
-        "</dl></div></aside></div>"
+        + _tracer_dashboard_html()
+        + "</aside></div>"
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'
         '<div class="ap-box-body" data-ap-conclusion-body>Use Left → Right → Compare → Value on every graph.</div></div>'

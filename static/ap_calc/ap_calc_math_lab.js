@@ -1437,6 +1437,17 @@
     });
   };
 
+  var TRACER_STEP_LABELS = [
+    "Predict",
+    "Explore left",
+    "Lock L⁻",
+    "Explore right",
+    "Lock L⁺",
+    "Compare",
+    "Inspect f(c)",
+    "Explain",
+  ];
+
   OneSidedLimitTracer.prototype._syncPanels = function () {
     var predictPanel = this.root.querySelector("[data-ap-predict-panel]");
     var exploreStack = this.root.querySelector("[data-ap-explore-stack]");
@@ -1458,7 +1469,11 @@
     if (fc) fc.hidden = this.step !== 6;
     if (explain) explain.hidden = this.step < 7;
     var sideTitle = this.root.querySelector("[data-ap-side-title]");
-    if (sideTitle) sideTitle.textContent = gatedExplore ? "Predict" : "Current action";
+    if (sideTitle) {
+      sideTitle.textContent = gatedExplore
+        ? "Controls · Predict"
+        : "Controls · " + (TRACER_STEP_LABELS[this.step] || "Explore");
+    }
     var tutor = this.root.querySelector("[data-ap-tutor]");
     if (tutor) tutor.hidden = gatedExplore;
     this._updateDashboard();
@@ -1486,6 +1501,12 @@
       node.classList.toggle("is-done", n < this.step);
       node.classList.toggle("is-active", n === this.step);
     }.bind(this));
+    var stepNow = dash.querySelector("[data-ap-step-now-text]");
+    if (stepNow) stepNow.textContent = TRACER_STEP_LABELS[this.step] || "Explore";
+    var benchStatus = this.root.querySelector("[data-ap-bench-status]");
+    if (benchStatus) {
+      benchStatus.textContent = "Step " + this.step + " · " + (TRACER_STEP_LABELS[this.step] || "Explore");
+    }
   };
 
   OneSidedLimitTracer.prototype._buildPresets = function (side) {

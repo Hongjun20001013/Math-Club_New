@@ -1525,14 +1525,62 @@ html[data-exam-theme="dark"] .ap-data-table td {
   }
 }
 
-/* ═══ Interactive Math Lab ═══ */
-.ap-math-lab {
-  margin: 0.85rem 0;
-  padding: 0.85rem 1rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(108, 78, 255, 0.16);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(243, 236, 251, 0.92));
-  box-shadow: 0 14px 40px rgba(79, 47, 216, 0.08);
+/* ═══ Interactive Math Lab (experiment bench) ═══ */
+.ap-math-lab,
+.ap-lab-bench {
+  margin: 0.65rem 0;
+  border-radius: 14px;
+  border: 1px solid rgba(79, 47, 216, 0.18);
+  background: #f5f2fc;
+  box-shadow: 0 10px 32px rgba(79, 47, 216, 0.1);
+  overflow: hidden;
+}
+
+.ap-lab-bench__head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.85rem;
+  background: linear-gradient(90deg, #4f2fd8 0%, #6c4eff 100%);
+  color: #fff;
+  font-size: 0.76rem;
+}
+
+.ap-lab-bench__kicker {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.ap-lab-bench__title {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.ap-lab-bench__status {
+  margin-left: auto;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.ap-lab-bench__body {
+  padding: 0.75rem 0.85rem 0.9rem;
+}
+
+.ap-lab-scenario-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.ap-lab-scenario-tab {
+  font-size: 0.76rem;
 }
 
 .ap-lab-phase {
@@ -1599,11 +1647,16 @@ html[data-exam-theme="dark"] .ap-data-table td {
 }
 
 .ap-lab-graph-wrap {
-  margin: 0.5rem auto 0;
+  margin: 0.35rem auto 0;
   border-radius: 0.65rem;
-  border: 1px solid rgba(108, 78, 255, 0.12);
-  background: #faf8ff;
+  border: 1px solid rgba(108, 78, 255, 0.14);
+  background:
+    linear-gradient(rgba(108, 78, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 78, 255, 0.04) 1px, transparent 1px),
+    #fff;
+  background-size: 18px 18px;
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .ap-lab-graph-wrap--interactive {
@@ -1804,34 +1857,123 @@ body.is-cm-projector .np-cm-viewer--ap-calc .ap-fig--wide img {
 }
 
 .ap-lab-dashboard {
-  margin: 0.75rem 0 1rem;
-  padding: 0.85rem 1rem;
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(108, 78, 255, 0.12);
+  margin: 0.5rem 0 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(108, 78, 255, 0.14);
 }
 
-.ap-lab-step {
-  margin: 0.2rem 0;
-  font-size: 0.82rem;
+.ap-lab-protocol {
+  margin-bottom: 0.45rem;
+}
+
+.ap-lab-step-now {
+  margin: 0 0 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.ap-lab-step-now__kicker {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: #6f658c;
 }
 
-.ap-lab-step.is-active {
+.ap-lab-step-now__text {
+  font-size: 0.92rem;
+  font-weight: 800;
   color: #4f2fd8;
-  font-weight: 700;
 }
 
-.ap-lab-step.is-done {
-  color: #059669;
+.ap-lab-protocol-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
+.ap-lab-protocol-track .ap-lab-step {
+  width: 1.65rem;
+  height: 1.65rem;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #6f658c;
+  background: rgba(108, 78, 255, 0.08);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.ap-lab-protocol-track .ap-lab-step.is-active {
+  color: #fff;
+  background: #4f2fd8;
+  border-color: #4f2fd8;
+  box-shadow: 0 0 0 2px rgba(79, 47, 216, 0.2);
+}
+
+.ap-lab-protocol-track .ap-lab-step.is-done {
+  color: #fff;
+  background: #059669;
+  border-color: #059669;
+}
+
+.ap-lab-instruments,
 .ap-lab-dash-stats {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.25rem 0.75rem;
-  margin: 0.65rem 0 0;
-  font-size: 0.84rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.5rem;
+  background: rgba(248, 246, 255, 0.95);
+  border: 1px solid rgba(108, 78, 255, 0.1);
+  font-size: 0.78rem;
+}
+
+.ap-lab-instruments dt,
+.ap-lab-dash-stats dt {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6f658c;
+}
+
+.ap-lab-instruments dd,
+.ap-lab-dash-stats dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #161022;
+}
+
+.ap-lab-side--action {
+  border-left: 3px solid rgba(79, 47, 216, 0.35);
+  padding-left: 0.65rem;
+}
+
+.ap-math-lab--secant .ap-secant-metrics {
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.5rem;
+  background: rgba(248, 246, 255, 0.95);
+  border: 1px solid rgba(108, 78, 255, 0.1);
+}
+
+@media (max-width: 720px) {
+  .ap-lab-instruments,
+  .ap-lab-dash-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .ap-lab-tutor {

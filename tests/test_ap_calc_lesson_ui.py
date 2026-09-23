@@ -225,6 +225,16 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertLess(predict_idx, dash_idx)
         self.assertIn("ap-lab-graph-wrap--primary", html)
         self.assertIn("data-ap-explore-stack", html)
+        self.assertIn("ap-lab-bench__head", html)
+        self.assertIn("ap-lab-protocol-track", html)
+        self.assertIn("data-ap-step-now-text", html)
+
+    def test_lab_slide_workstation_mode(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        js = LESSON_UI_JS.read_text(encoding="utf-8")
+        self.assertIn(".is-lab-slide", css)
+        self.assertIn("syncLabSlideLayout", js)
+        self.assertIn("ap-lab-bench", css)
 
     def test_path_open_restores_hidden_mode(self) -> None:
         js = COURSE_MATERIALS_JS.read_text(encoding="utf-8")

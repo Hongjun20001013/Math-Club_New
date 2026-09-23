@@ -960,6 +960,69 @@ body.is-ap-calc-lesson .np-app-container {
   margin: 0;
 }
 
+/* ══ Lab slide = experiment workstation (not lecture slide) ══ */
+.np-cm-viewer--ap-calc.is-lab-slide .np-cm-slide-head {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .np-cm-slide-body {
+  max-width: none;
+  padding-top: 0.25rem;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .cm-slide-role,
+.np-cm-viewer--ap-calc.is-lab-slide .ap-phase-divider,
+.np-cm-viewer--ap-calc.is-lab-slide .ap-prose-after-math {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-slide-phase--learn {
+  margin-bottom: 0.35rem;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-lab-scenario-note {
+  margin: 0 0 0.35rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #43318f;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-math-lab {
+  margin: 0;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-lab-body--split,
+.np-cm-viewer--ap-calc.is-lab-slide .ap-lab-body--tracer {
+  min-height: min(58vh, 620px);
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .np-cm-slide-head,
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .np-cm-deck-chrome-tools {
+  display: none !important;
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-bench__head {
+  padding: 0.4rem 0.75rem;
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-graph-wrap,
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-svg {
+  min-height: min(54vh, 560px);
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-instruments,
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-dash-stats {
+  font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .np-cm-slide-stage {
+  padding-bottom: calc(var(--ap-cm-rail-h) * 0.35);
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-lab-tutor {
+  display: none !important;
+}
+
 .np-cm-viewer--ap-calc .cm-strategy-details {
   margin-bottom: var(--space-3);
   border: 1px solid rgba(91, 77, 255, 0.14);

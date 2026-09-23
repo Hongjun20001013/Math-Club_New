@@ -216,9 +216,15 @@
     root.classList.toggle("is-intro-slide", !!isIntro);
   }
 
+  function syncLabSlideLayout(slideEl) {
+    var hasLab = slideEl && slideEl.querySelector("[data-ap-math-lab]");
+    root.classList.toggle("is-lab-slide", !!hasLab);
+  }
+
   document.addEventListener("np-cm-slide-rendered", function (ev) {
     var slideEl = root.querySelector("[data-cm-slide]");
     syncIntroLayout(slideEl);
+    syncLabSlideLayout(slideEl);
     syncPhaseStepperVisibility(slideEl);
     if (stickyCounter && ev.detail && ev.detail.index) {
       var total = root.getAttribute("data-slide-count") || "?";
@@ -297,6 +303,7 @@
   bindPhaseStepper();
   var initialSlide = root.querySelector("[data-cm-slide]");
   syncIntroLayout(initialSlide);
+  syncLabSlideLayout(initialSlide);
   syncPhaseStepperVisibility(initialSlide);
 
   loadPathMode();
