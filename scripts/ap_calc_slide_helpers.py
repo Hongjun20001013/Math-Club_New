@@ -825,7 +825,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         + _lab_conclusion_html("Use Left → Right → Compare → Value on every graph.")
         + _tracer_tutor_panel()
     )
-    inner = inner + _explore_phase_gate(explore)
+    inner = inner + explore
     return _math_lab_shell(spec_json, inner, lab_mod="limit")
 
 
@@ -886,7 +886,11 @@ def limit_tracer_embed(worked_example: bool = False) -> str:
     from ap_calc_math_lab_specs import tracer_lab_13, tracer_lab_13_worked_example, spec_json as _sj
 
     spec = tracer_lab_13_worked_example() if worked_example else tracer_lab_13()
-    return tracer_math_lab_embed(_sj(spec), gated=True, minimal_learn=worked_example)
+    return tracer_math_lab_embed(
+        _sj(spec),
+        gated=worked_example,
+        minimal_learn=worked_example,
+    )
 
 
 def practice_packet(section: str, title: str) -> str:

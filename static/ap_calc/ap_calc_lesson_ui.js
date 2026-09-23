@@ -216,6 +216,15 @@
     root.classList.toggle("is-intro-slide", !!isIntro);
   }
 
+  function openLabExplorePanels(scope) {
+    (scope || root).querySelectorAll("[data-ap-explore-phase]").forEach(function (phase) {
+      var gate = phase.querySelector("[data-ap-explore-gate]");
+      var panel = phase.querySelector("[data-ap-explore-panel]");
+      if (gate) gate.hidden = true;
+      if (panel) panel.hidden = false;
+    });
+  }
+
   function syncLabSlideLayout(slideEl) {
     var hasLab = slideEl && slideEl.querySelector("[data-ap-math-lab]");
     root.classList.toggle("is-lab-slide", !!hasLab);
@@ -225,6 +234,9 @@
     var slideEl = root.querySelector("[data-cm-slide]");
     syncIntroLayout(slideEl);
     syncLabSlideLayout(slideEl);
+    if (document.body.classList.contains("is-cm-projector") || root.classList.contains("is-focus-mode")) {
+      openLabExplorePanels(slideEl);
+    }
     syncPhaseStepperVisibility(slideEl);
     if (stickyCounter && ev.detail && ev.detail.index) {
       var total = root.getAttribute("data-slide-count") || "?";

@@ -193,6 +193,9 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("Start investigation", slide5["html"])
         self.assertIn("data-ap-explore-panel", slide5["html"])
         self.assertEqual(slide5.get("template"), "investigation")
+        slide6 = next(s for s in lesson["slides"] if s["index"] == 6)
+        self.assertIn("data-ap-trace-left-slider", slide6["html"])
+        self.assertNotIn("data-ap-explore-gate", slide6["html"])
 
     def test_phase_stepper_sync_in_js(self) -> None:
         js = LESSON_UI_JS.read_text(encoding="utf-8")

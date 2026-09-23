@@ -752,7 +752,8 @@ body.is-ap-calc-lesson .np-app-container {
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-kind,
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-path-filters,
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-path-current,
-.np-cm-viewer--ap-calc.is-path-compact .np-cm-knowledge-head {
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-knowledge-head,
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-knowledge {
   display: none;
 }
 
@@ -761,6 +762,23 @@ body.is-ap-calc-lesson .np-app-container {
   min-width: 44px;
   min-height: 44px;
   padding: var(--space-2);
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-copy {
+  display: none;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-num {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #43318f;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-km-drawer-open {
+  display: inline-flex;
+  margin: 0.35rem 0 0.5rem;
 }
 
 @media (max-width: 1099px) {
@@ -997,7 +1015,16 @@ body.is-ap-calc-lesson .np-app-container {
 
 .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-body--split,
 .np-cm-viewer--ap-calc.is-lab-slide .ap-lab-body--tracer {
-  min-height: min(58vh, 620px);
+  min-height: min(52vh, 560px);
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-explore-gate {
+  margin: 0.5rem 0;
+  padding: 0.85rem 1rem;
+}
+
+.np-cm-viewer--ap-calc.is-lab-slide .ap-slide-phase--learn {
+  flex-shrink: 0;
 }
 
 body.is-cm-projector .np-cm-viewer--ap-calc.is-lab-slide .np-cm-slide-head,
