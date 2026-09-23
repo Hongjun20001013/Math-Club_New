@@ -787,12 +787,28 @@ body.is-ap-calc-lesson .np-app-container {
   min-height: 100%;
 }
 
+.np-cm-viewer--ap-calc.is-intro-slide .np-cm-workspace {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.np-cm-viewer--ap-calc.is-intro-slide .np-cm-path {
+  display: none !important;
+}
+
+.np-cm-viewer--ap-calc.is-intro-slide .np-cm-deck {
+  width: 100%;
+}
+
 .np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-content {
-  width: min(100%, 52rem);
-  max-width: none;
+  width: 100%;
+  max-width: min(56rem, 100%);
   margin: 0 auto;
-  padding: var(--space-4) var(--space-3);
+  padding: var(--space-4) var(--space-5);
   box-sizing: border-box;
+}
+
+.np-cm-viewer--ap-calc .ap-slide-template--intro .cm-intro-chips {
+  justify-content: center;
 }
 
 .np-cm-viewer--ap-calc .ap-slide-template--concept .ap-phase-divider,

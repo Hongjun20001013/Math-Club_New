@@ -4404,7 +4404,7 @@
     } else {
       loadInkForCurrentSlide(true);
     }
-    if (kind === "intro") injectIntroOverview();
+    if (kind === "intro" && !root.classList.contains("np-cm-viewer--ap-calc")) injectIntroOverview();
     if (kind === "closing") injectClosingCheckpointCta();
     if (kind === "score") {
       if (isSupervisorScoreView()) {

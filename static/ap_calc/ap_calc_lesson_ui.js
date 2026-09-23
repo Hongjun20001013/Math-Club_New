@@ -211,8 +211,14 @@
     setActivePhase(phaseFromSlideKind(kind));
   }
 
+  function syncIntroLayout(slideEl) {
+    var isIntro = slideEl && slideEl.classList.contains("np-cm-slide--intro");
+    root.classList.toggle("is-intro-slide", !!isIntro);
+  }
+
   document.addEventListener("np-cm-slide-rendered", function (ev) {
     var slideEl = root.querySelector("[data-cm-slide]");
+    syncIntroLayout(slideEl);
     syncPhaseStepperVisibility(slideEl);
     if (stickyCounter && ev.detail && ev.detail.index) {
       var total = root.getAttribute("data-slide-count") || "?";
@@ -267,7 +273,9 @@
 
   bindExploreGates(root);
   bindPhaseStepper();
-  syncPhaseStepperVisibility(root.querySelector("[data-cm-slide]"));
+  var initialSlide = root.querySelector("[data-cm-slide]");
+  syncIntroLayout(initialSlide);
+  syncPhaseStepperVisibility(initialSlide);
 
   /* ── Focus / projector mode ── */
   var focusToggle = root.querySelector("[data-cm-focus-toggle]");

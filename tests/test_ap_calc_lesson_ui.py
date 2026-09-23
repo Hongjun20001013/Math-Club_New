@@ -191,8 +191,18 @@ class LessonUIAssetTests(unittest.TestCase):
 
     def test_tracer_graph_gated_before_predict(self) -> None:
         js = MATH_LAB_JS.read_text(encoding="utf-8")
-        self.assertIn("graphWrap.hidden = !this.predictDone", js)
+        self.assertIn("split.hidden = gatedExplore", js)
         self.assertIn("showMarkers = this.predictDone", js)
+
+    def test_ap_calc_skips_intro_overview_inject(self) -> None:
+        js = COURSE_MATERIALS_JS.read_text(encoding="utf-8")
+        self.assertIn('kind === "intro" && !root.classList.contains("np-cm-viewer--ap-calc")', js)
+
+    def test_intro_slide_hides_path(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        self.assertIn(".is-intro-slide .np-cm-path", css)
+        js = LESSON_UI_JS.read_text(encoding="utf-8")
+        self.assertIn("syncIntroLayout", js)
 
     def test_mastery_tooltip_on_ring(self) -> None:
         html = _lesson_html("ap-1-1-instantaneous-change")

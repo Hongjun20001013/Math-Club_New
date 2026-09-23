@@ -1454,8 +1454,13 @@
     if (compare) compare.hidden = this.step !== 5;
     if (fc) fc.hidden = this.step !== 6;
     if (explain) explain.hidden = this.step < 7;
-    var graphWrap = this.root.querySelector(".ap-trace-svg")?.closest(".ap-lab-graph-wrap");
-    if (graphWrap) graphWrap.hidden = !this.predictDone && this.step === 0;
+    var gatedExplore = !this.predictDone && this.step === 0;
+    var split = this.root.querySelector(".ap-lab-body--split");
+    if (split) split.hidden = gatedExplore;
+    var dash = this.root.querySelector("[data-ap-dashboard]");
+    if (dash) dash.hidden = gatedExplore;
+    var tutor = this.root.querySelector("[data-ap-tutor]");
+    if (tutor) tutor.hidden = gatedExplore;
     this._updateDashboard();
   };
 
