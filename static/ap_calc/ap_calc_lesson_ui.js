@@ -237,11 +237,33 @@
     }
   });
 
+  function onProjectorChange(on) {
+    if (on) {
+      setPathMode("hidden");
+      if (stickyChrome) stickyChrome.hidden = true;
+      root.querySelectorAll("[data-ap-explore-gate]").forEach(function (gate) {
+        gate.hidden = true;
+      });
+      root.querySelectorAll("[data-ap-explore-panel]").forEach(function (panel) {
+        panel.hidden = false;
+      });
+    }
+    window.dispatchEvent(new Event("resize"));
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([root]).catch(function () {});
+    }
+  }
+
+  document.addEventListener("np-cm-focus-mode", function (ev) {
+    onProjectorChange(!!(ev.detail && ev.detail.on));
+  });
+
   /* ── Resume banner: entry only ── */
   window.ApCalcLessonUI = {
     consumeResumeBanner: consumeResumeBanner,
     markLessonStarted: markLessonStarted,
     setPathMode: setPathMode,
+    onProjectorChange: onProjectorChange,
     isResumeConsumed: function () { return resumeConsumed; },
   };
 
@@ -276,18 +298,6 @@
   var initialSlide = root.querySelector("[data-cm-slide]");
   syncIntroLayout(initialSlide);
   syncPhaseStepperVisibility(initialSlide);
-
-  /* ── Focus / projector mode ── */
-  var focusToggle = root.querySelector("[data-cm-focus-toggle]");
-  if (focusToggle) {
-    focusToggle.addEventListener("click", function () {
-      window.setTimeout(function () {
-        if (root.classList.contains("is-focus-mode")) {
-          setPathMode("hidden");
-        }
-      }, 0);
-    });
-  }
 
   loadPathMode();
 })();

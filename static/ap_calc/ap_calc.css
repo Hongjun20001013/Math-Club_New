@@ -1607,7 +1607,18 @@ html[data-exam-theme="dark"] .ap-data-table td {
 }
 
 .ap-lab-graph-wrap--interactive {
-  max-width: min(100%, 34rem);
+  max-width: min(100%, 42rem);
+}
+
+@media (min-width: 1280px) {
+  .np-cm-viewer--ap-calc .ap-lab-graph-wrap--interactive {
+    max-width: none;
+  }
+
+  .np-cm-viewer--ap-calc .ap-fig--teach img,
+  .np-cm-viewer--ap-calc .ap-fig--wide img {
+    max-width: min(100%, 560px);
+  }
 }
 
 .ap-lab-svg {
@@ -1615,8 +1626,25 @@ html[data-exam-theme="dark"] .ap-data-table td {
   width: 100%;
   height: auto;
   min-height: 200px;
-  max-height: 300px;
+  max-height: 340px;
   vertical-align: top;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-svg,
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-lab-svg {
+  max-height: none;
+}
+
+.np-cm-viewer--ap-calc.is-focus-mode .ap-lab-graph-wrap--interactive,
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-lab-graph-wrap--interactive {
+  max-width: none;
+}
+
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-fig--teach img,
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-fig--gallery img,
+body.is-cm-projector .np-cm-viewer--ap-calc .ap-fig--wide img {
+  max-width: min(72vw, 760px);
+  max-height: 48vh;
 }
 
 .ap-lab-body--split {

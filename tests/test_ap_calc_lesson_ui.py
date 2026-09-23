@@ -39,9 +39,10 @@ class LessonUIAssetTests(unittest.TestCase):
         for token in ("--space-1", "--space-8", "--ap-cm-path-compact: 68px", "--ap-content-read"):
             self.assertIn(token, css)
 
-    def test_rail_padding_includes_24px_buffer(self) -> None:
+    def test_rail_padding_includes_buffer(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")
-        self.assertIn("calc(4.75rem + 24px)", css)
+        self.assertIn("--ap-cm-rail-h:", css)
+        self.assertIn("scroll-padding-bottom: calc(var(--ap-cm-rail-h) + 12px)", css)
 
     def test_resume_banner_dismissed_class(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")
@@ -158,6 +159,20 @@ class LessonUIAssetTests(unittest.TestCase):
     def test_projector_hides_chrome(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")
         self.assertIn("body.is-cm-projector", css)
+        self.assertIn("ap-lesson-chrome__sticky", css)
+        self.assertIn("clamp(1.18rem, 1.7vw, 1.72rem)", css)
+
+    def test_projector_keeps_lab_split_horizontal(self) -> None:
+        css = LESSON_UI_CSS.read_text(encoding="utf-8")
+        self.assertIn("ap-lab-body--tracer", css)
+        self.assertNotIn(".is-focus-mode .ap-lab-body--split {\n  grid-template-columns: 1fr;\n}", css)
+
+    def test_projector_focus_event_wired(self) -> None:
+        js = COURSE_MATERIALS_JS.read_text(encoding="utf-8")
+        ui = LESSON_UI_JS.read_text(encoding="utf-8")
+        self.assertIn("np-cm-focus-mode", js)
+        self.assertIn("onProjectorChange", ui)
+        self.assertIn("data-ap-explore-gate", ui)
 
     def test_structured_lesson_state_in_math_lab(self) -> None:
         js = MATH_LAB_JS.read_text(encoding="utf-8")

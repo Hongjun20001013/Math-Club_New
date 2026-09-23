@@ -3999,6 +3999,7 @@
       else exitProjectionFullscreen();
     }
     saveFocusMode(on);
+    document.dispatchEvent(new CustomEvent("np-cm-focus-mode", { detail: { on: on } }));
     if (on && isInkTeacher()) {
       openInkForTeaching({ tool: "pen", sizeKey: "s" });
     }
