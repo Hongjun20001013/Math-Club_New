@@ -1641,6 +1641,8 @@
     limitsMatch: limitsMatch,
     resolveScenarioIndex: resolveScenarioIndex,
     approachEndpoint: approachEndpoint,
+    leftApproachAllowed: leftApproachAllowed,
+    predictAdvanceMessage: predictAdvanceMessage,
     branchForApproach: branchForApproach,
     evaluateScenarioY: evaluateScenarioY,
     evaluateHoleWithValue: evaluateHoleWithValue,

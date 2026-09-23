@@ -326,6 +326,39 @@ class LessonUIAssetTests(unittest.TestCase):
             self.assertIn("ap_calc_lesson_ui.js", html)
             self.assertIn("is-ap-calc-lesson", html)
 
+    def test_tracer_protocol_helpers_node(self) -> None:
+        script = r"""
+const fs = require('fs');
+const vm = require('vm');
+const code = fs.readFileSync(process.argv[process.argv.length - 1], 'utf8');
+const sandbox = { window: {}, global: {}, document: { readyState: 'complete', addEventListener: function () {}, createElement: function () { return { addEventListener: function () {} }; } }, matchMedia: () => ({ matches: false }) };
+sandbox.window = sandbox.global = sandbox;
+vm.runInNewContext(code, sandbox);
+const lab = sandbox.ApCalcMathLab;
+const endpoint = { targetX: 0, domainMin: 0, leftLimit: null, rightLimit: 0, infinite: false };
+const hole = { targetX: 2, leftLimit: 3, rightLimit: 3, functionValue: 1.5, infinite: false };
+console.log(JSON.stringify({
+  endpointLeft: lab.leftApproachAllowed(endpoint),
+  holeLeft: lab.leftApproachAllowed(hole),
+  endpointMsg: lab.predictAdvanceMessage(endpoint),
+  wrongLockHint: lab.MISCONCEPTION_HINTS['limit-lock-mismatch'],
+  lockMatch: lab.limitsMatch(2, 3),
+}));
+"""
+        out = subprocess.run(
+            ["node", "-e", script, str(MATH_LAB_JS)],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=ROOT,
+        )
+        data = json.loads(out.stdout.strip())
+        self.assertFalse(data["endpointLeft"])
+        self.assertTrue(data["holeLeft"])
+        self.assertIn("0⁺", data["endpointMsg"])
+        self.assertIn("does not match", data["wrongLockHint"])
+        self.assertFalse(data["lockMatch"])
+
     def test_tracer_math_regression_node(self) -> None:
         script = r"""
 const fs = require('fs');
