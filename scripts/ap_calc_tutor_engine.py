@@ -86,6 +86,13 @@ MISCONCEPTIONS: dict[str, dict[str, Any]] = {
         "level2Hint": "Follow the left branch toward x = c and watch which y-height you approach.",
         "remediationSlideId": None,
     },
+    "limit-lock-mismatch": {
+        "lessonIds": ["1.2", "1.3"],
+        "studentFacingMessage": "That number does not match the y-height the branch approaches. Trace closer to c and read the approach value.",
+        "level1Hint": "Use the preset buttons to approach c and watch the y-value on the tracer readout.",
+        "level2Hint": "Lock the approach height L, not f(c) and not a guess from the axis scale alone.",
+        "remediationSlideId": None,
+    },
     "checks-left-only": {
         "lessonIds": ["1.3"],
         "studentFacingMessage": "You locked only the left side — complete the right trace too.",

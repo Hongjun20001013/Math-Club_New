@@ -36,7 +36,7 @@ def _lesson_html(slug: str) -> str:
 class LessonUIAssetTests(unittest.TestCase):
     def test_design_tokens_in_css(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")
-        for token in ("--space-1", "--space-8", "--ap-cm-path-compact: 68px", "--ap-content-read"):
+        for token in ("--space-1", "--space-8", "--ap-cm-path-compact: 80px", "--ap-content-read"):
             self.assertIn(token, css)
 
     def test_rail_padding_includes_buffer(self) -> None:

@@ -17,7 +17,7 @@
   --ap-radius-surface: 20px;
   --ap-cm-rail-h: calc(4.35rem + 18px);
   --ap-cm-path-expanded: 220px;
-  --ap-cm-path-compact: 68px;
+  --ap-cm-path-compact: 80px;
   --ap-elev-bg: #f3f0ff;
   --ap-elev-card: #ffffff;
   --ap-elev-panel: #faf8ff;
@@ -757,11 +757,32 @@ body.is-ap-calc-lesson .np-app-container {
   display: none;
 }
 
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-list {
+  align-items: center;
+  padding-inline: 0.35rem;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-item {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-btn {
   justify-content: center;
+  width: 44px;
   min-width: 44px;
   min-height: 44px;
+  margin-inline: auto;
   padding: var(--space-2);
+  box-shadow: none;
+  transform: none;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-btn.is-active {
+  background: rgba(91, 77, 255, 0.14);
+  border-color: rgba(91, 77, 255, 0.28);
+  box-shadow: inset 0 0 0 2px rgba(91, 77, 255, 0.35);
 }
 
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-copy {
@@ -769,11 +790,43 @@ body.is-ap-calc-lesson .np-app-container {
 }
 
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-num {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.82rem;
   font-weight: 800;
   color: #43318f;
-  min-width: 1.5rem;
+  width: 1.75rem;
+  min-width: 1.75rem;
   text-align: center;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-btn.is-done .np-cm-outline-num {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 0;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .np-cm-outline-btn.is-done .np-cm-outline-num::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #10b981;
+  box-sizing: border-box;
+}
+
+.np-cm-viewer--ap-calc.is-path-compact .ap-path-mode-toggle {
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-left: 0;
 }
 
 .np-cm-viewer--ap-calc.is-path-compact .np-cm-km-drawer-open {

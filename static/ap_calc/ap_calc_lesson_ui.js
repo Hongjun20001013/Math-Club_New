@@ -96,7 +96,7 @@
     } catch (e) {}
     var mode = "expanded";
     try {
-      mode = localStorage.getItem(pathKey) || (mobile ? "hidden" : started ? "compact" : "expanded");
+      mode = localStorage.getItem(pathKey) || (mobile ? "hidden" : "expanded");
     } catch (e) {}
     if (mobile && !localStorage.getItem(pathKey)) mode = "hidden";
     setPathMode(mode);

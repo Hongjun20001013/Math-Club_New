@@ -258,6 +258,7 @@ def tracer_lab_13() -> dict[str, Any]:
         "scenarios": enriched,
         "misconceptionTags": [
             "filled-point-first",
+            "limit-lock-mismatch",
             "checks-left-only",
             "checks-right-only",
             "averages-unequal-one-sided-limits",

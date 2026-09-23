@@ -29,6 +29,7 @@
     "filled-point-first": "Trace both branches before reading f(c) from the filled dot.",
     "checks-left-only": "Complete a right trace before comparing.",
     "checks-right-only": "Complete a left trace before comparing.",
+    "limit-lock-mismatch": "That number does not match the y-height the branch approaches. Trace closer to c and read the approach value.",
     "averages-unequal-one-sided-limits": "Do not average L⁻ and L⁺ — they must match exactly.",
     "endpoint-needs-two-sides": "At a domain endpoint, only the valid one-sided limit exists.",
     "infinite-treated-as-finite": "If |y| grows without bound, the finite limit does not exist.",
@@ -95,6 +96,33 @@
 
   function approachEndpoint(c, side, domainMin) {
     return clampTracerX(side === "left" ? c - TRACER_EPS : c + TRACER_EPS, c, side, domainMin);
+  }
+
+  function leftApproachAllowed(sc) {
+    if (!sc) return true;
+    if (sc.infinite) return true;
+    var dm = sc.domainMin;
+    if (dm != null && dm >= sc.targetX - TRACER_EPS) return false;
+    return true;
+  }
+
+  function rightApproachAllowed(sc) {
+    return true;
+  }
+
+  function firstExploreStep(sc) {
+    return leftApproachAllowed(sc) ? 1 : 3;
+  }
+
+  function predictAdvanceMessage(sc) {
+    var c = sc.targetX;
+    if (!leftApproachAllowed(sc)) {
+      return "Prediction recorded. Explore from the right (x → " + c + "⁺).";
+    }
+    if (!rightApproachAllowed(sc)) {
+      return "Prediction recorded. Explore from the left (x → " + c + "⁻).";
+    }
+    return "Prediction recorded. Explore the left branch (x < " + c + ").";
   }
 
   function branchForApproach(sc, x) {
@@ -1105,6 +1133,15 @@
     this.predictDone = false;
     this.fcConfirmed = false;
     this.tutor.reset();
+    var predictResult = this.root.querySelector("[data-ap-predict-result]");
+    if (predictResult) {
+      predictResult.hidden = true;
+      predictResult.textContent = "";
+    }
+    this.root.querySelectorAll("[data-ap-lock-left-feedback], [data-ap-lock-right-feedback]").forEach(function (node) {
+      node.hidden = true;
+      node.textContent = "";
+    });
     this._syncPanels();
   };
 
@@ -1156,21 +1193,26 @@
 
   OneSidedLimitTracer.prototype._submitPredict = function () {
     var sc = this.scenario();
+    var leftAllowed = leftApproachAllowed(sc);
     var leftVal = this.root.querySelector("[data-ap-predict-left]")?.value;
     var rightVal = this.root.querySelector("[data-ap-predict-right]")?.value;
     var twoVal = this.root.querySelector("[data-ap-predict-two]")?.value;
     var fcVal = this.root.querySelector("[data-ap-predict-fc]")?.value;
-    if (!leftVal || !rightVal || !twoVal || !fcVal) {
-      var panel = this.root.querySelector("[data-ap-predict-result]");
-      if (panel) { panel.hidden = false; panel.textContent = "Complete all four predictions first."; }
+    var panel = this.root.querySelector("[data-ap-predict-result]");
+    if ((leftAllowed && !leftVal) || !rightVal || !twoVal || !fcVal) {
+      if (panel) {
+        panel.hidden = false;
+        panel.textContent = leftAllowed
+          ? "Complete all four predictions first."
+          : "Complete L⁺, two-sided, and f(c) predictions first (L⁻ is not in the domain here).";
+      }
       return;
     }
     this.predictDone = true;
-    this.step = 1;
-    var panel = this.root.querySelector("[data-ap-predict-result]");
+    this.step = firstExploreStep(sc);
     if (panel) {
       panel.hidden = false;
-      panel.textContent = "Prediction recorded. Explore the left branch (x < " + sc.targetX + ").";
+      panel.textContent = predictAdvanceMessage(sc);
     }
     this._syncPanels();
     emitLearningState(this.root, {
@@ -1213,11 +1255,22 @@
       });
       return;
     }
-    var tag = side === "left" ? "checks-left-only" : "checks-right-only";
-    if (parsed != null && expected != null && sc.functionValue != null && Math.abs(parsed - sc.functionValue) < 0.2) {
+    var tag;
+    var message;
+    if (parsed == null) {
+      tag = "DNE-without-reason";
+      message = "Enter a numeric limit (or DNE if the limit does not exist).";
+    } else if (expected == null) {
+      tag = "endpoint-needs-two-sides";
+      message = this.tutor.misconception(tag);
+    } else if (sc.functionValue != null && Math.abs(parsed - sc.functionValue) < 0.2) {
       tag = "filled-point-first";
+      message = this.tutor.misconception(tag);
+    } else {
+      tag = "limit-lock-mismatch";
+      message = this.tutor.misconception(tag);
     }
-    if (feedback) feedback.textContent = this.tutor.misconception(tag);
+    if (feedback) feedback.textContent = message;
     this.tutor.recordMisconception(tag);
     emitLearningState(this.root, {
       eventType: "answer_checked",
@@ -1362,7 +1415,8 @@
     if (distEl) distEl.textContent = Math.abs(x - sc.targetX).toFixed(3);
     var sideMsgR = this.root.querySelector("[data-ap-side-msg]");
     if (sideMsgR) sideMsgR.textContent = "Tracing from the right toward x = " + sc.targetX;
-    if (this.leftLocked != null && Math.abs(x - sc.targetX) <= 0.11) {
+    var leftReady = this.leftLocked != null || !leftApproachAllowed(sc);
+    if (leftReady && Math.abs(x - sc.targetX) <= 0.11) {
       this.step = Math.max(this.step, 4);
       this._syncPanels();
     }
@@ -1388,6 +1442,11 @@
   ];
 
   OneSidedLimitTracer.prototype._syncPanels = function () {
+    var sc = this.scenario();
+    var leftAllowed = leftApproachAllowed(sc);
+    if (!leftAllowed && this.step >= 1 && this.step <= 2) {
+      this.step = 3;
+    }
     var predictPanel = this.root.querySelector("[data-ap-predict-panel]");
     var exploreStack = this.root.querySelector("[data-ap-explore-stack]");
     var leftPanel = this.root.querySelector("[data-ap-trace-left-panel]");
@@ -1400,8 +1459,8 @@
     var gatedExplore = !this.predictDone && this.step === 0;
     if (predictPanel) predictPanel.hidden = !gatedExplore;
     if (exploreStack) exploreStack.hidden = gatedExplore;
-    if (leftPanel) leftPanel.hidden = this.step < 1 || this.step > 2;
-    if (lockLeft) lockLeft.hidden = this.step !== 2;
+    if (leftPanel) leftPanel.hidden = !leftAllowed || this.step < 1 || this.step > 2;
+    if (lockLeft) lockLeft.hidden = !leftAllowed || this.step !== 2;
     if (rightPanel) rightPanel.hidden = this.step < 3 || this.step > 4;
     if (lockRight) lockRight.hidden = this.step !== 4;
     if (compare) compare.hidden = this.step !== 5;
@@ -1470,6 +1529,17 @@
     });
     var note = this.root.querySelector("[data-ap-scenario-note]");
     if (note) note.textContent = sc.previewNote || sc.verbal || "";
+    var leftAllowed = leftApproachAllowed(sc);
+    var leftPredictInput = this.root.querySelector("[data-ap-predict-left]");
+    if (leftPredictInput) {
+      var leftPredictLabel = leftPredictInput.closest("label");
+      if (leftPredictLabel) leftPredictLabel.hidden = !leftAllowed;
+      leftPredictInput.disabled = !leftAllowed;
+      leftPredictInput.placeholder = leftAllowed ? "?" : "n/a";
+      if (!leftAllowed) leftPredictInput.value = "";
+    }
+    var traceLeftBtn = this.root.querySelector('[data-ap-action="trace-left"]');
+    if (traceLeftBtn) traceLeftBtn.hidden = !leftAllowed;
     this._syncCaseChrome();
     var c = sc.targetX;
     var domainMin = sc.domainMin != null ? sc.domainMin : c - 2;
