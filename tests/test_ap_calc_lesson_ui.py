@@ -194,6 +194,19 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("split.hidden = gatedExplore", js)
         self.assertIn("showMarkers = this.predictDone", js)
 
+    def test_tracer_lab_graph_left_controls_right(self) -> None:
+        from ap_calc_slide_helpers import tracer_math_lab_embed
+        from ap_calc_math_lab_specs import tracer_lab_13, spec_json
+
+        html = tracer_math_lab_embed(spec_json(tracer_lab_13()), gated=True)
+        split_idx = html.index('class="ap-lab-body ap-lab-body--split ap-lab-body--tracer"')
+        graph_idx = html.index("ap-lab-main--graph", split_idx)
+        aside_idx = html.index('class="ap-lab-side ap-lab-side--action"', split_idx)
+        dash_idx = html.index("data-ap-dashboard", aside_idx)
+        self.assertLess(graph_idx, aside_idx)
+        self.assertLess(aside_idx, dash_idx)
+        self.assertIn("ap-lab-graph-wrap--primary", html)
+
     def test_ap_calc_skips_intro_overview_inject(self) -> None:
         js = COURSE_MATERIALS_JS.read_text(encoding="utf-8")
         self.assertIn('kind === "intro" && !root.classList.contains("np-cm-viewer--ap-calc")', js)

@@ -1627,14 +1627,23 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin-top: 0.5rem;
 }
 
+.ap-lab-body--tracer {
+  grid-template-columns: minmax(0, 1.05fr) minmax(300px, 42%);
+}
+
 .ap-lab-main {
   min-width: 0;
 }
 
+.ap-lab-side--action {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
 .ap-math-lab--tracer .ap-lab-dashboard {
-  margin: 0;
-  position: sticky;
-  top: 0.5rem;
+  margin: 0.35rem 0 0;
 }
 
 .ap-lab-dashboard__title {
@@ -1651,9 +1660,12 @@ html[data-exam-theme="dark"] .ap-data-table td {
     grid-template-columns: 1fr;
   }
 
-  .ap-math-lab--tracer .ap-lab-dashboard {
+  .ap-lab-body--tracer {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-math-lab--tracer .ap-lab-side--action {
     order: -1;
-    position: static;
   }
 
   .ap-graph-grid--gallery {

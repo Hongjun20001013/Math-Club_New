@@ -720,8 +720,25 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-predict-submit>Submit prediction</button>'
         '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
         "</div>"
-        '<div class="ap-lab-body ap-lab-body--split">'
-        '<div class="ap-lab-main">'
+        '<div class="ap-lab-body ap-lab-body--split ap-lab-body--tracer">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive ap-lab-graph-wrap--primary">'
+        f'<svg class="ap-lab-svg ap-trace-svg" viewBox="{_LAB_VIEWBOX}" role="img">'
+        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
+        '<g data-ap-plot-layer>'
+        '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.25"/>'
+        '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.25"/>'
+        '<line data-ap-target-x stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4 3"/>'
+        '<path data-ap-branch="0" fill="none" stroke-width="2.5"/>'
+        '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
+        '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
+        '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
+        '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
+        "</g></svg></div></div>"
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Current action">'
+        '<p class="ap-lab-side__title">Current action</p>'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
@@ -777,22 +794,7 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         '<button type="button" class="ap-lab-btn ap-lab-btn--primary" data-ap-explain-submit>Check explanation</button>'
         '<p class="ap-lab-feedback" data-ap-explain-feedback hidden></p>'
         "</div>"
-        '<div class="ap-lab-graph-wrap ap-lab-graph-wrap--interactive">'
-        f'<svg class="ap-lab-svg ap-trace-svg" viewBox="{_LAB_VIEWBOX}" role="img">'
-        f'<rect width="{_LAB_SVG}" height="{_LAB_SVG_H}" fill="#faf8ff" rx="10"/>'
-        '<g data-ap-plot-layer>'
-        '<line data-ap-axis-x stroke="#4c3d99" stroke-width="1.25"/>'
-        '<line data-ap-axis-y stroke="#4c3d99" stroke-width="1.25"/>'
-        '<line data-ap-target-x stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4 3"/>'
-        '<path data-ap-branch="0" fill="none" stroke-width="2.5"/>'
-        '<path data-ap-branch="1" fill="none" stroke-width="2.5"/>'
-        '<circle data-ap-open-0 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-open-1 r="5" fill="#fff" stroke="#6c4eff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-filled-0 r="5" fill="#6c4eff" visibility="hidden"/>'
-        '<circle data-ap-tracer-left r="6" fill="#2563eb" stroke="#fff" stroke-width="2" visibility="hidden"/>'
-        '<circle data-ap-tracer-right r="6" fill="#ea580c" stroke="#fff" stroke-width="2" visibility="hidden"/>'
-        "</g></svg></div></div>"
-        '<aside class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
+        '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Observation dashboard">'
         '<p class="ap-lab-dashboard__title">Observation dashboard</p>'
         '<p data-ap-step="0" class="ap-lab-step is-active">0 · Predict</p>'
         '<p data-ap-step="1" class="ap-lab-step">1 · Explore left</p>'
@@ -808,7 +810,7 @@ def tracer_math_lab_embed(spec_json: str, gated: bool = False, minimal_learn: bo
         "<dt>Same?</dt><dd data-d-same>—</dd>"
         "<dt>Two-sided</dt><dd data-d-two>—</dd>"
         "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
-        "</dl></aside></div>"
+        "</dl></div></aside></div>"
         '<div class="ap-box ap-box--checkpoint" data-ap-conclusion hidden>'
         '<span class="ap-box-label">Conclusion</span>'
         '<div class="ap-box-body" data-ap-conclusion-body>Use Left → Right → Compare → Value on every graph.</div></div>'
