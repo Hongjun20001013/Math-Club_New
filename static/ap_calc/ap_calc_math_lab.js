@@ -914,15 +914,19 @@
 
     this.root.querySelectorAll("[data-ap-h-val]").forEach(function (n) { n.textContent = h; });
 
-    if (h < 0) {
-      this.leftEst = rate;
-      this.step = Math.max(this.step, 2);
+    if (this.step >= 1) {
+      if (h < 0) {
+        this.leftEst = rate;
+        this.step = Math.max(this.step, 2);
+      }
+      if (h > 0) {
+        this.rightEst = rate;
+        this.step = Math.max(this.step, 3);
+      }
+      this._syncPanels();
+    } else {
+      this._updateDashboard();
     }
-    if (h > 0) {
-      this.rightEst = rate;
-      this.step = Math.max(this.step, 3);
-    }
-    if (this.step >= 1) this._syncPanels();
 
     var formula = this.root.querySelector("[data-ap-formula-val]");
     if (formula) {
