@@ -210,6 +210,12 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("predictPanel.hidden = !gatedExplore", js)
         self.assertIn("showMarkers = this.predictDone", js)
 
+    def test_unified_lab_protocol_helpers(self) -> None:
+        js = MATH_LAB_JS.read_text(encoding="utf-8")
+        self.assertIn("function updateLabProtocol", js)
+        self.assertIn("SECANT_STEP_LABELS", js)
+        self.assertIn("LIMIT_STEP_LABELS", js)
+
     def test_tracer_lab_graph_left_controls_right(self) -> None:
         from ap_calc_slide_helpers import tracer_math_lab_embed
         from ap_calc_math_lab_specs import tracer_lab_13, spec_json
@@ -228,6 +234,35 @@ class LessonUIAssetTests(unittest.TestCase):
         self.assertIn("ap-lab-bench__head", html)
         self.assertIn("ap-lab-protocol-track", html)
         self.assertIn("data-ap-step-now-text", html)
+
+    def test_secant_lab_protocol_dashboard(self) -> None:
+        from ap_calc_slide_helpers import secant_math_lab_embed
+        from ap_calc_math_lab_specs import secant_lab_11, spec_json
+
+        html = secant_math_lab_embed(spec_json(secant_lab_11()))
+        split_idx = html.index('class="ap-lab-body ap-lab-body--split ap-lab-body--secant"')
+        graph_idx = html.index("ap-lab-main--graph", split_idx)
+        aside_idx = html.index('class="ap-lab-side ap-lab-side--action"', split_idx)
+        predict_idx = html.index("data-ap-predict-panel", aside_idx)
+        dash_idx = html.index("data-ap-dashboard", aside_idx)
+        self.assertLess(graph_idx, aside_idx)
+        self.assertLess(predict_idx, dash_idx)
+        self.assertIn("data-d-h", html)
+        self.assertIn("data-d-left-est", html)
+        self.assertIn("data-d-right-est", html)
+        self.assertNotIn("ap-lab-estimates", html)
+
+    def test_limit_lab_protocol_dashboard(self) -> None:
+        from ap_calc_slide_helpers import limit_cases_math_lab_embed
+        from ap_calc_math_lab_specs import limit_cases_lab_12, spec_json
+
+        html = limit_cases_math_lab_embed(spec_json(limit_cases_lab_12()))
+        explore_idx = html.index("ap-lab-body--limit")
+        dash_idx = html.index("data-ap-dashboard", explore_idx)
+        self.assertIn("data-d-fx", html)
+        self.assertIn("data-d-limit", html)
+        self.assertIn("ap-lab-protocol-track", html)
+        self.assertNotIn("data-ap-limit-panel", html)
 
     def test_lab_slide_workstation_mode(self) -> None:
         css = LESSON_UI_CSS.read_text(encoding="utf-8")

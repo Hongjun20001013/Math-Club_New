@@ -1723,7 +1723,9 @@ body.is-cm-projector .np-cm-viewer--ap-calc .ap-fig--wide img {
   gap: 0.55rem;
 }
 
-.ap-math-lab--tracer .ap-lab-dashboard {
+.ap-math-lab--tracer .ap-lab-dashboard,
+.ap-math-lab--secant .ap-lab-dashboard,
+.ap-math-lab--limit .ap-lab-dashboard {
   margin: 0.35rem 0 0;
 }
 

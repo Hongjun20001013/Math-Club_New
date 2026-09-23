@@ -935,13 +935,17 @@ body.is-ap-calc-lesson .np-app-container {
   margin: 0;
 }
 
-.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-side--action {
+.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-side--action,
+.np-cm-viewer--ap-calc .ap-lab-body--secant .ap-lab-side--action,
+.np-cm-viewer--ap-calc .ap-lab-body--limit .ap-lab-side--action {
   max-height: min(72vh, 680px);
   overflow-y: auto;
   padding-right: 0.15rem;
 }
 
-.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-dashboard {
+.np-cm-viewer--ap-calc .ap-lab-body--tracer .ap-lab-dashboard,
+.np-cm-viewer--ap-calc .ap-lab-body--secant .ap-lab-dashboard,
+.np-cm-viewer--ap-calc .ap-lab-body--limit .ap-lab-dashboard {
   margin-top: 0.25rem;
   padding: 0.65rem 0.75rem;
 }

@@ -666,6 +666,46 @@
     return bar;
   }
 
+  var SECANT_STEP_LABELS = [
+    "Predict",
+    "Explore h",
+    "Left est",
+    "Right est",
+    "Tangent",
+    "Explain",
+  ];
+
+  var LIMIT_STEP_LABELS = [
+    "Predict",
+    "Trace left",
+    "Lock L⁻",
+    "Trace right",
+    "Lock L⁺",
+    "Compare",
+  ];
+
+  function updateLabProtocol(root, step, labels, instruments) {
+    var dash = root.querySelector("[data-ap-dashboard]");
+    if (!dash) return;
+    dash.querySelectorAll("[data-ap-step]").forEach(function (node) {
+      var n = parseInt(node.getAttribute("data-ap-step"), 10);
+      node.classList.toggle("is-done", n < step);
+      node.classList.toggle("is-active", n === step);
+    });
+    var stepNow = dash.querySelector("[data-ap-step-now-text]");
+    if (stepNow) stepNow.textContent = labels[step] || "Explore";
+    var benchStatus = root.querySelector("[data-ap-bench-status]");
+    if (benchStatus) {
+      benchStatus.textContent = "Step " + step + " · " + (labels[step] || "Explore");
+    }
+    if (instruments) {
+      Object.keys(instruments).forEach(function (sel) {
+        var node = dash.querySelector(sel);
+        if (node) node.textContent = instruments[sel];
+      });
+    }
+  }
+
   function SecantTangentLab(root, spec) {
     _lastRoot = root;
     this.root = root;
@@ -677,9 +717,11 @@
     this.predictLocked = null;
     this.leftEst = null;
     this.rightEst = null;
+    this.step = 0;
     this.animTimer = null;
     this.tutor = new ContextualTutor(root, spec);
     this._bind();
+    this._syncPanels();
     this._render();
   }
 
@@ -726,24 +768,69 @@
     });
   };
 
+  SecantTangentLab.prototype._syncPanels = function () {
+    var predictPanel = this.root.querySelector("[data-ap-predict-panel]");
+    var exploreStack = this.root.querySelector("[data-ap-explore-stack]");
+    var explainPanel = this.root.querySelector("[data-ap-explain-panel]");
+    var gatedExplore = this.step === 0;
+    if (predictPanel) predictPanel.hidden = !gatedExplore;
+    if (exploreStack) exploreStack.hidden = gatedExplore;
+    if (explainPanel) explainPanel.hidden = this.step < 4;
+    var sideTitle = this.root.querySelector("[data-ap-side-title]");
+    if (sideTitle) {
+      sideTitle.textContent = gatedExplore
+        ? "Controls · Predict"
+        : "Controls · " + (SECANT_STEP_LABELS[this.step] || "Explore");
+    }
+    this._updateDashboard();
+  };
+
+  SecantTangentLab.prototype._updateDashboard = function () {
+    var h = this.hValues[this.hIndex];
+    var rate = this.slope(h);
+    var deltaS = this.s(this.a + h) - this.s(this.a);
+    var agree = this.leftEst != null && this.rightEst != null && Math.abs(this.leftEst - this.rightEst) < 0.25;
+    updateLabProtocol(this.root, this.step, SECANT_STEP_LABELS, {
+      "[data-d-h]": String(h),
+      "[data-d-rise]": formatSecantNum(deltaS),
+      "[data-d-rate]": formatSecantNum(rate),
+      "[data-d-left-est]": this.leftEst != null ? formatSecantNum(this.leftEst) : "—",
+      "[data-d-right-est]": this.rightEst != null ? formatSecantNum(this.rightEst) : "—",
+    });
+    if (this.step >= 3 && agree) {
+      var dash = this.root.querySelector("[data-ap-dashboard]");
+      var rateNode = dash && dash.querySelector("[data-d-rate]");
+      if (rateNode) rateNode.textContent = formatSecantNum(rate) + " → 4";
+    }
+  };
+
   SecantTangentLab.prototype._action = function (action) {
     var self = this;
     if (action === "reset") {
       this.hIndex = this.hValues.indexOf(1) >= 0 ? this.hValues.indexOf(1) : 0;
       this.tangentRevealed = false;
+      this.predictLocked = null;
+      this.leftEst = null;
+      this.rightEst = null;
+      this.step = 0;
       this.tutor.reset();
+      this._syncPanels();
       this._render();
       return;
     }
     if (action === "left") {
       var neg = this.hValues.filter(function (h) { return h < 0; });
       this.hIndex = this.hValues.indexOf(neg[neg.length - 1]);
+      this.step = Math.max(this.step, 2);
+      this._syncPanels();
       this._render();
       return;
     }
     if (action === "right") {
       var pos = this.hValues.filter(function (h) { return h > 0; });
       this.hIndex = this.hValues.indexOf(pos[0]);
+      this.step = Math.max(this.step, 3);
+      this._syncPanels();
       this._render();
       return;
     }
@@ -762,12 +849,15 @@
     }
     if (action === "reveal-tangent") {
       this.tangentRevealed = true;
+      this.step = Math.max(this.step, 4);
+      this._syncPanels();
       this._render();
     }
   };
 
   SecantTangentLab.prototype._predict = function (val) {
     this.predictLocked = val;
+    this.step = 1;
     var correct = val === "stabilize-4";
     var panel = this.root.querySelector("[data-ap-predict-result]");
     if (panel) {
@@ -776,6 +866,7 @@
         ? "Prediction recorded. Explore with h → 0 to verify."
         : this.tutor.misconception("average-vs-instantaneous");
     }
+    this._syncPanels();
     emitLearningState(this.root, {
       eventType: "prediction_submitted",
       lessonId: this.spec.lessonId,
@@ -788,6 +879,7 @@
 
   SecantTangentLab.prototype._explain = function (val) {
     var correct = val === "h-not-zero";
+    this.step = 5;
     var panel = this.root.querySelector("[data-ap-explain-result]");
     if (panel) {
       panel.hidden = false;
@@ -797,6 +889,7 @@
     }
     var conclusion = this.root.querySelector("[data-ap-conclusion]");
     if (conclusion && correct) conclusion.hidden = false;
+    this._syncPanels();
     emitLearningState(this.root, {
       eventType: "explanation_submitted",
       lessonId: this.spec.lessonId,
@@ -820,19 +913,16 @@
     var units = this.spec.annotations.units || {};
 
     this.root.querySelectorAll("[data-ap-h-val]").forEach(function (n) { n.textContent = h; });
-    this.root.querySelectorAll("[data-ap-rate-val]").forEach(function (n) { n.textContent = formatSecantNum(rate); });
-    this.root.querySelectorAll("[data-ap-rise-val]").forEach(function (n) { n.textContent = formatSecantNum(deltaS); });
-    this.root.querySelectorAll("[data-ap-run-val]").forEach(function (n) { n.textContent = h; });
 
-    if (h < 0) this.leftEst = rate;
-    if (h > 0) this.rightEst = rate;
-    var agree = this.leftEst != null && this.rightEst != null && Math.abs(this.leftEst - this.rightEst) < 0.25;
-    var leftEl = this.root.querySelector("[data-ap-left-est]");
-    var rightEl = this.root.querySelector("[data-ap-right-est]");
-    var agreeEl = this.root.querySelector("[data-ap-agree]");
-    if (leftEl) leftEl.textContent = this.leftEst != null ? formatSecantNum(this.leftEst) : "—";
-    if (rightEl) rightEl.textContent = this.rightEst != null ? formatSecantNum(this.rightEst) : "—";
-    if (agreeEl) agreeEl.textContent = agree ? "Yes → 4 m/s" : "Explore both sides";
+    if (h < 0) {
+      this.leftEst = rate;
+      this.step = Math.max(this.step, 2);
+    }
+    if (h > 0) {
+      this.rightEst = rate;
+      this.step = Math.max(this.step, 3);
+    }
+    if (this.step >= 1) this._syncPanels();
 
     var formula = this.root.querySelector("[data-ap-formula-val]");
     if (formula) {
@@ -917,6 +1007,8 @@
     this.rightDone = false;
     this.leftObs = "";
     this.rightObs = "";
+    this.step = 1;
+    this.currentY = null;
     this.tutor = new ContextualTutor(root, spec);
     this._bind();
     this._renderCase();
@@ -947,18 +1039,48 @@
     this.root.querySelector("[data-ap-lock-right]")?.addEventListener("click", function () { self._lockSide("right"); });
   };
 
+  GraphCaseSwitcher.prototype._updateDashboard = function () {
+    var c = this.current();
+    var same = c.leftLimit != null && c.rightLimit != null && c.leftLimit === c.rightLimit;
+    updateLabProtocol(this.root, this.step, LIMIT_STEP_LABELS, {
+      "[data-d-fx]": this.currentY != null ? formatTracerY(this.currentY, c) : "—",
+      "[data-d-left]": this.leftDone ? this.leftObs : "—",
+      "[data-d-right]": this.rightDone ? this.rightObs : "—",
+      "[data-d-limit]": this.leftDone && this.rightDone
+        ? (c.twoSidedLimit != null ? String(c.twoSidedLimit) : "DNE")
+        : "—",
+      "[data-d-fc]": this.leftDone && this.rightDone
+        ? (c.functionValue != null ? String(c.functionValue) : "undefined")
+        : "—",
+    });
+    var sideTitle = this.root.querySelector("[data-ap-side-title]");
+    if (sideTitle) {
+      sideTitle.textContent = "Controls · " + (LIMIT_STEP_LABELS[this.step] || "Explore");
+    }
+    if (this.step >= 5) {
+      var dash = this.root.querySelector("[data-ap-dashboard]");
+      var sameNode = dash && dash.querySelector("[data-d-limit]");
+      if (sameNode && this.leftDone && this.rightDone) {
+        sameNode.textContent = (c.twoSidedLimit != null ? String(c.twoSidedLimit) : "DNE")
+          + (same ? " (same)" : " (diff)");
+      }
+    }
+  };
+
   GraphCaseSwitcher.prototype._action = function (action) {
     var c = this.current();
     var slider = this.root.querySelector("[data-ap-x-slider]");
     if (!slider) return;
     var self = this;
     if (action === "trace-left" || action === "left") {
+      this.step = Math.max(this.step, 1);
       this._animateTrace("left", approachEndpoint(c.targetX, "left", c.domainMin), function (x) {
         slider.value = x;
         self._trace(x);
       });
     }
     if (action === "trace-right" || action === "right") {
+      this.step = Math.max(this.step, 3);
       this._animateTrace("right", approachEndpoint(c.targetX, "right", c.domainMin), function (x) {
         slider.value = x;
         self._trace(x);
@@ -967,6 +1089,9 @@
     if (action === "reset") {
       this.leftDone = false;
       this.rightDone = false;
+      this.leftObs = "";
+      this.rightObs = "";
+      this.step = 1;
       this.tutor.reset();
       this._renderCase();
     }
@@ -1016,16 +1141,19 @@
       x = clampTracerX(x, c.targetX, side, c.domainMin);
     }
     var y = this._yAt(x);
+    this.currentY = y;
     this.tutor.setContext({ caseId: c.id, caseIndex: this.caseIndex, leftDone: this.leftDone, rightDone: this.rightDone });
     this.root.querySelectorAll("[data-ap-x-read]").forEach(function (n) {
       n.textContent = formatApproachX(x, c.targetX, side).replace("x = ", "").replace("x → ", "");
     });
-    this.root.querySelectorAll("[data-ap-y-read]").forEach(function (n) { n.textContent = formatTracerY(y, c); });
     if (side === "left") {
+      this.step = Math.max(this.step, 1);
       this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the left toward x = " + c.targetX;
     } else {
+      this.step = Math.max(this.step, 3);
       this.root.querySelector("[data-ap-side-msg]").textContent = "Tracing from the right toward x = " + c.targetX;
     }
+    this._updateDashboard();
     this._drawCase(x, y);
   };
 
@@ -1034,20 +1162,16 @@
     if (side === "left") {
       this.leftDone = true;
       this.leftObs = String(c.leftLimit);
-      this.root.querySelector("[data-ap-left-obs]").textContent = this.leftObs;
+      this.step = Math.max(this.step, 2);
     } else {
       this.rightDone = true;
       this.rightObs = String(c.rightLimit);
-      this.root.querySelector("[data-ap-right-obs]").textContent = this.rightObs;
+      this.step = Math.max(this.step, 4);
     }
     if (this.leftDone && this.rightDone) {
-      var panel = this.root.querySelector("[data-ap-limit-panel]");
-      if (panel) panel.hidden = false;
-      var same = c.leftLimit === c.rightLimit;
-      this.root.querySelector("[data-ap-compare]").textContent = same ? "same" : "different";
-      this.root.querySelector("[data-ap-limit-val]").textContent = c.twoSidedLimit != null ? c.twoSidedLimit : "DNE";
-      this.root.querySelector("[data-ap-fc-val]").textContent = c.functionValue != null ? c.functionValue : "undefined";
+      this.step = 5;
     }
+    this._updateDashboard();
   };
 
   GraphCaseSwitcher.prototype._renderCase = function () {
@@ -1066,14 +1190,14 @@
       slider.step = 0.001;
       slider.value = clampTracerX(c.targetX - 0.4, c.targetX, "left", c.domainMin);
     }
-    var panel = this.root.querySelector("[data-ap-limit-panel]");
-    if (panel) panel.hidden = true;
-    this.root.querySelector("[data-ap-left-obs]").textContent = "______";
-    this.root.querySelector("[data-ap-right-obs]").textContent = "______";
     this.leftDone = false;
     this.rightDone = false;
+    this.leftObs = "";
+    this.rightObs = "";
+    this.step = 1;
     this._syncCaseModel();
     this._trace(parseFloat(slider.value));
+    this._updateDashboard();
   };
 
   GraphCaseSwitcher.prototype._drawCase = function (x, y) {
@@ -1482,31 +1606,20 @@
 
   OneSidedLimitTracer.prototype._updateDashboard = function () {
     var sc = this.scenario();
-    var dash = this.root.querySelector("[data-ap-dashboard]");
-    if (!dash) return;
-    dash.querySelector("[data-d-left]").textContent = this.leftLocked != null ? this.leftLocked : "—";
-    dash.querySelector("[data-d-right]").textContent = this.rightLocked != null ? this.rightLocked : "—";
     var same = sc.leftLimit != null && sc.rightLimit != null && sc.leftLimit === sc.rightLimit;
-    dash.querySelector("[data-d-same]").textContent = this.step >= 5
-      ? (sc.leftLimit == null || sc.rightLimit == null ? "n/a" : (same ? "same" : "different"))
-      : "—";
-    dash.querySelector("[data-d-two]").textContent = this.step >= 5
-      ? (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE")
-      : "—";
-    dash.querySelector("[data-d-fc]").textContent = this.fcConfirmed
-      ? (sc.functionValue != null ? sc.functionValue : "undefined")
-      : "—";
-    dash.querySelectorAll("[data-ap-step]").forEach(function (node) {
-      var n = parseInt(node.getAttribute("data-ap-step"), 10);
-      node.classList.toggle("is-done", n < this.step);
-      node.classList.toggle("is-active", n === this.step);
-    }.bind(this));
-    var stepNow = dash.querySelector("[data-ap-step-now-text]");
-    if (stepNow) stepNow.textContent = TRACER_STEP_LABELS[this.step] || "Explore";
-    var benchStatus = this.root.querySelector("[data-ap-bench-status]");
-    if (benchStatus) {
-      benchStatus.textContent = "Step " + this.step + " · " + (TRACER_STEP_LABELS[this.step] || "Explore");
-    }
+    updateLabProtocol(this.root, this.step, TRACER_STEP_LABELS, {
+      "[data-d-left]": this.leftLocked != null ? this.leftLocked : "—",
+      "[data-d-right]": this.rightLocked != null ? this.rightLocked : "—",
+      "[data-d-same]": this.step >= 5
+        ? (sc.leftLimit == null || sc.rightLimit == null ? "n/a" : (same ? "same" : "different"))
+        : "—",
+      "[data-d-two]": this.step >= 5
+        ? (sc.twoSidedLimit != null ? sc.twoSidedLimit : "DNE")
+        : "—",
+      "[data-d-fc]": this.fcConfirmed
+        ? (sc.functionValue != null ? sc.functionValue : "undefined")
+        : "—",
+    });
   };
 
   OneSidedLimitTracer.prototype._buildPresets = function (side) {

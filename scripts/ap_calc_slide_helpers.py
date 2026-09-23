@@ -494,6 +494,26 @@ def _math_lab_shell(spec_json: str, inner: str, lab_mod: str = "") -> str:
     )
 
 
+def _lab_protocol_dashboard(protocol: tuple[tuple[int, str], ...], instruments_html: str) -> str:
+    steps = "".join(
+        f'<li class="ap-lab-step" data-ap-step="{n}" title="{label}">{n}</li>'
+        for n, label in protocol
+    )
+    first_label = protocol[0][1] if protocol else "Explore"
+    return (
+        '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Lab instruments">'
+        '<div class="ap-lab-protocol">'
+        '<p class="ap-lab-step-now" data-ap-step-now>'
+        '<span class="ap-lab-step-now__kicker">Current step</span>'
+        f'<span class="ap-lab-step-now__text" data-ap-step-now-text>{first_label}</span>'
+        "</p>"
+        f'<ol class="ap-lab-protocol-track" aria-label="Protocol">{steps}</ol>'
+        "</div>"
+        f'<dl class="ap-lab-instruments ap-lab-dash-stats">{instruments_html}</dl>'
+        "</div>"
+    )
+
+
 def _tracer_dashboard_html() -> str:
     protocol = (
         (0, "Predict"),
@@ -505,27 +525,52 @@ def _tracer_dashboard_html() -> str:
         (6, "f(c)"),
         (7, "Explain"),
     )
-    steps = "".join(
-        f'<li class="ap-lab-step" data-ap-step="{n}" title="{label}">{n}</li>'
-        for n, label in protocol
-    )
-    return (
-        '<div class="ap-lab-dashboard" data-ap-dashboard aria-label="Lab instruments">'
-        '<div class="ap-lab-protocol">'
-        '<p class="ap-lab-step-now" data-ap-step-now>'
-        '<span class="ap-lab-step-now__kicker">Current step</span>'
-        '<span class="ap-lab-step-now__text" data-ap-step-now-text>Predict</span>'
-        "</p>"
-        f'<ol class="ap-lab-protocol-track" aria-label="Protocol">{steps}</ol>'
-        "</div>"
-        '<dl class="ap-lab-instruments ap-lab-dash-stats">'
+    instruments = (
         '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
         '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
         "<dt>Same?</dt><dd data-d-same>—</dd>"
         "<dt>Two-sided</dt><dd data-d-two>—</dd>"
         "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
-        "</dl></div>"
     )
+    return _lab_protocol_dashboard(protocol, instruments)
+
+
+def _secant_dashboard_html() -> str:
+    protocol = (
+        (0, "Predict"),
+        (1, "Explore h"),
+        (2, "Left"),
+        (3, "Right"),
+        (4, "Tangent"),
+        (5, "Explain"),
+    )
+    instruments = (
+        "<dt>h</dt><dd data-d-h>—</dd>"
+        "<dt>Δs</dt><dd data-d-rise>—</dd>"
+        "<dt>Rate</dt><dd data-d-rate>—</dd>"
+        "<dt>Left est</dt><dd data-d-left-est>—</dd>"
+        "<dt>Right est</dt><dd data-d-right-est>—</dd>"
+    )
+    return _lab_protocol_dashboard(protocol, instruments)
+
+
+def _limit_dashboard_html() -> str:
+    protocol = (
+        (0, "Predict"),
+        (1, "Trace left"),
+        (2, "Lock L⁻"),
+        (3, "Trace right"),
+        (4, "Lock L⁺"),
+        (5, "Compare"),
+    )
+    instruments = (
+        "<dt>f(x)</dt><dd data-d-fx>—</dd>"
+        '<dt>\\(L^{-}\\)</dt><dd data-d-left>—</dd>'
+        '<dt>\\(L^{+}\\)</dt><dd data-d-right>—</dd>'
+        "<dt>Limit</dt><dd data-d-limit>—</dd>"
+        "<dt>\\(f(c)\\)</dt><dd data-d-fc>—</dd>"
+    )
+    return _lab_protocol_dashboard(protocol, instruments)
 
 
 _LAB_VIEWBOX = "0 0 480 280"
@@ -550,7 +595,14 @@ def secant_math_lab_embed(spec_json: str) -> str:
         "</svg></div>"
     )
     inner = (
-        '<div class="ap-lab-phase ap-lab-phase--predict">'
+        '<div class="ap-lab-body ap-lab-body--split ap-lab-body--secant">'
+        '<div class="ap-lab-main ap-lab-main--graph">'
+        + graph_svg
+        + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
+        "</div>"
+        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
+        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Predict</p>'
+        '<div class="ap-lab-phase ap-lab-phase--predict" data-ap-predict-panel>'
         '<p class="ap-lab-phase__label">Predict</p>'
         '<p class="ap-lab-phase__prompt">As h → 0 from both sides, does the secant slope stabilize to one value?</p>'
         '<div class="ap-lab-predict-btns">'
@@ -560,36 +612,16 @@ def secant_math_lab_embed(spec_json: str) -> str:
         "</div>"
         '<p class="ap-lab-feedback" data-ap-predict-result hidden></p>'
         "</div>"
-        '<div class="ap-lab-phase ap-lab-phase--explore">'
-        '<p class="ap-lab-phase__label">Investigate</p>'
-        '<div class="ap-lab-explore ap-lab-body ap-lab-body--split ap-lab-body--secant">'
-        '<div class="ap-lab-main ap-lab-main--graph">'
-        + graph_svg
-        + '<p class="ap-lab-eq"><span data-ap-secant-eq></span> · <span data-ap-tangent-eq></span></p>'
-        "</div>"
-        '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
-        '<p class="ap-lab-side__title">Controls</p>'
+        '<div class="ap-lab-explore-stack" data-ap-explore-stack hidden>'
         '<div class="ap-lab-controls" data-ap-controls></div>'
         '<label class="ap-lab-slider-label" for="ap-secant-h">'
         'Interval h = <strong data-ap-h-val>1</strong> s (h ≠ 0)</label>'
         '<input type="range" id="ap-secant-h" class="ap-range ap-lab-range" '
         'data-ap-h-slider aria-label="Secant interval h in seconds"/>'
-        '<div class="ap-secant-metrics tex2jax_ignore">'
-        '<div class="ap-metric"><span>Rise Δs</span><strong data-ap-rise-val>—</strong> m</div>'
-        '<div class="ap-metric"><span>Run h</span><strong data-ap-run-val>—</strong> s</div>'
-        '<div class="ap-metric ap-metric--accent"><span>Avg rate</span>'
-        '<strong data-ap-rate-val>—</strong> m/s</div>'
-        "</div>"
         '<p class="ap-formula-readout" data-ap-formula-val></p>'
         '<table class="ap-lab-table"><thead><tr><th>h</th><th>Δs</th><th>Δs/h</th><th>From → To</th></tr></thead>'
         '<tbody data-ap-table-body></tbody></table>'
-        '<div class="ap-lab-estimates">'
-        '<span>Left estimate: <strong data-ap-left-est>—</strong></span>'
-        '<span>Right estimate: <strong data-ap-right-est>—</strong></span>'
-        '<span>Agreement: <strong data-ap-agree>Explore both sides</strong></span>'
-        "</div>"
-        "</aside></div></div>"
-        '<div class="ap-lab-phase ap-lab-phase--explain">'
+        '<div class="ap-lab-explain-panel" data-ap-explain-panel hidden>'
         '<p class="ap-lab-phase__label">Explain</p>'
         '<p>Why can we use h → 0 but not h = 0?</p>'
         '<div class="ap-lab-predict-btns">'
@@ -601,7 +633,9 @@ def secant_math_lab_embed(spec_json: str) -> str:
         '<span class="ap-box-label">Formal conclusion</span>'
         '<div class="ap-box-body">Instantaneous rate at t = 2 is <strong>4 m/s</strong>. '
         "Left and right secant slopes approach 4; tangent slope 4.</div></div>"
-        "</div>"
+        "</div></div>"
+        + _secant_dashboard_html()
+        + "</aside></div>"
         '<div class="ap-lab-tutor" data-ap-tutor>'
         '<p data-ap-tutor-text>Need a nudge? Tap for a hint (Level 1).</p>'
         '<button type="button" class="ap-lab-btn" data-ap-tutor-next>Get hint</button>'
@@ -689,7 +723,7 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         + '<p class="ap-lab-side-msg" data-ap-side-msg></p>'
         "</div>"
         '<aside class="ap-lab-side ap-lab-side--action" aria-label="Lab controls">'
-        '<p class="ap-lab-side__title">Controls</p>'
+        '<p class="ap-lab-side__title" data-ap-side-title>Controls · Trace left</p>'
         '<div class="ap-lab-controls">'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-left">Trace left</button>'
         '<button type="button" class="ap-lab-btn" data-ap-action="trace-right">Trace right</button>'
@@ -698,16 +732,12 @@ def limit_cases_math_lab_embed(spec_json: str) -> str:
         '<label for="ap-limit-x">x = <strong data-ap-x-read>2.60</strong></label>'
         '<input type="range" id="ap-limit-x" class="ap-range ap-lab-range" data-ap-x-slider '
         'aria-label="Trace x toward c"/>'
-        '<div class="ap-secant-metrics"><div class="ap-metric"><span>f(x)</span><strong data-ap-y-read>—</strong></div></div>'
         '<div class="ap-lab-lock-row">'
         '<button type="button" class="ap-lab-btn" data-ap-lock-left>Lock left observation</button>'
         '<button type="button" class="ap-lab-btn" data-ap-lock-right>Lock right observation</button>'
         "</div>"
-        '<p>Left: <strong data-ap-left-obs>______</strong> · Right: <strong data-ap-right-obs>______</strong></p>'
-        '<div class="ap-lab-limit-panel" data-ap-limit-panel hidden>'
-        '<p>Compare: <strong data-ap-compare>—</strong> · Limit: <strong data-ap-limit-val>—</strong> · f(c): <strong data-ap-fc-val>—</strong></p>'
-        "</div>"
-        "</aside></div>"
+        + _limit_dashboard_html()
+        + "</aside></div>"
         + _tracer_tutor_panel()
     )
     inner = inner + _explore_phase_gate(explore)
