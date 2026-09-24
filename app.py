@@ -5099,6 +5099,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
         "download_name": "NovelPrep-SAT-Unit-1-Algebra.pdf",
         "practice_test_candidates": ["SAT_Practice_Test_Unit_1.pdf"],
         "practice_test_download_name": "NovelPrep-SAT-Unit-1-Practice-Test.pdf",
+        "solutions_candidates": ["SAT_Unit1_CB_Solutions.pdf"],
+        "solutions_download_name": "NovelPrep-SAT-Unit-1-CB-Solutions.pdf",
     },
     "advanced_math": {
         "unit": "Unit 2",
@@ -5155,6 +5157,7 @@ def _unit_pdf_cards() -> List[dict]:
     cards: List[dict] = []
     for domain, meta in UNIT_PDF_MATERIALS.items():
         found = _resolve_first_existing_path(list(meta.get("candidates") or []))
+        sol = _resolve_first_existing_path(list(meta.get("solutions_candidates") or []))
         cards.append(
             {
                 "domain": domain,
@@ -5164,6 +5167,10 @@ def _unit_pdf_cards() -> List[dict]:
                 "available": found is not None,
                 "href": url_for("practice_unit_pdf", domain=domain) if found else "",
                 "filename_hint": str((meta.get("candidates") or [""])[0]),
+                "solutions_available": sol is not None,
+                "solutions_href": (
+                    url_for("practice_unit_solutions_pdf", domain=domain) if sol else ""
+                ),
             }
         )
     return cards
@@ -10737,6 +10744,23 @@ def practice_unit_pdf(domain: str):
         mimetype="application/pdf",
         as_attachment=True,
         download_name=meta.get("download_name") or os.path.basename(path),
+    )
+
+
+@app.route("/practice/specialized/pdf/<domain>/solutions")
+def practice_unit_solutions_pdf(domain: str):
+    session["active_track_label"] = "SAT Math"
+    meta = UNIT_PDF_MATERIALS.get(domain)
+    if not meta:
+        abort(404)
+    path = _resolve_first_existing_path(list(meta.get("solutions_candidates") or []))
+    if not path:
+        abort(404)
+    return send_file(
+        path,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=meta.get("solutions_download_name") or os.path.basename(path),
     )
 
 

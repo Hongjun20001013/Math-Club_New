@@ -258,6 +258,13 @@
                 <strong>Unit {{ unit_num }} worksheet</strong>
                 <em>Printable packet for offline practice</em>
               </a>
+              {% if unit_pdf.solutions_available %}
+              <a href="{{ unit_pdf.solutions_href }}" class="np-hard-detail-material">
+                <span>PDF</span>
+                <strong>Unit {{ unit_num }} step-by-step solutions</strong>
+                <em>CB bank answer key with worked steps</em>
+              </a>
+              {% endif %}
             </div>
           </div>
           {% endif %}
