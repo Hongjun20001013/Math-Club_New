@@ -5114,6 +5114,8 @@ UNIT_PDF_MATERIALS: Dict[str, Dict[str, Any]] = {
         "download_name": "NovelPrep-SAT-Unit-2-Advanced-Math.pdf",
         "practice_test_candidates": ["SAT_Practice_Test_Unit_2.pdf"],
         "practice_test_download_name": "NovelPrep-SAT-Unit-2-Practice-Test.pdf",
+        "solutions_candidates": ["SAT_Unit2_CB_Solutions.pdf"],
+        "solutions_download_name": "NovelPrep-SAT-Unit-2-CB-Solutions.pdf",
     },
     "problem_solving": {
         "unit": "Unit 3",

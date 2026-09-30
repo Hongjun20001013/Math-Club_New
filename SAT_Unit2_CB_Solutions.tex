@@ -1,0 +1,1497 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.70in,headheight=24pt,headsep=15pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,xcolor,fancyhdr,lastpage,needspace,booktabs,longtable,array,hyperref}
+\definecolor{NPdeep}{HTML}{3D247A}
+\definecolor{NPurple}{HTML}{6D4AFF}
+\definecolor{NPgray}{HTML}{666174}
+\definecolor{NPlav}{HTML}{F1ECFF}
+\hypersetup{colorlinks=true,linkcolor=NPdeep,pdftitle={SAT Unit 2 CB Bank - Step-by-Step Solutions},pdfauthor={Novel Prep}}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small\textcolor{NPdeep}{Novel Prep | SAT Unit 2}}
+\rhead{\small\textcolor{NPgray}{Advanced Math | Worked Solutions}}
+\cfoot{\small\textcolor{NPgray}{\thepage\ / \pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{NPlav}\leaders\hrule height 0.7pt\hfill}}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2em}
+\setlength{\abovedisplayskip}{6pt}\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{4pt}\setlength{\belowdisplayshortskip}{4pt}
+\newcommand{\step}[3]{\par\vspace{7pt}\textbf{\textcolor{NPurple}{Step #1.} #2}\par\vspace{2pt}#3\par}
+\newcommand{\answer}[1]{\par\vspace{10pt}\colorbox{NPlav}{\parbox{\dimexpr\linewidth-2\fboxsep}{\vspace{5pt}\textbf{\color{NPdeep}Final answer:} #1\vspace{5pt}}}\par}
+\begin{document}
+\vspace*{14pt}
+{\small\bfseries\color{NPurple} NOVEL PREP / SAT MATHEMATICS}\par
+\vspace{14pt}
+{\Huge\bfseries\color{NPdeep} Unit 2: Advanced Math}\par
+\vspace{6pt}
+{\LARGE\bfseries\color{NPurple} CB Bank}\par
+{\Large Step-by-Step Solutions}\par
+\vspace{12pt}
+{\large Jack Zeng}\par
+\textcolor{NPurple}{\rule{\linewidth}{1.2pt}}\par
+\vspace{8pt}
+\colorbox{NPlav}{\parbox{\dimexpr\linewidth-2\fboxsep}{\vspace{8pt}\centering\large\textbf{117 questions}\quad /\quad\textbf{3 sections}\quad /\quad\textbf{Fully worked}\vspace{8pt}}}\par
+\vspace{12pt}
+Original questions, choices, tables, and graphs are followed by clear numbered steps. Key equations appear on their own lines; each solution ends with a highlighted answer. Exact fractions and radicals are retained whenever possible.
+
+Question numbering follows the source within each section. Labels such as \textbf{2.2 / Q16} keep every solution easy to locate. A complete solution stays together; longer original questions may occupy the preceding page.
+\vspace{8pt}
+\tableofcontents
+\vfill
+{\small\color{NPgray}Source: the supplied Unit 2 question packet and answer-key screenshot. All 117 answers were compared with the supplied key after solving. See the verification notes for source wording and units requiring clarification.}
+\clearpage
+\section*{2.1 Equivalent Expressions}
+\addcontentsline{toc}{section}{2.1 Equivalent Expressions}
+\phantomsection\label{q1}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 1}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=1,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q1}\par
+\step{1}{Match the cubic coefficient.}{Only $(ax)(5x^2)$ produces an $x^3$ term.\[5a=20\quad\Rightarrow\quad a=4.\]}
+\step{2}{Match the quadratic coefficient.}{The $x^2$ terms are $-abx^2$ and $15x^2$.\[15-ab=-9\quad\Rightarrow\quad ab=24.\]}
+\step{3}{Check the remaining coefficient.}{Since $a=4$, $b=6$. The coefficient of $x$ is $4a-3b=16-18=-2$, as required.}
+\answer{C; $24$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q2}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 2}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=2,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q2}\par
+\step{1}{Split the middle term.}{Find two numbers with product $3(-63)=-189$ and sum 20: 27 and $-7$.\[3x^2+20x-63=3x^2+27x-7x-63.\]}
+\step{2}{Factor by grouping.}{\[3x(x+9)-7(x+9)=(3x-7)(x+9).\]}
+\step{3}{Evaluate the statements.}{II is a factor. I is not: $x-9$ would require $x=9$ to be a zero, but the polynomial equals 360 there.}
+\answer{B; II only}
+\end{minipage}
+\clearpage
+\phantomsection\label{q3}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 3}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=3,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q3}\par
+\step{1}{Convert each radical to a power.}{For $x>0$,\[\sqrt{x^5}=x^{5/2},\qquad \sqrt[3]{x^4}=x^{4/3}.\]}
+\step{2}{Subtract exponents when dividing.}{\[\frac{x^{5/2}}{x^{4/3}}=x^{5/2-4/3}=x^{15/6-8/6}=x^{7/6}.\]}
+\step{3}{Read the requested ratio.}{The exponent is $a/b$, so $a/b=7/6$. Positivity of $x$ makes these power rules valid.}
+\answer{$\frac76$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q4}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 4}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=4,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q4}\par
+\step{1}{Use a common denominator.}{\[\frac2{x-2}+\frac3{x+5}=\frac{2(x+5)+3(x-2)}{(x-2)(x+5)}.\]}
+\step{2}{Simplify the numerator.}{\[2x+10+3x-6=5x+4.\] Thus $r=5$ and $t=4$.}
+\step{3}{Multiply the constants.}{$rt=5(4)=20$. The stated domain $x>2$ excludes both denominator zeros.}
+\answer{C; $20$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q5}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 5}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=5,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q5}\par
+\step{1}{Convert the radicals to fractional exponents.}{\[\sqrt[5]{70n}\left(\sqrt[6]{70n}\right)^2=(70n)^{1/5}(70n)^{2/6}.\]}
+\step{2}{Add the exponents.}{\[\frac15+\frac26=\frac15+\frac13=\frac8{15}.\]}
+\step{3}{Match and solve the exponents.}{Since $70n>1$, equal powers require equal exponents.\[30x=\frac8{15}\quad\Rightarrow\quad x=\frac4{225}.\]}
+\answer{$\frac4{225}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q6}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 6}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=6,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q6}\par
+\step{1}{Expand the product.}{\[(3x-23)(19x+6)=57x^2+18x-437x-138.\]}
+\step{2}{Combine the linear terms.}{\[18x-437x=-419x.\]}
+\step{3}{Identify $b$.}{The standard form is $57x^2-419x-138$, so the coefficient $b$ is $-419$.}
+\answer{$-419$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q7}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 7}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=7,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q7}\par
+\step{1}{State the domain and common denominator.}{The original expression requires $x\ne5/4,-1$. Use $(4x-5)(x+1)$ as the common denominator.}
+\step{2}{Combine the numerators.}{\[\frac4{4x-5}-\frac1{x+1}=\frac{4(x+1)-(4x-5)}{(4x-5)(x+1)}.\]}
+\step{3}{Simplify carefully.}{$4x+4-4x+5=9$, so the result is $\frac9{(x+1)(4x-5)}$, on the original domain.}
+\answer{D; $\frac9{(x+1)(4x-5)}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q8}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 8}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=8,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q8}\par
+\step{1}{Multiply by the nonzero denominator.}{For $x\ne b$, equivalence gives\[x^2-c=(x-b)(x+b).\]}
+\step{2}{Use the difference of squares.}{The right side is $x^2-b^2$, so $c=b^2$.}
+\step{3}{Use the integer condition.}{Because $b$ is a positive integer, $c$ must be a positive perfect square. Of 4, 6, 8, and 10, only 4 qualifies ($b=2$).}
+\answer{A; $4$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q9}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 9}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=9,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q9}\par
+\step{1}{Compare the quadratic coefficients.}{\[4a=0.36\quad\Rightarrow\quad a=0.09.\]}
+\step{2}{Check the linear coefficient.}{$7(0.09)=0.63$.}
+\step{3}{Check the constant term.}{$13(0.09)=1.17$. All three coefficients agree, so $a=0.09=9/100$.}
+\answer{$0.09=\frac9{100}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q10}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 10}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=10,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q10}\par
+\step{1}{Expand the expression.}{\[3(2x^2+px+8)-16x(p+4)=6x^2+(3p-16p-64)x+24.\]}
+\step{2}{Match the coefficient of $x$.}{\[-13p-64=-155\quad\Rightarrow\quad -13p=-91.\]}
+\step{3}{Solve and verify.}{$p=7$. Then $-13(7)-64=-155$, and the other coefficients already match.}
+\answer{B; $7$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q11}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 11}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=11,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q11}\par
+\step{1}{Subtract exponents for each variable.}{\[\frac{x^{-2}y^{1/2}}{x^{1/3}y^{-1}}=x^{-2-1/3}y^{1/2-(-1)}=x^{-7/3}y^{3/2}.\]}
+\step{2}{Rewrite with positive exponents.}{\[x^{-7/3}y^{3/2}=\frac{y^{3/2}}{x^{7/3}}.\]}
+\step{3}{Convert to radicals.}{Since $x,y>1$,\[\frac{y^{3/2}}{x^{7/3}}=\frac{y\sqrt y}{x^2\sqrt[3]x}.\]}
+\answer{D; $\frac{y\sqrt y}{x^2\sqrt[3]x}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q12}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 12}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=12,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q12}\par
+\step{1}{Expand the factored form.}{\[(hx+k)(x+j)=hx^2+(hj+k)x+kj.\]}
+\step{2}{Match coefficients.}{$h=4$, $b=4j+k$, and $kj=-45$. In particular, $k\ne0$.}
+\step{3}{Identify the guaranteed integer.}{\[\frac{45}{k}=-j,\] which is an integer. For comparison, $k=5,j=-9$ gives $b=-31$, so $b/h$ and $b/k$ need not be integers; $45/h=45/4$ is not an integer.}
+\answer{D; $\frac{45}{k}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q13}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 13}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=13,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q13}\par
+\step{1}{Factor numerator and denominator.}{\[x^3-9x=x(x-3)(x+3),\qquad x^2-2x-3=(x-3)(x+1).\]}
+\step{2}{Cancel the common factor.}{Since $x>3$, the factor $x-3$ is nonzero.\[\frac{f(x)}{g(x)}=\frac{x(x-3)(x+3)}{(x-3)(x+1)}=\frac{x(x+3)}{x+1}.\]}
+\step{3}{Check the domain.}{For $x>3$, $x+1$ is also nonzero. The simplification is valid throughout the stated domain.}
+\answer{D; $\frac{x(x+3)}{x+1}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q14}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 14}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=14,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q14}\par
+\step{1}{Factor out $1/3$.}{\[\frac13x^2-2=\frac13(x^2-6).\]}
+\step{2}{Compare with the proposed factors.}{\[\frac13(x-k)(x+k)=\frac13(x^2-k^2).\] Thus $k^2=6$.}
+\step{3}{Choose the positive value.}{The problem specifies $k>0$, so $k=\sqrt6$.}
+\answer{D; $\sqrt6$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q15}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 15}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=15,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q15}\par
+\step{1}{Use the square-of-a-sum identity.}{$(u+v)^2=u^2+2uv+v^2$. Here $u=a$ and $v=b/2$.}
+\step{2}{Expand all three terms.}{\[\left(a+\frac b2\right)^2=a^2+2a\left(\frac b2\right)+\left(\frac b2\right)^2.\]}
+\step{3}{Simplify.}{\[a^2+ab+\frac{b^2}{4}.\] The middle term $ab$ must be included.}
+\answer{D; $a^2+ab+\frac{b^2}{4}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q16}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 16}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=16,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q16}\par
+\step{1}{Factor the denominator and preserve restrictions.}{$x^2y-8xy=xy(x-8)$, so the original domain requires $x\ne0,8$ and $y\ne0$.}
+\step{2}{Use the common denominator.}{\[\frac{y+12}{x-8}+\frac{y(x-8)}{xy(x-8)}=\frac{xy(y+12)+y(x-8)}{xy(x-8)}.\]}
+\step{3}{Expand and combine the numerator.}{\[xy^2+12xy+xy-8y=xy^2+13xy-8y.\] This gives choice C, with the original domain retained.}
+\answer{C; $\frac{xy^2+13xy-8y}{x^2y-8xy}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q17}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 17}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=17,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q17}\par
+\step{1}{Factor out the greatest common factor.}{\[2x^3+42x^2+208x=2x(x^2+21x+104).\]}
+\step{2}{Factor the quadratic.}{Since $8+13=21$ and $8(13)=104$,\[2x(x^2+21x+104)=2x(x+8)(x+13).\]}
+\step{3}{Choose the smallest positive $b$.}{The factors of the form $x+b$ with $b>0$ correspond to $b=8$ and $b=13$. The smaller value is 8.}
+\answer{$8$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q18}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 18}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=18,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q18}\par
+\step{1}{Factor the numerator.}{\[x^2+6x-7=(x+7)(x-1).\]}
+\step{2}{Cancel on the stated domain.}{For $x\ne-7$,\[\frac{(x+7)(x-1)}{x+7}=x-1.\]}
+\step{3}{Match coefficients.}{$a=1$ and $d=-1$, so $a+d=0$.}
+\answer{C; $0$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q19}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 19}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=19,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q19}\par
+\step{1}{Divide the leading terms.}{Dividing $x^2$ by $x$ gives $x$. Subtract $x(x-3)=x^2-3x$ from the numerator to obtain $x-5$.}
+\step{2}{Complete the division.}{The next quotient term is 1. Subtract $(x-3)$ from $(x-5)$ to obtain the remainder $-2$.}
+\step{3}{Write and verify the result.}{\[\frac{x^2-2x-5}{x-3}=x+1-\frac2{x-3},\qquad x\ne3.\] Check: $(x-3)(x+1)-2=x^2-2x-5$.}
+\answer{D; $x+1-\frac2{x-3}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q20}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 20}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=20,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q20}\par
+\step{1}{Distribute the factor 10.}{\[(7532+100y^2)+10(10y^2-110)=7532+100y^2+100y^2-1100.\]}
+\step{2}{Combine like terms.}{The expression becomes $200y^2+6432$. Thus $a=200$ and $b=6432$.}
+\step{3}{Add the coefficients requested.}{\[a+b=200+6432=6632.\]}
+\answer{$6632$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q21}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 21}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=21,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q21}\par
+\step{1}{Simplify the fifth root.}{Since $x>1$,\[6\sqrt[5]{3^5x^{45}}=6(3x^9)=18x^9.\]}
+\step{2}{Simplify the eighth root and multiply.}{\[\sqrt[8]{2^8x}=2x^{1/8},\qquad (18x^9)(2x^{1/8})=36x^{73/8}.\]}
+\step{3}{Identify and add $a$ and $b$.}{\[a=36,\quad b=\frac{73}{8},\quad a+b=\frac{288+73}{8}=\frac{361}{8}=45.125.\]}
+\answer{$\frac{361}{8}=45.125$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q22}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 22}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=22,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q22}\par
+\step{1}{Recognize a perfect square.}{\[c^2+2cd+d^2=(c+d)^2=a^2.\]}
+\step{2}{Rewrite the expression.}{\[x^2-c^2-2cd-d^2=x^2-a^2.\]}
+\step{3}{Factor the difference of squares.}{\[x^2-a^2=(x+a)(x-a).\]}
+\answer{C; $(x+a)(x-a)$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q23}
+{\Large\bfseries\color{NPdeep} 2.1 / Question 23}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=23,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.1 / Q23}\par
+\step{1}{Combine the radicals.}{Since $a+c>0$,\[\sqrt{(a+c)^3}\sqrt{a+c}=\sqrt{(a+c)^4}.\]}
+\step{2}{Simplify the square root.}{$\sqrt{(a+c)^4}=(a+c)^2$, since a square is nonnegative.}
+\step{3}{Expand the binomial.}{\[(a+c)^2=a^2+2ac+c^2.\]}
+\answer{C; $a^2+2ac+c^2$}
+\end{minipage}
+\clearpage
+\section*{2.2 Nonlinear Equations and Systems}
+\addcontentsline{toc}{section}{2.2 Nonlinear Equations and Systems}
+\phantomsection\label{q24}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 1}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=24,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q1}\par
+\step{1}{Combine identical absolute-value terms.}{\[2|4-x|+3|4-x|=25\quad\Rightarrow\quad |4-x|=5.\]}
+\step{2}{Solve both branches.}{$4-x=5$ gives $x=-1$; $4-x=-5$ gives $x=9$.}
+\step{3}{Select and check the positive root.}{The positive solution is 9. Substitution gives $2(5)+3(5)=25$.}
+\answer{$9$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q25}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 2}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=25,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q2}\par
+\step{1}{Complete the square.}{\[x^2-2x-9=0\quad\Rightarrow\quad (x-1)^2=10.\]}
+\step{2}{Take both square roots.}{\[x=1\pm\sqrt{10}.\]}
+\step{3}{Match the specified form.}{The solution $1+\sqrt k$ has $k=10$.}
+\answer{B; $10$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q26}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 3}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=26,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q3}\par
+\step{1}{Set the parabola equal to the line.}{The line is $y=4.5/2=9/4$. Thus\[4x^2-bx+\frac94=0.\]}
+\step{2}{Require a repeated root.}{Exactly one intersection requires discriminant zero.\[(-b)^2-4(4)\left(\frac94\right)=b^2-36=0.\]}
+\step{3}{Use positivity and check.}{$b=6$. Then $y=-4(x-3/4)^2+9/4$, so the horizontal line meets exactly the vertex.}
+\answer{$6$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q27}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 4}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=27,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q4}\par
+\step{1}{Express $y$ in terms of $x$.}{From $x-y=1$, obtain $y=x-1$.}
+\step{2}{Substitute and solve.}{\[x+(x-1)=x^2-3\quad\Rightarrow\quad x^2-2x-2=0.\] Hence $x=1\pm\sqrt3$ and $y=\pm\sqrt3$ with matching signs.}
+\step{3}{Identify the listed pair.}{Choice A is $(1+\sqrt3,\sqrt3)$. It satisfies both $x-y=1$ and $x+y=x^2-3$.}
+\answer{A; $(1+\sqrt3,\sqrt3)$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q28}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 5}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=28,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q5}\par
+\step{1}{Recognize the denominator.}{\[x^2+10x+25=(x+5)^2,\qquad x\ne-5.\]}
+\step{2}{Solve for the squared expression.}{\[\frac1{(x+5)^2}=4\quad\Rightarrow\quad (x+5)^2=\frac14.\]}
+\step{3}{Take both signs and select a listed value.}{$x+5=\pm1/2$. Only $1/2$ is listed, and its square makes the reciprocal equal 4.}
+\answer{A; $\frac12$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q29}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 6}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=29,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q6}\par
+\step{1}{Clear the denominator.}{\[a=\frac{v_f-12}{5}\quad\Rightarrow\quad 5a=v_f-12.\]}
+\step{2}{Isolate final velocity.}{\[v_f=5a+12.\]}
+\step{3}{Match coefficients.}{Comparing with $v_f=xa+y$ gives $x=5$ and $y=12$. The requested value is 5.}
+\answer{$5$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q30}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 7}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=30,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q7}\par
+\step{1}{Put the equation in standard form.}{\[2x^2-2=2x+3\quad\Rightarrow\quad 2x^2-2x-5=0.\]}
+\step{2}{Apply the quadratic formula.}{\[x=\frac{2\pm\sqrt{(-2)^2-4(2)(-5)}}4=\frac{2\pm\sqrt{44}}4.\]}
+\step{3}{Simplify the radical.}{\[x=\frac{1\pm\sqrt{11}}2.\] The positive-sign root is listed in D.}
+\answer{D; $\frac{1+\sqrt{11}}2$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q31}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 8}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=31,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q8}\par
+\step{1}{Find the vertex's horizontal coordinate.}{For $y=-2x^2+9x$,\[x_v=-\frac9{2(-2)}=\frac94.\]}
+\step{2}{Evaluate the maximum height.}{\[y_v=-2\left(\frac94\right)^2+9\left(\frac94\right)=\frac{81}{8}.\]}
+\step{3}{Relate the line to the vertex.}{The horizontal line is $y=c/2$. One intersection requires $c/2=81/8$, so $c=81/4=20.25$.}
+\answer{$\frac{81}{4}=20.25$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q32}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 9}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=32,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q9}\par
+\step{1}{State the domain and square the equality.}{The right radical requires $x\ge-34/3$. Squaring the nonnegative sides gives\[(x-2)^2=3x+34.\]}
+\step{2}{Solve the resulting quadratic.}{\[x^2-7x-30=0\quad\Rightarrow\quad (x-10)(x+3)=0.\] Candidates are 10 and $-3$.}
+\step{3}{Check both in the original equation.}{At $x=-3$, both sides equal 5; at $x=10$, both equal 8. Both are valid, and the smaller is $-3$.}
+\answer{$-3$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q33}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 10}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=33,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q10}\par
+\step{1}{Identify the quadratic coefficients.}{For $Ax^2+Bx+C=0$, the product of its roots is $C/A$. Here $A=57$ and $C=ab$.}
+\step{2}{Compute the product.}{\[x_1x_2=\frac{ab}{57}=kab.\]}
+\step{3}{Solve for $k$.}{Since $a,b>0$, divide by $ab$ to get $k=1/57$. Equivalently, the polynomial factors as $(57x+a)(x+b)$.}
+\answer{A; $\frac1{57}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q34}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 11}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=34,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q11}\par
+\step{1}{Compute the discriminant.}{For $-x^2+bx-676=0$,\[\Delta=b^2-4(-1)(-676)=b^2-2704.\]}
+\step{2}{Require no real solutions.}{$\Delta<0$ gives $b^2<2704=52^2$. Since $b$ is positive, $b<52$.}
+\step{3}{Choose the greatest integer.}{The greatest possible integer is 51. Check: $51^2-2704=-103<0$; at 52 the discriminant is zero.}
+\answer{$51$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q35}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 12}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=35,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q12}\par
+\step{1}{Group the requested expression.}{\[3x^2-18x-15=0\quad\Rightarrow\quad 3(x^2-6x)=15.\]}
+\step{2}{Divide by 3.}{\[x^2-6x=5.\]}
+\step{3}{Check why individual roots are unnecessary.}{Every solution of the original equation satisfies this rearrangement, so the requested expression has value 5 for either root.}
+\answer{$5$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q36}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 13}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=36,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q13}\par
+\step{1}{Complete the square.}{\[2x^2-4x=2(x-1)^2-2.\]}
+\step{2}{Identify the range.}{Because $(x-1)^2\ge0$, the left side is at least $-2$. There are no real solutions when $t<-2$.}
+\step{3}{Compare the choices.}{Only $t=-3$ is below $-2$. At that value, the equation would require a negative square.}
+\answer{A; $-3$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q37}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 14}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=37,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q14}\par
+\step{1}{Write the quadratic and handle $k=0$.}{\[kx^2-56x+16=0.\] If $k=0$, the equation is linear and has a solution, so that case is excluded.}
+\step{2}{Apply the discriminant condition.}{For $k\ne0$, no real solution requires\[(-56)^2-4k(16)<0\quad\Rightarrow\quad 3136-64k<0.\]}
+\step{3}{Choose the smallest integer.}{$k>49$, so the smallest integer is 50. At $k=49$, there is a repeated real root; at 50, the discriminant is $-64$.}
+\answer{$50$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q38}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 15}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=38,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q15}\par
+\step{1}{Simplify and isolate the radical.}{The original radical covers $w+19$.\[\frac{14x}{7y}=2\sqrt{w+19}\quad\Rightarrow\quad \frac xy=\sqrt{w+19}.\]}
+\step{2}{Square both sides.}{Since $x,y>0$, both sides are nonnegative.\[\left(\frac xy\right)^2=w+19.\]}
+\step{3}{Solve for $w$.}{\[w=\left(\frac xy\right)^2-19.\] The given positivity of $w$ further implies $(x/y)^2>19$.}
+\answer{C; $w=\left(\frac xy\right)^2-19$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q39}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 16}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=39,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q16}\par
+\step{1}{Isolate the radical and restrict $x$.}{\[\sqrt{2x+6}=x-1.\] Since a square root is nonnegative, any solution must have $x\ge1$.}
+\step{2}{Square and factor.}{\[2x+6=(x-1)^2\quad\Rightarrow\quad x^2-4x-5=(x-5)(x+1)=0.\]}
+\step{3}{Reject the extraneous candidate.}{$x=-1$ violates $x\ge1$. For $x=5$, the original sides are $\sqrt{16}+4=8$ and $5+3=8$. Thus the solution set is $\{5\}$.}
+\answer{B; $\{5\}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q40}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 17}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=40,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q17}\par
+\step{1}{Set the functions equal.}{\[-\frac12(a-4)^2+10=-a+10\quad\Rightarrow\quad (a-4)^2=2a.\]}
+\step{2}{Expand and factor.}{\[a^2-10a+16=0\quad\Rightarrow\quad (a-2)(a-8)=0.\]}
+\step{3}{Check and give one possible value.}{At $a=2$, both functions equal 8; at $a=8$, both equal 2. Either 2 or 8 answers the question.}
+\answer{$2$ or $8$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q41}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 18}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=41,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q18}\par
+\step{1}{Complete the square.}{\[x^2-34x+c=0\quad\Rightarrow\quad (x-17)^2=289-c.\]}
+\step{2}{Determine when real roots are impossible.}{The left side is nonnegative, so no real solutions occur exactly when $289-c<0$, or $c>289$.}
+\step{3}{Identify the least threshold.}{$n=289$. Any smaller threshold would incorrectly include some values of $c$ at or below 289, where real solutions exist.}
+\answer{$289$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q42}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 19}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=42,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q19}\par
+\step{1}{Complete the square.}{\[-16x^2-8x+c=-16\left(x+\frac14\right)^2+(c+1).\]}
+\step{2}{Require exactly one real root.}{The equation gives $(x+1/4)^2=(c+1)/16$. A single root occurs only when the right side is zero.}
+\step{3}{Solve and check.}{$c=-1$. The equation becomes $-16(x+1/4)^2=0$, with the unique solution $x=-1/4$.}
+\answer{$-1$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q43}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 20}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=43,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q20}\par
+\step{1}{Use the sign of a real square.}{For every real $x$, $(x-1)^2\ge0$.}
+\step{2}{Compare with the required value.}{The equation requires $(x-1)^2=-4$, a negative value.}
+\step{3}{Count the real solutions.}{No real number can satisfy the equation. The number of distinct real solutions is zero.}
+\answer{D; zero real solutions}
+\end{minipage}
+\clearpage
+\phantomsection\label{q44}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 21}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=44,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q21}\par
+\step{1}{Compute the discriminant.}{\[\Delta=10^2-4(5)(16)=100-320=-220.\]}
+\step{2}{Apply the real-root criterion.}{A negative discriminant means there are no real roots.}
+\step{3}{Confirm by completing the square.}{$5x^2+10x+16=5(x+1)^2+11>0$ for all real $x$, so it can never equal zero.}
+\answer{D; zero real solutions}
+\end{minipage}
+\clearpage
+\phantomsection\label{q45}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 22}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=45,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q22}\par
+\step{1}{Substitute the linear equation.}{From $x+y+1=0$, $y=-x-1$. Thus\[x^2+2x+1=-x-1.\]}
+\step{2}{Find both intersections.}{$x^2+3x+2=(x+1)(x+2)=0$, giving $(x,y)=(-1,0)$ and $(-2,1)$.}
+\step{3}{Add the $y$-coordinates.}{\[y_1+y_2=0+1=1.\]}
+\answer{D; $1$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q46}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 23}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=46,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q23}\par
+\step{1}{Clear the denominator.}{The original equation requires $t\ne2$.\[(u-3)(t-2)=6.\] It also follows that $u\ne3$.}
+\step{2}{Isolate $t$.}{\[t=2+\frac6{u-3}.\]}
+\step{3}{Combine into one fraction.}{\[t=\frac{2(u-3)+6}{u-3}=\frac{2u}{u-3}.\] For $u\ne3$, this expression cannot equal 2, so the original restriction is respected.}
+\answer{D; $t=\frac{2u}{u-3}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q47}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 24}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=47,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q24}\par
+\step{1}{Compute the discriminant.}{\[\Delta=30^2-4(-9)c=900+36c.\]}
+\step{2}{Set it equal to zero.}{Exactly one real solution requires $900+36c=0$.}
+\step{3}{Solve and verify.}{$c=-25$. The resulting equation is $-(3x-5)^2=0$, with one root $x=5/3$.}
+\answer{C; $-25$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q48}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 25}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=48,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q25}\par
+\step{1}{State the domain and combine fractions.}{The radical is in a denominator, so $x^2-c^2>0$. Subtract the two fractions:\[\frac{x^2-c^2}{\sqrt{x^2-c^2}}=39.\]}
+\step{2}{Simplify and solve.}{\[\sqrt{x^2-c^2}=39\quad\Rightarrow\quad x^2=c^2+39^2.\]}
+\step{3}{Select a valid listed root.}{Both signs are valid: $x=\pm\sqrt{c^2+39^2}$. Each gives a nonzero denominator of 39. The negative root is choice D.}
+\answer{D; $-\sqrt{c^2+39^2}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q49}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 26}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=49,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q26}\par
+\step{1}{Express $y$ from each equation.}{\[y=-11-8x,\qquad y=2x^2-341.\]}
+\step{2}{Equate and factor.}{\[2x^2+8x-330=0\quad\Rightarrow\quad (x+15)(x-11)=0.\]}
+\step{3}{Select and check the listed value.}{The candidates are $-15$ and 11; only $-15$ is listed. It gives $y=109$, and $2(-15)^2=109+341=450$.}
+\answer{A; $-15$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q50}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 27}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=50,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q27}\par
+\step{1}{Expand both sides.}{\[x^2+x-56=4x^2-28x.\]}
+\step{2}{Write standard form.}{\[3x^2-29x+56=0.\]}
+\step{3}{Use the sum-of-roots formula.}{The sum is $-B/A=29/3$. Its discriminant is $29^2-4(3)(56)=169>0$, confirming two real roots.}
+\answer{$\frac{29}{3}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q51}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 28}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=51,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q28}\par
+\step{1}{Find the two points on the parabola.}{At $x=1$, $a=1^2-9=-8$. At $x=5$, $b=5^2-9=16$.}
+\step{2}{Calculate the slope.}{\[m=\frac{16-(-8)}{5-1}=\frac{24}{4}=6.\]}
+\step{3}{Check the secant line.}{The line $y=6x-14$ gives $-8$ at $x=1$ and 16 at $x=5$, matching both points.}
+\answer{A; $6$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q52}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 29}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=52,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q29}\par
+\step{1}{Expand the formula.}{\[D=T-36+\frac9{25}H.\]}
+\step{2}{Isolate the humidity term.}{\[D-T+36=\frac9{25}H.\]}
+\step{3}{Multiply by $25/9$.}{\[H=\frac{25}{9}(D-T)+100.\] The relation is used within the stated range $H>50$.}
+\answer{A; $H=\frac{25}{9}(D-T)+100$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q53}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 30}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=53,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q30}\par
+\step{1}{Move all terms to one side.}{\[(x-a)(x-29)-(x-29)=0.\]}
+\step{2}{Factor without dividing by $x-29$.}{\[(x-29)(x-a-1)=0.\] Thus $x=29$ or $x=a+1$.}
+\step{3}{Evaluate the statements.}{II and III are solutions. I is not: at $x=a$, the right side is 0 but the left is $a-29>1$.}
+\answer{C; II and III only}
+\end{minipage}
+\clearpage
+\phantomsection\label{q54}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 31}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=54,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q31}\par
+\step{1}{Set the two equations equal.}{\[2x^2-21x+64=3x+a\quad\Rightarrow\quad 2x^2-24x+64-a=0.\]}
+\step{2}{Complete the square.}{\[2(x-6)^2=a+8.\]}
+\step{3}{Use the single-intersection condition.}{A single real root requires $a=-8$, making $(x-6)^2=0$. Therefore the intersection has $x=6$.}
+\answer{C; $6$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q55}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 32}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=55,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q32}\par
+\step{1}{Set the outputs equal.}{\[3x^2-14x=x\quad\Rightarrow\quad 3x^2-15x=0.\]}
+\step{2}{Factor.}{\[3x(x-5)=0,\] so $x=0$ or $x=5$.}
+\step{3}{Identify the second point.}{The first point is already $(0,0)$. The other is $(5,5)$, so $a=5$.}
+\answer{$5$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q56}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 33}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=56,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q33}\par
+\step{1}{Apply the sum-of-roots formula.}{\[x_1+x_2=\frac{16a+4b}{64}.\]}
+\step{2}{Factor and simplify.}{\[\frac{16a+4b}{64}=\frac{4(4a+b)}{64}=\frac1{16}(4a+b).\]}
+\step{3}{Identify the coefficient.}{The requested multiplier is $k=1/16=0.0625$.}
+\answer{$\frac1{16}=0.0625$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q57}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 34}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=57,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q34}\par
+\step{1}{Identify the coefficients.}{For $x^2-40x-10=0$, $A=1$ and $B=-40$.}
+\step{2}{Use the sum of roots.}{\[x_1+x_2=-\frac BA=-\frac{-40}{1}=40.\]}
+\step{3}{Check with the explicit roots.}{Completing the square gives $x=20\pm\sqrt{410}$; their sum is 40.}
+\answer{D; $40$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q58}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 35}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=58,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q35}\par
+\step{1}{Rewrite the linear equation.}{$y-5x+8=0$ gives $y=5x-8$.}
+\step{2}{Equate and factor.}{\[x^2+3x-7=5x-8\quad\Rightarrow\quad (x-1)^2=0.\]}
+\step{3}{Count and check the intersection.}{Only $x=1$ is possible, giving $y=-3$ in both equations. There is exactly one solution.}
+\answer{C; exactly one solution}
+\end{minipage}
+\clearpage
+\phantomsection\label{q59}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 36}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=59,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q36}\par
+\step{1}{State restrictions and clear denominators.}{The domain excludes $x=\pm3$. Multiply by $(x-3)(x+3)$:\[4x^2-2x(x-3)=x+3.\]}
+\step{2}{Simplify and factor.}{\[2x^2+5x-3=(2x-1)(x+3)=0.\]}
+\step{3}{Discard the forbidden value.}{$x=-3$ makes original denominators zero. The valid root is $x=1/2$; substitution gives $-2/5$ on both sides of the original equation.}
+\answer{C; $\frac12$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q60}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 37}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=60,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q37}\par
+\step{1}{Require a positive discriminant.}{More than one real solution means two distinct roots.\[\Delta=b^2-4(64)(25)=b^2-6400>0.\]}
+\step{2}{Solve the condition.}{$b^2>80^2$, equivalently $|b|>80$.}
+\step{3}{Check the choices.}{Only $b=-91$ has absolute value greater than 80. At $b=-80$ the discriminant is zero, so it gives only one distinct root.}
+\answer{A; $-91$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q61}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 38}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=61,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q38}\par
+\step{1}{Complete the square for the parabola.}{\[y=x^2+8x+a=(x+4)^2+a-16.\]}
+\step{2}{Make the horizontal line tangent.}{A horizontal line meets this upward-opening parabola once only at its minimum. Thus $a-16=-1.5$.}
+\step{3}{Solve and check.}{$a=14.5=29/2$. The unique point is $(-4,-1.5)$.}
+\answer{$\frac{29}{2}=14.5$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q62}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 39}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=62,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q39}\par
+\step{1}{Locate the vertex.}{For $y=-x^2+9x-100$,\[x_v=-\frac9{2(-1)}=\frac92.\]}
+\step{2}{Compute the vertex height.}{\[y_v=-\left(\frac92\right)^2+9\left(\frac92\right)-100=-\frac{319}{4}.\]}
+\step{3}{Choose the tangent horizontal line.}{Exactly one intersection occurs at the vertex, so $c=-319/4$.}
+\answer{C; $-\frac{319}{4}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q63}
+{\Large\bfseries\color{NPdeep} 2.2 / Question 40}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=63,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.2 / Q40}\par
+\step{1}{Solve both equations for $y$.}{\[x^2+y+7=7\Rightarrow y=-x^2,\qquad 20x+100-y=0\Rightarrow y=20x+100.\]}
+\step{2}{Equate and factor.}{\[x^2+20x+100=(x+10)^2=0.\]}
+\step{3}{Find and verify the solution.}{$x=-10$, and $y=-100$. Both original equations hold, so the requested value is $-10$.}
+\answer{$-10$}
+\end{minipage}
+\clearpage
+\section*{2.3 Nonlinear Functions}
+\addcontentsline{toc}{section}{2.3 Nonlinear Functions}
+\phantomsection\label{q64}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 1}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=64,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q1}\par
+\step{1}{Set the height equal to zero.}{At an $x$-intercept,\[2(x-4)^2-32=0\quad\Rightarrow\quad (x-4)^2=16.\]}
+\step{2}{Solve both branches.}{$x-4=\pm4$, so $x=0$ or $x=8$.}
+\step{3}{Identify the second intercept.}{The first is $(0,0)$, so the other is $(8,0)$ and $t=8$.}
+\answer{D; $8$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q65}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 2}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=65,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q2}\par
+\step{1}{Use the definition of a $y$-intercept.}{Set $x=0$ in the exponential function $f(x)=-8\cdot2^x+22$.}
+\step{2}{Evaluate the zero power.}{\[f(0)=-8(2^0)+22=-8+22=14.\]}
+\step{3}{Write the coordinate pair.}{The $y$-intercept is $(0,14)$, not just the number 14.}
+\answer{A; $(0,14)$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q66}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 3}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=66,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q3}\par
+\step{1}{Evaluate the initial output.}{\[f(0)=9000(0.66)^0=9000.\]}
+\step{2}{Translate the input into a year.}{The input counts years since 1997, so $x=0$ means 1997.}
+\step{3}{Interpret the intercept.}{The model estimates that the company sent 9,000 advertisements in 1997. Because the model decreases, this is the initial value, not the minimum over the interval.}
+\answer{D; 9,000 advertisements in 1997}
+\end{minipage}
+\clearpage
+\phantomsection\label{q67}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 4}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=67,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q4}\par
+\step{1}{Identify the geometric-sequence rule.}{The first term is 9 and the common ratio is 4.}
+\step{2}{Count the multiplications.}{To reach term $n$ from term 1, multiply by 4 exactly $n-1$ times.\[w=9\cdot4^{n-1}.\]}
+\step{3}{Check the first two terms.}{At $n=1$, $w=9$; at $n=2$, $w=36$, four times the first term.}
+\answer{D; $w=9\cdot4^{n-1}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q68}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 5}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=68,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q5}\par
+\step{1}{Evaluate the shifted function at zero.}{Read $f(x)=-a^x+b$ as an exponential function. Since $a^0=1$,\[f(0)-12=-1+b-12=b-13.\]}
+\step{2}{Use the given $y$-intercept.}{\[b-13=-\frac{75}{7}\quad\Rightarrow\quad b=\frac{16}{7}.\]}
+\step{3}{Use the product and solve for $a$.}{\[ab=\frac{320}{7}\quad\Rightarrow\quad a=\frac{320/7}{16/7}=20.\]}
+\answer{$20$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q69}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 6}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=69,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q6}\par
+\step{1}{Use vertex form.}{The maximum occurs at $(1.8,51.84)$, so\[h=A(t-1.8)^2+51.84,\qquad A<0.\]}
+\step{2}{Use the launch height.}{At $t=0$, $h=0$. Thus $0=A(1.8)^2+51.84$, giving $A=-51.84/3.24=-16$.}
+\step{3}{Write and check the model.}{\[h=-16(t-1.8)^2+51.84.\] At $t=3.6$, this also gives $h=0$, matching the landing time.}
+\answer{D; $h=-16(t-1.8)^2+51.84$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q70}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 7}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=70,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q7}\par
+\step{1}{Evaluate the exponential at zero.}{The function is $f(x)=a^x+b$, so\[f(0)=1+b.\]}
+\step{2}{Use the given intercept.}{\[1+b=-323\quad\Rightarrow\quad b=-324.\]}
+\step{3}{Check the other intercept.}{$f(2)=0$ requires $a^2=324$. The positive exponential base $a=18$ works, confirming consistency.}
+\answer{$-324$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q71}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 8}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=71,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q8}\par
+\step{1}{Find the nonzero root.}{\[f(x)=-500x^2+25{,}000x=-500x(x-50).\] Thus the nonzero $x$-intercept is $a=50$.}
+\step{2}{Interpret input and output.}{The input $x$ is the unit price; the output $f(x)$ is revenue. At an $x$-intercept, revenue is zero.}
+\step{3}{State the meaning.}{$a$ represents the unit price that produces \$0 revenue. It does not represent the price maximizing revenue, which lies midway between the roots.}
+\answer{C; the unit price producing zero revenue}
+\end{minipage}
+\clearpage
+\phantomsection\label{q72}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 9}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=72,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q9}\par
+\step{1}{Identify the daily growth factor.}{The table doubles each day: $5.0\times10^5/(2.5\times10^5)=2$.}
+\step{2}{Write the model from day 1.}{\[N(d)=2.5\times10^5\cdot2^{d-1}.\]}
+\step{3}{Solve for the day.}{\[2^{d-1}=\frac{5.12\times10^8}{2.5\times10^5}=2048=2^{11}.\] Therefore $d-1=11$ and $d=12$.}
+\answer{D; Day 12}
+\end{minipage}
+\clearpage
+\phantomsection\label{q73}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 10}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=73,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q10}\par
+\step{1}{Find the axis of symmetry.}{Since $f(-9)=f(3)$, the axis is halfway between these inputs:\[h=\frac{-9+3}{2}=-3.\]}
+\step{2}{Determine $a$.}{For $f(x)=ax^2+4x+c$, $h=-4/(2a)=-2/a$. Thus $a=2/3$, so statement II ($a\ge1$) is false.}
+\step{3}{Test whether statement I is necessary.}{At the vertex, $k=c-6<0$, giving only $c<6$. For example, $c=1$ gives $k=-5<0$ while $c>0$. Thus I need not be true either.}
+\answer{D; neither I nor II}
+\end{minipage}
+\clearpage
+\phantomsection\label{q74}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 11}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=74,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q11}\par
+\step{1}{Find the minimum input for $f$.}{\[x_v=-\frac{64}{2(4)}=-8.\] The positive leading coefficient guarantees a minimum.}
+\step{2}{Match the input of $g$ to that value.}{Since $g(x)=f(x+5)$, its minimum occurs when $x+5=-8$.}
+\step{3}{Solve.}{$x=-13$. Equivalently, $f(x)=4(x+8)^2+6$, so $g(x)=4(x+13)^2+6$.}
+\answer{A; $-13$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q75}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 12}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=75,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q12}\par
+\step{1}{Express the upward shift.}{Translating up 4 units gives $g(x)=f(x)+4$.}
+\step{2}{Evaluate the original function at zero.}{\[f(0)=(-6)(-2)(6)=72.\]}
+\step{3}{Add the vertical shift.}{\[g(0)=72+4=76.\]}
+\answer{$76$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q76}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 13}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=76,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q13}\par
+\step{1}{Use the parabola's symmetry.}{The maximum occurs at $t=3$, so the axis of symmetry is $t=3$.}
+\step{2}{Reflect the initial time across that axis.}{The initial height of 7 meters occurs at $t=0$, which is 3 seconds before the vertex. The same height occurs 3 seconds after it.}
+\step{3}{Calculate and check the later time.}{The time is $t=6$. Indeed, $h(t)=-4.9(t-3)^2+51.1$ gives $h(0)=h(6)=7$.}
+\answer{B; $6$ seconds}
+\end{minipage}
+\clearpage
+\phantomsection\label{q77}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 14}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=77,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q14}\par
+\step{1}{Identify an upward-opening quadratic.}{The coefficient of $x^2$ is positive, so the vertex gives the minimum.}
+\step{2}{Find its $x$-coordinate.}{\[x_v=-\frac{-14}{2(1)}=7.\]}
+\step{3}{Confirm by completing the square.}{$y=(x-7)^2-27$, minimized when $x=7$. The question asks for the input, not the minimum output $-27$.}
+\answer{$7$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q78}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 15}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=78,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q15}\par
+\step{1}{Evaluate the shifted function at zero.}{Because $f(x)=-a^x+b$,\[f(0)-15=-1+b-15=b-16.\]}
+\step{2}{Use the $y$-intercept to find $b$.}{\[b-16=-\frac{99}{7}\quad\Rightarrow\quad b=\frac{13}{7}.\]}
+\step{3}{Solve using the product.}{\[ab=\frac{65}{7}\quad\Rightarrow\quad a=\frac{65/7}{13/7}=5.\]}
+\answer{$5$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q79}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 16}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=79,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q16}\par
+\step{1}{Read the roots.}{$f(x)=(x-14)(x+19)$ has roots $14$ and $-19$.}
+\step{2}{Find their midpoint.}{The vertex lies halfway between the roots:\[x_v=\frac{14+(-19)}2=-\frac52.\]}
+\step{3}{Confirm it is a minimum.}{The leading coefficient is 1, so the parabola opens upward. Its minimum occurs at $x=-5/2$.}
+\answer{D; $-\frac52$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q80}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 17}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=80,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q17}\par
+\step{1}{Convert the percentage increase to a multiplier.}{An increase of 150\% means the new value is $100\%+150\%=250\%$ of the old value, so the growth factor is 2.5.}
+\step{2}{Find the initial population.}{The end of 2016 corresponds to $t=1$. If $n=A(2.5)^t$, then $180=2.5A$, so $A=72$.}
+\step{3}{Write and check the model.}{\[n=72(2.5)^t.\] At $t=1$, this gives 180, as required.}
+\answer{B; $n=72(2.5)^t$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q81}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 18}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=81,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q18}\par
+\step{1}{Use the sign restriction.}{$|59-2k|=3k$ requires $k\ge0$ because an absolute value is nonnegative.}
+\step{2}{Solve the two branches.}{$59-2k=3k$ gives $k=59/5$. The other branch, $59-2k=-3k$, gives $k=-59$, which violates $k\ge0$.}
+\step{3}{Check the valid result.}{At $k=59/5$, $|59-118/5|=177/5=3k$.}
+\answer{A; $\frac{59}{5}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q82}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 19}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=82,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q19}\par
+\step{1}{Interpret the annual factor.}{The population is multiplied by $1+r$ each year.}
+\step{2}{Require positive decay.}{For a positive population to decrease by a fixed percentage each year, its multiplier must satisfy\[0<1+r<1.\]}
+\step{3}{Solve for $r$.}{Subtract 1 throughout to obtain $-1<r<0$.}
+\answer{B; $-1<r<0$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q83}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 20}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=83,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q20}\par
+\step{1}{Convert a year into the model's time unit.}{A year is 12 months, so increasing $x$ by 12 increases the exponent $x/12$ by 1.}
+\step{2}{Find the yearly multiplier.}{The equipment retains $0.64=64\%$ of its value each year.}
+\step{3}{Find the percentage decrease.}{\[p=100-64=36.\]}
+\answer{C; $36$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q84}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 21}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=84,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q21}\par
+\step{1}{Read the vertex from vertex form.}{$f(x)=\frac19(x-7)^2+3$ has vertex $(7,3)$.}
+\step{2}{Check the direction and domain.}{The coefficient $1/9$ is positive, and $x=7$ lies within $0\le x\le10$. Thus the vertex is the minimum on the stated interval.}
+\step{3}{Interpret the output.}{The ball's minimum height is 3 inches, reached after 7 seconds.}
+\answer{A; minimum height of $3$ inches}
+\end{minipage}
+\clearpage
+\phantomsection\label{q85}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 22}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=85,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q22}\par
+\step{1}{Evaluate the $y$-intercept.}{\[f(0)=8000(0.65)^0=8000.\]}
+\step{2}{Interpret the time origin.}{$t=0$ corresponds to the end of 1998.}
+\step{3}{State the contextual meaning.}{The model estimates 8,000 coupons sent at the end of 1998. This is the initial value, rather than the minimum over the five-year interval.}
+\answer{D; 8,000 coupons at the end of 1998}
+\end{minipage}
+\clearpage
+\phantomsection\label{q86}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 23}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=86,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q23}\par
+\step{1}{Use the vertex and intercept information.}{Write $y=a(x-9)^2-14$. With a vertex below the $x$-axis and two $x$-intercepts, the parabola must open upward, so $a>0$.}
+\step{2}{Relate the requested sum to an output.}{In standard form, $a+b+c=f(1)$. Therefore\[f(1)=a(1-9)^2-14=64a-14>-14.\]}
+\step{3}{Select a possible value.}{Only $-12$ is greater than $-14$. It is attainable with $a=1/32>0$, which also gives two $x$-intercepts.}
+\answer{D; $-12$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q87}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 24}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=87,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q24}\par
+\step{1}{Identify the zeros in the table.}{The table gives $p(-1)=0$ and $p(2)=0$.}
+\step{2}{Apply the factor theorem.}{Thus $x+1$ and $x-2$ are factors of the polynomial $p$.}
+\step{3}{Combine the distinct factors.}{Because the roots are distinct, $(x+1)(x-2)$ must divide $p(x)$. This does not require $p$ to be quadratic.}
+\answer{D; $(x+1)(x-2)$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q88}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 25}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=88,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q25}\par
+\step{1}{Use symmetry about the vertex.}{The axis is $x=-3$, so the two roots have average $-3$.}
+\step{2}{Solve for the other root.}{Let it be $r$. Then\[\frac{-17/4+r}{2}=-3\quad\Rightarrow\quad r=-6+\frac{17}{4}=-\frac74.\]}
+\step{3}{Write the intercept.}{The other $x$-intercept is $(-7/4,0)$. Both roots are $5/4$ unit from the axis.}
+\answer{B; $\left(-\frac74,0\right)$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q89}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 26}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=89,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q26}\par
+\step{1}{Read the zeros.}{The roots of $(x+3)(x+1)$ are $-3$ and $-1$.}
+\step{2}{Find the vertex's $x$-coordinate.}{\[x_v=\frac{-3+(-1)}2=-2.\]}
+\step{3}{Locate that value in the choices.}{$-3<-2<1$, so the interval in B contains the vertex's input.}
+\answer{B; $-3<x<1$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q90}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 27}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=90,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q27}\par
+\step{1}{Define the dimensions.}{Let the width be $w>0$ feet. The length is $w+5$ feet, and\[w(w+5)=104.\]}
+\step{2}{Factor the area equation.}{\[w^2+5w-104=(w+13)(w-8)=0.\] The positive width is $w=8$.}
+\step{3}{Find and verify the length.}{The length is $8+5=13$ feet, and $8(13)=104$ square feet.}
+\answer{$13$ feet}
+\end{minipage}
+\clearpage
+\phantomsection\label{q91}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 28}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=91,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q28}\par
+\step{1}{Convert the growth interval to years.}{Eighteen months is $18/12=3/2$ years.}
+\step{2}{Find the change in exponent.}{In $P(t)=290(1.04)^{(4/6)t}$, a $3/2$-year increase changes the exponent by\[\frac46\cdot\frac32=1.\]}
+\step{3}{Interpret the factor.}{Over 18 months, the population is multiplied by 1.04, an increase of 4\%. Thus $n=4$.}
+\answer{C; $4$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q92}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 29}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=92,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q29}\par
+\step{1}{Find the retained proportion.}{A decrease of 80\% leaves $1-0.80=0.20$ of the previous value per unit increase in $x$.}
+\step{2}{Apply the factor twice.}{\[f(2)=86(0.20)^2.\]}
+\step{3}{Calculate.}{$86(0.04)=3.44=86/25$. Check: $f(1)=17.2$ and $0.2(17.2)=3.44$.}
+\answer{$\frac{86}{25}=3.44$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q93}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 30}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=93,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q30}\par
+\step{1}{Relate quarter-years to years.}{There are four quarter-years per year, so $t=q/4$.}
+\step{2}{Substitute into the original model.}{\[M=1800(1.02)^{q/4}.\]}
+\step{3}{Check a full year.}{At $q=4$, the model gives $1800(1.02)$, exactly one year's growth.}
+\answer{A; $M=1800(1.02)^{q/4}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q94}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 31}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=94,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q31}\par
+\step{1}{Locate the maxima on the stated domain.}{Since $0<0.4<1$, both positive exponential functions decrease as $x$ increases. On $x\ge0$, each maximum occurs at $x=0$.}
+\step{2}{Evaluate function I.}{\[f(0)=33(0.4)^3=2.112.\] This maximum is not a displayed constant or coefficient in form I.}
+\step{3}{Evaluate function II.}{\[g(0)=33(0.16)(0.4)^{-2}=33\frac{0.16}{0.16}=33.\] The number 33 appears explicitly as a coefficient in II. Thus II only shows its maximum in the requested way.}
+\answer{B; II only}
+\end{minipage}
+\clearpage
+\phantomsection\label{q95}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 32}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=95,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q32}\par
+\step{1}{Find the perimeter of square Q.}{Square P has perimeter $4x$, so Q has perimeter $4x+176$ inches.}
+\step{2}{Find Q's side length.}{\[s_Q=\frac{4x+176}{4}=x+44.\]}
+\step{3}{Square the side length.}{\[f(x)=(x+44)^2.\] Area is measured in \emph{square inches}; the source's wording ``in inches'' is a unit typo.}
+\answer{A; $f(x)=(x+44)^2$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q96}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 33}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=96,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q33}\par
+\step{1}{Use the cube surface-area formula.}{For side length $s>0$, the surface area is $6s^2$. Thus\[6s^2=6\left(\frac a4\right)^2.\]}
+\step{2}{Find the side length.}{Since $a>0$, $s=a/4$.}
+\step{3}{Calculate one face's perimeter.}{Each face is a square, so its perimeter is $4s=4(a/4)=a$.}
+\answer{B; $a$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q97}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 34}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=97,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q34}\par
+\step{1}{Use the point with input zero.}{The function is exponential: $h(x)=a^x+b$. Thus $h(0)=1+b=10$, giving $b=9$.}
+\step{2}{Use the second point.}{\[a^{-2}+9=\frac{325}{36}\quad\Rightarrow\quad a^{-2}=\frac1{36}.\] Hence $a^2=36$, and positivity gives $a=6$.}
+\step{3}{Calculate the product.}{\[ab=6(9)=54.\]}
+\answer{C; $54$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q98}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 35}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=98,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q35}\par
+\step{1}{Recover the quadratic values of $f$.}{The table gives $y=f(x)+4$, so subtract 4: $f(21)=-12$, $f(23)=4$, and $f(25)=-12$. Equal values at 21 and 25 place the axis at $x=23$.}
+\step{2}{Write and determine the vertex form.}{\[f(x)=A(x-23)^2+4.\] Using $f(21)=-12$ gives $4A+4=-12$, so $A=-4$.}
+\step{3}{Evaluate the $y$-intercept.}{\[f(0)=-4(23^2)+4=-2116+4=-2112.\]}
+\answer{$-2112$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q99}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 36}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=99,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q36}\par
+\step{1}{Write vertex form.}{The maximum is 1,034 feet at $t=8$, so\[h(t)=A(t-8)^2+1034.\]}
+\step{2}{Use the initial height.}{$h(0)=10$ gives $64A+1034=10$, so $A=-16$.}
+\step{3}{Evaluate at 10 seconds.}{\[h(10)=-16(10-8)^2+1034=-64+1034=970.\]}
+\answer{C; $970$ feet}
+\end{minipage}
+\clearpage
+\phantomsection\label{q100}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 37}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=100,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q37}\par
+\step{1}{Substitute $x-1$ into every factor.}{\[g(x)=f(x-1)=(x+5)(x+4)x.\]}
+\step{2}{Find the zeros.}{The three distinct roots are $-5$, $-4$, and 0.}
+\step{3}{Add the intercept inputs.}{\[a+b+c=-5-4+0=-9.\]}
+\answer{B; $-9$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q101}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 38}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=101,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q38}\par
+\step{1}{Set up the quadratic model.}{Let $d(t)=At^2+Bt+C$. Since $d(0)=0$, $C=0$. The other data give\[100A+10B=50,\qquad 400A+20B=200.\]}
+\step{2}{Solve for the coefficients.}{Subtract twice the first equation from the second: $200A=100$, so $A=1/2$. Then $50+10B=50$ gives $B=0$.}
+\step{3}{Evaluate the requested time.}{\[d(30)=\frac12(30)^2=450\text{ meters}.\]}
+\answer{$450$ meters}
+\end{minipage}
+\clearpage
+\phantomsection\label{q102}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 39}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=102,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q39}\par
+\step{1}{Identify the coefficients.}{For $f(x)=4x^2-50x+126$, the leading coefficient is positive, so the vertex is a minimum.}
+\step{2}{Find the vertex input.}{\[x_v=-\frac{-50}{2(4)}=\frac{50}{8}=\frac{25}{4}.\]}
+\step{3}{Express the value.}{The minimum occurs at $x=25/4=6.25$. The question asks for the input, not the minimum output.}
+\answer{$\frac{25}{4}=6.25$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q103}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 40}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=103,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q40}\par
+\step{1}{Write the monic polynomial from its zeros.}{The coefficient of $x^3$ is 1, so\[h(x)=(x+5)(x-6)(x-7).\]}
+\step{2}{Evaluate the constant term.}{The constant is $h(0)$:\[c=(5)(-6)(-7).\]}
+\step{3}{Calculate and check the sign.}{$c=210$. Two negative factors make the product positive.}
+\answer{$210$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q104}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 41}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=104,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q41}\par
+\step{1}{Substitute the shifted input.}{\[g(x)=f(x+2)=9\cdot4^{x+2}.\]}
+\step{2}{Separate the powers.}{\[9\cdot4^{x+2}=9\cdot4^x\cdot4^2.\]}
+\step{3}{Simplify the coefficient.}{$9(16)=144$, so $g(x)=144\cdot4^x$. Check: $g(0)=f(2)=144$.}
+\answer{B; $g(x)=144\cdot4^x$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q105}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 42}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=105,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q42}\par
+\step{1}{Recognize the nonnegative term.}{In $f(x)=(x+7)^2+4$, the square is always at least zero.}
+\step{2}{Make that term as small as possible.}{The square is zero when $x+7=0$.}
+\step{3}{State the minimizing input.}{$x=-7$, where $f(-7)=4$. The requested answer is the input $-7$.}
+\answer{$-7$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q106}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 43}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=106,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q43}\par
+\step{1}{Model the excess temperature above room temperature.}{At the start, the excess is $185-70=115$ degrees Fahrenheit. The model must start at 185 and approach 70 as time increases.}
+\step{2}{Estimate the five-minute factor.}{After 5 minutes the excess is 86; after 10 minutes it is 65. The ratios $86/115\approx0.748$ and $65/86\approx0.756$ are both close to 0.75.}
+\step{3}{Write and check the model.}{\[T(m)=70+115(0.75)^{m/5}.\] It predicts $T(0)=185$, $T(5)=156.25$, and $T(10)=134.6875$, close to the measurements.}
+\answer{D; $T(m)=70+115(0.75)^{m/5}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q107}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 44}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=107,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q44}\par
+\step{1}{Convert months to years.}{At $m$ months after the census, the elapsed time in years is $t=m/12$.}
+\step{2}{Substitute into the given function.}{\[r(m)=90{,}000(1.06)^{m/12}.\]}
+\step{3}{Check the starting and yearly values.}{$r(0)=90{,}000$ and $r(12)=90{,}000(1.06)$, matching the original model.}
+\answer{D; $r(m)=90{,}000(1.06)^{m/12}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q108}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 45}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=108,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q45}\par
+\step{1}{Find the annual growth factor.}{A 3\% annual increase corresponds to multiplication by $1+0.03=1.03$.}
+\step{2}{Write the population after $t$ years.}{\[P(t)=50{,}000(1.03)^t.\]}
+\step{3}{Set the model equal to the target.}{\[60{,}000=50{,}000(1.03)^t.\] The question asks for an equation, so solving for $t$ is unnecessary.}
+\answer{D; $60{,}000=50{,}000(1.03)^t$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q109}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 46}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=109,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q46}\par
+\step{1}{Look for an exponent that becomes zero at $x=1$.}{For a form $A\cdot2^{x-1}$, substituting $x=1$ gives $A\cdot2^0=A$, displaying $f(1)$ as the coefficient.}
+\step{2}{Evaluate choice C.}{\[f(1)=128\cdot2^{1-1}=128.\] Thus C has the requested structural feature.}
+\step{3}{Check the source wording.}{At $x=1$, A, B, C, and D give 200, 160, 128, and 102.5, respectively. They are \emph{not equivalent functions} as printed. C is the intended answer because only C directly displays its value at 1 as a coefficient; the source's ``equivalent forms'' claim is incorrect.}
+\answer{C (intended answer; source wording inconsistent)}
+\end{minipage}
+\clearpage
+\phantomsection\label{q110}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 47}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=110,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q47}\par
+\step{1}{Interpret an $x$-intercept.}{At an $x$-intercept, the output is zero, so $h(x)=0$ means the projectile is at ground level.}
+\step{2}{Interpret the positive input.}{Here $x$ measures seconds after launch. The positive root represents a time after the projectile was launched.}
+\step{3}{State the physical event.}{The positive $x$-intercept gives the time at which the projectile hits the ground. The initial height is instead $h(0)=10$ feet.}
+\answer{D; the time when the projectile hits the ground}
+\end{minipage}
+\clearpage
+\phantomsection\label{q111}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 48}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=111,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q48}\par
+\step{1}{Find the common ratio.}{Successive outputs are multiplied by $a^4$:\[\frac{a^5}{a}=a^4,\qquad \frac{a^9}{a^5}=a^4.\]}
+\step{2}{Write the general function.}{Starting from $f(1)=a$,\[f(x)=a(a^4)^{x-1}=a^{4x-3}.\]}
+\step{3}{Match the exponents.}{Since $a>1$, $a^{4k-3}=a^{29}$ implies $4k-3=29$, so $k=8$.}
+\answer{$8$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q112}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 49}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=112,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q49}\par
+\step{1}{Read points consistent with the graph.}{The curve passes through approximately $(-10,-1)$ and $(-6,-3)$. For $f(x)=a/(x+b)$, these give $a=10-b$ and $a=18-3b$.}
+\step{2}{Find a rational function that fits.}{Equating gives $b=4$ and $a=6$, so $f(x)=6/(x+4)$. This also predicts $f(-5)=-6$, consistent with the graph.}
+\step{3}{Apply the horizontal input shift.}{\[g(x)=f(x+4)=\frac6{(x+4)+4}=\frac6{x+8},\qquad x\ne-8.\] The graph shifts left by 4 units.}
+\answer{C; $g(x)=\frac6{x+8}$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q113}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 50}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=113,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q50}\par
+\step{1}{Read the roots.}{For $f(x)=(x-10)(x+13)$, the roots are 10 and $-13$.}
+\step{2}{Find the axis of symmetry.}{\[x_v=\frac{10+(-13)}2=-\frac32.\]}
+\step{3}{Confirm the minimum.}{The positive leading coefficient makes the vertex a minimum, so the minimizing input is $-3/2$.}
+\answer{D; $-\frac32$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q114}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 51}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=114,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q51}\par
+\step{1}{Convert the decrease to a multiplier.}{A 45\% decrease retains $100\%-45\%=55\%$, so the per-unit factor is 0.55.}
+\step{2}{Use the initial value.}{$q(0)=14$ gives the exponential model\[q(x)=14(0.55)^x.\]}
+\step{3}{Check both defining conditions.}{$q(0)=14$ and $q(x+1)/q(x)=0.55$, so each step is a 45\% decrease.}
+\answer{C; $q(x)=14(0.55)^x$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q115}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 52}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=115,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q52}\par
+\step{1}{Identify the exponential multiplier.}{Each unit increase in $x$ multiplies $y$ by 4, so write $y=A4^x$.}
+\step{2}{Use the initial condition.}{At $x=0$, $200=A4^0=A$.}
+\step{3}{State and check the rule.}{\[y=200\cdot4^x.\] Increasing $x$ by 1 multiplies the output by 4, as required.}
+\answer{C; $y=200\cdot4^x$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q116}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 53}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=116,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q53}\par
+\step{1}{Use the nonnegativity of a square.}{$(x-2)^2\ge0$ for every real $x$.}
+\step{2}{Find the smallest possible output.}{\[f(x)=(x-2)^2-4\ge-4.\]}
+\step{3}{Show the bound is attained.}{At $x=2$, $f(2)=-4$. Thus the minimum \emph{value} is $-4$, not the minimizing input 2.}
+\answer{A; $-4$}
+\end{minipage}
+\clearpage
+\phantomsection\label{q117}
+{\Large\bfseries\color{NPdeep} 2.3 / Question 54}\par
+\textcolor{NPurple}{\rule{\linewidth}{0.7pt}}\par
+\begin{center}\includegraphics[page=117,width=\linewidth,height=540pt,keepaspectratio]{assets/questions.pdf}\end{center}
+\par\vspace{6pt}\begin{minipage}{\linewidth}{\large\bfseries\color{NPdeep} Worked solution}\hfill{\small\color{NPgray}2.3 / Q54}\par
+\step{1}{Evaluate $p(c)$.}{The denominator requires $c\ne0$.\[p(c)=\frac{(c-c)^2+160}{2c}=\frac{80}{c}=10.\]}
+\step{2}{Solve for the constant.}{$80=10c$, so $c=8$.}
+\step{3}{Evaluate the requested input.}{\[p(12)=\frac{(12-8)^2+160}{16}=\frac{176}{16}=11.\]}
+\answer{D; $11$}
+\end{minipage}
+\clearpage\section*{Verification Notes}\addcontentsline{toc}{section}{Verification Notes}
+\textbf{Answer-key comparison.} All 117 items match the supplied key in exact value or intended option: 23 in Section 2.1, 40 in Section 2.2, and 54 in Section 2.3. The qualification for 2.3 / Q46 is explained below.
+
+\textbf{2.3 / Q46: the options are not equivalent as printed.}\par
+At $x=1$, the four options give 200, 160, 128, and 102.5. Therefore they cannot all be equivalent forms of one function. Choice C is the intended answer because $128\cdot2^{x-1}$ displays $f(1)=128$ as its coefficient. The solution preserves the printed question and explicitly distinguishes this structural answer from the inaccurate equivalence claim.
+
+\textbf{2.3 / Q32: area units.}\par
+The area of square Q is measured in \emph{square inches}, not inches. The correct formula remains $(x+44)^2$, choice A.
+
+\textbf{Exact values and decimal alternatives.}\par
+The supplied key sometimes lists shortened or rounded decimals alongside a fraction. These are not exact equalities. This packet uses exact answers:
+\begin{center}\renewcommand{\arraystretch}{1.4}\begin{tabular}{lll}\toprule
+Question & Exact value & Decimal expansion \\\midrule
+2.1 / Q5 & $4/225$ & $0.017777\ldots$ \\
+2.1 / Q21 & $361/8$ & $45.125$ \\
+2.2 / Q27 & $29/3$ & $9.666666\ldots$ \\\bottomrule
+\end{tabular}\end{center}
+\textbf{Checks used throughout.}\par
+Polynomial expansion and factorization, original-equation substitution, discriminants and repeated roots, domain restrictions, rejection of extraneous roots, vertex and intercept checks, and exponential growth-factor checks. Graph reading for 2.3 / Q49 is checked against a rational function consistent with the plotted curve.
+\clearpage\section*{Quick Answer Reference}\addcontentsline{toc}{section}{Quick Answer Reference}
+\subsection*{2.1 Equivalent Expressions}
+{\small\color{NPgray}Questions 1--23}\par
+\renewcommand{\arraystretch}{1.25}\begin{longtable}{@{}p{0.09\linewidth}p{0.86\linewidth}@{}}\toprule Question & Answer \\ \midrule\endhead
+\hyperref[q1]{1} & C; $24$\\
+\hyperref[q2]{2} & B; II only\\
+\hyperref[q3]{3} & $\frac76$\\
+\hyperref[q4]{4} & C; $20$\\
+\hyperref[q5]{5} & $\frac4{225}$\\
+\hyperref[q6]{6} & $-419$\\
+\hyperref[q7]{7} & D; $\frac9{(x+1)(4x-5)}$\\
+\hyperref[q8]{8} & A; $4$\\
+\hyperref[q9]{9} & $0.09=\frac9{100}$\\
+\hyperref[q10]{10} & B; $7$\\
+\hyperref[q11]{11} & D; $\frac{y\sqrt y}{x^2\sqrt[3]x}$\\
+\hyperref[q12]{12} & D; $\frac{45}{k}$\\
+\hyperref[q13]{13} & D; $\frac{x(x+3)}{x+1}$\\
+\hyperref[q14]{14} & D; $\sqrt6$\\
+\hyperref[q15]{15} & D; $a^2+ab+\frac{b^2}{4}$\\
+\hyperref[q16]{16} & C; $\frac{xy^2+13xy-8y}{x^2y-8xy}$\\
+\hyperref[q17]{17} & $8$\\
+\hyperref[q18]{18} & C; $0$\\
+\hyperref[q19]{19} & D; $x+1-\frac2{x-3}$\\
+\hyperref[q20]{20} & $6632$\\
+\hyperref[q21]{21} & $\frac{361}{8}=45.125$\\
+\hyperref[q22]{22} & C; $(x+a)(x-a)$\\
+\hyperref[q23]{23} & C; $a^2+2ac+c^2$\\
+\bottomrule\end{longtable}
+\clearpage
+\subsection*{2.2 Nonlinear Equations and Systems}
+{\small\color{NPgray}Questions 1--20}\par
+\renewcommand{\arraystretch}{1.25}\begin{longtable}{@{}p{0.09\linewidth}p{0.86\linewidth}@{}}\toprule Question & Answer \\ \midrule\endhead
+\hyperref[q24]{1} & $9$\\
+\hyperref[q25]{2} & B; $10$\\
+\hyperref[q26]{3} & $6$\\
+\hyperref[q27]{4} & A; $(1+\sqrt3,\sqrt3)$\\
+\hyperref[q28]{5} & A; $\frac12$\\
+\hyperref[q29]{6} & $5$\\
+\hyperref[q30]{7} & D; $\frac{1+\sqrt{11}}2$\\
+\hyperref[q31]{8} & $\frac{81}{4}=20.25$\\
+\hyperref[q32]{9} & $-3$\\
+\hyperref[q33]{10} & A; $\frac1{57}$\\
+\hyperref[q34]{11} & $51$\\
+\hyperref[q35]{12} & $5$\\
+\hyperref[q36]{13} & A; $-3$\\
+\hyperref[q37]{14} & $50$\\
+\hyperref[q38]{15} & C; $w=\left(\frac xy\right)^2-19$\\
+\hyperref[q39]{16} & B; $\{5\}$\\
+\hyperref[q40]{17} & $2$ or $8$\\
+\hyperref[q41]{18} & $289$\\
+\hyperref[q42]{19} & $-1$\\
+\hyperref[q43]{20} & D; zero real solutions\\
+\bottomrule\end{longtable}
+\clearpage
+\subsection*{2.2 Nonlinear Equations and Systems}
+{\small\color{NPgray}Questions 21--40}\par
+\renewcommand{\arraystretch}{1.25}\begin{longtable}{@{}p{0.09\linewidth}p{0.86\linewidth}@{}}\toprule Question & Answer \\ \midrule\endhead
+\hyperref[q44]{21} & D; zero real solutions\\
+\hyperref[q45]{22} & D; $1$\\
+\hyperref[q46]{23} & D; $t=\frac{2u}{u-3}$\\
+\hyperref[q47]{24} & C; $-25$\\
+\hyperref[q48]{25} & D; $-\sqrt{c^2+39^2}$\\
+\hyperref[q49]{26} & A; $-15$\\
+\hyperref[q50]{27} & $\frac{29}{3}$\\
+\hyperref[q51]{28} & A; $6$\\
+\hyperref[q52]{29} & A; $H=\frac{25}{9}(D-T)+100$\\
+\hyperref[q53]{30} & C; II and III only\\
+\hyperref[q54]{31} & C; $6$\\
+\hyperref[q55]{32} & $5$\\
+\hyperref[q56]{33} & $\frac1{16}=0.0625$\\
+\hyperref[q57]{34} & D; $40$\\
+\hyperref[q58]{35} & C; exactly one solution\\
+\hyperref[q59]{36} & C; $\frac12$\\
+\hyperref[q60]{37} & A; $-91$\\
+\hyperref[q61]{38} & $\frac{29}{2}=14.5$\\
+\hyperref[q62]{39} & C; $-\frac{319}{4}$\\
+\hyperref[q63]{40} & $-10$\\
+\bottomrule\end{longtable}
+\clearpage
+\subsection*{2.3 Nonlinear Functions}
+{\small\color{NPgray}Questions 1--27}\par
+\renewcommand{\arraystretch}{1.25}\begin{longtable}{@{}p{0.09\linewidth}p{0.86\linewidth}@{}}\toprule Question & Answer \\ \midrule\endhead
+\hyperref[q64]{1} & D; $8$\\
+\hyperref[q65]{2} & A; $(0,14)$\\
+\hyperref[q66]{3} & D; 9,000 advertisements in 1997\\
+\hyperref[q67]{4} & D; $w=9\cdot4^{n-1}$\\
+\hyperref[q68]{5} & $20$\\
+\hyperref[q69]{6} & D; $h=-16(t-1.8)^2+51.84$\\
+\hyperref[q70]{7} & $-324$\\
+\hyperref[q71]{8} & C; the unit price producing zero revenue\\
+\hyperref[q72]{9} & D; Day 12\\
+\hyperref[q73]{10} & D; neither I nor II\\
+\hyperref[q74]{11} & A; $-13$\\
+\hyperref[q75]{12} & $76$\\
+\hyperref[q76]{13} & B; $6$ seconds\\
+\hyperref[q77]{14} & $7$\\
+\hyperref[q78]{15} & $5$\\
+\hyperref[q79]{16} & D; $-\frac52$\\
+\hyperref[q80]{17} & B; $n=72(2.5)^t$\\
+\hyperref[q81]{18} & A; $\frac{59}{5}$\\
+\hyperref[q82]{19} & B; $-1<r<0$\\
+\hyperref[q83]{20} & C; $36$\\
+\hyperref[q84]{21} & A; minimum height of $3$ inches\\
+\hyperref[q85]{22} & D; 8,000 coupons at the end of 1998\\
+\hyperref[q86]{23} & D; $-12$\\
+\hyperref[q87]{24} & D; $(x+1)(x-2)$\\
+\hyperref[q88]{25} & B; $\left(-\frac74,0\right)$\\
+\hyperref[q89]{26} & B; $-3<x<1$\\
+\hyperref[q90]{27} & $13$ feet\\
+\bottomrule\end{longtable}
+\clearpage
+\subsection*{2.3 Nonlinear Functions}
+{\small\color{NPgray}Questions 28--54}\par
+\renewcommand{\arraystretch}{1.25}\begin{longtable}{@{}p{0.09\linewidth}p{0.86\linewidth}@{}}\toprule Question & Answer \\ \midrule\endhead
+\hyperref[q91]{28} & C; $4$\\
+\hyperref[q92]{29} & $\frac{86}{25}=3.44$\\
+\hyperref[q93]{30} & A; $M=1800(1.02)^{q/4}$\\
+\hyperref[q94]{31} & B; II only\\
+\hyperref[q95]{32} & A; $f(x)=(x+44)^2$\\
+\hyperref[q96]{33} & B; $a$\\
+\hyperref[q97]{34} & C; $54$\\
+\hyperref[q98]{35} & $-2112$\\
+\hyperref[q99]{36} & C; $970$ feet\\
+\hyperref[q100]{37} & B; $-9$\\
+\hyperref[q101]{38} & $450$ meters\\
+\hyperref[q102]{39} & $\frac{25}{4}=6.25$\\
+\hyperref[q103]{40} & $210$\\
+\hyperref[q104]{41} & B; $g(x)=144\cdot4^x$\\
+\hyperref[q105]{42} & $-7$\\
+\hyperref[q106]{43} & D; $T(m)=70+115(0.75)^{m/5}$\\
+\hyperref[q107]{44} & D; $r(m)=90{,}000(1.06)^{m/12}$\\
+\hyperref[q108]{45} & D; $60{,}000=50{,}000(1.03)^t$\\
+\hyperref[q109]{46} & C (intended answer; source wording inconsistent)\\
+\hyperref[q110]{47} & D; the time when the projectile hits the ground\\
+\hyperref[q111]{48} & $8$\\
+\hyperref[q112]{49} & C; $g(x)=\frac6{x+8}$\\
+\hyperref[q113]{50} & D; $-\frac32$\\
+\hyperref[q114]{51} & C; $q(x)=14(0.55)^x$\\
+\hyperref[q115]{52} & C; $y=200\cdot4^x$\\
+\hyperref[q116]{53} & A; $-4$\\
+\hyperref[q117]{54} & D; $11$\\
+\bottomrule\end{longtable}
+\end{document}
