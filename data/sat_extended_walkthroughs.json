@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "readme": "Keys are domain:topic_key:local_index (0-based). Unit 2 advanced_math walkthroughs imported from SAT_Unit2_CB_Solutions.tex. Use **double asterisks** for bold.",
+  "readme": "Keys are domain:topic_key:local_index (0-based). Unit 1 algebra and Unit 2 advanced_math walkthroughs imported from CB solution sources. Use **double asterisks** for bold.",
   "walkthroughs": {
     "algebra:1_1:0": "Step 1: Find the removal rate. In 5 hours, the auger removes 24,000 − 19,350 = 4 ,650 bushels. Thus the rate is 4,650 ÷ 5 = 930 bushels per hour.\n\nStep 2: Find the total amount removed. To leave 12,840 bushels, Hector must remove 24,000 − 12,840 = 11,160 bushels.\n\nStep 3: Find the total elapsed time. t = 11,160 ÷ 930 = 12 hours. Check: 24,000 − 930(12) = 12,840. This is the total time, including the first 5 hours.\n\n**Final answer:** D; 12 hours",
     "algebra:1_1:1": "Step 1: Convert fuel efficiency to cost per mile. Each mile uses 1 25 gallon, so the cost per mile is 4 ( 1 25 ) = 4 25 dollar.\n\nStep 2: Write the savings expression. Driving m fewer miles saves 4 25 m dollars each week.\n\nStep 3: Set the savings equal to the goal. 4 25 m = 5. This givesm = 31.25 fewer miles; the equation requested is choice D.\n\n**Final answer:** D; 4 25 m = 5",

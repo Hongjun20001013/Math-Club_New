@@ -14,6 +14,7 @@ APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WT_PATH = os.path.join(APP_DIR, "data", "sat_extended_walkthroughs.json")
 BANK_PATH = os.path.join(APP_DIR, "data", "question_bank.json")
 DEFAULT_TEX = os.path.join(APP_DIR, "SAT_Unit2_CB_Solutions.tex")
+DEFAULT_PDF = os.path.join(APP_DIR, "SAT_Unit2_CB_Solutions.pdf")
 DOMAIN = "advanced_math"
 
 SECTION_TO_TOPIC = {
@@ -195,9 +196,55 @@ def parse_walkthroughs(tex: str, sections: set[str] | None = None) -> dict[str, 
     return out
 
 
+def _pdf_text(path: str) -> str:
+    from pypdf import PdfReader
+
+    reader = PdfReader(path)
+    return "\n".join((page.extract_text() or "") for page in reader.pages)
+
+
+def _u1_body_to_walkthrough(body: str) -> str:
+    import importlib.util
+
+    u1_path = os.path.join(APP_DIR, "scripts", "import_sat_unit1_cb_walkthroughs.py")
+    spec = importlib.util.spec_from_file_location("import_sat_unit1_cb_walkthroughs", u1_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Cannot load import_sat_unit1_cb_walkthroughs")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod._body_to_walkthrough(body)
+
+
+def _parse_walkthroughs_from_pdf(pdf_text: str, sections: set[str] | None) -> dict[str, str]:
+    """Cross-check PDF text; LaTeX source remains the canonical import."""
+
+    out: dict[str, str] = {}
+    for block in re.split(r"Worked solution\s*", pdf_text)[1:]:
+        m = re.match(r"([\d.]+)\s*/\s*Q(\d+)\s*(.*)", block, re.S)
+        if not m:
+            continue
+        sec, q_raw, body = m.group(1), m.group(2), m.group(3)
+        if sections is not None and sec not in sections:
+            continue
+        topic = SECTION_TO_TOPIC.get(sec)
+        if not topic:
+            continue
+        body = re.split(r"\n\d+\s*/\s*\d+\s*\n", body)[0]
+        body = re.sub(r"\s+\d+\s*/\s*\d+\s*$", "", body.strip())
+        text = _u1_body_to_walkthrough(body)
+        if text:
+            out[f"{DOMAIN}:{topic}:{int(q_raw) - 1}"] = text
+    return out
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("tex", nargs="?", default=DEFAULT_TEX, help="Path to SAT_Unit2_CB_Solutions.tex")
+    p.add_argument(
+        "--pdf",
+        default=None,
+        help="Optional PDF to verify slot count (SAT_Unit2_CB_Solutions.pdf)",
+    )
     p.add_argument(
         "--sections",
         default="2.1,2.2,2.3",
@@ -207,6 +254,11 @@ def main() -> int:
         "--copy-tex",
         action="store_true",
         help="Copy source .tex into repo root as SAT_Unit2_CB_Solutions.tex",
+    )
+    p.add_argument(
+        "--copy-pdf",
+        action="store_true",
+        help="Copy --pdf into repo root as SAT_Unit2_CB_Solutions.pdf",
     )
     args = p.parse_args()
 
@@ -219,9 +271,25 @@ def main() -> int:
         shutil.copy2(tex_path, DEFAULT_TEX)
         print(f"Copied LaTeX → {DEFAULT_TEX}")
 
+    pdf_path = os.path.abspath(args.pdf or DEFAULT_PDF)
+    if args.copy_pdf and os.path.isfile(pdf_path):
+        if os.path.abspath(pdf_path) != os.path.abspath(DEFAULT_PDF):
+            shutil.copy2(pdf_path, DEFAULT_PDF)
+            print(f"Copied PDF → {DEFAULT_PDF}")
+        pdf_path = DEFAULT_PDF
+
     sections = {s.strip() for s in args.sections.split(",") if s.strip()}
     with open(tex_path, encoding="utf-8") as f:
         parsed = parse_walkthroughs(f.read(), sections)
+
+    if os.path.isfile(pdf_path):
+        pdf_parsed = _parse_walkthroughs_from_pdf(_pdf_text(pdf_path), sections)
+        missing = sorted(set(parsed) - set(pdf_parsed))
+        extra = sorted(set(pdf_parsed) - set(parsed))
+        if missing or extra:
+            print(f"PDF verify warning: missing={len(missing)} extra={len(extra)}", file=sys.stderr)
+        else:
+            print(f"PDF verify OK ({len(pdf_parsed)} slots match LaTeX import)")
 
     with open(BANK_PATH, encoding="utf-8") as f:
         bank = json.load(f)

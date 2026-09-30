@@ -250,14 +250,20 @@ def _extended_walkthrough_section_html(extended_plain: str) -> str:
     s = (extended_plain or "").strip()
     if not s:
         return ""
-    esc = html.escape(s, quote=False)
-    esc = _inline_bold_from_markdown(esc)
-    parts = [p.strip() for p in re.split(r"\n\s*\n", esc) if p.strip()]
-    if not parts:
-        parts = [esc.replace("\n", "<br>")]
-    inner = "".join(
-        f'<p class="np-sol-walk-para">{p.replace(chr(10), "<br>")}</p>' for p in parts
-    )
+    chunks = [p.strip() for p in re.split(r"\n\s*\n", s) if p.strip()]
+    if not chunks:
+        chunks = [s]
+    inner_parts: list[str] = []
+    for chunk in chunks:
+        esc = _inline_bold_from_markdown(html.escape(chunk, quote=False))
+        body = esc.replace("\n", "<br>")
+        if re.match(r"\*\*Step \d+:\*\*", chunk, re.I):
+            inner_parts.append(f'<div class="np-sol-walk-step">{body}</div>')
+        elif re.match(r"\*\*Final answer:\*\*", chunk, re.I):
+            inner_parts.append(f'<div class="np-sol-walk-answer">{body}</div>')
+        else:
+            inner_parts.append(f'<p class="np-sol-walk-para">{body}</p>')
+    inner = "".join(inner_parts)
     foot = (
         "<p class=\"np-sol-walk-footer\">"
         "SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. "
@@ -265,8 +271,8 @@ def _extended_walkthrough_section_html(extended_plain: str) -> str:
         "</p>"
     )
     return (
-        '<section class="np-sol-block np-sol-block--walkthrough" aria-label="SAT-style walkthrough">'
-        '<span class="np-sol-label np-sol-label--walk">Full walkthrough</span>'
+        '<section class="np-sol-block np-sol-block--walkthrough" aria-label="SAT CB step-by-step solution">'
+        '<span class="np-sol-label np-sol-label--walk">CB step-by-step solution</span>'
         f'<div class="np-sol-walk-body">{inner}</div>'
         f"{foot}"
         "</section>"
