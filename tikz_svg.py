@@ -179,6 +179,67 @@ def _safe_linear_y(expr: str, x: float) -> float:
     return float(eval(e, {"__builtins__": {}}, {}))
 
 
+def _pgfplot_expr_y(expr: str, x: float) -> float:
+    """Evaluate pgfplots ``\\addplot { ... }`` expressions in one variable x."""
+    s0 = expr.strip().strip("{}")
+    s = re.sub(r"\s+", "", s0)
+    s = s.replace("x", "xv").replace("^", "**")
+    s = re.sub(r"\bsqrt\s*\(", "math.sqrt(", s)
+    probe = re.sub(r"xv", "0", s)
+    probe = re.sub(r"math\.sqrt", "M", probe)
+    if re.search(r"[^0-9eE.+\-*/()M,\s]", probe):
+        raise ValueError("unsafe plot expression")
+    return float(eval(compile(s, "<pgfplot>", "eval"), {"__builtins__": {}}, {"xv": x, "math": math}))
+
+
+def _axis_plot_domain(axis_options: str, xmin: float, xmax: float) -> Tuple[float, float]:
+    m = re.search(r"domain\s*=\s*([-\d.]+)\s*:\s*([-\d.]+)", axis_options)
+    if m:
+        return float(m.group(1)), float(m.group(2))
+    return xmin, xmax
+
+
+def _axis_restrict_y(axis_options: str, ymin: float, ymax: float) -> Tuple[float, float]:
+    m = re.search(
+        r"restrict\s+y\s+to\s+domain\s*=\s*([-\d.]+)\s*:\s*([-\d.]+)",
+        axis_options,
+        re.I,
+    )
+    if m:
+        return float(m.group(1)), float(m.group(2))
+    return ymin, ymax
+
+
+def _axis_samples(axis_options: str) -> int:
+    m = re.search(r"\bsamples\s*=\s*(\d+)", axis_options)
+    return int(m.group(1)) if m else 160
+
+
+def _split_curve_segments(
+    pts: List[Tuple[float, float]], ymax_span: float
+) -> List[List[Tuple[float, float]]]:
+    """Break sampled curves at vertical asymptotes / discontinuities."""
+    if not pts:
+        return []
+    jump = max(8.0, ymax_span * 0.85)
+    segments: List[List[Tuple[float, float]]] = []
+    current: List[Tuple[float, float]] = [pts[0]]
+    for i in range(1, len(pts)):
+        x0, y0 = pts[i - 1]
+        x1, y1 = pts[i]
+        if abs(y1 - y0) > jump or not math.isfinite(y1):
+            if len(current) >= 2:
+                segments.append(current)
+            current = []
+            if math.isfinite(y1):
+                current = [(x1, y1)]
+            continue
+        current.append((x1, y1))
+    if len(current) >= 2:
+        segments.append(current)
+    return segments
+
+
 def _extract_addplots(
     axis_inner: str, axis_options: str = ""
 ) -> Tuple[List[Tuple[str, object]], List[Tuple[float, float]]]:
@@ -238,13 +299,34 @@ def _series_to_points(
     xmax: float,
     ymin: float,
     ymax: float,
+    axis_options: str = "",
 ) -> List[Tuple[str, List[Tuple[float, float]]]]:
     out: List[Tuple[str, List[Tuple[float, float]]]] = []
+    x_lo, x_hi = _axis_plot_domain(axis_options, xmin, xmax)
+    y_lo, y_hi = _axis_restrict_y(axis_options, ymin, ymax)
+    n_samples = _axis_samples(axis_options)
+    y_span = ymax - ymin if ymax > ymin else 1.0
     for kind, payload in series:
         if kind == "line":
             out.append(("line", payload))  # type: ignore[arg-type]
         elif kind == "expr":
             expr = str(payload)
+            sampled: List[Tuple[float, float]] = []
+            for i in range(n_samples + 1):
+                xv = x_lo + (x_hi - x_lo) * i / n_samples
+                try:
+                    yv = _pgfplot_expr_y(expr, xv)
+                except (ValueError, SyntaxError, ZeroDivisionError, OverflowError):
+                    continue
+                if not math.isfinite(yv) or yv < y_lo - 1e-6 or yv > y_hi + 1e-6:
+                    continue
+                if xv < xmin - 1e-6 or xv > xmax + 1e-6:
+                    continue
+                sampled.append((xv, yv))
+            if len(sampled) >= 2:
+                for seg in _split_curve_segments(sampled, y_span):
+                    out.append(("line", seg))
+                continue
             try:
                 y0 = _safe_linear_y(expr, xmin)
                 y1 = _safe_linear_y(expr, xmax)
@@ -465,7 +547,7 @@ def _pgfplots_to_svg(tikz_block: str) -> Optional[str]:
     yticks = _axis_tick_list(opt_str, "ytick")
 
     raw_series, scatter = _extract_addplots(inner, opt_str)
-    lines = _series_to_points(raw_series, xmin, xmax, ymin, ymax)
+    lines = _series_to_points(raw_series, xmin, xmax, ymin, ymax, opt_str)
 
     b = _data_bounds(lines, scatter)
     if b and opts.get("enlargelimits", True):
