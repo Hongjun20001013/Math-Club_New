@@ -15077,6 +15077,11 @@ def submit_practice_answer():
                     return redirect(
                         url_for("placement_section_work", slug=slug, section=paper_upload)
                     )
+        if domain in SAT_STUDENT_DOMAINS and not mistake_redo:
+            return redirect(
+                url_for("practice_session_item", attempt_id=attempt_id, q_index=q_index)
+                + "#sat-solution"
+            )
         return redirect(
             url_for("practice_question", domain=domain, topic=topic, qnum=q_index + 1)
         )
@@ -15092,6 +15097,11 @@ def submit_practice_answer():
     sk = _practice_session_key(domain, topic)
     session[sk] = attempt_id
     session.modified = True
+    if domain in SAT_STUDENT_DOMAINS and not mistake_redo:
+        return redirect(
+            url_for("practice_session_item", attempt_id=attempt_id, q_index=q_index)
+            + "#sat-solution"
+        )
     return redirect(url_for("practice_session_summary", attempt_id=attempt_id))
 
 

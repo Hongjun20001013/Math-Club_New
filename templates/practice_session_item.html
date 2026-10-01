@@ -67,8 +67,9 @@
     {% endif %}
 
     {% if explanation_en %}
-    <article class="np-session-item-explain" aria-label="Coach walkthrough">
-      <h2>Coach's breakdown</h2>
+    <article id="sat-solution" class="np-session-item-explain np-session-item-explain--cb" aria-label="CB step-by-step solution">
+      <h2 class="np-session-item-explain-title">CB step-by-step solution</h2>
+      <p class="np-session-item-explain-lede">Verified key plus numbered College Board–style steps. Read through once, then use <strong>Next question</strong> when you are ready.</p>
       <div class="np-explain-body np-explain-body--rich question-panel">{{ explanation_en | safe }}</div>
     </article>
     {% endif %}

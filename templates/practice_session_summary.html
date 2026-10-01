@@ -325,8 +325,8 @@
         </ol>
         {% endif %}
         {% if m.explanation_en %}
-        <details class="np-explain-details np-mistake-card-explain">
-          <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>
+        <details class="np-explain-details np-mistake-card-explain" open>
+          <summary class="np-explain-summary">CB step-by-step solution · strategy, key, walkthrough</summary>
           <div class="np-explain-body np-explain-body--rich">{{ m.explanation_en | safe }}</div>
         </details>
         {% endif %}
@@ -504,8 +504,8 @@
         </span>
       </div>
       {% if row.explanation_en %}
-      <details class="np-explain-details">
-        <summary class="np-explain-summary">Coach’s breakdown · strategy, key, walkthrough</summary>
+      <details class="np-explain-details"{% if row.status == 'incorrect' %} open{% endif %}>
+        <summary class="np-explain-summary">CB step-by-step solution · strategy, key, walkthrough</summary>
         <div class="np-explain-body np-explain-body--rich">{{ row.explanation_en | safe }}</div>
       </details>
       {% endif %}
