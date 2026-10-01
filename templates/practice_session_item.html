@@ -95,4 +95,16 @@
   </div>
 </div>
 </div>
+<script>
+(function () {
+  function typeset(root) {
+    if (!root || !window.MathJax || !window.MathJax.typesetPromise) return;
+    window.MathJax.typesetPromise([root]).catch(function () {});
+  }
+  document.querySelectorAll(".np-sol-walk-details, .np-sol-walk-step-details").forEach(function (el) {
+    el.addEventListener("toggle", function () { if (el.open) typeset(el); });
+  });
+  typeset(document.getElementById("sat-solution") || document.body);
+})();
+</script>
 {% endblock %}

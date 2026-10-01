@@ -246,35 +246,86 @@ def _walkthrough_slot_key(domain: str, topic_key: str, local_index: int) -> str:
     return f"{domain}:{topic_key}:{int(local_index)}"
 
 
+def _parse_walkthrough_plain(extended_plain: str) -> list[tuple[str, ...]]:
+    """Split authored walkthrough into step / final / paragraph records."""
+    s = (extended_plain or "").strip()
+    if not s:
+        return []
+    s = re.sub(r"\*\*Step (\d+):\*\*", r"Step \1:", s, flags=re.I)
+    s = re.sub(r"\*\*Step (\d+):", r"Step \1:", s, flags=re.I)
+    s = re.sub(r"\*\*Final answer:\*\*", "Final answer:", s, flags=re.I)
+    s = re.sub(r"\*\*Final answer:", "Final answer:", s, flags=re.I)
+    out: list[tuple[str, ...]] = []
+    pieces = re.split(r"(?=Step \d+:|Final answer:)", s, flags=re.I)
+    for piece in pieces:
+        piece = piece.strip()
+        if not piece:
+            continue
+        m_step = re.match(r"Step (\d+):\s*(.*)", piece, re.S | re.I)
+        if m_step:
+            step_no, rest = m_step.group(1), m_step.group(2).strip()
+            if "\n\n" in rest:
+                title, body = rest.split("\n\n", 1)
+            else:
+                m_dot = re.match(r"^([^.]+\.)\s*(.*)$", rest, re.S)
+                if m_dot and len(m_dot.group(1)) <= 120:
+                    title, body = m_dot.group(1).strip(), m_dot.group(2).strip()
+                else:
+                    title, body = rest, ""
+            out.append(("step", step_no, title.strip(), body.strip()))
+            continue
+        m_final = re.match(r"Final answer:\s*(.*)", piece, re.I | re.S)
+        if m_final:
+            out.append(("final", m_final.group(1).strip()))
+            continue
+        out.append(("para", piece))
+    return out
+
+
+def _walkthrough_rich_html(text: str) -> str:
+    from latex_parser import clean_math, format_walkthrough_math_plain, html_escape_allow_math
+
+    body = clean_math(format_walkthrough_math_plain(text))
+    return html_escape_allow_math(body).replace("\n", "<br>")
+
+
 def _extended_walkthrough_section_html(extended_plain: str) -> str:
     s = (extended_plain or "").strip()
     if not s:
         return ""
-    chunks = [p.strip() for p in re.split(r"\n\s*\n", s) if p.strip()]
-    if not chunks:
-        chunks = [s]
+    from latex_parser import format_walkthrough_math_plain, html_escape_allow_math
+
     inner_parts: list[str] = []
-    for chunk in chunks:
-        esc = _inline_bold_from_markdown(html.escape(chunk, quote=False))
-        body = esc.replace("\n", "<br>")
-        if re.match(r"\*\*Step \d+:\*\*", chunk, re.I):
-            inner_parts.append(f'<div class="np-sol-walk-step">{body}</div>')
-        elif re.match(r"\*\*Final answer:\*\*", chunk, re.I):
-            inner_parts.append(f'<div class="np-sol-walk-answer">{body}</div>')
+    for rec in _parse_walkthrough_plain(s):
+        if rec[0] == "step":
+            _, step_no, title, body = rec
+            title_html = _inline_bold_from_markdown(
+                html_escape_allow_math(format_walkthrough_math_plain(title))
+            )
+            body_html = _walkthrough_rich_html(body) if body else ""
+            inner_parts.append(
+                '<details class="np-sol-walk-step-details">'
+                f'<summary class="np-sol-walk-step-summary">'
+                f"<strong>Step {html.escape(str(step_no))}:</strong> {title_html}"
+                "</summary>"
+                f'<div class="np-sol-walk-step-body">{body_html}</div>'
+                "</details>"
+            )
+        elif rec[0] == "final":
+            ans_html = _inline_bold_from_markdown(
+                html_escape_allow_math(format_walkthrough_math_plain(str(rec[1])))
+            )
+            inner_parts.append(f'<div class="np-sol-walk-answer"><strong>Final answer:</strong> {ans_html}</div>')
         else:
-            inner_parts.append(f'<p class="np-sol-walk-para">{body}</p>')
+            para_html = _walkthrough_rich_html(str(rec[1]))
+            inner_parts.append(f'<p class="np-sol-walk-para">{para_html}</p>')
     inner = "".join(inner_parts)
-    foot = (
-        "<p class=\"np-sol-walk-footer\">"
-        "SAT workflow: try the problem first, then use this only for the step where your reasoning stopped. "
-        "Close the tab and rework from the stem without the key when you review later."
-        "</p>"
-    )
     return (
         '<section class="np-sol-block np-sol-block--walkthrough" aria-label="SAT CB step-by-step solution">'
-        '<span class="np-sol-label np-sol-label--walk">CB step-by-step solution</span>'
+        '<details class="np-sol-walk-details">'
+        '<summary class="np-sol-walk-summary">CB step-by-step solution</summary>'
         f'<div class="np-sol-walk-body">{inner}</div>'
-        f"{foot}"
+        "</details>"
         "</section>"
     )
 

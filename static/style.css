@@ -10617,6 +10617,35 @@ html[data-exam-theme="dark"] .np-mistake-card-stem {
     list-style: none;
 }
 
+.np-explain-details--compact {
+    padding: 0 16px 10px;
+}
+
+.np-explain-details--compact .np-explain-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(108, 78, 255, 0.08);
+    border: 1px solid rgba(108, 78, 255, 0.18);
+}
+
+.np-explain-details--compact .np-explain-summary::before {
+    content: "▸";
+    font-size: 11px;
+    transition: transform 0.15s ease;
+}
+
+.np-explain-details--compact[open] .np-explain-summary::before {
+    transform: rotate(90deg);
+}
+
+.np-explain-details--compact .np-explain-body {
+    margin-top: 8px;
+    padding: 12px 14px;
+}
+
 .np-explain-summary::-webkit-details-marker {
     display: none;
 }
@@ -10850,8 +10879,63 @@ html[data-exam-theme="dark"] .np-mistake-card-stem {
     letter-spacing: 0.1em;
 }
 
+.np-sol-walk-details {
+    margin-top: 6px;
+}
+
+.np-sol-walk-summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5b4a8a;
+    list-style: none;
+}
+
+.np-sol-walk-summary::-webkit-details-marker {
+    display: none;
+}
+
+.np-sol-walk-summary::before {
+    content: "▸ ";
+    font-size: 11px;
+}
+
+.np-sol-walk-details[open] > .np-sol-walk-summary::before {
+    content: "▾ ";
+}
+
 .np-sol-walk-body {
-    margin-top: 4px;
+    margin-top: 8px;
+}
+
+.np-sol-walk-step-details {
+    margin: 0 0 6px;
+    border: 1px solid rgba(108, 78, 255, 0.14);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.np-sol-walk-step-summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #3d3658;
+    list-style: none;
+}
+
+.np-sol-walk-step-summary::-webkit-details-marker {
+    display: none;
+}
+
+.np-sol-walk-step-body {
+    padding: 0 12px 10px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: #4a4468;
+    border-top: 1px solid rgba(108, 78, 255, 0.1);
 }
 
 .np-sol-walk-para {

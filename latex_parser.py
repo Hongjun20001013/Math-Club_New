@@ -2249,3 +2249,68 @@ def parse_enhanced_math_placement_fr_answer_key(tex: str) -> dict[int, dict[str,
             entry["answer_alternates"] = alts
         out[n] = entry
     return out
+
+
+_WALK_MATH_RUN = re.compile(
+    r"(?:"
+    r"\\frac\{[^{}]+\}\{[^{}]+\}|"
+    r"√\([^)]+\)|"
+    r"(?:\d+)?\(-?\d+\)|"
+    r"[-\d.]*[a-zA-Z](?:\^[^{}\s]+)?"
+    r"(?:[-+*/=]"
+    r"(?:\([^)]*\)|[-\d.]*[a-zA-Z0-9]*(?:\^[^{}\s]+)?)"
+    r")+"
+    r")"
+)
+
+
+def _walkthrough_line_is_display_math(line: str) -> bool:
+    line = line.strip()
+    if not line or len(line) < 4:
+        return False
+    if not re.search(r"[=^\\]|\\frac|√", line):
+        return False
+    compact = re.sub(r"\s+", "", line)
+    return bool(re.match(r"^[\w().,+*/=\-^\\frac√]+$", compact))
+
+
+def format_walkthrough_math_plain(text: str) -> str:
+    """Turn plain walkthrough text into MathJax-friendly \\( \\) / \\[ \\] segments."""
+    if not text:
+        return ""
+    text = text.replace("−", "-").replace("–", "-").replace("÷", r"\div ")
+    lines = re.split(r"\n+", text)
+    out_lines: list[str] = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        if _walkthrough_line_is_display_math(line):
+            out_lines.append(f"\\[{line}\\]")
+            continue
+
+        def _wrap(m: re.Match[str]) -> str:
+            frag = m.group(0).strip()
+            return f"\\({frag}\\)"
+
+        out_lines.append(_WALK_MATH_RUN.sub(_wrap, line))
+    return "\n".join(out_lines)
+
+
+def html_escape_allow_math(text: str) -> str:
+    """HTML-escape prose while preserving existing MathJax delimiters."""
+    import html as html_mod
+
+    vault: list[str] = []
+
+    def _stash(m: re.Match[str]) -> str:
+        vault.append(m.group(0))
+        return f"%%MATHV{len(vault) - 1}%%"
+
+    s = text or ""
+    s = re.sub(r"\\\[[\s\S]*?\\\]", _stash, s)
+    s = re.sub(r"\\\([\s\S]*?\\\)", _stash, s)
+    s = html_mod.escape(s, quote=False)
+    for i, frag in enumerate(vault):
+        s = s.replace(f"%%MATHV{i}%%", frag)
+    return s

@@ -325,8 +325,8 @@
         </ol>
         {% endif %}
         {% if m.explanation_en %}
-        <details class="np-explain-details np-mistake-card-explain" open>
-          <summary class="np-explain-summary">CB step-by-step solution · strategy, key, walkthrough</summary>
+        <details class="np-explain-details np-mistake-card-explain np-explain-details--compact">
+          <summary class="np-explain-summary">Expand · CB step-by-step solution</summary>
           <div class="np-explain-body np-explain-body--rich">{{ m.explanation_en | safe }}</div>
         </details>
         {% endif %}
@@ -504,8 +504,8 @@
         </span>
       </div>
       {% if row.explanation_en %}
-      <details class="np-explain-details"{% if row.status == 'incorrect' %} open{% endif %}>
-        <summary class="np-explain-summary">CB step-by-step solution · strategy, key, walkthrough</summary>
+      <details class="np-explain-details np-explain-details--compact">
+        <summary class="np-explain-summary">Expand · CB step-by-step solution</summary>
         <div class="np-explain-body np-explain-body--rich">{{ row.explanation_en | safe }}</div>
       </details>
       {% endif %}
@@ -638,5 +638,19 @@
 sessionStorage.removeItem("sat-placement-deadline-ms-" + String({{ attempt_id|int }}));
 </script>
 {% endif %}
+<script>
+(function () {
+  function typeset(root) {
+    if (!root || !window.MathJax || !window.MathJax.typesetPromise) return;
+    window.MathJax.typesetPromise([root]).catch(function () {});
+  }
+  document.querySelectorAll(".np-explain-details, .np-sol-walk-details, .np-sol-walk-step-details").forEach(function (el) {
+    el.addEventListener("toggle", function () {
+      if (el.open) typeset(el);
+    });
+  });
+  typeset(document.querySelector(".np-summary-shell") || document.body);
+})();
+</script>
 
 {% endblock %}
