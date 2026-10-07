@@ -372,11 +372,75 @@ def limit_data_table(
 
 
 def phase_divider(phase: str, subtitle: str = "") -> str:
-    sub = f'<p class="ap-phase-sub">{subtitle}</p>' if subtitle else ""
+    title = (subtitle or phase).strip()
+    sub = (
+        f'<p class="ap-phase-sub">{subtitle}</p>'
+        if subtitle and subtitle.strip() != phase.strip()
+        else ""
+    )
     return (
         f'<div class="ap-phase-divider" data-ap-phase="{phase}">'
         f'<span class="ap-phase-label">{phase}</span>'
-        f'<h3 class="ap-phase-title">{subtitle or phase}</h3>{sub}</div>'
+        f'<h3 class="ap-phase-title">{title}</h3>{sub}</div>'
+    )
+
+
+def lesson_bridge(title: str, recall_html: str, now_html: str, ahead_html: str = "") -> str:
+    ahead = f'<p class="ap-bridge-ahead">{ahead_html}</p>' if ahead_html else ""
+    return (
+        '<div class="ap-box ap-box--key ap-lesson-bridge">'
+        '<span class="ap-box-label">Connecting ideas</span>'
+        '<div class="ap-box-body">'
+        f'<p class="ap-bridge-title">{title}</p>'
+        '<div class="ap-bridge-cols">'
+        f'<section class="ap-bridge-col"><h4>Recall</h4>{recall_html}</section>'
+        f'<section class="ap-bridge-col"><h4>In this lesson</h4>{now_html}</section>'
+        "</div>"
+        f"{ahead}</div></div>"
+    )
+
+
+def unit_path_strip(current_section: str) -> str:
+    steps = [
+        ("1.1", "Instant"),
+        ("1.2", "Notation"),
+        ("1.3", "Graphs"),
+        ("1.4", "Tables"),
+    ]
+    parts: list[str] = []
+    for i, (sec, label) in enumerate(steps):
+        if i > 0:
+            parts.append('<span class="ap-unit-step-arrow" aria-hidden="true">→</span>')
+        cur = " ap-unit-step--current" if sec == current_section else ""
+        parts.append(
+            f'<span class="ap-unit-step{cur}">'
+            f'<span class="ap-unit-step-num">{sec}</span>'
+            f'<span class="ap-unit-step-label">{label}</span></span>'
+        )
+    return (
+        '<nav class="ap-unit-path" aria-label="Unit 1 · sections 1.1 through 1.4">'
+        + "".join(parts)
+        + "</nav>"
+    )
+
+
+def representation_strip(active: str) -> str:
+    items = [
+        ("notation", "Limit notation", "1.2"),
+        ("graph", "Graph trace", "1.3"),
+        ("table", "Table columns", "1.4"),
+    ]
+    chips = []
+    for key, name, sec in items:
+        cls = " is-active" if key == active else ""
+        chips.append(
+            f'<span class="ap-rep-chip{cls}">'
+            f'<span class="ap-rep-chip-sec">{sec}</span>{name}</span>'
+        )
+    return (
+        '<div class="ap-rep-strip-wrap">'
+        '<p class="ap-rep-strip-label">Same limit · three representations</p>'
+        f'<div class="ap-rep-strip">{"".join(chips)}</div></div>'
     )
 
 

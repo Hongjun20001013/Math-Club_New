@@ -12,6 +12,9 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
+    lesson_bridge,
+    representation_strip,
+    unit_path_strip,
     limit_card,
     limit_cards_row,
     limit_compare_note,
@@ -38,17 +41,31 @@ def build(graphs: dict[str, str]) -> dict:
             "1.4",
             "Estimating limit values from tables",
             [
-                (2, "Launch"),
-                (3, "One-sided"),
-                (4, "Examples"),
-                (10, "Tools"),
-                (11, "AP Practice"),
-                (15, "Exit"),
+                (3, "Launch"),
+                (4, "One-sided"),
+                (5, "Examples"),
+                (11, "Tools"),
+                (12, "AP Practice"),
+                (16, "Exit"),
             ],
             lede="Numerical evidence for \\(\\displaystyle\\lim_{x\\to c} f(x)\\) — left column vs right column",
         ),
         kind="intro",
         group="divider",
+    )
+
+    s.add(
+        "Bridge · from 1.3",
+        unit_path_strip("1.4")
+        + lesson_bridge(
+            "Same protocol · new representation",
+            "<p><strong>1.3</strong> traced left branch → \\(L^{-}\\), right branch → \\(L^{+}\\), then compared.</p>",
+            "<p>A table lists the same information: <strong>left columns</strong> (\\(x&lt;c\\)) vs "
+            "<strong>right columns</strong> (\\(x&gt;c\\)).</p>",
+            "Algebraic rules in <strong>1.5–1.6</strong> confirm limits when tables suggest a value.",
+        )
+        + representation_strip("table"),
+        path_phase="Launch",
     )
 
     s.add(
@@ -226,6 +243,11 @@ def build(graphs: dict[str, str]) -> dict:
         + math_block("\\[\\displaystyle\\lim_{x\\to 2}\\cos(f(x)) \\approx 0.284\\]")
         + checkpoint(
             "Tables give evidence for the <em>inside</em> function first; apply the outer function to the limiting value."
+        )
+        + key_point(
+            "Unit thread",
+            "<p>Graph (1.3) → table (1.4) → algebra (1.5+): each representation should give the same "
+            "\\(L^{-}\\), \\(L^{+}\\), and two-sided conclusion when the limit exists.</p>",
         ),
         path_phase="AP Connection",
     )

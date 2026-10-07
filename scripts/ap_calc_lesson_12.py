@@ -12,7 +12,10 @@ from ap_calc_slide_helpers import (
     fig,
     guided_example,
     intro,
+    lesson_bridge,
     limit_approach_embed,
+    representation_strip,
+    unit_path_strip,
     key_point,
     limit_card,
     math_block,
@@ -38,10 +41,35 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "1.2 · Defining limits and notation",
-        intro("1", "1.2", "Defining limits and limit notation", [
-            (2, "Launch"), (3, "Definition"), (4, "Four cases"), (11, "Practice"), (15, "Exit"),
-        ]),
+        intro(
+            "1",
+            "1.2",
+            "Defining limits and limit notation",
+            [
+                (3, "Launch"),
+                (4, "Definition"),
+                (5, "Four cases"),
+                (12, "Practice"),
+                (16, "Exit"),
+            ],
+            lede="Name the approach value \\(L\\) — separate from \\(f(c)\\)",
+        ),
         kind="intro", group="divider",
+    )
+
+    s.add(
+        "Bridge · from 1.1",
+        unit_path_strip("1.2")
+        + lesson_bridge(
+            "Secant slopes become limits",
+            "<p>In <strong>1.1</strong>, secant slopes as \\(h\\to 0\\) stabilized at one number "
+            "(e.g. <strong>4</strong> m/s at \\(t=2\\)).</p>",
+            "<p>A <strong>two-sided limit</strong> records that stabilization: as inputs approach \\(c\\), "
+            "outputs approach \\(L\\).</p>",
+            "You will estimate the same \\(L\\) from graphs (1.3) and tables (1.4).",
+        )
+        + representation_strip("notation"),
+        path_phase="Launch",
     )
 
     s.add(

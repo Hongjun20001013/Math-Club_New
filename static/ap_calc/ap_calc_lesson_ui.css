@@ -1096,6 +1096,161 @@ body.is-ap-calc-lesson .np-app-container {
   background: #d97706;
 }
 
+/* Unit 1.1–1.4 arc: bridge + representation strip */
+.np-cm-viewer--ap-calc .ap-lesson-bridge {
+  margin: 0.85rem 0 1rem;
+}
+
+.np-cm-viewer--ap-calc .ap-bridge-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e1830;
+}
+
+.np-cm-viewer--ap-calc .ap-bridge-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem 1rem;
+}
+
+@media (max-width: 720px) {
+  .np-cm-viewer--ap-calc .ap-bridge-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.np-cm-viewer--ap-calc .ap-bridge-col h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-violet-deep, #4f2fd8);
+}
+
+.np-cm-viewer--ap-calc .ap-bridge-col p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.np-cm-viewer--ap-calc .ap-bridge-ahead {
+  margin: 0.85rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(108, 78, 255, 0.22);
+  font-size: 0.88rem;
+  color: #5b5675;
+}
+
+.np-cm-viewer--ap-calc .ap-unit-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f8f6ff 0%, #fff 100%);
+  border: 1px solid rgba(108, 78, 255, 0.16);
+}
+
+.np-cm-viewer--ap-calc .ap-unit-step {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 3.25rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.5rem;
+  opacity: 0.72;
+}
+
+.np-cm-viewer--ap-calc .ap-unit-step--current {
+  opacity: 1;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(79, 50, 240, 0.12);
+  border: 1px solid rgba(108, 78, 255, 0.28);
+}
+
+.np-cm-viewer--ap-calc .ap-unit-step-num {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ap-violet-deep, #4f2fd8);
+}
+
+.np-cm-viewer--ap-calc .ap-unit-step-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #6b6580;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.np-cm-viewer--ap-calc .ap-unit-step-arrow {
+  font-size: 0.75rem;
+  color: #9b8cff;
+  font-weight: 700;
+}
+
+.np-cm-viewer--ap-calc .ap-rep-strip-wrap {
+  margin: 0.75rem 0 0.25rem;
+}
+
+.np-cm-viewer--ap-calc .ap-rep-strip-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b6580;
+  text-align: center;
+}
+
+.np-cm-viewer--ap-calc .ap-rep-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.np-cm-viewer--ap-calc .ap-rep-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5b5675;
+  background: #f5f1ff;
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.np-cm-viewer--ap-calc .ap-rep-chip.is-active {
+  color: #1e1830;
+  background: #fff;
+  border-color: rgba(108, 78, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(79, 50, 240, 0.1);
+}
+
+.np-cm-viewer--ap-calc .ap-rep-chip-sec {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ap-violet-deep, #4f2fd8);
+}
+
+.np-cm-viewer--ap-calc .ap-procedure-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.15rem;
+  line-height: 1.65;
+}
+
+.np-cm-viewer--ap-calc .ap-procedure-list li {
+  margin: 0.35rem 0;
+}
+
 .np-cm-viewer--ap-calc .np-cm-slide--intro .np-cm-slide-body,
 .np-cm-viewer--ap-calc .np-cm-slide.np-cm-slide--canvas .np-cm-slide-body {
   max-width: none;

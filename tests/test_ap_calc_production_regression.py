@@ -118,10 +118,13 @@ console.log(JSON.stringify({
 
 def _extract_worked_example_spec(materials: dict) -> dict:
     lesson = next(m for m in materials["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
-    slide = lesson["slides"][4]
-    assert "Worked example" in slide.get("title", "") or "piecewise" in slide.get("html", "").lower()
+    slide = next(
+        s for s in lesson["slides"]
+        if "hole-with-value" in (s.get("html") or "")
+        and "initialScenarioId" in (s.get("html") or "")
+    )
     html = slide["html"]
-    start = html.index('{"id":"one-sided-tracer-13"')
+    start = html.index('{"id":')
     end = html.index("</script>", start)
     return json.loads(html[start:end])
 

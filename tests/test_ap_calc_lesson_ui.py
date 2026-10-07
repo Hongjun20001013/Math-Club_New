@@ -111,27 +111,27 @@ class LessonUIAssetTests(unittest.TestCase):
     def test_piecewise_in_12_slide_6(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
-        slide = next(s for s in lesson["slides"] if s["index"] == 6)
+        slide = next(s for s in lesson["slides"] if s["index"] == 7)
         self.assertIn("begin{cases}", slide["html"])
 
     def test_12_slide_14_not_blank_optional(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
-        slide = next(s for s in lesson["slides"] if s["index"] == 14)
+        slide = next(s for s in lesson["slides"] if s["index"] == 15)
         self.assertNotIn("ap-box--optional", slide["html"])
         self.assertIn("varepsilon", slide["html"])
 
     def test_13_slide_14_mcq_no_yes_conflict(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
-        slide = next(s for s in lesson["slides"] if s["index"] == 14)
+        slide = next(s for s in lesson["slides"] if s["index"] == 15)
         self.assertIn("What is wrong with that reasoning", slide["html"])
         self.assertNotIn("Yes — limits come from branches", slide["html"])
 
     def test_13_slide_15_one_sided_infinite_limits(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
-        slide = next(s for s in lesson["slides"] if s["index"] == 15)
+        slide = next(s for s in lesson["slides"] if s["index"] == 16)
         self.assertIn("L^{-}=-\\infty", slide["html"])
         self.assertIn("L^{+}=+\\infty", slide["html"])
 
@@ -183,17 +183,17 @@ class LessonUIAssetTests(unittest.TestCase):
     def test_graph_notice_in_materials(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-2-defining-limits")
-        slide4 = next(s for s in lesson["slides"] if s["index"] == 4)
+        slide4 = next(s for s in lesson["slides"] if s["index"] == 5)
         self.assertIn("What to notice", slide4["html"])
 
     def test_investigate_gate_in_materials(self) -> None:
         data = json.loads(MATERIALS.read_text(encoding="utf-8"))
         lesson = next(m for m in data["materials"] if m["slug"] == "ap-1-3-limits-from-graphs")
-        slide5 = next(s for s in lesson["slides"] if s["index"] == 5)
+        slide5 = next(s for s in lesson["slides"] if s["index"] == 6)
         self.assertIn("Start investigation", slide5["html"])
         self.assertIn("data-ap-explore-panel", slide5["html"])
         self.assertEqual(slide5.get("template"), "investigation")
-        slide6 = next(s for s in lesson["slides"] if s["index"] == 6)
+        slide6 = next(s for s in lesson["slides"] if s["index"] == 7)
         self.assertIn("data-ap-trace-left-slider", slide6["html"])
         self.assertNotIn("data-ap-explore-gate", slide6["html"])
 

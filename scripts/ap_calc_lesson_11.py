@@ -13,6 +13,7 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
+    unit_path_strip,
     limit_card,
     math_block,
     rate_card,
@@ -33,9 +34,20 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "1.1 · Can change occur at an instant?",
-        intro("1", "1.1", "Can change occur at an instant?", [
-            (2, "Launch"), (5, "Visual"), (9, "Concept"), (13, "Practice"), (15, "Exit"),
-        ]),
+        intro(
+            "1",
+            "1.1",
+            "Can change occur at an instant?",
+            [
+                (2, "Launch"),
+                (5, "Visual"),
+                (9, "Concept"),
+                (13, "Practice"),
+                (15, "Unit arc"),
+                (16, "Exit"),
+            ],
+            lede="Secant slopes stabilize → the limit story in Unit 1 begins here",
+        ),
         kind="intro", group="divider", path_phase="Launch",
     )
 
@@ -259,6 +271,19 @@ def build(graphs: dict[str, str]) -> dict:
             "<strong>B</strong> is the definition of instantaneous rate.</p>",
         ),
         kind="question", group="practice", path_phase="AP Practice",
+    )
+
+    s.add(
+        "Unit 1 arc · where this leads",
+        unit_path_strip("1.1")
+        + key_point(
+            "What's next",
+            "<p>Section <strong>1.2</strong> names the stabilized value with "
+            "\\(\\displaystyle\\lim_{x\\to c} f(x)=L\\). "
+            "Sections <strong>1.3</strong> (graphs) and <strong>1.4</strong> (tables) "
+            "estimate the same \\(L\\) with different representations.</p>",
+        ),
+        path_phase="Summary",
     )
 
     s.add(

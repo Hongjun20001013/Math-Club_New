@@ -12,6 +12,9 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
+    lesson_bridge,
+    representation_strip,
+    unit_path_strip,
     limit_cards_row,
     limit_compare_note,
     limit_tracer_embed,
@@ -39,10 +42,34 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "1.3 · Limits from graphs",
-        intro("1", "1.3", "Estimating limits from graphs", [
-            (2, "Procedure"), (3, "One-sided"), (6, "Cases"), (12, "Practice"), (19, "Exit"),
-        ]),
+        intro(
+            "1",
+            "1.3",
+            "Estimating limits from graphs",
+            [
+                (3, "Procedure"),
+                (4, "One-sided"),
+                (7, "Cases"),
+                (13, "Practice"),
+                (20, "Exit"),
+            ],
+            lede="Left → Right → Compare → Value on every graph",
+        ),
         kind="intro", group="divider",
+    )
+
+    s.add(
+        "Bridge · from 1.2",
+        unit_path_strip("1.3")
+        + lesson_bridge(
+            "Notation meets pictures",
+            "<p><strong>1.2</strong> defined \\(\\displaystyle\\lim_{x\\to c} f(x)=L\\) and one-sided limits "
+            "\\(L^{-}\\), \\(L^{+}\\).</p>",
+            "<p>On a graph, <strong>branch height</strong> as you trace toward \\(c\\) is numerical evidence for those limits.</p>",
+            "Section <strong>1.4</strong> runs the same logic with table columns instead of branches.",
+        )
+        + representation_strip("graph"),
+        path_phase="Launch",
     )
 
     s.add(
