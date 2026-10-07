@@ -325,30 +325,47 @@ def limit_data_table(
     caption: str = "",
     split_at: int | None = None,
 ) -> str:
-    """AP 1.4-style limit table: left columns (blue) vs right columns (purple)."""
+    """AP 1.4-style limit table: left columns (blue) vs right columns (orange)."""
     if len(x_vals) != len(f_vals):
         raise ValueError("x_vals and f_vals must match")
     n = len(x_vals)
     if split_at is None:
         split_at = n // 2
+    split_at = max(1, min(split_at, n - 1))
+    right_cols = n - split_at
+
     def _cell(val: str, i: int) -> str:
         side = "ap-td--left" if i < split_at else "ap-td--right"
-        return f'<td class="{side}">{val}</td>'
+        edge = ' ap-td--split-edge' if i == split_at else ""
+        return f'<td class="{side}{edge}">{val}</td>'
 
     x_row = "".join(_cell(xv, i) for i, xv in enumerate(x_vals))
     f_row = "".join(_cell(fv, i) for i, fv in enumerate(f_vals))
     cap = f'<p class="ap-limit-table-cap">{caption}</p>' if caption else ""
+    side_head = (
+        "<thead>"
+        '<tr class="ap-limit-table-sides">'
+        '<th scope="col" class="ap-limit-side-corner" aria-hidden="true"></th>'
+        f'<th scope="col" colspan="{split_at}" class="ap-limit-side-label ap-limit-side-label--left">'
+        '<span class="ap-limit-side-tag">\\(x &lt; c\\)</span> Left of \\(c\\)</th>'
+        f'<th scope="col" colspan="{right_cols}" class="ap-limit-side-label ap-limit-side-label--right">'
+        'Right of \\(c\\) <span class="ap-limit-side-tag">\\(x &gt; c\\)</span></th>'
+        "</tr></thead>"
+    )
     return (
-        f'<div class="ap-limit-table-wrap">{cap}'
+        f'<div class="ap-limit-table-wrap ap-limit-table-wrap--v2">{cap}'
         '<table class="ap-data-table ap-data-table--limit" role="grid">'
-        "<tbody>"
+        + side_head
+        + "<tbody>"
         '<tr><th scope="row">\\(x\\)</th>' + x_row + "</tr>"
         '<tr><th scope="row">\\(f(x)\\)</th>' + f_row + "</tr>"
         "</tbody></table>"
         '<p class="ap-limit-table-legend">'
-        '<span class="ap-legend-left">Left of \\(c\\)</span> · '
-        '<span class="ap-legend-right">Right of \\(c\\)</span></p>'
-        "</div>"
+        '<span class="ap-legend-pill ap-legend-pill--left">'
+        '<span class="ap-legend-swatch" aria-hidden="true"></span>Left · \\(L^{-}\\)</span>'
+        '<span class="ap-legend-pill ap-legend-pill--right">'
+        '<span class="ap-legend-swatch" aria-hidden="true"></span>Right · \\(L^{+}\\)</span>'
+        "</p></div>"
     )
 
 
