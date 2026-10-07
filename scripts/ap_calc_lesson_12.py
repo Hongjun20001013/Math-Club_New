@@ -12,10 +12,8 @@ from ap_calc_slide_helpers import (
     fig,
     guided_example,
     intro,
-    lesson_bridge,
+    bridge_slide,
     limit_approach_embed,
-    representation_strip,
-    unit_path_strip,
     key_point,
     limit_card,
     math_block,
@@ -59,16 +57,16 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "Bridge · from 1.1",
-        unit_path_strip("1.2")
-        + lesson_bridge(
+        bridge_slide(
+            "1.2",
             "Secant slopes become limits",
             "<p>In <strong>1.1</strong>, secant slopes as \\(h\\to 0\\) stabilized at one number "
             "(e.g. <strong>4</strong> m/s at \\(t=2\\)).</p>",
             "<p>A <strong>two-sided limit</strong> records that stabilization: as inputs approach \\(c\\), "
             "outputs approach \\(L\\).</p>",
-            "You will estimate the same \\(L\\) from graphs (1.3) and tables (1.4).",
-        )
-        + representation_strip("notation"),
+            "Same \\(L\\) later from graphs (1.3) and tables (1.4).",
+            "notation",
+        ),
         path_phase="Launch",
     )
 

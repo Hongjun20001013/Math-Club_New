@@ -12,9 +12,7 @@ from ap_calc_slide_helpers import (
     guided_example,
     intro,
     key_point,
-    lesson_bridge,
-    representation_strip,
-    unit_path_strip,
+    bridge_slide,
     limit_card,
     limit_cards_row,
     limit_compare_note,
@@ -56,15 +54,14 @@ def build(graphs: dict[str, str]) -> dict:
 
     s.add(
         "Bridge · from 1.3",
-        unit_path_strip("1.4")
-        + lesson_bridge(
+        bridge_slide(
+            "1.4",
             "Same protocol · new representation",
-            "<p><strong>1.3</strong> traced left branch → \\(L^{-}\\), right branch → \\(L^{+}\\), then compared.</p>",
-            "<p>A table lists the same information: <strong>left columns</strong> (\\(x&lt;c\\)) vs "
-            "<strong>right columns</strong> (\\(x&gt;c\\)).</p>",
-            "Algebraic rules in <strong>1.5–1.6</strong> confirm limits when tables suggest a value.",
-        )
-        + representation_strip("table"),
+            "<p><strong>1.3</strong>: trace left → \\(L^{-}\\), right → \\(L^{+}\\), then compare.</p>",
+            "<p><strong>Tables</strong> list the same story: left columns (\\(x&lt;c\\)) vs right columns (\\(x&gt;c\\)).</p>",
+            "Use several inputs close to \\(c\\) on each side so the trend is visible.",
+            "table",
+        ),
         path_phase="Launch",
     )
 
@@ -76,9 +73,10 @@ def build(graphs: dict[str, str]) -> dict:
             "<p>If \\(y=f(x)\\) near \\(x=3\\) looks like outputs near <strong>4</strong>, then "
             "\\(\\displaystyle\\lim_{x\\to 3} f(x)\\approx 4\\).</p>"
             + limit_data_table(
-                ["2.9", "2.99", "3.01", "3.1"],
-                ["3.9", "3.99", "4.01", "4.1"],
-                caption="Sample table near \\(c=3\\)",
+                ["2.9", "2.99", "2.999", "3.001", "3.01", "3.1"],
+                ["3.90", "3.99", "3.999", "4.001", "4.01", "4.10"],
+                caption="Sample table near \\(c=3\\) — watch \\(f(x)\\) close in on \\(4\\)",
+                split_at=3,
             )
             + math_block("\\[\\displaystyle\\lim_{x\\to 3} f(x) \\approx 4\\]")
         )
@@ -130,9 +128,10 @@ def build(graphs: dict[str, str]) -> dict:
             "\\(\\displaystyle\\lim_{x\\to -4} f(x)=2.5\\) (estimate from table)",
             "Round to three decimals on AP if asked; here the pattern is clear.",
             stem_math=limit_data_table(
-                ["-4.4", "-4.001", "-3.999", "-3.5"],
-                ["2.43", "2.499", "2.501", "2.68"],
-                caption="Packet example 1",
+                ["-4.4", "-4.01", "-4.001", "-3.999", "-3.99", "-3.5"],
+                ["2.43", "2.48", "2.499", "2.501", "2.52", "2.68"],
+                caption="Packet example 1 · \\(c=-4\\)",
+                split_at=3,
             ),
             collapsible_model=True,
         ),
@@ -144,9 +143,10 @@ def build(graphs: dict[str, str]) -> dict:
         guided_example(
             "<p><strong>Estimate at \\(x=9\\)</strong></p>"
             + limit_data_table(
-                ["8.7", "8.999", "9.001", "9.8"],
-                ["-5.8", "-5.001", "-4.999", "-4"],
-                caption="Practice sheet #1",
+                ["8.7", "8.99", "8.999", "9.001", "9.01", "9.8"],
+                ["-5.8", "-5.05", "-5.001", "-4.999", "-4.05", "-4.0"],
+                caption="Practice sheet #1 · \\(c=9\\)",
+                split_at=3,
             ),
             [
                 "Left columns: outputs near \\(-5\\).",
@@ -173,9 +173,10 @@ def build(graphs: dict[str, str]) -> dict:
             "\\(\\displaystyle\\lim_{x\\to -2} f(x)=21\\) (table estimate; \\(f(-2)\\) undefined)",
             "Undefined in the table does not kill the limit — look at nearby rows.",
             stem_math=limit_data_table(
-                ["-2.1", "-2.001", "-1.999", "-1.9"],
-                ["22.01", "21.01", "20.99", "20.01"],
-                caption="Model table (packet #2)",
+                ["-2.1", "-2.01", "-2.001", "-1.999", "-1.99", "-1.9"],
+                ["22.01", "21.20", "21.01", "20.99", "20.80", "20.01"],
+                caption="Model table (packet #2) · limit near \\(21\\)",
+                split_at=3,
             ),
             collapsible_model=True,
         ),
@@ -188,10 +189,10 @@ def build(graphs: dict[str, str]) -> dict:
         + definition(
             "When the limit does not exist",
             limit_data_table(
-                ["-0.1", "-0.01", "-0.001", "0.001", "0.01", "0.1"],
-                ["-1.01", "-1.00", "-1.00", "0.99", "1.00", "1.01"],
-                caption="\\(g(x)\\) near \\(0\\) (textbook 1.4.2)",
-                split_at=3,
+                ["-0.1", "-0.05", "-0.01", "-0.001", "0.001", "0.01", "0.05", "0.1"],
+                ["-1.05", "-1.02", "-1.01", "-1.001", "0.999", "1.001", "1.02", "1.05"],
+                caption="\\(g(x)\\) near \\(0\\) (textbook 1.4.2) — \\(L^{-}\\approx -1\\), \\(L^{+}\\approx 1\\)",
+                split_at=4,
             )
             + limit_compare_note("-1", "1", "0")
             + math_block("\\[\\displaystyle\\lim_{x\\to 0} g(x)\\ \\text{DNE}\\]"),
@@ -217,9 +218,10 @@ def build(graphs: dict[str, str]) -> dict:
             "\\(\\displaystyle\\lim_{x\\to 0}\\bigl(x\\sqrt{x+1}-1\\bigr)=2\\)",
             "Calculator table view is fast; three-decimal reporting on AP when specified.",
             stem_math=limit_data_table(
-                ["-0.01", "-0.001", "0.001", "0.01"],
-                ["1.99499", "1.99950", "2.00050", "2.00499"],
-                caption="Textbook table (\\(x=0\\) omitted if undefined in your calculator)",
+                ["-0.1", "-0.01", "-0.001", "0.001", "0.01", "0.1"],
+                ["1.94987", "1.99499", "1.99950", "2.00050", "2.00499", "2.04987"],
+                caption="Textbook 1.4.1 · values approach \\(2\\)",
+                split_at=3,
             ),
             collapsible_model=True,
         ),
@@ -231,9 +233,10 @@ def build(graphs: dict[str, str]) -> dict:
         phase_divider("AP Connection", "Composition with table input")
         + role("Example", "Packet notes #3", "First estimate \\(f(2)\\) from the table, then think about \\(\\cos(f(x))\\).")
         + limit_data_table(
-            ["1.99", "1.999", "2.001", "2.01"],
-            ["4.85", "4.999", "5.001", "5.15"],
-            caption="\\(f\\) increasing · continuous for \\(x\\ge 1\\)",
+            ["1.99", "1.999", "1.9999", "2.0001", "2.001", "2.01"],
+            ["4.85", "4.99", "4.999", "5.001", "5.01", "5.15"],
+            caption="\\(f\\) increasing · \\(f(x)\\to 5\\) as \\(x\\to 2\\)",
+            split_at=3,
         )
         + key_point(
             "Chain of reasoning",
@@ -351,7 +354,12 @@ def build(graphs: dict[str, str]) -> dict:
                 "<p>Use columns with \\(x&lt;c\\) for \\(L^{-}\\); columns with \\(x&gt;c\\) for \\(L^{+}\\).</p>",
             ),
             (
-                limit_data_table(["-0.1", "-0.01", "0.01", "0.1"], ["-1.0", "-1.0", "1.0", "1.0"])
+                limit_data_table(
+                    ["-0.1", "-0.05", "-0.01", "-0.001", "0.001", "0.01", "0.05", "0.1"],
+                    ["-1.05", "-1.02", "-1.01", "-1.001", "1.001", "1.01", "1.02", "1.05"],
+                    caption="Exit · does the two-sided limit exist at \\(0\\)?",
+                    split_at=4,
+                )
                 + "<p>Does \\(\\displaystyle\\lim_{x\\to 0} f(x)\\) exist?</p>",
                 limit_compare_note("-1", "1", "0")
                 + math_block("\\[\\displaystyle\\lim_{x\\to 0} f(x)\\ \\text{DNE}\\]"),

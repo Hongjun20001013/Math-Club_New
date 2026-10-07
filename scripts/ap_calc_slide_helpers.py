@@ -342,6 +342,7 @@ def limit_data_table(
     x_row = "".join(_cell(xv, i) for i, xv in enumerate(x_vals))
     f_row = "".join(_cell(fv, i) for i, fv in enumerate(f_vals))
     cap = f'<p class="ap-limit-table-cap">{caption}</p>' if caption else ""
+    dense = " ap-data-table--dense" if n >= 6 else ""
     side_head = (
         "<thead>"
         '<tr class="ap-limit-table-bands">'
@@ -356,47 +357,62 @@ def limit_data_table(
     )
     return (
         f'<div class="ap-limit-table-wrap ap-limit-table-wrap--v3">{cap}'
-        '<table class="ap-data-table ap-data-table--limit" role="grid">'
+        '<div class="ap-limit-table-scroll">'
+        f'<table class="ap-data-table ap-data-table--limit{dense}" role="grid">'
         + side_head
         + "<tbody>"
         '<tr><th scope="row">\\(x\\)</th>' + x_row + "</tr>"
         '<tr><th scope="row">\\(f(x)\\)</th>' + f_row + "</tr>"
-        "</tbody></table>"
+        "</tbody></table></div>"
         '<p class="ap-limit-table-legend">'
         '<span class="ap-limit-key ap-limit-key--left"><span class="ap-limit-key-dot" aria-hidden="true"></span>'
-        "Left columns → \\(L^{-}\\)</span>"
+        "Left → \\(L^{-}\\)</span>"
         '<span class="ap-limit-key ap-limit-key--right"><span class="ap-limit-key-dot" aria-hidden="true"></span>'
-        "Right columns → \\(L^{+}\\)</span>"
+        "Right → \\(L^{+}\\)</span>"
+        '<span class="ap-limit-key ap-limit-key--hint">More points near \\(c\\) clarify the trend</span>'
         "</p></div>"
     )
 
 
 def phase_divider(phase: str, subtitle: str = "") -> str:
     title = (subtitle or phase).strip()
-    sub = (
-        f'<p class="ap-phase-sub">{subtitle}</p>'
-        if subtitle and subtitle.strip() != phase.strip()
-        else ""
-    )
     return (
         f'<div class="ap-phase-divider" data-ap-phase="{phase}">'
         f'<span class="ap-phase-label">{phase}</span>'
-        f'<h3 class="ap-phase-title">{title}</h3>{sub}</div>'
+        f'<h3 class="ap-phase-title">{title}</h3></div>'
     )
 
 
 def lesson_bridge(title: str, recall_html: str, now_html: str, ahead_html: str = "") -> str:
-    ahead = f'<p class="ap-bridge-ahead">{ahead_html}</p>' if ahead_html else ""
+    ahead = f'<p class="ap-bridge-footnote">{ahead_html}</p>' if ahead_html else ""
     return (
-        '<div class="ap-box ap-box--key ap-lesson-bridge">'
-        '<span class="ap-box-label">Connecting ideas</span>'
-        '<div class="ap-box-body">'
-        f'<p class="ap-bridge-title">{title}</p>'
-        '<div class="ap-bridge-cols">'
-        f'<section class="ap-bridge-col"><h4>Recall</h4>{recall_html}</section>'
-        f'<section class="ap-bridge-col"><h4>In this lesson</h4>{now_html}</section>'
+        '<article class="ap-bridge-card">'
+        '<p class="ap-bridge-eyebrow">Connecting ideas</p>'
+        f'<h3 class="ap-bridge-card-title">{title}</h3>'
+        '<div class="ap-bridge-flow">'
+        f'<section class="ap-bridge-pane"><span class="ap-bridge-pane-label">Recall</span>{recall_html}</section>'
+        '<span class="ap-bridge-arrow" aria-hidden="true"></span>'
+        f'<section class="ap-bridge-pane"><span class="ap-bridge-pane-label">This lesson</span>{now_html}</section>'
         "</div>"
-        f"{ahead}</div></div>"
+        f"{ahead}</article>"
+    )
+
+
+def bridge_slide(
+    current_section: str,
+    title: str,
+    recall_html: str,
+    now_html: str,
+    ahead_html: str,
+    rep_active: str,
+) -> str:
+    return (
+        '<div class="ap-bridge-page">'
+        + unit_path_strip(current_section)
+        + '<div class="ap-bridge-shell">'
+        + lesson_bridge(title, recall_html, now_html, ahead_html)
+        + representation_strip(rep_active)
+        + "</div></div>"
     )
 
 
@@ -410,15 +426,15 @@ def unit_path_strip(current_section: str) -> str:
     parts: list[str] = []
     for i, (sec, label) in enumerate(steps):
         if i > 0:
-            parts.append('<span class="ap-unit-step-arrow" aria-hidden="true">→</span>')
-        cur = " ap-unit-step--current" if sec == current_section else ""
+            parts.append('<span class="ap-unit-rail-sep" aria-hidden="true"></span>')
+        cur = " ap-unit-rail-item--current" if sec == current_section else ""
         parts.append(
-            f'<span class="ap-unit-step{cur}">'
-            f'<span class="ap-unit-step-num">{sec}</span>'
-            f'<span class="ap-unit-step-label">{label}</span></span>'
+            f'<span class="ap-unit-rail-item{cur}">'
+            f'<span class="ap-unit-rail-num">{sec}</span>'
+            f'<span class="ap-unit-rail-label">{label}</span></span>'
         )
     return (
-        '<nav class="ap-unit-path" aria-label="Unit 1 · sections 1.1 through 1.4">'
+        '<nav class="ap-unit-rail" aria-label="Unit 1 · sections 1.1 through 1.4">'
         + "".join(parts)
         + "</nav>"
     )
@@ -434,13 +450,12 @@ def representation_strip(active: str) -> str:
     for key, name, sec in items:
         cls = " is-active" if key == active else ""
         chips.append(
-            f'<span class="ap-rep-chip{cls}">'
+            f'<span class="ap-rep-chip{cls}" role="listitem">'
             f'<span class="ap-rep-chip-sec">{sec}</span>{name}</span>'
         )
     return (
-        '<div class="ap-rep-strip-wrap">'
-        '<p class="ap-rep-strip-label">Same limit · three representations</p>'
-        f'<div class="ap-rep-strip">{"".join(chips)}</div></div>'
+        '<div class="ap-rep-seg" role="list" aria-label="Limit representations in Unit 1">'
+        f'{"".join(chips)}</div>'
     )
 
 
@@ -1038,6 +1053,8 @@ def infer_slide_template(
 ) -> str:
     if kind == "intro":
         return "intro"
+    if "ap-bridge-page" in html:
+        return "summary"
     if kind == "question":
         return "practice"
     if "data-ap-math-lab" in html:
