@@ -325,7 +325,7 @@ def limit_data_table(
     caption: str = "",
     split_at: int | None = None,
 ) -> str:
-    """AP 1.4-style limit table: left columns (blue) vs right columns (orange)."""
+    """AP 1.4-style limit table: left vs right columns (subtle indigo / amber accents)."""
     if len(x_vals) != len(f_vals):
         raise ValueError("x_vals and f_vals must match")
     n = len(x_vals)
@@ -344,16 +344,18 @@ def limit_data_table(
     cap = f'<p class="ap-limit-table-cap">{caption}</p>' if caption else ""
     side_head = (
         "<thead>"
-        '<tr class="ap-limit-table-sides">'
-        '<th scope="col" class="ap-limit-side-corner" aria-hidden="true"></th>'
-        f'<th scope="col" colspan="{split_at}" class="ap-limit-side-label ap-limit-side-label--left">'
-        '<span class="ap-limit-side-tag">\\(x &lt; c\\)</span> Left of \\(c\\)</th>'
-        f'<th scope="col" colspan="{right_cols}" class="ap-limit-side-label ap-limit-side-label--right">'
-        'Right of \\(c\\) <span class="ap-limit-side-tag">\\(x &gt; c\\)</span></th>'
+        '<tr class="ap-limit-table-bands">'
+        '<th scope="col" class="ap-limit-band-corner" aria-hidden="true"></th>'
+        f'<th scope="col" colspan="{split_at}" class="ap-limit-band ap-limit-band--left">'
+        '<span class="ap-limit-band-title">Left of \\(c\\)</span>'
+        '<span class="ap-limit-band-meta">\\(x&lt;c\\)</span></th>'
+        f'<th scope="col" colspan="{right_cols}" class="ap-limit-band ap-limit-band--right">'
+        '<span class="ap-limit-band-title">Right of \\(c\\)</span>'
+        '<span class="ap-limit-band-meta">\\(x&gt;c\\)</span></th>'
         "</tr></thead>"
     )
     return (
-        f'<div class="ap-limit-table-wrap ap-limit-table-wrap--v2">{cap}'
+        f'<div class="ap-limit-table-wrap ap-limit-table-wrap--v3">{cap}'
         '<table class="ap-data-table ap-data-table--limit" role="grid">'
         + side_head
         + "<tbody>"
@@ -361,10 +363,10 @@ def limit_data_table(
         '<tr><th scope="row">\\(f(x)\\)</th>' + f_row + "</tr>"
         "</tbody></table>"
         '<p class="ap-limit-table-legend">'
-        '<span class="ap-legend-pill ap-legend-pill--left">'
-        '<span class="ap-legend-swatch" aria-hidden="true"></span>Left · \\(L^{-}\\)</span>'
-        '<span class="ap-legend-pill ap-legend-pill--right">'
-        '<span class="ap-legend-swatch" aria-hidden="true"></span>Right · \\(L^{+}\\)</span>'
+        '<span class="ap-limit-key ap-limit-key--left"><span class="ap-limit-key-dot" aria-hidden="true"></span>'
+        "Left columns → \\(L^{-}\\)</span>"
+        '<span class="ap-limit-key ap-limit-key--right"><span class="ap-limit-key-dot" aria-hidden="true"></span>'
+        "Right columns → \\(L^{+}\\)</span>"
         "</p></div>"
     )
 
