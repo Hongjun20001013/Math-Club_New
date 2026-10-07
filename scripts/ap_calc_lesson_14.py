@@ -61,6 +61,13 @@ def build(graphs: dict[str, str]) -> dict:
             "<p><strong>Tables</strong> list the same story: left columns (\\(x&lt;c\\)) vs right columns (\\(x&gt;c\\)).</p>",
             "Use several inputs close to \\(c\\) on each side so the trend is visible.",
             "table",
+            protocol_mode="table",
+            demo_html=limit_data_table(
+                ["2.99", "2.999", "2.9999", "3.0001", "3.001", "3.01"],
+                ["3.99", "3.999", "3.9999", "4.0001", "4.001", "4.01"],
+                caption="Live preview · \\(c=3\\), outputs → \\(4\\)",
+                split_at=3,
+            ),
         ),
         path_phase="Launch",
     )

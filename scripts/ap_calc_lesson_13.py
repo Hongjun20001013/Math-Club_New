@@ -66,6 +66,11 @@ def build(graphs: dict[str, str]) -> dict:
             "<p>On a graph, <strong>branch height</strong> as you trace toward \\(c\\) is evidence for those limits.</p>",
             "Section <strong>1.4</strong> uses the same steps with table columns.",
             "graph",
+            protocol_mode="graph",
+            demo_html=limit_cards_row([
+                ("Left trace", "L^{-}", "x\\to c^-"),
+                ("Right trace", "L^{+}", "x\\to c^+"),
+            ], layout="stack"),
         ),
         path_phase="Launch",
     )

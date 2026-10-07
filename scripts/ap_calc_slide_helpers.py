@@ -383,18 +383,35 @@ def phase_divider(phase: str, subtitle: str = "") -> str:
     )
 
 
-def lesson_bridge(title: str, recall_html: str, now_html: str, ahead_html: str = "") -> str:
-    ahead = f'<p class="ap-bridge-footnote">{ahead_html}</p>' if ahead_html else ""
+def bridge_protocol_strip(mode: str) -> str:
+    if mode == "table":
+        steps = [
+            ("1", "Left columns", "\\(x&lt;c\\) → \\(L^{-}\\)"),
+            ("2", "Right columns", "\\(x&gt;c\\) → \\(L^{+}\\)"),
+            ("3", "Compare", "Two-sided limit?"),
+        ]
+    elif mode == "graph":
+        steps = [
+            ("1", "Trace left", "Branch height → \\(L^{-}\\)"),
+            ("2", "Trace right", "Branch height → \\(L^{+}\\)"),
+            ("3", "Compare", "Then read \\(f(c)\\)"),
+        ]
+    else:
+        steps = [
+            ("1", "Approach", "\\(x\\to c\\)"),
+            ("2", "Outputs", "→ \\(L\\)"),
+            ("3", "Separate", "\\(f(c)\\) may differ"),
+        ]
+    cells = "".join(
+        f'<li class="ap-bridge-step"><span class="ap-bridge-step-num">{n}</span>'
+        f'<span class="ap-bridge-step-body"><strong>{label}</strong>'
+        f'<span>{detail}</span></span></li>'
+        for n, label, detail in steps
+    )
     return (
-        '<article class="ap-bridge-card">'
-        '<p class="ap-bridge-eyebrow">Connecting ideas</p>'
-        f'<h3 class="ap-bridge-card-title">{title}</h3>'
-        '<div class="ap-bridge-flow">'
-        f'<section class="ap-bridge-pane"><span class="ap-bridge-pane-label">Recall</span>{recall_html}</section>'
-        '<span class="ap-bridge-arrow" aria-hidden="true"></span>'
-        f'<section class="ap-bridge-pane"><span class="ap-bridge-pane-label">This lesson</span>{now_html}</section>'
-        "</div>"
-        f"{ahead}</article>"
+        '<ol class="ap-bridge-protocol" aria-label="Shared limit protocol">'
+        + cells
+        + "</ol>"
     )
 
 
@@ -405,14 +422,38 @@ def bridge_slide(
     now_html: str,
     ahead_html: str,
     rep_active: str,
+    *,
+    protocol_mode: str = "notation",
+    demo_html: str = "",
 ) -> str:
+    demo = f'<div class="ap-bridge-demo">{demo_html}</div>' if demo_html else ""
+    foot = f'<p class="ap-bridge-footnote">{ahead_html}</p>' if ahead_html else ""
     return (
-        '<div class="ap-bridge-page">'
+        '<div class="ap-bridge-page ap-bridge-page--premium ap-slide-template--bridge">'
+        '<div class="ap-bridge-canvas" aria-hidden="true">'
+        '<span class="ap-bridge-orb ap-bridge-orb--1"></span>'
+        '<span class="ap-bridge-orb ap-bridge-orb--2"></span>'
+        '<span class="ap-bridge-grid"></span></div>'
+        '<div class="ap-bridge-stage">'
+        '<header class="ap-bridge-header">'
         + unit_path_strip(current_section)
-        + '<div class="ap-bridge-shell">'
-        + lesson_bridge(title, recall_html, now_html, ahead_html)
+        + '<p class="ap-bridge-eyebrow">Unit 1 · Connecting ideas</p>'
+        + f'<h2 class="ap-bridge-hero-title">{title}</h2>'
+        + "</header>"
+        '<div class="ap-bridge-bento">'
+        f'<section class="ap-bridge-pane ap-bridge-pane--recall">'
+        f'<span class="ap-bridge-pane-label">Recall</span>{recall_html}</section>'
+        '<div class="ap-bridge-mid" aria-hidden="true"><span class="ap-bridge-mid-glow"></span></div>'
+        f'<section class="ap-bridge-pane ap-bridge-pane--now">'
+        f'<span class="ap-bridge-pane-label">This lesson</span>{now_html}</section>'
+        "</div>"
+        + bridge_protocol_strip(protocol_mode)
+        + demo
+        + foot
+        + '<div class="ap-bridge-rep-bar">'
         + representation_strip(rep_active)
-        + "</div></div>"
+        + "</div>"
+        "</div></div>"
     )
 
 
@@ -1053,6 +1094,8 @@ def infer_slide_template(
 ) -> str:
     if kind == "intro":
         return "intro"
+    if "ap-bridge-page--premium" in html:
+        return "bridge"
     if "ap-bridge-page" in html:
         return "summary"
     if kind == "question":

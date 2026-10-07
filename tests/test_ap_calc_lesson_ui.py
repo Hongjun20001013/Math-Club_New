@@ -83,7 +83,7 @@ class LessonUIAssetTests(unittest.TestCase):
                 templates.add(slide.get("template"))
         self.assertEqual(
             templates,
-            {"intro", "concept", "investigation", "worked-example", "practice", "summary"},
+            {"intro", "bridge", "concept", "investigation", "worked-example", "practice", "summary"},
         )
 
     def test_intro_simplified_without_flow_meta(self) -> None:

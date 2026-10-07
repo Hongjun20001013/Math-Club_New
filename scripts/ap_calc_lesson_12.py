@@ -66,6 +66,8 @@ def build(graphs: dict[str, str]) -> dict:
             "outputs approach \\(L\\).</p>",
             "Same \\(L\\) later from graphs (1.3) and tables (1.4).",
             "notation",
+            protocol_mode="notation",
+            demo_html=limit_card("h\\to 0", expr="\\dfrac{s(2+h)-s(2)}{h}", equals="4"),
         ),
         path_phase="Launch",
     )
