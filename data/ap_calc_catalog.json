@@ -12,7 +12,7 @@
         {"section": "1.1", "title": "Introducing Calculus: Can Change Occur at an Instant?", "slug": "ap-1-1-instantaneous-change", "live": true},
         {"section": "1.2", "title": "Defining Limits and Using Limit Notation", "slug": "ap-1-2-defining-limits", "live": true},
         {"section": "1.3", "title": "Estimating Limit Values from Graphs", "slug": "ap-1-3-limits-from-graphs", "live": true},
-        {"section": "1.4", "title": "Estimating Limit Values from Tables", "slug": null, "live": false},
+        {"section": "1.4", "title": "Estimating Limit Values from Tables", "slug": "ap-1-4-limits-from-tables", "live": true},
         {"section": "1.5", "title": "Determining Limits Using Algebraic Properties", "slug": null, "live": false},
         {"section": "1.6", "title": "Determining Limits Using Algebraic Manipulation", "slug": null, "live": false},
         {"section": "1.7", "title": "Selecting Procedures for Determining Limits", "slug": null, "live": false},

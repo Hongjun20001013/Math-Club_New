@@ -944,6 +944,97 @@ body.is-ap-calc-lesson .np-app-container {
   display: none;
 }
 
+.np-cm-viewer--ap-calc .ap-calc-intro--v2 .cm-intro-lede {
+  display: block;
+  max-width: 36rem;
+  margin: 0.65rem auto 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 500;
+}
+
+.np-cm-viewer--ap-calc .ap-calc-intro--v2 .cm-intro-title {
+  letter-spacing: -0.02em;
+}
+
+.np-cm-viewer--ap-calc .ap-calc-intro--v2 .cm-intro-chip {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+/* §1.4 limit tables — left vs right columns */
+.np-cm-viewer--ap-calc .ap-limit-table-wrap {
+  margin: var(--space-3) 0;
+}
+
+.np-cm-viewer--ap-calc .ap-limit-table-cap {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4f2fd8;
+}
+
+.np-cm-viewer--ap-calc .ap-data-table--limit {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(79, 47, 216, 0.12), 0 8px 24px rgba(79, 47, 216, 0.08);
+}
+
+.np-cm-viewer--ap-calc .ap-data-table--limit th[scope="row"] {
+  text-align: left;
+  font-weight: 700;
+  background: #f3f0ff;
+  padding: 0.65rem 0.85rem;
+  border-right: 1px solid rgba(79, 47, 216, 0.12);
+}
+
+.np-cm-viewer--ap-calc .ap-data-table--limit td {
+  text-align: center;
+  padding: 0.65rem 0.75rem;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid rgba(79, 47, 216, 0.08);
+}
+
+.np-cm-viewer--ap-calc .ap-data-table--limit .ap-td--left {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.04));
+  border-bottom-color: rgba(37, 99, 235, 0.12);
+}
+
+.np-cm-viewer--ap-calc .ap-data-table--limit .ap-td--right {
+  background: linear-gradient(180deg, rgba(108, 78, 255, 0.12), rgba(108, 78, 255, 0.04));
+  border-bottom-color: rgba(108, 78, 255, 0.12);
+}
+
+.np-cm-viewer--ap-calc .ap-limit-table-legend {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #5b5675;
+  text-align: center;
+}
+
+.np-cm-viewer--ap-calc .ap-legend-left::before,
+.np-cm-viewer--ap-calc .ap-legend-right::before {
+  content: "";
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 3px;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.np-cm-viewer--ap-calc .ap-legend-left::before {
+  background: #2563eb;
+}
+
+.np-cm-viewer--ap-calc .ap-legend-right::before {
+  background: #6c4eff;
+}
+
 .np-cm-viewer--ap-calc .np-cm-slide--intro .np-cm-slide-body,
 .np-cm-viewer--ap-calc .np-cm-slide.np-cm-slide--canvas .np-cm-slide-body {
   max-width: none;

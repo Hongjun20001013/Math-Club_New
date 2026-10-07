@@ -319,6 +319,39 @@ def data_table(headers: list[str], rows: list[list[str]]) -> str:
     return f'<table class="ap-data-table"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
 
 
+def limit_data_table(
+    x_vals: list[str],
+    f_vals: list[str],
+    caption: str = "",
+    split_at: int | None = None,
+) -> str:
+    """AP 1.4-style limit table: left columns (blue) vs right columns (purple)."""
+    if len(x_vals) != len(f_vals):
+        raise ValueError("x_vals and f_vals must match")
+    n = len(x_vals)
+    if split_at is None:
+        split_at = n // 2
+    def _cell(val: str, i: int) -> str:
+        side = "ap-td--left" if i < split_at else "ap-td--right"
+        return f'<td class="{side}">{val}</td>'
+
+    x_row = "".join(_cell(xv, i) for i, xv in enumerate(x_vals))
+    f_row = "".join(_cell(fv, i) for i, fv in enumerate(f_vals))
+    cap = f'<p class="ap-limit-table-cap">{caption}</p>' if caption else ""
+    return (
+        f'<div class="ap-limit-table-wrap">{cap}'
+        '<table class="ap-data-table ap-data-table--limit" role="grid">'
+        "<tbody>"
+        '<tr><th scope="row">\\(x\\)</th>' + x_row + "</tr>"
+        '<tr><th scope="row">\\(f(x)\\)</th>' + f_row + "</tr>"
+        "</tbody></table>"
+        '<p class="ap-limit-table-legend">'
+        '<span class="ap-legend-left">Left of \\(c\\)</span> · '
+        '<span class="ap-legend-right">Right of \\(c\\)</span></p>'
+        "</div>"
+    )
+
+
 def phase_divider(phase: str, subtitle: str = "") -> str:
     sub = f'<p class="ap-phase-sub">{subtitle}</p>' if subtitle else ""
     return (
@@ -328,7 +361,13 @@ def phase_divider(phase: str, subtitle: str = "") -> str:
     )
 
 
-def intro(unit: str, section: str, title: str, chips: list[tuple[int, str]]) -> str:
+def intro(
+    unit: str,
+    section: str,
+    title: str,
+    chips: list[tuple[int, str]],
+    lede: str = "Interactive slides · tables · one-sided limits · practice packet",
+) -> str:
     chip_html = "".join(
         f'<button type="button" class="cm-intro-chip" data-cm-jump-section="{idx}">'
         f'<span class="cm-intro-chip-num">{num}</span>'
@@ -336,7 +375,7 @@ def intro(unit: str, section: str, title: str, chips: list[tuple[int, str]]) -> 
         for num, (idx, label) in enumerate(chips, 1)
     )
     return (
-        '<div class="cm-intro-canvas ap-calc-intro ap-slide-template--intro">'
+        '<div class="cm-intro-canvas ap-calc-intro ap-slide-template--intro ap-calc-intro--v2">'
         '<div class="cm-intro-bg" aria-hidden="true">'
         '<span class="cm-intro-orb cm-intro-orb--1"></span>'
         '<span class="cm-intro-orb cm-intro-orb--2"></span>'
@@ -345,6 +384,7 @@ def intro(unit: str, section: str, title: str, chips: list[tuple[int, str]]) -> 
         '<span class="cm-intro-kicker">Novel Prep · AP Calculus AB / BC</span>'
         f'<p class="cm-intro-unit">Unit {unit} · Section {section}</p>'
         f'<h1 class="cm-intro-title">{title}</h1>'
+        f'<p class="cm-intro-lede">{lede}</p>'
         f'<div class="cm-intro-chips">{chip_html}</div>'
         '<p class="cm-intro-cta">Jump to a section or press <strong>Next</strong> to begin.</p>'
         "</div></div>"
