@@ -1126,73 +1126,42 @@ body.is-ap-calc-lesson .np-app-container {
   font-size: 0.72rem;
 }
 
-/* Unit 1 bridge slide — premium canvas (1.2–1.4) */
-.np-cm-viewer--ap-calc .np-cm-slide-body:has(.ap-bridge-page--premium) {
+/* Unit 1 bridge slide — light canvas (1.2–1.4) */
+.np-cm-viewer--ap-calc .np-cm-slide-body:has(.ap-bridge-page--light) {
   max-width: min(54rem, 100%);
 }
 
-.np-cm-viewer--ap-calc .np-cm-slide:has(.ap-bridge-page--premium) .np-cm-slide-head {
+.np-cm-viewer--ap-calc .np-cm-slide:has(.ap-bridge-page--light) .np-cm-slide-head {
   margin-bottom: 0.35rem;
 }
 
-.np-cm-viewer--ap-calc .ap-bridge-page--premium {
+.np-cm-viewer--ap-calc .ap-bridge-page--light {
   position: relative;
   margin: 0.15rem 0 0.5rem;
-  border-radius: 1.15rem;
+  border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid rgba(108, 78, 255, 0.2);
+  border: 1px solid #e4ddf5;
+  background: #fcfbff;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 24px 48px rgba(79, 50, 240, 0.12);
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 8px 28px rgba(79, 50, 240, 0.06);
 }
 
-.np-cm-viewer--ap-calc .ap-bridge-canvas {
+.np-cm-viewer--ap-calc .ap-bridge-wash {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(145deg, #1a1035 0%, #2d1b69 42%, #4f2fd8 100%);
-}
-
-.np-cm-viewer--ap-calc .ap-bridge-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.55;
-}
-
-.np-cm-viewer--ap-calc .ap-bridge-orb--1 {
-  width: 55%;
-  height: 45%;
-  top: -12%;
-  left: -8%;
-  background: #6c4eff;
-}
-
-.np-cm-viewer--ap-calc .ap-bridge-orb--2 {
-  width: 45%;
-  height: 40%;
-  bottom: -15%;
-  right: -5%;
-  background: #f59e0b;
-  opacity: 0.35;
-}
-
-.np-cm-viewer--ap-calc .ap-bridge-grid {
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 75%);
+  background:
+    radial-gradient(ellipse 70% 55% at 12% 0%, rgba(124, 92, 255, 0.07), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 92% 100%, rgba(245, 158, 11, 0.06), transparent 50%),
+    linear-gradient(180deg, #faf8ff 0%, #f6f3ff 48%, #faf8ff 100%);
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-stage {
   position: relative;
   z-index: 1;
-  padding: 1.15rem 1.25rem 1rem;
-  color: #f8f6ff;
+  padding: 1.1rem 1.2rem 1rem;
+  color: #2a2438;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-header {
@@ -1206,17 +1175,16 @@ body.is-ap-calc-lesson .np-app-container {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: #7a7390;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-hero-title {
   margin: 0;
   font-family: "Source Serif 4", Georgia, serif;
-  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-size: clamp(1.28rem, 2.6vw, 1.65rem);
   font-weight: 600;
-  line-height: 1.2;
-  color: #fff;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  line-height: 1.25;
+  color: #1e1830;
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail {
@@ -1227,9 +1195,9 @@ body.is-ap-calc-lesson .np-app-container {
   gap: 0.15rem 0.25rem;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #e8e2f4;
+  box-shadow: 0 2px 8px rgba(79, 50, 240, 0.05);
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail-item {
@@ -1240,13 +1208,14 @@ body.is-ap-calc-lesson .np-app-container {
   min-width: 2.75rem;
   padding: 0.2rem 0.45rem;
   border-radius: 999px;
-  opacity: 0.65;
+  opacity: 0.72;
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail-item--current {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, #fff 0%, #f3eeff 100%);
+  border: 1px solid #d8cff5;
+  box-shadow: 0 3px 10px rgba(79, 50, 240, 0.1);
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail-item--current .ap-unit-rail-num {
@@ -1260,7 +1229,7 @@ body.is-ap-calc-lesson .np-app-container {
 .np-cm-viewer--ap-calc .ap-unit-rail-num {
   font-size: 0.72rem;
   font-weight: 800;
-  color: #fff;
+  color: #5b5675;
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail-label {
@@ -1268,13 +1237,13 @@ body.is-ap-calc-lesson .np-app-container {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  color: #8b849e;
 }
 
 .np-cm-viewer--ap-calc .ap-unit-rail-sep {
   width: 0.65rem;
   height: 1px;
-  background: rgba(255, 255, 255, 0.35);
+  background: #d5cee8;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-bento {
@@ -1308,16 +1277,16 @@ body.is-ap-calc-lesson .np-app-container {
   width: 2px;
   height: 70%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.65), transparent);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+  background: linear-gradient(180deg, transparent, #c9b8f0, transparent);
+  border-radius: 2px;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-pane {
   padding: 0.85rem 0.95rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  background: #fff;
+  border: 1px solid #ebe6f5;
+  box-shadow: 0 4px 14px rgba(79, 50, 240, 0.06);
   color: #1e1830;
 }
 
@@ -1367,9 +1336,9 @@ body.is-ap-calc-lesson .np-app-container {
   align-items: flex-start;
   padding: 0.55rem 0.65rem;
   border-radius: 0.65rem;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(6px);
+  background: #fff;
+  border: 1px solid #ebe6f5;
+  box-shadow: 0 2px 8px rgba(79, 50, 240, 0.04);
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-step-num {
@@ -1392,12 +1361,12 @@ body.is-ap-calc-lesson .np-app-container {
   gap: 0.1rem;
   font-size: 0.78rem;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.92);
+  color: #5b5675;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-step-body strong {
   font-size: 0.8rem;
-  color: #fff;
+  color: #2a2438;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-demo {
@@ -1408,8 +1377,9 @@ body.is-ap-calc-lesson .np-app-container {
   margin: 0;
   padding: 0.65rem 0.75rem 0.5rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  border: 1px solid #ebe6f5;
+  box-shadow: 0 4px 14px rgba(79, 50, 240, 0.06);
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-demo .ap-math-block,
@@ -1417,8 +1387,9 @@ body.is-ap-calc-lesson .np-app-container {
   margin: 0;
   padding: 0.75rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  border: 1px solid #ebe6f5;
+  box-shadow: 0 4px 14px rgba(79, 50, 240, 0.06);
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-footnote {
@@ -1426,13 +1397,13 @@ body.is-ap-calc-lesson .np-app-container {
   text-align: center;
   font-size: 0.84rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.78);
+  color: #6b6580;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-rep-bar {
   margin-top: 1rem;
   padding-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid #e8e2f4;
 }
 
 .np-cm-viewer--ap-calc .ap-bridge-rep-bar .ap-rep-seg {
@@ -1441,7 +1412,8 @@ body.is-ap-calc-lesson .np-app-container {
   gap: 0.4rem;
   padding: 0.15rem;
   border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.15);
+  background: #f0ecf8;
+  border: 1px solid #e4ddf5;
 }
 
 .np-cm-viewer--ap-calc .ap-rep-chip {
@@ -1453,15 +1425,16 @@ body.is-ap-calc-lesson .np-app-container {
   border-radius: 0.55rem;
   font-size: 0.76rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
+  color: #7a7390;
   background: transparent;
   border: none;
 }
 
 .np-cm-viewer--ap-calc .ap-rep-chip.is-active {
   color: #1e1830;
-  background: linear-gradient(180deg, #fff 0%, #f3f0ff 100%);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  background: #fff;
+  border: 1px solid #d8cff5;
+  box-shadow: 0 3px 10px rgba(79, 50, 240, 0.08);
 }
 
 .np-cm-viewer--ap-calc .ap-rep-chip-sec {

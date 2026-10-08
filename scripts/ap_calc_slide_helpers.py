@@ -429,11 +429,8 @@ def bridge_slide(
     demo = f'<div class="ap-bridge-demo">{demo_html}</div>' if demo_html else ""
     foot = f'<p class="ap-bridge-footnote">{ahead_html}</p>' if ahead_html else ""
     return (
-        '<div class="ap-bridge-page ap-bridge-page--premium ap-slide-template--bridge">'
-        '<div class="ap-bridge-canvas" aria-hidden="true">'
-        '<span class="ap-bridge-orb ap-bridge-orb--1"></span>'
-        '<span class="ap-bridge-orb ap-bridge-orb--2"></span>'
-        '<span class="ap-bridge-grid"></span></div>'
+        '<div class="ap-bridge-page ap-bridge-page--light ap-slide-template--bridge">'
+        '<div class="ap-bridge-wash" aria-hidden="true"></div>'
         '<div class="ap-bridge-stage">'
         '<header class="ap-bridge-header">'
         + unit_path_strip(current_section)
@@ -1094,7 +1091,7 @@ def infer_slide_template(
 ) -> str:
     if kind == "intro":
         return "intro"
-    if "ap-bridge-page--premium" in html:
+    if "ap-bridge-page--light" in html or "ap-slide-template--bridge" in html:
         return "bridge"
     if "ap-bridge-page" in html:
         return "summary"
