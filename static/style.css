@@ -8372,6 +8372,47 @@ html[data-exam-theme="dark"] .stem-table tbody tr:nth-child(even) td {
 .stem-figure-wrap {
     margin: 0.75em 0;
     text-align: center;
+    max-width: 100%;
+}
+
+/* SAT split layout: scale figures/tables to the stem column (avoid 840px+ intrinsic clip) */
+.sat-stem-body .stem-figure-img,
+.sat-practice-page-wrap .sat-stem-body .stem-figure-img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin: 0.75em auto;
+}
+
+.sat-stem-body .stem-figure-wrap,
+.sat-practice-page-wrap .sat-stem-body .stem-figure-wrap {
+    width: 100%;
+    max-width: 100%;
+}
+
+.sat-stem-body .stem-tikz-svg:not(.stem-tikz-svg--choice),
+.sat-practice-page-wrap .sat-stem-body .stem-tikz-svg:not(.stem-tikz-svg--choice) {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.sat-stem-body.question-panel:has(.stem-figure-img, .stem-tikz-svg, .stem-figure-wrap, .stem-table-wrap),
+.sat-practice-page-wrap .sat-stem-body.question-panel:has(.stem-figure-img, .stem-tikz-svg, .stem-figure-wrap, .stem-table-wrap) {
+    max-width: none !important;
+    width: 100%;
+}
+
+.sat-practice-page-wrap--split-lock .sat-stem-body .stem-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sat-practice-page-wrap--split-lock .sat-stem-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 .stem-figure-wrap .stem-figure-img {
@@ -18163,15 +18204,15 @@ body.np-lux-motion .np-page-shell .glass-panel.np-glass:hover,
 /* Absolute final split lock: question left, answers right. */
 .sat-practice-page-wrap--split-lock .sat-split-card {
     display: block !important;
-    width: min(1120px, 100%) !important;
-    max-width: 1120px !important;
+    width: min(1180px, 100%) !important;
+    max-width: 1180px !important;
     margin-inline: auto !important;
     overflow: hidden !important;
 }
 
 .sat-practice-page-wrap--split-lock .sat-split {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(380px, 0.96fr) !important;
+    grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr) !important;
     grid-auto-flow: column !important;
     align-items: stretch !important;
 }
