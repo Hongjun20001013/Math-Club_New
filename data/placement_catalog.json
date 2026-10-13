@@ -6,7 +6,7 @@
       "id": "english",
       "title": "English",
       "title_zh": "英语",
-      "description": "Reading and language diagnostics for grades 7–8 and 9–11 (writing essay on the printable test).",
+      "description": "Grades 7–8 and 9–11 — Reading, Language, and Writing (three parts online).",
       "tests": [
         {
           "slug": "english-g7-8",
