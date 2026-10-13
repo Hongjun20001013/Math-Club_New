@@ -29,8 +29,8 @@ SLUG_TO_TOPIC = {
 }
 TOPIC_TO_SLUG = {v: k for k, v in SLUG_TO_TOPIC.items()}
 ITEM_COUNTS = {
-    "english_g7_8": 31,
-    "english_g9_11": 40,
+    "english_g7_8": 32,
+    "english_g9_11": 41,
     "middle_level": 100,
     "enhanced_math_1": 65,
     "enhanced_math_2": 69,

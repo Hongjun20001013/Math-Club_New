@@ -1,5 +1,11 @@
 /* English placement — TOEFL-style passage (left) + question (right) */
 
+.sat-practice-page-wrap--english-reading,
+.sat-practice-page-wrap--english-writing {
+  --np-en-serif: "Literata", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --np-en-display: "Fraunces", "Libre Baskerville", Georgia, serif;
+}
+
 .sat-practice-page-wrap--english-reading .sat-split-card {
   max-width: min(1240px, 100%) !important;
 }
@@ -25,9 +31,10 @@
   padding: 1.1rem 1.35rem 1.75rem;
 }
 
-.sat-practice-page-wrap--english-reading .sat-stem-body.question-panel {
+.sat-practice-page-wrap--english-reading .sat-stem-body.question-panel,
+.sat-practice-page-wrap--english-writing .sat-stem-body.question-panel {
   max-width: none !important;
-  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-family: var(--np-en-serif);
   font-size: 1.05rem;
   line-height: 1.72;
   color: #1a1628;
@@ -51,11 +58,12 @@
 
 .np-en-passage-title {
   margin: 0;
-  font-family: "Outfit", "DM Sans", system-ui, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 650;
-  line-height: 1.35;
+  font-family: var(--np-en-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
   color: #2a2240;
+  letter-spacing: -0.01em;
 }
 
 .np-en-passage-body p {
@@ -107,6 +115,70 @@
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.02rem;
   line-height: 1.5;
+}
+
+/* Writing (TOEFL-style) */
+.sat-practice-page-wrap--english-writing .sat-split {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+}
+
+.sat-practice-page-wrap--english-writing .sat-pane-stem {
+  background: linear-gradient(180deg, #faf7f2 0%, #f3efe8 100%);
+}
+
+.np-en-writing-prompt__meta {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a6b4a;
+  margin: 0 0 0.75rem;
+}
+
+.np-en-writing-option {
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(107, 74, 50, 0.12);
+}
+
+.np-en-writing-option h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--np-en-display);
+  font-size: 1.05rem;
+}
+
+.sat-en-writing-input {
+  width: 100%;
+  min-height: 280px;
+  font-family: var(--np-en-serif);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(107, 74, 50, 0.2);
+  resize: vertical;
+}
+
+.sat-en-writing-count {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #6a5f78;
+}
+
+.sat-en-writing-options {
+  border: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.sat-en-writing-option-pick {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
 }
 
 @media (max-width: 900px) {

@@ -168,6 +168,76 @@ MIDDLE_LEVEL_PART_GATES: List[dict[str, Any]] = [
 ]
 
 
+def _english_placement_part_gates(topic: str) -> List[dict[str, Any]]:
+    """Part I–III transition screens for English placement (reading → language → writing)."""
+    if topic == "english_g7_8":
+        reading_end = 9
+        mc_count = 31
+        prefix = "placement_en_g78"
+        lang_label = "Part II · Language & conventions"
+        lang_body = "22 multiple-choice items on grammar, usage, and sentence skills."
+    elif topic == "english_g9_11":
+        reading_end = 12
+        mc_count = 40
+        prefix = "placement_en_g911"
+        lang_label = "Part II · Language & conventions"
+        lang_body = "28 multiple-choice items on grammar, rhetoric, and conventions."
+    else:
+        return []
+    total = mc_count + 1
+    return [
+        {
+            "section": "part_i",
+            "session_flag": f"{prefix}_seen_part_i",
+            "first_qnum": 0,
+            "after_q_index": None,
+            "part_num": 1,
+            "part_total": 3,
+            "title": "Part I · Reading",
+            "part_title": "Reading passages",
+            "prev_part": None,
+            "item_count": reading_end,
+            "q_start": 1,
+            "q_end": reading_end,
+            "total_items": total,
+            "lead_extra": "Passage on the left, question on the right — like TOEFL Reading.",
+        },
+        {
+            "section": "part_ii",
+            "session_flag": f"{prefix}_seen_part_ii",
+            "first_qnum": reading_end,
+            "after_q_index": reading_end - 1,
+            "part_num": 2,
+            "part_total": 3,
+            "title": lang_label,
+            "part_title": "Language section",
+            "prev_part": "Reading",
+            "item_count": mc_count - reading_end,
+            "q_start": reading_end + 1,
+            "q_end": mc_count,
+            "total_items": total,
+            "lead_extra": lang_body,
+        },
+        {
+            "section": "part_iii",
+            "session_flag": f"{prefix}_seen_part_iii",
+            "first_qnum": mc_count,
+            "after_q_index": mc_count - 1,
+            "part_num": 3,
+            "part_total": 3,
+            "title": "Part III · Writing",
+            "part_title": "Essay response",
+            "prev_part": "Language",
+            "item_count": 1,
+            "q_start": mc_count + 1,
+            "q_end": total,
+            "total_items": total,
+            "lead_extra": "Prompt on the left, essay box on the right — like TOEFL Writing.",
+            "writing": True,
+        },
+    ]
+
+
 def _upper_placement_gate_gates() -> List[dict[str, Any]]:
     """Gate 2–5 transition screens for the upper-school Five-Gate diagnostic."""
     meta = _load_placement_meta_file("placement_full")
@@ -1950,14 +2020,17 @@ def _placement_flow_config(topic: str) -> dict | None:
             "mc_scored": False,
         }
     if topic in ("english_g7_8", "english_g9_11"):
-        mc = int(row.get("online_mcq_count") or row.get("online_item_count") or 0)
+        mc = int(row.get("online_mcq_count") or 31 if topic == "english_g7_8" else 40)
+        writing = 1
+        total = mc + writing
         return {
             "mc_count": mc,
             "graph_count": 0,
-            "fr_count": 0,
-            "total": mc,
-            "has_gates": False,
-            "gate_kind": "english_mcq",
+            "fr_count": writing,
+            "writing_count": writing,
+            "total": total,
+            "has_gates": True,
+            "gate_kind": "english_parts",
             "session_prefix": "placement_english",
             "mc_scored": True,
             "english_reading_layout": True,
@@ -9665,6 +9738,58 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
                 ],
             }
         return None
+    if cfg.get("gate_kind") == "english_parts":
+        for gate in _english_placement_part_gates(topic):
+            if gate["section"] != section:
+                continue
+            part_num = int(gate["part_num"])
+            prev = gate.get("prev_part")
+            lead = (
+                f"Next: {int(gate['item_count'])} "
+                f"{'essay' if gate.get('writing') else 'multiple-choice'} "
+                f"item{'s' if int(gate['item_count']) != 1 else ''} "
+                f"(questions {int(gate['q_start'])}–{int(gate['q_end'])} of {int(gate['total_items'])})."
+            )
+            if prev:
+                lead = (
+                    f"You completed {prev}. Take a short breath, then continue. "
+                    + lead
+                    + f" {gate.get('lead_extra') or ''}"
+                ).strip()
+            else:
+                lead = (gate.get("lead_extra") or "") + " " + lead
+            return {
+                "section": section,
+                "session_flag": str(gate["session_flag"]),
+                "first_qnum": int(gate["first_qnum"]),
+                "kicker": f"English placement · Part {part_num} of 3",
+                "title": str(gate["title"]),
+                "lead": lead.strip(),
+                "begin_label": f"Begin Part {part_num}",
+                "part_num": part_num,
+                "part_total": 3,
+                "q_start": int(gate["q_start"]),
+                "q_end": int(gate["q_end"]),
+                "total_items": int(gate["total_items"]),
+                "cards": [
+                    {
+                        "icon": str(part_num),
+                        "title": str(gate.get("part_title") or gate["title"]),
+                        "body": str(gate.get("lead_extra") or "Same structure as the printable diagnostic."),
+                    },
+                    {
+                        "icon": str(gate["item_count"]),
+                        "title": f"{gate['item_count']} item{'s' if int(gate['item_count']) != 1 else ''}",
+                        "body": "Your answers save automatically as you work.",
+                    },
+                    {
+                        "icon": "⏱",
+                        "title": "Timer",
+                        "body": "Your placement timer keeps running across all three parts.",
+                    },
+                ],
+            }
+        return None
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
             if gate["section"] != section:
@@ -9846,6 +9971,15 @@ def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
                     section=str(gate["section"]),
                 )
         return None
+    if cfg.get("gate_kind") == "english_parts":
+        for gate in _english_placement_part_gates(topic):
+            if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
+                return url_for(
+                    "placement_section_intro",
+                    slug=slug,
+                    section=str(gate["section"]),
+                )
+        return None
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
             if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
@@ -9888,6 +10022,15 @@ def _placement_section_back_href(topic: str, section: str) -> str:
         for gate in MIDDLE_LEVEL_PART_GATES:
             if gate["section"] == section:
                 return _q_href(int(gate["after_q_index"]))
+        return _q_href(0)
+    if cfg.get("gate_kind") == "english_parts":
+        gates = _english_placement_part_gates(topic)
+        for gate in gates:
+            if gate["section"] == section:
+                ai = gate.get("after_q_index")
+                if ai is None:
+                    return _q_href(0)
+                return _q_href(int(ai))
         return _q_href(0)
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
@@ -10136,10 +10279,31 @@ def admin_placement_upload(attempt_id: int, upload_id: int):
 @app.route("/placement")
 def placement_landing():
     session["active_track_label"] = "Course placement"
-    catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
     return render_template(
-        "placement_catalog.html",
+        "placement_track_hub.html",
+        placement_public_guest=placement_public_enabled() and "user_id" not in session,
+    )
+
+
+@app.route("/placement/track/<track>")
+def placement_track_catalog(track: str):
+    session["active_track_label"] = "Course placement"
+    if track not in ("math", "english"):
+        abort(404)
+    catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
+    tiers = []
+    for tier in catalog.get("tiers") or []:
+        tid = str(tier.get("id") or "")
+        if track == "english" and tid == "english":
+            tiers.append(tier)
+        elif track == "math" and tid != "english":
+            tiers.append(tier)
+    catalog = {**catalog, "tiers": tiers, "track": track}
+    return render_template(
+        "placement_track_catalog.html",
         catalog=catalog,
+        track=track,
+        placement_public_guest=placement_public_enabled() and "user_id" not in session,
     )
 
 
@@ -10155,12 +10319,14 @@ def placement_test_landing(slug: str):
     topic = _placement_topic_for_slug(slug)
     if not topic:
         abort(404)
+    track = "english" if topic in ("english_g7_8", "english_g9_11") else "math"
     return render_template(
         "placement_test_landing.html",
         test=test,
         placement_parts=_placement_landing_parts_for_topic(topic),
         topic=topic,
         slug=slug,
+        track=track,
         pdf_meta=_placement_pdf_meta(test.get("pdf_file")),
     )
 
@@ -10364,6 +10530,11 @@ def _placement_public_next_href(topic: str, public_id: str, q_index: int, bank_t
         if flow.get("gate_kind") == "middle_parts":
             for gate in MIDDLE_LEVEL_PART_GATES:
                 if q_index == int(gate["after_q_index"]):
+                    return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
+        elif flow.get("gate_kind") == "english_parts":
+            for gate in _english_placement_part_gates(topic):
+                ai = gate.get("after_q_index")
+                if ai is not None and q_index == int(ai):
                     return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
         elif flow.get("gate_kind") == "upper_gates":
             for gate in _upper_placement_gate_gates():
@@ -15063,6 +15234,17 @@ def submit_practice_answer():
             if flow.get("gate_kind") == "middle_parts":
                 for gate in MIDDLE_LEVEL_PART_GATES:
                     if q_index == int(gate["after_q_index"]):
+                        return redirect(
+                            url_for(
+                                "placement_section_intro",
+                                slug=slug,
+                                section=str(gate["section"]),
+                            )
+                        )
+            elif flow.get("gate_kind") == "english_parts":
+                for gate in _english_placement_part_gates(topic):
+                    ai = gate.get("after_q_index")
+                    if ai is not None and q_index == int(ai):
                         return redirect(
                             url_for(
                                 "placement_section_intro",

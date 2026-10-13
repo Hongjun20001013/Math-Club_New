@@ -10,9 +10,10 @@
 {% set mc_count = placement_mc_count|default(0) %}
 {% set nav_total = mc_count if paper_gate and mc_count else total %}
 {% set last_paper_mc = paper_gate and mc_count and qnum == (mc_count - 1) %}
-{% set placement_english_reading = placement_mode and (q.english_layout|default('') == 'passage_split' or topic in ['english_g7_8', 'english_g9_11']) %}
+{% set placement_english_reading = placement_mode and q.english_layout|default('') == 'passage_split' %}
+{% set placement_english_writing = placement_mode and q.question_kind|default('') == 'english_writing' %}
 
-<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if placement_english_reading %} sat-practice-page-wrap--english-reading{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if placement_english_reading %} sat-practice-page-wrap--english-reading{% endif %}{% if placement_english_writing %} sat-practice-page-wrap--english-writing{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
 {% if placement_mode %}
 <div class="sat-placement-sky" aria-hidden="true">
     <span class="sat-placement-sky__orb sat-placement-sky__orb--a"></span>
@@ -274,16 +275,18 @@
         <input type="hidden" name="selected_answer" value="{{ saved_selected_answer }}">
         {% endif %}
         {% endif %}
-    <div id="question-area" class="sat-split-card{% if placement_english_reading %} sat-split-card--english-reading{% endif %}" aria-label="Question and answer area">
-        <div class="sat-split{% if placement_english_reading %} sat-split--english-reading{% endif %}">
-            <section class="sat-pane sat-pane-stem" aria-label="{% if placement_english_reading %}Reading passage{% else %}Question{% endif %}">
+    <div id="question-area" class="sat-split-card{% if placement_english_reading %} sat-split-card--english-reading{% endif %}{% if placement_english_writing %} sat-split-card--english-writing{% endif %}" aria-label="Question and answer area">
+        <div class="sat-split{% if placement_english_reading %} sat-split--english-reading{% endif %}{% if placement_english_writing %} sat-split--english-writing{% endif %}">
+            <section class="sat-pane sat-pane-stem" aria-label="{% if placement_english_writing %}Writing prompt{% elif placement_english_reading %}Reading passage{% else %}Question{% endif %}">
                 <header class="sat-pane-head">
-                    <span class="sat-pane-kicker">{% if placement_english_reading %}{% if q.placement_section == 'language' %}Language{% else %}Passage{% endif %}{% else %}Question{% endif %}</span>
-                    <span class="sat-pane-badge">{% if placement_english_reading %}{{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total|default(total) }}{% elif miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% elif placement_mode and q.placement_section %}{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if placement_english_writing %}Prompt{% elif placement_english_reading %}{% if q.placement_section == 'language' %}Language{% else %}Passage{% endif %}{% else %}Question{% endif %}</span>
+                    <span class="sat-pane-badge">{% if placement_english_reading or placement_english_writing %}{{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total|default(total) }}{% elif miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% elif placement_mode and q.placement_section %}{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
                 </header>
                 <div class="sat-stem-scroll">
                     <div class="question-panel sat-stem-body">
-                        {% if placement_english_reading %}
+                        {% if placement_english_writing %}
+                        {{ q.english_writing_prompt_html|safe }}
+                        {% elif placement_english_reading %}
                         {{ q.english_passage_html|safe }}
                         {% else %}
                         {{ q.stem|safe }}
@@ -294,17 +297,35 @@
 
             <div class="sat-split-gutter" aria-hidden="true"></div>
 
-                    <aside class="sat-pane sat-pane-choices" aria-label="{% if placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+                    <aside class="sat-pane sat-pane-choices" aria-label="{% if placement_english_writing %}Your essay{% elif placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if placement_english_reading %}{{ q.placement_section_title|default('Select the best answer') }}{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if placement_english_writing %}Your response{% elif placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if placement_english_writing %}Type your essay — saved for advisor review{% elif placement_english_reading %}{{ q.placement_section_title|default('Select the best answer') }}{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
                 {% if placement_english_reading %}
                 <div class="sat-en-question-stem">
                     {{ q.stem|safe }}
                 </div>
+                {% elif placement_english_writing %}
+                <div class="sat-en-writing-studio">
+                    {% if q.english_writing_options and q.english_writing_options|length > 1 %}
+                    <fieldset class="sat-en-writing-options">
+                        <legend class="sat-en-writing-options__legend">Choose one prompt</legend>
+                        {% for opt in q.english_writing_options %}
+                        <label class="sat-en-writing-option-pick">
+                            <input type="radio" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form">
+                            <span>{{ opt.label }}</span>
+                        </label>
+                        {% endfor %}
+                    </fieldset>
+                    {% endif %}
+                    <label class="sat-en-writing-label" for="english-writing-input">Essay</label>
+                    <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="16" placeholder="Write clearly in full sentences and paragraphs…" form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
+                    <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
+                </div>
                 {% endif %}
-                {% if q.question_kind|default('mcq') == 'constructed_response' %}
+                {% if placement_english_writing %}
+                {% elif q.question_kind|default('mcq') == 'constructed_response' %}
                 <div class="sat-response-scroll">
                     <div class="sat-response-studio">
                         <div class="sat-response-studio__head">
@@ -1155,6 +1176,21 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
 </script>
 {% if q.question_kind|default('mcq') == 'free_response' %}
 <script src="{{ url_for('static', filename='spr_math_input.js') }}?v={{ style_css_revision }}"></script>
+{% endif %}
+{% if placement_english_writing|default(false) %}
+<script>
+(function () {
+  const ta = document.getElementById("english-writing-input");
+  const out = document.getElementById("english-writing-count");
+  if (!ta || !out) return;
+  const count = () => {
+    const words = (ta.value || "").trim().split(/\s+/).filter(Boolean);
+    out.textContent = words.length + (words.length === 1 ? " word" : " words");
+  };
+  ta.addEventListener("input", count);
+  count();
+})();
+</script>
 {% endif %}
 {% if recovery_code %}
 {% include 'partials/placement_atelier_scripts.html' %}

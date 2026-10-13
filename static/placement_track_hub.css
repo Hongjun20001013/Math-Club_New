@@ -1,0 +1,168 @@
+/* Placement track hub — Math / English entry cards */
+
+.np-pl-hub__inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.np-pl-hub__hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.np-pl-hub__lead {
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.np-pl-hub__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.35rem;
+}
+
+@media (max-width: 720px) {
+  .np-pl-hub__cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.np-pl-hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.75rem 1.6rem 1.5rem;
+  border-radius: 22px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 50px rgba(36, 28, 68, 0.1);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.np-pl-hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 60px rgba(36, 28, 68, 0.14);
+}
+
+.np-pl-hub-card__glow {
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 70%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.np-pl-hub-card--english .np-pl-hub-card__glow {
+  background: radial-gradient(ellipse at 50% 0%, rgba(196, 149, 106, 0.35), transparent 65%);
+}
+
+.np-pl-hub-card--math .np-pl-hub-card__glow {
+  background: radial-gradient(ellipse at 50% 0%, rgba(108, 78, 255, 0.28), transparent 65%);
+}
+
+.np-pl-hub-card--english {
+  border-color: rgba(164, 118, 78, 0.22);
+}
+
+.np-pl-hub-card--math {
+  border-color: rgba(108, 78, 255, 0.18);
+}
+
+.np-pl-hub-card__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #3d2f6e;
+}
+
+.np-pl-hub-card--english .np-pl-hub-card__icon {
+  color: #6b4a32;
+}
+
+.np-pl-hub-card__title {
+  margin: 0;
+  font-family: "Fraunces", "Libre Baskerville", Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.np-pl-hub-card__desc {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: #4a4560;
+}
+
+.np-pl-hub-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.np-pl-hub-card__tags li {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(30, 24, 48, 0.06);
+  color: #5a5470;
+}
+
+.np-pl-hub-card__cta {
+  margin-top: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 650;
+  font-size: 0.92rem;
+  color: #3d2f6e;
+}
+
+.np-pl-hub-card--english .np-pl-hub-card__cta {
+  color: #6b4a32;
+}
+
+.np-pl2--humanities .np-pl-display,
+.np-pl-canvas--humanities .np-pl-display {
+  font-family: "Fraunces", "Libre Baskerville", Georgia, serif;
+}
+
+.np-pl-card--humanities .np-pl-card__name {
+  font-family: "Fraunces", Georgia, serif;
+}
+
+.np-pl2--humanities.np-pl2--landing {
+  --np-pl-accent: #8a6b4a;
+}
+
+.np-pl2--humanities .np-pl-display {
+  font-family: "Fraunces", "Libre Baskerville", Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.np-pl-device__passage {
+  font-family: "Literata", Georgia, serif;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0.35rem 0 0.65rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}

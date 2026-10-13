@@ -85,7 +85,8 @@ def _extract_passages(part_i_text: str) -> list[dict[str, str]]:
             first_q = re.search(r"\n\s*\d+\.\s", passage_body)
         if first_q:
             passage_body = passage_body[: first_q.start()]
-        title = f"Passage {pm.group(1)} {pm.group(2).strip()}"
+        subtitle = re.sub(r"\s+", " ", pm.group(2).strip())
+        title = f"Passage {pm.group(1)} · {subtitle}" if subtitle else f"Passage {pm.group(1)}"
         pid = f"p{pm.group(1)}"
         out.append(
             {
@@ -143,6 +144,36 @@ def _parse_mcq_block(text: str, start: int, end: int) -> list[dict]:
     return items
 
 
+def _writing_prompt_html(topic: str) -> str:
+    if topic == "english_g7_8":
+        return """
+<div class="np-en-writing-prompt">
+  <p class="np-en-writing-prompt__meta">Part III · Writing · 20 points · about 20 minutes</p>
+  <p class="np-en-writing-prompt__lead">Choose <strong>one</strong> option. Your essay is saved for advisor review (not auto-scored).</p>
+  <article class="np-en-writing-option">
+    <h3>Option A · Personal experience</h3>
+    <p>Everyone faces moments that are hard: a difficult class, a new school, a tough game, or a problem with a friend.</p>
+    <p class="np-en-writing-option__prompt"><strong>Prompt:</strong> Write about a time you faced a challenge. Describe what happened, how you felt, what you did, and what you learned.</p>
+  </article>
+  <article class="np-en-writing-option">
+    <h3>Option B · Argument</h3>
+    <p>Some people believe homework helps students practice and build good habits. Others believe it causes stress and takes time away from family, sleep, and activities.</p>
+    <p class="np-en-writing-option__prompt"><strong>Prompt:</strong> Should middle school students have homework every night? State your opinion, support it with reasons and examples, and explain why the other side is less convincing.</p>
+  </article>
+  <p class="np-en-writing-prompt__hint">Aim for 3–5 paragraphs (about 200–300 words).</p>
+</div>
+"""
+    return """
+<div class="np-en-writing-prompt">
+  <p class="np-en-writing-prompt__meta">Part III · Writing · 20 points · about 30 minutes</p>
+  <p class="np-en-writing-prompt__lead">Argumentative essay — saved for advisor review (not auto-scored).</p>
+  <p>AI can already do tasks once done by customer service workers, translators, and even programmers. Supporters say it will create new kinds of jobs, as past technologies did. Critics warn that this change is happening faster than workers can adapt.</p>
+  <p class="np-en-writing-option__prompt"><strong>Prompt:</strong> Will AI do more good than harm to the future job market? Develop an argument using reasoning and specific examples, and explain why the opposing view is less convincing.</p>
+  <p class="np-en-writing-prompt__hint">Aim for 4–5 paragraphs (about 350–500 words).</p>
+</div>
+"""
+
+
 def build_topic(topic: str, test_pdf: Path, key_pdf: Path) -> list[dict]:
     max_q = 31 if topic == "english_g7_8" else 40
     test_text = _pdf_text(test_pdf)
@@ -183,11 +214,11 @@ def build_topic(topic: str, test_pdf: Path, key_pdf: Path) -> list[dict]:
         if topic == "english_g7_8":
             section_index = n if section == "reading" else n - 9
             section_total = 9 if section == "reading" else 22
-            global_total = 31
+            global_total = 32
         else:
             section_index = n if section == "reading" else n - 12
             section_total = 12 if section == "reading" else 28
-            global_total = 40
+            global_total = 41
 
         questions.append(
             {
@@ -208,6 +239,34 @@ def build_topic(topic: str, test_pdf: Path, key_pdf: Path) -> list[dict]:
                 "display_number": n,
             }
         )
+
+    mc_count = max_q
+    global_total = mc_count + 1
+    writing_num = mc_count + 1
+    questions.append(
+        {
+            "stem": "<p class=\"np-en-stem-question\">Write your essay in the response box. Select Option A or B first if your test offers a choice.</p>",
+            "choices": [],
+            "question_kind": "english_writing",
+            "correct_answer": "",
+            "answer_alternates": [],
+            "placement_section": "writing",
+            "placement_section_title": "Writing",
+            "placement_section_index": 1,
+            "placement_section_total": 1,
+            "placement_global_index": writing_num,
+            "placement_global_total": global_total,
+            "english_writing_prompt_html": _writing_prompt_html(topic),
+            "english_layout": "writing_split",
+            "english_writing_options": (
+                [{"id": "A", "label": "Option A · Personal experience"}, {"id": "B", "label": "Option B · Argument"}]
+                if topic == "english_g7_8"
+                else [{"id": "essay", "label": "Argumentative essay"}]
+            ),
+            "knowledge_section": topic,
+            "display_number": writing_num,
+        }
+    )
     return questions
 
 

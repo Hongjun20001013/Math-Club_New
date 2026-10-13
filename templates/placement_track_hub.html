@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
+{% endblock %}
+
+{% block content %}
+<div class="np-pl-canvas np-pl-hub">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-hub" aria-labelledby="np-pl-hub-heading">
+    {% include 'partials/placement_atelier_mesh.html' %}
+
+    <div class="np-pl-canvas__inner np-pl-hub__inner">
+        <header class="np-pl-hub__hero np-pl-reveal">
+            <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep Learning Studio') }}</p>
+            <p class="np-pl-eyebrow">
+                <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                Course placement
+            </p>
+            <h1 class="np-pl-display" id="np-pl-hub-heading">Choose your diagnostic</h1>
+            <p class="np-pl-lead np-pl-hub__lead">Two pathways — same premium experience. Select the subject your advisor named.</p>
+        </header>
+
+        <div class="np-pl-hub__cards" data-pl-stagger>
+            <a href="{{ url_for('placement_track_catalog', track='english') }}" class="np-pl-hub-card np-pl-hub-card--english np-pl-reveal" data-pl-reveal>
+                <span class="np-pl-hub-card__glow" aria-hidden="true"></span>
+                <span class="np-pl-hub-card__icon" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h8M8 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <h2 class="np-pl-hub-card__title">English</h2>
+                <p class="np-pl-hub-card__desc">Reading, language, and writing — passage-based layout with TOEFL-style essay.</p>
+                <ul class="np-pl-hub-card__tags">
+                    <li>Grades 7–8</li>
+                    <li>Grades 9–11</li>
+                    <li>3 parts</li>
+                </ul>
+                <span class="np-pl-hub-card__cta">Enter English <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+
+            <a href="{{ url_for('placement_track_catalog', track='math') }}" class="np-pl-hub-card np-pl-hub-card--math np-pl-reveal" data-pl-reveal>
+                <span class="np-pl-hub-card__glow" aria-hidden="true"></span>
+                <span class="np-pl-hub-card__icon" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18 10l2 2-2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <h2 class="np-pl-hub-card__title">Math</h2>
+                <p class="np-pl-hub-card__desc">Middle school through precalculus — gates, constructed response, and paper sections.</p>
+                <ul class="np-pl-hub-card__tags">
+                    <li>Middle level</li>
+                    <li>Enhanced Math</li>
+                    <li>Upper gates</li>
+                </ul>
+                <span class="np-pl-hub-card__cta">Enter Math <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+        </div>
+
+        {% if placement_public_guest|default(false) %}
+        <a class="np-pl-recover-cta np-pl-reveal" data-pl-reveal href="{{ url_for('placement_public_recover') }}">
+            <span class="np-pl-recover-cta__shine" aria-hidden="true"></span>
+            <span class="np-pl-recover-cta__copy">
+                <em>Left the test?</em>
+                <strong>Recover with your code</strong>
+            </span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}
