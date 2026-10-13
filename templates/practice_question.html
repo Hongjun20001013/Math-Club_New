@@ -10,8 +10,9 @@
 {% set mc_count = placement_mc_count|default(0) %}
 {% set nav_total = mc_count if paper_gate and mc_count else total %}
 {% set last_paper_mc = paper_gate and mc_count and qnum == (mc_count - 1) %}
+{% set placement_english_reading = placement_mode and (q.english_layout|default('') == 'passage_split' or topic in ['english_g7_8', 'english_g9_11']) %}
 
-<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
+<div class="sat-practice-page-wrap sat-practice-page-wrap--split-lock{% if placement_mode %} sat-practice-page-wrap--placement{% endif %}{% if placement_english_reading %} sat-practice-page-wrap--english-reading{% endif %}{% if chrome_focus %} sat-practice-page-wrap--miss-quiz{% endif %}" data-calculator-allowed="{{ 'true' if calculator_allowed else 'false' }}">
 {% if placement_mode %}
 <div class="sat-placement-sky" aria-hidden="true">
     <span class="sat-placement-sky__orb sat-placement-sky__orb--a"></span>
@@ -273,27 +274,36 @@
         <input type="hidden" name="selected_answer" value="{{ saved_selected_answer }}">
         {% endif %}
         {% endif %}
-    <div id="question-area" class="sat-split-card" aria-label="Question and answer area">
-        <div class="sat-split">
-            <section class="sat-pane sat-pane-stem" aria-label="Question">
+    <div id="question-area" class="sat-split-card{% if placement_english_reading %} sat-split-card--english-reading{% endif %}" aria-label="Question and answer area">
+        <div class="sat-split{% if placement_english_reading %} sat-split--english-reading{% endif %}">
+            <section class="sat-pane sat-pane-stem" aria-label="{% if placement_english_reading %}Reading passage{% else %}Question{% endif %}">
                 <header class="sat-pane-head">
-                    <span class="sat-pane-kicker">Question</span>
-                    <span class="sat-pane-badge">{% if miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% elif placement_mode and q.placement_section %}{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if placement_english_reading %}{% if q.placement_section == 'language' %}Language{% else %}Passage{% endif %}{% else %}Question{% endif %}</span>
+                    <span class="sat-pane-badge">{% if placement_english_reading %}{{ q.placement_global_index|default(qnum + 1) }} / {{ q.placement_global_total|default(total) }}{% elif miss_quiz_mode %}{{ miss_quiz_step + 1 }} / {{ miss_quiz_total }}{% elif mistake_redo_mode|default(false) %}1 / 1{% elif placement_mode and q.placement_section %}{{ q.placement_section_index|default(qnum + 1) }} / {{ q.placement_section_total|default(total) }}{% else %}{{ qnum + 1 }} / {{ total }}{% endif %}</span>
                 </header>
                 <div class="sat-stem-scroll">
                     <div class="question-panel sat-stem-body">
+                        {% if placement_english_reading %}
+                        {{ q.english_passage_html|safe }}
+                        {% else %}
                         {{ q.stem|safe }}
+                        {% endif %}
                     </div>
                 </div>
             </section>
 
             <div class="sat-split-gutter" aria-hidden="true"></div>
 
-                    <aside class="sat-pane sat-pane-choices" aria-label="{% if q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
+                    <aside class="sat-pane sat-pane-choices" aria-label="{% if placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Your work{% elif q.question_kind|default('mcq') == 'free_response' %}Your answer{% else %}Answer choices{% endif %}">
                 <header class="sat-pane-head sat-pane-head-choices">
-                    <span class="sat-pane-kicker">{% if q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
-                    <span class="sat-pane-hint">{% if q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
+                    <span class="sat-pane-kicker">{% if placement_english_reading %}Question{% elif q.question_kind|default('mcq') == 'constructed_response' %}Show your work{% elif q.question_kind|default('mcq') == 'free_response' %}Student-produced response{% else %}Answer choices{% endif %}</span>
+                    <span class="sat-pane-hint">{% if placement_english_reading %}{{ q.placement_section_title|default('Select the best answer') }}{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
+                {% if placement_english_reading %}
+                <div class="sat-en-question-stem">
+                    {{ q.stem|safe }}
+                </div>
+                {% endif %}
                 {% if q.question_kind|default('mcq') == 'constructed_response' %}
                 <div class="sat-response-scroll">
                     <div class="sat-response-studio">

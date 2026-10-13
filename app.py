@@ -119,6 +119,8 @@ PLACEMENT_META_BY_TOPIC: Dict[str, str] = {
     "enhanced_math_1": os.path.join(APP_DIR, "data", "placement_enhanced_math_1_meta.json"),
     "enhanced_math_2": os.path.join(APP_DIR, "data", "placement_enhanced_math_2_meta.json"),
     "middle_level": os.path.join(APP_DIR, "data", "placement_middle_level_meta.json"),
+    "english_g7_8": os.path.join(APP_DIR, "data", "placement_english_g7_8_meta.json"),
+    "english_g9_11": os.path.join(APP_DIR, "data", "placement_english_g9_11_meta.json"),
 }
 
 # Part transitions for the 100-item middle-level placement (0-based q indices).
@@ -365,17 +367,17 @@ def _practice_redirect(domain: str, topic: str, qnum: int, *, mistake_redo: bool
 
 
 def _site_brand_name() -> str:
-    return (os.environ.get("SITE_BRAND_NAME") or "Novel Prep Math Studio").strip() or "Novel Prep Math Studio"
+    return (os.environ.get("SITE_BRAND_NAME") or "Novel Prep Learning Studio").strip() or "Novel Prep Learning Studio"
 
 
 SITE_BRAND_NAME = _site_brand_name()
 SITE_BRAND_SHORT = (os.environ.get("SITE_BRAND_SHORT") or "Novel Prep").strip() or "Novel Prep"
 SITE_META_DESCRIPTION = (
     os.environ.get("SITE_META_DESCRIPTION")
-    or f"{SITE_BRAND_NAME} — SAT Math practice (Units 1–4), course placement, mistake analytics, and a unified workspace."
+    or f"{SITE_BRAND_NAME} — SAT Math & English practice, course placement, mistake analytics, and a unified workspace."
 ).strip()
 SITE_LOGIN_KICKER = (
-    os.environ.get("SITE_LOGIN_KICKER") or f"{SITE_BRAND_SHORT} · SAT Math Studio"
+    os.environ.get("SITE_LOGIN_KICKER") or f"{SITE_BRAND_SHORT} · Learning Studio"
 ).strip()
 SITE_TEACHER_LABEL = (os.environ.get("SITE_TEACHER_LABEL") or "Novel Prep").strip()
 SITE_SUPPORT_CONTACT = (
@@ -1947,6 +1949,19 @@ def _placement_flow_config(topic: str) -> dict | None:
             "session_prefix": "placement_middle",
             "mc_scored": False,
         }
+    if topic in ("english_g7_8", "english_g9_11"):
+        mc = int(row.get("online_mcq_count") or row.get("online_item_count") or 0)
+        return {
+            "mc_count": mc,
+            "graph_count": 0,
+            "fr_count": 0,
+            "total": mc,
+            "has_gates": False,
+            "gate_kind": "english_mcq",
+            "session_prefix": "placement_english",
+            "mc_scored": True,
+            "english_reading_layout": True,
+        }
     if topic == "placement_full":
         mc = int(row.get("online_mcq_count") or row.get("online_item_count") or 85)
         return {
@@ -1982,6 +1997,8 @@ def _placement_flow_config(topic: str) -> dict | None:
 
 def _placement_timer_seconds(topic: str) -> int:
     return {
+        "english_g7_8": 55 * 60,
+        "english_g9_11": 65 * 60,
         "enhanced_math_1": 120 * 60,
         "enhanced_math_2": 130 * 60,
         "middle_level": 150 * 60,
@@ -4646,6 +4663,8 @@ BANKS: Dict[str, Dict[str, str]] = {
         "enhanced_math_1": "Placement_Enhanced_Math_1.tex",
         "enhanced_math_2": "Placement_Enhanced_Math_2.tex",
         "middle_level": "Placement_Middle_Level.tex",
+        "english_g7_8": "banks/placement/english_g7_8.tex",
+        "english_g9_11": "banks/placement/english_g9_11.tex",
     },
 }
 

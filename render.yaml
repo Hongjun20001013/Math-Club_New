@@ -32,7 +32,7 @@ services:
       - key: DB_PATH
         value: /var/data/sat.db
       - key: SITE_BRAND_NAME
-        value: Novel Prep Math Studio
+        value: Novel Prep Learning Studio
       - key: SITE_BRAND_SHORT
         value: Novel Prep
       - key: DESMOS_API_KEY

@@ -1,0 +1,38 @@
+{
+  "description": "Novel Prep English Diagnostic — Grades 9–11 (Reading + Language, 40 scored MCQ online; writing essay on paper).",
+  "brand": {
+    "report_title": "English placement report · Grades 9–11",
+    "trust_line": "Scores follow the Novel Prep English Diagnostic answer key (40 multiple-choice items).",
+    "trust_line_zh": "分数依据 Novel Prep 9–11 英语诊断标准答案（40 道选择题）。"
+  },
+  "calculator_by_index": {},
+  "score_band_rubric": [
+    {
+      "course_key": "english_foundations",
+      "tier": 1,
+      "title": "Foundations",
+      "min_score": 0,
+      "max_score": 24,
+      "headline": "Strengthen analytical reading and advanced language skills.",
+      "summary": "Prioritize evidence-based reading, rhetoric, and conventions before honors-level English."
+    },
+    {
+      "course_key": "english_on_level",
+      "tier": 2,
+      "title": "On-level",
+      "min_score": 25,
+      "max_score": 33,
+      "headline": "Grade-appropriate English readiness for high school.",
+      "summary": "The student shows balanced strength across reading passages and language items."
+    },
+    {
+      "course_key": "english_advanced",
+      "tier": 3,
+      "title": "Advanced-ready",
+      "min_score": 34,
+      "max_score": 40,
+      "headline": "Strong candidate for honors / AP-prep English.",
+      "summary": "High performance on complex passages and language conventions supports an accelerated placement."
+    }
+  ]
+}

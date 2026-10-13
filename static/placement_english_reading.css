@@ -1,0 +1,122 @@
+/* English placement — TOEFL-style passage (left) + question (right) */
+
+.sat-practice-page-wrap--english-reading .sat-split-card {
+  max-width: min(1240px, 100%) !important;
+}
+
+.sat-practice-page-wrap--english-reading .sat-split {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr) !important;
+}
+
+.sat-practice-page-wrap--english-reading .sat-pane-stem {
+  background: linear-gradient(180deg, #fdfcfa 0%, #f8f6f2 100%);
+  border-right: 1px solid rgba(30, 24, 48, 0.08);
+}
+
+.sat-practice-page-wrap--english-reading .sat-pane-choices {
+  background: linear-gradient(180deg, #ffffff 0%, #faf8ff 100%);
+}
+
+.sat-practice-page-wrap--english-reading .sat-pane-head {
+  border-bottom-color: rgba(30, 24, 48, 0.08);
+}
+
+.sat-practice-page-wrap--english-reading .sat-stem-scroll {
+  padding: 1.1rem 1.35rem 1.75rem;
+}
+
+.sat-practice-page-wrap--english-reading .sat-stem-body.question-panel {
+  max-width: none !important;
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  line-height: 1.72;
+  color: #1a1628;
+}
+
+.np-en-passage-head {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.np-en-passage-kicker {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6c5a9e;
+  margin-bottom: 0.35rem;
+}
+
+.np-en-passage-title {
+  margin: 0;
+  font-family: "Outfit", "DM Sans", system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: #2a2240;
+}
+
+.np-en-passage-body p {
+  margin: 0 0 1em;
+  text-align: left;
+}
+
+.np-en-placement-lang-panel {
+  padding: 1.25rem 1.1rem;
+  border-radius: 14px;
+  background: rgba(108, 78, 255, 0.06);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.np-en-placement-lang-panel__title {
+  margin: 0 0 0.5rem;
+  font-family: "Outfit", system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #3d2f6e;
+}
+
+.np-en-placement-lang-panel p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #4a4560;
+}
+
+.sat-practice-page-wrap--english-reading .sat-en-question-stem {
+  padding: 0 1.35rem 0.65rem;
+  border-bottom: 1px solid rgba(108, 78, 255, 0.1);
+  margin-bottom: 0.35rem;
+}
+
+.sat-practice-page-wrap--english-reading .np-en-stem-question {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.65;
+  margin: 0 0 0.25rem;
+  color: #1a1628;
+}
+
+.sat-practice-page-wrap--english-reading .choices-panel.sat-choices-list {
+  padding-top: 0.35rem;
+}
+
+.sat-practice-page-wrap--english-reading .choice-card {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .sat-practice-page-wrap--english-reading .sat-split {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sat-practice-page-wrap--english-reading .sat-pane-stem {
+    max-height: min(52vh, 420px);
+    border-right: none;
+    border-bottom: 1px solid rgba(30, 24, 48, 0.08);
+  }
+}
