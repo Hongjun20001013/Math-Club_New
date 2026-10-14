@@ -51,7 +51,58 @@ def placement_track_for_topic(topic: str) -> str:
 
 
 def english_writing_max_points(topic: str) -> int:
-    return 30 if topic == "english_g9_11" else 20
+    return 20
+
+
+def _dedupe_paragraphs(text: str) -> str:
+    paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
+    seen: set[str] = set()
+    out: list[str] = []
+    for p in paras:
+        key = re.sub(r"\s+", " ", p.lower())[:160]
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(p)
+    return "\n\n".join(out)
+
+
+def clean_essay_body_for_display(body: str, option: str = "") -> str:
+    """Strip accidental prompt paste from the essay field."""
+    text = (body or "").strip()
+    if not text:
+        return ""
+    text = re.sub(
+        r"^\[Option\s+([AB])\]\s*(?:ption\s+[AB]\s*·)?",
+        "",
+        text,
+        count=1,
+        flags=re.IGNORECASE,
+    ).lstrip()
+    opt = (option or "").strip().upper()
+    for prefix in (
+        f"[Option {opt}]",
+        f"Option {opt}",
+        f"Option {opt} ·",
+        f"Option {opt} -",
+        "Option A · Personal experience",
+        "Option B · Argument",
+    ):
+        if text.startswith(prefix):
+            text = text[len(prefix) :].lstrip(" ·-\n")
+    lines = [ln.strip() for ln in text.splitlines()]
+    while lines and lines[0].lower().startswith("prompt:"):
+        lines.pop(0)
+    filtered: list[str] = []
+    for ln in lines:
+        low = ln.lower()
+        if low.startswith("option a ·") or low.startswith("option b ·"):
+            continue
+        if low.startswith("everyone faces moments that are hard") and len(ln) < 120:
+            continue
+        filtered.append(ln)
+    text = "\n\n".join(filtered).strip()
+    return _dedupe_paragraphs(text)
 
 
 def essay_word_count(text: str) -> int:

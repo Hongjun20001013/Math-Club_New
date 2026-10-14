@@ -65,8 +65,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
 from placement_atelier_pdf import build_placement_atelier_pdf
+from placement_english_rubrics import writing_rubric_for, writing_score_band
 from placement_english_ui import (
     ENGLISH_PLACEMENT_TOPICS,
+    clean_essay_body_for_display,
     english_writing_max_points,
     essay_word_count,
     merge_form_english_writing,
@@ -18527,6 +18529,53 @@ def admin():
     )
 
 
+def _english_writing_review_bundle(
+    q: dict,
+    topic: str,
+    raw_answer: str,
+    attempt_id: int,
+    q_index: int,
+    paper_grades: dict[int, int],
+    score_payload: dict | None,
+) -> dict:
+    opt, body = unpack_english_writing_answer(raw_answer or "")
+    body_clean = clean_essay_body_for_display(body, opt)
+    wmin, wmax_words = writing_word_targets(topic)
+    wmax_pts = english_writing_max_points(topic)
+    wpts = paper_grades.get(q_index)
+    rubric = writing_rubric_for(topic, opt)
+    breakdown = {}
+    if score_payload:
+        breakdown = dict(score_payload.get("writing_breakdown") or {})
+    total_saved = score_payload.get("writing_total") if score_payload else None
+    if wpts is not None and total_saved is None:
+        total_saved = wpts
+    band = writing_score_band(int(total_saved or wpts or 0)) if (total_saved is not None or wpts is not None) else None
+    return {
+        "q_index": q_index,
+        "option": opt,
+        "body": body_clean,
+        "body_raw": body,
+        "word_count": essay_word_count(body_clean or body),
+        "word_min": wmin,
+        "word_max": wmax_words,
+        "max_points": wmax_pts,
+        "points": wpts,
+        "total_points": total_saved if total_saved is not None else wpts,
+        "prompt_html": q.get("english_writing_prompt_html") or "",
+        "options": q.get("english_writing_options") or [],
+        "needs_grade": wpts is None and bool((body_clean or body).strip()),
+        "rubric": rubric,
+        "breakdown": breakdown,
+        "score_band": band,
+        "review_href": url_for(
+            "admin_placement_candidate_item",
+            attempt_id=attempt_id,
+            q_index=q_index,
+        ),
+    }
+
+
 def _placement_list_track_param(raw: str | None) -> str:
     track = (raw or "math").strip().lower()
     return track if track in ("math", "english") else "math"
@@ -18854,32 +18903,28 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     topic = str(att["topic"] or "")
     is_english_placement = topic in ENGLISH_PLACEMENT_TOPICS
     english_writing: dict | None = None
+    score_payload: dict = {}
+    if att["score_json"]:
+        try:
+            score_payload = json.loads(att["score_json"])
+        except (TypeError, ValueError, json.JSONDecodeError):
+            score_payload = {}
     if is_english_placement and questions:
         widx = len(questions) - 1
         wq = questions[widx]
         if str(wq.get("question_kind") or "") == "english_writing":
             raw_essay = selected_by_index.get(widx, "")
-            opt, body = unpack_english_writing_answer(raw_essay)
-            wmin, wmax_words = writing_word_targets(topic)
-            wmax_pts = english_writing_max_points(topic)
-            wpts = paper_grades.get(widx)
-            english_writing = {
-                "q_index": widx,
-                "option": opt,
-                "body": body,
-                "word_count": essay_word_count(body),
-                "word_min": wmin,
-                "word_max": wmax_words,
-                "max_points": wmax_pts,
-                "points": wpts,
-                "prompt_html": wq.get("english_writing_prompt_html") or "",
-                "needs_grade": wpts is None and bool((body or "").strip()),
-                "review_href": url_for(
-                    "admin_placement_candidate_item",
-                    attempt_id=attempt_id,
-                    q_index=widx,
-                ),
-            }
+            english_writing = _english_writing_review_bundle(
+                wq,
+                topic,
+                raw_essay,
+                attempt_id,
+                widx,
+                paper_grades,
+                score_payload,
+            )
+            wpts = english_writing.get("points")
+            wmax_pts = english_writing.get("max_points") or 20
             if wpts is not None:
                 for row in items:
                     if row["q_index"] == widx:
@@ -19129,7 +19174,24 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
     area_title = str(row.get("area_title") or "")
     if part_label and area_title.lower().startswith(part_label.lower()):
         area_title = area_title[len(part_label) :].lstrip(" —–-")
-    english_w = ctx.get("english_writing") if kind == "english_writing" else None
+    english_w = None
+    if kind == "english_writing":
+        raw = str(row.get("selected") or "")
+        score_payload = {}
+        if ctx["attempt"].get("score_json"):
+            try:
+                score_payload = json.loads(ctx["attempt"]["score_json"])
+            except (TypeError, ValueError, json.JSONDecodeError):
+                score_payload = {}
+        english_w = _english_writing_review_bundle(
+            qobj,
+            str(ctx["attempt"].get("topic") or ""),
+            raw,
+            attempt_id,
+            q_index,
+            ctx.get("paper_grades") or {},
+            score_payload,
+        )
     return render_template(
         "admin_placement_item.html",
         attempt=ctx["attempt"],
@@ -19148,7 +19210,7 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
         topic_title=topic_title,
         part_label=part_label,
         area_title=area_title,
-        is_paper_item=not is_mcq_item(qobj),
+        is_paper_item=not is_mcq_item(qobj) and kind != "english_writing",
         result_choices=result_choices,
         explanation_en=qobj.get("explanation_en") or qobj.get("solution_en") or "",
         summary_href=summary_href,
@@ -19231,34 +19293,83 @@ def admin_placement_english_writing_grade(attempt_id: int):
         abort(404)
     widx = len(questions) - 1
     wmax = english_writing_max_points(topic)
-    raw = (request.form.get("writing_points") or "").strip()
-    if raw == "":
-        flash("Choose a score for the essay.")
-        return redirect(
-            url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
-            + "#np-admin-pl-writing"
-        )
-    try:
-        pts = int(raw)
-    except ValueError:
-        flash("Invalid essay score.")
-        return redirect(
-            url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
-            + "#np-admin-pl-writing"
-        )
-    pts = max(0, min(wmax, pts))
+    raw_answer = ""
+    resp = db.execute(
+        "SELECT selected_answer FROM placement_candidate_responses WHERE attempt_id = ? AND question_index = ?",
+        (attempt_id, widx),
+    ).fetchone()
+    if resp:
+        raw_answer = str(resp["selected_answer"] or "")
+    opt, _ = unpack_english_writing_answer(raw_answer)
+    rubric = writing_rubric_for(topic, opt)
+    breakdown: dict[str, int] = {}
+    total = 0
+    for crit in rubric.get("criteria") or []:
+        cid = str(crit.get("id") or "")
+        cap = int(crit.get("max_points") or 0)
+        raw_pts = (request.form.get(f"crit_{cid}") or "").strip()
+        if raw_pts == "":
+            continue
+        try:
+            pts_c = int(raw_pts)
+        except ValueError:
+            continue
+        pts_c = max(0, min(cap, pts_c))
+        breakdown[cid] = pts_c
+        total += pts_c
+    crit_ids = [str(c.get("id") or "") for c in rubric.get("criteria") or []]
+
+    def _writing_grade_redirect() -> str:
+        anchor = "#np-admin-pl-writing"
+        if request.form.get("return_to") == "item":
+            try:
+                qi = int(request.form.get("q_index") or widx)
+            except ValueError:
+                qi = widx
+            return (
+                url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=qi)
+                + anchor
+            )
+        return url_for("admin_placement_candidate_detail", attempt_id=attempt_id) + anchor
+
+    if breakdown and len(breakdown) < len(crit_ids):
+        flash("Score every rubric row before saving.")
+        return redirect(_writing_grade_redirect())
+    if not breakdown:
+        raw = (request.form.get("writing_points") or "").strip()
+        if raw == "":
+            flash("Enter a score for each rubric row, or choose a total.")
+            return redirect(_writing_grade_redirect())
+        try:
+            total = int(raw)
+        except ValueError:
+            flash("Invalid essay score.")
+            return redirect(_writing_grade_redirect())
+    total = max(0, min(wmax, total))
     placement_public_mod.save_paper_grades(
-        db, attempt_id, [(widx, pts, wmax)], owner_kind="candidate"
+        db, attempt_id, [(widx, total, wmax)], owner_kind="candidate"
     )
     db.commit()
     ctx = _admin_placement_report_ctx(attempt_id)
     if ctx:
+        score_out = dict(ctx["score"])
+        score_out["writing_breakdown"] = breakdown
+        score_out["writing_total"] = total
         db.execute(
             "UPDATE placement_candidate_attempts SET score_json = ? WHERE id = ?",
-            (json.dumps(ctx["score"]), attempt_id),
+            (json.dumps(score_out), attempt_id),
         )
         db.commit()
     flash("Essay score saved.")
+    if request.form.get("return_to") == "item":
+        try:
+            qi = int(request.form.get("q_index") or widx)
+        except ValueError:
+            qi = widx
+        return redirect(
+            url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=qi)
+            + "#np-admin-pl-writing"
+        )
     return redirect(
         url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
         + "#np-admin-pl-writing"

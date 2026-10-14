@@ -172,46 +172,9 @@
   </section>
 
   {% if is_english_placement and english_writing %}
-  <section id="np-admin-pl-writing" class="np-en-advisor-writing" aria-label="Writing essay and grade">
-    <header class="np-en-advisor-writing__head">
-      <div>
-        <p class="np-en-advisor-writing__kicker">Part III · Writing</p>
-        <h2>Student essay</h2>
-      </div>
-      <div class="np-en-advisor-writing__meta">
-        {% if english_writing.option %}<span class="np-en-advisor-writing__pill">Option {{ english_writing.option }}</span>{% endif %}
-        <span class="np-en-advisor-writing__pill">{{ english_writing.word_count }} words</span>
-        <span class="np-en-advisor-writing__pill">Target {{ english_writing.word_min }}–{{ english_writing.word_max }}</span>
-        {% if english_writing.points is not none %}
-        <span class="np-en-advisor-writing__pill np-en-advisor-writing__pill--ok">Scored {{ english_writing.points }}/{{ english_writing.max_points }}</span>
-        {% elif english_writing.body %}
-        <span class="np-en-advisor-writing__pill np-en-advisor-writing__pill--warn">Needs grade</span>
-        {% endif %}
-      </div>
-    </header>
-    <div class="np-en-advisor-writing__body">
-      {% if english_writing.prompt_html %}
-      <div class="np-en-advisor-writing__prompt question-panel">{{ english_writing.prompt_html|safe }}</div>
-      {% endif %}
-      <article class="np-en-advisor-essay" aria-label="Essay text">{{ english_writing.body }}</article>
-      <div class="np-en-advisor-writing__grade">
-        <h3>Advisor score (0–{{ english_writing.max_points }} points)</h3>
-        <p class="np-summary-sheet-lead">Save a score after you read the full essay. Families see this on the PDF once grading is complete.</p>
-        <form method="post" action="{{ url_for('admin_placement_english_writing_grade', attempt_id=attempt.id) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <div class="np-en-advisor-grade-pills" role="group" aria-label="Essay points">
-            {% for p in range(0, english_writing.max_points + 1) %}
-            <label class="np-en-advisor-grade-pill">
-              <input type="radio" name="writing_points" value="{{ p }}"{% if english_writing.points == p %} checked{% endif %}>
-              <span>{{ p }}</span>
-            </label>
-            {% endfor %}
-          </div>
-          <button type="submit" class="np-pw-btn np-pw-btn--primary">Save essay score</button>
-        </form>
-      </div>
-    </div>
-  </section>
+  {% set q_index = english_writing.q_index %}
+  {% set total_q = attempt.total_count %}
+  {% include 'partials/admin_english_writing_review.html' %}
   {% endif %}
 
   {% if section_stats %}
