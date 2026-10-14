@@ -2,10 +2,13 @@
 {% block title %}Q{{ q_index + 1 }} · {{ attempt.display_name }} · Placement report{% endblock %}
 {% block extra_css %}
 {% include 'partials/placement_cinema_css.html' %}
+{% if is_english_writing|default(false) %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_placement_english.css') }}?v={{ style_css_revision }}">
+{% endif %}
 {% endblock %}
 {% block content %}
 <div class="np-page-shell">
-<div class="np-session-item np-admin-pl-item glass-panel np-glass">
+<div class="np-session-item np-admin-pl-item glass-panel np-glass{% if is_english_writing|default(false) %} np-admin-pl-item--writing{% endif %}">
   {% include 'partials/placement_atelier_mesh.html' %}
   <p class="np-pw-breadcrumb">
     <a href="{{ summary_href }}">← Back to {{ attempt.display_name }} report</a>
@@ -50,11 +53,47 @@
   </header>
 
   <div class="np-session-item-body">
+    {% if is_english_writing|default(false) and english_writing %}
+    <section class="np-en-advisor-writing np-en-advisor-writing--item" aria-label="Writing essay">
+      <header class="np-en-advisor-writing__head">
+        <div>
+          <p class="np-en-advisor-writing__kicker">Writing item</p>
+          <h2>Essay for advisor review</h2>
+        </div>
+        <div class="np-en-advisor-writing__meta">
+          {% if english_writing.option %}<span class="np-en-advisor-writing__pill">Option {{ english_writing.option }}</span>{% endif %}
+          <span class="np-en-advisor-writing__pill">{{ english_writing.word_count }} words</span>
+        </div>
+      </header>
+      <div class="np-en-advisor-writing__body">
+        {% if english_writing.prompt_html %}
+        <div class="np-en-advisor-writing__prompt question-panel">{{ english_writing.prompt_html|safe }}</div>
+        {% endif %}
+        <article class="np-en-advisor-essay">{{ english_writing.body }}</article>
+        <div class="np-en-advisor-writing__grade">
+          <h3>Score (0–{{ english_writing.max_points }})</h3>
+          <form method="post" action="{{ url_for('admin_placement_english_writing_grade', attempt_id=attempt.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="np-en-advisor-grade-pills" role="group" aria-label="Essay points">
+              {% for p in range(0, english_writing.max_points + 1) %}
+              <label class="np-en-advisor-grade-pill">
+                <input type="radio" name="writing_points" value="{{ p }}"{% if english_writing.points == p %} checked{% endif %}>
+                <span>{{ p }}</span>
+              </label>
+              {% endfor %}
+            </div>
+            <button type="submit" class="np-pw-btn np-pw-btn--primary">Save essay score</button>
+          </form>
+        </div>
+      </div>
+    </section>
+    {% else %}
     <section class="np-session-item-stem question-panel sat-stem-body" aria-label="Question">
       {{ q.stem|safe }}
     </section>
+    {% endif %}
 
-    {% if result_choices %}
+    {% if not is_english_writing|default(false) and result_choices %}
     <section class="np-session-item-choices" aria-label="Answer choices">
       <p class="np-session-item-choices-label">Answer choices</p>
       <div class="choices-panel choices-stack sat-choices-list np-session-item-choice-list">

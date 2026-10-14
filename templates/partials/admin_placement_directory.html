@@ -1,3 +1,4 @@
+{% include "partials/admin_placement_track_tabs.html" %}
 <div class="np-pl-roster">
   {% for group in placement_groups %}
   <section class="np-pl-roster-group{% if group.unassigned %} is-unassigned{% endif %}" aria-label="Advisor {{ group.advisor }}">
@@ -29,7 +30,12 @@
             <dt>Score</dt>
             <dd>{{ row.score_label }}</dd>
           </div>
-          {% if row.paper_label and row.paper_label != "—" %}
+          {% if row.placement_track|default('math') == 'english' %}
+          <div class="np-pl-roster-metric--writing">
+            <dt>Writing</dt>
+            <dd>{{ row.writing_label or "—" }}</dd>
+          </div>
+          {% elif row.paper_label and row.paper_label != "—" %}
           <div>
             <dt>Graphing</dt>
             <dd>{{ row.paper_label }}</dd>
@@ -40,7 +46,7 @@
           <span class="np-pl-roster-status np-pl-roster-status--{{ row.status }}">{{ row.status_label }}</span>
           {% if row.when_label %}<time>{{ row.when_label }}</time>{% endif %}
           <div class="np-pl-roster-actions">
-            <a class="np-pl-roster-open" href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}">Open report</a>
+            <a class="np-pl-roster-open{% if row.writing_needs_grade|default(false) %} np-pl-roster-open--grade{% endif %}" href="{{ url_for('admin_placement_candidate_detail', attempt_id=row.attempt_id) }}{% if row.writing_needs_grade|default(false) %}#np-admin-pl-writing{% endif %}">{% if row.writing_needs_grade|default(false) %}Grade essay{% else %}Open report{% endif %}</a>
             <form method="post" action="{{ url_for('admin_placement_candidate_delete', attempt_id=row.attempt_id) }}" class="np-pl-roster-remove" onsubmit="return confirm({{ ('Remove ' ~ (row.display_name or 'this sitting') ~ ' from Placement testers? This cannot be undone.')|tojson }});">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
               <input type="hidden" name="from" value="{{ 'list' if request.endpoint == 'admin_placement_candidates' else 'admin' }}">
@@ -53,6 +59,6 @@
     </div>
   </section>
   {% else %}
-  <p class="np-admin-empty">No placement testers yet.</p>
+  <p class="np-admin-empty">No {% if placement_track|default('math') == 'english' %}English{% else %}Math{% endif %} placement testers yet.</p>
   {% endfor %}
 </div>

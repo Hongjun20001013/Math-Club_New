@@ -38,3 +38,21 @@ def writing_word_targets(topic: str) -> tuple[int, int]:
     if topic == "english_g9_11":
         return 350, 500
     return 200, 300
+
+
+ENGLISH_PLACEMENT_TOPICS = frozenset({"english_g7_8", "english_g9_11"})
+
+
+def placement_track_for_topic(topic: str) -> str:
+    t = str(topic or "").strip()
+    if t in ENGLISH_PLACEMENT_TOPICS or t.startswith("english_"):
+        return "english"
+    return "math"
+
+
+def english_writing_max_points(topic: str) -> int:
+    return 30 if topic == "english_g9_11" else 20
+
+
+def essay_word_count(text: str) -> int:
+    return len((text or "").strip().split())

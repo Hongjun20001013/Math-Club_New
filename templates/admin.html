@@ -598,8 +598,8 @@
           </ul>
         </div>
         <div class="np-admin-hero-actions np-admin-hero-actions--placement">
-          <a href="{{ url_for('admin_placement_candidates') }}" class="np-admin-hero-btn">All sittings</a>
-          <a href="{{ url_for('admin_placement_candidates_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">CSV</a>
+          <a href="{{ url_for('admin_placement_candidates', track=placement_track|default('math')) }}" class="np-admin-hero-btn">All sittings</a>
+          <a href="{{ url_for('admin_placement_candidates_csv', track=placement_track|default('math')) }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">CSV</a>
         </div>
       </header>
       {% include "partials/admin_placement_directory.html" %}

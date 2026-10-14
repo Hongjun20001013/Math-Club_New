@@ -66,7 +66,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from placement_report_pdf import build_placement_parent_pdf
 from placement_atelier_pdf import build_placement_atelier_pdf
 from placement_english_ui import (
+    ENGLISH_PLACEMENT_TOPICS,
+    english_writing_max_points,
+    essay_word_count,
     merge_form_english_writing,
+    placement_track_for_topic,
     unpack_english_writing_answer,
     writing_word_targets,
 )
@@ -18479,8 +18483,9 @@ def admin():
     }
     placement_rows = []
     placement_totals = {"testers": 0, "in_progress": 0, "submitted": 0}
+    placement_track = _placement_list_track_param(request.args.get("track"))
     if _placement_admin_reports_active():
-        placement_rows = _placement_candidate_admin_rows(db)
+        placement_rows = _placement_candidate_admin_rows(db, track=placement_track)
         placement_totals = {
             "testers": len(placement_rows),
             "in_progress": sum(
@@ -18518,15 +18523,31 @@ def admin():
         placement_candidates=placement_rows,
         placement_groups=_group_placement_admin_rows(placement_rows),
         placement_totals=placement_totals,
+        placement_track=placement_track,
     )
 
 
-def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
+def _placement_list_track_param(raw: str | None) -> str:
+    track = (raw or "math").strip().lower()
+    return track if track in ("math", "english") else "math"
+
+
+def _placement_candidate_admin_rows(
+    db, q: str = "", track: str | None = "math"
+) -> list[dict]:
     tests = {t["slug"]: t.get("title") for t in _placement_tests_flat()}
     rows = placement_public_mod.list_candidates(db)
     needle = (q or "").strip().lower()
+    filter_track = _placement_list_track_param(track) if track else None
     decorated = []
     for row in rows:
+        topic = placement_public_mod.SLUG_TO_TOPIC.get(
+            str(row.get("selected_slug") or ""), ""
+        )
+        row["topic"] = topic
+        row["placement_track"] = placement_track_for_topic(topic)
+        if filter_track and row["placement_track"] != filter_track:
+            continue
         row["test_title"] = tests.get(row["selected_slug"], row["selected_slug"])
         row["status_label"] = placement_public_mod.status_label(row["status"])
         rec = {}
@@ -18559,6 +18580,29 @@ def _placement_candidate_admin_rows(db, q: str = "") -> list[dict]:
             row["score_label"] = "—"
             row["paper_label"] = "—"
             row["provisional"] = False
+        if row["placement_track"] == "english":
+            row["paper_label"] = ""
+            attempt_id = int(row.get("attempt_id") or 0)
+            widx = max(0, int(row.get("total_count") or 1) - 1)
+            wmax = english_writing_max_points(topic)
+            wgrades = (
+                placement_public_mod.list_paper_grades(db, attempt_id)
+                if attempt_id
+                else {}
+            )
+            wpts = wgrades.get(widx)
+            row["writing_max"] = wmax
+            row["writing_label"] = (
+                f"{wpts}/{wmax}" if wpts is not None else "Needs grade"
+            )
+            row["writing_needs_grade"] = (
+                wpts is None and str(row.get("status") or "") == "submitted"
+            )
+            if score and mcq_t:
+                row["score_label"] = f"{mcq_c}/{mcq_t} MC"
+        else:
+            row["writing_label"] = ""
+            row["writing_needs_grade"] = False
         if needle:
             blob = " ".join(
                 str(row.get(key) or "")
@@ -18621,12 +18665,14 @@ def admin_placement_candidates():
         return gate
     db = get_db()
     q = (request.args.get("q") or "").strip()
-    rows = _placement_candidate_admin_rows(db, q)
+    placement_track = _placement_list_track_param(request.args.get("track"))
+    rows = _placement_candidate_admin_rows(db, q, track=placement_track)
     return render_template(
         "admin_placement_candidates.html",
         rows=rows,
         placement_groups=_group_placement_admin_rows(rows),
         q=q,
+        placement_track=placement_track,
     )
 
 
@@ -18639,8 +18685,8 @@ def admin_placement_candidates_csv():
     from io import StringIO
 
     db = get_db()
-    rows = placement_public_mod.list_candidates(db)
-    tests = {t["slug"]: t.get("title") for t in _placement_tests_flat()}
+    placement_track = _placement_list_track_param(request.args.get("track"))
+    rows = _placement_candidate_admin_rows(db, track=placement_track)
     buf = StringIO()
     writer = csv.writer(buf)
     writer.writerow(
@@ -18650,12 +18696,14 @@ def admin_placement_candidates_csv():
             "school",
             "current_course",
             "test",
+            "track",
             "progress",
             "status",
             "started_at",
             "last_activity",
             "submitted_at",
             "score",
+            "writing",
             "advisor",
         ]
     )
@@ -18666,13 +18714,15 @@ def admin_placement_candidates_csv():
                 row.get("grade") or "",
                 row.get("school") or "",
                 row.get("math_course") or "",
-                tests.get(row["selected_slug"], row["selected_slug"]),
+                row.get("test_title") or row.get("selected_slug") or "",
+                row.get("placement_track") or "math",
                 f"{row['answered_count']}/{row['total_count']}",
                 row["status"],
                 row.get("started_at") or "",
                 row.get("last_activity_at") or "",
                 row.get("submitted_at") or "",
-                row.get("score_json") or "",
+                row.get("score_label") or "",
+                row.get("writing_label") or "",
                 row.get("counselor_source") or "Not provided",
             ]
         )
@@ -18753,11 +18803,23 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             status = "skipped"
         sec, title_en, _detail = _summary_topic_fields("placement", q)
         key = extract_correct_answer(q) or resp.get("correct_answer") or ""
+        q_kind_loop = str(q.get("question_kind") or "mcq")
+        yours_display = selected or "—"
+        key_display = display_answer_plain(key) if key else "—"
+        if q_kind_loop == "english_writing":
+            opt, body = unpack_english_writing_answer(selected)
+            wc = essay_word_count(body)
+            if body:
+                yours_display = f"Option {opt or '?'} · {wc} words"
+            elif opt:
+                yours_display = f"Option {opt} (no essay yet)"
+            key_display = "Advisor rubric"
         items.append(
             {
                 "n": i + 1,
                 "q_index": i,
                 "q_display": str(i + 1),
+                "question_kind": q_kind_loop,
                 "review_href": url_for(
                     "admin_placement_candidate_item", attempt_id=attempt_id, q_index=i
                 ),
@@ -18768,8 +18830,8 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                 "effective_is_correct": effective_correct,
                 "result_label": label,
                 "status": status,
-                "yours_display": selected or "—",
-                "key_display": display_answer_plain(key) if key else "—",
+                "yours_display": yours_display,
+                "key_display": key_display,
                 "knowledge_section": sec,
                 "knowledge_title_en": title_en,
             }
@@ -18789,6 +18851,41 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                     row["yours_display"] = f"{paper_grades[idx]} / {cap}"
                     row["status"] = "correct" if paper_grades[idx] >= cap else "paper"
                     row["result_label"] = "advisor grade"
+    topic = str(att["topic"] or "")
+    is_english_placement = topic in ENGLISH_PLACEMENT_TOPICS
+    english_writing: dict | None = None
+    if is_english_placement and questions:
+        widx = len(questions) - 1
+        wq = questions[widx]
+        if str(wq.get("question_kind") or "") == "english_writing":
+            raw_essay = selected_by_index.get(widx, "")
+            opt, body = unpack_english_writing_answer(raw_essay)
+            wmin, wmax_words = writing_word_targets(topic)
+            wmax_pts = english_writing_max_points(topic)
+            wpts = paper_grades.get(widx)
+            english_writing = {
+                "q_index": widx,
+                "option": opt,
+                "body": body,
+                "word_count": essay_word_count(body),
+                "word_min": wmin,
+                "word_max": wmax_words,
+                "max_points": wmax_pts,
+                "points": wpts,
+                "prompt_html": wq.get("english_writing_prompt_html") or "",
+                "needs_grade": wpts is None and bool((body or "").strip()),
+                "review_href": url_for(
+                    "admin_placement_candidate_item",
+                    attempt_id=attempt_id,
+                    q_index=widx,
+                ),
+            }
+            if wpts is not None:
+                for row in items:
+                    if row["q_index"] == widx:
+                        row["yours_display"] = f"{wpts}/{wmax_pts} pts"
+                        row["result_label"] = "advisor grade"
+                        row["status"] = "correct" if wpts >= wmax_pts else "paper"
     test = _placement_test_by_slug(att["slug"])
     answered_live = sum(
         1
@@ -18811,7 +18908,6 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             "paper_max": 0,
         }
     )
-    topic = str(att["topic"] or "")
     rubric_by_index = {int(r["index"]): r for r in (paper_rubric or [])}
     for row, qobj in zip(items, questions):
         sec = row.get("knowledge_section") or qobj.get("knowledge_section") or "—"
@@ -18976,6 +19072,8 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         "paper_uploads": paper_uploads,
         "paper_rubric": paper_rubric,
         "paper_grades": paper_grades,
+        "is_english_placement": is_english_placement,
+        "english_writing": english_writing,
     }
 
 
@@ -19000,6 +19098,8 @@ def admin_placement_candidate_detail(attempt_id: int):
         paper_uploads=ctx.get("paper_uploads") or [],
         paper_rubric=ctx.get("paper_rubric") or [],
         paper_grades=ctx.get("paper_grades") or {},
+        is_english_placement=ctx.get("is_english_placement", False),
+        english_writing=ctx.get("english_writing"),
     )
 
 
@@ -19029,12 +19129,15 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
     area_title = str(row.get("area_title") or "")
     if part_label and area_title.lower().startswith(part_label.lower()):
         area_title = area_title[len(part_label) :].lstrip(" —–-")
+    english_w = ctx.get("english_writing") if kind == "english_writing" else None
     return render_template(
         "admin_placement_item.html",
         attempt=ctx["attempt"],
         test=ctx["test"],
         q=qobj,
         row=row,
+        english_writing=english_w,
+        is_english_writing=kind == "english_writing",
         q_index=q_index,
         total_q=len(questions),
         status=row.get("status") or "review",
@@ -19105,6 +19208,60 @@ def admin_placement_response_override(attempt_id: int, q_index: int):
     flash("Score override saved." if val is not None else "Score override cleared.")
     return redirect(
         url_for("admin_placement_candidate_item", attempt_id=attempt_id, q_index=q_index)
+    )
+
+
+@app.route("/admin/placement-candidates/<int:attempt_id>/writing-grade", methods=["POST"])
+def admin_placement_english_writing_grade(attempt_id: int):
+    gate = _require_placement_admin_reports()
+    if gate is not None:
+        return gate
+    db = get_db()
+    att = db.execute(
+        "SELECT id, topic FROM placement_candidate_attempts WHERE id = ?",
+        (attempt_id,),
+    ).fetchone()
+    if att is None:
+        abort(404)
+    topic = str(att["topic"] or "")
+    if topic not in ENGLISH_PLACEMENT_TOPICS:
+        abort(404)
+    questions = _placement_public_questions(topic)
+    if not questions:
+        abort(404)
+    widx = len(questions) - 1
+    wmax = english_writing_max_points(topic)
+    raw = (request.form.get("writing_points") or "").strip()
+    if raw == "":
+        flash("Choose a score for the essay.")
+        return redirect(
+            url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
+            + "#np-admin-pl-writing"
+        )
+    try:
+        pts = int(raw)
+    except ValueError:
+        flash("Invalid essay score.")
+        return redirect(
+            url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
+            + "#np-admin-pl-writing"
+        )
+    pts = max(0, min(wmax, pts))
+    placement_public_mod.save_paper_grades(
+        db, attempt_id, [(widx, pts, wmax)], owner_kind="candidate"
+    )
+    db.commit()
+    ctx = _admin_placement_report_ctx(attempt_id)
+    if ctx:
+        db.execute(
+            "UPDATE placement_candidate_attempts SET score_json = ? WHERE id = ?",
+            (json.dumps(ctx["score"]), attempt_id),
+        )
+        db.commit()
+    flash("Essay score saved.")
+    return redirect(
+        url_for("admin_placement_candidate_detail", attempt_id=attempt_id)
+        + "#np-admin-pl-writing"
     )
 
 

@@ -10,16 +10,17 @@
           <h1 id="np-admin-placement-heading">Placement testers</h1>
           <ul class="np-pl-roster-summary">
             <li><strong>{{ rows|length }}</strong> sitting{{ 's' if rows|length != 1 else '' }}</li>
-            <li>Grouped by advisor</li>
+            <li>{% if placement_track|default('math') == 'english' %}English{% else %}Math{% endif %} · grouped by advisor</li>
           </ul>
         </div>
         <form method="get" action="{{ url_for('admin_placement_candidates') }}" class="np-admin-search np-admin-search--studio">
+          <input type="hidden" name="track" value="{{ placement_track|default('math') }}">
           <input name="q" value="{{ q or '' }}" type="search" placeholder="Search name, advisor, course…">
           <button type="submit">Search</button>
         </form>
       </header>
       <p class="np-pl-roster-toolbar">
-        <a class="np-admin-hero-btn" href="{{ url_for('admin_placement_candidates_csv') }}">CSV</a>
+        <a class="np-admin-hero-btn" href="{{ url_for('admin_placement_candidates_csv') }}?track={{ placement_track|default('math') }}">CSV</a>
         <a class="np-admin-hero-btn np-admin-hero-btn--ghost" href="{{ url_for('admin') }}#np-admin-placement">Back to admin</a>
       </p>
       {% include "partials/admin_placement_directory.html" %}

@@ -1,0 +1,6 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_placement_english.css') }}?v={{ style_css_revision }}">
+<nav class="np-pl-track-switch" aria-label="Placement track">
+  <a class="np-pl-track-switch__btn{% if placement_track|default('math') == 'math' %} is-active{% endif %}" href="{% if request.endpoint == 'admin_placement_candidates' %}{{ url_for('admin_placement_candidates', track='math', q=q|default('')) }}{% else %}{{ url_for('admin', track='math') }}#np-admin-placement{% endif %}">Math placement</a>
+  <a class="np-pl-track-switch__btn{% if placement_track|default('math') == 'english' %} is-active{% endif %}" href="{% if request.endpoint == 'admin_placement_candidates' %}{{ url_for('admin_placement_candidates', track='english', q=q|default('')) }}{% else %}{{ url_for('admin', track='english') }}#np-admin-placement{% endif %}">English placement</a>
+</nav>
+<p class="np-pl-track-switch__hint">{% if placement_track|default('math') == 'english' %}Reading, language, and writing — grade essays from each report.{% else %}Math diagnostics only — graphing and paper scores stay here.{% endif %}</p>
