@@ -474,12 +474,17 @@
                     <p class="sat-submit-hint">This is the last on-screen question. Next opens the paper PDF upload for graphing and free response.</p>
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Save &amp; continue to paper</button>
                     {% elif is_last %}
-                    <p class="sat-submit-hint">{% if placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
-                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">Submit session &amp; see results</button>
+                    {% if placement_english_writing %}
+                    <p class="sat-submit-hint">{% if public_run_mode|default(false) %}Save your essay here, then continue to the <strong>submit test</strong> screen (or use <strong>Submit test</strong> in the header).{% else %}Save your essay, then finish the placement session.{% endif %}</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">{% if public_run_mode|default(false) %}Save essay &amp; continue{% else %}Save essay &amp; see results{% endif %}</button>
+                    {% else %}
+                    <p class="sat-submit-hint">{% if placement_mode and public_run_mode|default(false) %}Save this answer, then use <strong>Submit test</strong> in the header when you are done with every part.{% elif placement_mode %}Continue to the next item.{% else %}Finish this question to see your score for all {{ total }} questions.{% endif %}</p>
+                    <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill sat-submit-final">{% if placement_mode and public_run_mode|default(false) %}Save &amp; continue{% else %}Submit session &amp; see results{% endif %}</button>
+                    {% endif %}
                     {% else %}
                     <button type="submit" class="nav-btn nav-btn-submit sat-submit-btn sat-submit-btn--pill">Save &amp; next question</button>
                     {% endif %}
-                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
+                    <p id="sat-answer-status" class="sat-answer-status" aria-live="polite">{% if placement_english_writing %}Pick a prompt (if shown), write your essay, then save.{% elif q.question_kind|default('mcq') == 'constructed_response' %}Enter your work before submitting.{% elif miss_quiz_mode %}Choose an answer, then check.{% elif mistake_redo_mode|default(false) %}Choose an answer, then submit.{% else %}Choose an answer, then save and continue.{% endif %}</p>
                 </div>
             </aside>
         </div>
@@ -830,6 +835,8 @@ function clearLegacyPracticeDrafts() {
 const selectedInput = document.getElementById("selected-answer-input");
 const sprInput = document.getElementById("spr-answer-input");
 const constructedInput = document.getElementById("constructed-answer-input");
+const englishWritingInput = document.getElementById("english-writing-input");
+const isEnglishWritingMode = {{ placement_english_writing|default(false) | tojson }};
 const paperCompletedInput = document.getElementById("paper-completed-input");
 const paperSelectedInput = document.getElementById("paper-selected-input");
 const practiceForm = document.querySelector(".sat-practice-form");
@@ -844,6 +851,7 @@ function currentPracticeAnswer() {
     if (paperCompletedInput) {
         return paperCompletedInput.checked ? "PAPER_COMPLETE" : "";
     }
+    if (englishWritingInput) return (englishWritingInput.value || "").trim();
     if (constructedInput) return (constructedInput.value || "").trim();
     if (sprInput) return (sprInput.value || "").trim();
     const checked = document.querySelector(".choice-radio-input:checked");
@@ -862,6 +870,10 @@ function autosaveNow() {
     body.append("qnum", String(practiceQnum));
     body.append("attempt_id", String(practiceAttemptId));
     body.append("selected_answer", answer);
+    if (englishWritingInput) {
+        const picked = document.querySelector(".sat-en-writing-pick-input:checked");
+        if (picked) body.append("english_writing_option", picked.value);
+    }
     if (paperCompletedInput && paperCompletedInput.checked) {
         body.append("paper_completed", "1");
     }
@@ -893,7 +905,7 @@ function setAnswerState(hasAnswer, label) {
     answerStatus?.classList.toggle("is-visible", hasAnswer || isConstructedMode);
     const nativeChoice = document.querySelector(".choice-radio-input");
     submitButtons.forEach((btn) => {
-        if (isConstructedMode || isPlacementPaper || nativeChoice || sprInput) {
+        if (isConstructedMode || isPlacementPaper || nativeChoice || sprInput || englishWritingInput) {
             btn.removeAttribute("disabled");
             btn.classList.remove("is-disabled");
             return;
@@ -919,6 +931,8 @@ if (isPlacementPaper) {
     syncPaper();
 } else if (isConstructedMode) {
     setAnswerState(true, "Type your work in the box, then save and continue.");
+} else if (isEnglishWritingMode) {
+    setAnswerState(true, "Write your essay, then save and continue.");
 } else {
     setAnswerState(false);
 }
@@ -1095,6 +1109,31 @@ window.addEventListener("load", () => {
         if (serverSavedAnswer) constructedInput.value = serverSavedAnswer;
         else if (saved !== null && saved !== "") constructedInput.value = saved;
         setAnswerState(true, constructedInput.value.trim() ? "Work entered. Click Save & next when ready." : "Type your work, then save and continue.");
+    } else if (englishWritingInput) {
+        if (serverSavedAnswer) englishWritingInput.value = serverSavedAnswer;
+        else if (saved !== null && saved !== "") englishWritingInput.value = saved;
+        const syncEnglishWritingStatus = () => {
+            const hasEssay = englishWritingInput.value.trim().length > 0;
+            const picked = document.querySelector(".sat-en-writing-pick-input:checked");
+            const needsPick = !!document.querySelector(".sat-en-writing-pick-input");
+            if (needsPick && !picked) {
+                setAnswerState(hasEssay, hasEssay ? "Choose Option A or B above, then save." : "Pick a prompt, then write your essay.");
+            } else {
+                setAnswerState(true, hasEssay ? "Essay ready — save and continue." : "Write your essay, then save.");
+            }
+        };
+        syncEnglishWritingStatus();
+        englishWritingInput.addEventListener("input", () => {
+            localStorage.setItem(storageKey, englishWritingInput.value);
+            syncEnglishWritingStatus();
+            scheduleAutosave();
+        });
+        document.querySelectorAll(".sat-en-writing-pick-input").forEach((inp) => {
+            inp.addEventListener("change", () => {
+                syncEnglishWritingStatus();
+                scheduleAutosave();
+            });
+        });
     } else if (sprInput) {
         if (serverSavedAnswer) sprInput.value = serverSavedAnswer;
         else if (saved !== null && saved !== "") sprInput.value = saved;

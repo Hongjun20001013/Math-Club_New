@@ -52,6 +52,11 @@
         const picked = document.querySelector(".sat-en-writing-pick-input:checked");
         if (!picked) {
           ev.preventDefault();
+          const status = document.getElementById("sat-answer-status");
+          if (status) {
+            status.classList.add("is-visible");
+            status.textContent = "Choose Option A or B above before saving your essay.";
+          }
           document.getElementById("np-en-writing-pick-block")?.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       },
