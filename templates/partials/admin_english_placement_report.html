@@ -1,0 +1,94 @@
+{% set er = english_report %}
+{% if er %}
+<section id="np-en-placement-overview" class="np-en-report-overview glass-panel np-glass" aria-label="English placement overview">
+  <header class="np-en-report-overview__head">
+    <p class="np-en-report-overview__kicker">English diagnostic · three parts</p>
+    <h2 class="np-en-report-overview__title">{{ er.headline }}</h2>
+    {% if er.summary %}<p class="np-en-report-overview__lead">{{ er.summary }}</p>{% endif %}
+  </header>
+
+  <div class="np-en-report-modules" role="list">
+    {% for s in section_stats %}
+    <article class="np-en-report-module np-en-report-module--{{ s.status }}" role="listitem">
+      <header class="np-en-report-module__head">
+        <span class="np-en-report-module__part">{{ s.part_label }}</span>
+        <span class="np-en-report-module__pill">{{ s.status_label }}</span>
+      </header>
+      <h3 class="np-en-report-module__title">{{ s.area_title }}</h3>
+      <p class="np-en-report-module__range">{{ s.range_label }}</p>
+      <p class="np-en-report-module__score">
+        {% if s.is_writing %}
+          {% if s.paper %}
+          <strong>—</strong><span>/ {{ s.total }} pts</span>
+          {% else %}
+          <strong>{{ s.correct }}</strong><span>/ {{ s.total }} pts</span>
+          {% endif %}
+        {% else %}
+        <strong>{{ s.correct }}</strong><span>/ {{ s.total }}</span>
+        <em>{{ s.pct }}%</em>
+        {% endif %}
+      </p>
+      <p class="np-en-report-module__read">{{ s.interpretation }}</p>
+      {% if s.is_writing and english_writing %}
+      <a class="np-en-report-module__cta" href="#np-admin-pl-writing">{% if s.paper %}Grade essay →{% else %}View essay &amp; rubric →{% endif %}</a>
+      {% elif not s.is_writing and s.total %}
+      <a class="np-en-report-module__cta" href="#np-summary-full-sheet">Review {{ s.part_label }} items →</a>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="np-en-report-levels" aria-label="Placement levels">
+    <article class="np-en-report-level np-en-report-level--mcq">
+      <span>Multiple choice ({{ er.mcq_correct }}/{{ er.mcq_total }})</span>
+      {% if er.mcq_recommendation %}
+      <strong>{{ er.mcq_recommendation.title }}</strong>
+      <p>{{ er.mcq_recommendation.headline or er.mcq_recommendation.summary }}</p>
+      <em>Band {{ er.mcq_recommendation.band_range }} on the answer key</em>
+      {% else %}
+      <strong>{{ er.mcq_pct }}% accuracy</strong>
+      {% endif %}
+    </article>
+    <article class="np-en-report-level np-en-report-level--writing">
+      <span>Writing essay</span>
+      {% if er.writing_graded and er.writing_band %}
+      <strong>{{ er.writing_band.title }} · {{ er.writing_band.range }}</strong>
+      <p>{{ er.writing_band.summary }}</p>
+      <em>{{ er.writing_points }}/{{ er.writing_max }} rubric points</em>
+      {% elif english_writing and (english_writing.body or english_writing.needs_grade) %}
+      <strong>Awaiting advisor score</strong>
+      <p>Use the official 20-point rubric below.</p>
+      {% else %}
+      <strong>No essay yet</strong>
+      <p>Student has not submitted Part III.</p>
+      {% endif %}
+    </article>
+    {% if er.combined_graded %}
+    <article class="np-en-report-level np-en-report-level--total">
+      <span>Combined sitting</span>
+      <strong>{{ er.combined_points }}/{{ er.combined_max }}</strong>
+      <p>MCQ items plus graded essay ({{ er.mcq_total }} + {{ er.writing_max }} points).</p>
+    </article>
+    {% endif %}
+  </div>
+</section>
+
+{% if english_writing and er.essay_excerpt %}
+<section class="np-en-report-writing-snap glass-panel np-glass" aria-label="Writing snapshot">
+  <header>
+    <p class="np-summary-sheet-kicker">Part III · Writing</p>
+    <h2 class="np-summary-sheet-title">Essay snapshot</h2>
+    <p class="np-summary-sheet-lead">
+      {% if english_writing.option %}Option {{ english_writing.option }} · {% endif %}
+      {{ english_writing.word_count }} words
+      {% if er.writing_graded %} · <strong>{{ er.writing_points }}/{{ er.writing_max }}</strong>{% endif %}
+    </p>
+  </header>
+  <blockquote class="np-en-report-writing-snap__quote">{{ er.essay_excerpt }}</blockquote>
+  <p class="np-en-report-writing-snap__actions">
+    <a class="np-pw-btn np-pw-btn--primary" href="{{ english_writing.review_href }}">Open full essay review</a>
+    <a class="np-pw-btn np-pw-btn--ghost" href="#np-admin-pl-writing">Score on this report</a>
+  </p>
+</section>
+{% endif %}
+{% endif %}

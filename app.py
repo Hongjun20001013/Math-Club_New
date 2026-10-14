@@ -77,6 +77,10 @@ from placement_english_ui import (
     unpack_english_writing_answer,
     writing_word_targets,
 )
+from placement_english_report import (
+    build_english_placement_report,
+    build_english_section_stats,
+)
 from placement_intelligent_report import (
     build_intelligent_placement_report,
     enrich_placement_section_stats,
@@ -18867,6 +18871,24 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             elif opt:
                 yours_display = f"Option {opt} (no essay yet)"
             key_display = "Advisor rubric"
+        topic_row = str(att["topic"] or "")
+        part_label_row = ""
+        area_title_row = title_en
+        range_label_row = ""
+        if topic_row in ENGLISH_PLACEMENT_TOPICS:
+            ps = str(q.get("placement_section") or "")
+            part_label_row = {
+                "reading": "Part I",
+                "language": "Part II",
+                "writing": "Part III",
+            }.get(ps, "")
+            area_title_row = str(q.get("placement_section_title") or title_en)
+            if ps == "reading":
+                range_label_row = "Q1–9" if topic_row == "english_g7_8" else "Q1–12"
+            elif ps == "language":
+                range_label_row = "Q10–31" if topic_row == "english_g7_8" else "Q13–40"
+            elif ps == "writing":
+                range_label_row = "Essay"
         items.append(
             {
                 "n": i + 1,
@@ -18887,6 +18909,10 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
                 "key_display": key_display,
                 "knowledge_section": sec,
                 "knowledge_title_en": title_en,
+                "part_label": part_label_row,
+                "area_title": area_title_row,
+                "range_label": range_label_row,
+                "placement_section": str(q.get("placement_section") or ""),
             }
         )
     score = placement_auto_score_breakdown(
@@ -19015,14 +19041,29 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
             }
         )
     section_stats = enrich_placement_section_stats(topic, section_stats)
-    by_sec = {str(s.get("section")): s for s in section_stats}
-    for row in items:
-        s = by_sec.get(str(row.get("knowledge_section") or ""), {})
-        row["part_label"] = s.get("part_label") or row.get("knowledge_section") or "—"
-        row["area_title"] = s.get("area_title") or row.get("knowledge_title_en") or ""
-        row["range_label"] = s.get("range_label") or ""
     placement_meta = _load_placement_meta_file(topic)
     placement_rec = _placement_recommendation(placement_meta, auto_correct, auto_total, topic)
+    english_report: dict | None = None
+    if is_english_placement:
+        section_stats = build_english_section_stats(topic, questions, items, english_writing)
+        english_report = build_english_placement_report(
+            topic,
+            auto_correct,
+            auto_total,
+            placement_rec,
+            english_writing,
+        )
+    by_sec = {str(s.get("section")): s for s in section_stats}
+    for row, qobj in zip(items, questions):
+        if is_english_placement:
+            ps = str(qobj.get("placement_section") or row.get("placement_section") or "")
+            s = by_sec.get(ps, {})
+        else:
+            s = by_sec.get(str(row.get("knowledge_section") or ""), {})
+        if s:
+            row["part_label"] = s.get("part_label") or row.get("part_label") or "—"
+            row["area_title"] = s.get("area_title") or row.get("area_title") or ""
+            row["range_label"] = s.get("range_label") or row.get("range_label") or ""
     placement_gate_scores: list[dict] = []
     if topic == "placement_full":
         placement_gate_scores = _placement_gate_scores_from_sections(section_stats, placement_meta)
@@ -19123,6 +19164,7 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         "paper_grades": paper_grades,
         "is_english_placement": is_english_placement,
         "english_writing": english_writing,
+        "english_report": english_report,
     }
 
 
@@ -19149,6 +19191,7 @@ def admin_placement_candidate_detail(attempt_id: int):
         paper_grades=ctx.get("paper_grades") or {},
         is_english_placement=ctx.get("is_english_placement", False),
         english_writing=ctx.get("english_writing"),
+        english_report=ctx.get("english_report"),
     )
 
 
