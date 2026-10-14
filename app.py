@@ -10368,11 +10368,13 @@ def placement_test_start(slug: str):
     else:
         _clear_placement_session_attempt(topic)
         session.modified = True
+    track = "english" if topic in ("english_g7_8", "english_g9_11") else "math"
     return render_template(
         "placement_start.html",
         test=test,
         topic=topic,
         slug=slug,
+        track=track,
         public_guest=public_guest,
         begin_nonce=placement_public_mod.begin_nonce() if public_guest else "",
         advisor_presets=placement_public_mod.ADVISOR_PRESETS,

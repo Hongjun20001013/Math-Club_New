@@ -240,6 +240,7 @@ class TestPublicProfile(_Base):
             self.assertIn("You selected", body)
             self.assertIn("Mia Hu", body)
             self.assertIn("Jimmy Zheng", body)
+            self.assertIn('id="pl-advisor"', body)
             self.assertIn("Before you begin", body)
             self.assertIn("I confirm that I selected the appropriate placement test and will complete it independently.", body)
             rv = self.begin(slug=slug, name=f"Student {slug}")
@@ -269,7 +270,9 @@ class TestPublicProfile(_Base):
     def test_required_profile_rejects_incomplete(self):
         self.flag_on()
         html = self.client.get("/placement/enhanced-math-1/start").get_data(as_text=True)
-        self.assertIn("Advisor <span class=\"np-pl-req\">required</span>", html)
+        self.assertIn('id="pl-advisor-label"', html)
+        self.assertIn("Mia Hu", html)
+        self.assertIn('name="advisor_choice"', html)
         nonce = re.search(r'name="begin_nonce" value="([^"]+)"', html).group(1)
         token = self.csrf()
         base = {
