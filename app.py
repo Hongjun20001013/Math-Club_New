@@ -65,6 +65,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
 from placement_atelier_pdf import build_placement_atelier_pdf
+from placement_english_ui import (
+    merge_form_english_writing,
+    unpack_english_writing_answer,
+    writing_word_targets,
+)
 from placement_intelligent_report import (
     build_intelligent_placement_report,
     enrich_placement_section_stats,
@@ -397,6 +402,19 @@ def _sanitize_question_for_render(q: dict) -> dict:
     if isinstance(choices, list):
         out["choices"] = [_sanitize_display_text(c) for c in choices]
     return out
+
+
+def _placement_english_writing_render_ctx(q: dict, topic: str, saved_raw: str) -> dict:
+    if str(q.get("question_kind") or "") != "english_writing":
+        return {"saved_selected_answer": saved_raw}
+    opt, body = unpack_english_writing_answer(saved_raw or "")
+    wmin, wmax = writing_word_targets(topic)
+    return {
+        "saved_selected_answer": body,
+        "english_writing_selected_option": opt,
+        "english_writing_word_min": wmin,
+        "english_writing_word_max": wmax,
+    }
 
 
 def _safe_db_commit(db: sqlite3.Connection) -> bool:
@@ -10653,6 +10671,8 @@ def placement_public_item(public_id: str, qnum: int):
     saved = placement_public_mod.saved_answer(db, int(att["id"]), qnum)
     if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
         saved = _mcq_letter(saved)
+    writing_render = _placement_english_writing_render_ctx(q, topic, saved)
+    saved = writing_render.get("saved_selected_answer", saved)
     bank_total = len(questions)
     answered_count = len(answered_qset)
     calc_ok = bool(q.get("calculator_allowed", True))
@@ -10694,6 +10714,9 @@ def placement_public_item(public_id: str, qnum: int):
         lock_phase3_answers=False,
         phase3_answer_locked=False,
         saved_selected_answer=saved,
+        english_writing_selected_option=writing_render.get("english_writing_selected_option", ""),
+        english_writing_word_min=writing_render.get("english_writing_word_min", 200),
+        english_writing_word_max=writing_render.get("english_writing_word_max", 300),
         restart_href=None,
         public_run_mode=True,
         public_run_id=public_id,
@@ -10715,9 +10738,9 @@ def _placement_public_save_item(db, att, questions, qnum: int):
     public_id = att["public_id"]
     topic = str(att["topic"])
     q = questions[qnum]
-    raw_answer = (request.form.get("selected_answer") or "").strip()
-    goto_raw = request.form.get("goto_qnum")
     q_kind = str(q.get("question_kind") or "mcq")
+    raw_answer = merge_form_english_writing(q_kind, request.form)
+    goto_raw = request.form.get("goto_qnum")
     paper_item = is_placement_paper_item(q)
     if q_kind in ("mcq", "mcq5") and raw_answer:
         raw_answer = _mcq_letter(raw_answer)
@@ -10783,9 +10806,10 @@ def placement_public_autosave(public_id: str):
         qnum = int(request.form.get("qnum") or 0)
     except ValueError:
         qnum = 0
-    answer = (request.form.get("selected_answer") or "").strip()
     questions = _placement_public_questions(str(att["topic"]))
     qnum = max(0, min(len(questions) - 1, qnum)) if questions else qnum
+    q_kind = str(questions[qnum].get("question_kind") or "mcq") if questions else "mcq"
+    answer = merge_form_english_writing(q_kind, request.form)
     paper_item = bool(questions) and is_placement_paper_item(questions[qnum])
     if paper_item:
         answer = placement_recorded_paper_answer(
@@ -14838,6 +14862,8 @@ def practice_question(domain, topic, qnum):
     )
     if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
         saved_selected_answer = _mcq_letter(saved_selected_answer)
+    writing_render = _placement_english_writing_render_ctx(q, topic, saved_selected_answer or "")
+    saved_selected_answer = writing_render.get("saved_selected_answer", saved_selected_answer)
 
     return render_template(
         "practice_question.html",
@@ -14878,6 +14904,9 @@ def practice_question(domain, topic, qnum):
         lock_phase3_answers=False,
         phase3_answer_locked=False,
         saved_selected_answer=saved_selected_answer,
+        english_writing_selected_option=writing_render.get("english_writing_selected_option", ""),
+        english_writing_word_min=writing_render.get("english_writing_word_min", 200),
+        english_writing_word_max=writing_render.get("english_writing_word_max", 300),
         restart_href=url_for("practice_new_session", domain=domain, topic=topic)
         if domain == "hard_problem" and not mistake_redo_mode
         else None,
@@ -14943,6 +14972,8 @@ def practice_draft_answer():
     qobj = questions[current_q] if questions else {}
     if questions:
         q_kind = str(qobj.get("question_kind") or "mcq")
+    if q_kind == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind, request.form)
     paper_item = domain == "placement" and is_placement_paper_item(qobj)
     if paper_item:
         raw_answer = placement_recorded_paper_answer(
@@ -15021,6 +15052,8 @@ def practice_autosave_answer():
         current_q = max(0, min(len(questions) - 1, current_q))
         qobj = questions[current_q]
         q_kind = str(qobj.get("question_kind") or "mcq")
+    if q_kind == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind, request.form)
     if domain == "placement" and is_placement_paper_item(qobj):
         raw_answer = placement_recorded_paper_answer(
             raw_answer, request.form.get("paper_completed")
@@ -15050,7 +15083,6 @@ def practice_autosave_answer():
 def submit_practice_answer():
     domain = request.form.get("domain", "").strip()
     topic = request.form.get("topic", "").strip()
-    raw_answer = request.form.get("selected_answer", "").strip()
     attempt_id_raw = request.form.get("attempt_id", "").strip()
     qnum_raw = request.form.get("qnum", "0").strip()
     mistake_redo = _mistake_redo_flag(request.form.get("mistake_redo"))
@@ -15082,6 +15114,11 @@ def submit_practice_answer():
 
     q_index = qnum % len(questions)
     question = questions[q_index]
+    q_kind_submit = str(question.get("question_kind") or "mcq")
+    if q_kind_submit == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind_submit, request.form)
+    else:
+        raw_answer = (request.form.get("selected_answer") or "").strip()
     paper_item = domain == "placement" and is_placement_paper_item(question)
 
     if paper_item:

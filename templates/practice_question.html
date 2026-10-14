@@ -303,27 +303,65 @@
                     <span class="sat-pane-hint">{% if placement_english_writing %}Type your essay — saved for advisor review{% elif placement_english_reading %}{{ q.placement_section_title|default('Select the best answer') }}{% elif q.question_kind|default('mcq') == 'constructed_response' %}Type steps, graph notes, or final answer{% elif q.question_kind|default('mcq') == 'free_response' %}Math notation — fractions, powers, roots{% else %}Select one{% endif %}</span>
                 </header>
                 {% if placement_english_reading %}
-                <div class="sat-en-question-stem">
-                    {{ q.stem|safe }}
+                <div class="sat-en-mcq-panel">
+                    <div class="sat-en-mcq-panel__head">
+                        <span class="sat-en-mcq-panel__part">{{ q.placement_section_title|default('Reading') }}</span>
+                        <span class="sat-en-mcq-panel__item">Item {{ q.placement_section_index|default(qnum + 1) }} of {{ q.placement_section_total|default(total) }}</span>
+                    </div>
+                    <div class="sat-en-question-stem">
+                        {{ q.stem|safe }}
+                    </div>
+                    <p class="sat-en-mcq-panel__instruction">Select the <strong>one best answer</strong> below.</p>
                 </div>
                 {% elif placement_english_writing %}
-                <div class="sat-en-writing-studio">
+                <div class="sat-en-writing-studio np-en-writing-studio" data-word-min="{{ english_writing_word_min|default(200) }}" data-word-max="{{ english_writing_word_max|default(300) }}">
+                    <ol class="np-en-writing-steps" aria-label="Writing steps">
+                        <li class="np-en-writing-step np-en-writing-step--pick{% if q.english_writing_options and q.english_writing_options|length > 1 %} is-active{% endif %}">
+                            <span class="np-en-writing-step__num">1</span>
+                            <span class="np-en-writing-step__label">Choose prompt</span>
+                        </li>
+                        <li class="np-en-writing-step np-en-writing-step--plan">
+                            <span class="np-en-writing-step__num">2</span>
+                            <span class="np-en-writing-step__label">Plan &amp; write</span>
+                        </li>
+                        <li class="np-en-writing-step np-en-writing-step--save">
+                            <span class="np-en-writing-step__num">3</span>
+                            <span class="np-en-writing-step__label">Save &amp; submit test</span>
+                        </li>
+                    </ol>
                     {% if q.english_writing_options and q.english_writing_options|length > 1 %}
-                    <p class="sat-en-writing-pick-title">Which prompt are you answering?</p>
-                    <div class="sat-en-writing-pick-grid" role="radiogroup" aria-label="Choose writing prompt">
-                        {% for opt in q.english_writing_options %}
-                        <label class="sat-en-writing-pick-card">
-                            <input type="radio" class="sat-en-writing-pick-input" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form" required>
-                            <span class="sat-en-writing-pick-card__letter" aria-hidden="true">{{ opt.id }}</span>
-                            <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
-                            <span class="sat-en-writing-pick-card__check" aria-hidden="true"></span>
-                        </label>
-                        {% endfor %}
+                    <div class="np-en-writing-step-block" id="np-en-writing-pick-block">
+                        <p class="sat-en-writing-pick-title">Step 1 — Which prompt are you answering?</p>
+                        <div class="sat-en-writing-pick-grid" role="radiogroup" aria-label="Choose writing prompt">
+                            {% for opt in q.english_writing_options %}
+                            <label class="sat-en-writing-pick-card{% if english_writing_selected_option|default('') == opt.id %} is-selected{% endif %}">
+                                <input type="radio" class="sat-en-writing-pick-input" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form" required{% if english_writing_selected_option|default('') == opt.id %} checked{% endif %}>
+                                <span class="sat-en-writing-pick-card__letter" aria-hidden="true">{{ opt.id }}</span>
+                                <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
+                                <span class="sat-en-writing-pick-card__check" aria-hidden="true"></span>
+                            </label>
+                            {% endfor %}
+                        </div>
                     </div>
                     {% endif %}
-                    <label class="sat-en-writing-label" for="english-writing-input">Your essay</label>
-                    <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="16" placeholder="Write in full sentences and paragraphs. Aim for the word count in the prompt." form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
-                    <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
+                    <div class="np-en-writing-step-block np-en-essay-frame">
+                        <div class="np-en-essay-frame__head">
+                            <label class="sat-en-writing-label" for="english-writing-input">Step 2 — Your essay</label>
+                            <p class="np-en-essay-frame__guide">Use full paragraphs. Suggested shape:</p>
+                        </div>
+                        <ul class="np-en-essay-outline" aria-hidden="true">
+                            <li><span>Introduction</span><em>Hook + thesis</em></li>
+                            <li><span>Body ¶1</span><em>Reason or scene</em></li>
+                            <li><span>Body ¶2</span><em>Evidence / detail</em></li>
+                            <li><span>Conclusion</span><em>So what you learned</em></li>
+                        </ul>
+                        <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="18" placeholder="Write here in complete sentences. Press Enter twice to start a new paragraph." form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
+                        <div class="np-en-essay-meta">
+                            <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
+                            <p class="np-en-essay-target" id="english-writing-target">Target: {{ english_writing_word_min|default(200) }}–{{ english_writing_word_max|default(300) }} words</p>
+                        </div>
+                        <p class="np-en-essay-advisor-note">Saved for your advisor — not auto-scored. Step 3: use <strong>Submit test</strong> in the header when you finish the whole diagnostic.</p>
+                    </div>
                 </div>
                 {% endif %}
                 {% if placement_english_writing %}
@@ -388,7 +426,7 @@
                 </div>
                 </div>
                 {% else %}
-                <div class="choices-panel choices-stack sat-choices-list" role="radiogroup" aria-label="Answer choices">
+                <div class="choices-panel choices-stack sat-choices-list{% if placement_english_reading %} sat-choices-list--english{% endif %}" role="radiogroup" aria-label="Answer choices">
             {% for choice in q.choices %}
             <label class="choice-card{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} selected is-selected{% endif %}" tabindex="0" data-index="{{ loop.index0 }}" data-letter="{{ choice_letters[loop.index0] }}">
                 <input type="radio" class="choice-radio-input" name="selected_answer" value="{{ choice_letters[loop.index0] }}"{% if saved_selected_answer|default('') == choice_letters[loop.index0] %} checked{% endif %}{% if phase3_answer_locked|default(false) and saved_selected_answer|default('') %} disabled{% endif %}>
@@ -401,10 +439,12 @@
             {% endfor %}
                 </div>
                 {% endif %}
+                {% if not placement_english_reading and not placement_english_writing %}
                 <details class="sat-scratchpad">
                     <summary>Scratch notes for this question</summary>
                     <textarea id="sat-scratch-note" class="sat-scratch-note" rows="4" placeholder="Write quick steps, formulas, or why you chose this answer. Notes stay in this browser only."></textarea>
                 </details>
+                {% endif %}
                 <div class="sat-submit-wrap">
                     {% if paper_upload_next %}
                     <div class="np-pl-work-banner" role="status">
@@ -1195,28 +1235,7 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
 <script src="{{ url_for('static', filename='spr_math_input.js') }}?v={{ style_css_revision }}"></script>
 {% endif %}
 {% if placement_english_writing|default(false) %}
-<script>
-(function () {
-  const ta = document.getElementById("english-writing-input");
-  const out = document.getElementById("english-writing-count");
-  if (ta && out) {
-    const count = () => {
-      const words = (ta.value || "").trim().split(/\s+/).filter(Boolean);
-      out.textContent = words.length + (words.length === 1 ? " word" : " words");
-    };
-    ta.addEventListener("input", count);
-    count();
-  }
-  document.querySelectorAll(".sat-en-writing-pick-input").forEach((inp) => {
-    const sync = () => {
-      document.querySelectorAll(".sat-en-writing-pick-card").forEach((c) => c.classList.remove("is-selected"));
-      if (inp.checked) inp.closest(".sat-en-writing-pick-card")?.classList.add("is-selected");
-    };
-    inp.addEventListener("change", sync);
-    if (inp.checked) sync();
-  });
-})();
-</script>
+<script src="{{ url_for('static', filename='placement_english_exam.js') }}?v={{ style_css_revision }}"></script>
 {% endif %}
 {% if placement_mode and public_run_mode|default(false) %}
 <script>

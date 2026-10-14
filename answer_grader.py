@@ -642,6 +642,8 @@ def grade_placement_response(
     question: dict, student_raw: str, topic: str | None = None
 ) -> tuple[Optional[int], str]:
     """Enhanced Math paper items are teacher-graded. Placement MCQ is an exact A–D/E key match."""
+    if str(question.get("question_kind") or "") == "english_writing":
+        return None, ""
     if is_enhanced_paper_topic(topic) and not is_mcq_item(question):
         return None, ""
     if is_mcq_item(question):

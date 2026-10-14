@@ -4,6 +4,8 @@ import json
 import unittest
 from pathlib import Path
 
+from placement_english_ui import pack_english_writing_answer, unpack_english_writing_answer
+
 ROOT = Path(__file__).resolve().parents[1]
 BANK = ROOT / "data" / "question_bank.json"
 
@@ -19,6 +21,13 @@ class PlacementEnglishBankTests(unittest.TestCase):
         self.assertEqual(qs[0]["correct_answer"], "A")
         self.assertEqual(qs[8]["placement_section"], "reading")
         self.assertEqual(qs[9]["placement_section"], "language")
+
+    def test_english_writing_answer_pack(self) -> None:
+        packed = pack_english_writing_answer("B", "Hello world essay.")
+        self.assertIn("[Option B]", packed)
+        opt, body = unpack_english_writing_answer(packed)
+        self.assertEqual(opt, "B")
+        self.assertEqual(body, "Hello world essay.")
 
     def test_g9_11_bank(self) -> None:
         bank = json.loads(BANK.read_text(encoding="utf-8"))

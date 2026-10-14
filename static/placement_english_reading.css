@@ -389,6 +389,251 @@
   color: #fff !important;
 }
 
+/* English MCQ panel (reading + language) */
+.sat-en-mcq-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 1.35rem 0.65rem;
+  margin-bottom: 0.15rem;
+}
+
+.sat-en-mcq-panel__part {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5c4a9a;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(108, 78, 255, 0.1);
+  border: 1px solid rgba(108, 78, 255, 0.15);
+}
+
+.sat-en-mcq-panel__item {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #6a6380;
+}
+
+.sat-en-mcq-panel__instruction {
+  margin: 0.5rem 1.35rem 0.25rem;
+  font-size: 0.88rem;
+  color: #5a5470;
+}
+
+.sat-choices-list--english {
+  padding: 0.35rem 1.1rem 0.75rem;
+  gap: 10px;
+}
+
+.sat-practice-page-wrap--english-reading .sat-choices-list--english .choice-card {
+  padding: 0.95rem 1rem 0.95rem 3.15rem;
+  border-radius: 16px;
+  border: 1.5px solid rgba(42, 34, 64, 0.1);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(28, 21, 40, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sat-practice-page-wrap--english-reading .sat-choices-list--english .choice-card:hover {
+  border-color: rgba(108, 78, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.sat-practice-page-wrap--english-reading .sat-choices-list--english .choice-card.is-selected,
+.sat-practice-page-wrap--english-reading .sat-choices-list--english .choice-card.selected {
+  border-color: #6c4eff;
+  box-shadow: 0 0 0 3px rgba(108, 78, 255, 0.18);
+  background: linear-gradient(180deg, rgba(108, 78, 255, 0.08), #fff 55%);
+}
+
+.sat-practice-page-wrap--english-reading .sat-choices-list--english .choice-letter {
+  font-family: var(--np-en-display);
+  font-weight: 700;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(108, 78, 255, 0.1);
+  color: #4f2fd8;
+}
+
+.sat-practice-page-wrap--english-reading .sat-pane-choices .sat-pane-head-choices {
+  border-bottom: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.sat-practice-page-wrap--english-reading .sat-pane-choices {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sat-practice-page-wrap--english-reading .sat-choices-list--english {
+  flex: 1;
+  overflow: auto;
+  max-height: min(52vh, 520px);
+}
+
+/* Writing studio framework */
+.np-en-writing-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 1.15rem;
+  padding: 0;
+  list-style: none;
+}
+
+.np-en-writing-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid rgba(107, 74, 50, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8a7a6a;
+}
+
+.np-en-writing-step.is-active {
+  border-color: rgba(166, 124, 82, 0.45);
+  background: linear-gradient(180deg, #fffaf3, #f5ebe0);
+  color: #5c4030;
+}
+
+.np-en-writing-step__num {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-family: var(--np-en-display);
+  font-size: 0.8rem;
+  background: rgba(166, 124, 82, 0.15);
+}
+
+.np-en-writing-step.is-active .np-en-writing-step__num {
+  background: linear-gradient(135deg, #a67c52, #6b4a32);
+  color: #fff;
+}
+
+.np-en-essay-frame {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(107, 74, 50, 0.16);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.np-en-essay-frame__head {
+  margin-bottom: 0.65rem;
+}
+
+.np-en-essay-frame__guide {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #6a5f78;
+}
+
+.np-en-essay-outline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 0.85rem;
+  padding: 0;
+  list-style: none;
+}
+
+.np-en-essay-outline li {
+  padding: 0.45rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(250, 247, 242, 0.95);
+  border: 1px dashed rgba(166, 124, 82, 0.25);
+  text-align: center;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.np-en-essay-outline span {
+  display: block;
+  font-weight: 800;
+  color: #6b4a32;
+}
+
+.np-en-essay-outline em {
+  display: block;
+  font-style: normal;
+  color: #8a7a6a;
+  margin-top: 2px;
+}
+
+.sat-practice-page-wrap--english-writing .sat-en-writing-input {
+  min-height: 320px;
+  line-height: 1.72;
+  background: #fffefb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.np-en-essay-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 0.5rem;
+}
+
+.sat-en-writing-count.is-in-target {
+  color: #0d6b4d;
+  font-weight: 800;
+}
+
+.sat-en-writing-count.is-below-target {
+  color: #9a6b2e;
+}
+
+.sat-en-writing-count.is-above-target {
+  color: #6b4a32;
+}
+
+.np-en-essay-target {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #6a6380;
+}
+
+.np-en-essay-advisor-note {
+  margin: 0.85rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #4a4560;
+  background: rgba(108, 78, 255, 0.06);
+  border: 1px solid rgba(108, 78, 255, 0.1);
+}
+
+.sat-practice-page-wrap--english-writing .sat-pane-choices .sat-submit-wrap {
+  border-top: 1px solid rgba(107, 74, 50, 0.1);
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .np-en-essay-outline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .np-en-writing-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .sat-practice-page-wrap--english-reading .sat-split {
     grid-template-columns: 1fr !important;
@@ -398,5 +643,13 @@
     max-height: min(52vh, 420px);
     border-right: none;
     border-bottom: 1px solid rgba(30, 24, 48, 0.08);
+  }
+
+  .sat-practice-page-wrap--english-writing .sat-split {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sat-practice-page-wrap--english-writing .sat-pane-stem {
+    max-height: min(48vh, 380px);
   }
 }
