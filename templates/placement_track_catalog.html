@@ -4,92 +4,83 @@
 {% include 'partials/placement_cinema_css.html' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_catalog.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_light.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas np-track-catalog np-track-catalog--{{ track }}">
-<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-catalog{% if track == 'english' %} np-pl2--humanities{% endif %}" aria-labelledby="np-pl-catalog-heading">
-    <div class="np-pl-hub-aurora" aria-hidden="true">
-        <span class="np-pl-hub-aurora__orb {% if track == 'english' %}np-pl-hub-aurora__orb--en{% else %}np-pl-hub-aurora__orb--math{% endif %}"></span>
-        <span class="np-pl-hub-aurora__grain"></span>
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-catalog np-luxe np-luxe--{{ track }}" aria-labelledby="np-pl-catalog-heading">
+    <div class="np-luxe-scene" aria-hidden="true">
+        <span class="np-luxe-scene__ring np-luxe-scene__ring--1"></span>
+        <span class="np-luxe-scene__ring np-luxe-scene__ring--2"></span>
+        <span class="np-luxe-scene__blob"></span>
     </div>
     {% include 'partials/placement_atelier_mesh.html' %}
 
-    <div class="np-pl-canvas__inner np-track-catalog__inner">
+    <div class="np-pl-canvas__inner np-track-catalog__inner np-track-catalog__inner--luxe">
         <nav class="np-pl2-nav np-pl-reveal">
             <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Math &amp; English
+                Back
             </a>
         </nav>
 
-        <div class="np-track-catalog__layout">
-            <header class="np-track-catalog__hero np-pl-reveal">
-                <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
-                <p class="np-pl-eyebrow">
-                    <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
-                    {% if track == 'english' %}English placement{% else %}Math placement{% endif %}
-                </p>
-                <h1 class="np-pl-display np-track-catalog__title" id="np-pl-catalog-heading">
-                    {% if track == 'english' %}Select your<br><em>grade band</em>{% else %}Select your<br><em>pathway</em>{% endif %}
-                </h1>
-                <p class="np-pl-lead np-track-catalog__lead">
-                    {% if track == 'english' %}Two live diagnostics. Calm layout, clear parts, counselor-ready when you finish.{% else %}Four live math tracks. Your advisor will name the one that fits your school program.{% endif %}
-                </p>
-                <ul class="np-track-catalog__trust" aria-label="Includes">
-                    <li>Timed sitting</li>
-                    <li>Auto scoring</li>
-                    <li>PDF export</li>
-                </ul>
-            </header>
+        <header class="np-track-catalog__hero-luxe np-pl-reveal">
+            <p class="np-pl-eyebrow">
+                <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                {% if track == 'english' %}English{% else %}Math{% endif %} placement
+            </p>
+            <h1 class="np-luxe-display" id="np-pl-catalog-heading">
+                {% if track == 'english' %}Your grade<br><em>band</em>{% else %}Your school<br><em>pathway</em>{% endif %}
+            </h1>
+            <p class="np-luxe-lead">{% if track == 'english' %}Two live diagnostics — tap the one your counselor named.{% else %}Four live tracks — each opens to overview, then begin when you are ready.{% endif %}</p>
+        </header>
 
-            <div class="np-track-catalog__main" data-pl-stagger>
-                {% set timers = {
-                    'english_g7_8': 55, 'english_g9_11': 65,
-                    'middle_level': 150, 'enhanced_math_1': 120, 'enhanced_math_2': 130, 'placement_full': 115
-                } %}
-                {% set row_num = namespace(n=0) %}
-                {% for tier in catalog.tiers %}
-                <section class="np-track-catalog__group np-pl-reveal" data-pl-reveal aria-labelledby="np-tier-{{ tier.id }}">
-                    {% if catalog.tiers|length > 1 or track == 'math' %}
-                    <h2 class="np-track-catalog__group-title" id="np-tier-{{ tier.id }}">{{ tier.title }}</h2>
-                    {% if tier.description %}<p class="np-track-catalog__group-desc">{{ tier.description }}</p>{% endif %}
-                    {% endif %}
-                    <div class="np-track-catalog__list">
-                        {% for test in tier.tests %}
-                        {% set row_num.n = row_num.n + 1 %}
-                        {% if test.status == 'available' %}
-                        <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-track-catalog-row np-track-catalog-row--{{ track }}">
-                        {% else %}
-                        <div class="np-track-catalog-row np-track-catalog-row--soon np-track-catalog-row--{{ track }}">
+        {% set timers = {
+            'english_g7_8': 55, 'english_g9_11': 65,
+            'middle_level': 150, 'enhanced_math_1': 120, 'enhanced_math_2': 130, 'placement_full': 115
+        } %}
+        {% set row_num = namespace(n=0) %}
+
+        <div class="np-track-catalog__mosaic" data-pl-stagger>
+            {% for tier in catalog.tiers %}
+            {% for test in tier.tests %}
+            {% set row_num.n = row_num.n + 1 %}
+            {% set is_feature = track == 'math' and test.slug in ['middle-level', 'upper-algebra-precalc'] %}
+            {% if test.status == 'available' %}
+            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-luxe-tile np-luxe-tile--catalog{% if is_feature %} np-luxe-tile--feature{% endif %} np-pl-reveal" data-pl-reveal>
+            {% else %}
+            <div class="np-luxe-tile np-luxe-tile--catalog np-luxe-tile--soon{% if is_feature %} np-luxe-tile--feature{% endif %}">
+            {% endif %}
+                <div class="np-luxe-tile__top">
+                    <div>
+                        {% if catalog.tiers|length > 1 and track == 'math' %}
+                        <p class="np-luxe-tile__tier">{{ tier.title }}</p>
                         {% endif %}
-                            <span class="np-track-catalog-row__index" aria-hidden="true">{{ '%02d'|format(row_num.n) }}</span>
-                            <span class="np-track-catalog-row__accent" aria-hidden="true"></span>
-                            <div class="np-track-catalog-row__body">
-                                <h3 class="np-track-catalog-row__title">{{ test.title }}</h3>
-                                {% if test.subtitle %}<p class="np-track-catalog-row__sub">{{ test.subtitle }}</p>{% endif %}
-                                <ul class="np-track-catalog-row__meta">
-                                    <li><strong>{{ test.online_item_count|default(test.online_mcq_count) }}</strong> items</li>
-                                    {% if test.topic and timers.get(test.topic) %}
-                                    <li><strong>{{ timers[test.topic] }}</strong> min</li>
-                                    {% endif %}
-                                    {% if test.parts %}<li><strong>{{ test.parts|length }}</strong> parts</li>{% endif %}
-                                </ul>
-                            </div>
-                            {% if test.status == 'available' %}
-                            <span class="np-track-catalog-row__action" aria-hidden="true">
-                                <span class="np-track-catalog-row__action-text">Open</span>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </span>
-                            {% else %}
-                            <span class="np-track-catalog-row__soon">Soon</span>
-                            {% endif %}
-                        {% if test.status == 'available' %}</a>{% else %}</div>{% endif %}
-                        {% endfor %}
+                        <h2 class="np-luxe-tile__title">{{ test.title }}</h2>
+                        <p class="np-luxe-tile__kicker">{{ '%02d'|format(row_num.n) }} · Live</p>
                     </div>
-                </section>
-                {% endfor %}
-            </div>
+                    <span class="np-luxe-tile__glyph">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
+                </div>
+                {% if test.subtitle %}<p class="np-luxe-tile__desc">{{ test.subtitle }}</p>{% endif %}
+                <ul class="np-luxe-tile__stats">
+                    {% if test.topic and timers.get(test.topic) %}
+                    <li>{{ timers[test.topic] }} min</li>
+                    {% endif %}
+                    {% if test.parts %}<li>{{ test.parts|length }} parts</li>{% endif %}
+                    <li>{{ test.online_item_count|default(test.online_mcq_count) }} items</li>
+                </ul>
+                {% if test.status == 'available' %}
+                <span class="np-luxe-tile__cta">
+                    Open overview
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                {% else %}
+                <span class="np-luxe-tile__cta np-luxe-tile__cta--muted">Coming soon</span>
+                {% endif %}
+            {% if test.status == 'available' %}</a>{% else %}</div>{% endif %}
+            {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </div>

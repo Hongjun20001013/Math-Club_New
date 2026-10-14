@@ -3,120 +3,83 @@
 {% block extra_css %}
 {% include 'partials/placement_cinema_css.html' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_light.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas np-pl-hub">
-<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-hub" aria-labelledby="np-pl-hub-heading">
-    <div class="np-pl-hub-aurora" aria-hidden="true">
-        <span class="np-pl-hub-aurora__orb np-pl-hub-aurora__orb--en"></span>
-        <span class="np-pl-hub-aurora__orb np-pl-hub-aurora__orb--math"></span>
-        <span class="np-pl-hub-aurora__grain"></span>
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-hub np-luxe" aria-labelledby="np-pl-hub-heading">
+    <div class="np-luxe-scene" aria-hidden="true">
+        <span class="np-luxe-scene__ring np-luxe-scene__ring--1"></span>
+        <span class="np-luxe-scene__ring np-luxe-scene__ring--2"></span>
+        <span class="np-luxe-scene__blob"></span>
     </div>
     {% include 'partials/placement_atelier_mesh.html' %}
 
-    <div class="np-pl-canvas__inner np-pl-hub__inner">
-        <header class="np-pl-hub__hero np-pl-reveal">
-            <div class="np-pl-hub__hero-top">
-                <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep Learning Studio') }}</p>
-                <ul class="np-pl-hub__pills" aria-label="Highlights">
-                    <li>Timed diagnostic</li>
-                    <li>Instant report</li>
-                    <li>Counselor PDF</li>
-                </ul>
-            </div>
-            <p class="np-pl-eyebrow np-pl-hub__eyebrow">
+    <div class="np-pl-canvas__inner np-pl-hub__inner np-pl-hub__inner--luxe">
+        <header class="np-pl-hub__hero np-pl-hub__hero--luxe np-pl-reveal">
+            <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep Learning Studio') }}</p>
+            <p class="np-pl-eyebrow np-pl-hub__eyebrow-center">
                 <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
                 Course placement
             </p>
-            <h1 class="np-pl-display np-pl-hub__title" id="np-pl-hub-heading">
-                Choose your <em>diagnostic</em>
-            </h1>
-            <p class="np-pl-lead np-pl-hub__lead">Two crafted pathways — English humanities or Math mastery. Pick what your advisor named; everything else stays calm and clear.</p>
+            <h1 class="np-luxe-display" id="np-pl-hub-heading">Where will you<br><em>begin?</em></h1>
+            <p class="np-luxe-lead np-pl-hub__lead--center">Light, calm, and precise — choose English or Math. Your advisor picks the exact test inside.</p>
+            <ul class="np-luxe-chip-row np-pl-hub__chips-center" aria-label="Highlights">
+                <li>No account needed</li>
+                <li>Timed</li>
+                <li>Instant report</li>
+            </ul>
         </header>
 
-        <div class="np-pl-hub__cards" data-pl-stagger>
-            <a href="{{ url_for('placement_track_catalog', track='english') }}" class="np-pl-hub-card np-pl-hub-card--english np-pl-reveal" data-pl-reveal>
-                <span class="np-pl-hub-card__border" aria-hidden="true"></span>
-                <span class="np-pl-hub-card__shine" aria-hidden="true"></span>
-                <div class="np-pl-hub-card__head">
-                    <span class="np-pl-hub-card__glyph" aria-hidden="true">En</span>
+        <div class="np-pl-hub__luxe-grid" data-pl-stagger>
+            <a href="{{ url_for('placement_track_catalog', track='english') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe--english np-pl-reveal" data-pl-reveal>
+                <div class="np-luxe-tile__top">
                     <div>
-                        <h2 class="np-pl-hub-card__title">English</h2>
-                        <p class="np-pl-hub-card__kicker">Reading · Language · Writing</p>
+                        <h2 class="np-luxe-tile__title">English</h2>
+                        <p class="np-luxe-tile__kicker">Humanities diagnostic</p>
                     </div>
+                    <span class="np-luxe-tile__glyph">En</span>
                 </div>
-                <p class="np-pl-hub-card__desc">Passage on the left, questions on the right — then a TOEFL-style essay. Grades 7–8 and 9–11.</p>
-                <div class="np-pl-hub-card__preview" aria-hidden="true">
-                    <div class="np-pl-hub-card__preview-pane np-pl-hub-card__preview-pane--passage">
-                        <span class="np-pl-hub-card__preview-label">Passage</span>
-                        <span class="np-pl-hub-card__preview-line"></span>
-                        <span class="np-pl-hub-card__preview-line np-pl-hub-card__preview-line--short"></span>
-                        <span class="np-pl-hub-card__preview-line"></span>
-                    </div>
-                    <div class="np-pl-hub-card__preview-pane np-pl-hub-card__preview-pane--q">
-                        <span class="np-pl-hub-card__preview-label">Question</span>
-                        <span class="np-pl-hub-card__preview-choice is-on">A</span>
-                        <span class="np-pl-hub-card__preview-choice">B</span>
-                        <span class="np-pl-hub-card__preview-choice">C</span>
-                    </div>
+                <p class="np-luxe-tile__desc">Reading beside the passage, language items, then a TOEFL-style essay — Grades 7–8 and 9–11.</p>
+                <div class="np-luxe-tile__visual np-luxe-visual--reading" aria-hidden="true">
+                    <div class="np-luxe-visual__col"></div>
+                    <div class="np-luxe-visual__col np-luxe-visual__col--q"></div>
                 </div>
-                <ul class="np-pl-hub-card__tags">
-                    <li>G7–8</li>
-                    <li>G9–11</li>
-                    <li>3 parts</li>
-                </ul>
-                <span class="np-pl-hub-card__cta">
-                    <span>Enter English</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="np-luxe-tile__cta">
+                    Enter English
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
             </a>
 
-            <a href="{{ url_for('placement_track_catalog', track='math') }}" class="np-pl-hub-card np-pl-hub-card--math np-pl-reveal" data-pl-reveal>
-                <span class="np-pl-hub-card__border" aria-hidden="true"></span>
-                <span class="np-pl-hub-card__shine" aria-hidden="true"></span>
-                <div class="np-pl-hub-card__head">
-                    <span class="np-pl-hub-card__glyph" aria-hidden="true">π</span>
+            <a href="{{ url_for('placement_track_catalog', track='math') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe--math np-pl-reveal" data-pl-reveal>
+                <div class="np-luxe-tile__top">
                     <div>
-                        <h2 class="np-pl-hub-card__title">Math</h2>
-                        <p class="np-pl-hub-card__kicker">Middle · Enhanced · Upper</p>
+                        <h2 class="np-luxe-tile__title">Math</h2>
+                        <p class="np-luxe-tile__kicker">Quantitative diagnostic</p>
                     </div>
+                    <span class="np-luxe-tile__glyph">π</span>
                 </div>
-                <p class="np-pl-hub-card__desc">From Math 5 readiness through Five-Gate upper school — gates, constructed response, and paper sections where needed.</p>
-                <div class="np-pl-hub-card__preview np-pl-hub-card__preview--math" aria-hidden="true">
-                    <div class="np-pl-hub-card__math-gate">
-                        <span>Gate II</span>
-                        <em>Geometry readiness</em>
-                    </div>
-                    <p class="np-pl-hub-card__math-eq">2x + 5 = 17</p>
-                    <div class="np-pl-hub-card__math-bars">
-                        <span style="--w: 72%"></span>
-                        <span style="--w: 48%"></span>
-                        <span style="--w: 91%"></span>
-                    </div>
+                <p class="np-luxe-tile__desc">Middle school through upper gates — structured parts, constructed response, and paper sections where your program requires them.</p>
+                <div class="np-luxe-tile__visual np-luxe-visual--math" aria-hidden="true">
+                    <span class="np-luxe-visual__eq">∫ · Σ · x²</span>
+                    <span class="np-luxe-visual__bar"></span>
+                    <span class="np-luxe-visual__bar np-luxe-visual__bar--short"></span>
                 </div>
-                <ul class="np-pl-hub-card__tags">
-                    <li>100-item middle</li>
-                    <li>Enhanced I & II</li>
-                    <li>85-gate upper</li>
-                </ul>
-                <span class="np-pl-hub-card__cta">
-                    <span>Enter Math</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="np-luxe-tile__cta">
+                    Enter Math
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" stroke-width="2.2"/></svg>
                 </span>
             </a>
         </div>
 
         {% if placement_public_guest|default(false) %}
-        <a class="np-pl-hub-recover np-pl-reveal" data-pl-reveal href="{{ url_for('placement_public_recover') }}">
-            <span class="np-pl-hub-recover__icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10V8a5 5 0 0110 0v2" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="10" width="14" height="11" rx="2.2" stroke="currentColor" stroke-width="1.8"/></svg>
-            </span>
+        <a class="np-pl-hub-recover np-pl-hub-recover--luxe np-pl-reveal" data-pl-reveal href="{{ url_for('placement_public_recover') }}">
             <span class="np-pl-hub-recover__copy">
                 <em>Already started?</em>
                 <strong>Recover with your code</strong>
             </span>
-            <svg class="np-pl-hub-recover__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </a>
         {% endif %}
     </div>
