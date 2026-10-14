@@ -247,28 +247,15 @@
   background: conic-gradient(from 200deg, rgba(200, 215, 255, 0.55), var(--lx-prism-b), rgba(180, 200, 255, 0.45));
 }
 
+/* Equal columns — English/Math are peers, not a featured pair */
 .np-pl-hub__luxe-grid--spectacle {
-  grid-template-columns: 1.12fr 0.88fr;
-  gap: clamp(1.15rem, 2.8vw, 1.75rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
   perspective: 1200px;
 }
 
-.np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:first-child {
-  min-height: 440px;
-}
-
-.np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:last-child {
-  margin-top: clamp(0.5rem, 2vw, 1.25rem);
-}
-
-@media (max-width: 800px) {
-  .np-pl-hub__luxe-grid--spectacle {
-    grid-template-columns: 1fr;
-  }
-
-  .np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:last-child {
-    margin-top: 0;
-  }
+.np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub {
+  min-height: 420px;
 }
 
 @media (prefers-reduced-motion: reduce) {
