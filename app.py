@@ -10580,8 +10580,6 @@ def _placement_public_questions(topic: str) -> list[dict]:
 def placement_public_recover():
     if not placement_public_enabled():
         abort(404)
-    if "user_id" in session:
-        return redirect(url_for("placement_landing"))
     if request.method == "GET":
         return render_template(
             "placement_public_recover.html",
@@ -10881,12 +10879,23 @@ def placement_public_finish(public_id: str):
 
 @app.route("/placement/run/<public_id>/done")
 def placement_public_done(public_id: str):
-    if not is_public_guest():
+    if not placement_public_enabled():
         abort(404)
     db = get_db()
     att = placement_public_mod.authorize_attempt(db, public_id)
     if att is None:
-        abort(404)
+        fallback = placement_public_mod.load_attempt(db, public_id)
+        if fallback is None:
+            abort(404)
+        if fallback["status"] != "submitted":
+            flash("Enter your recovery code to continue this placement sitting.")
+            return redirect(url_for("placement_public_recover"))
+        test = _placement_test_by_slug(fallback["slug"])
+        return render_template(
+            "placement_public_done_gate.html",
+            test=test,
+            public_id=public_id,
+        )
     if att["status"] != "submitted":
         return redirect(url_for("placement_public_finish", public_id=public_id))
     test = _placement_test_by_slug(att["slug"])
