@@ -65,6 +65,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from placement_report_pdf import build_placement_parent_pdf
 from placement_atelier_pdf import build_placement_atelier_pdf
+from placement_english_ui import (
+    merge_form_english_writing,
+    unpack_english_writing_answer,
+    writing_word_targets,
+)
 from placement_intelligent_report import (
     build_intelligent_placement_report,
     enrich_placement_section_stats,
@@ -119,6 +124,8 @@ PLACEMENT_META_BY_TOPIC: Dict[str, str] = {
     "enhanced_math_1": os.path.join(APP_DIR, "data", "placement_enhanced_math_1_meta.json"),
     "enhanced_math_2": os.path.join(APP_DIR, "data", "placement_enhanced_math_2_meta.json"),
     "middle_level": os.path.join(APP_DIR, "data", "placement_middle_level_meta.json"),
+    "english_g7_8": os.path.join(APP_DIR, "data", "placement_english_g7_8_meta.json"),
+    "english_g9_11": os.path.join(APP_DIR, "data", "placement_english_g9_11_meta.json"),
 }
 
 # Part transitions for the 100-item middle-level placement (0-based q indices).
@@ -164,6 +171,76 @@ MIDDLE_LEVEL_PART_GATES: List[dict[str, Any]] = [
         "prev_band": "Math 8",
     },
 ]
+
+
+def _english_placement_part_gates(topic: str) -> List[dict[str, Any]]:
+    """Part I–III transition screens for English placement (reading → language → writing)."""
+    if topic == "english_g7_8":
+        reading_end = 9
+        mc_count = 31
+        prefix = "placement_en_g78"
+        lang_label = "Part II · Language & conventions"
+        lang_body = "22 multiple-choice items on grammar, usage, and sentence skills."
+    elif topic == "english_g9_11":
+        reading_end = 12
+        mc_count = 40
+        prefix = "placement_en_g911"
+        lang_label = "Part II · Language & conventions"
+        lang_body = "28 multiple-choice items on grammar, rhetoric, and conventions."
+    else:
+        return []
+    total = mc_count + 1
+    return [
+        {
+            "section": "part_i",
+            "session_flag": f"{prefix}_seen_part_i",
+            "first_qnum": 0,
+            "after_q_index": None,
+            "part_num": 1,
+            "part_total": 3,
+            "title": "Part I · Reading",
+            "part_title": "Reading passages",
+            "prev_part": None,
+            "item_count": reading_end,
+            "q_start": 1,
+            "q_end": reading_end,
+            "total_items": total,
+            "lead_extra": "Passage on the left, question on the right — like TOEFL Reading.",
+        },
+        {
+            "section": "part_ii",
+            "session_flag": f"{prefix}_seen_part_ii",
+            "first_qnum": reading_end,
+            "after_q_index": reading_end - 1,
+            "part_num": 2,
+            "part_total": 3,
+            "title": lang_label,
+            "part_title": "Language section",
+            "prev_part": "Reading",
+            "item_count": mc_count - reading_end,
+            "q_start": reading_end + 1,
+            "q_end": mc_count,
+            "total_items": total,
+            "lead_extra": lang_body,
+        },
+        {
+            "section": "part_iii",
+            "session_flag": f"{prefix}_seen_part_iii",
+            "first_qnum": mc_count,
+            "after_q_index": mc_count - 1,
+            "part_num": 3,
+            "part_total": 3,
+            "title": "Part III · Writing",
+            "part_title": "Essay response",
+            "prev_part": "Language",
+            "item_count": 1,
+            "q_start": mc_count + 1,
+            "q_end": total,
+            "total_items": total,
+            "lead_extra": "Prompt on the left, essay box on the right — like TOEFL Writing.",
+            "writing": True,
+        },
+    ]
 
 
 def _upper_placement_gate_gates() -> List[dict[str, Any]]:
@@ -327,6 +404,19 @@ def _sanitize_question_for_render(q: dict) -> dict:
     return out
 
 
+def _placement_english_writing_render_ctx(q: dict, topic: str, saved_raw: str) -> dict:
+    if str(q.get("question_kind") or "") != "english_writing":
+        return {"saved_selected_answer": saved_raw}
+    opt, body = unpack_english_writing_answer(saved_raw or "")
+    wmin, wmax = writing_word_targets(topic)
+    return {
+        "saved_selected_answer": body,
+        "english_writing_selected_option": opt,
+        "english_writing_word_min": wmin,
+        "english_writing_word_max": wmax,
+    }
+
+
 def _safe_db_commit(db: sqlite3.Connection) -> bool:
     try:
         db.commit()
@@ -365,17 +455,17 @@ def _practice_redirect(domain: str, topic: str, qnum: int, *, mistake_redo: bool
 
 
 def _site_brand_name() -> str:
-    return (os.environ.get("SITE_BRAND_NAME") or "Novel Prep Math Studio").strip() or "Novel Prep Math Studio"
+    return (os.environ.get("SITE_BRAND_NAME") or "Novel Prep Learning Studio").strip() or "Novel Prep Learning Studio"
 
 
 SITE_BRAND_NAME = _site_brand_name()
 SITE_BRAND_SHORT = (os.environ.get("SITE_BRAND_SHORT") or "Novel Prep").strip() or "Novel Prep"
 SITE_META_DESCRIPTION = (
     os.environ.get("SITE_META_DESCRIPTION")
-    or f"{SITE_BRAND_NAME} — SAT Math practice (Units 1–4), course placement, mistake analytics, and a unified workspace."
+    or f"{SITE_BRAND_NAME} — SAT Math & English practice, course placement, mistake analytics, and a unified workspace."
 ).strip()
 SITE_LOGIN_KICKER = (
-    os.environ.get("SITE_LOGIN_KICKER") or f"{SITE_BRAND_SHORT} · SAT Math Studio"
+    os.environ.get("SITE_LOGIN_KICKER") or f"{SITE_BRAND_SHORT} · Learning Studio"
 ).strip()
 SITE_TEACHER_LABEL = (os.environ.get("SITE_TEACHER_LABEL") or "Novel Prep").strip()
 SITE_SUPPORT_CONTACT = (
@@ -1947,6 +2037,22 @@ def _placement_flow_config(topic: str) -> dict | None:
             "session_prefix": "placement_middle",
             "mc_scored": False,
         }
+    if topic in ("english_g7_8", "english_g9_11"):
+        mc = int(row.get("online_mcq_count") or 31 if topic == "english_g7_8" else 40)
+        writing = 1
+        total = mc + writing
+        return {
+            "mc_count": mc,
+            "graph_count": 0,
+            "fr_count": writing,
+            "writing_count": writing,
+            "total": total,
+            "has_gates": True,
+            "gate_kind": "english_parts",
+            "session_prefix": "placement_english",
+            "mc_scored": True,
+            "english_reading_layout": True,
+        }
     if topic == "placement_full":
         mc = int(row.get("online_mcq_count") or row.get("online_item_count") or 85)
         return {
@@ -1982,6 +2088,8 @@ def _placement_flow_config(topic: str) -> dict | None:
 
 def _placement_timer_seconds(topic: str) -> int:
     return {
+        "english_g7_8": 55 * 60,
+        "english_g9_11": 65 * 60,
         "enhanced_math_1": 120 * 60,
         "enhanced_math_2": 130 * 60,
         "middle_level": 150 * 60,
@@ -4646,6 +4754,8 @@ BANKS: Dict[str, Dict[str, str]] = {
         "enhanced_math_1": "Placement_Enhanced_Math_1.tex",
         "enhanced_math_2": "Placement_Enhanced_Math_2.tex",
         "middle_level": "Placement_Middle_Level.tex",
+        "english_g7_8": "banks/placement/english_g7_8.tex",
+        "english_g9_11": "banks/placement/english_g9_11.tex",
     },
 }
 
@@ -9646,6 +9756,58 @@ def _placement_section_intro_meta(topic: str, section: str) -> dict[str, Any] | 
                 ],
             }
         return None
+    if cfg.get("gate_kind") == "english_parts":
+        for gate in _english_placement_part_gates(topic):
+            if gate["section"] != section:
+                continue
+            part_num = int(gate["part_num"])
+            prev = gate.get("prev_part")
+            lead = (
+                f"Next: {int(gate['item_count'])} "
+                f"{'essay' if gate.get('writing') else 'multiple-choice'} "
+                f"item{'s' if int(gate['item_count']) != 1 else ''} "
+                f"(questions {int(gate['q_start'])}–{int(gate['q_end'])} of {int(gate['total_items'])})."
+            )
+            if prev:
+                lead = (
+                    f"You completed {prev}. Take a short breath, then continue. "
+                    + lead
+                    + f" {gate.get('lead_extra') or ''}"
+                ).strip()
+            else:
+                lead = (gate.get("lead_extra") or "") + " " + lead
+            return {
+                "section": section,
+                "session_flag": str(gate["session_flag"]),
+                "first_qnum": int(gate["first_qnum"]),
+                "kicker": f"English placement · Part {part_num} of 3",
+                "title": str(gate["title"]),
+                "lead": lead.strip(),
+                "begin_label": f"Begin Part {part_num}",
+                "part_num": part_num,
+                "part_total": 3,
+                "q_start": int(gate["q_start"]),
+                "q_end": int(gate["q_end"]),
+                "total_items": int(gate["total_items"]),
+                "cards": [
+                    {
+                        "icon": str(part_num),
+                        "title": str(gate.get("part_title") or gate["title"]),
+                        "body": str(gate.get("lead_extra") or "Same structure as the printable diagnostic."),
+                    },
+                    {
+                        "icon": str(gate["item_count"]),
+                        "title": f"{gate['item_count']} item{'s' if int(gate['item_count']) != 1 else ''}",
+                        "body": "Your answers save automatically as you work.",
+                    },
+                    {
+                        "icon": "⏱",
+                        "title": "Timer",
+                        "body": "Your placement timer keeps running across all three parts.",
+                    },
+                ],
+            }
+        return None
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
             if gate["section"] != section:
@@ -9827,6 +9989,15 @@ def _placement_section_gate_redirect(topic: str, qnum: int) -> str | None:
                     section=str(gate["section"]),
                 )
         return None
+    if cfg.get("gate_kind") == "english_parts":
+        for gate in _english_placement_part_gates(topic):
+            if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
+                return url_for(
+                    "placement_section_intro",
+                    slug=slug,
+                    section=str(gate["section"]),
+                )
+        return None
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
             if qnum >= int(gate["first_qnum"]) and not session.get(str(gate["session_flag"])):
@@ -9869,6 +10040,15 @@ def _placement_section_back_href(topic: str, section: str) -> str:
         for gate in MIDDLE_LEVEL_PART_GATES:
             if gate["section"] == section:
                 return _q_href(int(gate["after_q_index"]))
+        return _q_href(0)
+    if cfg.get("gate_kind") == "english_parts":
+        gates = _english_placement_part_gates(topic)
+        for gate in gates:
+            if gate["section"] == section:
+                ai = gate.get("after_q_index")
+                if ai is None:
+                    return _q_href(0)
+                return _q_href(int(ai))
         return _q_href(0)
     if cfg.get("gate_kind") == "upper_gates":
         for gate in _upper_placement_gate_gates():
@@ -10117,16 +10297,49 @@ def admin_placement_upload(attempt_id: int, upload_id: int):
 @app.route("/placement")
 def placement_landing():
     session["active_track_label"] = "Course placement"
-    catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
     return render_template(
-        "placement_catalog.html",
+        "placement_track_hub.html",
+        placement_public_guest=placement_public_enabled() and "user_id" not in session,
+    )
+
+
+@app.route("/placement/catalog")
+def placement_catalog_legacy():
+    return redirect(url_for("placement_landing"))
+
+
+@app.route("/placement/track")
+def placement_track_root():
+    return redirect(url_for("placement_landing"))
+
+
+@app.route("/placement/track/<track>")
+def placement_track_catalog(track: str):
+    session["active_track_label"] = "Course placement"
+    if track not in ("math", "english"):
+        abort(404)
+    catalog = _enrich_placement_catalog_with_pdf_meta(_load_placement_catalog())
+    tiers = []
+    for tier in catalog.get("tiers") or []:
+        tid = str(tier.get("id") or "")
+        if track == "english" and tid == "english":
+            tiers.append(tier)
+        elif track == "math" and tid != "english":
+            tiers.append(tier)
+    catalog = {**catalog, "tiers": tiers, "track": track}
+    return render_template(
+        "placement_track_catalog.html",
         catalog=catalog,
+        track=track,
+        placement_public_guest=placement_public_enabled() and "user_id" not in session,
     )
 
 
 @app.route("/placement/<slug>")
 def placement_test_landing(slug: str):
     session["active_track_label"] = "Course placement"
+    if slug in ("track", "catalog", "recover", "begin", "start", "run"):
+        return redirect(url_for("placement_landing"))
     test = _placement_test_by_slug(slug)
     if not test:
         abort(404)
@@ -10136,12 +10349,14 @@ def placement_test_landing(slug: str):
     topic = _placement_topic_for_slug(slug)
     if not topic:
         abort(404)
+    track = "english" if topic in ("english_g7_8", "english_g9_11") else "math"
     return render_template(
         "placement_test_landing.html",
         test=test,
         placement_parts=_placement_landing_parts_for_topic(topic),
         topic=topic,
         slug=slug,
+        track=track,
         pdf_meta=_placement_pdf_meta(test.get("pdf_file")),
     )
 
@@ -10171,11 +10386,13 @@ def placement_test_start(slug: str):
     else:
         _clear_placement_session_attempt(topic)
         session.modified = True
+    track = "english" if topic in ("english_g7_8", "english_g9_11") else "math"
     return render_template(
         "placement_start.html",
         test=test,
         topic=topic,
         slug=slug,
+        track=track,
         public_guest=public_guest,
         begin_nonce=placement_public_mod.begin_nonce() if public_guest else "",
         advisor_presets=placement_public_mod.ADVISOR_PRESETS,
@@ -10346,6 +10563,11 @@ def _placement_public_next_href(topic: str, public_id: str, q_index: int, bank_t
             for gate in MIDDLE_LEVEL_PART_GATES:
                 if q_index == int(gate["after_q_index"]):
                     return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
+        elif flow.get("gate_kind") == "english_parts":
+            for gate in _english_placement_part_gates(topic):
+                ai = gate.get("after_q_index")
+                if ai is not None and q_index == int(ai):
+                    return url_for("placement_section_intro", slug=slug, section=str(gate["section"]))
         elif flow.get("gate_kind") == "upper_gates":
             for gate in _upper_placement_gate_gates():
                 if q_index == int(gate["after_q_index"]):
@@ -10376,8 +10598,6 @@ def _placement_public_questions(topic: str) -> list[dict]:
 def placement_public_recover():
     if not placement_public_enabled():
         abort(404)
-    if "user_id" in session:
-        return redirect(url_for("placement_landing"))
     if request.method == "GET":
         return render_template(
             "placement_public_recover.html",
@@ -10451,6 +10671,8 @@ def placement_public_item(public_id: str, qnum: int):
     saved = placement_public_mod.saved_answer(db, int(att["id"]), qnum)
     if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
         saved = _mcq_letter(saved)
+    writing_render = _placement_english_writing_render_ctx(q, topic, saved)
+    saved = writing_render.get("saved_selected_answer", saved)
     bank_total = len(questions)
     answered_count = len(answered_qset)
     calc_ok = bool(q.get("calculator_allowed", True))
@@ -10492,6 +10714,9 @@ def placement_public_item(public_id: str, qnum: int):
         lock_phase3_answers=False,
         phase3_answer_locked=False,
         saved_selected_answer=saved,
+        english_writing_selected_option=writing_render.get("english_writing_selected_option", ""),
+        english_writing_word_min=writing_render.get("english_writing_word_min", 200),
+        english_writing_word_max=writing_render.get("english_writing_word_max", 300),
         restart_href=None,
         public_run_mode=True,
         public_run_id=public_id,
@@ -10513,9 +10738,9 @@ def _placement_public_save_item(db, att, questions, qnum: int):
     public_id = att["public_id"]
     topic = str(att["topic"])
     q = questions[qnum]
-    raw_answer = (request.form.get("selected_answer") or "").strip()
-    goto_raw = request.form.get("goto_qnum")
     q_kind = str(q.get("question_kind") or "mcq")
+    raw_answer = merge_form_english_writing(q_kind, request.form)
+    goto_raw = request.form.get("goto_qnum")
     paper_item = is_placement_paper_item(q)
     if q_kind in ("mcq", "mcq5") and raw_answer:
         raw_answer = _mcq_letter(raw_answer)
@@ -10581,9 +10806,10 @@ def placement_public_autosave(public_id: str):
         qnum = int(request.form.get("qnum") or 0)
     except ValueError:
         qnum = 0
-    answer = (request.form.get("selected_answer") or "").strip()
     questions = _placement_public_questions(str(att["topic"]))
     qnum = max(0, min(len(questions) - 1, qnum)) if questions else qnum
+    q_kind = str(questions[qnum].get("question_kind") or "mcq") if questions else "mcq"
+    answer = merge_form_english_writing(q_kind, request.form)
     paper_item = bool(questions) and is_placement_paper_item(questions[qnum])
     if paper_item:
         answer = placement_recorded_paper_answer(
@@ -10677,12 +10903,23 @@ def placement_public_finish(public_id: str):
 
 @app.route("/placement/run/<public_id>/done")
 def placement_public_done(public_id: str):
-    if not is_public_guest():
+    if not placement_public_enabled():
         abort(404)
     db = get_db()
     att = placement_public_mod.authorize_attempt(db, public_id)
     if att is None:
-        abort(404)
+        fallback = placement_public_mod.load_attempt(db, public_id)
+        if fallback is None:
+            abort(404)
+        if fallback["status"] != "submitted":
+            flash("Enter your recovery code to continue this placement sitting.")
+            return redirect(url_for("placement_public_recover"))
+        test = _placement_test_by_slug(fallback["slug"])
+        return render_template(
+            "placement_public_done_gate.html",
+            test=test,
+            public_id=public_id,
+        )
     if att["status"] != "submitted":
         return redirect(url_for("placement_public_finish", public_id=public_id))
     test = _placement_test_by_slug(att["slug"])
@@ -14625,6 +14862,8 @@ def practice_question(domain, topic, qnum):
     )
     if q.get("question_kind", "mcq") in ("mcq", "mcq5"):
         saved_selected_answer = _mcq_letter(saved_selected_answer)
+    writing_render = _placement_english_writing_render_ctx(q, topic, saved_selected_answer or "")
+    saved_selected_answer = writing_render.get("saved_selected_answer", saved_selected_answer)
 
     return render_template(
         "practice_question.html",
@@ -14665,6 +14904,9 @@ def practice_question(domain, topic, qnum):
         lock_phase3_answers=False,
         phase3_answer_locked=False,
         saved_selected_answer=saved_selected_answer,
+        english_writing_selected_option=writing_render.get("english_writing_selected_option", ""),
+        english_writing_word_min=writing_render.get("english_writing_word_min", 200),
+        english_writing_word_max=writing_render.get("english_writing_word_max", 300),
         restart_href=url_for("practice_new_session", domain=domain, topic=topic)
         if domain == "hard_problem" and not mistake_redo_mode
         else None,
@@ -14730,6 +14972,8 @@ def practice_draft_answer():
     qobj = questions[current_q] if questions else {}
     if questions:
         q_kind = str(qobj.get("question_kind") or "mcq")
+    if q_kind == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind, request.form)
     paper_item = domain == "placement" and is_placement_paper_item(qobj)
     if paper_item:
         raw_answer = placement_recorded_paper_answer(
@@ -14808,6 +15052,8 @@ def practice_autosave_answer():
         current_q = max(0, min(len(questions) - 1, current_q))
         qobj = questions[current_q]
         q_kind = str(qobj.get("question_kind") or "mcq")
+    if q_kind == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind, request.form)
     if domain == "placement" and is_placement_paper_item(qobj):
         raw_answer = placement_recorded_paper_answer(
             raw_answer, request.form.get("paper_completed")
@@ -14837,7 +15083,6 @@ def practice_autosave_answer():
 def submit_practice_answer():
     domain = request.form.get("domain", "").strip()
     topic = request.form.get("topic", "").strip()
-    raw_answer = request.form.get("selected_answer", "").strip()
     attempt_id_raw = request.form.get("attempt_id", "").strip()
     qnum_raw = request.form.get("qnum", "0").strip()
     mistake_redo = _mistake_redo_flag(request.form.get("mistake_redo"))
@@ -14869,6 +15114,11 @@ def submit_practice_answer():
 
     q_index = qnum % len(questions)
     question = questions[q_index]
+    q_kind_submit = str(question.get("question_kind") or "mcq")
+    if q_kind_submit == "english_writing":
+        raw_answer = merge_form_english_writing(q_kind_submit, request.form)
+    else:
+        raw_answer = (request.form.get("selected_answer") or "").strip()
     paper_item = domain == "placement" and is_placement_paper_item(question)
 
     if paper_item:
@@ -15044,6 +15294,17 @@ def submit_practice_answer():
             if flow.get("gate_kind") == "middle_parts":
                 for gate in MIDDLE_LEVEL_PART_GATES:
                     if q_index == int(gate["after_q_index"]):
+                        return redirect(
+                            url_for(
+                                "placement_section_intro",
+                                slug=slug,
+                                section=str(gate["section"]),
+                            )
+                        )
+            elif flow.get("gate_kind") == "english_parts":
+                for gate in _english_placement_part_gates(topic):
+                    ai = gate.get("after_q_index")
+                    if ai is not None and q_index == int(ai):
                         return redirect(
                             url_for(
                                 "placement_section_intro",

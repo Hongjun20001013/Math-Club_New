@@ -1,0 +1,194 @@
+/* Hub layout — works with placement_luxe_light.css */
+
+.np-pl-hub__inner--luxe {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-bottom: clamp(4rem, 10vw, 6rem);
+  position: relative;
+  z-index: 2;
+}
+
+.np-pl-hub__hero--luxe {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 6vw, 3.5rem);
+}
+
+.np-pl-hub__eyebrow-center {
+  justify-content: center;
+}
+
+.np-pl-hub__lead--center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.np-pl-hub__chips-center {
+  justify-content: center;
+}
+
+.np-pl-hub__luxe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+@media (max-width: 800px) {
+  .np-pl-hub__luxe-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.np-luxe-tile--hub {
+  min-height: 420px;
+}
+
+/* Mini UI in hub tiles */
+.np-luxe-visual--reading {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 8px;
+  min-height: 96px;
+  max-height: 96px;
+}
+
+.np-luxe-visual__col {
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 245, 238, 0.9));
+  border: 1px solid var(--lx-line);
+  min-height: 86px;
+}
+
+.np-luxe-visual__col--q {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+.np-luxe-visual__col--q::before,
+.np-luxe-visual__col--q::after {
+  content: "";
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(111, 78, 50, 0.15);
+}
+
+.np-luxe-tile--hub:hover .np-luxe-visual__col:first-child {
+  background: linear-gradient(180deg, #fff 0%, rgba(255, 248, 238, 0.95) 100%);
+  box-shadow: inset 0 0 0 1px rgba(184, 149, 110, 0.12);
+}
+
+.np-luxe-visual__col:first-child {
+  position: relative;
+  overflow: hidden;
+}
+
+.np-luxe-visual__col:first-child::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 18px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(111, 78, 50, 0.12);
+  box-shadow:
+    0 14px 0 rgba(111, 78, 50, 0.08),
+    0 28px 0 rgba(111, 78, 50, 0.06),
+    0 42px 0 rgba(111, 78, 50, 0.05);
+  animation: np-luxe-passage-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes np-luxe-passage-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.np-luxe-tile--hub:hover .np-luxe-visual__bar {
+  transform: scaleX(1.02);
+}
+
+.np-luxe-visual__bar {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
+}
+
+.np-luxe-visual--math {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  min-height: 96px;
+  max-height: 96px;
+  padding: 8px 12px;
+}
+
+.np-luxe-visual__eq {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--lx-accent-deep);
+  opacity: 0.85;
+}
+
+.np-luxe-visual__bar {
+  display: block;
+  height: 6px;
+  width: 88%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--lx-accent), rgba(107, 127, 215, 0.2));
+}
+
+.np-luxe-visual__bar--short {
+  width: 58%;
+}
+
+.np-pl-hub-recover--luxe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(28, 21, 40, 0.08);
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.np-pl-hub-recover--luxe em {
+  display: block;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a8498;
+}
+
+/* Catalog + humanities helpers (shared) */
+.np-pl2--humanities .np-pl-display,
+.np-pl-canvas--humanities .np-pl-display {
+  font-family: "Fraunces", "Libre Baskerville", Georgia, serif;
+}
+
+.np-pl-device__passage {
+  font-family: "Literata", Georgia, serif;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0.35rem 0 0.65rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}

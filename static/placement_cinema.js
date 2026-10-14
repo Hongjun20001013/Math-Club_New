@@ -119,6 +119,62 @@
         }
     }
 
+    /* Luxe spectacle — pointer spotlight + card tilt (light UI, desktop) */
+    if (root.classList.contains("np-luxe--spectacle") && !reduceMotion) {
+        var spotlight = root.querySelector("[data-np-luxe-spotlight]");
+        if (spotlight) {
+            root.classList.add("is-spotlight-ready");
+            var spotPending = false;
+            var sx = 0.5;
+            var sy = 0.38;
+            function paintSpot() {
+                spotlight.style.left = sx * 100 + "%";
+                spotlight.style.top = sy * 100 + "%";
+                spotlight.style.transform = "translate(-50%, -50%)";
+                spotPending = false;
+            }
+            root.addEventListener(
+                "mousemove",
+                function (ev) {
+                    var r = root.getBoundingClientRect();
+                    sx = (ev.clientX - r.left) / r.width;
+                    sy = (ev.clientY - r.top) / r.height;
+                    if (spotPending) return;
+                    spotPending = true;
+                    requestAnimationFrame(paintSpot);
+                },
+                { passive: true }
+            );
+        }
+
+        if (window.matchMedia("(min-width: 900px)").matches) {
+            root.querySelectorAll("[data-np-luxe-tilt]").forEach(function (tile) {
+                var tiltPending = false;
+                var tx = 0;
+                var ty = 0;
+                tile.addEventListener("mousemove", function (ev) {
+                    var r = tile.getBoundingClientRect();
+                    tx = (ev.clientX - r.left) / r.width - 0.5;
+                    ty = (ev.clientY - r.top) / r.height - 0.5;
+                    if (tiltPending) return;
+                    tiltPending = true;
+                    requestAnimationFrame(function () {
+                        tile.style.transform =
+                            "translateY(-10px) scale(1.012) rotateX(" +
+                            (-ty * 5) +
+                            "deg) rotateY(" +
+                            (tx * 6) +
+                            "deg)";
+                        tiltPending = false;
+                    });
+                });
+                tile.addEventListener("mouseleave", function () {
+                    tile.style.transform = "";
+                });
+            });
+        }
+    }
+
     var drop = root.querySelector("[data-pl-drop]");
     if (drop) {
         var fileInput = drop.querySelector('input[type="file"]');

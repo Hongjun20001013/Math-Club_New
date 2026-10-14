@@ -1,0 +1,293 @@
+/* Novel Prep — Luxe Light placement (hub + catalog). Warm paper, no dark UI. */
+
+.np-luxe {
+  --lx-paper: #faf7f2;
+  --lx-paper-2: #fffefb;
+  --lx-ink: #1c1528;
+  --lx-muted: #6b6578;
+  --lx-line: rgba(28, 21, 40, 0.08);
+  --lx-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 24px 64px rgba(28, 21, 40, 0.08),
+    0 4px 16px rgba(28, 21, 40, 0.04);
+  --lx-shadow-hover:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 40px 90px rgba(28, 21, 40, 0.12),
+    0 8px 24px rgba(28, 21, 40, 0.06);
+  --lx-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.np-luxe--english {
+  --lx-accent: #b8956e;
+  --lx-accent-deep: #6f4e32;
+  --lx-wash-a: rgba(255, 236, 210, 0.55);
+  --lx-wash-b: rgba(250, 247, 242, 0.9);
+  --lx-glow: rgba(196, 149, 106, 0.35);
+}
+
+.np-luxe--math {
+  --lx-accent: #6b7fd7;
+  --lx-accent-deep: #3d4f9a;
+  --lx-wash-a: rgba(220, 228, 255, 0.6);
+  --lx-wash-b: rgba(248, 249, 255, 0.92);
+  --lx-glow: rgba(107, 127, 215, 0.32);
+}
+
+.np-luxe .np-pl2-mesh {
+  opacity: 0.2 !important;
+  background: linear-gradient(165deg, var(--lx-wash-b) 0%, var(--lx-paper) 45%, #f3f0ff 100%) !important;
+}
+
+.np-luxe .np-pl-hub-aurora__orb {
+  filter: blur(100px);
+  opacity: 0.7;
+}
+
+.np-luxe-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.np-luxe-scene__ring {
+  position: absolute;
+  border: 1px solid rgba(28, 21, 40, 0.06);
+  border-radius: 50%;
+  animation: np-luxe-drift 22s ease-in-out infinite;
+}
+
+.np-luxe-scene__ring--1 {
+  width: min(90vmax, 720px);
+  height: min(90vmax, 720px);
+  right: -20%;
+  top: -25%;
+}
+
+.np-luxe-scene__ring--2 {
+  width: min(60vmax, 480px);
+  height: min(60vmax, 480px);
+  left: -15%;
+  bottom: -20%;
+  animation-delay: -8s;
+}
+
+.np-luxe-scene__blob {
+  position: absolute;
+  width: min(42vw, 380px);
+  height: min(42vw, 380px);
+  border-radius: 40% 60% 55% 45% / 48% 42% 58% 52%;
+  background: radial-gradient(circle at 30% 30%, var(--lx-glow), transparent 68%);
+  animation: np-luxe-morph 16s ease-in-out infinite;
+  right: 8%;
+  top: 22%;
+}
+
+@keyframes np-luxe-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-2%, 3%) rotate(4deg);
+  }
+}
+
+@keyframes np-luxe-morph {
+  0%,
+  100% {
+    border-radius: 40% 60% 55% 45% / 48% 42% 58% 52%;
+  }
+  50% {
+    border-radius: 55% 45% 40% 60% / 52% 58% 42% 48%;
+  }
+}
+
+.np-luxe-display {
+  font-family: "Fraunces", "Libre Baskerville", Georgia, serif;
+  font-size: clamp(2.6rem, 6vw, 4.25rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  color: var(--lx-ink);
+  margin: 0.4rem 0 1rem;
+}
+
+.np-luxe-display em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--lx-accent-deep);
+}
+
+.np-luxe-lead {
+  max-width: 26rem;
+  font-size: 1.08rem;
+  line-height: 1.68;
+  color: var(--lx-muted);
+  margin: 0;
+}
+
+.np-luxe-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.np-luxe-chip-row li {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  color: var(--lx-accent-deep);
+  background: var(--lx-paper-2);
+  border: 1px solid var(--lx-line);
+  box-shadow: 0 4px 12px rgba(28, 21, 40, 0.04);
+}
+
+/* Premium tile (hub + catalog) */
+.np-luxe-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  border-radius: 28px;
+  text-decoration: none !important;
+  color: inherit;
+  background: var(--lx-paper-2);
+  border: 1px solid var(--lx-line);
+  box-shadow: var(--lx-shadow);
+  overflow: hidden;
+  transition:
+    transform 0.55s var(--lx-ease),
+    box-shadow 0.55s var(--lx-ease);
+}
+
+.np-luxe-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, var(--lx-wash-a) 0%, transparent 55%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.np-luxe-tile:hover {
+  transform: translateY(-10px) scale(1.012);
+  box-shadow: var(--lx-shadow-hover);
+}
+
+.np-luxe-tile__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.np-luxe-tile__glyph {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--lx-accent-deep);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--lx-line);
+  box-shadow: 0 8px 20px rgba(28, 21, 40, 0.06);
+}
+
+.np-luxe-tile__title {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--lx-ink);
+}
+
+.np-luxe-tile__kicker {
+  margin: 0.25rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lx-muted);
+}
+
+.np-luxe-tile__desc {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.58;
+  color: var(--lx-muted);
+}
+
+.np-luxe-tile__visual {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 100px;
+  margin-bottom: 1.25rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--lx-line);
+  padding: 12px;
+}
+
+.np-luxe-tile__cta {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 0.75rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--lx-ink);
+  background: #fff;
+  border: 1px solid var(--lx-line);
+  box-shadow: 0 6px 16px rgba(28, 21, 40, 0.06);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.np-luxe-tile:hover .np-luxe-tile__cta {
+  color: #fff;
+  background: var(--lx-accent-deep);
+  border-color: transparent;
+}
+
+.np-luxe-tile__cta svg {
+  transition: transform 0.35s var(--lx-ease);
+}
+
+.np-luxe-tile:hover .np-luxe-tile__cta svg {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-luxe-scene__ring,
+  .np-luxe-scene__blob {
+    animation: none;
+  }
+
+  .np-luxe-tile:hover {
+    transform: none;
+  }
+}

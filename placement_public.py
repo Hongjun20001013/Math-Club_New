@@ -20,6 +20,8 @@ from flask import current_app, request, session
 FORBIDDEN_SQL = re.compile(r"\b(DROP|TRUNCATE|DELETE|ALTER)\b", re.IGNORECASE)
 
 SLUG_TO_TOPIC = {
+    "english-g7-8": "english_g7_8",
+    "english-g9-11": "english_g9_11",
     "middle-level": "middle_level",
     "enhanced-math-1": "enhanced_math_1",
     "enhanced-math-2": "enhanced_math_2",
@@ -27,12 +29,16 @@ SLUG_TO_TOPIC = {
 }
 TOPIC_TO_SLUG = {v: k for k, v in SLUG_TO_TOPIC.items()}
 ITEM_COUNTS = {
+    "english_g7_8": 32,
+    "english_g9_11": 41,
     "middle_level": 100,
     "enhanced_math_1": 65,
     "enhanced_math_2": 69,
     "placement_full": 85,
 }
 TIMER_MINUTES = {
+    "english_g7_8": 55,
+    "english_g9_11": 65,
     "middle_level": 150,
     "enhanced_math_1": 120,
     "enhanced_math_2": 130,

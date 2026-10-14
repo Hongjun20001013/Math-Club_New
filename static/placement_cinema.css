@@ -1425,8 +1425,19 @@ a.np-pl-card__pdf-pill.np-pl-cta-pulse {
     font-size: 12px; font-weight: 750; letter-spacing: 0.04em;
     text-transform: uppercase; color: var(--pl-ink-muted);
 }
-.np-pl-advisor { border: 0; margin: 0; padding: 0; min-width: 0; }
-.np-pl-advisor legend { padding: 0; }
+.np-pl-advisor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 16px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(108, 78, 255, 0.18);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(246, 242, 255, 0.92));
+    box-shadow: 0 12px 28px rgba(26, 18, 48, 0.05);
+}
+.np-pl-advisor__hint {
+    margin: -4px 0 2px;
+}
 .np-pl-req { color: #b45309; }
 .np-pl-opt {
     margin-left: 6px;

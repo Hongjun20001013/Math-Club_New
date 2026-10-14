@@ -240,6 +240,7 @@ class TestPublicProfile(_Base):
             self.assertIn("You selected", body)
             self.assertIn("Mia Hu", body)
             self.assertIn("Jimmy Zheng", body)
+            self.assertIn('id="pl-advisor"', body)
             self.assertIn("Before you begin", body)
             self.assertIn("I confirm that I selected the appropriate placement test and will complete it independently.", body)
             rv = self.begin(slug=slug, name=f"Student {slug}")
@@ -269,7 +270,9 @@ class TestPublicProfile(_Base):
     def test_required_profile_rejects_incomplete(self):
         self.flag_on()
         html = self.client.get("/placement/enhanced-math-1/start").get_data(as_text=True)
-        self.assertIn("Advisor <span class=\"np-pl-req\">required</span>", html)
+        self.assertIn('id="pl-advisor-label"', html)
+        self.assertIn("Mia Hu", html)
+        self.assertIn('name="advisor_choice"', html)
         nonce = re.search(r'name="begin_nonce" value="([^"]+)"', html).group(1)
         token = self.csrf()
         base = {
@@ -802,6 +805,28 @@ class TestRecoveryAndIsolation(_Base):
 
 
 class TestLockAndAdmin(_Base):
+    def test_done_without_browser_session_shows_gate_not_404(self):
+        self.flag_on()
+        rv = self.begin(slug="english-g7-8", name="Gate Test")
+        pid = self.public_id_from_location(rv)
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        with self.client.session_transaction() as sess:
+            for key in (
+                "pp_candidate_id",
+                "pp_attempt_public_id",
+                "pp_session_token",
+                "pp_recovery_once",
+            ):
+                sess.pop(key, None)
+        page = self.client.get(f"/placement/run/{pid}/done")
+        self.assertEqual(page.status_code, 200)
+        body = page.get_data(as_text=True)
+        self.assertIn("Test already submitted", body)
+        self.assertIn("recovery code", body.lower())
+
     def test_final_submit_locks_answers(self):
         self.flag_on()
         rv = self.begin()

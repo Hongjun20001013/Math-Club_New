@@ -1,0 +1,38 @@
+{
+  "description": "Novel Prep English Diagnostic — Grades 7–8 (Reading + Language, 31 scored MCQ online; writing essay on paper).",
+  "brand": {
+    "report_title": "English placement report · Grades 7–8",
+    "trust_line": "Scores follow the Novel Prep English Diagnostic answer key (31 multiple-choice items).",
+    "trust_line_zh": "分数依据 Novel Prep 7–8 英语诊断标准答案（31 道选择题）。"
+  },
+  "calculator_by_index": {},
+  "score_band_rubric": [
+    {
+      "course_key": "english_foundations",
+      "tier": 1,
+      "title": "Foundations",
+      "min_score": 0,
+      "max_score": 18,
+      "headline": "Build core reading and language skills with structured support.",
+      "summary": "Focus on close reading, vocabulary in context, and sentence-level grammar before accelerating into advanced coursework."
+    },
+    {
+      "course_key": "english_on_level",
+      "tier": 2,
+      "title": "On-level",
+      "min_score": 19,
+      "max_score": 26,
+      "headline": "Solid grade-level English readiness.",
+      "summary": "Performance suggests the student can handle grade-level reading and language work with occasional targeted review."
+    },
+    {
+      "course_key": "english_advanced",
+      "tier": 3,
+      "title": "Advanced-ready",
+      "min_score": 27,
+      "max_score": 31,
+      "headline": "Strong reading and language command for accelerated English.",
+      "summary": "High accuracy on both reading and language sections supports placement into a more rigorous English track."
+    }
+  ]
+}

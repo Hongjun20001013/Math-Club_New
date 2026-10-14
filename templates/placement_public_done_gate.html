@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block extra_css %}
+{% include 'partials/placement_cinema_css.html' %}
+{% endblock %}
+{% block content %}
+<div class="np-pl-canvas">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--start">
+  {% include 'partials/placement_atelier_mesh.html' %}
+  <div class="np-pl-canvas__inner np-pl-canvas__inner--narrow">
+    <article class="np-pl-intake np-pl-intake--done np-pl-reveal">
+      <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+      <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>Sitting locked</p>
+      <h1 class="np-pl-display np-pl-display--md">Test already submitted</h1>
+      <p class="np-pl-lead">
+        {% if test %}{{ test.title }}{% else %}This placement sitting{% endif %} is complete on our servers.
+        To see your score receipt again, use the <strong>recovery code</strong> from when you started (same browser session may have expired).
+      </p>
+      {% if user_logged_in|default(false) %}
+      <p class="np-pl-lead">You are signed in to a staff or student account. Recovery still works — enter the candidate’s recovery code below.</p>
+      {% endif %}
+      <div class="np-pl-intake__actions">
+        <a href="{{ url_for('placement_public_recover') }}" class="np-pl2-btn np-pl2-btn--primary">Enter recovery code</a>
+        <a href="{{ url_for('placement_landing') }}" class="np-pl2-btn np-pl2-btn--ghost">Placement home</a>
+      </div>
+    </article>
+  </div>
+</div>
+</div>
+{% include 'partials/placement_atelier_scripts.html' %}
+{% endblock %}

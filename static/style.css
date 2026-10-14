@@ -28415,6 +28415,59 @@ html[data-exam-theme="dark"] .np-admin-persist-warn {
     letter-spacing: 0.02em;
 }
 
+.np-login-track-pick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.np-login-track-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 12px;
+    border-radius: 16px;
+    text-decoration: none !important;
+    border: 1px solid rgba(26, 18, 48, 0.1);
+    background: rgba(255, 255, 255, 0.88);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.np-login-track-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(36, 28, 68, 0.12);
+}
+
+.np-login-track-card--english {
+    border-color: rgba(154, 123, 92, 0.35);
+}
+
+.np-login-track-card--math {
+    border-color: rgba(108, 78, 255, 0.28);
+}
+
+.np-login-track-card__title {
+    font: 700 1.05rem / 1.2 "Fraunces", Georgia, serif;
+    color: #1a1230;
+}
+
+.np-login-track-card__sub {
+    font-size: 0.72rem;
+    color: #5c5470;
+    line-height: 1.35;
+}
+
+.np-login-placement-btn--secondary {
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: #4f2fd8 !important;
+    border: 1px solid rgba(108, 78, 255, 0.35);
+    box-shadow: none;
+    min-height: 44px;
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
 .np-login-placement-btn {
     display: flex;
     align-items: center;

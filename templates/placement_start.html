@@ -22,7 +22,7 @@
                 <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
                 <p class="np-pl-eyebrow"><span class="np-pl-eyebrow__dot" aria-hidden="true"></span>One step before question 1</p>
                 <h1 class="np-pl-display np-pl-display--md" id="np-pl-start-heading">Your placement profile</h1>
-                <p class="np-pl-lead">Name, grade, advisor, and current school math class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
+                <p class="np-pl-lead">Name, grade, <strong>advisor</strong>, and current school {% if track == 'english' %}English{% else %}math{% endif %} class are required. School is optional. About <strong>30 seconds</strong>, then the diagnostic opens.</p>
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -51,13 +51,9 @@
                         <option>10th</option><option>11th</option><option>12th</option><option>College</option><option>Other</option>
                     </select>
                 </div>
-                <div class="np-pl-field np-pl-field--full">
-                    <label class="np-pl-label" for="pl-course">Current school math class <span class="np-pl-req">*</span></label>
-                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="e.g. Algebra II Honors, Precalculus, AP Calculus AB" class="np-pl-input" required minlength="2">
-                    <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
-                </div>
-                <fieldset class="np-pl-field np-pl-field--full np-pl-advisor">
-                    <legend class="np-pl-label">Advisor <span class="np-pl-req">required</span></legend>
+                <div class="np-pl-field np-pl-field--full np-pl-advisor" role="radiogroup" aria-labelledby="pl-advisor-label">
+                    <p class="np-pl-label" id="pl-advisor-label">Advisor <span class="np-pl-req">required</span></p>
+                    <p class="np-pl-field__note np-pl-advisor__hint">Who assigned this placement? Pick your counselor or choose Other.</p>
                     <div class="np-pl-choice-grid" id="pl-advisor">
                         {% for advisor in advisor_presets %}
                         <label class="np-pl-choice">
@@ -70,7 +66,12 @@
                             <span>Other</span>
                         </label>
                     </div>
-                </fieldset>
+                </div>
+                <div class="np-pl-field np-pl-field--full">
+                    <label class="np-pl-label" for="pl-course">{% if track == 'english' %}Current school English class{% else %}Current school math class{% endif %} <span class="np-pl-req">*</span></label>
+                    <input id="pl-course" name="student_math_course" type="text" autocomplete="off" maxlength="400" placeholder="{% if track == 'english' %}e.g. English 8 Honors, ELA 9, AP English Language{% else %}e.g. Algebra II Honors, Precalculus, AP Calculus AB{% endif %}" class="np-pl-input" required minlength="2">
+                    <p class="np-pl-field__note">Write the exact class name from school — not a nickname.</p>
+                </div>
                 <div class="np-pl-field np-pl-field--full" id="pl-advisor-other-wrap"{% if placement_advisor_choice != advisor_other %} hidden{% endif %}>
                     <label class="np-pl-label" for="pl-advisor-other">Advisor name <span class="np-pl-req">required</span></label>
                     <input id="pl-advisor-other" name="advisor_other" type="text" maxlength="200" class="np-pl-input" placeholder="Type your advisor's full name" autocomplete="off" value="{{ placement_advisor_other }}">

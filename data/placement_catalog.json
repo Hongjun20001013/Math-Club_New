@@ -1,7 +1,49 @@
 {
   "title": "Course placement diagnostics",
-  "subtitle": "Choose the test your advisor named.",
+  "subtitle": "Choose the English or math diagnostic your advisor named.",
   "tiers": [
+    {
+      "id": "english",
+      "title": "English",
+      "title_zh": "英语",
+      "description": "Grades 7–8 and 9–11 — Reading, Language, and Writing (three parts online).",
+      "tests": [
+        {
+          "slug": "english-g7-8",
+          "topic": "english_g7_8",
+          "title": "Grades 7–8 English",
+          "subtitle": "32 items · Part I Reading · Part II Language · Part III Writing",
+          "status": "available",
+          "tex_file": "banks/placement/english_g7_8.tex",
+          "pdf_file": "static/placement_english/NovelPrep-English-G7-8-Test.pdf",
+          "meta_file": "data/placement_english_g7_8_meta.json",
+          "online_mcq_count": 31,
+          "online_item_count": 32,
+          "paper_sections": "Part I–III online · 9 reading · 22 language · 1 essay",
+          "parts": [
+            {"code": "I", "range": "1–9", "label": "Reading"},
+            {"code": "II", "range": "10–31", "label": "Language & conventions"}
+          ]
+        },
+        {
+          "slug": "english-g9-11",
+          "topic": "english_g9_11",
+          "title": "Grades 9–11 English",
+          "subtitle": "41 items · Part I Reading · Part II Language · Part III Writing",
+          "status": "available",
+          "tex_file": "banks/placement/english_g9_11.tex",
+          "pdf_file": "static/placement_english/NovelPrep-English-G9-11-Test.pdf",
+          "meta_file": "data/placement_english_g9_11_meta.json",
+          "online_mcq_count": 40,
+          "online_item_count": 41,
+          "paper_sections": "Part I–III online · 12 reading · 28 language · 1 essay",
+          "parts": [
+            {"code": "I", "range": "1–12", "label": "Reading"},
+            {"code": "II", "range": "13–40", "label": "Language & conventions"}
+          ]
+        }
+      ]
+    },
     {
       "id": "middle",
       "title": "Middle school",
