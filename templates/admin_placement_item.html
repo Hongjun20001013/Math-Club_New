@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='admin_placement_english.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 {% block content %}
-<div class="np-page-shell">
+<div class="np-page-shell{% if is_english_writing|default(false) and english_writing %} np-page-shell--admin-en-writing{% endif %}">
 {% if is_english_writing|default(false) and english_writing %}
   <p class="np-pw-breadcrumb np-admin-en-bc">
     <a href="{{ summary_href }}">← Back to {{ attempt.display_name }} report</a>

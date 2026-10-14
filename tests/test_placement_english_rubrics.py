@@ -1,7 +1,11 @@
 import unittest
 
 from placement_english_rubrics import writing_rubric_for, writing_score_band
-from placement_english_ui import clean_essay_body_for_display, english_writing_max_points
+from placement_english_ui import (
+    clean_essay_body_for_display,
+    english_writing_max_points,
+    filter_writing_prompt_for_review,
+)
 
 
 class TestPlacementEnglishRubrics(unittest.TestCase):
@@ -19,6 +23,17 @@ class TestPlacementEnglishRubrics(unittest.TestCase):
     def test_score_bands(self) -> None:
         self.assertEqual(writing_score_band(18)["range"], "17–20")
         self.assertEqual(writing_score_band(14)["range"], "13–16")
+
+    def test_filter_prompt_option(self) -> None:
+        html = (
+            '<div><p class="np-en-writing-prompt__lead">Choose one</p>'
+            '<article class="np-en-writing-option"><h3>Option A · Personal</h3><p>A text</p></article>'
+            '<article class="np-en-writing-option"><h3>Option B · Argument</h3><p>B text</p></article></div>'
+        )
+        out = filter_writing_prompt_for_review(html, "A")
+        self.assertIn("Option A", out)
+        self.assertNotIn("Option B", out)
+        self.assertNotIn("Choose one", out)
 
     def test_clean_essay_body(self) -> None:
         raw = "[Option A]\n\nOption A · Personal experience\n\nMy real essay starts here."

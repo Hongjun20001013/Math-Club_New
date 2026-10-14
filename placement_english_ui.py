@@ -107,3 +107,25 @@ def clean_essay_body_for_display(body: str, option: str = "") -> str:
 
 def essay_word_count(text: str) -> int:
     return len((text or "").strip().split())
+
+
+def filter_writing_prompt_for_review(prompt_html: str, option: str) -> str:
+    """Show only the prompt the student chose (G7-8 A/B); drop duplicate option cards."""
+    html = (prompt_html or "").strip()
+    opt = (option or "").strip().upper()
+    if not html or opt not in ("A", "B"):
+        return html
+    hide = "B" if opt == "A" else "A"
+    hide_pat = re.compile(
+        rf'<article\s+class="np-en-writing-option"[^>]*>\s*<h3>\s*Option\s+{hide}\b.*?</article>',
+        re.DOTALL | re.IGNORECASE,
+    )
+    html = hide_pat.sub("", html)
+    html = re.sub(
+        r'<p\s+class="np-en-writing-prompt__lead"[^>]*>.*?</p>',
+        "",
+        html,
+        count=1,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+    return html.strip()

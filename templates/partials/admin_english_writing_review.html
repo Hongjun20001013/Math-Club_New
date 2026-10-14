@@ -1,17 +1,20 @@
 {% set ew = english_writing %}
 {% if ew %}
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_english_reading.css') }}?v={{ style_css_revision }}">
-<div class="np-admin-en-review sat-practice-page-wrap--english-writing">
-  <header class="np-admin-en-review__top">
-    <div>
-      <p class="np-admin-en-review__kicker">Part III · Writing · {{ ew.max_points }} points</p>
-      <h1 class="np-admin-en-review__title">{{ ew.rubric.title }}</h1>
-      <p class="np-admin-en-review__sub">Same layout students saw when they wrote — read the prompt, then the essay, then score with the official rubric.</p>
+<div class="np-admin-en-review np-admin-en-review--studio sat-practice-page-wrap--english-writing sat-practice-page-wrap--split-lock"
+     data-student-option="{{ ew.option or '' }}"
+     id="np-admin-pl-writing">
+  <header class="np-admin-en-toolbar">
+    <div class="np-admin-en-toolbar__main">
+      <div>
+        <p class="np-admin-en-review__kicker">Part III · Writing · {{ ew.max_points }} pts</p>
+        <h1 class="np-admin-en-toolbar__title">{{ ew.rubric.title }}</h1>
+      </div>
     </div>
-    <div class="np-admin-en-review__badges">
+    <div class="np-admin-en-toolbar__meta">
       {% if ew.option %}<span class="np-en-advisor-writing__pill">Option {{ ew.option }}</span>{% endif %}
       <span class="np-en-advisor-writing__pill">{{ ew.word_count }} words</span>
-      <span class="np-en-advisor-writing__pill">Target {{ ew.word_min }}–{{ ew.word_max }}</span>
+      <span class="np-en-advisor-writing__pill">{{ ew.word_min }}–{{ ew.word_max }} target</span>
       {% if ew.total_points is not none %}
       <span class="np-en-advisor-writing__pill np-en-advisor-writing__pill--ok">{{ ew.total_points }}/{{ ew.max_points }} saved</span>
       {% elif ew.needs_grade %}
@@ -20,104 +23,97 @@
     </div>
   </header>
 
-  <div class="sat-split-card sat-split-card--english-writing np-admin-en-split">
-    <div class="sat-split sat-split--english-writing">
-      <section class="sat-pane sat-pane-stem" aria-label="Writing prompt">
-        <header class="sat-pane-head">
-          <span class="sat-pane-kicker">Prompt</span>
-          <span class="sat-pane-badge">{{ q_index + 1 }} / {{ total_q|default(ew.q_index + 1) }}</span>
-        </header>
-        <div class="sat-stem-scroll">
-          <div class="question-panel sat-stem-body np-admin-en-prompt">
-            {% if ew.prompt_html %}
-            {{ ew.prompt_html|safe }}
-            {% endif %}
-            {% if ew.options and ew.options|length > 1 %}
-            <div class="sat-en-writing-pick-grid np-admin-en-pick-readonly" aria-label="Student's prompt choice">
-              {% for opt in ew.options %}
-              <div class="sat-en-writing-pick-card{% if ew.option == opt.id %} is-selected{% endif %}{% if ew.option and ew.option != opt.id %} is-muted{% endif %}">
-                <span class="sat-en-writing-pick-card__letter">{{ opt.id }}</span>
-                <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
+  <div class="np-admin-en-studio">
+    <div class="np-admin-en-studio__read" aria-label="Prompt and student essay">
+      <div class="sat-split-card sat-split-card--english-writing np-admin-en-split">
+        <div class="sat-split sat-split--english-writing">
+          <section class="sat-pane sat-pane-stem" aria-label="Writing prompt">
+            <header class="sat-pane-head">
+              <span class="sat-pane-kicker">Prompt</span>
+              <span class="sat-pane-badge">Q{{ q_index + 1 }}</span>
+            </header>
+            <div class="sat-stem-scroll np-admin-en-scroll">
+              <div class="question-panel sat-stem-body np-admin-en-prompt">
+                {% if ew.prompt_html %}
+                {{ ew.prompt_html|safe }}
+                {% endif %}
               </div>
-              {% endfor %}
             </div>
-            {% endif %}
-          </div>
+          </section>
+          <div class="sat-split-gutter" aria-hidden="true"></div>
+          <aside class="sat-pane sat-pane-choices" aria-label="Student essay">
+            <header class="sat-pane-head sat-pane-head-choices">
+              <span class="sat-pane-kicker">Student response</span>
+              <span class="sat-pane-hint">Read-only</span>
+            </header>
+            <div class="np-en-essay-compose np-admin-en-scroll np-admin-en-essay-readonly">
+              <article class="np-en-advisor-essay np-en-advisor-essay--student-view">{{ ew.body }}</article>
+            </div>
+          </aside>
         </div>
-      </section>
-      <div class="sat-split-gutter" aria-hidden="true"></div>
-      <aside class="sat-pane sat-pane-choices" aria-label="Student essay">
-        <header class="sat-pane-head sat-pane-head-choices">
-          <span class="sat-pane-kicker">Student response</span>
-          <span class="sat-pane-hint">Submitted essay (read-only)</span>
-        </header>
-        <div class="np-en-essay-compose np-admin-en-essay-readonly">
-          <article class="np-en-advisor-essay np-en-advisor-essay--student-view">{{ ew.body }}</article>
-        </div>
-      </aside>
+      </div>
     </div>
-  </div>
 
-  <section class="np-admin-en-rubric" id="np-admin-pl-writing" aria-labelledby="np-admin-en-rubric-title">
-    <header class="np-admin-en-rubric__head">
-      <p class="np-en-advisor-writing__kicker">Official rubric</p>
-      <h2 id="np-admin-en-rubric-title">Writing score ({{ ew.max_points }} points)</h2>
-      <p class="np-admin-en-rubric__lead">Score each row using the answer key: <strong>Strong</strong> = top of range, <strong>Partial</strong> = middle, <strong>Weak</strong> = bottom. Points auto-sum to the total.</p>
-    </header>
-    <div class="np-admin-en-rubric-table" role="table">
-      <div class="np-admin-en-rubric-row np-admin-en-rubric-row--head" role="row">
-        <span>Criterion</span>
-        <span>Strong</span>
-        <span>Partial</span>
-        <span>Weak / missing</span>
-        <span>Score</span>
-      </div>
-      {% for crit in ew.rubric.criteria %}
-      <div class="np-admin-en-rubric-row" role="row">
-        <div class="np-admin-en-rubric-crit">
-          <strong>{{ crit.label }}</strong>
-          <em>max {{ crit.max_points }}</em>
+    <aside class="np-admin-en-studio__grade" aria-labelledby="np-admin-en-rubric-title">
+      <div class="np-admin-en-grade-panel">
+        <header class="np-admin-en-grade-panel__head">
+          <p class="np-en-advisor-writing__kicker">Official rubric</p>
+          <h2 id="np-admin-en-rubric-title">Score · {{ ew.max_points }} pts</h2>
+          <p class="np-admin-en-grade-panel__hint">Open a row for Strong / Partial / Weak descriptors. Points sum automatically.</p>
+        </header>
+
+        <div class="np-admin-en-crit-list">
+          {% for crit in ew.rubric.criteria %}
+          <details class="np-admin-en-crit"{% if loop.first %} open{% endif %}>
+            <summary class="np-admin-en-crit__summary">
+              <span class="np-admin-en-crit__label">{{ crit.label }}<em> / {{ crit.max_points }}</em></span>
+              <label class="np-admin-en-rubric-score-label" for="crit-{{ crit.id }}">Pts</label>
+              <select id="crit-{{ crit.id }}" name="crit_{{ crit.id }}" class="np-admin-en-rubric-select" data-crit-max="{{ crit.max_points }}" form="np-admin-en-rubric-form">
+                <option value="">—</option>
+                {% for p in range(0, crit.max_points + 1) %}
+                <option value="{{ p }}"{% if ew.breakdown.get(crit.id) == p %} selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+              </select>
+            </summary>
+            <div class="np-admin-en-crit__bands">
+              <p><strong>Strong</strong> {{ crit.strong }}</p>
+              <p><strong>Partial</strong> {{ crit.partial }}</p>
+              <p><strong>Weak</strong> {{ crit.weak }}</p>
+            </div>
+          </details>
+          {% endfor %}
         </div>
-        <p>{{ crit.strong }}</p>
-        <p>{{ crit.partial }}</p>
-        <p>{{ crit.weak }}</p>
-        <div class="np-admin-en-rubric-score">
-          <label class="np-admin-en-rubric-score-label" for="crit-{{ crit.id }}">Pts</label>
-          <select id="crit-{{ crit.id }}" name="crit_{{ crit.id }}" class="np-admin-en-rubric-select" data-crit-max="{{ crit.max_points }}">
-            <option value="">—</option>
-            {% for p in range(0, crit.max_points + 1) %}
-            <option value="{{ p }}"{% if ew.breakdown.get(crit.id) == p %} selected{% endif %}>{{ p }}</option>
-            {% endfor %}
-          </select>
-        </div>
+
+        {% if ew.score_band %}
+        <p class="np-admin-en-rubric-band"><strong>{{ ew.score_band.range }}</strong> — {{ ew.score_band.summary }}</p>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('admin_placement_english_writing_grade', attempt_id=attempt.id) }}" class="np-admin-en-grade-dock" id="np-admin-en-rubric-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="writing_points" id="np-admin-en-writing-total-hidden" value="">
+          {% if request.endpoint == 'admin_placement_candidate_item' %}
+          <input type="hidden" name="return_to" value="item">
+          <input type="hidden" name="q_index" value="{{ q_index }}">
+          {% endif %}
+          {% for crit in ew.rubric.criteria %}
+          <input type="hidden" name="crit_{{ crit.id }}" id="crit-hidden-{{ crit.id }}" value="{{ ew.breakdown.get(crit.id, '') }}">
+          {% endfor %}
+          <div class="np-admin-en-grade-dock__total">
+            <span>Total</span>
+            <strong id="np-admin-en-rubric-sum">{% if ew.total_points is not none %}{{ ew.total_points }}{% else %}—{% endif %}</strong>
+            <span class="np-admin-en-grade-dock__of">/ {{ ew.max_points }}</span>
+          </div>
+          <ul class="np-admin-en-grade-dock__bands" aria-label="Score bands">
+            <li>17–20 Strong</li>
+            <li>13–16 Solid</li>
+            <li>9–12 Dev.</li>
+            <li>0–8 Found.</li>
+          </ul>
+          <button type="submit" class="np-pw-btn np-pw-btn--primary np-admin-en-grade-dock__save">Save score</button>
+        </form>
       </div>
-      {% endfor %}
-    </div>
-    <div class="np-admin-en-rubric-foot">
-      <p class="np-admin-en-rubric-total">Total: <strong id="np-admin-en-rubric-sum">{% if ew.total_points is not none %}{{ ew.total_points }}{% else %}—{% endif %}</strong> / {{ ew.max_points }}</p>
-      {% if ew.score_band %}
-      <p class="np-admin-en-rubric-band"><strong>{{ ew.score_band.range }}</strong> — {{ ew.score_band.summary }}</p>
-      {% endif %}
-      <ul class="np-admin-en-rubric-bands-hint">
-        <li><strong>17–20</strong> Strong</li>
-        <li><strong>13–16</strong> Solid</li>
-        <li><strong>9–12</strong> Developing</li>
-        <li><strong>0–8</strong> Foundational</li>
-      </ul>
-    </div>
-    <form method="post" action="{{ url_for('admin_placement_english_writing_grade', attempt_id=attempt.id) }}" class="np-admin-en-rubric-form" id="np-admin-en-rubric-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-      <input type="hidden" name="writing_points" id="np-admin-en-writing-total-hidden" value="">
-      {% if request.endpoint == 'admin_placement_candidate_item' %}
-      <input type="hidden" name="return_to" value="item">
-      <input type="hidden" name="q_index" value="{{ q_index }}">
-      {% endif %}
-      {% for crit in ew.rubric.criteria %}
-      <input type="hidden" name="crit_{{ crit.id }}" id="crit-hidden-{{ crit.id }}" value="{{ ew.breakdown.get(crit.id, '') }}">
-      {% endfor %}
-      <button type="submit" class="np-pw-btn np-pw-btn--primary">Save writing score</button>
-    </form>
-  </section>
+    </aside>
+  </div>
 </div>
 <script>
 (function () {
