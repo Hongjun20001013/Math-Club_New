@@ -1,0 +1,285 @@
+/* Luxe Spectacle — light-only drama: beams, prism, iridescent edges, pointer glow */
+
+.np-luxe--spectacle {
+  --lx-sheen: rgba(255, 255, 255, 0.92);
+  --lx-prism-a: rgba(255, 214, 170, 0.55);
+  --lx-prism-b: rgba(186, 168, 255, 0.45);
+  --lx-prism-c: rgba(160, 230, 210, 0.4);
+}
+
+.np-luxe--spectacle .np-pl2-mesh {
+  opacity: 1 !important;
+  background:
+    radial-gradient(ellipse 80% 55% at 15% -5%, rgba(255, 236, 210, 0.55), transparent 58%),
+    radial-gradient(ellipse 65% 50% at 95% 12%, rgba(200, 190, 255, 0.42), transparent 52%),
+    radial-gradient(ellipse 55% 40% at 50% 105%, rgba(180, 220, 255, 0.35), transparent 55%),
+    linear-gradient(168deg, #fffefb 0%, #faf7f2 38%, #f5f0ff 100%) !important;
+}
+
+.np-luxe--spectacle .np-pl2-mesh__aurora {
+  opacity: 0.55;
+}
+
+.np-luxe--spectacle .np-pl2-mesh__noise {
+  opacity: 0.055;
+}
+
+.np-luxe-spectacle-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.np-luxe-spotlight {
+  position: absolute;
+  width: min(70vmax, 900px);
+  height: min(70vmax, 900px);
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 252, 245, 0.75) 0%,
+    rgba(255, 236, 210, 0.18) 32%,
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  mix-blend-mode: soft-light;
+}
+
+.np-luxe--spectacle.is-spotlight-ready .np-luxe-spotlight {
+  opacity: 1;
+}
+
+.np-luxe-spectacle__beam {
+  position: absolute;
+  width: 140%;
+  height: 55%;
+  left: -20%;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.55) 48%,
+    rgba(255, 230, 200, 0.25) 52%,
+    transparent 58%
+  );
+  transform-origin: 50% 0%;
+  animation: np-luxe-beam-sway 14s ease-in-out infinite;
+  opacity: 0.35;
+}
+
+.np-luxe-spectacle__beam--a {
+  top: -8%;
+  animation-delay: 0s;
+}
+
+.np-luxe-spectacle__beam--b {
+  top: 12%;
+  animation-delay: -5s;
+  transform: scaleX(-1);
+  opacity: 0.22;
+}
+
+@keyframes np-luxe-beam-sway {
+  0%,
+  100% {
+    transform: rotate(-6deg) translateX(-2%);
+  }
+  50% {
+    transform: rotate(5deg) translateX(2%);
+  }
+}
+
+.np-luxe-spectacle__prism {
+  position: absolute;
+  right: 6%;
+  top: 18%;
+  width: min(38vw, 320px);
+  height: min(38vw, 320px);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 120deg,
+    var(--lx-prism-a),
+    var(--lx-prism-b),
+    var(--lx-prism-c),
+    var(--lx-prism-a)
+  );
+  filter: blur(48px);
+  opacity: 0.55;
+  animation: np-luxe-prism-spin 28s linear infinite;
+}
+
+@keyframes np-luxe-prism-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.np-luxe-hero-mark {
+  position: absolute;
+  left: 50%;
+  top: 0.2em;
+  transform: translateX(-50%);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(5rem, 18vw, 11rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(28, 21, 40, 0.06);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.np-pl-hub__hero--luxe {
+  position: relative;
+}
+
+.np-pl-hub__hero--luxe .np-luxe-display,
+.np-pl-hub__hero--luxe .np-luxe-lead,
+.np-pl-hub__hero--luxe .np-pl-eyebrow,
+.np-pl-hub__hero--luxe .np-pl-brand,
+.np-pl-hub__hero--luxe .np-luxe-chip-row {
+  position: relative;
+  z-index: 1;
+}
+
+.np-luxe--spectacle .np-luxe-display em {
+  background: linear-gradient(
+    115deg,
+    var(--lx-accent-deep) 0%,
+    #8f6bff 38%,
+    #c9956a 72%,
+    var(--lx-accent-deep) 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: np-luxe-shimmer 7s ease-in-out infinite;
+}
+
+@keyframes np-luxe-shimmer {
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.np-luxe-tile--spectacle {
+  isolation: isolate;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.np-luxe-tile--spectacle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.95),
+    var(--lx-prism-b),
+    var(--lx-prism-c),
+    var(--lx-prism-a),
+    rgba(255, 255, 255, 0.9)
+  );
+  background-size: 300% 300%;
+  animation: np-luxe-edge-flow 9s ease infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.np-luxe-tile--spectacle:hover::after {
+  opacity: 0.95;
+}
+
+@keyframes np-luxe-edge-flow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.np-luxe-tile--spectacle:hover {
+  box-shadow:
+    0 1px 0 var(--lx-sheen) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 0 80px var(--lx-glow),
+    0 48px 100px rgba(28, 21, 40, 0.14);
+}
+
+.np-luxe-tile--spectacle .np-luxe-tile__glyph {
+  background: linear-gradient(145deg, #fff 0%, rgba(255, 252, 248, 0.85) 100%);
+  box-shadow:
+    0 10px 28px rgba(28, 21, 40, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+}
+
+.np-track-catalog__hero-luxe {
+  position: relative;
+}
+
+.np-track-catalog--english .np-luxe-spectacle__prism {
+  background: conic-gradient(from 90deg, var(--lx-prism-a), rgba(255, 245, 230, 0.5), var(--lx-prism-a));
+}
+
+.np-track-catalog--math .np-luxe-spectacle__prism {
+  background: conic-gradient(from 200deg, rgba(200, 215, 255, 0.55), var(--lx-prism-b), rgba(180, 200, 255, 0.45));
+}
+
+.np-pl-hub__luxe-grid--spectacle {
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: clamp(1.15rem, 2.8vw, 1.75rem);
+  perspective: 1200px;
+}
+
+.np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:first-child {
+  min-height: 440px;
+}
+
+.np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:last-child {
+  margin-top: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+@media (max-width: 800px) {
+  .np-pl-hub__luxe-grid--spectacle {
+    grid-template-columns: 1fr;
+  }
+
+  .np-pl-hub__luxe-grid--spectacle .np-luxe-tile--hub:last-child {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-luxe-spectacle__beam,
+  .np-luxe-spectacle__prism,
+  .np-luxe--spectacle .np-luxe-display em,
+  .np-luxe-tile--spectacle::after {
+    animation: none !important;
+  }
+
+  .np-luxe-spotlight {
+    opacity: 0.4 !important;
+  }
+}

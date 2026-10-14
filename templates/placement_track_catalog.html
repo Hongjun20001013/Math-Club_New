@@ -5,11 +5,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_catalog.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_light.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_spectacle.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas np-track-catalog np-track-catalog--{{ track }}">
-<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-catalog np-luxe np-luxe--{{ track }}" aria-labelledby="np-pl-catalog-heading">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-catalog np-luxe np-luxe--spectacle np-luxe--{{ track }}" aria-labelledby="np-pl-catalog-heading">
+    {% include 'partials/placement_luxe_spectacle_scene.html' %}
     <div class="np-luxe-scene" aria-hidden="true">
         <span class="np-luxe-scene__ring np-luxe-scene__ring--1"></span>
         <span class="np-luxe-scene__ring np-luxe-scene__ring--2"></span>
@@ -48,7 +50,7 @@
             {% set row_num.n = row_num.n + 1 %}
             {% set is_feature = track == 'math' and test.slug in ['middle-level', 'upper-algebra-precalc'] %}
             {% if test.status == 'available' %}
-            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-luxe-tile np-luxe-tile--catalog{% if is_feature %} np-luxe-tile--feature{% endif %} np-pl-reveal" data-pl-reveal>
+            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-luxe-tile np-luxe-tile--catalog np-luxe-tile--spectacle{% if is_feature %} np-luxe-tile--feature{% endif %} np-pl-reveal" data-pl-reveal>
             {% else %}
             <div class="np-luxe-tile np-luxe-tile--catalog np-luxe-tile--soon{% if is_feature %} np-luxe-tile--feature{% endif %}">
             {% endif %}

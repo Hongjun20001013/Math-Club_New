@@ -4,11 +4,13 @@
 {% include 'partials/placement_cinema_css.html' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_light.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_luxe_spectacle.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
 <div class="np-pl-canvas np-pl-hub">
-<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-hub np-luxe" aria-labelledby="np-pl-hub-heading">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-hub np-luxe np-luxe--spectacle" aria-labelledby="np-pl-hub-heading">
+    {% include 'partials/placement_luxe_spectacle_scene.html' %}
     <div class="np-luxe-scene" aria-hidden="true">
         <span class="np-luxe-scene__ring np-luxe-scene__ring--1"></span>
         <span class="np-luxe-scene__ring np-luxe-scene__ring--2"></span>
@@ -18,13 +20,14 @@
 
     <div class="np-pl-canvas__inner np-pl-hub__inner np-pl-hub__inner--luxe">
         <header class="np-pl-hub__hero np-pl-hub__hero--luxe np-pl-reveal">
+            <div class="np-luxe-hero-mark" aria-hidden="true">Begin</div>
             <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep Learning Studio') }}</p>
             <p class="np-pl-eyebrow np-pl-hub__eyebrow-center">
                 <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
                 Course placement
             </p>
             <h1 class="np-luxe-display" id="np-pl-hub-heading">Where will you<br><em>begin?</em></h1>
-            <p class="np-luxe-lead np-pl-hub__lead--center">Light, calm, and precise — choose English or Math. Your advisor picks the exact test inside.</p>
+            <p class="np-luxe-lead np-pl-hub__lead--center">Warm paper, sharp timing — pick English or Math. Your counselor names the exact band inside.</p>
             <ul class="np-luxe-chip-row np-pl-hub__chips-center" aria-label="Highlights">
                 <li>No account needed</li>
                 <li>Timed</li>
@@ -32,8 +35,8 @@
             </ul>
         </header>
 
-        <div class="np-pl-hub__luxe-grid" data-pl-stagger>
-            <a href="{{ url_for('placement_track_catalog', track='english') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe--english np-pl-reveal" data-pl-reveal>
+        <div class="np-pl-hub__luxe-grid np-pl-hub__luxe-grid--spectacle" data-pl-stagger>
+            <a href="{{ url_for('placement_track_catalog', track='english') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe-tile--spectacle np-luxe--english np-pl-reveal" data-pl-reveal data-np-luxe-tilt>
                 <div class="np-luxe-tile__top">
                     <div>
                         <h2 class="np-luxe-tile__title">English</h2>
@@ -52,7 +55,7 @@
                 </span>
             </a>
 
-            <a href="{{ url_for('placement_track_catalog', track='math') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe--math np-pl-reveal" data-pl-reveal>
+            <a href="{{ url_for('placement_track_catalog', track='math') }}" class="np-luxe-tile np-luxe-tile--hub np-luxe-tile--spectacle np-luxe--math np-pl-reveal" data-pl-reveal data-np-luxe-tilt>
                 <div class="np-luxe-tile__top">
                     <div>
                         <h2 class="np-luxe-tile__title">Math</h2>
