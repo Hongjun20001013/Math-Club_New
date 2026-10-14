@@ -3,14 +3,19 @@
 {% block extra_css %}
 {% include 'partials/placement_cinema_css.html' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='placement_track_hub.css') }}?v={{ style_css_revision }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='placement_track_catalog.css') }}?v={{ style_css_revision }}">
 {% endblock %}
 
 {% block content %}
-<div class="np-pl-canvas{% if track == 'english' %} np-pl-canvas--humanities{% endif %}">
-<div class="np-pl2 np-pl2--atelier np-pl2--cinema{% if track == 'english' %} np-pl2--humanities{% endif %}" aria-labelledby="np-pl-catalog-heading">
+<div class="np-pl-canvas np-track-catalog np-track-catalog--{{ track }}">
+<div class="np-pl2 np-pl2--atelier np-pl2--cinema np-pl2--track-catalog{% if track == 'english' %} np-pl2--humanities{% endif %}" aria-labelledby="np-pl-catalog-heading">
+    <div class="np-pl-hub-aurora" aria-hidden="true">
+        <span class="np-pl-hub-aurora__orb {% if track == 'english' %}np-pl-hub-aurora__orb--en{% else %}np-pl-hub-aurora__orb--math{% endif %}"></span>
+        <span class="np-pl-hub-aurora__grain"></span>
+    </div>
     {% include 'partials/placement_atelier_mesh.html' %}
 
-    <div class="np-pl-canvas__inner">
+    <div class="np-pl-canvas__inner np-track-catalog__inner">
         <nav class="np-pl2-nav np-pl-reveal">
             <a href="{{ url_for('placement_landing') }}" class="np-pl2-nav__back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -18,53 +23,61 @@
             </a>
         </nav>
 
-        <header class="np-pl-hero np-pl-hero--catalog np-pl-reveal">
-            <div class="np-pl-hero__layout">
-                <div class="np-pl-hero__copy">
-                    <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
-                    <p class="np-pl-eyebrow">
-                        <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
-                        {% if track == 'english' %}English placement{% else %}Math placement{% endif %}
-                    </p>
-                    <h1 class="np-pl-display" id="np-pl-catalog-heading">{% if track == 'english' %}English diagnostics{% else %}Math diagnostics{% endif %}</h1>
-                    <p class="np-pl-lead">{% if track == 'english' %}Reading, language, and writing — three parts, counselor-ready reports.{% else %}{{ catalog.subtitle|default('Choose the test your advisor named.') }}{% endif %}</p>
-                </div>
-            </div>
-            <div class="np-pl-hero__rule" aria-hidden="true"></div>
+        <header class="np-track-catalog__hero np-pl-reveal">
+            <p class="np-pl-brand">{{ site_brand_name|default('Novel Prep') }}</p>
+            <p class="np-pl-eyebrow">
+                <span class="np-pl-eyebrow__dot" aria-hidden="true"></span>
+                {% if track == 'english' %}English placement{% else %}Math placement{% endif %}
+            </p>
+            <h1 class="np-pl-display np-track-catalog__title" id="np-pl-catalog-heading">
+                {% if track == 'english' %}English <em>diagnostics</em>{% else %}Math <em>diagnostics</em>{% endif %}
+            </h1>
+            <p class="np-pl-lead np-track-catalog__lead">
+                {% if track == 'english' %}Pick your grade band — three parts online, counselor-ready report when you finish.{% else %}Choose the pathway your advisor named — timed, scored, and exportable.{% endif %}
+            </p>
         </header>
 
-        <div class="np-pl-tiers" data-pl-stagger>
+        <div class="np-track-catalog__grid" data-pl-stagger>
             {% for tier in catalog.tiers %}
-            <section class="np-pl-tier np-pl-tier--{{ tier.id }}" aria-labelledby="np-tier-{{ tier.id }}">
-                <div class="np-pl-tier__panel">
-                <header class="np-pl-tier__head">
-                    <span class="np-pl-tier__index" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
-                    <div class="np-pl-tier__copy">
-                        <h2 class="np-pl-tier__title" id="np-tier-{{ tier.id }}">{{ tier.title }}</h2>
-                        {% if tier.description %}<p class="np-pl-tier__desc">{{ tier.description }}</p>{% endif %}
-                    </div>
+            {% for test in tier.tests %}
+            <article class="np-track-catalog-card np-track-catalog-card--{{ track }}{% if test.status != 'available' %} np-track-catalog-card--soon{% endif %} np-pl-reveal" data-pl-reveal>
+                <span class="np-track-catalog-card__border" aria-hidden="true"></span>
+                {% if tier.id != 'english' and catalog.tiers|length > 1 %}
+                <span class="np-track-catalog-card__tier">{{ tier.title }}</span>
+                {% endif %}
+                <header class="np-track-catalog-card__head">
+                    <h2 class="np-track-catalog-card__title">{{ test.title }}</h2>
+                    {% if test.status == 'available' %}
+                    <span class="np-track-catalog-card__live"><span aria-hidden="true"></span>Live</span>
+                    {% endif %}
                 </header>
-                <div class="np-pl-cards">
-                    {% for test in tier.tests %}
-                    <article class="np-pl-card{% if test.status != 'available' %} np-pl-card--soon{% endif %}{% if track == 'english' %} np-pl-card--humanities{% endif %}">
-                        <div class="np-pl-card__body">
-                            <header class="np-pl-card__top">
-                                <h3 class="np-pl-card__name">{{ test.title }}</h3>
-                                {% if test.status == 'available' %}<span class="np-pl-card__live"><span aria-hidden="true"></span>Live</span>{% endif %}
-                            </header>
-                            {% if test.subtitle %}<p class="np-pl-card__sub">{{ test.subtitle }}</p>{% endif %}
-                            {% if test.paper_sections %}<p class="np-pl-card__format">{{ test.paper_sections }}</p>{% endif %}
-                        </div>
-                        <div class="np-pl-card__foot">
-                            {% if test.status == 'available' %}
-                            <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-pl2-btn np-pl2-btn--primary np-pl-btn-glow">Start test</a>
-                            {% endif %}
-                        </div>
-                    </article>
-                    {% endfor %}
+                {% if test.subtitle %}<p class="np-track-catalog-card__sub">{{ test.subtitle }}</p>{% endif %}
+                <div class="np-track-catalog-card__stats">
+                    <div class="np-track-catalog-card__stat">
+                        <span class="np-track-catalog-card__stat-val">{{ test.online_item_count|default(test.online_mcq_count) }}</span>
+                        <span class="np-track-catalog-card__stat-lbl">items</span>
+                    </div>
+                    {% if test.parts %}
+                    <ul class="np-track-catalog-card__parts">
+                        {% for p in test.parts %}
+                        <li><strong>Part {{ p.code }}</strong> {{ p.label }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
                 </div>
-                </div>
-            </section>
+                {% if test.paper_sections %}
+                <p class="np-track-catalog-card__format">{{ test.paper_sections }}</p>
+                {% endif %}
+                {% if test.status == 'available' %}
+                <a href="{{ placement_url('placement_test_landing', slug=test.slug) }}" class="np-track-catalog-card__cta">
+                    <span>View &amp; start</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                {% else %}
+                <span class="np-track-catalog-card__soon">Coming soon</span>
+                {% endif %}
+            </article>
+            {% endfor %}
             {% endfor %}
         </div>
     </div>

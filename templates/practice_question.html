@@ -231,7 +231,7 @@
         {% if placement_resume_paper|default(false) and paper_work_href %}
         <a href="{{ paper_work_href }}" class="nav-btn nav-btn-secondary">Paper PDF</a>
         {% endif %}
-        <a href="{{ url_for('placement_public_finish', public_id=public_run_id) }}" class="nav-btn nav-btn-secondary" data-pl-open-finish>Submit test</a>
+        <button type="button" class="nav-btn nav-btn-secondary" data-pl-open-finish data-pl-finish-href="{{ url_for('placement_public_finish', public_id=public_run_id) }}">Submit test</button>
         {% endif %}
         </div>
         {% elif not miss_quiz_mode and not (mistake_redo_mode|default(false)) %}
@@ -309,18 +309,20 @@
                 {% elif placement_english_writing %}
                 <div class="sat-en-writing-studio">
                     {% if q.english_writing_options and q.english_writing_options|length > 1 %}
-                    <fieldset class="sat-en-writing-options">
-                        <legend class="sat-en-writing-options__legend">Choose one prompt</legend>
+                    <p class="sat-en-writing-pick-title">Which prompt are you answering?</p>
+                    <div class="sat-en-writing-pick-grid" role="radiogroup" aria-label="Choose writing prompt">
                         {% for opt in q.english_writing_options %}
-                        <label class="sat-en-writing-option-pick">
-                            <input type="radio" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form">
-                            <span>{{ opt.label }}</span>
+                        <label class="sat-en-writing-pick-card">
+                            <input type="radio" class="sat-en-writing-pick-input" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form" required>
+                            <span class="sat-en-writing-pick-card__letter" aria-hidden="true">{{ opt.id }}</span>
+                            <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
+                            <span class="sat-en-writing-pick-card__check" aria-hidden="true"></span>
                         </label>
                         {% endfor %}
-                    </fieldset>
+                    </div>
                     {% endif %}
-                    <label class="sat-en-writing-label" for="english-writing-input">Essay</label>
-                    <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="16" placeholder="Write clearly in full sentences and paragraphs…" form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
+                    <label class="sat-en-writing-label" for="english-writing-input">Your essay</label>
+                    <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="16" placeholder="Write in full sentences and paragraphs. Aim for the word count in the prompt." form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
                     <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
                 </div>
                 {% endif %}
@@ -443,6 +445,21 @@
 
 </div>
 </div>
+
+{% if placement_mode and public_run_mode|default(false) %}
+<div id="pl-submit-confirm-backdrop" class="pl-submit-confirm-backdrop" hidden aria-hidden="true"></div>
+<div id="pl-submit-confirm" class="pl-submit-confirm" role="dialog" aria-modal="true" aria-labelledby="pl-submit-confirm-title" hidden>
+    <div class="pl-submit-confirm__panel">
+        <p class="pl-submit-confirm__kicker">Course placement</p>
+        <h2 class="pl-submit-confirm__title" id="pl-submit-confirm-title">Are you sure you want to submit?</h2>
+        <p class="pl-submit-confirm__lead">If you continue, you will lock in your answers. Make sure you have finished every part — Reading, Language, and Writing.</p>
+        <div class="pl-submit-confirm__actions">
+            <button type="button" class="pl-submit-confirm__btn pl-submit-confirm__btn--ghost" data-pl-submit-cancel>Keep working</button>
+            <a href="#" class="pl-submit-confirm__btn pl-submit-confirm__btn--primary" data-pl-submit-go>Yes, submit test</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Question picker (modal) — numbers only when opened -->
 {% if not chrome_focus %}
@@ -1182,13 +1199,54 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
 (function () {
   const ta = document.getElementById("english-writing-input");
   const out = document.getElementById("english-writing-count");
-  if (!ta || !out) return;
-  const count = () => {
-    const words = (ta.value || "").trim().split(/\s+/).filter(Boolean);
-    out.textContent = words.length + (words.length === 1 ? " word" : " words");
+  if (ta && out) {
+    const count = () => {
+      const words = (ta.value || "").trim().split(/\s+/).filter(Boolean);
+      out.textContent = words.length + (words.length === 1 ? " word" : " words");
+    };
+    ta.addEventListener("input", count);
+    count();
+  }
+  document.querySelectorAll(".sat-en-writing-pick-input").forEach((inp) => {
+    const sync = () => {
+      document.querySelectorAll(".sat-en-writing-pick-card").forEach((c) => c.classList.remove("is-selected"));
+      if (inp.checked) inp.closest(".sat-en-writing-pick-card")?.classList.add("is-selected");
+    };
+    inp.addEventListener("change", sync);
+    if (inp.checked) sync();
+  });
+})();
+</script>
+{% endif %}
+{% if placement_mode and public_run_mode|default(false) %}
+<script>
+(function () {
+  const dlg = document.getElementById("pl-submit-confirm");
+  const backdrop = document.getElementById("pl-submit-confirm-backdrop");
+  const go = dlg?.querySelector("[data-pl-submit-go]");
+  const cancel = dlg?.querySelector("[data-pl-submit-cancel]");
+  if (!dlg || !backdrop || !go) return;
+  const close = () => {
+    dlg.hidden = true;
+    backdrop.hidden = true;
+    document.body.classList.remove("pl-submit-confirm-open");
   };
-  ta.addEventListener("input", count);
-  count();
+  document.querySelectorAll("[data-pl-open-finish]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const href = btn.getAttribute("data-pl-finish-href");
+      if (!href) return;
+      go.href = href;
+      dlg.hidden = false;
+      backdrop.hidden = false;
+      document.body.classList.add("pl-submit-confirm-open");
+      cancel?.focus();
+    });
+  });
+  cancel?.addEventListener("click", close);
+  backdrop.addEventListener("click", close);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !dlg.hidden) close();
+  });
 })();
 </script>
 {% endif %}

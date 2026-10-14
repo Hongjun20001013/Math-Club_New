@@ -196,18 +196,192 @@
   color: #6a5f78;
 }
 
-.sat-en-writing-options {
-  border: none;
-  margin: 0 0 1rem;
-  padding: 0;
+.sat-en-writing-pick-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a6b4a;
 }
 
-.sat-en-writing-option-pick {
+.sat-en-writing-pick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .sat-en-writing-pick-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sat-en-writing-pick-card {
+  position: relative;
   display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 88px;
+  padding: 0.85rem 0.9rem 0.85rem 2.6rem;
+  border-radius: 14px;
+  border: 1.5px solid rgba(107, 74, 50, 0.18);
+  background: linear-gradient(180deg, #fffdfb 0%, #faf6f0 100%);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sat-en-writing-pick-card:hover {
+  border-color: rgba(166, 124, 82, 0.45);
+  box-shadow: 0 8px 20px rgba(107, 74, 50, 0.1);
+}
+
+.sat-en-writing-pick-card.is-selected {
+  border-color: #a67c52;
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.2);
+  background: linear-gradient(180deg, #fffaf3 0%, #f5ebe0 100%);
+}
+
+.sat-en-writing-pick-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sat-en-writing-pick-card__letter {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.8rem;
+  width: 1.65rem;
+  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
   font-size: 0.95rem;
+  color: #6b4a32;
+  background: rgba(166, 124, 82, 0.12);
+}
+
+.sat-en-writing-pick-card.is-selected .sat-en-writing-pick-card__letter {
+  color: #fff;
+  background: linear-gradient(135deg, #a67c52, #6b4a32);
+}
+
+.sat-en-writing-pick-card__copy {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #3d2f28;
+}
+
+.sat-en-writing-pick-card__check {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(107, 74, 50, 0.25);
+}
+
+.sat-en-writing-pick-card.is-selected .sat-en-writing-pick-card__check {
+  border-color: #a67c52;
+  background: #a67c52 radial-gradient(circle at 50% 50%, #fff 0, #fff 28%, transparent 30%);
+}
+
+.sat-en-writing-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6a6380;
+}
+
+/* Submit test confirmation */
+.pl-submit-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: rgba(14, 10, 24, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.pl-submit-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 12001;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.pl-submit-confirm__panel {
+  width: min(420px, 100%);
+  padding: 1.5rem 1.45rem;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 28px 80px rgba(20, 16, 31, 0.22);
+  border: 1px solid rgba(108, 78, 255, 0.12);
+}
+
+.pl-submit-confirm__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a8498;
+}
+
+.pl-submit-confirm__title {
+  margin: 0 0 0.5rem;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #14101f;
+}
+
+.pl-submit-confirm__lead {
+  margin: 0 0 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #5a5470;
+}
+
+.pl-submit-confirm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.pl-submit-confirm__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+}
+
+.pl-submit-confirm__btn--ghost {
+  background: rgba(20, 16, 31, 0.06);
+  color: #3d3550;
+}
+
+.pl-submit-confirm__btn--primary {
+  background: linear-gradient(135deg, #7c5cff, #4f2fd8);
+  color: #fff !important;
 }
 
 @media (max-width: 900px) {
