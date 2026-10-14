@@ -47,7 +47,13 @@ TIMER_MINUTES = {
 OPEN_STATUSES = frozenset({"profile_completed", "in_progress"})
 SITTING_TTL_HOURS = 24
 SITTING_TTL_SQL = f"-{SITTING_TTL_HOURS} hours"
-ADVISOR_PRESETS = ("Mia Hu", "Jimmy Zheng")
+ADVISOR_PRESETS = (
+    "Mia Hu",
+    "Jimmy Zheng",
+    "Rachel",
+    "Dayu",
+    "Beck Yang",
+)
 ADVISOR_OTHER = "Other"
 ADVISOR_CHOICES = ADVISOR_PRESETS + (ADVISOR_OTHER,)
 SESSION_CANDIDATE = "pp_candidate_id"
@@ -195,6 +201,35 @@ def placement_public_enabled() -> bool:
         return bool(current_app.config.get("PLACEMENT_PUBLIC_ACCESS"))
     except RuntimeError:
         return False
+
+
+def placement_staff_reports_enabled() -> bool:
+    """Colleague placement roster & reports (independent of guest PLACEMENT_PUBLIC_ACCESS)."""
+    env = (os.environ.get("PLACEMENT_STAFF_REPORTS") or "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    return True
+
+
+def counselor_names_for_staff_username(username: str) -> tuple[str, ...]:
+    """Map colleague logins to intake advisor labels (counselor_source)."""
+    local = (username or "").split("@", 1)[0].strip().lower()
+    if not local:
+        return ()
+    aliases: dict[str, tuple[str, ...]] = {
+        "mia": ("Mia Hu",),
+        "jimmy": ("Jimmy Zheng",),
+        "rachel": ("Rachel",),
+        "dayu": ("Dayu",),
+        "beck.yang": ("Beck Yang",),
+        "beckyang": ("Beck Yang",),
+    }
+    if local in aliases:
+        return aliases[local]
+    for preset in ADVISOR_PRESETS:
+        if local == preset.replace(" ", "").lower() or local == preset.split()[0].lower():
+            return (preset,)
+    return ()
 
 
 def public_path_allowed(path: str) -> bool:

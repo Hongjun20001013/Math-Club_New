@@ -31,7 +31,7 @@
         {% endif %}
         <div class="np-admin-hero-actions">
           <a href="{{ url_for('admin_export_students_csv') }}" class="np-admin-hero-btn">Export CSV</a>
-          {% if placement_public_access_enabled %}
+          {% if placement_staff_reports_enabled|default(false) %}
           <a href="#np-admin-placement" class="np-admin-hero-btn">Placement</a>
           {% endif %}
           <a href="{{ url_for('admin_export_weekly_digest_csv') }}" class="np-admin-hero-btn np-admin-hero-btn--ghost">Weekly digest CSV</a>
@@ -51,7 +51,7 @@
           <strong>{{ totals.responses }}</strong>
           <span>Total responses</span>
         </div>
-        {% if placement_public_access_enabled %}
+        {% if placement_staff_reports_enabled|default(false) %}
         <div class="np-admin-stat-tile">
           <strong>{{ placement_totals.testers }}</strong>
           <span>Placement testers</span>
@@ -215,7 +215,7 @@
                 </span>
               </label>
             </div>
-            <p class="np-admin-staff-scope-note">Change visibility anytime from the team directory.</p>
+            <p class="np-admin-staff-scope-note">Change visibility anytime from the team directory. <strong>Course placement</strong> reports are visible to every colleague on the team, regardless of this setting.</p>
           </div>
         </div>
         <footer class="np-admin-staff-composer-foot">
@@ -582,8 +582,11 @@
     })();
     </script>
 
-    {% if placement_public_access_enabled %}
+    {% if placement_staff_reports_enabled|default(false) %}
     <section class="np-admin-card np-admin-card--placement glass-panel np-glass mp-animate-up" id="np-admin-placement" aria-labelledby="np-admin-placement-heading">
+      {% if not user_is_supervisor %}
+      <p class="np-admin-staff-scope-note np-admin-placement-team-note">All colleagues can open every placement sitting, PDF, and essay — use the advisor groups below to find your students.</p>
+      {% endif %}
       <header class="np-admin-section-head np-admin-section-head--split">
         <div>
           <p class="np-admin-kicker">Placement</p>

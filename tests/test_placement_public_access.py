@@ -1018,6 +1018,37 @@ class TestLockAndAdmin(_Base):
         loc = rv.headers.get("Location") or ""
         self.assertTrue(loc.endswith("/admin#np-admin-placement") or "#np-admin-placement" in loc, loc)
 
+    def test_staff_colleague_sees_placement_reports_when_guest_flow_off(self):
+        from werkzeug.security import generate_password_hash
+
+        self.app_mod.app.config["PLACEMENT_PUBLIC_ACCESS"] = False
+        os.environ["PLACEMENT_PUBLIC_ACCESS"] = "0"
+        conn = sqlite3.connect(self.db)
+        try:
+            conn.execute(
+                """
+                INSERT INTO users (username, password, password_hash, role, is_active, student_view_scope, created_at)
+                VALUES (?, '', ?, 'staff', 1, 'own', CURRENT_TIMESTAMP)
+                """,
+                ("Mia@novelprep.org", generate_password_hash("staff-secret")),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        rv = self.client.post(
+            "/login",
+            data={"username": "Mia@novelprep.org", "password": "staff-secret"},
+            follow_redirects=False,
+        )
+        self.assertEqual(rv.status_code, 302)
+        admin = self.client.get("/admin")
+        self.assertEqual(admin.status_code, 200)
+        html = admin.get_data(as_text=True)
+        self.assertIn("np-admin-placement", html)
+        self.assertIn("Placement testers", html)
+        listing = self.client.get("/admin/placement-candidates")
+        self.assertEqual(listing.status_code, 200)
+
 
 class TestBanksAndLegacy(_Base):
     def test_item_counts_unchanged(self):

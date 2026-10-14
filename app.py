@@ -328,6 +328,7 @@ from placement_public import (
     ensure_tables as ensure_placement_public_tables,
     is_public_guest,
     placement_public_enabled,
+    placement_staff_reports_enabled,
     public_path_allowed,
 )
 
@@ -1425,6 +1426,7 @@ def inject_template_config():
         "skill_loop_pilot_enabled": skill_loop_enabled(),
         "skill_repair_enabled": skill_repair_enabled(),
         "placement_public_access_enabled": placement_public_enabled(),
+        "placement_staff_reports_enabled": placement_staff_reports_enabled(),
         "placement_public_guest": public_guest and placement_public_enabled(),
         "placement_url": placement_url,
         "placement_advisor_prefill": advisor_prefill_raw,
@@ -1712,9 +1714,22 @@ def current_user_can_access_admin() -> bool:
 
 def _admin_landing_url() -> str:
     """Colleagues land on Placement testers instead of the Team directory."""
-    if placement_public_enabled():
+    if placement_staff_reports_enabled():
         return url_for("admin", _anchor="np-admin-placement")
     return url_for("admin")
+
+
+def _placement_admin_reports_active() -> bool:
+    return placement_staff_reports_enabled()
+
+
+def _require_placement_admin_reports():
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    if not _placement_admin_reports_active():
+        abort(404)
+    return None
 
 
 def _current_staff_view_scope(db: sqlite3.Connection) -> str:
@@ -10276,11 +10291,9 @@ def placement_section_work(slug: str, section: str):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/uploads/<int:upload_id>")
 def admin_placement_upload(attempt_id: int, upload_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     row = db.execute(
         "SELECT * FROM placement_candidate_uploads WHERE id = ? AND attempt_id = ? AND owner_kind = 'candidate'",
@@ -18466,7 +18479,7 @@ def admin():
     }
     placement_rows = []
     placement_totals = {"testers": 0, "in_progress": 0, "submitted": 0}
-    if placement_public_enabled():
+    if _placement_admin_reports_active():
         placement_rows = _placement_candidate_admin_rows(db)
         placement_totals = {
             "testers": len(placement_rows),
@@ -18603,11 +18616,9 @@ def _group_placement_admin_rows(rows: list[dict]) -> list[dict]:
 
 @app.route("/admin/placement-candidates")
 def admin_placement_candidates():
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     q = (request.args.get("q") or "").strip()
     rows = _placement_candidate_admin_rows(db, q)
@@ -18621,11 +18632,9 @@ def admin_placement_candidates():
 
 @app.route("/admin/placement-candidates.csv")
 def admin_placement_candidates_csv():
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     import csv
     from io import StringIO
 
@@ -18972,11 +18981,9 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
 
 @app.route("/admin/placement-candidates/<int:attempt_id>")
 def admin_placement_candidate_detail(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     ctx = _admin_placement_report_ctx(attempt_id)
     if ctx is None:
         abort(404)
@@ -18998,11 +19005,9 @@ def admin_placement_candidate_detail(attempt_id: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/item/<int:q_index>")
 def admin_placement_candidate_item(attempt_id: int, q_index: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     ctx = _admin_placement_report_ctx(attempt_id)
     if ctx is None:
         abort(404)
@@ -19066,11 +19071,9 @@ def admin_placement_candidate_item(attempt_id: int, q_index: int):
     methods=["POST"],
 )
 def admin_placement_response_override(attempt_id: int, q_index: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     att = db.execute(
         "SELECT id, topic FROM placement_candidate_attempts WHERE id = ?",
@@ -19107,11 +19110,9 @@ def admin_placement_response_override(attempt_id: int, q_index: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/paper-grades", methods=["POST"])
 def admin_placement_paper_grades(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     att = db.execute(
         "SELECT id, topic FROM placement_candidate_attempts WHERE id = ?",
@@ -19152,11 +19153,9 @@ def admin_placement_paper_grades(attempt_id: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/report.pdf")
 def admin_placement_candidate_pdf(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     ctx = _admin_placement_report_ctx(attempt_id)
     if ctx is None:
         abort(404)
@@ -19181,11 +19180,9 @@ def admin_placement_candidate_pdf(attempt_id: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/reopen", methods=["POST"])
 def admin_placement_candidate_reopen(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     ok = placement_public_mod.reopen_attempt(db, attempt_id)
     db.commit()
@@ -19195,11 +19192,9 @@ def admin_placement_candidate_reopen(attempt_id: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/invalidate", methods=["POST"])
 def admin_placement_candidate_invalidate(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     att = db.execute(
         "SELECT candidate_id FROM placement_candidate_attempts WHERE id = ?",
@@ -19215,11 +19210,9 @@ def admin_placement_candidate_invalidate(attempt_id: int):
 
 @app.route("/admin/placement-candidates/<int:attempt_id>/delete", methods=["POST"])
 def admin_placement_candidate_delete(attempt_id: int):
-    gate = _require_admin_response()
+    gate = _require_placement_admin_reports()
     if gate is not None:
         return gate
-    if not placement_public_enabled():
-        abort(404)
     db = get_db()
     att = db.execute(
         """
