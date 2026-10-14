@@ -302,7 +302,12 @@
   color: #6a6380;
 }
 
-/* Submit test confirmation */
+/* Submit test confirmation — only visible after [data-pl-open-finish] click */
+.pl-submit-confirm-backdrop[hidden],
+.pl-submit-confirm[hidden] {
+  display: none !important;
+}
+
 .pl-submit-confirm-backdrop {
   position: fixed;
   inset: 0;
