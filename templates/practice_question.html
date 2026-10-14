@@ -315,52 +315,56 @@
                 </div>
                 {% elif placement_english_writing %}
                 <div class="sat-en-writing-studio np-en-writing-studio" data-word-min="{{ english_writing_word_min|default(200) }}" data-word-max="{{ english_writing_word_max|default(300) }}">
-                    <ol class="np-en-writing-steps" aria-label="Writing steps">
-                        <li class="np-en-writing-step np-en-writing-step--pick{% if q.english_writing_options and q.english_writing_options|length > 1 %} is-active{% endif %}">
-                            <span class="np-en-writing-step__num">1</span>
-                            <span class="np-en-writing-step__label">Choose prompt</span>
-                        </li>
-                        <li class="np-en-writing-step np-en-writing-step--plan">
-                            <span class="np-en-writing-step__num">2</span>
-                            <span class="np-en-writing-step__label">Plan &amp; write</span>
-                        </li>
-                        <li class="np-en-writing-step np-en-writing-step--save">
-                            <span class="np-en-writing-step__num">3</span>
-                            <span class="np-en-writing-step__label">Save &amp; submit test</span>
-                        </li>
-                    </ol>
-                    {% if q.english_writing_options and q.english_writing_options|length > 1 %}
-                    <div class="np-en-writing-step-block" id="np-en-writing-pick-block">
-                        <p class="sat-en-writing-pick-title">Step 1 — Which prompt are you answering?</p>
-                        <div class="sat-en-writing-pick-grid" role="radiogroup" aria-label="Choose writing prompt">
-                            {% for opt in q.english_writing_options %}
-                            <label class="sat-en-writing-pick-card{% if english_writing_selected_option|default('') == opt.id %} is-selected{% endif %}">
-                                <input type="radio" class="sat-en-writing-pick-input" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form" required{% if english_writing_selected_option|default('') == opt.id %} checked{% endif %}>
-                                <span class="sat-en-writing-pick-card__letter" aria-hidden="true">{{ opt.id }}</span>
-                                <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
-                                <span class="sat-en-writing-pick-card__check" aria-hidden="true"></span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                    <div class="np-en-writing-step-block np-en-essay-frame">
-                        <div class="np-en-essay-frame__head">
-                            <label class="sat-en-writing-label" for="english-writing-input">Step 2 — Your essay</label>
-                            <p class="np-en-essay-frame__guide">Use full paragraphs. Suggested shape:</p>
-                        </div>
-                        <ul class="np-en-essay-outline" aria-hidden="true">
-                            <li><span>Introduction</span><em>Hook + thesis</em></li>
-                            <li><span>Body ¶1</span><em>Reason or scene</em></li>
-                            <li><span>Body ¶2</span><em>Evidence / detail</em></li>
-                            <li><span>Conclusion</span><em>So what you learned</em></li>
-                        </ul>
-                        <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="18" placeholder="Write here in complete sentences. Press Enter twice to start a new paragraph." form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
-                        <div class="np-en-essay-meta">
-                            <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
-                            <p class="np-en-essay-target" id="english-writing-target">Target: {{ english_writing_word_min|default(200) }}–{{ english_writing_word_max|default(300) }} words</p>
-                        </div>
-                        <p class="np-en-essay-advisor-note">Saved for your advisor — not auto-scored. Step 3: use <strong>Submit test</strong> in the header when you finish the whole diagnostic.</p>
+                    <div class="np-en-writing-sheet">
+                        <ol class="np-en-writing-steps" aria-label="Writing steps">
+                            <li class="np-en-writing-step np-en-writing-step--pick{% if q.english_writing_options and q.english_writing_options|length > 1 %} is-active{% endif %}">
+                                <span class="np-en-writing-step__num">1</span>
+                                <span class="np-en-writing-step__label">Choose prompt</span>
+                            </li>
+                            <li class="np-en-writing-step np-en-writing-step--plan is-active">
+                                <span class="np-en-writing-step__num">2</span>
+                                <span class="np-en-writing-step__label">Plan &amp; write</span>
+                            </li>
+                            <li class="np-en-writing-step np-en-writing-step--save">
+                                <span class="np-en-writing-step__num">3</span>
+                                <span class="np-en-writing-step__label">Submit test</span>
+                            </li>
+                        </ol>
+                        {% if q.english_writing_options and q.english_writing_options|length > 1 %}
+                        <section class="np-en-writing-sheet__section" id="np-en-writing-pick-block" aria-labelledby="np-en-writing-pick-title">
+                            <h3 class="sat-en-writing-pick-title" id="np-en-writing-pick-title">Step 1 — Which prompt are you answering?</h3>
+                            <div class="sat-en-writing-pick-grid" role="radiogroup" aria-label="Choose writing prompt">
+                                {% for opt in q.english_writing_options %}
+                                <label class="sat-en-writing-pick-card{% if english_writing_selected_option|default('') == opt.id %} is-selected{% endif %}">
+                                    <input type="radio" class="sat-en-writing-pick-input" name="english_writing_option" value="{{ opt.id }}" form="practice-answer-form" required{% if english_writing_selected_option|default('') == opt.id %} checked{% endif %}>
+                                    <span class="sat-en-writing-pick-card__letter" aria-hidden="true">{{ opt.id }}</span>
+                                    <span class="sat-en-writing-pick-card__copy">{{ opt.label }}</span>
+                                    <span class="sat-en-writing-pick-card__check" aria-hidden="true"></span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+                        <section class="np-en-writing-sheet__section np-en-writing-sheet__section--compose" aria-labelledby="np-en-writing-compose-title">
+                            <div class="np-en-essay-frame__head">
+                                <h3 class="sat-en-writing-label" id="np-en-writing-compose-title">Step 2 — Your essay</h3>
+                                <p class="np-en-essay-frame__guide">Use full paragraphs. Suggested shape:</p>
+                            </div>
+                            <ul class="np-en-essay-outline" aria-hidden="true">
+                                <li><span>Introduction</span><em>Hook + thesis</em></li>
+                                <li><span>Body ¶1</span><em>Reason or scene</em></li>
+                                <li><span>Body ¶2</span><em>Evidence / detail</em></li>
+                                <li><span>Conclusion</span><em>So what you learned</em></li>
+                            </ul>
+                            <div class="np-en-essay-compose">
+                                <textarea class="sat-en-writing-input" name="selected_answer" id="english-writing-input" rows="16" placeholder="Write here in complete sentences. Press Enter twice to start a new paragraph." form="practice-answer-form">{{ saved_selected_answer|default('') }}</textarea>
+                            </div>
+                            <div class="np-en-essay-meta">
+                                <p class="sat-en-writing-count" id="english-writing-count" aria-live="polite">0 words</p>
+                                <p class="np-en-essay-target" id="english-writing-target">Target: {{ english_writing_word_min|default(200) }}–{{ english_writing_word_max|default(300) }} words</p>
+                            </div>
+                            <p class="np-en-essay-advisor-note">Saved for your advisor — not auto-scored. When finished, use <strong>Submit test</strong> in the header.</p>
+                        </section>
                     </div>
                 </div>
                 {% endif %}

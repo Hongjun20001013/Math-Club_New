@@ -146,13 +146,53 @@
   line-height: 1.5;
 }
 
-/* Writing (TOEFL-style) */
+/* Writing (TOEFL-style) — warm paper, no purple exam chrome */
 .sat-practice-page-wrap--english-writing .sat-split {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
 }
 
+.sat-practice-page-wrap--english-writing.sat-practice-page-wrap--split-lock .sat-pane-choices {
+  border-left: 1px solid rgba(107, 74, 50, 0.1) !important;
+  background: #f8f4ee !important;
+}
+
+.sat-practice-page-wrap--english-writing .sat-pane-choices {
+  border-left-color: rgba(107, 74, 50, 0.1);
+  background: #f8f4ee;
+}
+
+.sat-practice-page-wrap--english-writing .sat-pane-head-choices {
+  background: rgba(255, 253, 248, 0.98);
+  border-bottom: 1px solid rgba(107, 74, 50, 0.1);
+}
+
+.sat-practice-page-wrap--english-writing .sat-split-card {
+  border-color: rgba(107, 74, 50, 0.12);
+  background: linear-gradient(168deg, #fffefb 0%, #faf7f2 48%, #f5f0e8 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 24px 56px -20px rgba(42, 34, 28, 0.14);
+}
+
+.sat-practice-page-wrap--english-writing .sat-split-card::before {
+  height: 3px;
+  background: linear-gradient(90deg, #d4b896, #a67c52 45%, #c9a87c 100%);
+  opacity: 1;
+}
+
 .sat-practice-page-wrap--english-writing .sat-pane-stem {
   background: linear-gradient(180deg, #faf7f2 0%, #f3efe8 100%);
+  border-right: 1px solid rgba(107, 74, 50, 0.08);
+}
+
+.sat-practice-page-wrap--english-writing .sat-pane-choices > .sat-en-writing-studio {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.65rem 0 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(166, 124, 82, 0.35) transparent;
 }
 
 .np-en-writing-prompt__meta {
@@ -209,7 +249,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 1.1rem;
+  margin-bottom: 0;
 }
 
 @media (max-width: 640px) {
@@ -478,14 +518,38 @@
   max-height: min(52vh, 520px);
 }
 
+/* Writing studio — one sheet, one outer border */
+.np-en-writing-sheet {
+  margin: 0 1rem 0.75rem;
+  border-radius: 18px;
+  border: 1px solid rgba(107, 74, 50, 0.14);
+  background: #fffdfb;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(42, 34, 28, 0.05);
+}
+
+.np-en-writing-sheet__section {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.np-en-writing-sheet__section + .np-en-writing-sheet__section {
+  border-top: 1px solid rgba(107, 74, 50, 0.1);
+}
+
+.sat-en-writing-pick-title {
+  margin: 0 0 0.75rem;
+}
+
 /* Writing studio framework */
 .np-en-writing-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  margin: 0 0 1.15rem;
-  padding: 0;
+  margin: 0;
+  padding: 0.7rem 1rem;
   list-style: none;
+  background: rgba(250, 247, 242, 0.95);
+  border-bottom: 1px solid rgba(107, 74, 50, 0.1);
 }
 
 .np-en-writing-step {
@@ -523,15 +587,21 @@
   color: #fff;
 }
 
-.np-en-essay-frame {
-  padding: 1rem;
-  border-radius: 16px;
-  border: 1px solid rgba(107, 74, 50, 0.16);
-  background: rgba(255, 255, 255, 0.85);
+.np-en-essay-frame__head {
+  margin-bottom: 0.75rem;
 }
 
-.np-en-essay-frame__head {
-  margin-bottom: 0.65rem;
+.np-en-essay-compose {
+  border-radius: 14px;
+  border: 1px solid rgba(107, 74, 50, 0.22);
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.np-en-essay-compose:focus-within {
+  border-color: #a67c52;
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.18);
 }
 
 .np-en-essay-frame__guide {
@@ -543,8 +613,8 @@
 .np-en-essay-outline {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin: 0 0 0.85rem;
+  gap: 8px;
+  margin: 0 0 1rem;
   padding: 0;
   list-style: none;
 }
@@ -572,11 +642,24 @@
   margin-top: 2px;
 }
 
-.sat-practice-page-wrap--english-writing .sat-en-writing-input {
-  min-height: 320px;
+.sat-practice-page-wrap--english-writing .np-en-essay-compose .sat-en-writing-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: min(42vh, 340px);
+  max-height: 52vh;
   line-height: 1.72;
-  background: #fffefb;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: #fff;
+  resize: vertical;
+  box-shadow: none;
+}
+
+.sat-practice-page-wrap--english-writing .np-en-essay-compose .sat-en-writing-input:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .np-en-essay-meta {
@@ -608,20 +691,31 @@
 }
 
 .np-en-essay-advisor-note {
-  margin: 0.85rem 0 0;
+  margin: 1rem 0 0;
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
   font-size: 0.82rem;
   line-height: 1.5;
-  color: #4a4560;
-  background: rgba(108, 78, 255, 0.06);
-  border: 1px solid rgba(108, 78, 255, 0.1);
+  color: #5c4a38;
+  background: rgba(166, 124, 82, 0.08);
+  border: 1px solid rgba(166, 124, 82, 0.14);
 }
 
-.sat-practice-page-wrap--english-writing .sat-pane-choices .sat-submit-wrap {
-  border-top: 1px solid rgba(107, 74, 50, 0.1);
-  margin-top: 0.5rem;
-  padding-top: 0.75rem;
+.sat-practice-page-wrap--english-writing .sat-pane-choices > .sat-submit-wrap {
+  border-top: 1px solid rgba(107, 74, 50, 0.1) !important;
+  background: linear-gradient(180deg, rgba(248, 244, 238, 0.95), #fffdfb) !important;
+  padding: 12px 1rem 16px !important;
+  margin-top: 0 !important;
+}
+
+.sat-practice-page-wrap--english-writing .sat-en-writing-label {
+  margin: 0;
+  font-family: var(--np-en-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: #3d2f28;
 }
 
 @media (max-width: 720px) {
@@ -651,5 +745,16 @@
 
   .sat-practice-page-wrap--english-writing .sat-pane-stem {
     max-height: min(48vh, 380px);
+    border-right: none;
+    border-bottom: 1px solid rgba(107, 74, 50, 0.1);
+  }
+
+  .sat-practice-page-wrap--english-writing.sat-practice-page-wrap--split-lock .sat-pane-choices {
+    border-left: none !important;
+  }
+
+  .np-en-writing-sheet {
+    margin-left: 0.65rem;
+    margin-right: 0.65rem;
   }
 }
