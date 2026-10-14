@@ -10285,6 +10285,16 @@ def placement_landing():
     )
 
 
+@app.route("/placement/catalog")
+def placement_catalog_legacy():
+    return redirect(url_for("placement_landing"))
+
+
+@app.route("/placement/track")
+def placement_track_root():
+    return redirect(url_for("placement_landing"))
+
+
 @app.route("/placement/track/<track>")
 def placement_track_catalog(track: str):
     session["active_track_label"] = "Course placement"
@@ -10310,6 +10320,8 @@ def placement_track_catalog(track: str):
 @app.route("/placement/<slug>")
 def placement_test_landing(slug: str):
     session["active_track_label"] = "Course placement"
+    if slug in ("track", "catalog", "recover", "begin", "start", "run"):
+        return redirect(url_for("placement_landing"))
     test = _placement_test_by_slug(slug)
     if not test:
         abort(404)

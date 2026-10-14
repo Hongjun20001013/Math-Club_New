@@ -59,15 +59,46 @@ def _parse_answer_key(text: str, max_q: int) -> dict[int, str]:
     return keys
 
 
+def _passage_block_to_paragraphs(block: str) -> list[str]:
+    """PDF line breaks are wraps, not paragraphs — detect real paragraph boundaries."""
+    lines = [ln.strip() for ln in block.splitlines() if ln.strip()]
+    if not lines:
+        return []
+    paragraphs: list[str] = [lines[0]]
+    for line in lines[1:]:
+        prev = paragraphs[-1]
+        new_para = False
+        if re.match(r"^\d+\s+[A-Za-z]", line):
+            new_para = True
+        elif re.search(r'[.!?]["\']?$', prev) and re.match(r'^["\(\[]?[A-Z0-9]', line):
+            new_para = True
+        if new_para:
+            paragraphs.append(line)
+        elif prev.endswith("-"):
+            paragraphs[-1] = prev[:-1] + line
+        else:
+            paragraphs[-1] = prev + " " + line
+    return paragraphs
+
+
 def _paragraphs_to_html(block: str) -> str:
-    paras: list[str] = []
-    for raw in re.split(r"\n\s*\n", block.strip()):
-        chunk = raw.strip()
-        if not chunk:
-            continue
-        chunk = re.sub(r"\s*\n\s*", " ", chunk)
-        paras.append(f"<p>{html.escape(chunk)}</p>")
-    return "\n".join(paras)
+    paras = _passage_block_to_paragraphs(block)
+    parts: list[str] = []
+    para_num = 0
+    for chunk in paras:
+        m = re.match(r"^(\d+)\s+(.+)$", chunk)
+        if m:
+            label, text = m.group(1), m.group(2)
+        else:
+            para_num += 1
+            label, text = str(para_num), chunk
+        parts.append(
+            '<p class="np-en-para">'
+            f'<span class="np-en-para-label" aria-hidden="true">¶{html.escape(label)}</span>'
+            f'<span class="np-en-para-text">{html.escape(text)}</span>'
+            "</p>"
+        )
+    return "\n".join(parts)
 
 
 def _extract_passages(part_i_text: str) -> list[dict[str, str]]:

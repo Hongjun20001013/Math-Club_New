@@ -66,9 +66,38 @@
   letter-spacing: -0.01em;
 }
 
-.np-en-passage-body p {
-  margin: 0 0 1em;
+.np-en-passage-body .np-en-para {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  column-gap: 0.85rem;
+  row-gap: 0.35rem;
+  margin: 0 0 1.15rem;
+  padding: 0 0 1.1rem;
+  border-bottom: 1px solid rgba(42, 34, 64, 0.07);
   text-align: left;
+}
+
+.np-en-passage-body .np-en-para:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.np-en-para-label {
+  font-family: var(--np-en-display);
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: #9a7b5c;
+  text-align: right;
+  line-height: 1.65;
+  user-select: none;
+}
+
+.np-en-para-text {
+  font-family: var(--np-en-serif);
+  font-size: 1.05rem;
+  line-height: 1.72;
+  color: #1a1628;
 }
 
 .np-en-placement-lang-panel {

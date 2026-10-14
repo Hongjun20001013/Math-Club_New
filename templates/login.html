@@ -161,16 +161,26 @@
         </div>
         <h3>Placement Test</h3>
         {% if placement_public_access_enabled %}
-        <p>Choose your course diagnostic and begin. Name, grade, advisor, and current school math class are required.</p>
+        <p>Choose <strong>English</strong> or <strong>Math</strong>, then pick your grade-level diagnostic.</p>
         <ul class="np-login-placement-tags" aria-label="What to expect">
           <li>No sign-in</li>
           <li>Timed diagnostic</li>
           <li>Score report</li>
         </ul>
+        <div class="np-login-track-pick" role="navigation" aria-label="Choose placement subject">
+          <a class="np-login-track-card np-login-track-card--english" href="{{ url_for('placement_track_catalog', track='english') }}">
+            <span class="np-login-track-card__title">English</span>
+            <span class="np-login-track-card__sub">Reading · Language · Writing</span>
+          </a>
+          <a class="np-login-track-card np-login-track-card--math" href="{{ url_for('placement_track_catalog', track='math') }}">
+            <span class="np-login-track-card__title">Math</span>
+            <span class="np-login-track-card__sub">Middle · Enhanced · Upper</span>
+          </a>
+        </div>
         {% else %}
-        <p>Open the placement catalog. If you are not signed in yet, you will come back here and continue after login.</p>
+        <p>Open placement and choose English or Math. Sign in first if your school requires it.</p>
         {% endif %}
-        <a class="np-login-placement-btn" id="np-login-placement-start" href="{{ url_for('placement_landing') }}">Start Placement Test</a>
+        <a class="np-login-placement-btn np-login-placement-btn--secondary" id="np-login-placement-start" href="{{ url_for('placement_landing') }}">All placement options</a>
         {% if placement_public_access_enabled %}
         <a class="np-login-placement-recover-cta" href="{{ url_for('placement_public_recover') }}">
           <span>Already started</span>
