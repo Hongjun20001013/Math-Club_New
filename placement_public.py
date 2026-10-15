@@ -236,6 +236,8 @@ def public_path_allowed(path: str) -> bool:
     p = (path or "/").split("?")[0]
     if p == "/placement" or p.startswith("/placement/"):
         return True
+    if p == "/guide/placement":
+        return True
     return False
 
 

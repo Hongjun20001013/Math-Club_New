@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Placement Guide · {{ site_brand_name }}{% endblock %}
+
+{% block content %}
+<div class="np-page-shell">
+<div class="np-sat-atelier np-guide-page">
+
+  <nav class="np-atelier-rail" aria-label="Guide navigation">
+    <a href="{{ url_for('placement_landing') }}">Placement</a>
+    <span class="np-atelier-rail-sep">·</span>
+    <span class="np-atelier-rail-current">User guide</span>
+  </nav>
+
+  <header class="np-guide-hero glass-panel np-glass mp-animate-in">
+    <div class="np-sh-hero-noise" aria-hidden="true"></div>
+    <p class="np-atelier-kicker">{{ site_brand_short }} · Course placement</p>
+    <h1>Placement user guide<br><span lang="zh-Hans">分班测评使用教程</span></h1>
+    <p class="np-atelier-hero-lead">How students take English and Math diagnostics, and how advisors review essays, paper work, and PDF reports.<br><span lang="zh-Hans">学生如何完成英语/数学测评；老师如何批阅写作、纸质题并导出报告。</span></p>
+    <div class="np-guide-foot" style="margin-top:1.25rem;border:none;padding:0;">
+      <a href="{{ url_for('placement_landing') }}" class="np-atelier-btn np-atelier-btn--primary">Start placement · 进入测评</a>
+      <a href="{{ url_for('placement_user_guide_pdf') }}" class="np-atelier-btn np-atelier-btn--secondary">Download PDF · 下载 PDF</a>
+    </div>
+  </header>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-pl-guide-student">
+    <h2 id="np-pl-guide-student">1 · Students <span lang="zh-Hans">学生</span></h2>
+    <ol class="np-guide-steps">
+      <li>
+        <strong>Open the placement hub</strong>
+        <span>Go to <a href="{{ url_for('placement_landing') }}">Placement</a>, choose <strong>English</strong> or <strong>Math</strong>, then the test your counselor assigned.</span>
+        <span lang="zh-Hans">打开 Placement，选择英语或数学，再点顾问指定的测评。</span>
+      </li>
+      <li>
+        <strong>Complete the profile</strong>
+        <span>Name, grade, school, and advisor. Check the counselor confirmation box.</span>
+        <span lang="zh-Hans">填写姓名、年级、学校、顾问，并勾选确认项。</span>
+      </li>
+      <li>
+        <strong>Save your recovery code</strong>
+        <span>On the Ready screen, copy the 24-hour code. Use <a href="{{ url_for('placement_public_recover') }}">Recover sitting</a> if you switch devices.</span>
+        <span lang="zh-Hans">在 Ready 页保存 24 小时恢复码；换设备时用 Recover sitting。</span>
+      </li>
+      <li>
+        <strong>Work through parts</strong>
+        <span>English: Reading → Language → Writing essay. Math: follow on-screen gates; Enhanced Math also needs a paper PDF upload.</span>
+        <span lang="zh-Hans">英语：阅读→语言→写作。数学：按关卡推进；强化数学还需上传纸质卷 PDF。</span>
+      </li>
+      <li>
+        <strong>Submit test</strong>
+        <span>When every part is done, use <strong>Submit test</strong> in the header and confirm. Writing is graded later by your advisor.</span>
+        <span lang="zh-Hans">全部完成后点击页眉 Submit test 并确认。作文由顾问稍后评分。</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-pl-guide-advisor">
+    <h2 id="np-pl-guide-advisor">2 · Advisors &amp; teachers <span lang="zh-Hans">顾问老师</span></h2>
+    <ul class="np-guide-bullets">
+      <li><strong>Sign in</strong> with your staff account, then open <strong>Admin → Placement testers</strong>.<br><span lang="zh-Hans">使用教务账号登录，进入 Admin → Placement testers。</span></li>
+      <li><strong>Filter</strong> Math vs English on the roster.<br><span lang="zh-Hans">名单可按数学/英语筛选。</span></li>
+      <li><strong>Open a student</strong> for section scores, writing snapshot, and item-by-item review.<br><span lang="zh-Hans">点开学生查看各部分分数、写作摘要与逐题详情。</span></li>
+      <li><strong>Grade English writing</strong> on the last item (20-point rubric). Save all criterion rows.<br><span lang="zh-Hans">在最后一题按 20 分量表给写作打分并保存。</span></li>
+      <li><strong>Export</strong> <code>report.pdf</code> for parents.<br><span lang="zh-Hans">下载 report.pdf 给家长。</span></li>
+    </ul>
+    {% if user_logged_in and user_role in ('admin', 'teacher') %}
+    <p><a href="{{ url_for('admin_placement_candidates') }}">Open placement roster · 打开分班名单</a></p>
+    {% endif %}
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-pl-guide-tests">
+    <h2 id="np-pl-guide-tests">3 · Tests at a glance <span lang="zh-Hans">测评一览</span></h2>
+    <ul class="np-guide-bullets np-guide-bullets--compact">
+      <li><strong>English G7–8</strong> — 32 items, ~55 min · 阅读+语言+写作<br><span lang="zh-Hans">32 题，约 55 分钟</span></li>
+      <li><strong>English G9–11</strong> — 41 items, ~65 min<br><span lang="zh-Hans">41 题，约 65 分钟</span></li>
+      <li><strong>Middle Level Math</strong> — 100 fill-in, ~150 min<br><span lang="zh-Hans">100 填空，约 150 分钟</span></li>
+      <li><strong>Enhanced Math I / II</strong> — MCQ + paper PDF upload<br><span lang="zh-Hans">选择题 + 纸质卷 PDF</span></li>
+      <li><strong>Upper Algebra / Precalc</strong> — 85 MCQ, five gates<br><span lang="zh-Hans">85 选择题，五关结构</span></li>
+    </ul>
+  </section>
+
+  <section class="np-guide-section glass-panel np-glass" aria-labelledby="np-pl-guide-help">
+    <h2 id="np-pl-guide-help">4 · Help <span lang="zh-Hans">帮助</span></h2>
+    <ul class="np-guide-bullets np-guide-bullets--compact">
+      <li>Essay missing in admin? Student must <strong>Submit test</strong> after writing (autosave merges on submit).<br><span lang="zh-Hans">后台看不到作文？请确认学生写作后已 Submit test。</span></li>
+      <li>SAT Workspace accounts are separate — see the <a href="{{ url_for('student_guide') }}">student guide</a>.<br><span lang="zh-Hans">SAT 练习账号与分班分开，见学生指南。</span></li>
+    </ul>
+  </section>
+
+  <footer class="np-guide-foot">
+    <a href="{{ url_for('placement_landing') }}">Placement home</a>
+    <a href="{{ url_for('placement_user_guide_pdf') }}">PDF tutorial</a>
+    <a href="{{ url_for('student_guide') }}">SAT student guide</a>
+  </footer>
+
+</div>
+</div>
+{% endblock %}

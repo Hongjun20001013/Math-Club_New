@@ -1927,6 +1927,8 @@ def require_authenticated_user():
         "logout",
         "admin_setup",
         "student_guide",
+        "placement_user_guide",
+        "placement_user_guide_pdf",
     }:
         return None
 
@@ -7142,6 +7144,37 @@ def index():
 def student_guide():
     """Public bilingual guide for students and parents."""
     return render_template("student_guide.html")
+
+
+@app.route("/guide/placement")
+def placement_user_guide():
+    """Bilingual how-to for course placement (students + advisors)."""
+    return render_template("placement_user_guide.html")
+
+
+@app.route("/placement/user-guide.pdf")
+def placement_user_guide_pdf():
+    """Download bilingual placement tutorial PDF."""
+    docs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "placement_user_guide.pdf")
+    if os.path.isfile(docs_path):
+        return send_file(
+            docs_path,
+            mimetype="application/pdf",
+            as_attachment=False,
+            download_name="placement_user_guide.pdf",
+        )
+    from io import BytesIO
+
+    from placement_user_guide_pdf import build_placement_user_guide_pdf
+
+    site = (request.host_url or "").rstrip("/")
+    data = build_placement_user_guide_pdf(site or None)
+    return send_file(
+        BytesIO(data),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name="placement_user_guide.pdf",
+    )
 
 
 @app.route("/admin/export/students.csv")
