@@ -10848,7 +10848,15 @@ def placement_public_autosave(public_id: str):
             placement_public_mod.clear_response(db, int(att["id"]), qnum)
         db.commit()
         return jsonify({"ok": True})
-    placement_public_mod.save_draft(db, int(att["id"]), qnum, answer)
+    if q_kind == "english_writing" and (answer or "").strip():
+        is_correct, correct_answer = grade_placement_response(
+            questions[qnum], answer, str(att["topic"])
+        )
+        placement_public_mod.save_response(
+            db, int(att["id"]), qnum, answer, correct_answer, is_correct
+        )
+    else:
+        placement_public_mod.save_draft(db, int(att["id"]), qnum, answer)
     db.commit()
     return jsonify({"ok": True})
 
@@ -10880,6 +10888,9 @@ def placement_public_finish(public_id: str):
         return ("Too many submit attempts. Please wait.", 429)
     placement_public_mod.record_rate_hit("finish", public_id)
     questions = _placement_public_questions(str(att["topic"]))
+    placement_public_mod.promote_drafts_to_responses(
+        db, int(att["id"]), questions, str(att["topic"])
+    )
     responses = {
         int(r["question_index"]): r
         for r in db.execute(

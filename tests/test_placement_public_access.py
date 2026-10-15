@@ -827,6 +827,125 @@ class TestLockAndAdmin(_Base):
         self.assertIn("Test already submitted", body)
         self.assertIn("recovery code", body.lower())
 
+    def test_english_writing_autosave_visible_after_finish(self):
+        from app import BANKS, get_questions_for_topic
+        from placement_english_ui import pack_english_writing_answer
+
+        self.flag_on()
+        qs = get_questions_for_topic(
+            "placement", "english_g7_8", BANKS["placement"]["english_g7_8"]
+        )
+        widx = len(qs) - 1
+        self.assertEqual(str(qs[widx].get("question_kind") or ""), "english_writing")
+        essay = pack_english_writing_answer("A", "When I faced a challenge I learned to keep trying.")
+        rv = self.begin(slug="english-g7-8", name="Essay Student")
+        pid = self.public_id_from_location(rv)
+        aid = self.attempt_id(pid)
+        auto = self.client.post(
+            f"/placement/run/{pid}/autosave",
+            data={
+                "csrf_token": self.csrf(),
+                "qnum": str(widx),
+                "selected_answer": "When I faced a challenge I learned to keep trying.",
+                "english_writing_option": "A",
+            },
+        )
+        self.assertEqual(auto.status_code, 200)
+        conn = sqlite3.connect(self.db)
+        try:
+            before_finish = conn.execute(
+                """
+                SELECT selected_answer FROM placement_candidate_responses
+                WHERE attempt_id=? AND question_index=?
+                """,
+                (aid, widx),
+            ).fetchone()
+            self.assertIsNotNone(before_finish)
+            self.assertIn("keep trying", str(before_finish[0]))
+        finally:
+            conn.close()
+
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        conn = sqlite3.connect(self.db)
+        try:
+            row = conn.execute(
+                """
+                SELECT selected_answer FROM placement_candidate_responses
+                WHERE attempt_id=? AND question_index=?
+                """,
+                (aid, widx),
+            ).fetchone()
+            self.assertIsNotNone(row)
+            self.assertEqual(str(row[0]).strip(), essay.strip())
+        finally:
+            conn.close()
+
+    def test_english_writing_draft_promoted_on_finish(self):
+        from app import BANKS, get_questions_for_topic
+
+        self.flag_on()
+        qs = get_questions_for_topic(
+            "placement", "english_g7_8", BANKS["placement"]["english_g7_8"]
+        )
+        widx = len(qs) - 1
+        rv = self.begin(slug="english-g7-8", name="Draft Essay")
+        pid = self.public_id_from_location(rv)
+        aid = self.attempt_id(pid)
+        self.client.get(f"/placement/run/{pid}/item/{widx}")
+        self.client.post(
+            f"/placement/run/{pid}/item/{widx}",
+            data={
+                "csrf_token": self.csrf(),
+                "selected_answer": "Essay saved only as a draft when navigating away.",
+                "english_writing_option": "B",
+                "goto_qnum": str(widx - 1),
+            },
+        )
+        conn = sqlite3.connect(self.db)
+        try:
+            resp = conn.execute(
+                """
+                SELECT selected_answer FROM placement_candidate_responses
+                WHERE attempt_id=? AND question_index=?
+                """,
+                (aid, widx),
+            ).fetchone()
+            draft = conn.execute(
+                """
+                SELECT selected_answer FROM placement_candidate_drafts
+                WHERE attempt_id=? AND question_index=?
+                """,
+                (aid, widx),
+            ).fetchone()
+            self.assertTrue(
+                resp is None or not str(resp[0] or "").strip(),
+                "draft nav should not require a response row yet",
+            )
+            self.assertIsNotNone(draft)
+            self.assertIn("draft when navigating", str(draft[0]))
+        finally:
+            conn.close()
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        conn = sqlite3.connect(self.db)
+        try:
+            row = conn.execute(
+                """
+                SELECT selected_answer FROM placement_candidate_responses
+                WHERE attempt_id=? AND question_index=?
+                """,
+                (aid, widx),
+            ).fetchone()
+            self.assertIsNotNone(row)
+            self.assertIn("draft when navigating", str(row[0]))
+        finally:
+            conn.close()
+
     def test_final_submit_locks_answers(self):
         self.flag_on()
         rv = self.begin()

@@ -719,6 +719,39 @@ def clear_response(db: sqlite3.Connection, attempt_id: int, q_index: int) -> Non
     _refresh_answered_count(db, attempt_id)
 
 
+def promote_drafts_to_responses(
+    db: sqlite3.Connection,
+    attempt_id: int,
+    questions: list[dict],
+    topic: str,
+) -> None:
+    """Copy draft-only answers into responses before final submit (e.g. autosaved essays)."""
+    from answer_grader import grade_placement_response
+
+    rows = db.execute(
+        """
+        SELECT d.question_index, d.selected_answer
+        FROM placement_candidate_drafts d
+        LEFT JOIN placement_candidate_responses r
+          ON r.attempt_id = d.attempt_id AND r.question_index = d.question_index
+        WHERE d.attempt_id = ?
+          AND TRIM(COALESCE(d.selected_answer, '')) != ''
+          AND (r.attempt_id IS NULL OR TRIM(COALESCE(r.selected_answer, '')) = '')
+        """,
+        (attempt_id,),
+    ).fetchall()
+    for row in rows:
+        qi = int(row["question_index"])
+        if qi < 0 or qi >= len(questions):
+            continue
+        ans = str(row["selected_answer"] or "").strip()
+        if not ans:
+            continue
+        q = questions[qi]
+        is_correct, correct_answer = grade_placement_response(q, ans, topic)
+        save_response(db, attempt_id, qi, ans, correct_answer, is_correct)
+
+
 def saved_answer(db: sqlite3.Connection, attempt_id: int, q_index: int) -> str:
     row = _row(
         db,
