@@ -94,11 +94,19 @@ def clean_essay_body_for_display(body: str, option: str = "") -> str:
     while lines and lines[0].lower().startswith("prompt:"):
         lines.pop(0)
     filtered: list[str] = []
+    skip_phrases = (
+        "everyone faces moments that are hard",
+        "some people believe homework helps",
+        "prompt:",
+        "write about a time you faced a challenge",
+        "should middle school students have homework",
+        "will ai do more good than harm",
+    )
     for ln in lines:
         low = ln.lower()
         if low.startswith("option a ·") or low.startswith("option b ·"):
             continue
-        if low.startswith("everyone faces moments that are hard") and len(ln) < 120:
+        if any(low.startswith(p) for p in skip_phrases) and len(ln) < 200:
             continue
         filtered.append(ln)
     text = "\n\n".join(filtered).strip()

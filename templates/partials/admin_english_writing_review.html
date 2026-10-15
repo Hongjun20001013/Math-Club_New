@@ -1,18 +1,16 @@
 {% set ew = english_writing %}
 {% if ew %}
-<link rel="stylesheet" href="{{ url_for('static', filename='placement_english_reading.css') }}?v={{ style_css_revision }}">
-<div class="np-admin-en-review np-admin-en-review--studio sat-practice-page-wrap--english-writing sat-practice-page-wrap--split-lock"
+<div class="np-admin-en-review np-admin-en-review--folio"
      data-student-option="{{ ew.option or '' }}"
      id="np-admin-pl-writing">
   <header class="np-admin-en-toolbar">
     <div class="np-admin-en-toolbar__main">
       <div>
-        <p class="np-admin-en-review__kicker">Part III · Writing · {{ ew.max_points }} pts</p>
+        <p class="np-admin-en-review__kicker">Part III · Writing · {{ ew.max_points }} points · Q{{ q_index + 1 }}</p>
         <h1 class="np-admin-en-toolbar__title">{{ ew.rubric.title }}</h1>
       </div>
     </div>
     <div class="np-admin-en-toolbar__meta">
-      {% if ew.option %}<span class="np-en-advisor-writing__pill">Option {{ ew.option }}</span>{% endif %}
       <span class="np-en-advisor-writing__pill">{{ ew.word_count }} words</span>
       <span class="np-en-advisor-writing__pill">{{ ew.word_min }}–{{ ew.word_max }} target</span>
       {% if ew.total_points is not none %}
@@ -23,38 +21,40 @@
     </div>
   </header>
 
-  <div class="np-admin-en-studio">
-    <div class="np-admin-en-studio__read" aria-label="Prompt and student essay">
-      <div class="sat-split-card sat-split-card--english-writing np-admin-en-split">
-        <div class="sat-split sat-split--english-writing">
-          <section class="sat-pane sat-pane-stem" aria-label="Writing prompt">
-            <header class="sat-pane-head">
-              <span class="sat-pane-kicker">Prompt</span>
-              <span class="sat-pane-badge">Q{{ q_index + 1 }}</span>
-            </header>
-            <div class="sat-stem-scroll np-admin-en-scroll">
-              <div class="question-panel sat-stem-body np-admin-en-prompt">
-                {% if ew.prompt_html %}
-                {{ ew.prompt_html|safe }}
-                {% endif %}
-              </div>
-            </div>
-          </section>
-          <div class="sat-split-gutter" aria-hidden="true"></div>
-          <aside class="sat-pane sat-pane-choices" aria-label="Student essay">
-            <header class="sat-pane-head sat-pane-head-choices">
-              <span class="sat-pane-kicker">Student response</span>
-              <span class="sat-pane-hint">Read-only</span>
-            </header>
-            <div class="np-en-essay-compose np-admin-en-scroll np-admin-en-essay-readonly">
-              <article class="np-en-advisor-essay np-en-advisor-essay--student-view">{{ ew.body }}</article>
-            </div>
-          </aside>
+  <div class="np-admin-en-folio">
+    <article class="np-admin-en-essay-sheet" aria-label="Student writing submission">
+      {% if ew.option and ew.options %}
+      <div class="np-admin-en-essay-sheet__choice" aria-label="Prompt choice">
+        <span class="np-admin-en-essay-sheet__choice-label">Student chose</span>
+        {% for opt in ew.options if opt.id == ew.option %}
+        <div class="np-admin-en-essay-sheet__choice-card is-selected">
+          <span class="np-admin-en-essay-sheet__choice-letter">{{ opt.id }}</span>
+          <span class="np-admin-en-essay-sheet__choice-copy">{{ opt.label }}</span>
         </div>
+        {% endfor %}
       </div>
-    </div>
+      {% elif ew.option %}
+      <p class="np-admin-en-essay-sheet__choice-single"><span>Prompt</span> {{ ew.rubric.title }}</p>
+      {% endif %}
 
-    <aside class="np-admin-en-studio__grade" aria-labelledby="np-admin-en-rubric-title">
+      <section class="np-admin-en-essay-sheet__prompt" aria-label="Writing prompt">
+        <h2 class="np-admin-en-essay-sheet__section-title">Prompt</h2>
+        {% if ew.prompt_html %}
+        <div class="np-admin-en-essay-sheet__prompt-body">{{ ew.prompt_html|safe }}</div>
+        {% endif %}
+      </section>
+
+      <section class="np-admin-en-essay-sheet__response" aria-label="Student essay">
+        <h2 class="np-admin-en-essay-sheet__section-title">Student essay</h2>
+        {% if ew.body %}
+        <div class="np-admin-en-essay-sheet__essay">{{ ew.body }}</div>
+        {% else %}
+        <p class="np-admin-en-essay-sheet__empty">No essay text was submitted.</p>
+        {% endif %}
+      </section>
+    </article>
+
+    <aside class="np-admin-en-folio__grade" aria-labelledby="np-admin-en-rubric-title">
       <div class="np-admin-en-grade-panel">
         <header class="np-admin-en-grade-panel__head">
           <p class="np-en-advisor-writing__kicker">Official rubric</p>

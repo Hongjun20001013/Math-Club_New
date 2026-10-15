@@ -210,16 +210,170 @@
   margin: 0 0 1rem;
 }
 
-.np-page-shell--admin-en-writing {
+.np-page-shell--admin-en-writing,
+.np-summary-page--placement:has(#np-admin-pl-writing) {
   max-width: none;
-  width: min(1520px, 100%);
-  padding-left: clamp(0.75rem, 2vw, 1.25rem);
-  padding-right: clamp(0.75rem, 2vw, 1.25rem);
+  width: min(1680px, 100%);
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
 }
 
 .np-admin-en-review {
-  max-width: 1480px;
+  max-width: none;
   margin: 0 auto;
+}
+
+.np-admin-en-review--folio {
+  --np-en-folio-grade-w: min(360px, 100%);
+}
+
+.np-admin-en-folio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--np-en-folio-grade-w);
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  align-items: start;
+}
+
+.np-admin-en-essay-sheet {
+  border-radius: 20px;
+  border: 1px solid rgba(107, 74, 50, 0.14);
+  background: linear-gradient(180deg, #fffefb 0%, #faf7f2 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 20px 50px -24px rgba(42, 34, 28, 0.18);
+  padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1.35rem, 3vw, 2.5rem);
+}
+
+.np-admin-en-essay-sheet__choice {
+  margin-bottom: 1.35rem;
+}
+
+.np-admin-en-essay-sheet__choice-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a6b52;
+}
+
+.np-admin-en-essay-sheet__choice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 14px;
+  border: 1.5px solid rgba(107, 74, 50, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.np-admin-en-essay-sheet__choice-card.is-selected {
+  border-color: #a67c52;
+  background: linear-gradient(180deg, #fffaf3 0%, #f5ebe0 100%);
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.15);
+}
+
+.np-admin-en-essay-sheet__choice-card.is-muted {
+  opacity: 0.38;
+}
+
+.np-admin-en-essay-sheet__choice-letter {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  color: #6b4a32;
+  background: rgba(166, 124, 82, 0.12);
+}
+
+.np-admin-en-essay-sheet__choice-card.is-selected .np-admin-en-essay-sheet__choice-letter {
+  color: #fff;
+  background: linear-gradient(135deg, #a67c52, #6b4a32);
+}
+
+.np-admin-en-essay-sheet__choice-copy {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #3d2f28;
+  padding-top: 0.15rem;
+}
+
+.np-admin-en-essay-sheet__choice-single span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8a6b52;
+  margin-right: 0.5rem;
+}
+
+.np-admin-en-essay-sheet__section-title {
+  margin: 0 0 0.85rem;
+  font-family: "Outfit", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b4a32;
+}
+
+.np-admin-en-essay-sheet__prompt {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid rgba(107, 74, 50, 0.12);
+}
+
+.np-admin-en-essay-sheet__prompt-body {
+  font-family: "Literata", "Source Serif 4", Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: #1a1628;
+}
+
+.np-admin-en-essay-sheet__prompt-body .np-en-writing-prompt__meta {
+  margin-bottom: 0.65rem;
+}
+
+.np-admin-en-essay-sheet__prompt-body .np-en-writing-option {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.np-admin-en-essay-sheet__prompt-body .np-en-writing-option h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.65rem;
+}
+
+.np-admin-en-essay-sheet__essay {
+  font-family: "Literata", "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.05rem, 1.15vw, 1.2rem);
+  line-height: 1.88;
+  color: #141018;
+  white-space: pre-wrap;
+  max-width: none;
+}
+
+.np-admin-en-essay-sheet__empty {
+  margin: 0;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: rgba(234, 88, 12, 0.06);
+  color: #9a3412;
+  font-size: 0.95rem;
+}
+
+.np-admin-en-folio__grade {
+  position: sticky;
+  top: 12px;
 }
 
 .np-admin-en-review--studio {
@@ -392,7 +546,8 @@
   display: none;
 }
 
-.np-admin-en-review[data-student-option] .np-en-writing-prompt__lead {
+.np-admin-en-review[data-student-option] .np-en-writing-prompt__lead,
+.np-admin-en-review--folio .np-en-writing-prompt__meta {
   display: none;
 }
 
@@ -619,6 +774,16 @@
 
   .np-admin-en-review--studio.sat-practice-page-wrap--split-lock .sat-pane-choices {
     border-left: 1px solid rgba(107, 74, 50, 0.1) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .np-admin-en-folio {
+    grid-template-columns: 1fr;
+  }
+
+  .np-admin-en-folio__grade {
+    position: static;
   }
 }
 
