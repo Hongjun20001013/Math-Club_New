@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from placement_english_rubrics import writing_score_band
+from placement_english_rubrics import WRITING_SCORE_BANDS, writing_score_band
 
 ENGLISH_PARTS: dict[str, list[dict[str, str]]] = {
     "english_g7_8": [
@@ -192,4 +192,75 @@ def build_english_placement_report(
         "combined_graded": writing_graded,
         "combined_points": (mcq_correct + int(wpts)) if writing_graded else None,
         "combined_max": mcq_total + wmax,
+    }
+
+
+def criterion_performance_level(points: int, max_points: int) -> str:
+    cap = max(1, int(max_points))
+    pts = max(0, int(points))
+    if pts >= cap * 0.75:
+        return "strong"
+    if pts >= cap * 0.4:
+        return "partial"
+    return "weak"
+
+
+def build_english_writing_pdf_payload(
+    topic: str,
+    english_writing: dict | None,
+    english_report: dict | None,
+) -> dict[str, Any] | None:
+    if not english_writing:
+        return None
+    rubric = english_writing.get("rubric") or {}
+    criteria = list(rubric.get("criteria") or [])
+    breakdown = dict(english_writing.get("breakdown") or {})
+    wmax = int(english_writing.get("max_points") or 20)
+    wpts = english_writing.get("points")
+    if wpts is None:
+        wpts = english_writing.get("total_points")
+    graded = wpts is not None
+    band = writing_score_band(int(wpts)) if graded else None
+    body = str(english_writing.get("body") or "").strip()
+    essay_excerpt = body if len(body) <= 2400 else body[:2397].rstrip() + "…"
+    rows: list[dict[str, Any]] = []
+    for crit in criteria:
+        cid = str(crit.get("id") or "")
+        cap = int(crit.get("max_points") or 0)
+        pts = breakdown.get(cid)
+        if pts is None and graded:
+            pts = 0
+        level = criterion_performance_level(int(pts or 0), cap) if graded else ""
+        desc_key = level if level in ("strong", "partial", "weak") else "partial"
+        descriptor = str(crit.get(desc_key) or "")
+        rows.append(
+            {
+                "id": cid,
+                "label": str(crit.get("label") or ""),
+                "max_points": cap,
+                "points": int(pts) if pts is not None else None,
+                "level": level.title() if level else "—",
+                "descriptor": descriptor,
+                "strong": str(crit.get("strong") or ""),
+                "partial": str(crit.get("partial") or ""),
+                "weak": str(crit.get("weak") or ""),
+            }
+        )
+    rep = english_report or {}
+    mcq_rec = rep.get("mcq_recommendation") if isinstance(rep.get("mcq_recommendation"), dict) else None
+    return {
+        "topic": topic,
+        "title": str(rubric.get("title") or "Writing"),
+        "option": str(english_writing.get("option") or ""),
+        "word_count": int(english_writing.get("word_count") or 0),
+        "word_min": int(english_writing.get("word_min") or 0),
+        "word_max": int(english_writing.get("word_max") or 0),
+        "graded": graded,
+        "total_points": int(wpts) if graded else None,
+        "max_points": wmax,
+        "score_band": band,
+        "criteria_rows": rows,
+        "essay_excerpt": essay_excerpt,
+        "mcq_recommendation": mcq_rec,
+        "score_bands": list(WRITING_SCORE_BANDS),
     }

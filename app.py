@@ -80,6 +80,7 @@ from placement_english_ui import (
 from placement_english_report import (
     build_english_placement_report,
     build_english_section_stats,
+    build_english_writing_pdf_payload,
 )
 from placement_intelligent_report import (
     build_intelligent_placement_report,
@@ -19147,7 +19148,21 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
         "paper_complete": bool(score.get("paper_complete")),
         "mcq_correct": auto_correct,
         "mcq_total": auto_total,
+        "topic": topic,
+        "is_english_placement": is_english_placement,
+        "english_report": english_report,
+        "english_writing_pdf": (
+            build_english_writing_pdf_payload(topic, english_writing, english_report)
+            if is_english_placement
+            else None
+        ),
     }
+    if is_english_placement and english_report:
+        pdf_ctx["score_pct"] = int(english_report.get("mcq_pct") or 0)
+        pdf_ctx["correct_count"] = int(english_report.get("mcq_correct") or 0)
+        pdf_ctx["max_points"] = int(english_report.get("mcq_total") or auto_total)
+        pdf_ctx["placement_score_total"] = int(english_report.get("mcq_total") or auto_total)
+        pdf_ctx["total_q"] = int(english_report.get("mcq_total") or auto_total)
     paper_uploads = placement_public_mod.list_uploads(db, attempt_id, owner_kind="candidate")
     return {
         "attempt": dict(att),

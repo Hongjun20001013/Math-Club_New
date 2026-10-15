@@ -317,6 +317,16 @@ def _draw_hero(pdf: FPDF, ctx: dict[str, Any]) -> None:
     elif paper_total:
         pdf.set_xy(foot_x, y0 + 64)
         pdf.cell(44, 4, f"Graphing {paper_done} / {paper_total} submitted", align="C")
+    elif ctx.get("is_english_placement") and isinstance(ctx.get("english_report"), dict):
+        er = ctx["english_report"]
+        wpts = er.get("writing_points")
+        wmax = int(er.get("writing_max") or 20)
+        pdf.set_xy(foot_x - 6, y0 + 64)
+        if wpts is not None:
+            band = (er.get("writing_band") or {}).get("title") or ""
+            pdf.cell(56, 4, f"Writing {wpts}/{wmax}" + (f" · {band}" if band else ""), align="C")
+        else:
+            pdf.cell(56, 4, f"Writing —/{wmax} · awaiting grade", align="C")
     pdf.set_y(y0 + card_h + 6)
 
 
@@ -346,18 +356,52 @@ def _draw_study(pdf: FPDF, ctx: dict[str, Any]) -> None:
     pdf.set_font(pdf._ff, "B", 13)  # type: ignore[attr-defined]
     pdf.set_text_color(*_C_INK)
     pdf.cell(0, 6.5, _txt(pdf, headline), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    if sitting["paper_max"] and sitting["mcq_t"]:
+    if ctx.get("is_english_placement") and isinstance(ctx.get("english_report"), dict):
+        er = ctx["english_report"]
+        mcq_rec = er.get("mcq_recommendation") if isinstance(er.get("mcq_recommendation"), dict) else {}
+        mcq_band = str(mcq_rec.get("title") or f"{er.get('mcq_pct', pct)}%")
+        mcq_note = (
+            f"MCQ {er.get('mcq_correct')}/{er.get('mcq_total')} · band {mcq_rec.get('band_range', '—')}"
+            if mcq_rec
+            else f"MCQ {er.get('mcq_correct')}/{er.get('mcq_total')}"
+        )
+        if er.get("writing_graded"):
+            wb = er.get("writing_band") or {}
+            write_val = f"{er.get('writing_points')}/{er.get('writing_max')}"
+            write_note = f"{wb.get('range', '')} · {wb.get('title', '')} — {wb.get('summary', '')}"[:56]
+        else:
+            write_val = "—"
+            write_note = "Essay awaiting advisor rubric score."
+        cards = [
+            ("MCQ placement", mcq_band, mcq_note),
+            ("Writing score", write_val, write_note),
+            ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
+            ("Advisor", advisor, grade + (f" · {course}" if course else "")),
+        ]
+    elif sitting["paper_max"] and sitting["mcq_t"]:
         band_note = f"{sitting['mcq_c']} MC of {sitting['mcq_t']} · {correct}/{total} total"
+        cards = [
+            ("Score band", f"{pct}%", band_note),
+            ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
+            ("Misses", str(len(misses)), "Auto-incorrect items to review" if misses else "No auto-incorrect items"),
+            ("Advisor", advisor, grade + (f" · {course}" if course else "")),
+        ]
     elif sitting["paper_max"]:
         band_note = f"{correct}/{total} written"
+        cards = [
+            ("Score band", f"{pct}%", band_note),
+            ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
+            ("Misses", str(len(misses)), "Auto-incorrect items to review" if misses else "No auto-incorrect items"),
+            ("Advisor", advisor, grade + (f" · {course}" if course else "")),
+        ]
     else:
         band_note = f"{correct} correct of {total} scored items"
-    cards = [
-        ("Score band", f"{pct}%", band_note),
-        ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
-        ("Misses", str(len(misses)), "Auto-incorrect items to review" if misses else "No auto-incorrect items"),
-        ("Advisor", advisor, grade + (f" · {course}" if course else "")),
-    ]
+        cards = [
+            ("Score band", f"{pct}%", band_note),
+            ("Progress", f"{answered}/{item_total or '—'}", str(ctx.get("status_label") or "")),
+            ("Misses", str(len(misses)), "Auto-incorrect items to review" if misses else "No auto-incorrect items"),
+            ("Advisor", advisor, grade + (f" · {course}" if course else "")),
+        ]
     gap = 3
     cw = (w - 16 - gap * 3) / 4
     cy = y0 + 20
@@ -657,6 +701,178 @@ def _draw_items(pdf: FPDF, ctx: dict[str, Any]) -> None:
         pdf.set_y(y + 8.8)
 
 
+def _draw_english_writing(pdf: FPDF, ctx: dict[str, Any]) -> None:
+    payload = ctx.get("english_writing_pdf")
+    if not isinstance(payload, dict):
+        return
+    w = _cw(pdf)
+    _ensure(pdf, 48)
+    y0 = pdf.get_y()
+    _card(pdf, pdf.l_margin, y0, w, 28, radius=5.5)
+    pdf.set_xy(pdf.l_margin + 8, y0 + 5)
+    pdf.set_font(pdf._ff, "B", 7)  # type: ignore[attr-defined]
+    pdf.set_text_color(*_C_KICKER)
+    pdf.cell(0, 4, "PART III · WRITING")
+    pdf.set_xy(pdf.l_margin + 8, y0 + 10)
+    pdf.set_font(pdf._ff, "B", 14)  # type: ignore[attr-defined]
+    pdf.set_text_color(*_C_INK)
+    title = str(payload.get("title") or "Writing")
+    opt = str(payload.get("option") or "")
+    if opt:
+        title = f"Option {opt} · {title}"
+    pdf.cell(0, 7, _txt(pdf, title)[:70])
+    pdf.set_xy(pdf.l_margin + 8, y0 + 18)
+    pdf.set_font(pdf._ff, "", 8)  # type: ignore[attr-defined]
+    pdf.set_text_color(*_C_MUTED)
+    wc = int(payload.get("word_count") or 0)
+    wmin = int(payload.get("word_min") or 0)
+    wmax = int(payload.get("word_max") or 0)
+    graded = bool(payload.get("graded"))
+    total_pts = payload.get("total_points")
+    max_pts = int(payload.get("max_points") or 20)
+    score_line = f"{total_pts}/{max_pts} points" if graded else f"Not yet scored (0–{max_pts} points)"
+    pdf.cell(0, 4.5, _txt(pdf, f"{wc} words · target {wmin}–{wmax} · {score_line}"))
+    band = payload.get("score_band") if isinstance(payload.get("score_band"), dict) else {}
+    if band:
+        pdf.set_xy(pdf.l_margin + 8, y0 + 23)
+        pdf.set_text_color(*_C_PURPLE)
+        pdf.set_font(pdf._ff, "B", 8.2)  # type: ignore[attr-defined]
+        pdf.cell(
+            0,
+            4.5,
+            _txt(pdf, f"Band {band.get('range', '')} · {band.get('title', '')} — {band.get('summary', '')}")[:95],
+        )
+    pdf.set_y(y0 + 32)
+
+    rows = list(payload.get("criteria_rows") or [])
+    if rows:
+        _ensure(pdf, 24 + 14 * len(rows))
+        y0 = pdf.get_y()
+        pdf.set_xy(pdf.l_margin + 2, y0)
+        pdf.set_font(pdf._ff, "B", 8.5)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_INK)
+        pdf.cell(0, 5, "Rubric breakdown (advisor scores)")
+        pdf.set_y(y0 + 7)
+        cols = (38, 14, 14, 22, w - 38 - 14 - 14 - 22 - 4)
+        headers = ("Criterion", "Score", "Max", "Level", "Descriptor used")
+
+        def rubric_head() -> None:
+            y = pdf.get_y()
+            pdf.set_fill_color(*_C_PURPLE)
+            pdf.rect(pdf.l_margin, y, w, 7.2, style="F", round_corners=True, corner_radius=2)
+            pdf.set_text_color(255, 255, 255)
+            pdf.set_font(pdf._ff, "B", 6.8)  # type: ignore[attr-defined]
+            x = pdf.l_margin
+            for lab, cw in zip(headers, cols):
+                pdf.set_xy(x + 2, y + 1.8)
+                pdf.cell(cw - 3, 4, _txt(pdf, lab).upper())
+                x += cw
+            pdf.set_y(y + 7.2)
+
+        rubric_head()
+        for i, row in enumerate(rows):
+            _ensure(pdf, 16)
+            if pdf.get_y() < 22:
+                rubric_head()
+            y = pdf.get_y()
+            fill = _C_SOFT if i % 2 == 0 else _C_SOFT2
+            pdf.set_fill_color(*fill)
+            pdf.rect(pdf.l_margin, y, w, 13.5, style="DF")
+            pts = row.get("points")
+            pts_s = str(pts) if pts is not None else "—"
+            x = pdf.l_margin
+            pdf.set_xy(x + 2, y + 2.2)
+            pdf.set_font(pdf._ff, "B", 8)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_INK)
+            pdf.cell(cols[0] - 3, 4, _txt(pdf, str(row.get("label") or ""))[:22])
+            x += cols[0]
+            pdf.set_xy(x, y + 2.2)
+            pdf.cell(cols[1], 4, pts_s, align="C")
+            x += cols[1]
+            pdf.set_xy(x, y + 2.2)
+            pdf.cell(cols[2], 4, str(row.get("max_points") or ""), align="C")
+            x += cols[2]
+            pdf.set_xy(x + 1, y + 2.2)
+            pdf.set_font(pdf._ff, "B", 7)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_PURPLE)
+            pdf.cell(cols[3] - 2, 4, _txt(pdf, str(row.get("level") or ""))[:10])
+            x += cols[3]
+            pdf.set_xy(x + 1, y + 1.8)
+            pdf.set_font(pdf._ff, "", 6.8)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_MUTED)
+            pdf.multi_cell(cols[4] - 2, 3.2, _txt(pdf, str(row.get("descriptor") or ""))[:220])
+            pdf.set_y(max(y + 13.5, pdf.get_y()))
+        pdf.ln(3)
+
+    bands = list(payload.get("score_bands") or [])
+    if bands:
+        _ensure(pdf, 28)
+        y0 = pdf.get_y()
+        pdf.set_xy(pdf.l_margin + 2, y0)
+        pdf.set_font(pdf._ff, "B", 8.2)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_INK)
+        pdf.cell(0, 5, "Writing score bands (answer key)")
+        pdf.set_y(y0 + 6)
+        for b in bands:
+            _ensure(pdf, 8)
+            pdf.set_x(pdf.l_margin + 4)
+            pdf.set_font(pdf._ff, "B", 7.5)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_PURPLE)
+            pdf.cell(18, 4, _txt(pdf, str(b.get("range") or "")))
+            pdf.set_font(pdf._ff, "B", 7.5)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_INK)
+            pdf.cell(22, 4, _txt(pdf, str(b.get("title") or "")))
+            pdf.set_font(pdf._ff, "", 7)  # type: ignore[attr-defined]
+            pdf.set_text_color(*_C_MUTED)
+            pdf.cell(0, 4, _txt(pdf, str(b.get("summary") or ""))[:78])
+            pdf.ln(4.2)
+        pdf.ln(2)
+
+    essay = str(payload.get("essay_excerpt") or "").strip()
+    if essay:
+        _ensure(pdf, 40)
+        y0 = pdf.get_y()
+        pdf.set_xy(pdf.l_margin + 2, y0)
+        pdf.set_font(pdf._ff, "B", 8.5)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_INK)
+        pdf.cell(0, 5, "Student essay (excerpt)")
+        pdf.set_y(y0 + 7)
+        pdf.set_x(pdf.l_margin + 4)
+        pdf.set_font(pdf._ff, "", 8.2)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_INK)
+        pdf.multi_cell(w - 8, 4.2, _txt(pdf, essay))
+        pdf.ln(4)
+
+    _ensure(pdf, 36)
+    y0 = pdf.get_y()
+    pdf.set_xy(pdf.l_margin + 2, y0)
+    pdf.set_font(pdf._ff, "B", 8.2)  # type: ignore[attr-defined]
+    pdf.set_text_color(*_C_INK)
+    pdf.cell(0, 5, "Rubric reference (all criteria)")
+    pdf.set_y(y0 + 6)
+    for row in rows:
+        _ensure(pdf, 22)
+        y = pdf.get_y()
+        pdf.set_fill_color(252, 250, 255)
+        pdf.rect(pdf.l_margin, y, w, 20, style="DF", round_corners=True, corner_radius=2)
+        pdf.set_xy(pdf.l_margin + 3, y + 2)
+        pdf.set_font(pdf._ff, "B", 8)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_INK)
+        cap = int(row.get("max_points") or 0)
+        pdf.cell(0, 4, _txt(pdf, f"{row.get('label')} (0–{cap} pts)"))
+        pdf.set_xy(pdf.l_margin + 3, y + 6.5)
+        pdf.set_font(pdf._ff, "", 6.6)  # type: ignore[attr-defined]
+        pdf.set_text_color(*_C_MUTED)
+        ref = (
+            f"Strong (top): {row.get('strong', '')}  |  "
+            f"Partial (mid): {row.get('partial', '')}  |  "
+            f"Weak (low): {row.get('weak', '')}"
+        )
+        pdf.multi_cell(w - 6, 3.1, _txt(pdf, ref)[:420])
+        pdf.set_y(y + 21)
+    pdf.ln(4)
+
+
 def build_placement_atelier_pdf(ctx: dict[str, Any]) -> bytes:
     if FPDF is None or XPos is None or YPos is None:
         raise ImportError(_FPDF2_INSTALL_HINT)
@@ -668,6 +884,8 @@ def build_placement_atelier_pdf(ctx: dict[str, Any]) -> bytes:
     _draw_hero(pdf, ctx)
     _draw_study(pdf, ctx)
     _draw_sections(pdf, ctx)
+    if ctx.get("is_english_placement"):
+        _draw_english_writing(pdf, ctx)
     _draw_misses(pdf, ctx)
     _draw_items(pdf, ctx)
     bio = BytesIO()
