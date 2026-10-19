@@ -13,6 +13,7 @@
     {% if card.conflicts %}
       <p class="warn-line">{{ card.conflicts | join("；") }}</p>
     {% endif %}
+    {% include "_diagrams.html" %}
     <p>组织：{{ card.setter_name }}。{{ card.setter_note }}</p>
     <p>前排：{% for item in card.front_attack %}{{ item.name }}{{ item.wing }}{% if not loop.last %}，{% endif %}{% else %}未排{% endfor %}</p>
     <p>补位传球：{{ card.backup_name }}。{{ card.backup_note }}</p>

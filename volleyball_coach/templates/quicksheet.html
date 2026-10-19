@@ -12,6 +12,7 @@
 {% for card in cards %}
   <section class="card">
     <h2>R{{ card.rotation }} · {{ card.setter_name }} 组织</h2>
+    {% include "_diagrams.html" %}
     <p>前排：{% for item in card.front_attack %}{{ item.name }}{{ item.wing }}{% if not loop.last %} / {% endif %}{% endfor %}</p>
     <p>接发 {{ card.seam }}。{{ card.short_ball }}</p>
     <p>补位：{{ card.backup_name }}。</p>

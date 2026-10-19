@@ -7,12 +7,19 @@
   <a href="{{ url_for('correct_form', match_id=match.id) }}">校正</a>
 </p>
 <div class="scoreline">
-  <div>
+  <div class="side">
     <span>我方{% if match.opponent %} · 对 {{ match.opponent }}{% endif %}</span>
     <b>{{ state.score_us }}</b>
   </div>
-  <div>
-    <span>对方 · 第 {{ state.set_index }} 局</span>
+  <div class="mid">
+    <svg class="ball" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="13.2" fill="#F4F8FB" stroke="#0C2340" stroke-width="1.6"/>
+      <path d="M16 3.2C12.2 9 12.2 23 16 28.8M4.6 11.2C11 13.2 14.2 14.6 16 16c1.8 1.6 5.4 4.2 11.4 5.2M4.6 20.8C11 18.8 14.2 17.4 16 16c1.8-1.6 5.4-4.2 11.4-5.2" fill="none" stroke="#0C2340" stroke-width="1.15"/>
+    </svg>
+    <span>第 {{ state.set_index }} 局</span>
+  </div>
+  <div class="side">
+    <span>对方</span>
     <b>{{ state.score_them }}</b>
   </div>
 </div>
@@ -34,15 +41,18 @@
 </div>
 
 <article class="advice {% if suggestion.blocked %}blocked{% endif %}">
-  <div class="kicker">这一球只做一件事 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</div>
-  <p class="meta">{{ suggestion.situation }}</p>
-  <p class="action">{{ suggestion.action }}</p>
-  <p><strong>依据</strong> {{ suggestion.basis }}</p>
-  <p><strong>备选</strong> {{ suggestion.alternative }}</p>
-  <p><strong>切换</strong> {{ suggestion.switch }}</p>
+  <p class="kicker">这一球只做一件事 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</p>
+  <p class="situation">{{ suggestion.situation }}</p>
+  <h2 class="action">{{ suggestion.action }}</h2>
+  <dl class="advice-fields">
+    <div><dt>依据</dt><dd>{{ suggestion.basis }}</dd></div>
+    <div><dt>备选</dt><dd>{{ suggestion.alternative }}</dd></div>
+    <div><dt>切换</dt><dd>{{ suggestion.switch }}</dd></div>
+  </dl>
   <p class="meta">{{ suggestion.confidence }}</p>
 </article>
 
+{% include "_diagrams.html" %}
 {% include "_court.html" %}
 
 {% if match.status == "live" %}
@@ -50,7 +60,7 @@
     <button class="us" name="winner" value="us" type="submit">我方得分</button>
     <button class="them" name="winner" value="them" type="submit">对方得分</button>
   </form>
-  <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
+  <form class="undo-form" method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
     <button class="secondary" type="submit">撤销上一步</button>
   </form>
 {% endif %}

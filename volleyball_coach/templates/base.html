@@ -4,11 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title or "排球临场指挥" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="top">
-    <a class="brand" href="{{ url_for('home') }}">排球临场指挥</a>
+    <a class="brand" href="{{ url_for('home') }}">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="13.2" fill="#B9D9EB" stroke="#0C2340" stroke-width="1.6"/>
+        <path d="M16 3.2C12.2 9 12.2 23 16 28.8M4.6 11.2C11 13.2 14.2 14.6 16 16c1.8 1.6 5.4 4.2 11.4 5.2M4.6 20.8C11 18.8 14.2 17.4 16 16c1.8-1.6 5.4-4.2 11.4-5.2" fill="none" stroke="#0C2340" stroke-width="1.15"/>
+      </svg>
+      排球临场指挥
+    </a>
     <nav>
       <a href="{{ url_for('dictionary') }}">标注标准</a>
       <a href="{{ url_for('drills') }}">验收</a>

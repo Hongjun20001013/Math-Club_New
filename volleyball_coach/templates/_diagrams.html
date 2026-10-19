@@ -1,0 +1,60 @@
+{% if card.slots %}
+{% set receiver_ids = card.receivers | map(attribute='id') | list %}
+{% set front_receivers = card.receivers | selectattr('row', 'equalto', '前排') | list %}
+{% set short_name = front_receivers[0].name if front_receivers else (card.receivers[0].name if card.receivers else '') %}
+{% set seam_names = card.seam.split(' 与 ') %}
+{% set order = court_order if court_order is defined else (4, 3, 2, 5, 6, 1) %}
+<div class="diagrams">
+  <section class="diagram {% if state is defined and state.serving == 'us' %}is-now{% endif %}">
+    <div class="diagram-kicker">
+      <span>发球轮</span>
+      {% if state is defined and state.serving == 'us' %}<em>现在</em>{% endif %}
+    </div>
+    <div class="dnet" aria-hidden="true"></div>
+    <div class="dslots">
+      {% for slot in order %}
+        {% set cell = card.slots[slot] %}
+        <div class="dcell {% if cell.slot == 1 %}is-serve{% elif cell.wing %}is-front{% endif %}">
+          <span class="dpos">{{ cell.slot }} {{ cell.slot_name }}</span>
+          <strong>{{ cell.occupant_name }}</strong>
+          {% if cell.slot == 1 %}
+            <span class="dtag">发球</span>
+          {% elif cell.wing %}
+            <span class="dtag">发球后 {{ cell.wing }}</span>
+          {% elif cell.occupant_id == card.setter_id %}
+            <span class="dtag">组织</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="diagram {% if state is defined and state.serving == 'them' %}is-now{% endif %}">
+    <div class="diagram-kicker">
+      <span>接发轮</span>
+      {% if state is defined and state.serving == 'them' %}<em>现在</em>{% endif %}
+    </div>
+    <div class="dnet" aria-hidden="true"></div>
+    <div class="dslots">
+      {% for slot in order %}
+        {% set cell = card.slots[slot] %}
+        {% set receiving = cell.occupant_id in receiver_ids %}
+        {% set on_seam = seam_names | length == 2 and cell.occupant_name in seam_names %}
+        {% set on_short = short_name != '' and cell.occupant_name == short_name %}
+        <div class="dcell {% if receiving %}is-pass{% endif %} {% if on_seam %}is-seam{% endif %}">
+          <span class="dpos">{{ cell.slot }} {{ cell.slot_name }}</span>
+          <strong>{{ cell.occupant_name }}</strong>
+          {% if receiving or on_seam or on_short or cell.occupant_id == card.setter_id %}
+            <span class="dtag">
+              {%- if receiving %}接发{% endif -%}
+              {%- if on_seam %} · 结合部{% endif -%}
+              {%- if on_short %} · 短球{% endif -%}
+              {%- if cell.occupant_id == card.setter_id and not receiving %}组织{% endif -%}
+            </span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+<p class="diagram-note">海军底是发球人，蔚蓝底是主接发，深框是结合部。格子是轮转槽，不是这一球的实际站位。{{ card.position_note }}</p>
+{% endif %}
