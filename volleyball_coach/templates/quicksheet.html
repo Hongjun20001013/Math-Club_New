@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links no-print"><a href="{{ url_for('board', team_id=plan.team_id) }}">返回六轮卡片</a></p>
+<h1>{{ plan.name }} 场边速查</h1>
+<ul class="list">
+  <li>确认本场锁定的配对。候选没有锁定，就不能上场。</li>
+  <li>确认首发六人、发球队员、轮次和补位传球的人。</li>
+  <li>轮次到了，不等于替补已经换完。</li>
+  <li>漏记时先校正，不猜中间的轮次。</li>
+  <li>没有对手证据时，用基础发球预案，不编一个目标。</li>
+</ul>
+{% for card in cards %}
+  <section class="card">
+    <h2>R{{ card.rotation }} · {{ card.setter_name }} 组织</h2>
+    <p>前排：{% for item in card.front_attack %}{{ item.name }}{{ item.wing }}{% if not loop.last %} / {% endif %}{% endfor %}</p>
+    <p>接发 {{ card.seam }}。{{ card.short_ball }}</p>
+    <p>补位：{{ card.backup_name }}。</p>
+    {% for reminder in card.reminders %}<p>{{ reminder.text }}</p>{% endfor %}
+    {% for note in card.extra_notes %}
+      {% if "锁定" in note or "后排进攻" in note %}<p>{{ note }}</p>{% endif %}
+    {% endfor %}
+  </section>
+{% endfor %}
+<h2>每次换人看五件事</h2>
+<p>是不是固定配对。是不是这次死球真的换了。谁组织。谁接发、谁拦网。下一次什么时候换回。</p>
+<h2>下一球只留一个任务</h2>
+<p>发球：目标是谁或哪个区域，执行不到用什么。接发：结合部是谁，短球离开主二传。拦防：跟着这一轮的预案，一传没被破坏就不要按高球守。进攻：按到位、半到位、不到位收选择，并确认谁补位传球。</p>
+{% endblock %}

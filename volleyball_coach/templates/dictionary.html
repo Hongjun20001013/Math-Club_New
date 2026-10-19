@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>标注标准</h1>
+<p class="lede">同一件事用同一个词。看不清就标未知，未知不记成 0。</p>
+{% for term in terms %}
+  <article class="term">
+    <h2>{{ term.term }}</h2>
+    <p>{{ term.means }}</p>
+    <p class="muted">{{ term.not }}</p>
+  </article>
+{% endfor %}
+<h2>三个问题先要这些</h2>
+<div class="table-wrap">
+  <table>
+    <tr><th>问题</th><th>最少要记</th><th>分母</th></tr>
+    {% for metric in metrics %}
+      <tr>
+        <td>{{ metric.question }}</td>
+        <td>{{ metric.needs }}</td>
+        <td>{{ metric.denominator }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<h2>必填和可留空</h2>
+<p>必填：{{ required_fields | join("、") }}。</p>
+<p>可留空：{{ optional_fields | join("、") }}。</p>
+<ul class="list">
+  {% for rule in samples %}<li>{{ rule }}</li>{% endfor %}
+</ul>
+<h2>现在不做的识别</h2>
+<p>自动识别还没进这一版。以后如果做，要分开看漏回合、认错人、事件误判，以及人工修正花了多久。那些数字不能和现在的人工记录混成一个准确率。</p>
+{% endblock %}

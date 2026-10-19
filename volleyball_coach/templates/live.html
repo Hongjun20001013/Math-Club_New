@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
+  <a href="{{ url_for('review', match_id=match.id) }}">赛后三个问题</a>
+  <a href="{{ url_for('report_page', match_id=match.id) }}">报告</a>
+  <a href="{{ url_for('correct_form', match_id=match.id) }}">校正</a>
+</p>
+<div class="scoreline">
+  <div>
+    <span>我方{% if match.opponent %} · 对 {{ match.opponent }}{% endif %}</span>
+    <b>{{ state.score_us }}</b>
+  </div>
+  <div>
+    <span>对方 · 第 {{ state.set_index }} 局</span>
+    <b>{{ state.score_them }}</b>
+  </div>
+</div>
+<div class="pills">
+  <span class="pill">R{{ state.rotation }}</span>
+  <span class="pill">{{ "我方发球" if state.serving == "us" else "对方发球" }}</span>
+  <span class="pill">{{ "轻记录" if state.mode == "light" else "预案模式" }}</span>
+  {% if state.score_tracked and not state.history_gap %}
+    <span class="pill ok">比分链连续</span>
+  {% else %}
+    <span class="pill warn">手动轮次，统计未实时更新</span>
+  {% endif %}
+  {% if state.advice_blocked %}
+    <span class="pill bad">位置建议已停下</span>
+  {% else %}
+    <span class="pill ok">名单已确认</span>
+  {% endif %}
+  <span class="pill">对方轮次：未知</span>
+</div>
+
+<article class="advice {% if suggestion.blocked %}blocked{% endif %}">
+  <div class="kicker">这一球只做一件事 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</div>
+  <p class="meta">{{ suggestion.situation }}</p>
+  <p class="action">{{ suggestion.action }}</p>
+  <p><strong>依据</strong> {{ suggestion.basis }}</p>
+  <p><strong>备选</strong> {{ suggestion.alternative }}</p>
+  <p><strong>切换</strong> {{ suggestion.switch }}</p>
+  <p class="meta">{{ suggestion.confidence }}</p>
+</article>
+
+{% include "_court.html" %}
+
+{% if match.status == "live" %}
+  <form class="point-row" method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+    <button class="us" name="winner" value="us" type="submit">我方得分</button>
+    <button class="them" name="winner" value="them" type="submit">对方得分</button>
+  </form>
+  <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
+    <button class="secondary" type="submit">撤销上一步</button>
+  </form>
+{% endif %}
+
+<section>
+  <h2>换人</h2>
+  <p class="muted">先看是不是固定配对，再确认这次死球真的换了，然后看谁组织、谁接发和拦网、下一次什么时候换回。</p>
+  {% if subs %}
+    {% for sub in subs %}
+      <form class="sub-row" method="post" action="{{ url_for('post_sub', match_id=match.id) }}">
+        <input type="hidden" name="out" value="{{ sub.out }}">
+        <input type="hidden" name="in" value="{{ sub.in }}">
+        <button class="{{ 'warn' if sub.warning else '' }}" type="submit">确认：{{ sub.label }}</button>
+        {% if sub.warning %}<p class="warn-line">{{ sub.warning }}</p>{% endif %}
+      </form>
+    {% endfor %}
+  {% else %}
+    <p>现在没有可执行的换人。</p>
+  {% endif %}
+  {% for pair in unlocked %}
+    <p class="muted">{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} 这场没有锁定{% if pair.status == 'candidate' %}，它还是候选{% endif %}。</p>
+  {% endfor %}
+</section>
+
+<details>
+  <summary>不靠比分，直接改轮次</summary>
+  <form class="rot-row" method="post" action="{{ url_for('post_rotation', match_id=match.id) }}">
+    {% for number in range(1, 7) %}
+      <button class="secondary {% if number == state.rotation %}current{% endif %}" name="rotation" value="{{ number }}" type="submit">R{{ number }}</button>
+    {% endfor %}
+  </form>
+  <p class="muted">这样改会停下比分链。漏记的分不会被反推。</p>
+</details>
+
+<details>
+  <summary>本轮职责，不是第二条指令</summary>
+  <p>组织 {{ card.setter_name }}。补位 {{ card.backup_name }}。{{ card.backup_note }}</p>
+  <p>结合部 {{ card.seam }}。{{ card.short_ball }}</p>
+  <p>{{ card.position_note }}</p>
+  {% for note in card.extra_notes %}<p>{{ note }}</p>{% endfor %}
+</details>
+
+<details>
+  <summary>书签、模式、下一局</summary>
+  <form class="inline" method="post" action="{{ url_for('post_mode', match_id=match.id) }}">
+    {% if state.mode == "light" %}
+      <button class="secondary" name="mode" value="plan" type="submit">改回预案模式</button>
+    {% else %}
+      <button class="secondary" name="mode" value="light" type="submit">改成轻记录</button>
+    {% endif %}
+  </form>
+  <form class="stack" method="post" action="{{ url_for('post_bookmark', match_id=match.id) }}">
+    <label>死球时留一个书签</label>
+    <select name="tag">
+      <option>接发</option>
+      <option>进攻</option>
+      <option>拦防</option>
+    </select>
+    <input name="note" placeholder="一句话">
+    <button class="secondary" type="submit">记下书签</button>
+  </form>
+  {% if bookmarks %}
+    <ul class="list">
+      {% for mark in bookmarks %}
+        <li>{{ mark.created_at }} · {{ mark.payload.tag }} {{ mark.payload.note }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <form class="stack" method="post" action="{{ url_for('next_set', match_id=match.id) }}">
+    <h3>下一局</h3>
+    <label>起始轮次</label>
+    <select name="rotation">
+      {% for number in range(1, 7) %}<option value="{{ number }}">R{{ number }}</option>{% endfor %}
+    </select>
+    <label>谁发球</label>
+    <select name="serving">
+      <option value="us">我方</option>
+      <option value="them">对方</option>
+    </select>
+    {% if plan.rules.pair_lock_scope == "set" %}
+      {% for pair in plan.pairs %}
+        <label><input type="checkbox" name="pair_id" value="{{ pair.id }}"> 本局锁定 {{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }}</label>
+      {% endfor %}
+    {% else %}
+      <p class="muted">这支球队的配对整场锁定，新的一局沿用开场那几对。</p>
+    {% endif %}
+    <button class="secondary" type="submit">开始下一局</button>
+  </form>
+  {% if match.status == "live" %}
+    <form method="post" action="{{ url_for('finish_match', match_id=match.id) }}">
+      <button class="secondary" type="submit">结束本场，去补三个问题</button>
+    </form>
+  {% endif %}
+</details>
+{% endblock %}

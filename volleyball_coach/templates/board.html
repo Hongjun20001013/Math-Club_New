@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
+  <a href="{{ url_for('quicksheet', team_id=plan.team_id) }}">速查表</a>
+  <a href="{{ url_for('new_match', team_id=plan.team_id) }}">开场</a>
+</p>
+<h1>六轮可执行卡</h1>
+<p class="lede">{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
+{% for card in cards %}
+  <section class="card" id="r{{ card.rotation }}" data-front="{% for item in card.front_attack %}{{ item.name }}{% if not loop.last %},{% endif %}{% endfor %}">
+    <h2>R{{ card.rotation }}</h2>
+    {% if card.conflicts %}
+      <p class="warn-line">{{ card.conflicts | join("；") }}</p>
+    {% endif %}
+    <p>组织：{{ card.setter_name }}。{{ card.setter_note }}</p>
+    <p>前排：{% for item in card.front_attack %}{{ item.name }}{{ item.wing }}{% if not loop.last %}，{% endif %}{% else %}未排{% endfor %}</p>
+    <p>补位传球：{{ card.backup_name }}。{{ card.backup_note }}</p>
+    <p>接发：{% for item in card.receivers %}{{ item.name }}（{{ item.row }}）{% if not loop.last %}、{% endif %}{% else %}未指定{% endfor %}</p>
+    <p>结合部：{{ card.seam }}</p>
+    <p>短球：{{ card.short_ball }}</p>
+    <p>{{ card.position_note }}</p>
+    <p>发球轮：{{ card.movement_serve }}</p>
+    <p>接发轮：{{ card.movement_receive }}</p>
+    {% for note in card.extra_notes %}<p>{{ note }}</p>{% endfor %}
+    {% for reminder in card.reminders %}<p class="warn-line">{{ reminder.text }}</p>{% endfor %}
+    {% include "_court.html" %}
+    {% include "_serve_form.html" %}
+  </section>
+{% endfor %}
+{% endblock %}
