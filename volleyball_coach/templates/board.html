@@ -7,13 +7,27 @@
 </p>
 <h1>六轮可执行卡</h1>
 <p class="lede">{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
+<p class="legend">
+  <span class="chip is-front"><i class="fb">F</i>前排</span>
+  <span class="chip is-back"><i class="fb">B</i>后排</span>
+  <span>★ 二传</span>
+  <span>深框是结合部</span>
+  <span>右边是职责散开，不是已经确认的坐标</span>
+</p>
 {% for card in cards %}
-  <section class="card" id="r{{ card.rotation }}" data-front="{% for item in card.front_attack %}{{ item.name }}{% if not loop.last %},{% endif %}{% endfor %}">
-    <h2>R{{ card.rotation }}</h2>
-    {% if card.conflicts %}
-      <p class="warn-line">{{ card.conflicts | join("；") }}</p>
-    {% endif %}
-    {% include "_diagrams.html" %}
+  <section class="card rotation-sheet" id="r{{ card.rotation }}" data-front="{% for item in card.front_attack %}{{ item.name }}{% if not loop.last %},{% endif %}{% endfor %}">
+    <div class="sheet-row">
+      <h2>R{{ card.rotation }}</h2>
+      <div>
+        <p class="sheet-setter">二传 {{ card.setter_name }}</p>
+        {% if card.conflicts %}
+          <p class="warn-line">{{ card.conflicts | join("；") }}</p>
+        {% endif %}
+        {% include "_diagrams.html" %}
+      </div>
+    </div>
+    <details class="sheet-words">
+      <summary>这一轮的文字和槽位</summary>
     <p>组织：{{ card.setter_name }}。{{ card.setter_note }}</p>
     <p>前排：{% for item in card.front_attack %}{{ item.name }}{{ item.wing }}{% if not loop.last %}，{% endif %}{% else %}未排{% endfor %}</p>
     <p>补位传球：{{ card.backup_name }}。{{ card.backup_note }}</p>
@@ -27,6 +41,7 @@
     {% for reminder in card.reminders %}<p class="warn-line">{{ reminder.text }}</p>{% endfor %}
     {% include "_court.html" %}
     {% include "_serve_form.html" %}
+    </details>
   </section>
 {% endfor %}
 {% endblock %}
