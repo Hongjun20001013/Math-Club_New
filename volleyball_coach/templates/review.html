@@ -53,13 +53,7 @@
     <option value="complete">按完整比赛记录</option>
     <option value="key_clip">关键片段。不能算整场得分率。</option>
   </select>
-  <label for="pass_quality">一传质量（可以不填）</label>
-  <select id="pass_quality" name="pass_quality">
-    <option value="">先不填</option>
-    {% for code, label in qualities.items() %}
-      <option value="{{ code }}">{{ label }}</option>
-    {% endfor %}
-  </select>
+  {% include "_stat_fields.html" %}
   <label for="server_label">发球队员</label>
   <input id="server_label" name="server_label" placeholder="知道再填">
   <div class="split">
@@ -94,17 +88,22 @@
   <button type="submit">保存回合</button>
 </form>
 
+{% include "_skill_cards.html" %}
 <h2>已记下的回合</h2>
 {% if rallies %}
   <div class="table-wrap">
     <table>
-      <tr><th>轮次</th><th>发球</th><th>胜方</th><th>一传</th><th>范围</th><th>阵容</th><th></th></tr>
+      <tr><th>轮次</th><th>发球</th><th>胜方</th><th>一传</th><th>拦网</th><th>防守</th><th>扣球</th><th>严重失误</th><th>范围</th><th>阵容</th><th></th></tr>
       {% for rally in rallies %}
         <tr>
           <td>{{ "未知" if rally.rotation is none else "R" ~ rally.rotation }}</td>
           <td>{{ {"us": "我方", "them": "对方", "unknown": "未知"}[rally.serving_side] }}</td>
           <td>{{ {"us": "我方", "them": "对方", "unknown": "未知"}[rally.winner] }}</td>
           <td>{{ qualities.get(rally.pass_quality, "未填") if rally.pass_quality else "未填" }}</td>
+          <td>{{ stat_fields[1][2].get(rally.block_touch, "未填") if rally.block_touch else "未填" }}</td>
+          <td>{{ stat_fields[2][2].get(rally.defense_quality, "未填") if rally.defense_quality else "未填" }}</td>
+          <td>{{ stat_fields[3][2].get(rally.attack_result, "未填") if rally.attack_result else "未填" }}</td>
+          <td>{{ stat_fields[4][2].get(rally.severe_error, "未填") if rally.severe_error else "未填" }}{% if rally.severe_kind %} · {{ severe_kinds.get(rally.severe_kind, rally.severe_kind) }}{% endif %}</td>
           <td>{{ {"complete": "完整", "sample": "抽样", "key_clip": "片段"}[rally.sample_scope] }}</td>
           <td>{{ rally.bench_ids | join("、") if rally.bench_ids else "首发" }}</td>
           <td>

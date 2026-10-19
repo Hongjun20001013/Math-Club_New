@@ -8,6 +8,9 @@
 <h1>赛后报告</h1>
 <p class="lede">{{ report.review_budget }}</p>
 <p>对方轮次：未知。没有输入，就不生成对方阵容。</p>
+{% with skills = report.skills %}
+  {% include "_skill_cards.html" %}
+{% endwith %}
 
 <h2>哪一轮接发最困难？</h2>
 <p>{{ report.receive.headline }}</p>

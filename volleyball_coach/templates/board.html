@@ -7,13 +7,87 @@
 </p>
 <h1>六轮可执行卡</h1>
 <p class="lede">{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
+<p>轮转按顺时针走。R1 的 1 号位发球，每得一次发球权，六个人各进一个号位。右边是接发职责散开，不是已经量过的站位坐标。</p>
+{% if plan.schemes %}
+  <form class="scheme-switch" method="get">
+    <label for="scheme">正在看的方案</label>
+    <select id="scheme" name="scheme">
+      {% for scheme in plan.schemes %}
+        <option value="{{ scheme.id }}" {% if active_scheme and scheme.id == active_scheme.id %}selected{% endif %}>
+          {{ scheme.name }}{% if scheme.is_default %} · 默认{% endif %}
+        </option>
+      {% endfor %}
+    </select>
+    <button class="secondary" type="submit">查看</button>
+  </form>
+{% endif %}
 <p class="legend">
-  <span class="chip is-front"><i class="fb">F</i>前排</span>
-  <span class="chip is-back"><i class="fb">B</i>后排</span>
-  <span>★ 二传</span>
-  <span>深框是结合部</span>
-  <span>右边是职责散开，不是已经确认的坐标</span>
+  <span class="chip is-back"><i class="role">setter</i><span class="who">这一轮组织</span></span>
+  <span class="chip is-front"><i class="role">oppo</i><span class="who">接应</span></span>
+  <span class="chip is-front"><i class="role">outside</i><span class="who">主攻</span></span>
+  <span class="chip is-front"><i class="role">middle</i><span class="who">副攻</span></span>
+  <span class="chip is-back"><i class="role">def</i><span class="who">防守替补</span></span>
+  <span>深色是前排槽，浅色是后排槽。有自由人的队才标 libero。男排这套没有 libero。</span>
+  <span>深框是结合部。右边不是已经确认的坐标。</span>
 </p>
+{% set shown = active_scheme.order if active_scheme else plan.base_order() %}
+<details class="scheme-editor">
+  <summary>{% if active_scheme %}编辑「{{ active_scheme.name }}」{% else %}把六个号位存成方案{% endif %}</summary>
+  <form class="stack" method="post" action="{{ url_for('save_scheme', team_id=plan.team_id) }}">
+    {% if active_scheme %}<input type="hidden" name="scheme_id" value="{{ active_scheme.id }}">{% endif %}
+    <label for="scheme_name">方案名称</label>
+    <input id="scheme_name" name="name" value="{{ active_scheme.name if active_scheme else '' }}" required>
+    <div class="scheme-grid">
+      {% for slot, slot_name in court_slots %}
+        <label>
+          {{ slot }} {{ slot_name }}
+          <select name="slot_{{ slot }}">
+            {% for player in plan.players.values() %}
+              <option value="{{ player.id }}" {% if shown|length == 6 and shown[slot - 1] == player.id %}selected{% endif %}>{{ player.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+    </div>
+    {% if active_scheme and active_scheme.is_default %}
+      <input type="hidden" name="is_default" value="on">
+      <p class="muted">这是开场默认。六人顺序存在这里。要换默认，去另一套方案里勾上「设为开场默认」。</p>
+    {% else %}
+      <label class="checks"><span><input type="checkbox" name="is_default"> 设为开场默认。不勾就只保存这一套，现在的默认顺序不变。</span></label>
+    {% endif %}
+    <label for="scheme_notes">备注</label>
+    <input id="scheme_notes" name="notes" value="{{ active_scheme.notes if active_scheme else '' }}">
+    <button type="submit">保存这套方案</button>
+  </form>
+  {% if active_scheme and active_scheme.is_default %}
+    <p class="muted">这是默认方案。要换默认，把另一套勾上「设为开场默认」再保存。</p>
+  {% elif active_scheme %}
+    <form method="post" action="{{ url_for('delete_scheme', team_id=plan.team_id, scheme_id=active_scheme.id) }}">
+      <button class="secondary" type="submit">删除这套方案</button>
+    </form>
+  {% endif %}
+</details>
+<details>
+  <summary>另存一套方案</summary>
+  <form class="stack" method="post" action="{{ url_for('save_scheme', team_id=plan.team_id) }}">
+    <label for="new_scheme_name">新方案名称</label>
+    <input id="new_scheme_name" name="name" placeholder="例如：对高拦网" required>
+    <div class="scheme-grid">
+      {% for slot, slot_name in court_slots %}
+        <label>
+          {{ slot }} {{ slot_name }}
+          <select name="slot_{{ slot }}">
+            {% for player in plan.players.values() %}
+              <option value="{{ player.id }}" {% if shown|length == 6 and shown[slot - 1] == player.id %}selected{% endif %}>{{ player.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+    </div>
+    <label class="checks"><span><input type="checkbox" name="is_default"> 同时把这套设成开场默认</span></label>
+    <button type="submit">另存方案</button>
+  </form>
+</details>
 {% for card in cards %}
   <section class="card rotation-sheet" id="r{{ card.rotation }}" data-front="{% for item in card.front_attack %}{{ item.name }}{% if not loop.last %},{% endif %}{% endfor %}">
     <div class="sheet-row">

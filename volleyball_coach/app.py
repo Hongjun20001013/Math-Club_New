@@ -6,7 +6,14 @@ from pathlib import Path
 
 from flask import Flask, abort, flash, g, jsonify, redirect, render_template, request, send_file, url_for
 
-from volleyball_coach.dictionary import METRICS, OPTIONAL_RALLY_FIELDS, REQUIRED_RALLY_FIELDS, SAMPLE_RULES, TERMS
+from volleyball_coach.dictionary import (
+    METRICS,
+    OPTIONAL_RALLY_FIELDS,
+    REQUIRED_RALLY_FIELDS,
+    SAMPLE_RULES,
+    SKILL_METRICS,
+    TERMS,
+)
 from volleyball_coach.drills import acceptance_drills
 from volleyball_coach.lineup import build_card, build_suggestion, legal_sub_options, validate_pairs
 from volleyball_coach.match import (
@@ -19,20 +26,52 @@ from volleyball_coach.match import (
     last_reversible_seq,
     replay,
 )
-from volleyball_coach.model import PASS_QUALITY, Pair, Player, Rules, ServePlan, TeamPlan
-from volleyball_coach.report import build_report, execution_of
+from volleyball_coach.model import (
+    ATTACK_RESULT,
+    BLOCK_TOUCH,
+    DEFENSE_QUALITY,
+    PASS_QUALITY,
+    SEVERE_ERROR,
+    SEVERE_KIND,
+    Pair,
+    Player,
+    RotationScheme,
+    Rules,
+    ServePlan,
+    TeamPlan,
+)
+from volleyball_coach.report import build_report, execution_of, skill_summary
 from volleyball_coach.seed import MENS_TEAM_ID
 from volleyball_coach.store import Store, ability_label, locked_pairs_of, new_id, now, plan_for_match
 
 FONT_PATH = Path(__file__).resolve().parents[1] / "fonts" / "NotoSansSC-Regular.otf"
 COURT_ORDER = (4, 3, 2, 5, 6, 1)
 ROLES = (
-    ("opposite", "接应 / 对角二传"),
-    ("outside", "主攻"),
-    ("middle", "副攻"),
-    ("defender", "防守替补"),
-    ("flex", "主攻或接应"),
-    ("other", "其他"),
+    ("outside", "outside"),
+    ("opposite", "oppo"),
+    ("middle", "middle"),
+    ("setter", "setter"),
+    ("libero", "libero"),
+    ("defender", "defender"),
+    ("flex", "flex"),
+    ("other", "other"),
+)
+
+COURT_SLOTS = (
+    (4, "左前"),
+    (3, "中前"),
+    (2, "右前"),
+    (5, "左后"),
+    (6, "中后"),
+    (1, "右后"),
+)
+
+STAT_FIELDS = (
+    ("pass_quality", "一传", PASS_QUALITY),
+    ("block_touch", "拦网", BLOCK_TOUCH),
+    ("defense_quality", "防守", DEFENSE_QUALITY),
+    ("attack_result", "扣球", ATTACK_RESULT),
+    ("severe_error", "严重失误", SEVERE_ERROR),
 )
 
 
@@ -41,6 +80,10 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     app.config["DB_PATH"] = str(db_path or Path(__file__).resolve().parent / "data" / "coach.db")
     app.secret_key = "volleyball-coach-local"
     app.jinja_env.filters["ability"] = ability_label
+
+    @app.context_processor
+    def inject_labels():
+        return {"severe_kinds": SEVERE_KIND, "court_slots": COURT_SLOTS}
 
     @app.teardown_appcontext
     def close_store(_exc):
@@ -235,9 +278,19 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.get("/teams/<team_id>/board")
     def board(team_id: str):
         plan = team_or_404(team_id)
-        locked = {pair.key() for pair in plan.pairs if pair.status == "confirmed"}
-        cards = [build_card(plan, rotation, {}, locked) for rotation in range(1, 7)]
-        return render_template("board.html", plan=plan, cards=cards, court_order=COURT_ORDER, locked=locked)
+        active, view = preview_plan(plan, request.args.get("scheme"))
+        locked = {pair.key() for pair in view.pairs if pair.status == "confirmed"}
+        cards = [build_card(view, rotation, {}, locked) for rotation in range(1, 7)]
+        return render_template(
+            "board.html",
+            plan=plan,
+            view=view,
+            active_scheme=active,
+            cards=cards,
+            court_order=COURT_ORDER,
+            court_slots=COURT_SLOTS,
+            locked=locked,
+        )
 
     @app.post("/teams/<team_id>/serve")
     def save_serve(team_id: str):
@@ -254,20 +307,68 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.get("/teams/<team_id>/quicksheet")
     def quicksheet(team_id: str):
         plan = team_or_404(team_id)
-        locked = {pair.key() for pair in plan.pairs if pair.status == "confirmed"}
-        cards = [build_card(plan, rotation, {}, locked) for rotation in range(1, 7)]
-        return render_template("quicksheet.html", plan=plan, cards=cards)
+        _active, view = preview_plan(plan, request.args.get("scheme"))
+        locked = {pair.key() for pair in view.pairs if pair.status == "confirmed"}
+        cards = [build_card(view, rotation, {}, locked) for rotation in range(1, 7)]
+        return render_template("quicksheet.html", plan=view, cards=cards, court_order=COURT_ORDER)
+
+    @app.post("/teams/<team_id>/schemes")
+    def save_scheme(team_id: str):
+        plan = team_or_404(team_id)
+        try:
+            order = scheme_order_from_form(request.form, plan)
+            name = (request.form.get("name") or "").strip()
+            if not name:
+                raise ValueError("方案要有名字。")
+            raw_id = (request.form.get("scheme_id") or "").strip()
+            existing = plan.scheme_by_id(raw_id) if raw_id else None
+            if raw_id and existing is None:
+                raise ValueError("找不到这套方案。")
+            want_default = request.form.get("is_default") == "on"
+            if existing and existing.is_default:
+                want_default = True
+            if not plan.schemes:
+                want_default = True
+            scheme = RotationScheme(
+                id=raw_id or new_id("scheme"),
+                name=name,
+                order=order,
+                is_default=want_default,
+                notes=(request.form.get("notes") or "").strip(),
+            )
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("board", team_id=plan.team_id))
+        store().save_scheme(plan.team_id, scheme)
+        if want_default and not (existing and existing.is_default):
+            flash(f"已保存方案「{name}」，并设成开场默认。", "ok")
+        elif existing and existing.is_default:
+            flash(f"默认方案「{name}」已更新。六人顺序跟着这套走。", "ok")
+        else:
+            flash(f"已另存方案「{name}」。开场默认没有改。", "ok")
+        return redirect(url_for("board", team_id=plan.team_id, scheme=scheme.id))
+
+    @app.post("/teams/<team_id>/schemes/<scheme_id>/delete")
+    def delete_scheme(team_id: str, scheme_id: str):
+        team_or_404(team_id)
+        if store().delete_scheme(team_id, scheme_id):
+            flash("这套方案已删除。默认方案还在。", "ok")
+        else:
+            flash("默认方案要留着。先把另一套设成默认，再删这一套。", "error")
+        return redirect(url_for("board", team_id=team_id))
 
     @app.get("/teams/<team_id>/matches/new")
     def new_match(team_id: str):
         plan = team_or_404(team_id)
-        return render_template("match_new.html", plan=plan)
+        return render_template("match_new.html", plan=plan, court_slots=COURT_SLOTS)
 
     @app.post("/teams/<team_id>/matches")
     def start_match(team_id: str):
         plan = team_or_404(team_id)
-        if len(plan.base_order()) != 6:
-            flash("先把六个首发槽位排满，再开场。", "error")
+        chosen_scheme = plan.scheme_by_id(request.form.get("scheme_id")) or plan.default_scheme()
+        working = plan.with_order(chosen_scheme.order) if chosen_scheme else plan
+        if len(working.base_order()) != 6:
+            flash("先把六个首发槽位排满，或选一套完整方案，再开场。", "error")
             return redirect(url_for("new_match", team_id=plan.team_id))
         try:
             rotation = int(request.form.get("rotation", "1"))
@@ -284,14 +385,15 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             flash(str(exc), "error")
             return redirect(url_for("new_match", team_id=plan.team_id))
         match_id = store().create_match(
-            plan,
+            working,
             request.form.get("opponent", ""),
             mode,
             {frozenset(pair) for pair in selected},
             rotation,
             serving,
         )
-        flash("开场阵容已记下。换人要再确认一次，轮次不会自动把人换上场。", "ok")
+        scheme_name = chosen_scheme.name if chosen_scheme else "当前首发槽"
+        flash(f"开场使用方案「{scheme_name}」。换人要再确认一次，轮次不会自动把人换上场。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.get("/matches/<match_id>")
@@ -330,6 +432,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             unlocked=unlocked,
             court_order=COURT_ORDER,
             bookmarks=bookmarks[-3:],
+            skills=skill_summary(rallies),
+            stat_fields=STAT_FIELDS,
         )
 
     @app.post("/matches/<match_id>/point")
@@ -345,6 +449,49 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             flash(str(exc), "error")
             return redirect(url_for("live", match_id=match_id))
         store().append_event(match_id, "point", {"winner": winner})
+        return redirect(url_for("live", match_id=match_id))
+
+    @app.post("/matches/<match_id>/mark")
+    def post_mark(match_id: str):
+        """Stat line for the rally on screen now. Scoring is optional and uses that same rally."""
+        match, plan, state, _points, _events = match_bundle(match_id)
+        rotation = state.rotation
+        serving = state.serving
+        set_index = state.set_index
+        lineup = [
+            {"slot": slot, "player_id": state.occupants.get(slot), "name": plan.name_of(state.occupants.get(slot))}
+            for slot in range(1, 7)
+        ]
+        bench = [plan.name_of(player_id) for player_id in state.occupants.values() if player_id not in set(plan.base_order())]
+        try:
+            fields = rally_from_form(request.form, set_index)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("live", match_id=match_id))
+        fields["rotation"] = rotation
+        fields["serving_side"] = serving
+        fields["set_number"] = set_index
+        fields["lineup"] = lineup
+        fields["bench_ids"] = bench
+        also_score = request.form.get("also_score") == "on"
+        if also_score:
+            if match["status"] != "live":
+                flash("本场已结束，统计可以补，比分不再往下加。", "error")
+                return redirect(url_for("live", match_id=match_id))
+            if fields["winner"] not in ("us", "them"):
+                flash("胜方未知时不能同时改比分。先把技术统计留下。", "error")
+                return redirect(url_for("live", match_id=match_id))
+            try:
+                apply_point(plan, state, fields["winner"])
+            except MatchError as exc:
+                flash(str(exc), "error")
+                return redirect(url_for("live", match_id=match_id))
+            store().append_event(match_id, "point", {"winner": fields["winner"]})
+        store().add_rally(match_id, fields)
+        if also_score:
+            flash(f"R{rotation} 这一分已记下，比分和轮次按胜方走了一步。", "ok")
+        else:
+            flash(f"R{rotation} 这一分的技术统计已记下。比分和轮次没动。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.post("/matches/<match_id>/sub")
@@ -528,6 +675,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             bench_ids=bench,
             bench_names=[plan.name_of(player_id) for player_id in bench],
             qualities=PASS_QUALITY,
+            stat_fields=STAT_FIELDS,
+            skills=skill_summary(store().rallies_for(match_id)),
             required_fields=REQUIRED_RALLY_FIELDS,
             optional_fields=OPTIONAL_RALLY_FIELDS,
         )
@@ -599,6 +748,11 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                     "serving_side": rally["serving_side"],
                     "winner": rally["winner"],
                     "pass_quality": rally["pass_quality"],
+                    "block_touch": rally.get("block_touch"),
+                    "defense_quality": rally.get("defense_quality"),
+                    "attack_result": rally.get("attack_result"),
+                    "severe_error": rally.get("severe_error"),
+                    "severe_kind": rally.get("severe_kind") or None,
                     "server_label": rally["server_label"] or None,
                     "target_type": rally["target_type"] or None,
                     "target_label": rally["target_label"] or None,
@@ -622,6 +776,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             "dictionary.html",
             terms=TERMS,
             metrics=METRICS,
+            skill_metrics=SKILL_METRICS,
             samples=SAMPLE_RULES,
             required_fields=REQUIRED_RALLY_FIELDS,
             optional_fields=OPTIONAL_RALLY_FIELDS,
@@ -765,11 +920,16 @@ def rally_from_form(form, default_set: int) -> dict:
             raise ValueError("轮次要选 R1 到 R6，或未知。") from exc
         if rotation not in range(1, 7):
             raise ValueError("轮次要选 R1 到 R6，或未知。")
-    quality = form.get("pass_quality") or ""
-    if quality == "":
-        quality = None
-    elif quality not in PASS_QUALITY:
-        raise ValueError("一传质量不在标注标准里。")
+    quality = optional_code(form, "pass_quality", PASS_QUALITY, "一传质量不在标注标准里。")
+    block_touch = optional_code(form, "block_touch", BLOCK_TOUCH, "拦网不在标注标准里。")
+    defense_quality = optional_code(form, "defense_quality", DEFENSE_QUALITY, "防守不在标注标准里。")
+    attack_result = optional_code(form, "attack_result", ATTACK_RESULT, "扣球结果不在标注标准里。")
+    severe_error = optional_code(form, "severe_error", SEVERE_ERROR, "严重失误不在标注标准里。")
+    severe_kind = (form.get("severe_kind") or "").strip()
+    if severe_error != "yes":
+        severe_kind = ""
+    elif severe_kind and severe_kind not in SEVERE_KIND:
+        raise ValueError("严重失误的种类不在标注标准里。")
     try:
         set_number = int(form.get("set_number") or default_set)
     except ValueError as exc:
@@ -783,6 +943,11 @@ def rally_from_form(form, default_set: int) -> dict:
         "serving_side": serving,
         "winner": winner,
         "pass_quality": quality,
+        "block_touch": block_touch,
+        "defense_quality": defense_quality,
+        "attack_result": attack_result,
+        "severe_error": severe_error,
+        "severe_kind": severe_kind,
         "server_label": (form.get("server_label") or "").strip(),
         "target_type": target_type,
         "target_label": (form.get("target_label") or "").strip(),
@@ -792,6 +957,34 @@ def rally_from_form(form, default_set: int) -> dict:
         "sample_scope": scope,
         "note": (form.get("note") or "").strip(),
     }
+
+
+def optional_code(form, name: str, allowed: dict, message: str):
+    value = form.get(name) or ""
+    if value == "":
+        return None
+    if value not in allowed:
+        raise ValueError(message)
+    return value
+
+
+def scheme_order_from_form(form, plan: TeamPlan) -> list[str]:
+    order = []
+    for slot in range(1, 7):
+        player_id = form.get(f"slot_{slot}", "")
+        if player_id not in plan.players:
+            raise ValueError(f"{slot} 号位要选名单里的人。")
+        order.append(player_id)
+    if len(set(order)) != 6:
+        raise ValueError("六个号位必须是六个不同的人。")
+    return order
+
+
+def preview_plan(plan: TeamPlan, scheme_id: str | None) -> tuple[RotationScheme | None, TeamPlan]:
+    chosen = plan.scheme_by_id(scheme_id) or plan.default_scheme()
+    if chosen and len(chosen.order) == 6:
+        return chosen, plan.with_order(chosen.order)
+    return chosen, plan
 
 
 def confirmed_serve_samples(rallies: list[dict], rotation: int, target_label: str) -> int:

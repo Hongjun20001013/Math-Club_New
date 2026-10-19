@@ -130,6 +130,96 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
     assert "<strong>D</strong>" in reopened_html
 
 
+def test_role_chips_editable_scheme_and_skill_rates(tmp_path):
+    client = _client(tmp_path)
+    board = client.get(f"/teams/{MENS_TEAM_ID}/board").get_data(as_text=True)
+    assert "outside" in board
+    assert "oppo" in board
+    assert "middle" in board
+    assert "setter" in board
+    assert 'class="role">libero' not in board
+    assert "6-2 默认" in board
+    r1 = board.split('id="r1"')[1].split('id="r2"')[0]
+    assert "setter" in r1
+    assert "Michael" in r1
+
+    saved = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes",
+        data={
+            "name": "对高拦网",
+            "slot_1": "michael",
+            "slot_2": "vitas",
+            "slot_3": "andy-a",
+            "slot_4": "eric",
+            "slot_5": "leo",
+            "slot_6": "andy-b",
+            "notes": "只是另一套",
+        },
+        follow_redirects=True,
+    )
+    preview = saved.get_data(as_text=True)
+    assert "开场默认没有改" in preview
+    preview_r2 = preview.split('id="r2"')[1].split('id="r3"')[0]
+    assert 'data-front="Leo,Andy A,Eric"' in preview_r2
+    default_board = client.get(f"/teams/{MENS_TEAM_ID}/board").get_data(as_text=True)
+    default_r2 = default_board.split('id="r2"')[1].split('id="r3"')[0]
+    assert 'data-front="Vitas,Andy A,Eric"' in default_r2
+
+    started = client.post(
+        f"/teams/{MENS_TEAM_ID}/matches",
+        data={"opponent": "红队", "mode": "light", "rotation": "1", "serving": "them", "pair_id": "pair-d"},
+    )
+    match_url = started.headers["Location"]
+    marked = client.post(
+        f"{match_url}/mark",
+        data={
+            "set_number": "1",
+            "rotation": "1",
+            "serving_side": "them",
+            "winner": "us",
+            "sample_scope": "sample",
+            "pass_quality": "in_system",
+            "block_touch": "effective",
+            "defense_quality": "in_system",
+            "attack_result": "kill",
+            "severe_error": "no",
+            "severe_kind": "",
+            "also_score": "on",
+        },
+        follow_redirects=True,
+    )
+    marked_html = marked.get_data(as_text=True)
+    assert _rotation(marked_html) == "2"
+    assert _our_score(marked_html) == "1"
+    assert "样本不足" in marked_html
+
+    client.post(
+        f"{match_url}/rallies",
+        data={
+            "set_number": "1",
+            "rotation": "2",
+            "serving_side": "us",
+            "winner": "them",
+            "sample_scope": "key_clip",
+            "pass_quality": "out",
+            "block_touch": "unknown",
+            "defense_quality": "unknown",
+            "attack_result": "unknown",
+            "severe_error": "unknown",
+        },
+    )
+    report = client.get(f"{match_url}/report").get_data(as_text=True)
+    assert "1/1" in report
+    assert "不到位 0" in report or "不到位 0。" in report
+    assert "关键片段 1" in report
+    assert "上场后胜率更高" not in report
+    payload = client.get(f"{match_url}/report.json").get_json()
+    assert payload["report"]["skills"]["cards"][0]["ready"] is False
+    qualities = [rally["pass_quality"] for rally in payload["rallies"]]
+    assert "unknown" not in qualities
+    assert "out" in qualities
+
+
 def test_dictionary_and_drills_pages(tmp_path):
     client = _client(tmp_path)
     dictionary = client.get("/dictionary").get_data(as_text=True)

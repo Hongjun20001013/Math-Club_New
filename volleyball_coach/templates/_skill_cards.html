@@ -1,0 +1,15 @@
+<section class="skill-board">
+  <h2>这一分记下来的</h2>
+  <p>{{ skills.headline }}</p>
+  <div class="stat-grid">
+    {% for item in skills.cards %}
+      <article class="stat-card">
+        <p class="k">{{ item.label }}</p>
+        <strong>{{ item.display }}</strong>
+        <span>{{ item.fraction }}{% if item.fraction != '—' and not item.ready %} · 样本不足{% endif %}</span>
+        <p>{{ item.detail }}</p>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="muted">{{ skills.note }}</p>
+</section>

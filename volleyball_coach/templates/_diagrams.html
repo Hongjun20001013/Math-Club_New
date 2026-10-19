@@ -14,10 +14,10 @@
         {% for slot in order %}
           {% set cell = card.slots[slot] %}
           <div class="pcell">
-            <span class="pnum">{{ cell.slot }}{% if cell.slot == 1 %} · 发球{% endif %}</span>
+            <span class="pnum">{{ cell.slot }} {{ cell.slot_name }}{% if cell.slot == 1 %} · 发球{% endif %}</span>
             <span class="chip {{ 'is-front' if cell.row == '前排' else 'is-back' }}">
-              <i class="fb">{{ 'F' if cell.row == '前排' else 'B' }}</i>
-              {{ cell.occupant_name }}{% if cell.occupant_id == card.setter_id %}<i class="star">★</i>{% endif %}
+              <i class="role">{{ cell.role_label }}</i>
+              <span class="who">{{ cell.occupant_name }}{% if cell.occupant_id == card.setter_id %}<i class="star">★</i>{% endif %}</span>
             </span>
           </div>
         {% endfor %}
@@ -33,19 +33,19 @@
         {% set cell = card.slots[slot] %}
         {% set receiving = cell.occupant_id in receiver_ids %}
         {% set on_seam = seam_names | length == 2 and cell.occupant_name in seam_names %}
-        {% set pos = namespace(x=x_of[cell.slot], y=76) %}
+        {% set pos = namespace(x=x_of[cell.slot], y=78) %}
         {% if cell.row == '前排' and not receiving %}
-          {% set pos.y = 32 %}
-          {% if cell.wing == '左翼' %}{% set pos.x = 28 %}
+          {% set pos.y = 30 %}
+          {% if cell.wing == '左翼' %}{% set pos.x = 26 %}
           {% elif cell.wing == '中路' %}{% set pos.x = 50 %}
-          {% elif cell.wing == '右翼' %}{% set pos.x = 72 %}
+          {% elif cell.wing == '右翼' %}{% set pos.x = 74 %}
           {% endif %}
         {% elif receiving and cell.row == '前排' %}
-          {% set pos.y = 56 %}
+          {% set pos.y = 54 %}
         {% endif %}
         <span class="chip {{ 'is-front' if cell.row == '前排' else 'is-back' }}{% if on_seam %} is-seam{% endif %}" style="left: {{ pos.x }}%; top: {{ pos.y }}%;">
-          <i class="fb">{{ 'F' if cell.row == '前排' else 'B' }}</i>
-          {{ cell.occupant_name }}{% if cell.occupant_id == card.setter_id %}<i class="star">★</i>{% endif %}
+          <i class="role">{{ cell.role_label }}</i>
+          <span class="who">{{ cell.occupant_name }}{% if cell.occupant_id == card.setter_id %}<i class="star">★</i>{% endif %}</span>
         </span>
       {% endfor %}
     </div>

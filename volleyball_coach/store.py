@@ -12,6 +12,7 @@ from volleyball_coach.model import (
     ABILITY_LABEL,
     Pair,
     Player,
+    RotationScheme,
     Rules,
     ServePlan,
     SubWindow,
@@ -99,6 +100,15 @@ CREATE TABLE IF NOT EXISTS sub_windows (
   notes TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS schemes (
+  id TEXT PRIMARY KEY,
+  team_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  order_json TEXT NOT NULL,
+  is_default INTEGER NOT NULL DEFAULT 0,
+  notes TEXT NOT NULL DEFAULT ''
+);
+
 CREATE TABLE IF NOT EXISTS matches (
   id TEXT PRIMARY KEY,
   team_id TEXT NOT NULL,
@@ -128,6 +138,11 @@ CREATE TABLE IF NOT EXISTS rallies (
   serving_side TEXT NOT NULL,
   winner TEXT NOT NULL,
   pass_quality TEXT,
+  block_touch TEXT,
+  defense_quality TEXT,
+  attack_result TEXT,
+  severe_error TEXT,
+  severe_kind TEXT NOT NULL DEFAULT '',
   server_label TEXT NOT NULL DEFAULT '',
   target_type TEXT NOT NULL DEFAULT '',
   target_label TEXT NOT NULL DEFAULT '',
@@ -158,10 +173,63 @@ class Store:
         self.conn = sqlite3.connect(self.path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        self._migrate()
         self._seed_mens_if_empty()
 
     def close(self) -> None:
         self.conn.close()
+
+    def _migrate(self) -> None:
+        have = {row["name"] for row in self.conn.execute("PRAGMA table_info(rallies)")}
+        for column in ("block_touch", "defense_quality", "attack_result", "severe_error", "severe_kind"):
+            if column not in have:
+                self.conn.execute(f"ALTER TABLE rallies ADD COLUMN {column} TEXT")
+        self._backfill_schemes()
+        self.conn.commit()
+
+    def _backfill_schemes(self) -> None:
+        teams = self.conn.execute("SELECT id FROM teams").fetchall()
+        for team in teams:
+            count = self.conn.execute(
+                "SELECT COUNT(*) AS n FROM schemes WHERE team_id = ?",
+                (team["id"],),
+            ).fetchone()["n"]
+            if count:
+                continue
+            rows = self.conn.execute(
+                "SELECT id, base_slot FROM players WHERE team_id = ? AND base_slot IS NOT NULL",
+                (team["id"],),
+            ).fetchall()
+            by_slot: dict[int, str] = {}
+            duplicate = False
+            for row in rows:
+                slot = row["base_slot"]
+                if slot in by_slot:
+                    duplicate = True
+                    break
+                by_slot[slot] = row["id"]
+            if duplicate or sorted(by_slot) != [1, 2, 3, 4, 5, 6]:
+                continue
+            order = [by_slot[number] for number in range(1, 7)]
+            if team["id"] == MENS_TEAM_ID:
+                scheme_id = "scheme-mens-62"
+                name = "6-2 默认"
+            else:
+                scheme_id = new_id("scheme")
+                name = "当前首发"
+            self.conn.execute(
+                """
+                INSERT INTO schemes (id, team_id, name, order_json, is_default, notes)
+                VALUES (?, ?, ?, ?, 1, ?)
+                """,
+                (
+                    scheme_id,
+                    team["id"],
+                    name,
+                    json.dumps(order),
+                    "从现有首发槽生成。另存的方案不会改这一套，除非把它设成默认。",
+                ),
+            )
 
     def _seed_mens_if_empty(self) -> None:
         row = self.conn.execute("SELECT COUNT(*) AS n FROM teams").fetchone()
@@ -213,6 +281,8 @@ class Store:
                 """,
                 (plan.team_id, window.player_out, window.player_in, json.dumps(list(window.active_rotations)), window.notes),
             )
+        for scheme in plan.schemes:
+            self._write_scheme(plan.team_id, scheme)
         self.conn.commit()
 
     def _write_rules(self, team_id: str, rules: Rules) -> None:
@@ -346,6 +416,20 @@ class Store:
             windows.append(
                 SubWindow(row["player_out"], row["player_in"], tuple(json.loads(row["active_rotations"])), row["notes"])
             )
+        schemes = []
+        for row in self.conn.execute(
+            "SELECT * FROM schemes WHERE team_id = ? ORDER BY is_default DESC, name",
+            (team_id,),
+        ):
+            schemes.append(
+                RotationScheme(
+                    id=row["id"],
+                    name=row["name"],
+                    order=list(json.loads(row["order_json"])),
+                    is_default=bool(row["is_default"]),
+                    notes=row["notes"],
+                )
+            )
         rules = Rules(
             no_back_row_attack=bool(rules_row["no_back_row_attack"]),
             no_libero=bool(rules_row["no_libero"]),
@@ -368,6 +452,7 @@ class Store:
             guidance=json.loads(team["guidance_json"]),
             board_note=team["board_note"],
             notes=team["notes"],
+            schemes=schemes,
         )
 
     def abilities_for(self, team_id: str) -> dict[str, list[sqlite3.Row]]:
@@ -409,7 +494,84 @@ class Store:
 
     def save_player(self, team_id: str, player: Player) -> None:
         self._write_player(team_id, player)
+        self._align_default_scheme(team_id)
         self.conn.commit()
+
+    def _align_default_scheme(self, team_id: str) -> None:
+        rows = self.conn.execute(
+            "SELECT id, base_slot FROM players WHERE team_id = ? AND base_slot BETWEEN 1 AND 6",
+            (team_id,),
+        ).fetchall()
+        by_slot: dict[int, str] = {}
+        for row in rows:
+            slot = int(row["base_slot"])
+            if slot in by_slot:
+                return
+            by_slot[slot] = row["id"]
+        if sorted(by_slot) != [1, 2, 3, 4, 5, 6]:
+            return
+        order = [by_slot[number] for number in range(1, 7)]
+        payload = json.dumps(order)
+        current = self.conn.execute(
+            "SELECT id, order_json FROM schemes WHERE team_id = ? AND is_default = 1",
+            (team_id,),
+        ).fetchone()
+        if current is None:
+            self.conn.execute(
+                """
+                INSERT INTO schemes (id, team_id, name, order_json, is_default, notes)
+                VALUES (?, ?, '当前首发', ?, 1, ?)
+                """,
+                (new_id("scheme"), team_id, payload, "由六个首发槽生成。"),
+            )
+            return
+        if list(json.loads(current["order_json"])) != order:
+            self.conn.execute("UPDATE schemes SET order_json = ? WHERE id = ?", (payload, current["id"]))
+
+    def _write_scheme(self, team_id: str, scheme: RotationScheme) -> None:
+        self.conn.execute(
+            """
+            INSERT INTO schemes (id, team_id, name, order_json, is_default, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+              name=excluded.name,
+              order_json=excluded.order_json,
+              is_default=excluded.is_default,
+              notes=excluded.notes
+            """,
+            (
+                scheme.id,
+                team_id,
+                scheme.name,
+                json.dumps(scheme.order),
+                int(scheme.is_default),
+                scheme.notes,
+            ),
+        )
+
+    def save_scheme(self, team_id: str, scheme: RotationScheme) -> None:
+        if scheme.is_default:
+            self.conn.execute("UPDATE schemes SET is_default = 0 WHERE team_id = ?", (team_id,))
+        self._write_scheme(team_id, scheme)
+        if scheme.is_default:
+            self.conn.execute("UPDATE players SET base_slot = NULL WHERE team_id = ?", (team_id,))
+            for index, player_id in enumerate(scheme.order, start=1):
+                self.conn.execute(
+                    "UPDATE players SET base_slot = ? WHERE team_id = ? AND id = ?",
+                    (index, team_id, player_id),
+                )
+        self.conn.commit()
+
+    def delete_scheme(self, team_id: str, scheme_id: str) -> bool:
+        row = self.conn.execute(
+            "SELECT is_default FROM schemes WHERE team_id = ? AND id = ?",
+            (team_id, scheme_id),
+        ).fetchone()
+        if row is None or row["is_default"]:
+            return False
+        self.conn.execute("DELETE FROM schemes WHERE team_id = ? AND id = ?", (team_id, scheme_id))
+        self.conn.commit()
+        return True
 
     def save_ability(self, player_id: str, skill: str, label: str) -> None:
         if label not in ABILITY_LABEL:
@@ -523,10 +685,12 @@ class Store:
         self.conn.execute(
             """
             INSERT INTO rallies (
-              match_id, set_number, rotation, serving_side, winner, pass_quality, server_label,
+              match_id, set_number, rotation, serving_side, winner, pass_quality,
+              block_touch, defense_quality, attack_result, severe_error, severe_kind,
+              server_label,
               target_type, target_label, actual_receiver, actual_zone, lineup_json, bench_json,
               video_timestamp, sample_scope, note, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 match_id,
@@ -535,6 +699,11 @@ class Store:
                 fields["serving_side"],
                 fields["winner"],
                 fields["pass_quality"],
+                fields.get("block_touch"),
+                fields.get("defense_quality"),
+                fields.get("attack_result"),
+                fields.get("severe_error"),
+                fields.get("severe_kind") or "",
                 fields["server_label"],
                 fields["target_type"],
                 fields["target_label"],

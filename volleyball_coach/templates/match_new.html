@@ -6,6 +6,15 @@
   <p class="warn-line">六个首发槽还没排满，现在不能开场。</p>
 {% endif %}
 <form class="stack" method="post" action="{{ url_for('start_match', team_id=plan.team_id) }}">
+  {% if plan.schemes %}
+    <label for="scheme_id">本场使用的轮转方案</label>
+    <select id="scheme_id" name="scheme_id">
+      {% for scheme in plan.schemes %}
+        <option value="{{ scheme.id }}" {% if scheme.is_default %}selected{% endif %}>{{ scheme.name }}{% if scheme.is_default %} · 默认{% endif %}</option>
+      {% endfor %}
+    </select>
+    <p class="muted">开场快照会锁住这一套六人顺序。赛后改默认方案，不会改已经开场的比赛。</p>
+  {% endif %}
   <label for="opponent">对手</label>
   <input id="opponent" name="opponent" placeholder="可以留空">
   <label for="mode">场边模式</label>
