@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 {% block body %}
+<section class="home-actions">
+  {% if live_match %}
+    <a class="text-button" href="{{ url_for('live', match_id=live_match['id']) }}">继续比赛</a>
+  {% else %}
+    <span class="text-button is-quiet">继续比赛</span>
+  {% endif %}
+  {% if library_team %}
+    <a class="text-button" href="{{ url_for('new_match', team_id=library_team) }}">准备下一场</a>
+    <a class="text-button" href="{{ url_for('tactics', team_id=library_team) }}">阵容与战术库</a>
+  {% endif %}
+</section>
 <p class="eyebrow">场边</p>
 <h1>看人怎么转，看球怎么走。</h1>
 <p class="lede">顺时针进一格。只记看见的。不满 8 次，只显示次数。</p>

@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
+  <a href="{{ url_for('board', team_id=plan.team_id, scheme=scheme.id if scheme else none) }}">六人顺序</a>
+  {% if scheme %}<a href="{{ url_for('new_match', team_id=plan.team_id) }}">准备比赛</a>{% endif %}
+</p>
+<header class="tactic-head">
+  <div>
+    <p class="eyebrow">阵容与战术</p>
+    <h1>{{ plan.name }}{% if scheme %} / {{ scheme.name }}{% endif %}</h1>
+    {% if tactic %}
+      <p>{{ tactic.name }} · {% if published %}已发布{% else %}草稿 · 已保存{% endif %}</p>
+    {% else %}
+      <p>还没有战术。生成以后，六轮的接发、进攻、拦防和保护会按这套阵容摆好。</p>
+    {% endif %}
+  </div>
+  <div class="tactic-actions">
+    {% if tactic %}
+      <a class="text-button" href="{{ url_for('tactics_sheet', team_id=plan.team_id, tactic_id=tactic.id, phase=phase) }}">预览</a>
+      <form method="post" action="{{ url_for('duplicate_tactic', team_id=plan.team_id, tactic_id=tactic.id) }}">
+        <button type="submit">另存</button>
+      </form>
+      {% if not published %}
+        <form method="post" action="{{ url_for('publish_tactic', team_id=plan.team_id, tactic_id=tactic.id) }}">
+          <button type="submit">发布</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</header>
+
+{% if plan.rules.no_libero %}
+  <p class="rule-note">本场没有正式自由人。防守替补不会被改名为 libero。</p>
+{% else %}
+  <p class="rule-note">自由人要单独指定。防守替补不会自动显示成 libero。</p>
+{% endif %}
+<p class="muted">当前标成{{ position_kind }}。重叠规则还没确认时，不会标成已按本赛事规则核验的站位。圆点中心不能判断站位是否合法。</p>
+
+<div class="tactic-desk">
+  <aside class="lineup-list">
+    <h2>阵容方案</h2>
+    {% for item in plan.schemes %}
+      <article class="lineup {% if scheme and item.id == scheme.id %}is-on{% endif %}">
+        <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=item.id) }}">{{ item.name }}</a>
+        {% if item.is_default %}<span>默认</span>{% endif %}
+        <p>{% for player_id in item.order %}{{ plan.name_of(player_id) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+        <form method="post" action="{{ url_for('copy_scheme', team_id=plan.team_id, scheme_id=item.id) }}">
+          <input name="name" value="副本 · {{ item.name }}" aria-label="复制后的名称">
+          <button type="submit">复制阵容</button>
+        </form>
+      </article>
+    {% else %}
+      <p>还没有六人阵容。先在六人顺序里存一套。</p>
+    {% endfor %}
+    <h2>换人窗口</h2>
+    {% for window in plan.sub_windows %}
+      <p>{{ plan.name_of(window.player_in) }} 换 {{ plan.name_of(window.player_out) }}
+        {% for number in window.active_rotations %}R{{ number }} {% endfor %}
+      </p>
+    {% else %}
+      <p>没有预设换人窗口。</p>
+    {% endfor %}
+    <p class="muted">窗口到了也不等于人已经上场。没锁定的配对不会画进球场。</p>
+    {% if scheme %}
+      <h2>这套阵容的战术</h2>
+      {% for item in tactics %}
+        <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=item.id, rotation=rotation, phase=phase) }}">
+          {{ item.name }} · {{ "已发布" if item.status == "published" else "草稿" }}
+        </a>
+      {% endfor %}
+      <form method="post" action="{{ url_for('create_tactic', team_id=plan.team_id) }}">
+        <input type="hidden" name="scheme_id" value="{{ scheme.id }}">
+        <label>新战术<input name="name" required placeholder="例如：三人接发"></label>
+        <button type="submit">生成六轮</button>
+      </form>
+    {% endif %}
+  </aside>
+
+  <section class="court-pane">
+    {% if tactic %}
+      <nav class="rot-tabs" aria-label="轮次">
+        {% for number, status in statuses %}
+          <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=tactic.id, rotation=number, phase=phase) }}" {% if rotation == number %}aria-current="true"{% endif %}>R{{ number }}</a>
+        {% endfor %}
+      </nav>
+      <nav class="seg" aria-label="阶段">
+        {% for code, label in phases.items() %}
+          <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=tactic.id, rotation=rotation, phase=code) }}" {% if phase == code %}aria-current="true"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+      <p class="court-key"><i class="full-key" aria-hidden="true"><b></b><b></b></i>完整场 9×18。下面是本方半场，正方形，网在上方。</p>
+      {% with court_save = url_for('save_tactic_mark', team_id=plan.team_id, tactic_id=tactic.id) if not published else '', court_locked = published, court_snapshot = false, marks = marks, rotation = rotation, phase = phase %}
+        {% include "_halfcourt.html" %}
+      {% endwith %}
+      <p class="muted">{{ position_kind }}。拖动不改号位，刷新后还是这次保存的坐标。</p>
+      {% if published %}
+        <p>这一版已发布，球场不能拖。要改位置，先另存。</p>
+      {% endif %}
+      {% if drift and not published %}
+        <form method="post" action="{{ url_for('sync_tactic', team_id=plan.team_id, tactic_id=tactic.id) }}">
+          <p>有人和当前阵容方案不一致。</p>
+          <button type="submit">按阵容更正人员，坐标保留</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <div class="half-court is-empty" data-court data-locked="1">
+        <svg viewBox="0 0 100 100" class="routes" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="97" height="97" class="floor"></rect>
+          <line x1="1.5" y1="8" x2="98.5" y2="8" class="netline"></line>
+          <line x1="1.5" y1="33" x2="98.5" y2="33" class="attackline"></line>
+        </svg>
+        <p class="empty-copy">先生成战术。六轮站位按职责摆好，坐标只是示意。</p>
+      </div>
+    {% endif %}
+    <ol class="check-row">
+      {% for number, status in statuses %}
+        <li data-rotation="{{ number }}" data-status="{{ status }}">R{{ number }} {{ status }}</li>
+      {% endfor %}
+    </ol>
+    <p class="muted">状态分为已配置、待补充、存在冲突。由组织者、发球人、补位和站位算出来。</p>
+  </section>
+
+  <aside class="duty-pane">
+    <h2>R{{ rotation }} 本轮职责</h2>
+    <p>主二传 <strong>{{ card.setter_name }}</strong></p>
+    {% if card.setter_note %}<p>{{ card.setter_note }}</p>{% endif %}
+    <p>补位二传 <strong>{{ card.backup_name }}</strong></p>
+    {% if card.backup_note %}<p>{{ card.backup_note }}</p>{% endif %}
+    <p>主接发 {% for item in card.receivers %}{{ item.name }} {% else %}未指定{% endfor %}</p>
+    <p>短球 {{ card.short_ball }}</p>
+    <p>结合部 {{ card.seam }}</p>
+    <p>前排 {% for item in card.front_attack %}{{ item.name }} {{ item.wing }} {% else %}未排{% endfor %}</p>
+    {% if phase == 'receive' %}
+      <p>{{ card.movement_receive }}</p>
+    {% elif phase == 'attack' %}
+      <p>{{ card.movement_serve }}</p>
+    {% elif phase == 'block' %}
+      <p>前排先到网前拦。后排按这一轮的防守收。具体落点仍是示意。</p>
+    {% else %}
+      <p>{{ card.backup_name }} 在主二传碰到第一球时补位。保护点是示意，不是测量坐标。</p>
+    {% endif %}
+    {% for note in card.extra_notes %}
+      <p>{{ note }}</p>
+    {% endfor %}
+    {% for item in card.conflicts %}
+      <p class="warn-line">{{ item }}</p>
+    {% endfor %}
+    {% if tactic and not published %}
+      <form method="post" action="{{ url_for('save_tactic_notes', team_id=plan.team_id, tactic_id=tactic.id) }}">
+        <input type="hidden" name="rotation" value="{{ rotation }}">
+        <input type="hidden" name="phase" value="{{ phase }}">
+        {% for kind, label in note_kinds.items() %}
+          <label>{{ label }}<textarea name="{{ kind }}">{{ notes.get(kind, '') }}</textarea></label>
+        {% endfor %}
+        <button type="submit">保存本轮说明</button>
+      </form>
+    {% elif tactic %}
+      {% for kind, label in note_kinds.items() %}
+        {% if notes.get(kind) %}<p>{{ label }}：{{ notes.get(kind) }}</p>{% endif %}
+      {% endfor %}
+    {% endif %}
+  </aside>
+</div>
+
+{% if tactic and not published %}
+<script>
+(function () {
+  var court = document.querySelector("[data-court][data-save]");
+  if (!court || court.getAttribute("data-locked") === "1") return;
+  var url = court.getAttribute("data-save");
+  court.querySelectorAll(".pin").forEach(function (pin) {
+    pin.addEventListener("pointerdown", function (event) {
+      pin.setPointerCapture(event.pointerId);
+      pin.classList.add("is-selected");
+    });
+    pin.addEventListener("pointermove", function (event) {
+      if (!pin.hasPointerCapture(event.pointerId)) return;
+      var rect = court.getBoundingClientRect();
+      var x = clamp((event.clientX - rect.left) / rect.width * 100);
+      var y = clamp((event.clientY - rect.top) / rect.height * 100);
+      pin.style.left = x + "%";
+      pin.style.top = y + "%";
+      pin.dataset.draftX = String(Math.round(x * 10) / 10);
+      pin.dataset.draftY = String(Math.round(y * 10) / 10);
+    });
+    pin.addEventListener("pointerup", function () {
+      if (!pin.dataset.draftX) return;
+      var body = new FormData();
+      body.set("rotation", court.getAttribute("data-rotation"));
+      body.set("phase", court.getAttribute("data-phase"));
+      body.set("slot", pin.getAttribute("data-slot"));
+      body.set("player_id", pin.getAttribute("data-player"));
+      body.set("x", pin.dataset.draftX);
+      body.set("y", pin.dataset.draftY);
+      var backX = pin.getAttribute("data-x");
+      var backY = pin.getAttribute("data-y");
+      fetch(url, { method: "POST", body: body, headers: { Accept: "application/json" } }).then(function (response) {
+        if (!response.ok) {
+          pin.style.left = backX + "%";
+          pin.style.top = backY + "%";
+          return null;
+        }
+        return response.json();
+      }).then(function (payload) {
+        if (!payload) return;
+        pin.setAttribute("data-x", payload.x);
+        pin.setAttribute("data-y", payload.y);
+        pin.style.left = payload.x + "%";
+        pin.style.top = payload.y + "%";
+      });
+      delete pin.dataset.draftX;
+      delete pin.dataset.draftY;
+    });
+  });
+  function clamp(value) {
+    return Math.min(98, Math.max(2, value));
+  }
+})();
+</script>
+{% endif %}
+{% endblock %}

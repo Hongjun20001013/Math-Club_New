@@ -195,6 +195,37 @@ CREATE TABLE IF NOT EXISTS opponents (
   name TEXT NOT NULL DEFAULT '',
   UNIQUE(match_id, jersey)
 );
+
+CREATE TABLE IF NOT EXISTS tactics (
+  id TEXT PRIMARY KEY,
+  team_id TEXT NOT NULL,
+  scheme_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft',
+  notes TEXT NOT NULL DEFAULT '',
+  parent_id TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  published_at TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS tactic_marks (
+  tactic_id TEXT NOT NULL REFERENCES tactics(id),
+  rotation INTEGER NOT NULL,
+  phase TEXT NOT NULL,
+  player_id TEXT NOT NULL,
+  slot INTEGER NOT NULL,
+  x REAL NOT NULL,
+  y REAL NOT NULL,
+  PRIMARY KEY (tactic_id, rotation, phase, slot)
+);
+
+CREATE TABLE IF NOT EXISTS tactic_notes (
+  tactic_id TEXT NOT NULL REFERENCES tactics(id),
+  rotation INTEGER NOT NULL,
+  kind TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (tactic_id, rotation, kind)
+);
 """
 
 
@@ -258,6 +289,9 @@ class Store:
         self._ensure_column("rallies", "lineup_source", "TEXT NOT NULL DEFAULT 'legacy'")
         self._ensure_column("matches", "record_depth", "TEXT NOT NULL DEFAULT 'light'")
         self._ensure_column("matches", "sample_scope", "TEXT NOT NULL DEFAULT 'sample'")
+        self._ensure_column("matches", "tactic_id", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("matches", "tactic_json", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("rallies", "plan_execution", "TEXT NOT NULL DEFAULT ''")
         self._backfill_schemes()
         self.conn.commit()
 
@@ -636,6 +670,186 @@ class Store:
                 )
         self.conn.commit()
 
+    def copy_scheme(self, team_id: str, scheme_id: str, name: str) -> str:
+        row = self.conn.execute(
+            "SELECT name, order_json, notes FROM schemes WHERE team_id = ? AND id = ?",
+            (team_id, scheme_id),
+        ).fetchone()
+        if row is None:
+            raise ValueError("找不到这套阵容。")
+        copied = RotationScheme(
+            id=new_id("scheme"),
+            name=name.strip() or f"副本 · {row['name']}",
+            order=list(json.loads(row["order_json"])),
+            is_default=False,
+            notes=row["notes"] or "",
+        )
+        self._write_scheme(team_id, copied)
+        self.conn.commit()
+        return copied.id
+
+    def tactics_for_team(self, team_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT * FROM tactics WHERE team_id = ? ORDER BY created_at",
+            (team_id,),
+        )
+        return [dict(row) for row in rows]
+
+    def tactic(self, tactic_id: str) -> dict | None:
+        row = self.conn.execute("SELECT * FROM tactics WHERE id = ?", (tactic_id,)).fetchone()
+        return dict(row) if row else None
+
+    def tactic_marks(self, tactic_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            """
+            SELECT rotation, phase, player_id, slot, x, y
+            FROM tactic_marks WHERE tactic_id = ?
+            ORDER BY rotation, phase, slot
+            """,
+            (tactic_id,),
+        )
+        return [dict(row) for row in rows]
+
+    def tactic_notes(self, tactic_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT rotation, kind, body FROM tactic_notes WHERE tactic_id = ? ORDER BY rotation, kind",
+            (tactic_id,),
+        )
+        return [dict(row) for row in rows]
+
+    def create_tactic(self, team_id: str, scheme_id: str, name: str, marks: list[dict]) -> str:
+        tactic_id = new_id("tactic")
+        self.conn.execute(
+            """
+            INSERT INTO tactics (id, team_id, scheme_id, name, status, notes, parent_id, created_at, published_at)
+            VALUES (?, ?, ?, ?, 'draft', '', '', ?, '')
+            """,
+            (tactic_id, team_id, scheme_id, name.strip(), now()),
+        )
+        self._insert_marks(tactic_id, marks)
+        self.conn.commit()
+        return tactic_id
+
+    def _insert_marks(self, tactic_id: str, marks: list[dict]) -> None:
+        self.conn.executemany(
+            """
+            INSERT INTO tactic_marks (tactic_id, rotation, phase, player_id, slot, x, y)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    tactic_id,
+                    int(mark["rotation"]),
+                    mark["phase"],
+                    mark["player_id"],
+                    int(mark["slot"]),
+                    float(mark["x"]),
+                    float(mark["y"]),
+                )
+                for mark in marks
+            ],
+        )
+
+    def duplicate_tactic(self, tactic_id: str, name: str = "") -> str:
+        source = self.tactic(tactic_id)
+        if source is None:
+            raise ValueError("找不到这套战术。")
+        copied_id = new_id("tactic")
+        self.conn.execute(
+            """
+            INSERT INTO tactics (id, team_id, scheme_id, name, status, notes, parent_id, created_at, published_at)
+            VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, '')
+            """,
+            (
+                copied_id,
+                source["team_id"],
+                source["scheme_id"],
+                name.strip() or f"副本 · {source['name']}",
+                source["notes"] or "",
+                source["id"],
+                now(),
+            ),
+        )
+        self._insert_marks(copied_id, self.tactic_marks(tactic_id))
+        for note in self.tactic_notes(tactic_id):
+            self.conn.execute(
+                "INSERT INTO tactic_notes (tactic_id, rotation, kind, body) VALUES (?, ?, ?, ?)",
+                (copied_id, note["rotation"], note["kind"], note["body"]),
+            )
+        self.conn.commit()
+        return copied_id
+
+    def publish_tactic(self, tactic_id: str) -> None:
+        source = self.tactic(tactic_id)
+        if source is None:
+            raise ValueError("找不到这套战术。")
+        if source["status"] == "published":
+            return
+        self.conn.execute(
+            "UPDATE tactics SET status = 'published', published_at = ? WHERE id = ?",
+            (now(), tactic_id),
+        )
+        self.conn.commit()
+
+    def _require_draft(self, tactic_id: str) -> dict:
+        source = self.tactic(tactic_id)
+        if source is None:
+            raise ValueError("找不到这套战术。")
+        if source["status"] != "draft":
+            raise ValueError("已发布的版本不能改。先另存成草稿。")
+        return source
+
+    def update_tactic_mark(self, tactic_id: str, rotation: int, phase: str, slot: int, player_id: str, x: float, y: float) -> tuple[float, float]:
+        self._require_draft(tactic_id)
+        row = self.conn.execute(
+            """
+            SELECT player_id FROM tactic_marks
+            WHERE tactic_id = ? AND rotation = ? AND phase = ? AND slot = ?
+            """,
+            (tactic_id, rotation, phase, slot),
+        ).fetchone()
+        if row is None:
+            raise ValueError("这一格还没有站位。")
+        if row["player_id"] != player_id:
+            raise ValueError("拖动不能改轮转身份。")
+        x = max(0.0, min(100.0, round(float(x), 1)))
+        y = max(0.0, min(100.0, round(float(y), 1)))
+        self.conn.execute(
+            """
+            UPDATE tactic_marks SET x = ?, y = ?
+            WHERE tactic_id = ? AND rotation = ? AND phase = ? AND slot = ?
+            """,
+            (x, y, tactic_id, rotation, phase, slot),
+        )
+        self.conn.commit()
+        return x, y
+
+    def save_tactic_notes(self, tactic_id: str, rotation: int, notes: dict[str, str]) -> None:
+        self._require_draft(tactic_id)
+        for kind, body in notes.items():
+            self.conn.execute(
+                """
+                INSERT INTO tactic_notes (tactic_id, rotation, kind, body)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(tactic_id, rotation, kind) DO UPDATE SET body = excluded.body
+                """,
+                (tactic_id, rotation, kind, body.strip()),
+            )
+        self.conn.commit()
+
+    def sync_tactic_players(self, tactic_id: str, occupants: dict[int, dict[int, str]]) -> None:
+        self._require_draft(tactic_id)
+        for rotation, slots in occupants.items():
+            for slot, player_id in slots.items():
+                self.conn.execute(
+                    """
+                    UPDATE tactic_marks SET player_id = ?
+                    WHERE tactic_id = ? AND rotation = ? AND slot = ?
+                    """,
+                    (player_id, tactic_id, rotation, slot),
+                )
+        self.conn.commit()
+
     def delete_scheme(self, team_id: str, scheme_id: str) -> bool:
         row = self.conn.execute(
             "SELECT is_default FROM schemes WHERE team_id = ? AND id = ?",
@@ -691,13 +905,32 @@ class Store:
             )
         )
 
-    def create_match(self, plan: TeamPlan, opponent: str, mode: str, locked_pairs: set[frozenset[str]], rotation: int, serving: str) -> str:
+    def latest_live_match(self):
+        return self.conn.execute(
+            """
+            SELECT id, team_id, opponent FROM matches
+            WHERE status = 'live' ORDER BY created_at DESC LIMIT 1
+            """
+        ).fetchone()
+
+    def create_match(
+        self,
+        plan: TeamPlan,
+        opponent: str,
+        mode: str,
+        locked_pairs: set[frozenset[str]],
+        rotation: int,
+        serving: str,
+        tactic_id: str = "",
+        tactic_json: str = "",
+    ) -> str:
         match_id = new_id("m")
         created = now()
         self.conn.execute(
             """
-            INSERT INTO matches (id, team_id, opponent, mode, status, locked_pairs_json, plan_json, created_at)
-            VALUES (?, ?, ?, ?, 'live', ?, ?, ?)
+            INSERT INTO matches (
+              id, team_id, opponent, mode, status, locked_pairs_json, plan_json, created_at, tactic_id, tactic_json
+            ) VALUES (?, ?, ?, ?, 'live', ?, ?, ?, ?, ?)
             """,
             (
                 match_id,
@@ -707,6 +940,8 @@ class Store:
                 json.dumps([sorted(pair) for pair in locked_pairs], ensure_ascii=False),
                 json.dumps(plan.to_json(), ensure_ascii=False),
                 created,
+                tactic_id,
+                tactic_json,
             ),
         )
         self.append_event(
@@ -851,14 +1086,25 @@ class Store:
         self.conn.commit()
         return int(cursor.lastrowid)
 
-    def close_rally(self, match_id: str, rally_id: int, winner: str, score_us_after: int, score_them_after: int, scored: int) -> None:
+    def close_rally(
+        self,
+        match_id: str,
+        rally_id: int,
+        winner: str,
+        score_us_after: int,
+        score_them_after: int,
+        scored: int,
+        plan_execution: str = "",
+    ) -> None:
+        if plan_execution not in ("hit", "miss", "unchecked"):
+            plan_execution = ""
         self.conn.execute(
             """
             UPDATE rallies
-            SET status = 'closed', winner = ?, score_us_after = ?, score_them_after = ?, scored = ?
+            SET status = 'closed', winner = ?, score_us_after = ?, score_them_after = ?, scored = ?, plan_execution = ?
             WHERE match_id = ? AND id = ?
             """,
-            (winner, score_us_after, score_them_after, scored, match_id, rally_id),
+            (winner, score_us_after, score_them_after, scored, plan_execution, match_id, rally_id),
         )
         self.conn.commit()
 
@@ -866,7 +1112,7 @@ class Store:
         self.conn.execute(
             """
             UPDATE rallies
-            SET status = 'open', winner = '', score_us_after = NULL, score_them_after = NULL, scored = 0
+            SET status = 'open', winner = '', score_us_after = NULL, score_them_after = NULL, scored = 0, plan_execution = ''
             WHERE match_id = ? AND id = ?
             """,
             (match_id, rally_id),

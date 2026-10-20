@@ -1,0 +1,38 @@
+<div
+  class="half-court"
+  data-court
+  data-rotation="{{ rotation }}"
+  data-phase="{{ phase }}"
+  data-locked="{{ '1' if court_locked else '0' }}"
+  {% if court_save %}data-save="{{ court_save }}"{% endif %}
+  {% if court_snapshot %}data-snapshot="1"{% endif %}
+>
+  <svg viewBox="0 0 100 100" class="routes" aria-hidden="true">
+    <rect x="1.5" y="1.5" width="97" height="97" class="floor"></rect>
+    <line x1="1.5" y1="8" x2="98.5" y2="8" class="netline"></line>
+    <line x1="1.5" y1="33" x2="98.5" y2="33" class="attackline"></line>
+    <polygon points="50,16 46.5,26 53.5,26" class="dir"></polygon>
+    {% for mark in marks if mark.moved %}
+      <line class="move" x1="{{ mark.home_x }}" y1="{{ mark.home_y }}" x2="{{ mark.x }}" y2="{{ mark.y }}"></line>
+      <circle class="home" cx="{{ mark.home_x }}" cy="{{ mark.home_y }}" r="1.1"></circle>
+    {% endfor %}
+  </svg>
+  <span class="net-label">网</span>
+  <span class="attack-label">进攻线</span>
+  <span class="dir-label">进攻方向</span>
+  {% for mark in marks %}
+    <button
+      type="button"
+      class="pin {{ 'is-front' if mark.row == '前排' else 'is-back' }} {{ 'is-setter' if mark.setter else '' }}"
+      style="left: {{ mark.x }}%; top: {{ mark.y }}%;"
+      data-slot="{{ mark.slot }}"
+      data-player="{{ mark.player_id }}"
+      data-x="{{ mark.x }}"
+      data-y="{{ mark.y }}"
+    >
+      <strong>{{ mark.jersey or mark.slot }}</strong>
+      <em>{{ mark.name }}</em>
+      <small>{{ mark.row }}{% if mark.setter %} ★{% endif %}</small>
+    </button>
+  {% endfor %}
+</div>

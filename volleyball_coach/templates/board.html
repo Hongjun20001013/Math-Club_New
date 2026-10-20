@@ -4,6 +4,7 @@
   <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
   <a href="{{ url_for('quicksheet', team_id=plan.team_id) }}">速查表</a>
   <a href="{{ url_for('new_match', team_id=plan.team_id) }}">开场</a>
+  <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=active_scheme.id if active_scheme else none) }}">阵容与战术</a>
 </p>
 <h1>六轮可执行卡</h1>
 {% include "_film.html" %}

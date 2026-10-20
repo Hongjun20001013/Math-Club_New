@@ -15,6 +15,14 @@
     </select>
     <p class="muted">开场快照会锁住这一套六人顺序。赛后改默认方案，不会改已经开场的比赛。</p>
   {% endif %}
+  <label for="tactic_id">本场战术版本</label>
+  <select id="tactic_id" name="tactic_id">
+    <option value="">不调用已发布战术</option>
+    {% for tactic in published_tactics %}
+      <option value="{{ tactic.id }}">{{ tactic.name }}</option>
+    {% endfor %}
+  </select>
+  <p class="muted">只有发布后的版本能带进比赛。开场会把这一版抄下来。之后改战术库，不会改这场。</p>
   <label for="opponent">对手</label>
   <input id="opponent" name="opponent" placeholder="可以留空">
   <label for="mode">场边模式</label>

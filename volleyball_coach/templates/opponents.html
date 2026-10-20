@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <h1>对手分析</h1>
-<form class="opp-add" method="post" action="{{ url_for('post_opponent', match_id=match.id) }}">
+<form class="opp-add" id="add-opponent" method="post" action="{{ url_for('post_opponent', match_id=match.id) }}">
   <label>号码<input name="jersey" inputmode="numeric" required></label>
   <label>名字<input name="name"></label>
   <button type="submit">建档</button>
@@ -70,6 +70,19 @@
     {% endfor %}
   </ol>
 {% else %}
-  <p>先给对方攻手建一个号码。图上一次只看一名攻手。</p>
+  <figure class="scout empty-scout">
+    <svg viewBox="0 0 100 100" role="img" aria-label="空的对方半场">
+      <rect x="8" y="4" width="84" height="92" fill="#F4F6FA" stroke="#142238"></rect>
+      <line x1="8" y1="18" x2="92" y2="18" stroke="#142238" stroke-width="1.2"></line>
+      <line x1="8" y1="40" x2="92" y2="40" stroke="#087F8C" stroke-dasharray="2 2"></line>
+    </svg>
+    <figcaption>先给对方攻手建一个号码。图上一次只看一名攻手。</figcaption>
+  </figure>
+  <ol class="log">
+    <li>写下对方号码。</li>
+    <li>记这一分的起攻和线路。</li>
+    <li>再看箭头。落点不拿来反推线路。</li>
+  </ol>
+  <p><a class="text-button" href="#add-opponent">添加对方号码</a></p>
 {% endif %}
 {% endblock %}

@@ -136,6 +136,19 @@
   </section>
 
   <section class="col">
+    {% if plan_snapshot %}
+      <article class="plan-call">
+        <p>本场预案 · {{ plan_snapshot.name }} · {{ plan_phase_label }} · {{ plan_snapshot.position_kind }}</p>
+        {% with marks = plan_marks, rotation = state.rotation, phase = plan_phase, court_locked = true, court_save = '', court_snapshot = true %}
+          {% include "_halfcourt.html" %}
+        {% endwith %}
+        {% if plan_note %}<p>{{ plan_note }}</p>{% endif %}
+        {% if lineup_differs %}
+          <p>场上人员和发布时的阵容不一样。示意点仍是当时的版本。现在的职责按场上这六人。</p>
+        {% endif %}
+        <p>{{ execution_text }}</p>
+      </article>
+    {% endif %}
     <article class="tactic {% if suggestion.blocked %}blocked{% endif %}">
       <p>{{ suggestion.situation }}</p>
       <h2>{{ suggestion.action }}</h2>
@@ -167,10 +180,15 @@
 </form>
 
 <div class="dock">
-  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+  <form class="scores" method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+    {% if plan_snapshot %}
+      <div class="seg" role="group" aria-label="预案执行">
+        <label><input type="radio" name="plan_execution" value="hit">执行到</label>
+        <label><input type="radio" name="plan_execution" value="miss">没执行到</label>
+        <label><input type="radio" name="plan_execution" value="unchecked">未核对</label>
+      </div>
+    {% endif %}
     <button class="good" name="winner" value="us" type="submit">我方得分</button>
-  </form>
-  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
     <button class="bad" name="winner" value="them" type="submit">对方得分</button>
   </form>
   <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
