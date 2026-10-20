@@ -1,51 +1,72 @@
 {% set ew = english_writing %}
 {% if ew %}
-<div class="np-admin-en-review np-admin-en-review--folio np-admin-en-review--luxe"
+<div class="np-admin-en-review np-admin-en-review--folio np-admin-en-review--luxe np-admin-en-review--studio"
      data-student-option="{{ ew.option or '' }}"
      id="np-admin-pl-writing">
-  <header class="np-admin-en-masthead">
-    <div class="np-admin-en-masthead__lead">
-      <p class="np-admin-en-masthead__kicker">Part III · Writing · {{ ew.max_points }} points</p>
-      <h1 class="np-admin-en-masthead__title">{{ ew.rubric.title }}</h1>
-      <p class="np-admin-en-masthead__ref">Question {{ q_index + 1 }} · Advisor review</p>
+  <header class="np-admin-en-hero" aria-label="Writing review overview">
+    <div class="np-admin-en-hero__copy">
+      <p class="np-admin-en-hero__kicker">Part III · Writing · {{ ew.max_points }} pts · Question {{ q_index + 1 }}</p>
+      <h1 class="np-admin-en-hero__title">Advisor review</h1>
+      {% if ew.option %}
+      <p class="np-admin-en-hero__choice">
+        <span class="np-admin-en-hero__choice-badge" aria-hidden="true">{{ ew.option }}</span>
+        <span>{{ ew.option_short or ew.rubric.title }}</span>
+      </p>
+      {% else %}
+      <p class="np-admin-en-hero__choice">{{ ew.rubric.title }}</p>
+      {% endif %}
     </div>
-    <dl class="np-admin-en-masthead__stats">
-      <div>
-        <dt>Length</dt>
-        <dd>{{ ew.word_count }} <span>words</span></dd>
-      </div>
-      <div>
-        <dt>Target</dt>
-        <dd>{{ ew.word_min }}–{{ ew.word_max }}</dd>
-      </div>
-      <div class="np-admin-en-masthead__stats-score">
-        <dt>Score</dt>
-        <dd>
-          {% if ew.total_points is not none %}
-          <strong>{{ ew.total_points }}</strong><span>/{{ ew.max_points }}</span>
-          {% else %}
-          <strong class="is-pending">—</strong><span>/{{ ew.max_points }}</span>
+    <div class="np-admin-en-hero__metrics" role="list">
+      <article class="np-admin-en-metric np-admin-en-metric--length np-admin-en-metric--{{ ew.length_status }}" role="listitem">
+        <header class="np-admin-en-metric__head">
+          <span class="np-admin-en-metric__label">Length</span>
+          <span class="np-admin-en-metric__pill">{{ ew.length_label }}</span>
+        </header>
+        <p class="np-admin-en-metric__value">
+          <strong>{{ ew.word_count }}</strong>
+          <span class="np-admin-en-metric__unit">words</span>
+        </p>
+        <p class="np-admin-en-metric__hint">{{ ew.length_hint }}</p>
+        <div class="np-admin-en-metric__track" aria-hidden="true">
+          <span class="np-admin-en-metric__fill" style="width: {{ ew.length_pct }}%"></span>
+          <span class="np-admin-en-metric__target" style="left: {{ (100 * ew.word_min / ew.word_max)|round|int if ew.word_max else 0 }}%"></span>
+        </div>
+      </article>
+      <article class="np-admin-en-metric np-admin-en-metric--target" role="listitem">
+        <header class="np-admin-en-metric__head">
+          <span class="np-admin-en-metric__label">Target</span>
+        </header>
+        <p class="np-admin-en-metric__value np-admin-en-metric__value--range">
+          <strong>{{ ew.word_min }}</strong><span class="np-admin-en-metric__dash">–</span><strong>{{ ew.word_max }}</strong>
+          <span class="np-admin-en-metric__unit">words</span>
+        </p>
+        <p class="np-admin-en-metric__hint">Official prompt range</p>
+      </article>
+      <article class="np-admin-en-metric np-admin-en-metric--score{% if ew.total_points is none %} is-pending{% endif %}" role="listitem">
+        <header class="np-admin-en-metric__head">
+          <span class="np-admin-en-metric__label">Rubric score</span>
+          {% if ew.total_points is none %}
+          <span class="np-admin-en-metric__pill np-admin-en-metric__pill--pending">Needs grade</span>
           {% endif %}
-        </dd>
-      </div>
-    </dl>
+        </header>
+        <p class="np-admin-en-metric__value">
+          {% if ew.total_points is not none %}
+          <strong>{{ ew.total_points }}</strong><span class="np-admin-en-metric__of">/ {{ ew.max_points }}</span>
+          {% else %}
+          <strong class="is-pending">—</strong><span class="np-admin-en-metric__of">/ {{ ew.max_points }}</span>
+          {% endif %}
+        </p>
+        <p class="np-admin-en-metric__hint">20-point official rubric</p>
+      </article>
+    </div>
   </header>
 
   <div class="np-admin-en-folio">
     <article class="np-admin-en-essay-sheet" aria-label="Student writing submission">
-      {% if ew.option and ew.options %}
-      <div class="np-admin-en-luxe-choice" aria-label="Prompt choice">
-        {% for opt in ew.options if opt.id == ew.option %}
-        <span class="np-admin-en-luxe-choice__badge">Option {{ opt.id }}</span>
-        <span class="np-admin-en-luxe-choice__label">{{ opt.label }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
-
       <details class="np-admin-en-prompt-fold">
         <summary class="np-admin-en-prompt-fold__summary">
           <span class="np-admin-en-prompt-fold__title">Writing prompt</span>
-          <span class="np-admin-en-prompt-fold__hint">Tap to expand</span>
+          <span class="np-admin-en-prompt-fold__hint">Expand</span>
         </summary>
         <div class="np-admin-en-prompt-fold__body">
           {% if ew.prompt_html %}
@@ -57,7 +78,7 @@
       <section class="np-admin-en-manuscript" aria-label="Student essay">
         <header class="np-admin-en-manuscript__head">
           <h2>Student essay</h2>
-          <p>Submitted response · read-only</p>
+          <p>Submitted response · read-only · {{ ew.word_count }} words on file</p>
         </header>
         {% if ew.body %}
         <div class="np-admin-en-manuscript__frame">

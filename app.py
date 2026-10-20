@@ -18612,14 +18612,47 @@ def _english_writing_review_bundle(
     if wpts is not None and total_saved is None:
         total_saved = wpts
     band = writing_score_band(int(total_saved or wpts or 0)) if (total_saved is not None or wpts is not None) else None
+    wc = essay_word_count(body_clean or body)
+    if wc < wmin:
+        length_status = "below"
+        length_label = "Below target"
+        length_hint = f"Aim for {wmin}–{wmax_words} words"
+    elif wc > wmax_words:
+        length_status = "above"
+        length_label = "Above target"
+        length_hint = f"Suggested max {wmax_words} words"
+    elif wc > 0:
+        length_status = "in_range"
+        length_label = "In target range"
+        length_hint = f"{wmin}–{wmax_words} words"
+    else:
+        length_status = "empty"
+        length_label = "No essay yet"
+        length_hint = f"Target {wmin}–{wmax_words} words"
+    length_pct = min(100, int(round(100.0 * wc / wmax_words))) if wmax_words and wc else 0
+    option_short = ""
+    if opt:
+        for o in q.get("english_writing_options") or []:
+            if str(o.get("id") or "").upper() == opt:
+                lab = str(o.get("label") or "")
+                if "·" in lab:
+                    option_short = lab.split("·", 1)[1].strip()
+                else:
+                    option_short = lab.replace(f"Option {opt}", "").strip(" ·-")
+                break
     return {
         "q_index": q_index,
         "option": opt,
+        "option_short": option_short,
         "body": body_clean,
         "body_raw": body,
-        "word_count": essay_word_count(body_clean or body),
+        "word_count": wc,
         "word_min": wmin,
         "word_max": wmax_words,
+        "length_status": length_status,
+        "length_label": length_label,
+        "length_hint": length_hint,
+        "length_pct": length_pct,
         "max_points": wmax_pts,
         "points": wpts,
         "total_points": total_saved if total_saved is not None else wpts,
