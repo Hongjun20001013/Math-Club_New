@@ -6,8 +6,12 @@
   <a href="{{ url_for('new_match', team_id=plan.team_id) }}">开场</a>
 </p>
 <h1>六轮可执行卡</h1>
-<p class="lede">{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
-<p>轮转按顺时针走。R1 的 1 号位发球，每得一次发球权，六个人各进一个号位。右边是接发职责散开，不是已经量过的站位坐标。</p>
+{% include "_film.html" %}
+<p class="legend-note">从左到右是 R1 到 R6。深色前排，浅色后排。球亮着的人这一轮发球，亮完交给右边下一格。</p>
+<details class="sheet-words">
+  <summary>这支队的轮转说明</summary>
+  <p>{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
+</details>
 {% if plan.schemes %}
   <form class="scheme-switch" method="get">
     <label for="scheme">正在看的方案</label>
@@ -27,9 +31,8 @@
   <span class="chip is-front"><i class="role">outside</i><span class="who">主攻</span></span>
   <span class="chip is-front"><i class="role">middle</i><span class="who">副攻</span></span>
   <span class="chip is-back"><i class="role">def</i><span class="who">防守替补</span></span>
-  <span>深色是前排槽，浅色是后排槽。有自由人的队才标 libero。男排这套没有 libero。</span>
-  <span>深框是结合部。右边不是已经确认的坐标。</span>
 </p>
+<p class="legend-note">深色前排槽，浅色后排槽。虚线是从号位散开。深框是结合部。男排没有 libero。</p>
 {% set shown = active_scheme.order if active_scheme else plan.base_order() %}
 <details class="scheme-editor">
   <summary>{% if active_scheme %}编辑「{{ active_scheme.name }}」{% else %}把六个号位存成方案{% endif %}</summary>

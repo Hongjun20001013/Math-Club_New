@@ -8,6 +8,19 @@
 <h1>赛后报告</h1>
 <p class="lede">{{ report.review_budget }}</p>
 <p>对方轮次：未知。没有输入，就不生成对方阵容。</p>
+<p class="legend-note"><i class="swatch win"></i>我方拿下 <i class="swatch loss"></i>对方拿下</p>
+<div class="rot-meters" aria-label="各轮接发">
+  {% for row in report.receive.rows %}
+    <div>
+      <b>{{ row.label }}</b>
+      <div class="meter">
+        {% if row.wins %}<i class="win" style="flex: {{ row.wins }}"></i>{% endif %}
+        {% if row.losses %}<i class="loss" style="flex: {{ row.losses }}"></i>{% endif %}
+      </div>
+      <span>{{ row.display }}</span>
+    </div>
+  {% endfor %}
+</div>
 {% with skills = report.skills %}
   {% include "_skill_cards.html" %}
 {% endwith %}

@@ -1,0 +1,16 @@
+{% if cards is defined and cards %}
+<div class="film" aria-label="六轮，发球的人顺时针换">
+  {% for card in cards %}
+    <figure class="frame" style="--i: {{ loop.index0 }}">
+      <figcaption>R{{ card.rotation }}</figcaption>
+      <div class="frame-court">
+        <span class="frame-net"></span>
+        {% for slot in (4, 3, 2, 5, 6, 1) %}
+          {% set cell = card.slots[slot] %}
+          <span class="pip {{ 'is-front' if cell.row == '前排' else 'is-back' }}{% if cell.slot == 1 %} is-serve{% endif %}">{{ cell.occupant_name }}{% if cell.occupant_id == card.setter_id %}★{% endif %}</span>
+        {% endfor %}
+      </div>
+    </figure>
+  {% endfor %}
+</div>
+{% endif %}

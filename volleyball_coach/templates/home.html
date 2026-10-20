@@ -1,26 +1,34 @@
 {% extends "base.html" %}
 {% block body %}
 <p class="eyebrow">场边</p>
-<h1>各队分开记，场边只做最少的确认。</h1>
-<p class="lede">场边确认轮次和换人，当场记下这一分看见的一传、拦网、防守、扣球和严重失误。看不清就留空。比例只在样本够的时候出现。</p>
-<figure class="hero">
-  <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
-</figure>
+<h1>看人怎么转，看球怎么走。</h1>
+<p class="lede">顺时针进一格。只记看见的。不满 8 次，只显示次数。</p>
+<div class="hero-split">
+  {% include "_motion.html" %}
+  <figure class="hero">
+    <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
+  </figure>
+</div>
 <section class="use-grid">
   <article>
-    <p class="eyebrow">01</p>
-    <h2>方案可以有好几套</h2>
-    <p>男排现在的六人顺序是其中一套，名叫 6-2 默认。临场另存不会改它，开场时再选用哪一套。</p>
+    <div class="mini-pair" aria-hidden="true">
+      <span class="mini-court"><i></i><i></i><i></i><i></i><i></i><i class="on"></i></span>
+      <span class="mini-court alt"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span>
+    </div>
+    <h2>几套站位</h2>
+    <p>开场再选一套。</p>
   </article>
   <article>
-    <p class="eyebrow">02</p>
-    <h2>先记这一分，再动比分</h2>
-    <p>一传到不到位、拦网是有效还是破坏、防守、扣球、严重失误，都在当前轮次上记。勾了「同时记入比分」才会推动轮转。</p>
+    <div class="mini-marks" aria-hidden="true">
+      <span>到位</span><span>拦网</span><span>防守</span><span>扣球</span><span>失误</span>
+    </div>
+    <h2>记这一分</h2>
+    <p>先点看见的，再动比分。</p>
   </article>
   <article>
-    <p class="eyebrow">03</p>
-    <h2>比例要带着样本看</h2>
-    <p>未知和留空不进分母。关键片段不能写成整场。不足 8 个已判断回合，只给次数。三个复盘问题仍然分开回答。</p>
+    <div class="mini-meter" aria-hidden="true"><i></i><b>8</b></div>
+    <h2>次数先于比例</h2>
+    <p>不满 8 次，不报百分比。</p>
   </article>
 </section>
 <section class="home-grid">

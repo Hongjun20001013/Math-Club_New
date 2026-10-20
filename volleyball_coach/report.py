@@ -397,6 +397,11 @@ def skill_summary(rallies: list[dict]) -> dict:
             "fraction": pass_ratio["display"],
             "ready": pass_ratio["ready"],
             "detail": detail_pass(),
+            "bars": [
+                {"label": "到位", "n": passing["in_system"], "tone": "in"},
+                {"label": "半到位", "n": passing["half"], "tone": "mid"},
+                {"label": "不到位", "n": passing["out"], "tone": "out"},
+            ],
         },
         {
             "key": "block",
@@ -405,6 +410,11 @@ def skill_summary(rallies: list[dict]) -> dict:
             "fraction": "—" if judged == 0 else f"有效 {blocking['effective']} / 破坏 {blocking['disruptive']}",
             "ready": touched >= 8,
             "detail": detail_block(),
+            "bars": [
+                {"label": "有效", "n": blocking["effective"], "tone": "in"},
+                {"label": "破坏", "n": blocking["disruptive"], "tone": "out"},
+                {"label": "没拦到", "n": blocking["none"], "tone": "mid"},
+            ],
         },
         {
             "key": "defense",
@@ -416,6 +426,10 @@ def skill_summary(rallies: list[dict]) -> dict:
                 f"到位 {defense['in_system']}，不到位 {defense['out']}。"
                 f"未知 {defense['unknown']} 次不进分母。"
             ),
+            "bars": [
+                {"label": "到位", "n": defense["in_system"], "tone": "in"},
+                {"label": "不到位", "n": defense["out"], "tone": "out"},
+            ],
         },
         {
             "key": "attack",
@@ -427,6 +441,12 @@ def skill_summary(rallies: list[dict]) -> dict:
                 f"得分 {attack['kill']}，失误 {attack['error']}，被拦死 {attack['blocked']}，"
                 f"继续比赛 {attack['continue']}。未知 {attack['unknown']} 次不进分母。"
             ),
+            "bars": [
+                {"label": "得分", "n": attack["kill"], "tone": "in"},
+                {"label": "继续", "n": attack["continue"], "tone": "mid"},
+                {"label": "失误", "n": attack["error"], "tone": "out"},
+                {"label": "被拦死", "n": attack["blocked"], "tone": "out"},
+            ],
         },
         {
             "key": "severe",
@@ -442,6 +462,10 @@ def skill_summary(rallies: list[dict]) -> dict:
                     else "还没有记下种类。"
                 )
             ),
+            "bars": [
+                {"label": "有", "n": severe["yes"], "tone": "out"},
+                {"label": "没有", "n": severe["no"], "tone": "in"},
+            ],
         },
     ]
     judged_any = bool(
