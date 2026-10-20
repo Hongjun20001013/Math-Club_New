@@ -66,6 +66,9 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
     assert "对方发球" in live_html
     assert "对方轮次：未知" in live_html
     assert "Harvey" in live_html and "没有锁定" in live_html
+    assert "这场开场没有调用已发布战术" in live_html
+    assert "示意站位" in live_html
+    assert 'data-snapshot="1"' not in live_html
 
     blocked = client.post(f"{match_url}/sub", data={"out": "leo", "in": "harvey"}, follow_redirects=True)
     blocked_html = blocked.get_data(as_text=True)

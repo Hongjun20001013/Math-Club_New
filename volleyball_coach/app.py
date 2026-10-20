@@ -959,6 +959,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             opening_ids = {item.occupant_id for item in opening.slots.values()} if opening.slots else set()
             lineup_differs = opening_ids != set(state.occupants.values())
             execution_text = execution_sentence(execution_counts(rallies), plan_snapshot.get("name") or "战术")
+        else:
+            plan_marks = present_marks(plan, card, preview_marks(card, state.rotation, plan_phase))
         return render_template(
             "live.html",
             match=match,
@@ -998,6 +1000,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             plan_note=plan_note,
             lineup_differs=lineup_differs,
             execution_text=execution_text,
+            position_kind=position_kind(plan),
         )
 
     @app.post("/matches/<match_id>/point")

@@ -139,8 +139,8 @@
     {% if backup_call %}
       <p class="fine">备用阵容 {{ backup_call.name }}{% if backup_call.system %} · {{ backup_call.system }}{% endif %}。开场没有换成这一套。</p>
     {% endif %}
-    {% if plan_snapshot %}
-      <article class="plan-call">
+    <article class="plan-call">
+      {% if plan_snapshot %}
         <p>本场预案 · {{ plan_snapshot.name }} · {{ plan_phase_label }} · {{ plan_snapshot.position_kind }}</p>
         {% with marks = plan_marks, rotation = state.rotation, phase = plan_phase, court_locked = true, court_save = '', court_snapshot = true %}
           {% include "_halfcourt.html" %}
@@ -150,8 +150,14 @@
           <p>场上人员和发布时的阵容不一样。示意点仍是当时的版本。现在的职责按场上这六人。</p>
         {% endif %}
         <p>{{ execution_text }}</p>
-      </article>
-    {% endif %}
+      {% else %}
+        <p>这一轮 · {{ plan_phase_label }} · {{ position_kind }}</p>
+        {% with marks = plan_marks, rotation = state.rotation, phase = plan_phase, court_locked = true, court_save = '', court_snapshot = false %}
+          {% include "_halfcourt.html" %}
+        {% endwith %}
+        <p class="fine">这场开场没有调用已发布战术。圆点按当时的阵容示意，不是一份战术版本。</p>
+      {% endif %}
+    </article>
     <article class="tactic {% if suggestion.blocked %}blocked{% endif %}">
       <p>{{ suggestion.situation }}</p>
       <h2>{{ suggestion.action }}</h2>
