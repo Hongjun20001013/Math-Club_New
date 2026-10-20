@@ -36,7 +36,15 @@ from volleyball_coach.dictionary import (
     TERMS,
 )
 from volleyball_coach.drills import acceptance_drills
-from volleyball_coach.lineup import build_card, build_suggestion, legal_sub_options, validate_pairs
+from volleyball_coach.lineup import (
+    apply_system,
+    build_card,
+    build_suggestion,
+    legal_sub_options,
+    origins_for_rotation,
+    system_note,
+    validate_pairs,
+)
 from volleyball_coach.match import (
     MatchError,
     apply_correction,
@@ -75,6 +83,7 @@ from volleyball_coach.tactics import (
     load_snapshot,
     position_kind,
     present_marks,
+    preview_marks,
     rotation_status,
     snapshot_payload,
 )
@@ -419,6 +428,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 order=order,
                 is_default=want_default,
                 notes=(request.form.get("notes") or "").strip(),
+                system=existing.system if existing else "",
+                setters=list(existing.setters) if existing else [],
             )
         except ValueError as exc:
             flash(str(exc), "error")
@@ -480,7 +491,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             rotation = 1
         if phase not in TACTIC_PHASES:
             phase = "receive"
-        view = plan.with_order(scheme.order) if scheme and len(scheme.order) == 6 else plan
+        view = apply_system(plan, scheme)
         locked = confirmed_pairs(plan)
         cards = {number: build_card(view, number, {}, locked) for number in range(1, 7)}
         marks = store().tactic_marks(chosen["id"]) if chosen else []
@@ -490,7 +501,10 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             for number in range(1, 7)
         ]
         card = cards[rotation]
-        phase_marks = [mark for mark in marks if int(mark["rotation"]) == rotation and mark["phase"] == phase]
+        if chosen:
+            phase_marks = [mark for mark in marks if int(mark["rotation"]) == rotation and mark["phase"] == phase]
+        else:
+            phase_marks = preview_marks(card, rotation, phase)
         note_map = {
             note["kind"]: note["body"]
             for note in notes
@@ -515,6 +529,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             position_kind=position_kind(plan),
             drift=identity_drift(cards, marks),
             published=bool(chosen and chosen["status"] == "published"),
+            on_court=court_options(scheme),
+            system_note=system_note(scheme),
         )
 
     @app.get("/teams/<team_id>/tactics/<tactic_id>/sheet")
@@ -522,7 +538,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         plan = team_or_404(team_id)
         tactic = tactic_or_404(team_id, tactic_id)
         scheme = plan.scheme_by_id(tactic["scheme_id"])
-        view = plan.with_order(scheme.order) if scheme and len(scheme.order) == 6 else plan
+        view = apply_system(plan, scheme)
         locked = confirmed_pairs(plan)
         phase = request.args.get("phase") or "receive"
         if phase not in TACTIC_PHASES:
@@ -561,6 +577,33 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         flash("已复制阵容。默认阵容没有改。", "ok")
         return redirect(url_for("tactics", team_id=team_id, scheme=copied))
 
+    @app.post("/teams/<team_id>/schemes/<scheme_id>/system")
+    def save_scheme_system(team_id: str, scheme_id: str):
+        plan = team_or_404(team_id)
+        scheme = plan.scheme_by_id(scheme_id)
+        back = request.referrer or url_for("tactics", team_id=team_id, scheme=scheme_id)
+        if scheme is None or len(scheme.order) != 6:
+            flash("先选一套完整的六人阵容。", "error")
+            return redirect(back)
+        try:
+            label, setters = setters_from_system_form(scheme, request.form)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(back)
+        scheme.system = label_code(label)
+        scheme.setters = setters
+        store().save_scheme(plan.team_id, scheme)
+        flash(f"体系已改成{label}。名单上原来的二传能力还留着。", "ok")
+        tactic_id = (request.form.get("tactic") or "").strip()
+        if tactic_id:
+            phase = request.form.get("phase") or "receive"
+            try:
+                rotation = int(request.form.get("rotation") or "1")
+            except ValueError:
+                rotation = 1
+            return redirect(tactic_page_url(team_id, tactic_id, rotation if rotation in range(1, 7) else 1, phase if phase in TACTIC_PHASES else "receive"))
+        return redirect(url_for("tactics", team_id=team_id, scheme=scheme.id))
+
     @app.post("/teams/<team_id>/tactics")
     def create_tactic(team_id: str):
         plan = team_or_404(team_id)
@@ -572,7 +615,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         if not name:
             flash("战术要有名字。", "error")
             return redirect(url_for("tactics", team_id=team_id, scheme=scheme.id))
-        view = plan.with_order(scheme.order)
+        view = apply_system(plan, scheme)
         tactic_id = store().create_tactic(team_id, scheme.id, name, default_marks(view, confirmed_pairs(plan)))
         flash(f"已生成「{name}」的六轮示意站位。拖动只改坐标。", "ok")
         return redirect(tactic_page_url(team_id, tactic_id))
@@ -668,7 +711,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         if scheme is None or len(scheme.order) != 6:
             flash("这套战术的阵容不完整，不能更正人员。", "error")
             return redirect(url_for("tactics", team_id=team_id))
-        view = plan.with_order(scheme.order)
+        view = apply_system(plan, scheme)
         locked = confirmed_pairs(plan)
         occupants = {}
         for number in range(1, 7):
@@ -692,7 +735,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     def start_match(team_id: str):
         plan = team_or_404(team_id)
         chosen_scheme = plan.scheme_by_id(request.form.get("scheme_id")) or plan.default_scheme()
-        working = plan.with_order(chosen_scheme.order) if chosen_scheme else plan
+        working = apply_system(plan, chosen_scheme) if chosen_scheme else plan
         if len(working.base_order()) != 6:
             flash("先把六个首发槽位排满，或选一套完整方案，再开场。", "error")
             return redirect(url_for("new_match", team_id=plan.team_id))
@@ -1677,8 +1720,49 @@ def scheme_order_from_form(form, plan: TeamPlan) -> list[str]:
 def preview_plan(plan: TeamPlan, scheme_id: str | None) -> tuple[RotationScheme | None, TeamPlan]:
     chosen = plan.scheme_by_id(scheme_id) or plan.default_scheme()
     if chosen and len(chosen.order) == 6:
-        return chosen, plan.with_order(chosen.order)
+        return chosen, apply_system(plan, chosen)
     return chosen, plan
+
+
+def court_options(scheme: RotationScheme | None) -> list[tuple[int, list[str]]]:
+    if scheme is None or len(scheme.order) != 6:
+        return []
+    options = []
+    for number in range(1, 7):
+        origins = origins_for_rotation(list(scheme.order), number)
+        options.append((number, list(origins.values())))
+    return options
+
+
+def label_code(label: str) -> str:
+    return {"6-2": "62", "5-1": "51", "自定义": "custom"}[label]
+
+
+def setters_from_system_form(scheme: RotationScheme, form) -> tuple[str, list[str]]:
+    system = form.get("system") or ""
+    if system not in ("62", "51", "custom"):
+        raise ValueError("体系要选 6-2、5-1，或自定义。")
+    six = set(scheme.order)
+    names = {"62": "6-2", "51": "5-1", "custom": "自定义"}
+    if system == "51":
+        setter = form.get("setter") or ""
+        if setter not in six:
+            raise ValueError("5-1 的二传必须在这六个人里。")
+        return names[system], [setter]
+    if system == "62":
+        first = form.get("setter_a") or ""
+        second = form.get("setter_b") or ""
+        if first not in six or second not in six or first == second:
+            raise ValueError("6-2 要选两名不同的、都在这六个人里的二传。")
+        return names[system], [first, second]
+    setters = []
+    for number in range(1, 7):
+        origins = origins_for_rotation(list(scheme.order), number)
+        chosen = form.get(f"setter_{number}") or ""
+        if chosen not in origins.values():
+            raise ValueError(f"R{number} 的组织者必须是这一轮在场的人。")
+        setters.append(chosen)
+    return names[system], setters
 
 
 def snapshot_lineup(plan: TeamPlan, state) -> list[dict]:

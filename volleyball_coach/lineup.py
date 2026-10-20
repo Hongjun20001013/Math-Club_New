@@ -15,6 +15,7 @@ from volleyball_coach.model import (
     ServePlan,
     SlotView,
     Suggestion,
+    RotationScheme,
     TeamPlan,
 )
 
@@ -40,6 +41,76 @@ def next_rotation(rotation: int) -> int:
 
 def occupants_from(origins: dict[int, str], overrides: dict[str, str]) -> dict[int, str]:
     return {slot: overrides.get(origin, origin) for slot, origin in origins.items()}
+
+
+def _demote_setter(player) -> None:
+    if player.sets_when == "never":
+        return
+    if not player.can_backup_set:
+        player.can_backup_set = True
+        player.backup_rank = 0
+    player.sets_when = "never"
+
+
+def apply_system(plan: TeamPlan, scheme: RotationScheme | None) -> TeamPlan:
+    """Clone the plan onto this lineup's order, then apply 6-2, 5-1, or custom.
+
+    The stored roster keeps its own sets_when. A broken setter list is left unused.
+    """
+    if scheme is None or len(scheme.order) != 6:
+        return plan
+    view = plan.with_order(list(scheme.order))
+    six = set(scheme.order)
+    setters = [player_id for player_id in scheme.setters if player_id]
+    if scheme.system == "62":
+        if len(setters) != 2 or len(set(setters)) != 2 or any(player_id not in six for player_id in setters):
+            return view
+        for player in view.players.values():
+            if player.id in setters:
+                player.sets_when = "back_row"
+            else:
+                _demote_setter(player)
+        view.rotation_setters = {}
+        return view
+    if scheme.system == "51":
+        if len(setters) != 1 or setters[0] not in six:
+            return view
+        for player in view.players.values():
+            if player.id == setters[0]:
+                player.sets_when = "always"
+            else:
+                _demote_setter(player)
+        view.rotation_setters = {}
+        return view
+    if scheme.system == "custom":
+        if len(setters) != 6:
+            return view
+        view.rotation_setters = {rotation: setters[rotation - 1] for rotation in range(1, 7)}
+        for player in view.players.values():
+            _demote_setter(player)
+        return view
+    return view
+
+
+def system_note(scheme: RotationScheme | None) -> str:
+    if scheme is None or not scheme.system or len(scheme.order) != 6:
+        return ""
+    six = set(scheme.order)
+    setters = [player_id for player_id in scheme.setters if player_id]
+    if scheme.system == "62" and (
+        len(setters) != 2 or len(set(setters)) != 2 or any(player_id not in six for player_id in setters)
+    ):
+        return "这套 6-2 的两名二传不在当前六人里，仍按名单上的组织习惯。"
+    if scheme.system == "51" and (len(setters) != 1 or setters[0] not in six):
+        return "这套 5-1 的二传不在当前六人里，仍按名单上的组织习惯。"
+    if scheme.system == "custom" and len(setters) != 6:
+        return "自定义还没把六轮的组织者填满。"
+    if scheme.system == "custom":
+        for rotation, player_id in enumerate(setters, start=1):
+            origins = origins_for_rotation(list(scheme.order), rotation)
+            if player_id not in origins.values():
+                return f"R{rotation} 指定的组织者不在这一轮场上。"
+    return ""
 
 
 def validate_pairs(pairs: list[tuple[str, str]]) -> str | None:
@@ -98,25 +169,30 @@ def project_lineup(
     if structural:
         return origins, occupants, structural, tactical
 
-    designated: list[tuple[int, str]] = []
-    for slot, origin in origins.items():
-        player = plan.players[origin]
-        if player.sets_when == "always" or (player.sets_when == "back_row" and slot in BACK_SLOTS):
-            designated.append((slot, origin))
-    if len(designated) != 1:
-        tactical.append("组织者不唯一，或者这一轮没有人负责组织。先不要按位置指挥。")
+    forced = plan.rotation_setters.get(rotation, "")
+    if forced:
+        if forced not in occupants.values():
+            structural.append(f"{plan.name_of(forced)} 这一轮不在场上，不能按这个自定义组织。")
     else:
-        slot, origin = designated[0]
-        occupant = occupants[slot]
-        if occupant != origin:
-            occupier = plan.players.get(occupant)
-            if occupier and occupier.setting_verified and occupier.sets_when != "never":
-                pass
-            else:
-                tactical.append(
-                    f"{plan.name_of(occupant)} 占着 {plan.name_of(origin)} 的组织槽位，"
-                    "但二传能力尚未验证。不能默认由替补组织。"
-                )
+        designated: list[tuple[int, str]] = []
+        for slot, origin in origins.items():
+            player = plan.players[origin]
+            if player.sets_when == "always" or (player.sets_when == "back_row" and slot in BACK_SLOTS):
+                designated.append((slot, origin))
+        if len(designated) != 1:
+            tactical.append("组织者不唯一，或者这一轮没有人负责组织。先不要按位置指挥。")
+        else:
+            slot, origin = designated[0]
+            occupant = occupants[slot]
+            if occupant != origin:
+                occupier = plan.players.get(occupant)
+                if occupier and occupier.setting_verified and occupier.sets_when != "never":
+                    pass
+                else:
+                    tactical.append(
+                        f"{plan.name_of(occupant)} 占着 {plan.name_of(origin)} 的组织槽位，"
+                        "但二传能力尚未验证。不能默认由替补组织。"
+                    )
 
     for slot, occupant in occupants.items():
         player = plan.players.get(occupant)
@@ -151,7 +227,21 @@ def _origin_slot(origins: dict[int, str], player_id: str) -> int | None:
     return None
 
 
-def choose_setter(plan: TeamPlan, origins: dict[int, str], occupants: dict[int, str]) -> tuple[str | None, str]:
+def choose_setter(
+    plan: TeamPlan,
+    origins: dict[int, str],
+    occupants: dict[int, str],
+    rotation: int | None = None,
+) -> tuple[str | None, str]:
+    forced = plan.rotation_setters.get(rotation, "") if rotation else ""
+    if forced:
+        if forced not in occupants.values():
+            return None, f"{plan.name_of(forced)} 这一轮不在场上，不能按这个自定义组织。"
+        player = plan.players.get(forced)
+        note = ""
+        if player is None or not player.setting_verified:
+            note = "二传能力尚未验证。这是职责安排，不是能力评价。"
+        return forced, note
     designated: list[tuple[int, str]] = []
     for slot, origin in origins.items():
         player = plan.players[origin]
@@ -332,7 +422,7 @@ def build_card(
             structural=structural,
         )
 
-    setter_id, setter_note = choose_setter(plan, origins, occupants)
+    setter_id, setter_note = choose_setter(plan, origins, occupants, rotation)
     backup_id, backup_note = choose_backup(plan, occupants, setter_id)
     receivers, extra = choose_receivers(plan, occupants, setter_id)
     setter_name = plan.name_of(setter_id) if setter_id else "未指定"

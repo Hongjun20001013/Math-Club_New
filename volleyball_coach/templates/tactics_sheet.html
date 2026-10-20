@@ -7,7 +7,7 @@
   {% endfor %}
 </p>
 <h1>{{ tactic.name }} · {{ phases[phase] }}</h1>
-<p>{{ plan.name }}{% if scheme %} / {{ scheme.name }}{% endif %} · {{ "已发布" if tactic.status == "published" else "草稿" }} · {{ position_kind }}</p>
+<p>{{ plan.name }}{% if scheme %} / {{ scheme.name }} · {{ scheme.system_label() }}{% endif %} · {{ "已发布" if tactic.status == "published" else "草稿" }} · {{ position_kind }}</p>
 <p class="muted">这张总览可以打印。圆点是示意，不能用来判断站位是否合法。</p>
 <div class="sheet-grid">
   {% for item in cards %}

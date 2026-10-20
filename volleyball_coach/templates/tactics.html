@@ -35,7 +35,64 @@
 {% else %}
   <p class="rule-note">自由人要单独指定。防守替补不会自动显示成 libero。</p>
 {% endif %}
-<p class="muted">当前标成{{ position_kind }}。重叠规则还没确认时，不会标成已按本赛事规则核验的站位。圆点中心不能判断站位是否合法。</p>
+<div class="tactic-stage">
+{% if scheme and scheme.order|length == 6 %}
+<form class="system-bar" method="post" action="{{ url_for('save_scheme_system', team_id=plan.team_id, scheme_id=scheme.id) }}">
+  {% if tactic %}<input type="hidden" name="tactic" value="{{ tactic.id }}">{% endif %}
+  <input type="hidden" name="rotation" value="{{ rotation }}">
+  <input type="hidden" name="phase" value="{{ phase }}">
+  <div>
+    <p class="system-lead"><strong>{{ scheme.system_label() }}</strong></p>
+    <p class="muted">6-2：两名二传轮到后排时组织。5-1：一名二传六轮都组织。自定义：每一轮指定一个人。</p>
+  </div>
+  <div class="seg" role="radiogroup" aria-label="轮转体系">
+    <label><input type="radio" name="system" value="62" {% if scheme.system == '62' %}checked{% endif %}>6-2</label>
+    <label><input type="radio" name="system" value="51" {% if scheme.system == '51' %}checked{% endif %}>5-1</label>
+    <label><input type="radio" name="system" value="custom" {% if scheme.system == 'custom' %}checked{% endif %}>自定义</label>
+  </div>
+  <div class="for-62 setter-picks">
+    <label>后排二传 A
+      <select name="setter_a">
+        {% for player_id in scheme.order %}
+          <option value="{{ player_id }}" {% if scheme.system == '62' and scheme.setters|length > 0 and scheme.setters[0] == player_id %}selected{% endif %}>{{ plan.name_of(player_id) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>后排二传 B
+      <select name="setter_b">
+        {% for player_id in scheme.order %}
+          <option value="{{ player_id }}" {% if scheme.system == '62' and scheme.setters|length > 1 and scheme.setters[1] == player_id %}selected{% endif %}>{{ plan.name_of(player_id) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="for-51 setter-picks">
+    <label>六轮都组织
+      <select name="setter">
+        {% for player_id in scheme.order %}
+          <option value="{{ player_id }}" {% if scheme.system == '51' and scheme.setters and scheme.setters[0] == player_id %}selected{% endif %}>{{ plan.name_of(player_id) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="for-custom">
+    <div class="setter-grid">
+      {% for number, people in on_court %}
+        <label>R{{ number }}
+          <select name="setter_{{ number }}">
+            {% for player_id in people %}
+              <option value="{{ player_id }}" {% if scheme.system == 'custom' and scheme.setters|length == 6 and scheme.setters[number - 1] == player_id %}selected{% endif %}>{{ plan.name_of(player_id) }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+  <p class="for-roster muted">按名单。还没有人给这套阵容选 6-2、5-1 或自定义。</p>
+  {% if system_note %}<p class="warn-line">{{ system_note }}</p>{% endif %}
+  <div class="system-save"><button type="submit">保存体系</button></div>
+</form>
+{% endif %}
 
 <div class="tactic-desk">
   <aside class="lineup-list">
@@ -43,6 +100,7 @@
     {% for item in plan.schemes %}
       <article class="lineup {% if scheme and item.id == scheme.id %}is-on{% endif %}">
         <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=item.id) }}">{{ item.name }}</a>
+        <span class="sys-tag">{{ item.system_label() }}</span>
         {% if item.is_default %}<span>默认</span>{% endif %}
         <p>{% for player_id in item.order %}{{ plan.name_of(player_id) }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
         <form method="post" action="{{ url_for('copy_scheme', team_id=plan.team_id, scheme_id=item.id) }}">
@@ -89,11 +147,11 @@
           <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=tactic.id, rotation=rotation, phase=code) }}" {% if phase == code %}aria-current="true"{% endif %}>{{ label }}</a>
         {% endfor %}
       </nav>
-      <p class="court-key"><i class="full-key" aria-hidden="true"><b></b><b></b></i>完整场 9×18。下面是本方半场，正方形，网在上方。</p>
+      <p class="court-key"><i class="full-key" aria-hidden="true"><b></b><b></b></i>完整场 9×18。本方半场是正方形，网在上方。当前标成{{ position_kind }}。</p>
       {% with court_save = url_for('save_tactic_mark', team_id=plan.team_id, tactic_id=tactic.id) if not published else '', court_locked = published, court_snapshot = false, marks = marks, rotation = rotation, phase = phase %}
         {% include "_halfcourt.html" %}
       {% endwith %}
-      <p class="muted">{{ position_kind }}。拖动不改号位，刷新后还是这次保存的坐标。</p>
+      <p class="muted">拖动不改号位，刷新后还是这次保存的坐标。换了体系以后，星号跟着新的组织者走。已经拖过的坐标留在原地。圆点中心不能判断站位是否合法。</p>
       {% if published %}
         <p>这一版已发布，球场不能拖。要改位置，先另存。</p>
       {% endif %}
@@ -104,14 +162,21 @@
         </form>
       {% endif %}
     {% else %}
-      <div class="half-court is-empty" data-court data-locked="1">
-        <svg viewBox="0 0 100 100" class="routes" aria-hidden="true">
-          <rect x="1.5" y="1.5" width="97" height="97" class="floor"></rect>
-          <line x1="1.5" y1="8" x2="98.5" y2="8" class="netline"></line>
-          <line x1="1.5" y1="33" x2="98.5" y2="33" class="attackline"></line>
-        </svg>
-        <p class="empty-copy">先生成战术。六轮站位按职责摆好，坐标只是示意。</p>
-      </div>
+      <nav class="rot-tabs" aria-label="轮次">
+        {% for number, status in statuses %}
+          <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=scheme.id if scheme else none, rotation=number, phase=phase) }}" {% if rotation == number %}aria-current="true"{% endif %}>R{{ number }}</a>
+        {% endfor %}
+      </nav>
+      <nav class="seg" aria-label="阶段">
+        {% for code, label in phases.items() %}
+          <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=scheme.id if scheme else none, rotation=rotation, phase=code) }}" {% if phase == code %}aria-current="true"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+      <p class="court-key"><i class="full-key" aria-hidden="true"><b></b><b></b></i>完整场 9×18。本方半场是正方形，网在上方。当前标成{{ position_kind }}。</p>
+      {% with court_save = '', court_locked = true, court_snapshot = false, marks = marks, rotation = rotation, phase = phase %}
+        {% include "_halfcourt.html" %}
+      {% endwith %}
+      <p class="muted">这是按职责摆出来的预览，还不能拖。生成战术以后，坐标才会保存。圆点中心不能判断站位是否合法。</p>
     {% endif %}
     <ol class="check-row">
       {% for number, status in statuses %}
@@ -122,27 +187,32 @@
   </section>
 
   <aside class="duty-pane">
-    <h2>R{{ rotation }} 本轮职责</h2>
-    <p>主二传 <strong>{{ card.setter_name }}</strong></p>
+    <h2>R{{ rotation }}</h2>
+    <dl class="duty-dl">
+      <div><dt>主二传</dt><dd><strong>{{ card.setter_name }}</strong></dd></div>
+      <div><dt>补位</dt><dd><strong>{{ card.backup_name }}</strong></dd></div>
+      <div><dt>主接发</dt><dd>{% for item in card.receivers %}{{ item.name }}{% if not loop.last %} · {% endif %}{% else %}未指定{% endfor %}</dd></div>
+      <div><dt>短球</dt><dd>{{ card.short_ball }}</dd></div>
+      <div><dt>结合部</dt><dd>{{ card.seam }}</dd></div>
+      <div><dt>前排</dt><dd>{% for item in card.front_attack %}{{ item.name }} {{ item.wing }}{% if not loop.last %} · {% endif %}{% else %}未排{% endfor %}</dd></div>
+    </dl>
     {% if card.setter_note %}<p>{{ card.setter_note }}</p>{% endif %}
-    <p>补位二传 <strong>{{ card.backup_name }}</strong></p>
-    {% if card.backup_note %}<p>{{ card.backup_note }}</p>{% endif %}
-    <p>主接发 {% for item in card.receivers %}{{ item.name }} {% else %}未指定{% endfor %}</p>
-    <p>短球 {{ card.short_ball }}</p>
-    <p>结合部 {{ card.seam }}</p>
-    <p>前排 {% for item in card.front_attack %}{{ item.name }} {{ item.wing }} {% else %}未排{% endfor %}</p>
-    {% if phase == 'receive' %}
-      <p>{{ card.movement_receive }}</p>
-    {% elif phase == 'attack' %}
-      <p>{{ card.movement_serve }}</p>
-    {% elif phase == 'block' %}
-      <p>前排先到网前拦。后排按这一轮的防守收。具体落点仍是示意。</p>
-    {% else %}
-      <p>{{ card.backup_name }} 在主二传碰到第一球时补位。保护点是示意，不是测量坐标。</p>
-    {% endif %}
-    {% for note in card.extra_notes %}
-      <p>{{ note }}</p>
-    {% endfor %}
+    <details>
+      <summary>这一轮怎么走</summary>
+      {% if phase == 'receive' %}
+        <p>{{ card.movement_receive }}</p>
+      {% elif phase == 'attack' %}
+        <p>{{ card.movement_serve }}</p>
+      {% elif phase == 'block' %}
+        <p>前排先到网前拦。后排按这一轮的防守收。具体落点仍是示意。</p>
+      {% else %}
+        <p>{{ card.backup_name }} 在主二传碰到第一球时补位。保护点是示意，不是测量坐标。</p>
+      {% endif %}
+      {% if card.backup_note %}<p>{{ card.backup_note }}</p>{% endif %}
+      {% for note in card.extra_notes %}
+        <p>{{ note }}</p>
+      {% endfor %}
+    </details>
     {% for item in card.conflicts %}
       <p class="warn-line">{{ item }}</p>
     {% endfor %}
@@ -161,6 +231,7 @@
       {% endfor %}
     {% endif %}
   </aside>
+</div>
 </div>
 
 {% if tactic and not published %}

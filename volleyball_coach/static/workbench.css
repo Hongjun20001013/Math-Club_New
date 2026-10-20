@@ -221,6 +221,8 @@ body.app .bench:not(:has(input[name="skill"][value="set"]:checked)) .for-set { d
 body.app .home-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 body.app .text-button.is-quiet { background: #e1e6ef; color: #142238; }
 body.app .tactic-head, body.app .tactic-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+body.app .tactic-head h1 { margin: 0; font-size: 1.7rem; }
+body.app .tactic-head p { margin: 2px 0 0; }
 body.app .tactic-actions form { margin: 0; }
 body.app .rule-note { margin: 8px 0; padding: 8px 12px; border-left: 3px solid #087f8c; background: white; }
 body.app .tactic-desk { display: grid; grid-template-columns: 220px minmax(280px, 1fr) 260px; gap: 12px; align-items: start; }
@@ -248,9 +250,54 @@ body.app .rot-tabs a[aria-current="true"], body.app .seg a[aria-current="true"],
   color: white;
 }
 body.app .seg input { position: absolute; opacity: 0; pointer-events: none; }
+body.app .system-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  gap: 6px 16px;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+}
+body.app .system-lead { margin: 0; font-size: 1.15rem; }
+body.app .system-bar .for-62,
+body.app .system-bar .for-51,
+body.app .system-bar .for-custom,
+body.app .system-bar .for-roster,
+body.app .system-bar .system-save,
+body.app .system-bar .warn-line { grid-column: 1 / -1; }
+body.app .setter-picks { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+body.app .setter-picks label, body.app .setter-grid label { display: grid; gap: 4px; font-size: 12px; }
+body.app .setter-picks select, body.app .setter-grid select { min-width: 0; }
+body.app .setter-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+body.app .system-bar:not(:has(input[name="system"][value="62"]:checked)) .for-62,
+body.app .system-bar:not(:has(input[name="system"][value="51"]:checked)) .for-51,
+body.app .system-bar:not(:has(input[name="system"][value="custom"]:checked)) .for-custom { display: none; }
+body.app .system-bar:has(input[name="system"]:checked) .for-roster { display: none; }
+body.app .sys-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #d7ebf6;
+  color: #142238;
+  font-size: 12px;
+}
+body.app .duty-dl { margin: 0 0 8px; }
+body.app .duty-dl div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 4px 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e1e6ef;
+}
+body.app .duty-dl dt, body.app .duty-dl dd { margin: 0; }
+body.app .duty-dl dt { color: #5c6b7a; }
 body.app .half-court {
   position: relative;
-  width: min(100%, 440px);
+  width: min(100%, 520px);
   aspect-ratio: 1;
   margin: 8px auto;
   background: #f7f9fc;
@@ -295,7 +342,7 @@ body.app .check-row li[data-status="已配置"] { border-color: #1f7a4d; }
 body.app .check-row li[data-status="待补充"] { border-color: #087f8c; }
 body.app .check-row li[data-status="存在冲突"] { border-color: #d3542a; }
 body.app .full-key { display: inline-grid; width: 16px; height: 32px; margin-right: 6px; grid-template-rows: 1fr 1fr; border: 1px solid #142238; vertical-align: middle; }
-body.app .full-key b { display: block; background: white; }
+body.app .full-key b { display: block; height: 100%; background: white; }
 body.app .full-key b:last-child { background: #d7ebf6; }
 body.app .empty-copy { position: absolute; left: 12%; right: 12%; top: 46%; margin: 0; text-align: center; }
 body.app .sheet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -324,9 +371,16 @@ body.app .court-key { display: flex; align-items: center; }
   body.app .bench { grid-template-columns: 220px minmax(0, 1fr) 220px; }
   body.app .review-grid, body.app .tactic-desk, body.app .sheet-grid { grid-template-columns: 1fr; }
   body.app .court-pane { order: -1; }
+  body.app .tactic-stage { display: flex; flex-direction: column; }
+  body.app .tactic-stage .tactic-desk { order: -1; }
+  body.app .tactic-head h1 { font-size: 1.45rem; }
+  body.app .tactic-desk .half-court { width: min(100%, 340px); }
+  body.app .rot-tabs, body.app .court-pane .seg { margin: 2px 0; }
+  body.app .system-bar { grid-template-columns: 1fr; }
 }
 @media (max-width: 860px) {
   body.app .bench { grid-template-columns: 1fr; }
+  body.app .setter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {

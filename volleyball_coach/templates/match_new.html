@@ -10,7 +10,7 @@
     <label for="scheme_id">本场使用的轮转方案</label>
     <select id="scheme_id" name="scheme_id">
       {% for scheme in plan.schemes %}
-        <option value="{{ scheme.id }}" {% if scheme.is_default %}selected{% endif %}>{{ scheme.name }}{% if scheme.is_default %} · 默认{% endif %}</option>
+        <option value="{{ scheme.id }}" {% if scheme.is_default %}selected{% endif %}>{{ scheme.name }} · {{ scheme.system_label() }}{% if scheme.is_default %} · 默认{% endif %}</option>
       {% endfor %}
     </select>
     <p class="muted">开场快照会锁住这一套六人顺序。赛后改默认方案，不会改已经开场的比赛。</p>

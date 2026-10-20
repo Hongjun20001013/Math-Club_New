@@ -238,13 +238,22 @@ class ServePlan:
 
 @dataclass
 class RotationScheme:
-    """One named R1 order. Slot numbers are 1 through 6, not measured court coordinates."""
+    """One named R1 order. Slot numbers are 1 through 6, not measured court coordinates.
+
+    system is 62, 51, or custom. setters is two ids, one id, or one id per rotation.
+    An empty system keeps each player's own sets_when.
+    """
 
     id: str
     name: str
     order: list[str]
     is_default: bool = False
     notes: str = ""
+    system: str = ""
+    setters: list[str] = field(default_factory=list)
+
+    def system_label(self) -> str:
+        return {"62": "6-2", "51": "5-1", "custom": "自定义"}.get(self.system, "按名单")
 
     def to_json(self) -> dict:
         return {
@@ -253,6 +262,8 @@ class RotationScheme:
             "order": list(self.order),
             "is_default": self.is_default,
             "notes": self.notes,
+            "system": self.system,
+            "setters": list(self.setters),
         }
 
     @staticmethod
@@ -263,6 +274,8 @@ class RotationScheme:
             order=list(data.get("order") or []),
             is_default=bool(data.get("is_default")),
             notes=data.get("notes") or "",
+            system=data.get("system") or "",
+            setters=list(data.get("setters") or []),
         )
 
 
@@ -291,6 +304,22 @@ class SubWindow:
         )
 
 
+def _rotation_setters(raw) -> dict[int, str]:
+    """JSON object keys arrive as strings. Skip anything that is not R1–R6."""
+    if not isinstance(raw, dict):
+        return {}
+    parsed: dict[int, str] = {}
+    for key, player_id in raw.items():
+        try:
+            rotation = int(key)
+        except (TypeError, ValueError):
+            continue
+        if rotation not in range(1, 7) or not player_id:
+            continue
+        parsed[rotation] = str(player_id)
+    return parsed
+
+
 @dataclass
 class TeamPlan:
     team_id: str
@@ -305,6 +334,7 @@ class TeamPlan:
     board_note: str = ""
     notes: str = ""
     schemes: list[RotationScheme] = field(default_factory=list)
+    rotation_setters: dict[int, str] = field(default_factory=dict)
 
     def base_order(self) -> list[str]:
         slotted = [player for player in self.players.values() if player.base_slot]
@@ -358,6 +388,7 @@ class TeamPlan:
             "board_note": self.board_note,
             "notes": self.notes,
             "schemes": [scheme.to_json() for scheme in self.schemes],
+            "rotation_setters": {str(rotation): player_id for rotation, player_id in self.rotation_setters.items()},
         }
 
     @staticmethod
@@ -376,6 +407,7 @@ class TeamPlan:
             board_note=data.get("board_note") or "",
             notes=data.get("notes") or "",
             schemes=[RotationScheme.from_json(item) for item in data.get("schemes") or []],
+            rotation_setters=_rotation_setters(data.get("rotation_setters")),
         )
 
 

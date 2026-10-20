@@ -19,7 +19,7 @@
     <select id="scheme" name="scheme">
       {% for scheme in plan.schemes %}
         <option value="{{ scheme.id }}" {% if active_scheme and scheme.id == active_scheme.id %}selected{% endif %}>
-          {{ scheme.name }}{% if scheme.is_default %} · 默认{% endif %}
+          {{ scheme.name }} · {{ scheme.system_label() }}{% if scheme.is_default %} · 默认{% endif %}
         </option>
       {% endfor %}
     </select>

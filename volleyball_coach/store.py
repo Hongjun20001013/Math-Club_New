@@ -107,7 +107,9 @@ CREATE TABLE IF NOT EXISTS schemes (
   name TEXT NOT NULL,
   order_json TEXT NOT NULL,
   is_default INTEGER NOT NULL DEFAULT 0,
-  notes TEXT NOT NULL DEFAULT ''
+  notes TEXT NOT NULL DEFAULT '',
+  system TEXT NOT NULL DEFAULT '',
+  setters_json TEXT NOT NULL DEFAULT '[]'
 );
 
 CREATE TABLE IF NOT EXISTS matches (
@@ -292,7 +294,10 @@ class Store:
         self._ensure_column("matches", "tactic_id", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("matches", "tactic_json", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("rallies", "plan_execution", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("schemes", "system", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("schemes", "setters_json", "TEXT NOT NULL DEFAULT '[]'")
         self._backfill_schemes()
+        self._backfill_scheme_systems()
         self.conn.commit()
 
     def _backfill_schemes(self) -> None:
@@ -338,6 +343,16 @@ class Store:
                     "从现有首发槽生成。另存的方案不会改这一套，除非把它设成默认。",
                 ),
             )
+
+    def _backfill_scheme_systems(self) -> None:
+        self.conn.execute(
+            """
+            UPDATE schemes
+            SET system = '62', setters_json = ?
+            WHERE id = 'scheme-mens-62' AND (system = '' OR system IS NULL)
+            """,
+            (json.dumps(["michael", "eric"]),),
+        )
 
     def _seed_mens_if_empty(self) -> None:
         row = self.conn.execute("SELECT COUNT(*) AS n FROM teams").fetchone()
@@ -529,6 +544,10 @@ class Store:
             "SELECT * FROM schemes WHERE team_id = ? ORDER BY is_default DESC, name",
             (team_id,),
         ):
+            try:
+                setters = list(json.loads(row["setters_json"] or "[]"))
+            except (TypeError, json.JSONDecodeError):
+                setters = []
             schemes.append(
                 RotationScheme(
                     id=row["id"],
@@ -536,6 +555,8 @@ class Store:
                     order=list(json.loads(row["order_json"])),
                     is_default=bool(row["is_default"]),
                     notes=row["notes"],
+                    system=row["system"] or "",
+                    setters=[str(player_id) for player_id in setters if player_id],
                 )
             )
         rules = Rules(
@@ -639,13 +660,15 @@ class Store:
     def _write_scheme(self, team_id: str, scheme: RotationScheme) -> None:
         self.conn.execute(
             """
-            INSERT INTO schemes (id, team_id, name, order_json, is_default, notes)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO schemes (id, team_id, name, order_json, is_default, notes, system, setters_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               name=excluded.name,
               order_json=excluded.order_json,
               is_default=excluded.is_default,
-              notes=excluded.notes
+              notes=excluded.notes,
+              system=excluded.system,
+              setters_json=excluded.setters_json
             """,
             (
                 scheme.id,
@@ -654,6 +677,8 @@ class Store:
                 json.dumps(scheme.order),
                 int(scheme.is_default),
                 scheme.notes,
+                scheme.system or "",
+                json.dumps(list(scheme.setters)),
             ),
         )
 
@@ -672,17 +697,23 @@ class Store:
 
     def copy_scheme(self, team_id: str, scheme_id: str, name: str) -> str:
         row = self.conn.execute(
-            "SELECT name, order_json, notes FROM schemes WHERE team_id = ? AND id = ?",
+            "SELECT name, order_json, notes, system, setters_json FROM schemes WHERE team_id = ? AND id = ?",
             (team_id, scheme_id),
         ).fetchone()
         if row is None:
             raise ValueError("找不到这套阵容。")
+        try:
+            setters = list(json.loads(row["setters_json"] or "[]"))
+        except (TypeError, json.JSONDecodeError):
+            setters = []
         copied = RotationScheme(
             id=new_id("scheme"),
             name=name.strip() or f"副本 · {row['name']}",
             order=list(json.loads(row["order_json"])),
             is_default=False,
             notes=row["notes"] or "",
+            system=row["system"] or "",
+            setters=[str(player_id) for player_id in setters if player_id],
         )
         self._write_scheme(team_id, copied)
         self.conn.commit()

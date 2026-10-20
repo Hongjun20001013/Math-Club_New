@@ -219,3 +219,73 @@ def test_published_version_is_what_the_match_keeps(tmp_path):
     assert "当时选用的预案" in report
     assert "不能单独归因" in report
     assert "胜率更高" not in report
+
+
+def test_lineup_system_can_be_five_one_or_custom(tmp_path):
+    client = _client(tmp_path)
+    board = client.get(f"/teams/{MENS_TEAM_ID}/board").get_data(as_text=True)
+    assert "二传 Eric" in board.split('id="r4"')[1].split('id="r5"')[0]
+    assert 'data-front="Vitas,Andy A,Eric"' in board.split('id="r2"')[1].split('id="r3"')[0]
+
+    copied = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes/scheme-mens-62/copy",
+        data={"name": "五一试验"},
+        follow_redirects=False,
+    )
+    copy_id = _arg(copied.headers["Location"], "scheme")
+    made = client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": copy_id, "name": "五一站位"},
+        follow_redirects=False,
+    )
+    tactic_id = _arg(made.headers["Location"], "tactic")
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics/{tactic_id}/marks",
+        data={"rotation": "1", "phase": "receive", "slot": "4", "player_id": "eric", "x": "11", "y": "22"},
+    )
+
+    switched = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes/{copy_id}/system",
+        data={"system": "51", "setter": "michael", "tactic": tactic_id, "rotation": "4", "phase": "receive"},
+        follow_redirects=True,
+    )
+    assert "体系已改成5-1。名单上原来的二传能力还留着。" in switched.get_data(as_text=True)
+    preview = client.get(f"/teams/{MENS_TEAM_ID}/board?scheme={copy_id}").get_data(as_text=True)
+    assert "二传 Michael" in preview.split('id="r4"')[1].split('id="r5"')[0]
+    assert 'data-front="Vitas,Andy A,Eric"' in preview.split('id="r2"')[1].split('id="r3"')[0]
+    default = client.get(f"/teams/{MENS_TEAM_ID}/board").get_data(as_text=True)
+    assert "二传 Eric" in default.split('id="r4"')[1].split('id="r5"')[0]
+    assert 'data-front="Vitas,Andy A,Eric"' in default.split('id="r2"')[1].split('id="r3"')[0]
+    kept = client.get(f"/teams/{MENS_TEAM_ID}/tactics?tactic={tactic_id}&rotation=1&phase=receive").get_data(as_text=True)
+    pin = _pin(kept, "4")
+    assert 'data-player="eric"' in pin
+    assert 'data-x="11"' in pin and 'data-y="22"' in pin
+
+    custom = {
+        "system": "custom",
+        "tactic": tactic_id,
+        "rotation": "1",
+        "phase": "receive",
+    }
+    for number in range(1, 7):
+        custom[f"setter_{number}"] = "leo"
+    client.post(f"/teams/{MENS_TEAM_ID}/schemes/{copy_id}/system", data=custom, follow_redirects=True)
+    custom_page = client.get(f"/teams/{MENS_TEAM_ID}/tactics?tactic={tactic_id}&rotation=1&phase=receive").get_data(as_text=True)
+    assert "主二传" in custom_page and "<strong>Leo</strong>" in custom_page
+    custom_pin = _pin(custom_page, "4")
+    assert 'data-player="eric"' in custom_pin
+    assert 'data-x="11"' in custom_pin and 'data-y="22"' in custom_pin
+
+    refused = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes/{copy_id}/system",
+        data={"system": "51", "setter": "harvey", "tactic": tactic_id},
+        follow_redirects=True,
+    )
+    refused_html = refused.get_data(as_text=True)
+    assert "5-1 的二传必须在这六个人里。" in refused_html
+    assert "<strong>Leo</strong>" in refused_html
+    assert "准备好了" not in refused_html
+    assert "胜率更高" not in refused_html
+    conn = sqlite3.connect(tmp_path / "coach.db")
+    assert conn.execute("SELECT sets_when FROM players WHERE id = 'eric'").fetchone()[0] == "back_row"
+    assert conn.execute("SELECT sets_when FROM players WHERE id = 'michael'").fetchone()[0] == "back_row"

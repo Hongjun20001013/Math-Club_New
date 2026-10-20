@@ -64,6 +64,26 @@ def _phase_xy(card, slot: int, phase: str) -> tuple[float, float]:
     return SLOT_X[slot], 42.0 if view.role_label == "middle" else 72.0
 
 
+def preview_marks(card, rotation: int, phase: str) -> list[dict]:
+    """Unsaved receive shape for the court, before a tactic exists."""
+    if not card.slots or phase not in PHASES:
+        return []
+    marks = []
+    for slot, view in card.slots.items():
+        x, y = _phase_xy(card, slot, phase)
+        marks.append(
+            {
+                "rotation": rotation,
+                "phase": phase,
+                "slot": slot,
+                "player_id": view.occupant_id,
+                "x": x,
+                "y": y,
+            }
+        )
+    return marks
+
+
 def default_marks(plan: TeamPlan, locked_pairs: set[frozenset[str]]) -> list[dict]:
     marks = []
     for rotation in range(1, 7):
