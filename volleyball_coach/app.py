@@ -2021,7 +2021,7 @@ def confirmed_serve_samples(rallies: list[dict], rotation: int, target_label: st
 
 
 def main() -> None:
-    create_app().run(host="127.0.0.1", port=5055, debug=False)
+    create_app().run(host="0.0.0.0", port=5055, debug=False)
 
 
 if __name__ == "__main__":
