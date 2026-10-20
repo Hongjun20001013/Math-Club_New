@@ -8,7 +8,7 @@
 </p>
 <h1>六轮可执行卡</h1>
 {% include "_film.html" %}
-<p class="legend-note">从左到右是 R1 到 R6。深色前排，浅色后排。球亮着的人这一轮发球，亮完交给右边下一格。</p>
+<p class="fine">深色前排，浅色后排。亮着的人这一轮发球。</p>
 <details class="sheet-words">
   <summary>这支队的轮转说明</summary>
   <p>{{ plan.board_note or "每张卡是这一轮能直接喊的职责。轮转槽位不是发球和接发时的实际站位。" }}</p>
@@ -33,7 +33,7 @@
   <span class="chip is-front"><i class="role">middle</i><span class="who">副攻</span></span>
   <span class="chip is-back"><i class="role">def</i><span class="who">防守替补</span></span>
 </p>
-<p class="legend-note">深色前排槽，浅色后排槽。虚线是从号位散开。深框是结合部。男排没有 libero。</p>
+<p class="fine">虚线是从号位散开。深框是结合部。男排没有 libero。</p>
 {% set shown = active_scheme.order if active_scheme else plan.base_order() %}
 <details class="scheme-editor">
   <summary>{% if active_scheme %}编辑「{{ active_scheme.name }}」{% else %}把六个号位存成方案{% endif %}</summary>

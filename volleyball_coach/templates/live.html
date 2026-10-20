@@ -14,7 +14,7 @@
     {% endfor %}
   </fieldset>
   <button type="submit">保存记录方式</button>
-  <p>动作 {{ coverage.actions }} · 已结束回合 {{ coverage.closed }} · 比分 {{ coverage.points }} · 旧版回合 {{ coverage.legacy }}。旧版回合没有拆成个人动作。</p>
+  <p class="fine">动作 {{ coverage.actions }} · 已结束回合 {{ coverage.closed }} · 比分 {{ coverage.points }} · 旧版回合 {{ coverage.legacy }}</p>
 </form>
 
 <form class="bench" method="post" action="{{ url_for('post_action', match_id=match.id) }}">
@@ -156,7 +156,7 @@
         <p>尚未设置追发目标</p>
         <p><a class="text-button" href="{{ url_for('board', team_id=plan.team_id) }}">设置目标</a></p>
       {% endif %}
-      <p>{% if coverage.actions %}本场观察{% else %}赛前预案。本场还没有动作，这不是结论。{% endif %} 语言模型未接通。</p>
+      <p class="fine">{% if coverage.actions %}本场观察{% else %}赛前预案。本场还没有动作，这不是结论。{% endif %} 语言模型未接通。</p>
       <details>
         <summary>依据、切换和备选</summary>
         <p>依据：{{ suggestion.basis }}。样本 {{ coverage.actions }}。</p>
