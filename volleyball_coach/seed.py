@@ -130,6 +130,8 @@ def build_mens_plan() -> TeamPlan:
             order=["michael", "leo", "andy-a", "eric", "vitas", "andy-b"],
             is_default=True,
             notes="已确认的男排六人顺序。另存的方案不会改这一套，除非再把它设成默认。",
+            system="62",
+            setters=["michael", "eric"],
         )
     ]
     return TeamPlan(

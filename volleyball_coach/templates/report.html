@@ -84,6 +84,10 @@
   </article>
 {% endfor %}
 
+{% if execution %}
+  <h2>当时选用的预案</h2>
+  <p>{{ execution.sentence }}</p>
+{% endif %}
 <h2>场边操作</h2>
 <p>{{ report.burden.note }}</p>
 <p>操作 {{ report.burden.operations }} 次，撤销 {{ report.burden.undos }} 次，校正 {{ report.burden.corrections }} 次，手动改轮次 {{ report.burden.manual_rotations }} 次。</p>

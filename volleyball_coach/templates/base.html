@@ -13,6 +13,9 @@
     <aside class="nav">
       <a class="brand" href="{{ url_for('home') }}">排球临场指挥</a>
       <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>比赛中心</a>
+      {% if nav_team_id %}
+        <a href="{{ url_for('tactics', team_id=nav_team_id) }}" {% if request.endpoint in ('tactics', 'tactics_sheet') %}aria-current="page"{% endif %}>阵容与战术</a>
+      {% endif %}
       {% if nav_match %}
         <a href="{{ url_for('live', match_id=nav_match['id']) }}" {% if request.endpoint == 'live' %}aria-current="page"{% endif %}>实时记录</a>
         <a href="{{ url_for('players_page', match_id=nav_match['id']) }}" {% if request.endpoint == 'players_page' %}aria-current="page"{% endif %}>球员表现</a>
@@ -31,7 +34,7 @@
       <a href="{{ url_for('drills') }}" {% if request.endpoint == 'drills' %}aria-current="page"{% endif %}>验收</a>
     </aside>
     <div class="workspace">
-      {% if nav_state %}
+      {% if nav_state and not prep_screen %}
         <header class="matchbar">
           <span>{{ nav_plan.name }}{% if nav_match['opponent'] %} · {{ nav_match['opponent'] }}{% endif %}</span>
           <span>第 {{ nav_state.set_index }} 局</span>

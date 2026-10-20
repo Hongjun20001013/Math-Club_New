@@ -1,35 +1,15 @@
 {% extends "base.html" %}
 {% block body %}
-<p class="eyebrow">场边</p>
-<h1>看人怎么转，看球怎么走。</h1>
-<p class="lede">顺时针进一格。只记看见的。不满 8 次，只显示次数。</p>
-<div class="hero-split">
-  {% include "_motion.html" %}
-  <figure class="hero">
-    <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
-  </figure>
-</div>
-<section class="use-grid">
-  <article>
-    <div class="mini-pair" aria-hidden="true">
-      <span class="mini-court"><i></i><i></i><i></i><i></i><i></i><i class="on"></i></span>
-      <span class="mini-court alt"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span>
-    </div>
-    <h2>几套站位</h2>
-    <p>开场再选一套。</p>
-  </article>
-  <article>
-    <div class="mini-marks" aria-hidden="true">
-      <span>到位</span><span>拦网</span><span>防守</span><span>扣球</span><span>失误</span>
-    </div>
-    <h2>记这一分</h2>
-    <p>先点看见的，再动比分。</p>
-  </article>
-  <article>
-    <div class="mini-meter" aria-hidden="true"><i></i><b>8</b></div>
-    <h2>次数先于比例</h2>
-    <p>不满 8 次，不报百分比。</p>
-  </article>
+<section class="home-actions">
+  {% if live_match %}
+    <a class="text-button" href="{{ url_for('live', match_id=live_match['id']) }}">继续比赛</a>
+  {% else %}
+    <span class="text-button is-quiet">继续比赛</span>
+  {% endif %}
+  {% if library_team %}
+    <a class="text-button" href="{{ url_for('new_match', team_id=library_team) }}">准备下一场</a>
+    <a class="text-button" href="{{ url_for('tactics', team_id=library_team) }}">阵容与战术</a>
+  {% endif %}
 </section>
 <section class="home-grid">
   <div>
@@ -42,7 +22,6 @@
     {% else %}
       <p>还没有球队。</p>
     {% endfor %}
-    <p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。以后别的队也可以用同一套页面做复盘。</p>
   </div>
   <form class="stack" method="post" action="{{ url_for('create_team') }}">
     <h2>新建球队</h2>
@@ -57,4 +36,15 @@
     <button type="submit">建立球队</button>
   </form>
 </section>
+<details class="quiet-fold">
+  <summary>图示</summary>
+  <p class="lede">顺时针进一格。只记看见的。不满 8 次，只显示次数。</p>
+  <div class="hero-split">
+    {% include "_motion.html" %}
+    <figure class="hero">
+      <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
+    </figure>
+  </div>
+</details>
+<p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。以后别的队也可以用同一套页面做复盘。</p>
 {% endblock %}

@@ -1,52 +1,156 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>开场 · {{ plan.name }}</h1>
-<p class="lede">先确认名单、配对、起始轮次和发球方。预案可以离线用。场上六人从这一轮的首发槽开始，替补不会因为轮次到了就自动上场。</p>
-{% if plan.base_order()|length != 6 %}
+<p class="row-links">
+  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
+  <a href="{{ url_for('tactics', team_id=plan.team_id, scheme=scheme.id if scheme else none) }}">阵容与战术</a>
+  {% if scheme %}<a href="{{ url_for('board', team_id=plan.team_id, scheme=scheme.id) }}">六人顺序</a>{% endif %}
+</p>
+<h1>准备比赛</h1>
+<p class="fine">{{ plan.name }}{% if scheme %} · {{ scheme.name }} · {{ scheme.system_label() }}{% endif %}。开场抄下这一版。已经记过的比赛不动。</p>
+{% if plan.rules.no_libero %}
+  <p class="rule-note">没有正式自由人。防守替补不会被改名为 libero。</p>
+{% endif %}
+{% if not playable %}
   <p class="warn-line">六个首发槽还没排满，现在不能开场。</p>
 {% endif %}
-<form class="stack" method="post" action="{{ url_for('start_match', team_id=plan.team_id) }}">
-  {% if plan.schemes %}
-    <label for="scheme_id">本场使用的轮转方案</label>
-    <select id="scheme_id" name="scheme_id">
-      {% for scheme in plan.schemes %}
-        <option value="{{ scheme.id }}" {% if scheme.is_default %}selected{% endif %}>{{ scheme.name }}{% if scheme.is_default %} · 默认{% endif %}</option>
+
+{% if scheme %}
+<form class="prep-bar" method="get">
+  <input type="hidden" name="rotation" value="{{ rotation }}">
+  <label>开场阵容
+    <select name="scheme" onchange="this.form.submit()">
+      {% for item in plan.schemes %}
+        <option value="{{ item.id }}" {% if item.id == scheme.id %}selected{% endif %}>{{ item.name }} · {{ item.system_label() }}{% if item.is_default %} · 默认{% endif %}</option>
       {% endfor %}
     </select>
-    <p class="muted">开场快照会锁住这一套六人顺序。赛后改默认方案，不会改已经开场的比赛。</p>
-  {% endif %}
+  </label>
+  <label>已发布战术
+    <select name="tactic" onchange="this.form.submit()">
+      <option value="">不调用</option>
+      {% for item in published_tactics %}
+        <option value="{{ item.id }}" {% if tactic and item.id == tactic.id %}selected{% endif %}>{{ item.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>备用阵容
+    <select name="backup" onchange="this.form.submit()">
+      <option value="">不带</option>
+      {% for item in plan.schemes if item.id != scheme.id and item.order|length == 6 %}
+        <option value="{{ item.id }}" {% if backup and item.id == backup.id %}selected{% endif %}>{{ item.name }} · {{ item.system_label() }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+{% endif %}
+
+{% if playable %}
+<div class="prep-stage">
+  <section>
+    <p class="fine court-key">{{ position_kind }} · R{{ rotation }} 接发</p>
+    {% with marks = marks, rotation = rotation, phase = 'receive', court_locked = true, court_save = '', court_snapshot = false %}
+      {% include "_halfcourt.html" %}
+    {% endwith %}
+  </section>
+  <aside class="prep-side">
+    <p><span class="sys-tag">{{ current.status }}</span> R{{ rotation }}</p>
+    <p>二传 {{ current.setter }}</p>
+    <p>发球 {{ current.server }}</p>
+    <p>补位 {{ current.backup }}</p>
+    {% if current.after %}<p>{{ current.after }}</p>{% endif %}
+    <p class="fine">发球 {{ current.serve_label or "未设" }} · 拦防 {{ "已写" if current.block_note else "未写" }}</p>
+    <form class="prep-serve" method="post" action="{{ url_for('save_serve', team_id=plan.team_id) }}">
+      <input type="hidden" name="rotation" value="{{ rotation }}">
+      <input type="hidden" name="backup_label" value="{{ current.card.serve.backup_label }}">
+      <input type="hidden" name="evidence" value="{{ current.card.serve.evidence }}">
+      <label>这一轮发球
+        <select name="target_type">
+          <option value="unset" {% if current.card.serve.target_type == 'unset' %}selected{% endif %}>未设</option>
+          <option value="person" {% if current.card.serve.target_type == 'person' %}selected{% endif %}>追人</option>
+          <option value="zone" {% if current.card.serve.target_type == 'zone' %}selected{% endif %}>追区域</option>
+        </select>
+      </label>
+      <input name="target_label" value="{{ current.card.serve.target_label }}" placeholder="人或区域">
+      <input name="block_note" value="{{ current.card.serve.block_note }}" placeholder="拦防">
+      <button class="secondary" type="submit">保存 R{{ rotation }}</button>
+    </form>
+    <p class="prep-links">
+      {% if tactic %}
+        <a href="{{ url_for('tactics_sheet', team_id=plan.team_id, tactic_id=tactic.id, phase='receive') }}">打印六轮卡</a>
+        <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=tactic.id, rotation=rotation, phase='receive') }}">改战术</a>
+      {% else %}
+        <span class="fine">发布以后打印六轮卡</span>
+      {% endif %}
+    </p>
+  </aside>
+</div>
+{% endif %}
+
+<ol class="check-row prep-checks">
+  {% for row in rows %}
+    <li data-prep="{{ row.rotation }}" data-status="{{ row.status }}" {% if row.rotation == rotation %}aria-current="true"{% endif %}>
+      <a href="{{ url_for('new_match', team_id=plan.team_id, scheme=scheme.id if scheme else none, tactic=tactic.id if tactic else none, backup=backup.id if backup else none, rotation=row.rotation) }}">R{{ row.rotation }}</a>
+      <span>{{ row.status }}</span>
+      <span>二传 {{ row.setter }}</span>
+      <span>发球 {{ row.server }}</span>
+      <span>补位 {{ row.backup }}</span>
+      <span>发球 {{ row.serve_label or "未设" }}</span>
+    </li>
+  {% endfor %}
+</ol>
+<p class="fine">状态分为已配置、待补充、存在冲突。圆点中心不能判断站位是否合法。</p>
+{% if system_note %}<p class="fine">{{ system_note }}</p>{% endif %}
+
+{% if six %}
+<ul class="roster-line">
+  {% for item in six %}
+    <li>{{ item.slot }} {{ item.name }}{% if item.role %} · {{ item.role }}{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% if bench %}
+  <p class="fine">替补 {% for player in bench %}{{ player.name }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+{% endif %}
+
+<details>
+  <summary>换人窗口</summary>
+  {% for window in plan.sub_windows %}
+    {% if window in unlocked %}
+      <p>候选，没有锁定：{{ plan.name_of(window.player_in) }} 换 {{ plan.name_of(window.player_out) }}。{% for number in window.active_rotations %}R{{ number }} {% endfor %}窗口到了也不等于人已经上场。</p>
+    {% else %}
+      <p>本场可锁定：{{ plan.name_of(window.player_in) }} 换 {{ plan.name_of(window.player_out) }}。{% for number in window.active_rotations %}R{{ number }} {% endfor %}</p>
+    {% endif %}
+  {% else %}
+    <p>没有预设换人窗口。</p>
+  {% endfor %}
+</details>
+
+{% if playable %}
+<form class="stack prep-start" method="post" action="{{ url_for('start_match', team_id=plan.team_id) }}">
+  {% if scheme %}<input type="hidden" name="scheme_id" value="{{ scheme.id }}">{% endif %}
+  <input type="hidden" name="tactic_id" value="{{ tactic.id if tactic else '' }}">
+  <input type="hidden" name="backup_scheme_id" value="{{ backup.id if backup else '' }}">
+  <input type="hidden" name="rotation" value="{{ rotation }}">
   <label for="opponent">对手</label>
   <input id="opponent" name="opponent" placeholder="可以留空">
-  <label for="mode">场边模式</label>
-  <select id="mode" name="mode">
-    <option value="plan">预案模式。可以不点比分，轮次手动选。</option>
-    <option value="light">轻记录。每分点一下谁得分，用来推轮次。</option>
-  </select>
-  <div class="split">
-    <div>
-      <label for="rotation">起始轮次</label>
-      <select id="rotation" name="rotation">
-        {% for number in range(1, 7) %}<option value="{{ number }}">R{{ number }}</option>{% endfor %}
-      </select>
-    </div>
-    <div>
-      <label for="serving">发球方</label>
-      <select id="serving" name="serving">
-        <option value="us">我方</option>
-        <option value="them">对方</option>
-      </select>
-    </div>
+  <div class="seg" role="radiogroup" aria-label="发球方">
+    <label><input type="radio" name="serving" value="us" checked>我方发球</label>
+    <label><input type="radio" name="serving" value="them">对方发球</label>
   </div>
-  <h2>本场锁定的配对</h2>
-  {% for pair in plan.pairs %}
-    <label class="checks">
-      <span><input type="checkbox" name="pair_id" value="{{ pair.id }}" {% if pair.status == 'confirmed' %}checked{% endif %}>
-      {{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} · {{ "已确认" if pair.status == "confirmed" else "候选" }}</span>
-    </label>
-    {% if pair.notes %}<p class="muted">{{ pair.notes }}</p>{% endif %}
-  {% else %}
-    <p class="muted">还没有配对。固定换人的球队需要先在名单页建好。</p>
-  {% endfor %}
+  <div class="seg" role="radiogroup" aria-label="场边模式">
+    <label><input type="radio" name="mode" value="plan" checked>预案</label>
+    <label><input type="radio" name="mode" value="light">轻记录</label>
+  </div>
+  <div class="checks">
+    {% for pair in plan.pairs %}
+      <label>
+        <input type="checkbox" name="pair_id" value="{{ pair.id }}" {% if pair.status == 'confirmed' %}checked{% endif %}>
+        <span>{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} · {{ "已确认" if pair.status == "confirmed" else "候选" }}</span>
+      </label>
+    {% else %}
+      <p>还没有配对。</p>
+    {% endfor %}
+  </div>
   <button type="submit">开始</button>
 </form>
+{% endif %}
 {% endblock %}

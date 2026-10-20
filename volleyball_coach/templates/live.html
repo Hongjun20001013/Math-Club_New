@@ -14,7 +14,7 @@
     {% endfor %}
   </fieldset>
   <button type="submit">保存记录方式</button>
-  <p>动作 {{ coverage.actions }} · 已结束回合 {{ coverage.closed }} · 比分 {{ coverage.points }} · 旧版回合 {{ coverage.legacy }}。旧版回合没有拆成个人动作。</p>
+  <p class="fine">动作 {{ coverage.actions }} · 已结束回合 {{ coverage.closed }} · 比分 {{ coverage.points }} · 旧版回合 {{ coverage.legacy }}</p>
 </form>
 
 <form class="bench" method="post" action="{{ url_for('post_action', match_id=match.id) }}">
@@ -136,6 +136,28 @@
   </section>
 
   <section class="col">
+    {% if backup_call %}
+      <p class="fine">备用阵容 {{ backup_call.name }}{% if backup_call.system %} · {{ backup_call.system }}{% endif %}。开场没有换成这一套。</p>
+    {% endif %}
+    <article class="plan-call">
+      {% if plan_snapshot %}
+        <p>本场预案 · {{ plan_snapshot.name }} · {{ plan_phase_label }} · {{ plan_snapshot.position_kind }}</p>
+        {% with marks = plan_marks, rotation = state.rotation, phase = plan_phase, court_locked = true, court_save = '', court_snapshot = true %}
+          {% include "_halfcourt.html" %}
+        {% endwith %}
+        {% if plan_note %}<p>{{ plan_note }}</p>{% endif %}
+        {% if lineup_differs %}
+          <p>场上人员和发布时的阵容不一样。示意点仍是当时的版本。现在的职责按场上这六人。</p>
+        {% endif %}
+        <p>{{ execution_text }}</p>
+      {% else %}
+        <p>这一轮 · {{ plan_phase_label }} · {{ position_kind }}</p>
+        {% with marks = plan_marks, rotation = state.rotation, phase = plan_phase, court_locked = true, court_save = '', court_snapshot = false %}
+          {% include "_halfcourt.html" %}
+        {% endwith %}
+        <p class="fine">这场开场没有调用已发布战术。圆点按当时的阵容示意，不是一份战术版本。</p>
+      {% endif %}
+    </article>
     <article class="tactic {% if suggestion.blocked %}blocked{% endif %}">
       <p>{{ suggestion.situation }}</p>
       <h2>{{ suggestion.action }}</h2>
@@ -143,7 +165,7 @@
         <p>尚未设置追发目标</p>
         <p><a class="text-button" href="{{ url_for('board', team_id=plan.team_id) }}">设置目标</a></p>
       {% endif %}
-      <p>{% if coverage.actions %}本场观察{% else %}赛前预案。本场还没有动作，这不是结论。{% endif %} 语言模型未接通。</p>
+      <p class="fine">{% if coverage.actions %}本场观察{% else %}赛前预案。本场还没有动作，这不是结论。{% endif %} 语言模型未接通。</p>
       <details>
         <summary>依据、切换和备选</summary>
         <p>依据：{{ suggestion.basis }}。样本 {{ coverage.actions }}。</p>
@@ -167,10 +189,15 @@
 </form>
 
 <div class="dock">
-  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+  <form class="scores" method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+    {% if plan_snapshot %}
+      <div class="seg" role="group" aria-label="预案执行">
+        <label><input type="radio" name="plan_execution" value="hit">执行到</label>
+        <label><input type="radio" name="plan_execution" value="miss">没执行到</label>
+        <label><input type="radio" name="plan_execution" value="unchecked">未核对</label>
+      </div>
+    {% endif %}
     <button class="good" name="winner" value="us" type="submit">我方得分</button>
-  </form>
-  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
     <button class="bad" name="winner" value="them" type="submit">对方得分</button>
   </form>
   <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">

@@ -218,6 +218,144 @@ body.app .bench:not(:has(input[name="skill"][value="serve"]:checked)) .for-serve
 body.app .bench:not(:has(input[name="skill"][value="dig"]:checked)) .for-dig,
 body.app .bench:not(:has(input[name="skill"][value="set"]:checked)) .for-set { display: none; }
 
+body.app .home-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+body.app .text-button.is-quiet { background: #e1e6ef; color: #142238; }
+body.app .tactic-head, body.app .tactic-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+body.app .tactic-head h1 { margin: 0; font-size: 1.7rem; }
+body.app .tactic-head p { margin: 2px 0 0; }
+body.app .tactic-actions form { margin: 0; }
+body.app .rule-note { margin: 8px 0; padding: 8px 12px; border-left: 3px solid #087f8c; background: white; }
+body.app .tactic-desk { display: grid; grid-template-columns: 220px minmax(280px, 1fr) 260px; gap: 12px; align-items: start; }
+body.app .lineup-list, body.app .duty-pane, body.app .court-pane { min-width: 0; }
+body.app .lineup { margin: 0 0 8px; padding: 8px; background: white; border: 1px solid #e1e6ef; border-radius: 10px; }
+body.app .lineup.is-on { border-color: #087f8c; }
+body.app .lineup-list > form, body.app .duty-pane form { display: grid; gap: 6px; margin-top: 6px; }
+body.app .lineup form { display: flex; gap: 6px; margin-top: 6px; }
+body.app .lineup form input { flex: 1; min-width: 0; }
+body.app .rot-tabs, body.app .seg { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+body.app .rot-tabs a, body.app .seg a, body.app .seg label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 4px 10px;
+  border: 1px solid #142238;
+  border-radius: 8px;
+  background: white;
+  color: #142238;
+  text-decoration: none;
+}
+body.app .rot-tabs a[aria-current="true"], body.app .seg a[aria-current="true"], body.app .seg label:has(input:checked) {
+  background: #087f8c;
+  border-color: #087f8c;
+  color: white;
+}
+body.app .seg input { position: absolute; opacity: 0; pointer-events: none; }
+body.app .system-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 12px;
+}
+body.app .system-hint,
+body.app .system-bar .for-roster,
+body.app .system-bar .warn-line { flex: 1 1 100%; margin: 0; }
+body.app .system-save { margin-left: 0; }
+body.app .lineup button,
+body.app .lineup-list > form button {
+  background: white;
+  color: #142238;
+  border-color: #d7deea;
+}
+body.app .setter-picks { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+body.app .setter-picks label, body.app .setter-grid label { display: grid; gap: 4px; font-size: 12px; }
+body.app .setter-picks select, body.app .setter-grid select { min-width: 0; }
+body.app .setter-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+body.app .system-bar:not(:has(input[name="system"][value="62"]:checked)) .for-62,
+body.app .system-bar:not(:has(input[name="system"][value="51"]:checked)) .for-51,
+body.app .system-bar:not(:has(input[name="system"][value="custom"]:checked)) .for-custom { display: none; }
+body.app .system-bar:has(input[name="system"]:checked) .for-roster { display: none; }
+body.app .sys-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #d7ebf6;
+  color: #142238;
+  font-size: 12px;
+}
+body.app .duty-dl { margin: 0 0 8px; }
+body.app .duty-dl div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 4px 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e1e6ef;
+}
+body.app .duty-dl dt, body.app .duty-dl dd { margin: 0; }
+body.app .duty-dl dt { color: #5c6b7a; }
+body.app .half-court {
+  position: relative;
+  width: min(100%, 520px);
+  aspect-ratio: 1;
+  margin: 8px auto;
+  background: #f7f9fc;
+  border: 1px solid #142238;
+  border-radius: 10px;
+  touch-action: none;
+}
+body.app .half-court svg.routes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+body.app .half-court .floor { fill: #f7f9fc; stroke: #142238; stroke-width: 1; }
+body.app .half-court .netline { stroke: #142238; stroke-width: 1.6; }
+body.app .half-court .attackline { stroke: #087f8c; stroke-width: 0.8; stroke-dasharray: 2 1.4; }
+body.app .half-court .dir { fill: #087f8c; }
+body.app .half-court .move { stroke: #142238; stroke-width: 0.6; stroke-dasharray: 1.2 0.8; }
+body.app .half-court .home { fill: none; stroke: #142238; }
+body.app .net-label, body.app .attack-label, body.app .dir-label { position: absolute; z-index: 1; font-size: 11px; pointer-events: none; }
+body.app .net-label { top: 1%; left: 8px; }
+body.app .attack-label { top: 34%; left: 8px; color: #087f8c; }
+body.app .dir-label { top: 14%; right: 8px; }
+body.app .pin {
+  position: absolute;
+  z-index: 2;
+  width: 74px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 4px 3px;
+  border-radius: 8px;
+  line-height: 1.15;
+  cursor: grab;
+}
+body.app .pin strong { font-size: 14px; }
+body.app .pin em { max-width: 70px; overflow: hidden; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+body.app .pin small { font-size: 10px; }
+body.app .pin.is-front { background: #142238; color: white; border-color: #142238; }
+body.app .pin.is-back { background: #d7ebf6; color: #142238; }
+body.app .pin.is-selected { outline: 2px solid #087f8c; outline-offset: 2px; }
+body.app .half-court[data-locked="1"] .pin { cursor: default; }
+body.app .check-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; padding: 0; list-style: none; }
+body.app .check-row li { padding: 4px 8px; background: white; border: 1px solid #e1e6ef; border-radius: 8px; }
+body.app .check-row li[data-status="已配置"] { border-color: #1f7a4d; }
+body.app .check-row li[data-status="待补充"] { border-color: #087f8c; }
+body.app .check-row li[data-status="存在冲突"] { border-color: #d3542a; }
+body.app .full-key { display: inline-grid; width: 16px; height: 32px; margin-right: 6px; grid-template-rows: 1fr 1fr; border: 1px solid #142238; vertical-align: middle; }
+body.app .full-key b { display: block; height: 100%; background: white; }
+body.app .full-key b:last-child { background: #d7ebf6; }
+body.app .empty-copy { position: absolute; left: 12%; right: 12%; top: 46%; margin: 0; text-align: center; }
+body.app .sheet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+body.app .sheet-grid .half-court { width: 100%; }
+body.app .sheet-grid .pin { width: 58px; }
+body.app .plan-call { margin-bottom: 12px; padding: 8px; background: white; border: 1px solid #e1e6ef; border-radius: 10px; }
+body.app .plan-call .half-court { width: min(100%, 280px); }
+body.app .dock form.scores { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+body.app .court-key { display: flex; align-items: center; }
+
 @media (max-width: 1180px) {
   body.app .shell { grid-template-columns: 1fr; }
   body.app .nav {
@@ -233,14 +371,258 @@ body.app .bench:not(:has(input[name="skill"][value="set"]:checked)) .for-set { d
   body.app .nav .brand, body.app .nav-label { display: none; }
   body.app .nav a { white-space: nowrap; }
   body.app .matchbar { top: 52px; }
-  body.app .bench { grid-template-columns: 200px minmax(0, 1fr) 220px; }
-  body.app .review-grid { grid-template-columns: 1fr; }
+  body.app .bench { grid-template-columns: 220px minmax(0, 1fr) 220px; }
+  body.app .review-grid, body.app .tactic-desk, body.app .sheet-grid { grid-template-columns: 1fr; }
+  body.app .court-pane { order: -1; }
+  body.app .tactic-stage { display: flex; flex-direction: column; }
+  body.app .tactic-stage .tactic-desk { order: -1; }
+  body.app .tactic-head h1 { font-size: 1.45rem; }
+  body.app .tactic-desk .half-court { width: min(100%, 340px); }
+  body.app .rot-tabs, body.app .court-pane .seg { margin: 2px 0; }
+  body.app .system-bar { align-items: stretch; }
 }
 @media (max-width: 860px) {
   body.app .bench { grid-template-columns: 1fr; }
+  body.app .setter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  body.app .film { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
   body.app main { padding: 12px 12px 108px; }
   body.app .results button, body.app .dock button { flex: 1 1 42%; }
+}
+
+body.app {
+  background: #eef1f6;
+  font-size: 14px;
+  line-height: 1.45;
+}
+body.app h1,
+body.app h2,
+body.app h3,
+body.app strong { font-family: var(--sans); letter-spacing: 0; }
+body.app h1 { max-width: none; margin: 0; font-size: 1.35rem; line-height: 1.25; }
+body.app h2 { margin: 0 0 8px; font-size: 12px; font-weight: 560; letter-spacing: 0.08em; text-transform: none; color: #6a7b90; }
+body.app h3 { margin: 0 0 6px; font-size: 14px; }
+body.app .card > h2,
+body.app form.stack > h2:first-child { margin-top: 0; font-size: 12px; }
+body.app p { margin: 0 0 8px; }
+body.app .fine,
+body.app .muted,
+body.app .colophon,
+body.app .lede { color: #6a7b90; font-size: 12px; line-height: 1.45; letter-spacing: 0; }
+body.app .colophon { max-width: 42rem; margin-top: 18px; }
+body.app .eyebrow { letter-spacing: 0.08em; }
+body.app main { padding: 18px 22px 88px; }
+body.app .row-links { gap: 16px; margin: 0 0 12px; }
+body.app .row-links a { letter-spacing: 0; font-size: 13px; color: #6a7b90; text-decoration: none; }
+body.app label { margin: 0; letter-spacing: 0; font-size: 12px; line-height: 1.35; color: #526278; }
+body.app .nav { background: #101828; padding: 20px 12px; }
+body.app .nav .brand { font-size: 14px; letter-spacing: 0; }
+body.app .nav a { margin: 1px 0; padding: 8px 10px; border-radius: 8px; font-size: 13.5px; }
+body.app .nav a[aria-current="page"] { background: transparent; color: white; box-shadow: inset 2px 0 0 #3dbece; }
+body.app .nav a:hover { background: rgba(255, 255, 255, 0.06); color: white; }
+body.app .matchbar { padding: 8px 20px; background: white; border-bottom: 1px solid #e6ebf2; }
+body.app .pill { letter-spacing: 0; background: #f4f7fb; border-color: #e1e6ef; }
+body.app button,
+body.app .button {
+  min-width: 0;
+  min-height: 34px;
+  margin-top: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  letter-spacing: 0;
+  background: #142238;
+  border-color: #142238;
+}
+body.app button.secondary { background: white; color: #142238; }
+body.app .dock button,
+body.app .results button { min-height: 42px; }
+body.app input,
+body.app select,
+body.app textarea {
+  width: auto;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border-color: #d7deea;
+  background: white;
+}
+body.app form.stack,
+body.app .card,
+body.app .term { padding: 14px 16px; border-radius: 12px; border-color: #e6ebf2; }
+body.app form.stack input,
+body.app form.stack select,
+body.app form.stack textarea,
+body.app .card input,
+body.app .card select,
+body.app .card textarea { width: 100%; }
+body.app input[type="radio"],
+body.app input[type="checkbox"],
+body.app .checks input {
+  width: 1.05rem;
+  height: 1.05rem;
+  min-height: 0;
+  padding: 0;
+}
+body.app textarea { min-height: 72px; }
+body.app .duty-pane textarea { min-height: 52px; }
+body.app .lineup form input,
+body.app .setter-picks select,
+body.app .setter-grid select,
+body.app .scheme-switch select { width: auto; }
+body.app .home-actions { margin: 0 0 18px; }
+body.app .home-actions .text-button { min-height: 46px; padding: 0 18px; border-radius: 10px; font-size: 15px; }
+body.app .team-card { border-radius: 12px; border-color: #e6ebf2; padding: 14px 16px; }
+body.app .team-card strong { display: block; font-size: 16px; }
+body.app .rule-note {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6a7b90;
+  font-size: 12px;
+}
+body.app .lineup { border-color: #e6ebf2; border-radius: 12px; }
+body.app .lineup p { margin: 4px 0 0; color: #6a7b90; font-size: 12px; }
+body.app .tactic-desk { grid-template-columns: 210px minmax(320px, 1fr) 220px; gap: 16px; }
+body.app .half-court { width: min(100%, 460px); border-color: #d5dce6; border-radius: 16px; background: #f7f9fc; }
+body.app .pin { width: 68px; border-radius: 10px; }
+body.app .skill-pick label,
+body.app .side-pick label,
+body.app .scope fieldset label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #d7deea;
+  border-radius: 999px;
+  background: white;
+  color: #142238;
+}
+body.app .skill-pick input,
+body.app .side-pick input,
+body.app .scope input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+body.app .skill-pick label:has(input:checked),
+body.app .side-pick label:has(input:checked),
+body.app .scope fieldset label:has(input:checked) {
+  background: #142238;
+  border-color: #142238;
+  color: white;
+}
+body.app .player { border-color: #e6ebf2; border-radius: 10px; background: white; }
+body.app .player input { width: 1rem; }
+body.app .scope,
+body.app .filters,
+body.app .opp-add,
+body.app .tactic,
+body.app .plan-call { border-color: #e6ebf2; border-radius: 12px; }
+body.app .film { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+body.app .frame { animation: none; }
+body.app .frame figcaption { font-family: var(--sans); font-size: 12px; letter-spacing: 0; }
+body.app .frame-court {
+  min-height: 92px;
+  padding: 16px 4px 6px;
+  border-radius: 10px;
+  background: #f7f9fc;
+  border: 1px solid #e1e6ef;
+}
+body.app .frame-net { background: #142238; }
+body.app .pip { font-size: 10px; }
+body.app .quiet-fold { margin-top: 16px; }
+body.app .hero { margin: 0; border-radius: 12px; background: #d7e4ee; }
+body.app .home-grid,
+body.app .grid-2 { grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr); }
+body.app .home-grid > *,
+body.app form.stack,
+body.app .checks,
+body.app .checks label { min-width: 0; }
+body.app .checks { display: grid; gap: 10px; }
+body.app .checks label {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #142238;
+}
+
+body.app .prep-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin: 0 0 12px;
+}
+body.app .prep-bar label {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 180px;
+  min-width: 0;
+  color: #6a7b90;
+  font-size: 12px;
+}
+body.app .prep-bar select { width: 100%; }
+body.app .prep-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 16px;
+  align-items: start;
+  margin: 0 0 12px;
+}
+body.app .prep-stage .half-court { width: min(100%, 440px); }
+body.app .prep-side {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 12px;
+}
+body.app .prep-side p { margin: 0; }
+body.app .prep-serve { display: grid; gap: 6px; }
+body.app .prep-serve input,
+body.app .prep-serve select { width: 100%; }
+body.app .prep-links { display: flex; flex-wrap: wrap; gap: 10px; }
+body.app .prep-checks {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+body.app .prep-checks li {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  font-size: 12px;
+}
+body.app .prep-checks a { color: inherit; font-weight: 560; text-decoration: none; }
+body.app .prep-checks li[aria-current="true"] { outline: 2px solid #087f8c; }
+body.app .roster-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+body.app .roster-line li {
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  font-size: 12px;
+}
+body.app .prep-start { max-width: 520px; }
+
+@media (max-width: 860px) {
+  body.app .prep-stage { grid-template-columns: 1fr; }
+  body.app .prep-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

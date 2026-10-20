@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('tactics', team_id=plan.team_id, tactic=tactic.id) }}">返回编辑</a>
+  {% for code, label in phases.items() %}
+    <a href="{{ url_for('tactics_sheet', team_id=plan.team_id, tactic_id=tactic.id, phase=code) }}" {% if phase == code %}aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</p>
+<h1>{{ tactic.name }} · {{ phases[phase] }}</h1>
+<p>{{ plan.name }}{% if scheme %} / {{ scheme.name }} · {{ scheme.system_label() }}{% endif %} · {{ "已发布" if tactic.status == "published" else "草稿" }} · {{ position_kind }}</p>
+<p class="muted">这张总览可以打印。圆点是示意，不能用来判断站位是否合法。</p>
+<div class="sheet-grid">
+  {% for item in cards %}
+    <article>
+      <h2>R{{ item.card.rotation }} {{ item.status }}</h2>
+      <p>组织 {{ item.card.setter_name }} · 发球 {{ item.card.slots[1].occupant_name if item.card.slots else "未指定" }} · 补位 {{ item.card.backup_name }}</p>
+      {% with marks = item.marks, rotation = item.card.rotation, phase = phase, court_locked = true, court_save = '', court_snapshot = false %}
+        {% include "_halfcourt.html" %}
+      {% endwith %}
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

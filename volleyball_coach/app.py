@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from flask import Flask, abort, flash, g, jsonify, redirect, render_template, request, send_file, url_for
@@ -35,7 +36,15 @@ from volleyball_coach.dictionary import (
     TERMS,
 )
 from volleyball_coach.drills import acceptance_drills
-from volleyball_coach.lineup import build_card, build_suggestion, legal_sub_options, validate_pairs
+from volleyball_coach.lineup import (
+    apply_system,
+    build_card,
+    build_suggestion,
+    legal_sub_options,
+    origins_for_rotation,
+    system_note,
+    validate_pairs,
+)
 from volleyball_coach.match import (
     MatchError,
     apply_correction,
@@ -59,10 +68,28 @@ from volleyball_coach.model import (
     Rules,
     ServePlan,
     TeamPlan,
+    role_chip,
 )
 from volleyball_coach.report import build_report, execution_of, skill_summary
 from volleyball_coach.seed import MENS_TEAM_ID
 from volleyball_coach.store import Store, ability_label, locked_pairs_of, new_id, now, plan_for_match
+from volleyball_coach.tactics import (
+    NOTE_KINDS,
+    PHASES as TACTIC_PHASES,
+    default_marks,
+    display_num,
+    execution_counts,
+    execution_sentence,
+    identity_drift,
+    load_backup,
+    load_snapshot,
+    position_kind,
+    prep_rows,
+    present_marks,
+    preview_marks,
+    rotation_status,
+    snapshot_payload,
+)
 
 FONT_PATH = Path(__file__).resolve().parents[1] / "fonts" / "NotoSansSC-Regular.otf"
 COURT_ORDER = (4, 3, 2, 5, 6, 1)
@@ -109,6 +136,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         view_args = request.view_args or {}
         match_id = view_args.get("match_id")
         team_id = view_args.get("team_id")
+        nav_team_id = team_id
+        prep_screen = request.endpoint in {"tactics", "tactics_sheet", "new_match", "board", "quicksheet"}
         try:
             if not match_id and team_id:
                 matches = store().list_matches(team_id)
@@ -124,6 +153,13 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                         nav_match = found
                         nav_plan = plan
                         nav_state = state
+            if nav_match is not None and not nav_team_id:
+                nav_team_id = nav_match["team_id"]
+            if not nav_team_id:
+                preferred = store().conn.execute("SELECT id FROM teams WHERE id = ?", (MENS_TEAM_ID,)).fetchone()
+                if preferred is None:
+                    preferred = store().conn.execute("SELECT id FROM teams ORDER BY created_at LIMIT 1").fetchone()
+                nav_team_id = preferred["id"] if preferred else None
         except Exception:
             nav_match = None
         return {
@@ -132,6 +168,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             "nav_match": nav_match,
             "nav_plan": nav_plan,
             "nav_state": nav_state,
+            "nav_team_id": nav_team_id,
+            "prep_screen": prep_screen,
         }
 
     @app.teardown_appcontext
@@ -174,7 +212,16 @@ def create_app(db_path: str | Path | None = None) -> Flask:
 
     @app.get("/")
     def home():
-        return render_template("home.html", teams=store().list_teams(), mens_id=MENS_TEAM_ID)
+        teams = store().list_teams()
+        ids = [row["id"] for row in teams]
+        library = MENS_TEAM_ID if MENS_TEAM_ID in ids else (ids[0] if ids else None)
+        return render_template(
+            "home.html",
+            teams=teams,
+            mens_id=MENS_TEAM_ID,
+            live_match=store().latest_live_match(),
+            library_team=library,
+        )
 
     @app.post("/teams")
     def create_team():
@@ -384,6 +431,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 order=order,
                 is_default=want_default,
                 notes=(request.form.get("notes") or "").strip(),
+                system=existing.system if existing else "",
+                setters=list(existing.setters) if existing else [],
             )
         except ValueError as exc:
             flash(str(exc), "error")
@@ -406,19 +455,375 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             flash("默认方案要留着。先把另一套设成默认，再删这一套。", "error")
         return redirect(url_for("board", team_id=team_id))
 
+    def tactic_or_404(team_id: str, tactic_id: str) -> dict:
+        found = store().tactic(tactic_id)
+        if found is None or found["team_id"] != team_id:
+            abort(404)
+        return found
+
+    def confirmed_pairs(plan: TeamPlan) -> set[frozenset[str]]:
+        return {pair.key() for pair in plan.pairs if pair.status == "confirmed"}
+
+    def tactic_page_url(team_id: str, tactic_id: str, rotation: int = 1, phase: str = "receive"):
+        return url_for("tactics", team_id=team_id, tactic=tactic_id, rotation=rotation, phase=phase)
+
+    @app.get("/teams/<team_id>/tactics")
+    def tactics(team_id: str):
+        plan = team_or_404(team_id)
+        library = store().tactics_for_team(team_id)
+        chosen = store().tactic((request.args.get("tactic") or "").strip())
+        if chosen and chosen["team_id"] != team_id:
+            chosen = None
+        if chosen:
+            scheme = plan.scheme_by_id(chosen["scheme_id"]) or plan.default_scheme()
+        else:
+            scheme = plan.scheme_by_id(request.args.get("scheme")) or plan.default_scheme()
+            for item in reversed(library):
+                if scheme and item["scheme_id"] == scheme.id and item["status"] == "draft":
+                    chosen = item
+                    break
+            if chosen is None and scheme:
+                chosen = next((item for item in reversed(library) if item["scheme_id"] == scheme.id), None)
+        rotation = request.args.get("rotation", "1")
+        phase = request.args.get("phase") or "receive"
+        try:
+            rotation = int(rotation)
+        except ValueError:
+            rotation = 1
+        if rotation not in range(1, 7):
+            rotation = 1
+        if phase not in TACTIC_PHASES:
+            phase = "receive"
+        view = apply_system(plan, scheme)
+        locked = confirmed_pairs(plan)
+        cards = {number: build_card(view, number, {}, locked) for number in range(1, 7)}
+        marks = store().tactic_marks(chosen["id"]) if chosen else []
+        notes = store().tactic_notes(chosen["id"]) if chosen else []
+        statuses = [
+            (number, rotation_status(cards[number], [mark for mark in marks if int(mark["rotation"]) == number and mark["phase"] == "receive"]))
+            for number in range(1, 7)
+        ]
+        card = cards[rotation]
+        if chosen:
+            phase_marks = [mark for mark in marks if int(mark["rotation"]) == rotation and mark["phase"] == phase]
+        else:
+            phase_marks = preview_marks(card, rotation, phase)
+        note_map = {
+            note["kind"]: note["body"]
+            for note in notes
+            if int(note["rotation"]) == rotation
+        }
+        same_scheme = [item for item in library if scheme and item["scheme_id"] == scheme.id]
+        return render_template(
+            "tactics.html",
+            plan=plan,
+            view=view,
+            scheme=scheme,
+            tactics=same_scheme,
+            tactic=chosen,
+            rotation=rotation,
+            phase=phase,
+            phases=TACTIC_PHASES,
+            note_kinds=NOTE_KINDS,
+            statuses=statuses,
+            marks=present_marks(view, card, phase_marks),
+            card=card,
+            notes=note_map,
+            position_kind=position_kind(plan),
+            drift=identity_drift(cards, marks),
+            published=bool(chosen and chosen["status"] == "published"),
+            on_court=court_options(scheme),
+            system_note=system_note(scheme),
+        )
+
+    @app.get("/teams/<team_id>/tactics/<tactic_id>/sheet")
+    def tactics_sheet(team_id: str, tactic_id: str):
+        plan = team_or_404(team_id)
+        tactic = tactic_or_404(team_id, tactic_id)
+        scheme = plan.scheme_by_id(tactic["scheme_id"])
+        view = apply_system(plan, scheme)
+        locked = confirmed_pairs(plan)
+        phase = request.args.get("phase") or "receive"
+        if phase not in TACTIC_PHASES:
+            phase = "receive"
+        marks = store().tactic_marks(tactic_id)
+        cards = []
+        for number in range(1, 7):
+            card = build_card(view, number, {}, locked)
+            phase_marks = [mark for mark in marks if int(mark["rotation"]) == number and mark["phase"] == phase]
+            cards.append(
+                {
+                    "card": card,
+                    "marks": present_marks(view, card, phase_marks),
+                    "status": rotation_status(card, [mark for mark in marks if int(mark["rotation"]) == number and mark["phase"] == "receive"]),
+                }
+            )
+        return render_template(
+            "tactics_sheet.html",
+            plan=plan,
+            tactic=tactic,
+            scheme=scheme,
+            phase=phase,
+            phases=TACTIC_PHASES,
+            cards=cards,
+            position_kind=position_kind(plan),
+        )
+
+    @app.post("/teams/<team_id>/schemes/<scheme_id>/copy")
+    def copy_scheme(team_id: str, scheme_id: str):
+        team_or_404(team_id)
+        try:
+            copied = store().copy_scheme(team_id, scheme_id, request.form.get("name") or "")
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        flash("已复制阵容。默认阵容没有改。", "ok")
+        return redirect(url_for("tactics", team_id=team_id, scheme=copied))
+
+    @app.post("/teams/<team_id>/schemes/<scheme_id>/system")
+    def save_scheme_system(team_id: str, scheme_id: str):
+        plan = team_or_404(team_id)
+        scheme = plan.scheme_by_id(scheme_id)
+        back = request.referrer or url_for("tactics", team_id=team_id, scheme=scheme_id)
+        if scheme is None or len(scheme.order) != 6:
+            flash("先选一套完整的六人阵容。", "error")
+            return redirect(back)
+        try:
+            label, setters = setters_from_system_form(scheme, request.form)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(back)
+        scheme.system = label_code(label)
+        scheme.setters = setters
+        store().save_scheme(plan.team_id, scheme)
+        flash(f"体系已改成{label}。名单上原来的二传能力还留着。", "ok")
+        tactic_id = (request.form.get("tactic") or "").strip()
+        if tactic_id:
+            phase = request.form.get("phase") or "receive"
+            try:
+                rotation = int(request.form.get("rotation") or "1")
+            except ValueError:
+                rotation = 1
+            return redirect(tactic_page_url(team_id, tactic_id, rotation if rotation in range(1, 7) else 1, phase if phase in TACTIC_PHASES else "receive"))
+        return redirect(url_for("tactics", team_id=team_id, scheme=scheme.id))
+
+    @app.post("/teams/<team_id>/tactics")
+    def create_tactic(team_id: str):
+        plan = team_or_404(team_id)
+        scheme = plan.scheme_by_id(request.form.get("scheme_id"))
+        name = (request.form.get("name") or "").strip()
+        if scheme is None or len(scheme.order) != 6:
+            flash("先选一套完整的六人阵容，再生成战术。", "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        if not name:
+            flash("战术要有名字。", "error")
+            return redirect(url_for("tactics", team_id=team_id, scheme=scheme.id))
+        view = apply_system(plan, scheme)
+        tactic_id = store().create_tactic(team_id, scheme.id, name, default_marks(view, confirmed_pairs(plan)))
+        flash(f"已生成「{name}」的六轮示意站位。拖动只改坐标。", "ok")
+        return redirect(tactic_page_url(team_id, tactic_id))
+
+    @app.post("/teams/<team_id>/tactics/<tactic_id>/duplicate")
+    def duplicate_tactic(team_id: str, tactic_id: str):
+        tactic_or_404(team_id, tactic_id)
+        try:
+            copied = store().duplicate_tactic(tactic_id, request.form.get("name") or "")
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        flash("已另存成草稿。已发布的那一版没动。", "ok")
+        return redirect(tactic_page_url(team_id, copied))
+
+    @app.post("/teams/<team_id>/tactics/<tactic_id>/publish")
+    def publish_tactic(team_id: str, tactic_id: str):
+        tactic_or_404(team_id, tactic_id)
+        try:
+            store().publish_tactic(tactic_id)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        flash("这一版已发布。再改会另存成草稿，不会覆盖这一版。", "ok")
+        return redirect(tactic_page_url(team_id, tactic_id))
+
+    @app.post("/teams/<team_id>/tactics/<tactic_id>/marks")
+    def save_tactic_mark(team_id: str, tactic_id: str):
+        tactic_or_404(team_id, tactic_id)
+        wants_json = "application/json" in (request.headers.get("Accept") or "")
+
+        def fail(message: str):
+            if wants_json:
+                return jsonify({"ok": False, "error": message}), 409
+            flash(message, "error")
+            return redirect(request.referrer or url_for("tactics", team_id=team_id))
+
+        try:
+            rotation = int(request.form.get("rotation", "0"))
+            slot = int(request.form.get("slot", "0"))
+            phase = request.form.get("phase") or ""
+            x = float(request.form.get("x", ""))
+            y = float(request.form.get("y", ""))
+        except ValueError:
+            return fail("坐标和轮次要是数字。")
+        if phase not in TACTIC_PHASES or rotation not in range(1, 7) or slot not in range(1, 7):
+            return fail("轮次、阶段或号位不对。")
+        try:
+            saved_x, saved_y = store().update_tactic_mark(
+                tactic_id,
+                rotation,
+                phase,
+                slot,
+                request.form.get("player_id") or "",
+                x,
+                y,
+            )
+        except ValueError as exc:
+            return fail(str(exc))
+        if wants_json:
+            return jsonify({"ok": True, "x": display_num(saved_x), "y": display_num(saved_y)})
+        flash("示意坐标已保存。轮转身份没变。", "ok")
+        return redirect(tactic_page_url(team_id, tactic_id, rotation, phase))
+
+    @app.post("/teams/<team_id>/tactics/<tactic_id>/notes")
+    def save_tactic_notes(team_id: str, tactic_id: str):
+        tactic_or_404(team_id, tactic_id)
+        try:
+            rotation = int(request.form.get("rotation", "0"))
+        except ValueError:
+            rotation = 0
+        if rotation not in range(1, 7):
+            flash("轮次要是 1 到 6。", "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        try:
+            store().save_tactic_notes(
+                tactic_id,
+                rotation,
+                {kind: request.form.get(kind) or "" for kind in NOTE_KINDS},
+            )
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(tactic_page_url(team_id, tactic_id, rotation))
+        flash(f"R{rotation} 的职责说明已保存在这套战术里。", "ok")
+        phase = request.form.get("phase") or "receive"
+        return redirect(tactic_page_url(team_id, tactic_id, rotation, phase if phase in TACTIC_PHASES else "receive"))
+
+    @app.post("/teams/<team_id>/tactics/<tactic_id>/sync")
+    def sync_tactic(team_id: str, tactic_id: str):
+        plan = team_or_404(team_id)
+        tactic = tactic_or_404(team_id, tactic_id)
+        scheme = plan.scheme_by_id(tactic["scheme_id"])
+        if scheme is None or len(scheme.order) != 6:
+            flash("这套战术的阵容不完整，不能更正人员。", "error")
+            return redirect(url_for("tactics", team_id=team_id))
+        view = apply_system(plan, scheme)
+        locked = confirmed_pairs(plan)
+        occupants = {}
+        for number in range(1, 7):
+            card = build_card(view, number, {}, locked)
+            occupants[number] = {slot: view_slot.occupant_id for slot, view_slot in card.slots.items()}
+        try:
+            store().sync_tactic_players(tactic_id, occupants)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(tactic_page_url(team_id, tactic_id))
+        flash("人员已按当前阵容更正。坐标还在原来的示意位置。", "ok")
+        return redirect(tactic_page_url(team_id, tactic_id))
+
     @app.get("/teams/<team_id>/matches/new")
     def new_match(team_id: str):
         plan = team_or_404(team_id)
-        return render_template("match_new.html", plan=plan, court_slots=COURT_SLOTS)
+        scheme = plan.scheme_by_id(request.args.get("scheme")) or plan.default_scheme()
+        library = store().tactics_for_team(team_id)
+        published = [
+            item
+            for item in library
+            if item["status"] == "published" and scheme and item["scheme_id"] == scheme.id
+        ]
+        asked = (request.args.get("tactic") or "").strip()
+        tactic = next((item for item in published if item["id"] == asked), None)
+        backup = plan.scheme_by_id(request.args.get("backup"))
+        if backup is None or scheme is None or backup.id == scheme.id or len(backup.order) != 6:
+            backup = None
+        try:
+            rotation = int(request.args.get("rotation") or "1")
+        except ValueError:
+            rotation = 1
+        if rotation not in range(1, 7):
+            rotation = 1
+        view = apply_system(plan, scheme) if scheme else plan
+        locked = confirmed_pairs(plan)
+        cards = {number: build_card(view, number, {}, locked) for number in range(1, 7)}
+        marks = store().tactic_marks(tactic["id"]) if tactic else []
+        rows = prep_rows(view, cards, marks, locked)
+        current = rows[rotation - 1]
+        if tactic:
+            phase_marks = [
+                mark for mark in marks if int(mark["rotation"]) == rotation and mark["phase"] == "receive"
+            ]
+        else:
+            phase_marks = preview_marks(cards[rotation], rotation, "receive")
+        order = list(scheme.order) if scheme and len(scheme.order) == 6 else view.base_order()
+        six = []
+        for slot, player_id in enumerate(order, start=1):
+            player = plan.players.get(player_id)
+            six.append(
+                {
+                    "slot": slot,
+                    "name": plan.name_of(player_id),
+                    "role": role_chip(player.role) if player else "",
+                }
+            )
+        on_court = set(order)
+        bench = sorted(
+            (player for player in plan.players.values() if player.id not in on_court),
+            key=lambda player: player.name,
+        )
+        unlocked = [
+            window
+            for window in plan.sub_windows
+            if frozenset((window.player_out, window.player_in)) not in locked
+        ]
+        return render_template(
+            "match_new.html",
+            plan=plan,
+            scheme=scheme,
+            view=view,
+            tactic=tactic,
+            backup=backup,
+            published_tactics=published,
+            rotation=rotation,
+            rows=rows,
+            current=current,
+            marks=present_marks(view, cards[rotation], phase_marks),
+            playable=len(view.base_order()) == 6,
+            six=six,
+            bench=bench,
+            unlocked=unlocked,
+            position_kind=position_kind(plan),
+            system_note=system_note(scheme),
+            court_slots=COURT_SLOTS,
+        )
 
     @app.post("/teams/<team_id>/matches")
     def start_match(team_id: str):
         plan = team_or_404(team_id)
+
+        def back():
+            return redirect(
+                url_for(
+                    "new_match",
+                    team_id=plan.team_id,
+                    scheme=request.form.get("scheme_id") or None,
+                    tactic=request.form.get("tactic_id") or None,
+                    backup=request.form.get("backup_scheme_id") or None,
+                    rotation=request.form.get("rotation") or None,
+                )
+            )
+
         chosen_scheme = plan.scheme_by_id(request.form.get("scheme_id")) or plan.default_scheme()
-        working = plan.with_order(chosen_scheme.order) if chosen_scheme else plan
+        working = apply_system(plan, chosen_scheme) if chosen_scheme else plan
         if len(working.base_order()) != 6:
             flash("先把六个首发槽位排满，或选一套完整方案，再开场。", "error")
-            return redirect(url_for("new_match", team_id=plan.team_id))
+            return back()
         try:
             rotation = int(request.form.get("rotation", "1"))
             serving = request.form.get("serving", "")
@@ -432,7 +837,53 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 raise ValueError(error)
         except ValueError as exc:
             flash(str(exc), "error")
-            return redirect(url_for("new_match", team_id=plan.team_id))
+            return back()
+        raw_backup = (request.form.get("backup_scheme_id") or "").strip()
+        backup_scheme = None
+        backup_json = ""
+        if raw_backup:
+            backup_scheme = plan.scheme_by_id(raw_backup)
+            if backup_scheme is None or len(backup_scheme.order) != 6:
+                flash("找不到这套备用阵容。", "error")
+                return back()
+            if chosen_scheme and backup_scheme.id == chosen_scheme.id:
+                flash("备用阵容要换一套，不能和开场是同一套。", "error")
+                return back()
+            backup_view = apply_system(plan, backup_scheme)
+            backup_json = json.dumps(
+                {
+                    "scheme_id": backup_scheme.id,
+                    "name": backup_scheme.name,
+                    "system": backup_scheme.system_label(),
+                    "order": list(backup_scheme.order),
+                    "plan": backup_view.to_json(),
+                },
+                ensure_ascii=False,
+            )
+        tactic_id = (request.form.get("tactic_id") or "").strip()
+        tactic_json = ""
+        tactic = None
+        if tactic_id:
+            tactic = store().tactic(tactic_id)
+            if tactic is None or tactic["team_id"] != plan.team_id:
+                flash("找不到这套战术。", "error")
+                return back()
+            if tactic["status"] != "published":
+                flash("只有发布后的战术版本能带进比赛。", "error")
+                return back()
+            if chosen_scheme is None or tactic["scheme_id"] != chosen_scheme.id:
+                flash("这套战术属于另一套阵容。开场要选对应的阵容。", "error")
+                return back()
+            tactic_json = json.dumps(
+                snapshot_payload(
+                    tactic,
+                    store().tactic_marks(tactic_id),
+                    store().tactic_notes(tactic_id),
+                    working,
+                    chosen_scheme.name,
+                ),
+                ensure_ascii=False,
+            )
         match_id = store().create_match(
             working,
             request.form.get("opponent", ""),
@@ -440,9 +891,17 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             {frozenset(pair) for pair in selected},
             rotation,
             serving,
+            tactic_id=tactic_id,
+            tactic_json=tactic_json,
+            backup_scheme_id=backup_scheme.id if backup_scheme else "",
+            backup_json=backup_json,
         )
         scheme_name = chosen_scheme.name if chosen_scheme else "当前首发槽"
-        flash(f"开场使用方案「{scheme_name}」。换人要再确认一次，轮次不会自动把人换上场。", "ok")
+        spare = f"备用「{backup_scheme.name}」。" if backup_scheme else ""
+        if tactic:
+            flash(f"开场使用方案「{scheme_name}」，战术「{tactic['name']}」。{spare}之后改战术库，不会改这场已经抄下来的版本。", "ok")
+        else:
+            flash(f"开场使用方案「{scheme_name}」。{spare}换人要再确认一次，轮次不会自动把人换上场。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.get("/matches/<match_id>")
@@ -476,6 +935,32 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         opponents = store().opponents_for(match_id)
         depth = match["record_depth"] if "record_depth" in match.keys() else "light"
         scope = match["sample_scope"] if "sample_scope" in match.keys() else "sample"
+        raw_tactic = match["tactic_json"] if "tactic_json" in match.keys() else ""
+        raw_backup = match["backup_json"] if "backup_json" in match.keys() else ""
+        plan_snapshot = load_snapshot(raw_tactic or "")
+        backup_call = load_backup(raw_backup or "")
+        plan_phase = "attack" if state.serving == "us" else "receive"
+        plan_marks = []
+        plan_note = ""
+        lineup_differs = False
+        execution_text = ""
+        if plan_snapshot:
+            opening = build_card(plan, state.rotation, {}, state.locked_pairs)
+            phase_marks = [
+                mark
+                for mark in plan_snapshot["marks"]
+                if int(mark["rotation"]) == state.rotation and mark["phase"] == plan_phase
+            ]
+            plan_marks = present_marks(plan, opening, phase_marks)
+            note_kind = "serve_target" if state.serving == "us" else "block_task"
+            for note in plan_snapshot.get("notes") or []:
+                if int(note["rotation"]) == state.rotation and note["kind"] == note_kind and note.get("body"):
+                    plan_note = note["body"]
+            opening_ids = {item.occupant_id for item in opening.slots.values()} if opening.slots else set()
+            lineup_differs = opening_ids != set(state.occupants.values())
+            execution_text = execution_sentence(execution_counts(rallies), plan_snapshot.get("name") or "战术")
+        else:
+            plan_marks = present_marks(plan, card, preview_marks(card, state.rotation, plan_phase))
         return render_template(
             "live.html",
             match=match,
@@ -507,6 +992,15 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             set_qualities=SET_QUALITY,
             depths=DEPTHS,
             scopes=SCOPES,
+            plan_snapshot=plan_snapshot,
+            backup_call=backup_call,
+            plan_marks=plan_marks,
+            plan_phase=plan_phase,
+            plan_phase_label=TACTIC_PHASES[plan_phase],
+            plan_note=plan_note,
+            lineup_differs=lineup_differs,
+            execution_text=execution_text,
+            position_kind=position_kind(plan),
         )
 
     @app.post("/matches/<match_id>/point")
@@ -531,7 +1025,16 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             {"winner": winner, "rally_id": open_rally["id"] if open_rally else None},
         )
         if open_rally:
-            store().close_rally(match_id, open_rally["id"], winner, updated.score_us, updated.score_them, 1)
+            execution = request.form.get("plan_execution") or ""
+            store().close_rally(
+                match_id,
+                open_rally["id"],
+                winner,
+                updated.score_us,
+                updated.score_them,
+                1,
+                execution,
+            )
             flash("回合结束，比分已记下。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
@@ -810,14 +1313,19 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.get("/matches/<match_id>/report")
     def report_page(match_id: str):
         match, _plan, state, points, events = match_bundle(match_id)
+        rallies = store().rallies_for(match_id)
         report = build_report(
-            rallies=store().rallies_for(match_id),
+            rallies=rallies,
             events=events,
             points=points,
             history_gap=state.history_gap,
             opponent=match["opponent"],
         )
-        return render_template("report.html", match=match, report=report, state=state)
+        snap = load_snapshot(match["tactic_json"] if "tactic_json" in match.keys() else "")
+        execution = None
+        if snap:
+            execution = {"sentence": execution_sentence(execution_counts(rallies), snap.get("name") or "战术")}
+        return render_template("report.html", match=match, report=report, state=state, execution=execution)
 
     @app.get("/matches/<match_id>/report.json")
     def report_json(match_id: str):
@@ -1328,8 +1836,49 @@ def scheme_order_from_form(form, plan: TeamPlan) -> list[str]:
 def preview_plan(plan: TeamPlan, scheme_id: str | None) -> tuple[RotationScheme | None, TeamPlan]:
     chosen = plan.scheme_by_id(scheme_id) or plan.default_scheme()
     if chosen and len(chosen.order) == 6:
-        return chosen, plan.with_order(chosen.order)
+        return chosen, apply_system(plan, chosen)
     return chosen, plan
+
+
+def court_options(scheme: RotationScheme | None) -> list[tuple[int, list[str]]]:
+    if scheme is None or len(scheme.order) != 6:
+        return []
+    options = []
+    for number in range(1, 7):
+        origins = origins_for_rotation(list(scheme.order), number)
+        options.append((number, list(origins.values())))
+    return options
+
+
+def label_code(label: str) -> str:
+    return {"6-2": "62", "5-1": "51", "自定义": "custom"}[label]
+
+
+def setters_from_system_form(scheme: RotationScheme, form) -> tuple[str, list[str]]:
+    system = form.get("system") or ""
+    if system not in ("62", "51", "custom"):
+        raise ValueError("体系要选 6-2、5-1，或自定义。")
+    six = set(scheme.order)
+    names = {"62": "6-2", "51": "5-1", "custom": "自定义"}
+    if system == "51":
+        setter = form.get("setter") or ""
+        if setter not in six:
+            raise ValueError("5-1 的二传必须在这六个人里。")
+        return names[system], [setter]
+    if system == "62":
+        first = form.get("setter_a") or ""
+        second = form.get("setter_b") or ""
+        if first not in six or second not in six or first == second:
+            raise ValueError("6-2 要选两名不同的、都在这六个人里的二传。")
+        return names[system], [first, second]
+    setters = []
+    for number in range(1, 7):
+        origins = origins_for_rotation(list(scheme.order), number)
+        chosen = form.get(f"setter_{number}") or ""
+        if chosen not in origins.values():
+            raise ValueError(f"R{number} 的组织者必须是这一轮在场的人。")
+        setters.append(chosen)
+    return names[system], setters
 
 
 def snapshot_lineup(plan: TeamPlan, state) -> list[dict]:
@@ -1472,7 +2021,7 @@ def confirmed_serve_samples(rallies: list[dict], rotation: int, target_label: st
 
 
 def main() -> None:
-    create_app().run(host="127.0.0.1", port=5055, debug=False)
+    create_app().run(host="0.0.0.0", port=5055, debug=False)
 
 
 if __name__ == "__main__":
