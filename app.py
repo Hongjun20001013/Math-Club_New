@@ -69,6 +69,8 @@ from placement_english_rubrics import writing_rubric_for, writing_score_band
 from placement_english_ui import (
     ENGLISH_PLACEMENT_TOPICS,
     clean_essay_body_for_display,
+    essay_body_for_advisor_display,
+    english_writing_answer_is_incomplete,
     english_writing_max_points,
     filter_writing_prompt_for_review,
     essay_word_count,
@@ -10882,12 +10884,15 @@ def placement_public_autosave(public_id: str):
         db.commit()
         return jsonify({"ok": True})
     if q_kind == "english_writing" and (answer or "").strip():
-        is_correct, correct_answer = grade_placement_response(
-            questions[qnum], answer, str(att["topic"])
-        )
-        placement_public_mod.save_response(
-            db, int(att["id"]), qnum, answer, correct_answer, is_correct
-        )
+        if english_writing_answer_is_incomplete(answer):
+            placement_public_mod.save_draft(db, int(att["id"]), qnum, answer)
+        else:
+            is_correct, correct_answer = grade_placement_response(
+                questions[qnum], answer, str(att["topic"])
+            )
+            placement_public_mod.save_response(
+                db, int(att["id"]), qnum, answer, correct_answer, is_correct
+            )
     else:
         placement_public_mod.save_draft(db, int(att["id"]), qnum, answer)
     db.commit()
@@ -10906,6 +10911,12 @@ def placement_public_finish(public_id: str):
         return redirect(url_for("placement_public_done", public_id=public_id))
     test = _placement_test_by_slug(att["slug"])
     if request.method == "GET":
+        questions = _placement_public_questions(str(att["topic"]))
+        placement_public_mod.promote_drafts_to_responses(
+            db, int(att["id"]), questions, str(att["topic"])
+        )
+        db.commit()
+        att = placement_public_mod.authorize_attempt(db, public_id) or att
         return render_template(
             "placement_public_finish.html",
             test=test,
@@ -18589,7 +18600,7 @@ def _english_writing_review_bundle(
     score_payload: dict | None,
 ) -> dict:
     opt, body = unpack_english_writing_answer(raw_answer or "")
-    body_clean = clean_essay_body_for_display(body, opt)
+    body_clean = essay_body_for_advisor_display(body, opt)
     wmin, wmax_words = writing_word_targets(topic)
     wmax_pts = english_writing_max_points(topic)
     wpts = paper_grades.get(q_index)
@@ -18871,7 +18882,9 @@ def _admin_placement_report_ctx(attempt_id: int) -> dict | None:
     is_correct_by_index: dict[int, int | None] = {}
     for i, q in enumerate(questions):
         resp = responses.get(i) or {}
-        selected = str(resp.get("selected_answer") or "")
+        selected = placement_public_mod.saved_answer(db, attempt_id, i) or str(
+            resp.get("selected_answer") or ""
+        )
         selected_by_index[i] = selected
         stored_correct = resp.get("is_correct") if i in responses else None
         supervisor_override = resp.get("supervisor_is_correct") if i in responses else None
@@ -19399,13 +19412,7 @@ def admin_placement_english_writing_grade(attempt_id: int):
         abort(404)
     widx = len(questions) - 1
     wmax = english_writing_max_points(topic)
-    raw_answer = ""
-    resp = db.execute(
-        "SELECT selected_answer FROM placement_candidate_responses WHERE attempt_id = ? AND question_index = ?",
-        (attempt_id, widx),
-    ).fetchone()
-    if resp:
-        raw_answer = str(resp["selected_answer"] or "")
+    raw_answer = placement_public_mod.saved_answer(db, attempt_id, widx)
     opt, _ = unpack_english_writing_answer(raw_answer)
     rubric = writing_rubric_for(topic, opt)
     breakdown: dict[str, int] = {}

@@ -859,6 +859,44 @@ function currentPracticeAnswer() {
     return ((selectedInput && selectedInput.value) || "").trim();
 }
 
+function flushAutosaveBeforeLeave() {
+    return new Promise((resolve) => {
+        if (!autosaveUrl || !practiceAttemptId) {
+            resolve();
+            return;
+        }
+        const answer = currentPracticeAnswer();
+        if (!answer && !paperCompletedInput) {
+            resolve();
+            return;
+        }
+        const body = new FormData();
+        body.append("csrf_token", autosaveCsrf);
+        body.append("domain", "{{ domain }}");
+        body.append("topic", "{{ topic }}");
+        body.append("qnum", String(practiceQnum));
+        body.append("attempt_id", String(practiceAttemptId));
+        body.append("selected_answer", answer);
+        if (englishWritingInput) {
+            const picked = document.querySelector(".sat-en-writing-pick-input:checked");
+            if (picked) body.append("english_writing_option", picked.value);
+        }
+        if (paperCompletedInput && paperCompletedInput.checked) {
+            body.append("paper_completed", "1");
+        }
+        lastAutosaved = answer;
+        fetch(autosaveUrl, {
+            method: "POST",
+            body,
+            credentials: "same-origin",
+            keepalive: true,
+            headers: { "X-CSRF-Token": autosaveCsrf, "X-Requested-With": "XMLHttpRequest" },
+        })
+            .catch(() => {})
+            .finally(() => resolve());
+    });
+}
+
 function autosaveNow() {
     const answer = currentPracticeAnswer();
     if (!practiceAttemptId || answer === lastAutosaved) return;
@@ -1298,10 +1336,20 @@ document.querySelectorAll(".js-practice-jump").forEach((link) => {
       const href = btn.getAttribute("data-pl-finish-href");
       if (!href) return;
       go.href = href;
-      dlg.hidden = false;
-      backdrop.hidden = false;
-      document.body.classList.add("pl-submit-confirm-open");
-      cancel?.focus();
+      flushAutosaveBeforeLeave().then(() => {
+        dlg.hidden = false;
+        backdrop.hidden = false;
+        document.body.classList.add("pl-submit-confirm-open");
+        cancel?.focus();
+      });
+    });
+  });
+  go?.addEventListener("click", (event) => {
+    const href = go.getAttribute("href");
+    if (!href) return;
+    event.preventDefault();
+    flushAutosaveBeforeLeave().then(() => {
+      window.location.href = href;
     });
   });
   cancel?.addEventListener("click", close);

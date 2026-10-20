@@ -729,16 +729,14 @@ def promote_drafts_to_responses(
 ) -> None:
     """Copy draft-only answers into responses before final submit (e.g. autosaved essays)."""
     from answer_grader import grade_placement_response
+    from placement_english_ui import english_writing_answer_is_incomplete
 
     rows = db.execute(
         """
         SELECT d.question_index, d.selected_answer
         FROM placement_candidate_drafts d
-        LEFT JOIN placement_candidate_responses r
-          ON r.attempt_id = d.attempt_id AND r.question_index = d.question_index
         WHERE d.attempt_id = ?
           AND TRIM(COALESCE(d.selected_answer, '')) != ''
-          AND (r.attempt_id IS NULL OR TRIM(COALESCE(r.selected_answer, '')) = '')
         """,
         (attempt_id,),
     ).fetchall()
@@ -746,12 +744,36 @@ def promote_drafts_to_responses(
         qi = int(row["question_index"])
         if qi < 0 or qi >= len(questions):
             continue
-        ans = str(row["selected_answer"] or "").strip()
-        if not ans:
+        draft_ans = str(row["selected_answer"] or "").strip()
+        if not draft_ans:
             continue
         q = questions[qi]
-        is_correct, correct_answer = grade_placement_response(q, ans, topic)
-        save_response(db, attempt_id, qi, ans, correct_answer, is_correct)
+        q_kind = str(q.get("question_kind") or "mcq")
+        resp_row = _row(
+            db,
+            """
+            SELECT selected_answer FROM placement_candidate_responses
+            WHERE attempt_id = ? AND question_index = ?
+            """,
+            (attempt_id, qi),
+        )
+        resp_ans = str(resp_row["selected_answer"] or "").strip() if resp_row else ""
+        use_draft = False
+        if not resp_ans:
+            use_draft = True
+        elif q_kind == "english_writing":
+            resp_bad = english_writing_answer_is_incomplete(resp_ans)
+            draft_bad = english_writing_answer_is_incomplete(draft_ans)
+            if resp_bad and not draft_bad:
+                use_draft = True
+            elif resp_bad and draft_bad and len(draft_ans) > len(resp_ans):
+                use_draft = True
+            elif not resp_bad and not draft_bad and len(draft_ans) > len(resp_ans) + 40:
+                use_draft = True
+        if not use_draft:
+            continue
+        is_correct, correct_answer = grade_placement_response(q, draft_ans, topic)
+        save_response(db, attempt_id, qi, draft_ans, correct_answer, is_correct)
 
 
 def saved_answer(db: sqlite3.Connection, attempt_id: int, q_index: int) -> str:
@@ -763,8 +785,7 @@ def saved_answer(db: sqlite3.Connection, attempt_id: int, q_index: int) -> str:
         """,
         (attempt_id, q_index),
     )
-    if row and str(row["selected_answer"] or "").strip():
-        return str(row["selected_answer"])
+    resp_txt = str(row["selected_answer"] or "").strip() if row else ""
     draft = _row(
         db,
         """
@@ -773,7 +794,22 @@ def saved_answer(db: sqlite3.Connection, attempt_id: int, q_index: int) -> str:
         """,
         (attempt_id, q_index),
     )
-    return str(draft["selected_answer"] or "") if draft else ""
+    draft_txt = str(draft["selected_answer"] or "").strip() if draft else ""
+    if resp_txt and draft_txt:
+        try:
+            from placement_english_ui import english_writing_answer_is_incomplete
+
+            if english_writing_answer_is_incomplete(
+                resp_txt
+            ) and not english_writing_answer_is_incomplete(draft_txt):
+                return draft_txt
+            if english_writing_answer_is_incomplete(resp_txt) and english_writing_answer_is_incomplete(
+                draft_txt
+            ) and len(draft_txt) > len(resp_txt):
+                return draft_txt
+        except Exception:
+            pass
+    return resp_txt or draft_txt
 
 
 def answered_indices(db: sqlite3.Connection, attempt_id: int) -> set[int]:

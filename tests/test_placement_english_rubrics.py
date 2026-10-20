@@ -3,6 +3,8 @@ import unittest
 from placement_english_rubrics import writing_rubric_for, writing_score_band
 from placement_english_ui import (
     clean_essay_body_for_display,
+    english_writing_answer_is_incomplete,
+    essay_body_for_advisor_display,
     english_writing_max_points,
     filter_writing_prompt_for_review,
 )
@@ -40,6 +42,19 @@ class TestPlacementEnglishRubrics(unittest.TestCase):
         cleaned = clean_essay_body_for_display(raw, "A")
         self.assertIn("My real essay", cleaned)
         self.assertNotIn("Personal experience Everyone", cleaned)
+
+    def test_incomplete_writing_answer(self) -> None:
+        self.assertTrue(english_writing_answer_is_incomplete("[Option A]\n"))
+        self.assertFalse(
+            english_writing_answer_is_incomplete(
+                "[Option A]\n\nI wrote several sentences about my challenge and what I learned."
+            )
+        )
+
+    def test_advisor_display_falls_back_to_raw(self) -> None:
+        body = "Personal experience"
+        shown = essay_body_for_advisor_display(body, "A")
+        self.assertEqual(shown, "Personal experience")
 
 
 if __name__ == "__main__":

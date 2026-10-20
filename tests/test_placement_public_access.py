@@ -883,6 +883,51 @@ class TestLockAndAdmin(_Base):
         finally:
             conn.close()
 
+    def test_english_writing_draft_overwrites_placeholder_response_on_finish(self):
+        from app import BANKS, get_questions_for_topic
+
+        self.flag_on()
+        qs = get_questions_for_topic(
+            "placement", "english_g7_8", BANKS["placement"]["english_g7_8"]
+        )
+        widx = len(qs) - 1
+        rv = self.begin(slug="english-g7-8", name="Placeholder Essay")
+        pid = self.public_id_from_location(rv)
+        aid = self.attempt_id(pid)
+        self.client.post(
+            f"/placement/run/{pid}/autosave",
+            data={
+                "csrf_token": self.csrf(),
+                "qnum": str(widx),
+                "selected_answer": "",
+                "english_writing_option": "A",
+            },
+        )
+        self.client.post(
+            f"/placement/run/{pid}/autosave",
+            data={
+                "csrf_token": self.csrf(),
+                "qnum": str(widx),
+                "selected_answer": "This is my full essay about a challenge I overcame at school last year.",
+                "english_writing_option": "A",
+            },
+        )
+        self.client.get(f"/placement/run/{pid}/finish")
+        self.client.post(
+            f"/placement/run/{pid}/finish",
+            data={"csrf_token": self.csrf(), "confirm": "1"},
+        )
+        conn = sqlite3.connect(self.db)
+        try:
+            row = conn.execute(
+                "SELECT selected_answer FROM placement_candidate_responses WHERE attempt_id=? AND question_index=?",
+                (aid, widx),
+            ).fetchone()
+            self.assertIsNotNone(row)
+            self.assertIn("full essay", str(row[0]))
+        finally:
+            conn.close()
+
     def test_english_writing_draft_promoted_on_finish(self):
         from app import BANKS, get_questions_for_topic
 

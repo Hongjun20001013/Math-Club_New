@@ -67,6 +67,24 @@ def _dedupe_paragraphs(text: str) -> str:
     return "\n\n".join(out)
 
 
+def english_writing_answer_is_incomplete(raw: str) -> bool:
+    """True when stored answer has no substantive essay for advisors."""
+    opt, body = unpack_english_writing_answer(raw or "")
+    if not (body or "").strip():
+        return True
+    if clean_essay_body_for_display(body, opt):
+        return False
+    return len((body or "").strip()) < 120
+
+
+def essay_body_for_advisor_display(body: str, option: str = "") -> str:
+    """Prefer cleaned essay text; fall back to raw student body if cleaner removed everything."""
+    cleaned = clean_essay_body_for_display(body, option)
+    if cleaned.strip():
+        return cleaned
+    return (body or "").strip()
+
+
 def clean_essay_body_for_display(body: str, option: str = "") -> str:
     """Strip accidental prompt paste from the essay field."""
     text = (body or "").strip()
@@ -102,8 +120,23 @@ def clean_essay_body_for_display(body: str, option: str = "") -> str:
         "should middle school students have homework",
         "will ai do more good than harm",
     )
+    junk_only = frozenset(
+        {
+            "prompt",
+            "personal experience",
+            "argument",
+            "option a",
+            "option b",
+            "option a · personal experience",
+            "option b · argument",
+        }
+    )
     for ln in lines:
-        low = ln.lower()
+        low = ln.lower().strip()
+        if low in junk_only:
+            continue
+        if re.match(r"^\d+\s*/\s*\d+$", low):
+            continue
         if low.startswith("option a ·") or low.startswith("option b ·"):
             continue
         if any(low.startswith(p) for p in skip_phrases) and len(ln) < 200:
