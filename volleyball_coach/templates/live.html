@@ -40,20 +40,85 @@
   <span class="pill">对方轮次：未知</span>
 </div>
 
+<p class="legend">
+  <span class="chip is-back"><i class="role">setter</i><span class="who">组织</span></span>
+  <span class="chip is-front"><i class="role">outside</i><span class="who">主攻</span></span>
+  <span class="chip is-front"><i class="role">middle</i><span class="who">副攻</span></span>
+  <span class="chip is-front"><i class="role">oppo</i><span class="who">接应</span></span>
+</p>
+{% include "_diagrams.html" %}
+{% set passer = namespace(name=(card.receivers[0].name if card.receivers else "—")) %}
+{% if card.slots and card.receivers %}
+  {% for item in card.receivers %}
+    {% if item.name != card.slots[1].occupant_name and passer.name == card.slots[1].occupant_name %}
+      {% set passer.name = item.name %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+<ol class="beats named">
+  <li>
+    <div class="beat" aria-hidden="true"><i></i><em class="actor w-serve"></em><span class="bb b1"></span></div>
+    发球 {{ card.slots[1].occupant_name if card.slots else "—" }}
+  </li>
+  <li>
+    <div class="beat" aria-hidden="true"><i></i><em class="actor w-pass"></em><span class="bb b2"></span></div>
+    一传 {{ passer.name }}
+  </li>
+  <li>
+    <div class="beat" aria-hidden="true"><i></i><em class="actor w-set"></em><span class="bb b3"></span></div>
+    组织 {{ card.setter_name }}
+  </li>
+  <li>
+    <div class="beat" aria-hidden="true"><i></i><em class="actor w-hit"></em><span class="bb b4"></span></div>
+    扣球 {{ card.front_attack[0].name if card.front_attack else "—" }}
+  </li>
+</ol>
+
 <article class="advice {% if suggestion.blocked %}blocked{% endif %}">
-  <p class="kicker">这一球只做一件事 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</p>
-  <p class="situation">{{ suggestion.situation }}</p>
+  <p class="kicker">这一球 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</p>
   <h2 class="action">{{ suggestion.action }}</h2>
-  <dl class="advice-fields">
-    <div><dt>依据</dt><dd>{{ suggestion.basis }}</dd></div>
-    <div><dt>备选</dt><dd>{{ suggestion.alternative }}</dd></div>
-    <div><dt>切换</dt><dd>{{ suggestion.switch }}</dd></div>
-  </dl>
-  <p class="meta">{{ suggestion.confidence }}</p>
+  <details>
+    <summary>{{ suggestion.situation }}</summary>
+    <dl class="advice-fields">
+      <div><dt>依据</dt><dd>{{ suggestion.basis }}</dd></div>
+      <div><dt>备选</dt><dd>{{ suggestion.alternative }}</dd></div>
+      <div><dt>切换</dt><dd>{{ suggestion.switch }}</dd></div>
+    </dl>
+    <p class="meta">{{ suggestion.confidence }}</p>
+  </details>
 </article>
 
-{% include "_diagrams.html" %}
-{% include "_court.html" %}
+<details class="sheet-words">
+  <summary>六个槽位</summary>
+  {% include "_court.html" %}
+</details>
+
+{% if match.status == "live" %}
+  <form class="stack skill-form" method="post" action="{{ url_for('post_mark', match_id=match.id) }}">
+    <h2>记这一分 · R{{ state.rotation }}</h2>
+    <input type="hidden" name="set_number" value="{{ state.set_index }}">
+    <input type="hidden" name="rotation" value="{{ state.rotation }}">
+    <input type="hidden" name="serving_side" value="{{ state.serving }}">
+    <label for="winner">这一分谁拿到</label>
+    <select id="winner" name="winner">
+      <option value="us">我方</option>
+      <option value="them">对方</option>
+      <option value="unknown">未知</option>
+    </select>
+    <label for="sample_scope">这段记录是什么</label>
+    <select id="sample_scope" name="sample_scope">
+      <option value="sample">抽样。可以分析，但不能写成整场。</option>
+      <option value="complete">按完整比赛记录</option>
+      <option value="key_clip">关键片段。不能算整场得分率。</option>
+    </select>
+    {% include "_stat_fields.html" %}
+    <label for="note">备注</label>
+    <input id="note" name="note" placeholder="知道再写">
+    <label class="checks"><span><input type="checkbox" name="also_score"> 同时把胜方记进比分，并按规则推动轮转</span></label>
+    <button type="submit">保存这一分的统计</button>
+  </form>
+{% endif %}
+{% include "_skill_cards.html" %}
 
 {% if match.status == "live" %}
   <form class="point-row" method="post" action="{{ url_for('post_point', match_id=match.id) }}">

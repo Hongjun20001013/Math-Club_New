@@ -9,6 +9,7 @@ from volleyball_coach.model import (
     SLOT_NAME,
     WING_BY_ROLE,
     MatchState,
+    role_chip,
     Reminder,
     RotationCard,
     ServePlan,
@@ -385,6 +386,7 @@ def build_card(
             wing=wing,
             wing_note=wing_note,
             badges=badges,
+            role_label=role_chip(plan.players[occupant].role, setting=slot == setter_slot),
         )
 
     wing_order = {"左翼": 0, "中路": 1, "右翼": 2}

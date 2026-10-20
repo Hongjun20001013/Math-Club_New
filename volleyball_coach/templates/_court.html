@@ -7,6 +7,7 @@
         <article class="slot {% if cell.is_sub %}is-sub{% endif %}">
           <div class="pos">{{ cell.slot }} {{ cell.slot_name }} · {{ cell.row }}</div>
           <strong>{{ cell.occupant_name }}</strong>
+          <div class="pos">{{ cell.role_label }}</div>
           {% if cell.wing %}<em>{{ cell.wing }}{% if cell.wing_note %} · {{ cell.wing_note }}{% endif %}</em>{% endif %}
           {% if cell.is_sub %}<div class="pos">槽位属于 {{ cell.origin_name }}</div>{% endif %}
           <div class="badges">

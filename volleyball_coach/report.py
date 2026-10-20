@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from volleyball_coach.model import PASS_QUALITY
+from volleyball_coach.model import ATTACK_RESULT, BLOCK_TOUCH, DEFENSE_QUALITY, PASS_QUALITY, SEVERE_ERROR, SEVERE_KIND
 
 
 CAUTION = (
@@ -321,6 +321,175 @@ def sideout_summary(points: list[dict], history_gap: bool) -> dict:
     }
 
 
+def _ratio(numerator: int, denominator: int) -> dict:
+    ready = denominator >= 8
+    return {
+        "num": numerator,
+        "den": denominator,
+        "rate": None if not ready else numerator / denominator,
+        "percent": None if not ready else f"{round(100 * numerator / denominator)}%",
+        "display": "—" if denominator == 0 else f"{numerator}/{denominator}",
+        "ready": ready,
+    }
+
+
+def _filled(rally: dict, field: str) -> str:
+    return (rally.get(field) or "").strip()
+
+
+def skill_summary(rallies: list[dict]) -> dict:
+    """Per-skill counts. Unknown, blank, and key clips stay out of every rate."""
+    usable = [rally for rally in rallies if _in_rates(rally)]
+    clips = [rally for rally in rallies if rally.get("sample_scope") == "key_clip"]
+
+    def buckets(field: str, labels: dict) -> dict[str, int]:
+        counts = {key: 0 for key in labels}
+        for rally in usable:
+            value = _filled(rally, field)
+            if value in counts:
+                counts[value] += 1
+        return counts
+
+    passing = buckets("pass_quality", PASS_QUALITY)
+    blocking = buckets("block_touch", BLOCK_TOUCH)
+    defense = buckets("defense_quality", DEFENSE_QUALITY)
+    attack = buckets("attack_result", ATTACK_RESULT)
+    severe = buckets("severe_error", SEVERE_ERROR)
+    kinds: dict[str, int] = {}
+    for rally in usable:
+        if _filled(rally, "severe_error") != "yes":
+            continue
+        kind = _filled(rally, "severe_kind")
+        if kind in SEVERE_KIND:
+            kinds[kind] = kinds.get(kind, 0) + 1
+
+    pass_ratio = _ratio(
+        passing["in_system"],
+        passing["in_system"] + passing["half"] + passing["out"],
+    )
+    defense_ratio = _ratio(defense["in_system"], defense["in_system"] + defense["out"])
+    attack_ratio = _ratio(
+        attack["kill"],
+        attack["kill"] + attack["error"] + attack["blocked"] + attack["continue"],
+    )
+    severe_ratio = _ratio(severe["yes"], severe["yes"] + severe["no"])
+    touched = blocking["effective"] + blocking["disruptive"]
+    judged = touched + blocking["none"]
+
+    def detail_pass() -> str:
+        return (
+            f"到位 {passing['in_system']}，半到位 {passing['half']}，不到位 {passing['out']}。"
+            f"未知 {passing['unknown']} 次不进分母。"
+        )
+
+    def detail_block() -> str:
+        return (
+            f"有效 {blocking['effective']}，破坏性 {blocking['disruptive']}，没有拦到 {blocking['none']}。"
+            f"未知 {blocking['unknown']} 次不进。"
+            + (" 触球样本已够，仍把两种拦网分开看。" if touched >= 8 else " 两种拦网先分开计次，不合成一个百分比。")
+        )
+
+    cards = [
+        {
+            "key": "pass",
+            "label": "一传到位",
+            "display": pass_ratio["percent"] or pass_ratio["display"],
+            "fraction": pass_ratio["display"],
+            "ready": pass_ratio["ready"],
+            "detail": detail_pass(),
+            "bars": [
+                {"label": "到位", "n": passing["in_system"], "tone": "in"},
+                {"label": "半到位", "n": passing["half"], "tone": "mid"},
+                {"label": "不到位", "n": passing["out"], "tone": "out"},
+            ],
+        },
+        {
+            "key": "block",
+            "label": "拦网",
+            "display": "—" if judged == 0 else f"{blocking['effective']} · {blocking['disruptive']}",
+            "fraction": "—" if judged == 0 else f"有效 {blocking['effective']} / 破坏 {blocking['disruptive']}",
+            "ready": touched >= 8,
+            "detail": detail_block(),
+            "bars": [
+                {"label": "有效", "n": blocking["effective"], "tone": "in"},
+                {"label": "破坏", "n": blocking["disruptive"], "tone": "out"},
+                {"label": "没拦到", "n": blocking["none"], "tone": "mid"},
+            ],
+        },
+        {
+            "key": "defense",
+            "label": "防守到位",
+            "display": defense_ratio["percent"] or defense_ratio["display"],
+            "fraction": defense_ratio["display"],
+            "ready": defense_ratio["ready"],
+            "detail": (
+                f"到位 {defense['in_system']}，不到位 {defense['out']}。"
+                f"未知 {defense['unknown']} 次不进分母。"
+            ),
+            "bars": [
+                {"label": "到位", "n": defense["in_system"], "tone": "in"},
+                {"label": "不到位", "n": defense["out"], "tone": "out"},
+            ],
+        },
+        {
+            "key": "attack",
+            "label": "扣球成功",
+            "display": attack_ratio["percent"] or attack_ratio["display"],
+            "fraction": attack_ratio["display"],
+            "ready": attack_ratio["ready"],
+            "detail": (
+                f"得分 {attack['kill']}，失误 {attack['error']}，被拦死 {attack['blocked']}，"
+                f"继续比赛 {attack['continue']}。未知 {attack['unknown']} 次不进分母。"
+            ),
+            "bars": [
+                {"label": "得分", "n": attack["kill"], "tone": "in"},
+                {"label": "继续", "n": attack["continue"], "tone": "mid"},
+                {"label": "失误", "n": attack["error"], "tone": "out"},
+                {"label": "被拦死", "n": attack["blocked"], "tone": "out"},
+            ],
+        },
+        {
+            "key": "severe",
+            "label": "严重失误",
+            "display": severe_ratio["percent"] or severe_ratio["display"],
+            "fraction": severe_ratio["display"],
+            "ready": severe_ratio["ready"],
+            "detail": (
+                f"有 {severe['yes']}，没有 {severe['no']}，未知 {severe['unknown']}。"
+                + (
+                    "种类：" + "、".join(f"{SEVERE_KIND[key]} {count}" for key, count in kinds.items()) + "。"
+                    if kinds
+                    else "还没有记下种类。"
+                )
+            ),
+            "bars": [
+                {"label": "有", "n": severe["yes"], "tone": "out"},
+                {"label": "没有", "n": severe["no"], "tone": "in"},
+            ],
+        },
+    ]
+    judged_any = bool(
+        pass_ratio["den"] or judged or defense_ratio["den"] or attack_ratio["den"] or severe_ratio["den"]
+    )
+    ready_any = any(card["ready"] for card in cards)
+    if clips and not usable:
+        headline = "目前只有关键片段。这些片段可以回看，不能写成整场到位率或成功率。"
+    elif not judged_any:
+        headline = "还没有可计算的技术统计。留空和未知不会被当成 0。"
+    elif not ready_any:
+        headline = "次数已经记下。每一项已判断的回合还不足 8 个，先不报百分比。"
+    else:
+        headline = "样本够 8 个的项目给出比例，其余仍只报次数。"
+    if clips and usable:
+        headline += f" 另有关键片段 {len(clips)} 条，没有放进这些比例。"
+    return {
+        "headline": headline,
+        "note": "分母只含完整或抽样、而且这项已经判断的回合。未知、留空和关键片段不进比例。不足 8 个只显示次数。",
+        "key_clip_count": len(clips),
+        "cards": cards,
+    }
+
+
 def build_report(
     *,
     rallies: list[dict],
@@ -345,6 +514,7 @@ def build_report(
         )
     report = {
         "opponent_rotation": None,
+        "skills": skill_summary(rallies),
         "receive": question_receive(rallies),
         "serve": question_serve(rallies),
         "subs": question_subs(rallies, sub_events, opponent),

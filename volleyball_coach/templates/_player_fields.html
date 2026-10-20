@@ -8,7 +8,7 @@
     <option value="{{ code }}" {% if player and player.role == code %}selected{% endif %}>{{ label }}</option>
   {% endfor %}
 </select>
-<label>R1 首发槽位（1 右后到 6 中后，替补留空）</label>
+<label>R1 首发槽位（1 右后到 6 中后，替补留空）。六个槽都排满以后，默认方案会跟着更新。</label>
 <input name="base_slot" value="{{ player.base_slot if player and player.base_slot else '' }}">
 <label>组织职责</label>
 <select name="sets_when">

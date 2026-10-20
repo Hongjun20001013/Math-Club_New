@@ -1,0 +1,24 @@
+<div class="choice-grid">
+  {% for name, label, options in stat_fields %}
+    <fieldset class="choices">
+      <legend>{{ label }}</legend>
+      <label class="choice">
+        <input type="radio" name="{{ name }}" value="" checked>
+        <span>先不填</span>
+      </label>
+      {% for code, text in options.items() %}
+        <label class="choice">
+          <input type="radio" name="{{ name }}" value="{{ code }}">
+          <span>{{ text }}</span>
+        </label>
+      {% endfor %}
+    </fieldset>
+  {% endfor %}
+</div>
+<label for="severe_kind">严重失误种类。只有选了「有严重失误」才计入。</label>
+<select id="severe_kind" name="severe_kind">
+  <option value="">先不分类</option>
+  {% for code, text in severe_kinds.items() %}
+    <option value="{{ code }}">{{ text }}</option>
+  {% endfor %}
+</select>

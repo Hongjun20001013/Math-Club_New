@@ -22,6 +22,19 @@
     {% endfor %}
   </table>
 </div>
+<h2>技术统计怎么算</h2>
+<div class="table-wrap">
+  <table>
+    <tr><th>项目</th><th>分子</th><th>分母</th></tr>
+    {% for metric in skill_metrics %}
+      <tr>
+        <td>{{ metric.name }}</td>
+        <td>{{ metric.numerator }}</td>
+        <td>{{ metric.denominator }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
 <h2>必填和可留空</h2>
 <p>必填：{{ required_fields | join("、") }}。</p>
 <p>可留空：{{ optional_fields | join("、") }}。</p>

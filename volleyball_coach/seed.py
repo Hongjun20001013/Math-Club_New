@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from volleyball_coach.model import Pair, Player, Rules, ServePlan, SubWindow, TeamPlan
+from volleyball_coach.model import Pair, Player, RotationScheme, Rules, ServePlan, SubWindow, TeamPlan
 
 
 MENS_TEAM_ID = "team-mens"
@@ -123,6 +123,15 @@ def build_mens_plan() -> TeamPlan:
             "cost": "同样要看接发和左右翼转换，不能只比扣球。",
         },
     ]
+    schemes = [
+        RotationScheme(
+            id="scheme-mens-62",
+            name="6-2 默认",
+            order=["michael", "leo", "andy-a", "eric", "vitas", "andy-b"],
+            is_default=True,
+            notes="已确认的男排六人顺序。另存的方案不会改这一套，除非再把它设成默认。",
+        )
+    ]
     return TeamPlan(
         team_id=MENS_TEAM_ID,
         name="男排",
@@ -133,6 +142,7 @@ def build_mens_plan() -> TeamPlan:
         sub_windows=windows,
         calls={"in_system": "全开", "half": "两翼", "out": "高球"},
         guidance=guidance,
+        schemes=schemes,
         board_note=(
             "R2 和 R5 的前排按槽位重算过。原稿把 R1–R2、R4–R5 写成同一组前排，"
             "但 R2 的 Leo、R5 的 Vitas 已经转到后排。这支球队禁止后排进攻，卡片不沿用那个合并写法。"

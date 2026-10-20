@@ -2,6 +2,7 @@
 {% block body %}
 <p class="row-links no-print"><a href="{{ url_for('board', team_id=plan.team_id) }}">返回六轮卡片</a></p>
 <h1>{{ plan.name }} 场边速查</h1>
+{% include "_film.html" %}
 <ul class="list">
   <li>确认本场锁定的配对。候选没有锁定，就不能上场。</li>
   <li>确认首发六人、发球队员、轮次和补位传球的人。</li>

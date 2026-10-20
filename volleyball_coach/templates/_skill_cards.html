@@ -1,0 +1,28 @@
+<section class="skill-board">
+  <h2>这一分记下来的</h2>
+  <p>{{ skills.headline }}</p>
+  <div class="stat-grid">
+    {% for item in skills.cards %}
+      <article class="stat-card">
+        <p class="k">{{ item.label }}</p>
+        <strong>{{ item.display }}</strong>
+        <div class="meter" aria-hidden="true">
+          {% for bar in item.bars %}
+            {% if bar.n %}<i class="{{ bar.tone }}" style="flex: {{ bar.n }}"></i>{% endif %}
+          {% endfor %}
+        </div>
+        <ul class="meter-key">
+          {% for bar in item.bars %}
+            <li><i class="{{ bar.tone }}"></i>{{ bar.label }} {{ bar.n }}</li>
+          {% endfor %}
+        </ul>
+        <span>{{ item.fraction }}{% if item.fraction != '—' and not item.ready %} · 样本不足{% endif %}</span>
+        <details>
+          <summary>次数</summary>
+          <p>{{ item.detail }}</p>
+        </details>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="muted">{{ skills.note }}</p>
+</section>

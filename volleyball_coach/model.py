@@ -34,6 +34,61 @@ PASS_QUALITY = {
     "unknown": "未知",
 }
 
+BLOCK_TOUCH = {
+    "effective": "拦网有效",
+    "disruptive": "破坏性拦网",
+    "none": "没有拦到",
+    "unknown": "未知",
+}
+
+DEFENSE_QUALITY = {
+    "in_system": "防守到位",
+    "out": "防守不到位",
+    "unknown": "未知",
+}
+
+ATTACK_RESULT = {
+    "kill": "扣球得分",
+    "error": "扣球失误",
+    "blocked": "被拦死",
+    "continue": "继续比赛",
+    "unknown": "未知",
+}
+
+SEVERE_ERROR = {
+    "yes": "有严重失误",
+    "no": "没有",
+    "unknown": "未知",
+}
+
+SEVERE_KIND = {
+    "serve": "发球",
+    "pass": "一传",
+    "set": "二传",
+    "attack": "扣球",
+    "block": "拦网",
+    "defense": "防守",
+    "other": "其他",
+}
+
+ROLE_CHIP = {
+    "opposite": "oppo",
+    "outside": "outside",
+    "middle": "middle",
+    "setter": "setter",
+    "libero": "libero",
+    "defender": "def",
+    "flex": "flex",
+    "other": "other",
+}
+
+
+def role_chip(role: str, *, setting: bool = False) -> str:
+    """Court chip. The player actually setting this rotation reads setter, even in a 6-2."""
+    if setting or role == "setter":
+        return "setter"
+    return ROLE_CHIP.get(role, "other")
+
 ABILITY_LABEL = {
     "stable": "稳定可用",
     "protect": "需要保护",
@@ -182,6 +237,36 @@ class ServePlan:
 
 
 @dataclass
+class RotationScheme:
+    """One named R1 order. Slot numbers are 1 through 6, not measured court coordinates."""
+
+    id: str
+    name: str
+    order: list[str]
+    is_default: bool = False
+    notes: str = ""
+
+    def to_json(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "order": list(self.order),
+            "is_default": self.is_default,
+            "notes": self.notes,
+        }
+
+    @staticmethod
+    def from_json(data: dict) -> "RotationScheme":
+        return RotationScheme(
+            id=data["id"],
+            name=data.get("name") or "未命名方案",
+            order=list(data.get("order") or []),
+            is_default=bool(data.get("is_default")),
+            notes=data.get("notes") or "",
+        )
+
+
+@dataclass
 class SubWindow:
     player_out: str
     player_in: str
@@ -219,6 +304,7 @@ class TeamPlan:
     guidance: list[dict] = field(default_factory=list)
     board_note: str = ""
     notes: str = ""
+    schemes: list[RotationScheme] = field(default_factory=list)
 
     def base_order(self) -> list[str]:
         slotted = [player for player in self.players.values() if player.base_slot]
@@ -226,6 +312,31 @@ class TeamPlan:
         if [player.base_slot for player in slotted] != [1, 2, 3, 4, 5, 6]:
             return []
         return [player.id for player in slotted]
+
+    def default_scheme(self) -> Optional[RotationScheme]:
+        for scheme in self.schemes:
+            if scheme.is_default:
+                return scheme
+        return self.schemes[0] if self.schemes else None
+
+    def scheme_by_id(self, scheme_id: Optional[str]) -> Optional[RotationScheme]:
+        if not scheme_id:
+            return None
+        for scheme in self.schemes:
+            if scheme.id == scheme_id:
+                return scheme
+        return None
+
+    def with_order(self, order: list[str]) -> "TeamPlan":
+        """Copy used for one match or one preview. The stored default order stays put."""
+        clone = TeamPlan.from_json(self.to_json())
+        for player in clone.players.values():
+            player.base_slot = None
+        for index, player_id in enumerate(order, start=1):
+            player = clone.players.get(player_id)
+            if player is not None:
+                player.base_slot = index
+        return clone
 
     def name_of(self, player_id: Optional[str]) -> str:
         if not player_id:
@@ -246,6 +357,7 @@ class TeamPlan:
             "guidance": self.guidance,
             "board_note": self.board_note,
             "notes": self.notes,
+            "schemes": [scheme.to_json() for scheme in self.schemes],
         }
 
     @staticmethod
@@ -263,6 +375,7 @@ class TeamPlan:
             guidance=list(data.get("guidance") or []),
             board_note=data.get("board_note") or "",
             notes=data.get("notes") or "",
+            schemes=[RotationScheme.from_json(item) for item in data.get("schemes") or []],
         )
 
 
@@ -297,6 +410,7 @@ class SlotView:
     wing: str
     wing_note: str
     badges: list[str]
+    role_label: str = "other"
 
 
 @dataclass
