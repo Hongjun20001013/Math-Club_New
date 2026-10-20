@@ -6,6 +6,26 @@ from pathlib import Path
 
 from flask import Flask, abort, flash, g, jsonify, redirect, render_template, request, send_file, url_for
 
+from volleyball_coach.actions import (
+    ATTACK_RESULT as ACTION_ATTACK,
+    BLOCK_RESULT,
+    DEPTHS,
+    LINES,
+    PASS_QUALITY as ACTION_PASS,
+    PASS_STANDARD,
+    PHASES,
+    SCOPES,
+    SET_QUALITY,
+    SKILL_RESULTS,
+    SKILLS,
+    STARTS,
+    attack_summary,
+    block_summary,
+    coverage,
+    line_groups,
+    pass_summary,
+    team_block_kills,
+)
 from volleyball_coach.dictionary import (
     METRICS,
     OPTIONAL_RALLY_FIELDS,
@@ -83,7 +103,36 @@ def create_app(db_path: str | Path | None = None) -> Flask:
 
     @app.context_processor
     def inject_labels():
-        return {"severe_kinds": SEVERE_KIND, "court_slots": COURT_SLOTS}
+        nav_match = None
+        nav_plan = None
+        nav_state = None
+        view_args = request.view_args or {}
+        match_id = view_args.get("match_id")
+        team_id = view_args.get("team_id")
+        try:
+            if not match_id and team_id:
+                matches = store().list_matches(team_id)
+                live_match = next((item for item in matches if item["status"] == "live"), None)
+                match_id = (live_match or (matches[0] if matches else None))
+                match_id = match_id["id"] if match_id else None
+            if match_id:
+                found = store().get_match(match_id)
+                if found is not None:
+                    plan = plan_for_match(store(), found)
+                    state, _points = replay(plan, store().events_for(match_id), locked_pairs_of(found), found["mode"])
+                    if state is not None:
+                        nav_match = found
+                        nav_plan = plan
+                        nav_state = state
+        except Exception:
+            nav_match = None
+        return {
+            "severe_kinds": SEVERE_KIND,
+            "court_slots": COURT_SLOTS,
+            "nav_match": nav_match,
+            "nav_plan": nav_plan,
+            "nav_state": nav_state,
+        }
 
     @app.teardown_appcontext
     def close_store(_exc):
@@ -421,6 +470,12 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             )
         unlocked = [pair for pair in plan.pairs if pair.key() not in state.locked_pairs]
         bookmarks = [event for event in events if event["type"] == "bookmark"]
+        actions = store().actions_for(match_id)
+        open_rally = store().open_rally(match_id)
+        open_actions = [item for item in actions if open_rally and item["rally_id"] == open_rally["id"]]
+        opponents = store().opponents_for(match_id)
+        depth = match["record_depth"] if "record_depth" in match.keys() else "light"
+        scope = match["sample_scope"] if "sample_scope" in match.keys() else "sample"
         return render_template(
             "live.html",
             match=match,
@@ -431,9 +486,27 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             subs=subs,
             unlocked=unlocked,
             court_order=COURT_ORDER,
-            bookmarks=bookmarks[-3:],
+            bookmarks=bookmarks[-8:],
             skills=skill_summary(rallies),
             stat_fields=STAT_FIELDS,
+            actions=actions,
+            open_rally=open_rally,
+            open_actions=open_actions,
+            opponents=opponents,
+            record_depth=depth,
+            sample_scope=scope,
+            coverage=coverage(rallies, actions, len(_points)),
+            action_token=new_id("tok"),
+            on_court=set(state.occupants.values()),
+            player_table=player_rows(plan, actions, {item["id"]: item["participants"] for item in actions}),
+            skills_vocab=SKILLS,
+            skill_results=SKILL_RESULTS,
+            starts=STARTS,
+            lines=LINES,
+            phases=PHASES,
+            set_qualities=SET_QUALITY,
+            depths=DEPTHS,
+            scopes=SCOPES,
         )
 
     @app.post("/matches/<match_id>/point")
@@ -443,12 +516,23 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             flash("本场已结束。比分如果记错了，用校正，不要继续往下加。", "error")
             return redirect(url_for("live", match_id=match_id))
         winner = request.form.get("winner", "")
+        open_rally = store().open_rally(match_id)
+        if open_rally and open_rally.get("scored"):
+            flash("这一回合的比分已经记过，没有再次加分。", "error")
+            return redirect(url_for("live", match_id=match_id))
         try:
-            apply_point(plan, state, winner)
+            updated = apply_point(plan, state, winner)
         except MatchError as exc:
             flash(str(exc), "error")
             return redirect(url_for("live", match_id=match_id))
-        store().append_event(match_id, "point", {"winner": winner})
+        store().append_event(
+            match_id,
+            "point",
+            {"winner": winner, "rally_id": open_rally["id"] if open_rally else None},
+        )
+        if open_rally:
+            store().close_rally(match_id, open_rally["id"], winner, updated.score_us, updated.score_them, 1)
+            flash("回合结束，比分已记下。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.post("/matches/<match_id>/mark")
@@ -525,12 +609,25 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.post("/matches/<match_id>/undo")
     def post_undo(match_id: str):
         _match, _plan, _state, _points, events = match_bundle(match_id)
+        actions = store().actions_for(match_id)
+        last_action = actions[-1] if actions else None
+        last_event = events[-1] if events else None
+        if last_action and (last_event is None or last_action["created_at"] > last_event["created_at"]):
+            store().delete_action(match_id, last_action["id"])
+            flash("已撤销上一个动作。比分和轮次没动。", "ok")
+            return redirect(url_for("live", match_id=match_id))
         target = last_reversible_seq(events)
         if target is None:
             flash("没有可以撤销的操作。开场记录会保留。", "error")
             return redirect(url_for("live", match_id=match_id))
+        undone = next(event for event in events if event["seq"] == target)
         store().append_event(match_id, "undo", {"target_seq": target})
-        flash("已撤销上一步。", "ok")
+        rally_id = undone["payload"].get("rally_id") if undone["type"] == "point" else None
+        if rally_id:
+            store().reopen_rally(match_id, int(rally_id))
+            flash("已撤销这一分。回合里的动作还在，比分退回。", "ok")
+        else:
+            flash("已撤销上一步。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.post("/matches/<match_id>/rotation")
@@ -770,6 +867,254 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         }
         return jsonify(payload)
 
+    def _save_action(match_id: str, plan, state):
+        opponents = store().opponents_for(match_id)
+        try:
+            fields, participants = action_from_form(request.form, plan, opponents)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return None
+        manual = request.form.get("confirm_lineup") == "on"
+        requested = (request.form.get("rally_id") or "").strip()
+        if requested:
+            try:
+                rally_id = int(requested)
+            except ValueError:
+                flash("回合编号无效。", "error")
+                return None
+            rally = store().rally(match_id, rally_id)
+            if rally is None:
+                flash("找不到这个回合。没有用当前阵容新建。", "error")
+                return None
+        else:
+            rally = store().open_rally(match_id)
+            if rally is None:
+                match = store().get_match(match_id)
+                scope = match["sample_scope"] if match and "sample_scope" in match.keys() else "sample"
+                rally_id = store().insert_open_rally(
+                    match_id,
+                    {
+                        "set_number": state.set_index,
+                        "rotation": state.rotation,
+                        "serving_side": state.serving,
+                        "lineup": snapshot_lineup(plan, state),
+                        "sample_scope": scope,
+                        "score_us_before": state.score_us,
+                        "score_them_before": state.score_them,
+                    },
+                )
+                rally = store().rally(match_id, rally_id)
+        lineup, source = lineup_for_action(rally, plan, state, manual)
+        fields["rally_id"] = rally["id"]
+        fields["lineup"] = lineup
+        fields["lineup_source"] = source
+        action_id, created = store().add_action(match_id, fields, participants)
+        if created:
+            flash("动作已保存。比分还没动。", "ok")
+        else:
+            flash("这一动作已经保存过，没有重复记。", "ok")
+        return action_id
+
+    @app.post("/matches/<match_id>/recording")
+    def post_recording(match_id: str):
+        match_bundle(match_id)
+        depth = request.form.get("record_depth") or ""
+        scope = request.form.get("sample_scope") or ""
+        if depth not in DEPTHS or scope not in SCOPES:
+            flash("记录方式没有保存。", "error")
+            return redirect(url_for("live", match_id=match_id))
+        store().set_recording(match_id, depth, scope)
+        flash("记录方式已保存。之后的新回合用这个范围。", "ok")
+        return redirect(url_for("live", match_id=match_id))
+
+    @app.post("/matches/<match_id>/opponents")
+    def post_opponent(match_id: str):
+        match_bundle(match_id)
+        jersey = (request.form.get("jersey") or "").strip()
+        if not jersey:
+            flash("先填写对方号码。", "error")
+            return redirect(request.referrer or url_for("opponents_page", match_id=match_id))
+        store().ensure_opponent(match_id, jersey, request.form.get("name") or "")
+        flash(f"对方 {jersey} 号已建档。", "ok")
+        return redirect(request.referrer or url_for("opponents_page", match_id=match_id))
+
+    @app.post("/matches/<match_id>/actions")
+    def post_action(match_id: str):
+        _match, plan, state, _points, _events = match_bundle(match_id)
+        _save_action(match_id, plan, state)
+        return redirect(request.referrer or url_for("live", match_id=match_id))
+
+    @app.post("/matches/<match_id>/actions/<int:action_id>")
+    def post_action_edit(match_id: str, action_id: int):
+        _match, plan, _state, _points, _events = match_bundle(match_id)
+        opponents = store().opponents_for(match_id)
+        try:
+            fields, participants = action_from_form(request.form, plan, opponents)
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(request.referrer or url_for("video_page", match_id=match_id))
+        if not store().update_action(match_id, action_id, fields, participants):
+            flash("没有找到这个动作。", "error")
+        else:
+            flash("动作已改。比分和轮次没动。", "ok")
+        return redirect(request.referrer or url_for("video_page", match_id=match_id))
+
+    @app.post("/matches/<match_id>/actions/<int:action_id>/delete")
+    def post_action_delete(match_id: str, action_id: int):
+        match_bundle(match_id)
+        if store().delete_action(match_id, action_id) is None:
+            flash("没有找到这个动作。", "error")
+        else:
+            flash("动作已删除。比分和轮次没动。", "ok")
+        return redirect(request.referrer or url_for("live", match_id=match_id))
+
+    @app.get("/matches/<match_id>/players")
+    def players_page(match_id: str):
+        match, plan, state, _points, _events = match_bundle(match_id)
+        actions = store().actions_for(match_id)
+        set_filter = request.args.get("set") or ""
+        rotation_filter = request.args.get("rotation") or ""
+        phase_filter = request.args.get("phase") or ""
+        player_filter = request.args.get("player") or ""
+        skill_filter = request.args.get("skill") or ""
+        result_filter = request.args.get("result") or ""
+        selected = []
+        for action in actions:
+            if set_filter and str(action.get("set_number")) != set_filter:
+                continue
+            if rotation_filter and str(action.get("rotation") or "") != rotation_filter:
+                continue
+            if phase_filter and action.get("phase") != phase_filter:
+                continue
+            selected.append(action)
+        table_actions = selected
+        if player_filter:
+            table_actions = [
+                action
+                for action in selected
+                if action.get("player_id") == player_filter or player_filter in action.get("participants", [])
+            ]
+        membership = {item["id"]: item["participants"] for item in table_actions}
+        rows = player_rows(plan, table_actions, membership)
+        sort = request.args.get("sort") or "name"
+        reverse = request.args.get("dir") == "desc"
+
+        def sort_key(row):
+            if sort == "pass":
+                return row["passing"]["attempts"]
+            if sort == "attack":
+                return row["attack"]["attempts"]
+            if sort == "block":
+                return row["block"]["events"]
+            return row["name"]
+
+        rows.sort(key=sort_key, reverse=reverse)
+        visible = selected
+        if player_filter:
+            visible = [
+                action
+                for action in selected
+                if action.get("player_id") == player_filter or player_filter in action.get("participants", [])
+            ]
+        if skill_filter:
+            visible = [action for action in visible if action.get("skill") == skill_filter]
+        if result_filter:
+            visible = [
+                action
+                for action in visible
+                if action.get("result") == result_filter or action.get("quality") == result_filter
+            ]
+        return render_template(
+            "players.html",
+            match=match,
+            plan=plan,
+            state=state,
+            rows=rows,
+            actions=visible,
+            show_actions=bool(skill_filter or result_filter or player_filter),
+            team_block_kills=team_block_kills(table_actions),
+            standards=PASS_STANDARD,
+            skills_vocab=SKILLS,
+            attack_labels=ACTION_ATTACK,
+            block_labels=BLOCK_RESULT,
+            phases=PHASES,
+            scopes=SCOPES,
+            filters={
+                "set": set_filter,
+                "rotation": rotation_filter,
+                "phase": phase_filter,
+                "player": player_filter,
+                "skill": skill_filter,
+                "result": result_filter,
+                "sort": sort,
+            },
+            coverage=coverage(store().rallies_for(match_id), actions, 0),
+        )
+
+    @app.get("/matches/<match_id>/opponents")
+    def opponents_page(match_id: str):
+        match, plan, state, _points, _events = match_bundle(match_id)
+        opponents = store().opponents_for(match_id)
+        actions = [item for item in store().actions_for(match_id) if item.get("team_side") == "them" and item.get("skill") == "attack"]
+        player_id = request.args.get("player") or (opponents[0]["id"] if opponents else "")
+        start = request.args.get("start") or ""
+        line = request.args.get("line") or ""
+        phase = request.args.get("phase") or ""
+        quality = request.args.get("set_quality") or ""
+        chosen = [item for item in actions if not player_id or item.get("player_id") == player_id]
+        if start:
+            chosen = [item for item in chosen if item.get("start_zone") == start]
+        if line:
+            chosen = [item for item in chosen if item.get("attack_line") == line]
+        if phase:
+            chosen = [item for item in chosen if item.get("phase") == phase]
+        if quality:
+            chosen = [item for item in chosen if item.get("set_quality") == quality]
+        names = {item["id"]: (item["name"] or f"{item['jersey']}号") for item in opponents}
+        return render_template(
+            "opponents.html",
+            match=match,
+            plan=plan,
+            state=state,
+            opponents=opponents,
+            names=names,
+            arrows=line_groups(chosen),
+            actions=chosen,
+            attack=attack_summary(chosen),
+            starts=STARTS,
+            lines=LINES,
+            phases=PHASES,
+            set_qualities=SET_QUALITY,
+            attack_labels=ACTION_ATTACK,
+            filters={"player": player_id, "start": start, "line": line, "phase": phase, "set_quality": quality},
+        )
+
+    @app.get("/matches/<match_id>/video")
+    def video_page(match_id: str):
+        match, plan, state, _points, events = match_bundle(match_id)
+        rallies = store().rallies_for(match_id)
+        actions = store().actions_for(match_id)
+        opponents = store().opponents_for(match_id)
+        return render_template(
+            "video.html",
+            match=match,
+            plan=plan,
+            state=state,
+            rallies=rallies,
+            actions=actions,
+            opponents=opponents,
+            bookmarks=[event for event in events if event["type"] == "bookmark"],
+            on_court=set(state.occupants.values()),
+            action_token=new_id("tok"),
+            skills_vocab=SKILLS,
+            skill_results=SKILL_RESULTS,
+            starts=STARTS,
+            lines=LINES,
+            phases=PHASES,
+            set_qualities=SET_QUALITY,
+            names={item["id"]: (item["name"] or f"{item['jersey']}号") for item in opponents},
+        )
+
     @app.get("/dictionary")
     def dictionary():
         return render_template(
@@ -985,6 +1330,131 @@ def preview_plan(plan: TeamPlan, scheme_id: str | None) -> tuple[RotationScheme 
     if chosen and len(chosen.order) == 6:
         return chosen, plan.with_order(chosen.order)
     return chosen, plan
+
+
+def snapshot_lineup(plan: TeamPlan, state) -> list[dict]:
+    return [
+        {"slot": slot, "player_id": state.occupants.get(slot), "name": plan.name_of(state.occupants.get(slot))}
+        for slot in range(1, 7)
+    ]
+
+
+def action_from_form(form, plan: TeamPlan, opponents: list[dict]) -> tuple[dict, list[str]]:
+    skill = form.get("skill") or ""
+    if skill not in SKILL_RESULTS:
+        raise ValueError("先选技术动作。")
+    result = form.get("result") or ""
+    if result not in SKILL_RESULTS[skill]:
+        raise ValueError("先选这个动作的结果。")
+    side = form.get("team_side") or "us"
+    if side not in ("us", "them"):
+        raise ValueError("先选我方或对方。")
+    token = (form.get("client_token") or "").strip()
+    if not token:
+        raise ValueError("缺少动作标记，请再保存一次。")
+
+    def optional(name: str, allowed: dict) -> str:
+        value = (form.get(name) or "").strip()
+        if value and value not in allowed:
+            raise ValueError("有一个选项不在可选范围内。")
+        return value
+
+    player_id = ""
+    participants: list[str] = []
+    if skill == "block":
+        if side != "us":
+            raise ValueError("拦网记在我方参与的人身上。")
+        participants = [player for player in form.getlist("block_player") if player in plan.players]
+        player_id = participants[0] if len(participants) == 1 else ""
+    elif side == "us":
+        player_id = form.get("player_id") or ""
+        if player_id and player_id not in plan.players:
+            raise ValueError("球员不在这支球队里。")
+        if player_id:
+            participants = [player_id]
+    else:
+        player_id = form.get("opponent_id") or ""
+        known = {item["id"] for item in opponents}
+        if player_id and player_id not in known:
+            raise ValueError("对方号码还没建档。")
+    quality = result if skill == "pass" else optional("quality", ACTION_PASS)
+    return {
+        "client_token": token,
+        "team_side": side,
+        "player_id": player_id,
+        "skill": skill,
+        "result": result,
+        "quality": quality,
+        "start_zone": optional("start_zone", STARTS),
+        "attack_line": optional("attack_line", LINES),
+        "end_zone": (form.get("end_zone") or "").strip(),
+        "phase": optional("phase", PHASES),
+        "set_quality": optional("set_quality", SET_QUALITY),
+        "video_timestamp": (form.get("video_timestamp") or "").strip(),
+        "view_flip": form.get("view_flip") == "on",
+        "confirm_status": "unknown" if result == "unknown" or not (player_id or participants) else "confirmed",
+    }, participants
+
+
+def lineup_for_action(rally: dict, plan: TeamPlan, state, manual: bool) -> tuple[list, str]:
+    if manual:
+        return snapshot_lineup(plan, state), "manual"
+    if rally.get("lineup"):
+        source = "live" if rally.get("status") == "open" else "historical"
+        return rally["lineup"], source
+    return [], "unknown"
+
+
+def player_rows(plan: TeamPlan, actions: list[dict], membership: dict[int, list[str]]) -> list[dict]:
+    by_player: dict[str, list[dict]] = {player_id: [] for player_id in plan.players}
+    unknown: list[dict] = []
+    for action in actions:
+        if action.get("team_side") != "us":
+            continue
+        owners = membership.get(action["id"]) or ([action["player_id"]] if action.get("player_id") else [])
+        if action.get("skill") == "block":
+            owners = membership.get(action["id"], [])
+        if not owners:
+            unknown.append(action)
+            continue
+        for player_id in owners:
+            if player_id in by_player:
+                by_player[player_id].append(action)
+            else:
+                unknown.append(action)
+    rows = []
+    for player_id, player in plan.players.items():
+        own = by_player[player_id]
+        passes = [item for item in own if item["skill"] == "pass"]
+        attacks = [item for item in own if item["skill"] == "attack"]
+        rows.append(
+            {
+                "id": player_id,
+                "name": player.name,
+                "jersey": player.jersey,
+                "passing": pass_summary(passes),
+                "attack": attack_summary(attacks),
+                "block": block_summary(actions, membership, player_id),
+            }
+        )
+    lonely_blocks = [item for item in actions if item.get("skill") == "block" and not membership.get(item["id"])]
+    block_counts = {code: sum(1 for item in lonely_blocks if item.get("result") == code) for code in BLOCK_RESULT}
+    rows.append(
+        {
+            "id": "",
+            "name": "球员未知",
+            "jersey": "",
+            "passing": pass_summary([item for item in unknown if item["skill"] == "pass"]),
+            "attack": attack_summary([item for item in unknown if item["skill"] == "attack"]),
+            "block": {
+                "events": len(lonely_blocks),
+                "counts": block_counts,
+                "kills": block_counts["kill"],
+                "unknown": block_counts["unknown"],
+            },
+        }
+    )
+    return rows
 
 
 def confirmed_serve_samples(rallies: list[dict], rotation: int, target_label: str) -> int:

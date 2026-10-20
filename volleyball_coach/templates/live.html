@@ -1,223 +1,207 @@
 {% extends "base.html" %}
 {% block body %}
-<p class="row-links">
-  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
-  <a href="{{ url_for('review', match_id=match.id) }}">赛后三个问题</a>
-  <a href="{{ url_for('report_page', match_id=match.id) }}">报告</a>
-  <a href="{{ url_for('correct_form', match_id=match.id) }}">校正</a>
-</p>
-<div class="scoreline">
-  <div class="side">
-    <span>我方{% if match.opponent %} · 对 {{ match.opponent }}{% endif %}</span>
-    <b>{{ state.score_us }}</b>
-  </div>
-  <div class="mid">
-    <svg class="ball" viewBox="0 0 32 32" aria-hidden="true">
-      <circle cx="16" cy="16" r="13.2" fill="#F4F8FB" stroke="#0C2340" stroke-width="1.6"/>
-      <path d="M16 3.2C12.2 9 12.2 23 16 28.8M4.6 11.2C11 13.2 14.2 14.6 16 16c1.8 1.6 5.4 4.2 11.4 5.2M4.6 20.8C11 18.8 14.2 17.4 16 16c1.8-1.6 5.4-4.2 11.4-5.2" fill="none" stroke="#0C2340" stroke-width="1.15"/>
-    </svg>
-    <span>第 {{ state.set_index }} 局</span>
-  </div>
-  <div class="side">
-    <span>对方</span>
-    <b>{{ state.score_them }}</b>
-  </div>
-</div>
-<div class="pills">
-  <span class="pill">R{{ state.rotation }}</span>
-  <span class="pill">{{ "我方发球" if state.serving == "us" else "对方发球" }}</span>
-  <span class="pill">{{ "轻记录" if state.mode == "light" else "预案模式" }}</span>
-  {% if state.score_tracked and not state.history_gap %}
-    <span class="pill ok">比分链连续</span>
-  {% else %}
-    <span class="pill warn">手动轮次，统计未实时更新</span>
-  {% endif %}
-  {% if state.advice_blocked %}
-    <span class="pill bad">位置建议已停下</span>
-  {% else %}
-    <span class="pill ok">名单已确认</span>
-  {% endif %}
-  <span class="pill">对方轮次：未知</span>
-</div>
-
-<p class="legend">
-  <span class="chip is-back"><i class="role">setter</i><span class="who">组织</span></span>
-  <span class="chip is-front"><i class="role">outside</i><span class="who">主攻</span></span>
-  <span class="chip is-front"><i class="role">middle</i><span class="who">副攻</span></span>
-  <span class="chip is-front"><i class="role">oppo</i><span class="who">接应</span></span>
-</p>
-{% include "_diagrams.html" %}
-{% set passer = namespace(name=(card.receivers[0].name if card.receivers else "—")) %}
-{% if card.slots and card.receivers %}
-  {% for item in card.receivers %}
-    {% if item.name != card.slots[1].occupant_name and passer.name == card.slots[1].occupant_name %}
-      {% set passer.name = item.name %}
-    {% endif %}
-  {% endfor %}
-{% endif %}
-<ol class="beats named">
-  <li>
-    <div class="beat" aria-hidden="true"><i></i><em class="actor w-serve"></em><span class="bb b1"></span></div>
-    发球 {{ card.slots[1].occupant_name if card.slots else "—" }}
-  </li>
-  <li>
-    <div class="beat" aria-hidden="true"><i></i><em class="actor w-pass"></em><span class="bb b2"></span></div>
-    一传 {{ passer.name }}
-  </li>
-  <li>
-    <div class="beat" aria-hidden="true"><i></i><em class="actor w-set"></em><span class="bb b3"></span></div>
-    组织 {{ card.setter_name }}
-  </li>
-  <li>
-    <div class="beat" aria-hidden="true"><i></i><em class="actor w-hit"></em><span class="bb b4"></span></div>
-    扣球 {{ card.front_attack[0].name if card.front_attack else "—" }}
-  </li>
-</ol>
-
-<article class="advice {% if suggestion.blocked %}blocked{% endif %}">
-  <p class="kicker">这一球 · {{ "赛前预案" if suggestion.source == "prematch_plan" else suggestion.source }}</p>
-  <h2 class="action">{{ suggestion.action }}</h2>
-  <details>
-    <summary>{{ suggestion.situation }}</summary>
-    <dl class="advice-fields">
-      <div><dt>依据</dt><dd>{{ suggestion.basis }}</dd></div>
-      <div><dt>备选</dt><dd>{{ suggestion.alternative }}</dd></div>
-      <div><dt>切换</dt><dd>{{ suggestion.switch }}</dd></div>
-    </dl>
-    <p class="meta">{{ suggestion.confidence }}</p>
-  </details>
-</article>
-
-<details class="sheet-words">
-  <summary>六个槽位</summary>
-  {% include "_court.html" %}
-</details>
-
-{% if match.status == "live" %}
-  <form class="stack skill-form" method="post" action="{{ url_for('post_mark', match_id=match.id) }}">
-    <h2>记这一分 · R{{ state.rotation }}</h2>
-    <input type="hidden" name="set_number" value="{{ state.set_index }}">
-    <input type="hidden" name="rotation" value="{{ state.rotation }}">
-    <input type="hidden" name="serving_side" value="{{ state.serving }}">
-    <label for="winner">这一分谁拿到</label>
-    <select id="winner" name="winner">
-      <option value="us">我方</option>
-      <option value="them">对方</option>
-      <option value="unknown">未知</option>
-    </select>
-    <label for="sample_scope">这段记录是什么</label>
-    <select id="sample_scope" name="sample_scope">
-      <option value="sample">抽样。可以分析，但不能写成整场。</option>
-      <option value="complete">按完整比赛记录</option>
-      <option value="key_clip">关键片段。不能算整场得分率。</option>
-    </select>
-    {% include "_stat_fields.html" %}
-    <label for="note">备注</label>
-    <input id="note" name="note" placeholder="知道再写">
-    <label class="checks"><span><input type="checkbox" name="also_score"> 同时把胜方记进比分，并按规则推动轮转</span></label>
-    <button type="submit">保存这一分的统计</button>
-  </form>
-{% endif %}
-{% include "_skill_cards.html" %}
-
-{% if match.status == "live" %}
-  <form class="point-row" method="post" action="{{ url_for('post_point', match_id=match.id) }}">
-    <button class="us" name="winner" value="us" type="submit">我方得分</button>
-    <button class="them" name="winner" value="them" type="submit">对方得分</button>
-  </form>
-  <form class="undo-form" method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
-    <button class="secondary" type="submit">撤销上一步</button>
-  </form>
-{% endif %}
-
-<section>
-  <h2>换人</h2>
-  <p class="muted">先看是不是固定配对，再确认这次死球真的换了，然后看谁组织、谁接发和拦网、下一次什么时候换回。</p>
-  {% if subs %}
-    {% for sub in subs %}
-      <form class="sub-row" method="post" action="{{ url_for('post_sub', match_id=match.id) }}">
-        <input type="hidden" name="out" value="{{ sub.out }}">
-        <input type="hidden" name="in" value="{{ sub.in }}">
-        <button class="{{ 'warn' if sub.warning else '' }}" type="submit">确认：{{ sub.label }}</button>
-        {% if sub.warning %}<p class="warn-line">{{ sub.warning }}</p>{% endif %}
-      </form>
+<form class="scope" method="post" action="{{ url_for('post_recording', match_id=match.id) }}">
+  <fieldset>
+    <legend>记录方式</legend>
+    {% for code, label in depths.items() %}
+      <label><input type="radio" name="record_depth" value="{{ code }}" {% if record_depth == code %}checked{% endif %}>{{ label }}</label>
     {% endfor %}
-  {% else %}
-    <p>现在没有可执行的换人。</p>
-  {% endif %}
-  {% for pair in unlocked %}
-    <p class="muted">{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} 这场没有锁定{% if pair.status == 'candidate' %}，它还是候选{% endif %}。</p>
-  {% endfor %}
-</section>
-
-<details>
-  <summary>不靠比分，直接改轮次</summary>
-  <form class="rot-row" method="post" action="{{ url_for('post_rotation', match_id=match.id) }}">
-    {% for number in range(1, 7) %}
-      <button class="secondary {% if number == state.rotation %}current{% endif %}" name="rotation" value="{{ number }}" type="submit">R{{ number }}</button>
+  </fieldset>
+  <fieldset>
+    <legend>记录范围</legend>
+    {% for code, label in scopes.items() %}
+      <label><input type="radio" name="sample_scope" value="{{ code }}" {% if sample_scope == code %}checked{% endif %}>{{ label }}</label>
     {% endfor %}
-  </form>
-  <p class="muted">这样改会停下比分链。漏记的分不会被反推。</p>
-</details>
+  </fieldset>
+  <button type="submit">保存记录方式</button>
+  <p>动作 {{ coverage.actions }} · 已结束回合 {{ coverage.closed }} · 比分 {{ coverage.points }} · 旧版回合 {{ coverage.legacy }}。旧版回合没有拆成个人动作。</p>
+</form>
 
-<details>
-  <summary>本轮职责，不是第二条指令</summary>
-  <p>组织 {{ card.setter_name }}。补位 {{ card.backup_name }}。{{ card.backup_note }}</p>
-  <p>结合部 {{ card.seam }}。{{ card.short_ball }}</p>
-  <p>{{ card.position_note }}</p>
-  {% for note in card.extra_notes %}<p>{{ note }}</p>{% endfor %}
-</details>
+<form class="bench" method="post" action="{{ url_for('post_action', match_id=match.id) }}">
+  <input type="hidden" name="client_token" value="{{ action_token }}">
+  <section class="col">
+    <h2>我方</h2>
+    <div class="side-pick">
+      <label><input type="radio" name="team_side" value="us" checked>我方</label>
+      <label><input type="radio" name="team_side" value="them">对方</label>
+    </div>
+    <div class="roster our-roster">
+      {% for slot in court_order %}
+        {% set pid = state.occupants[slot] %}
+        <label class="player on">
+          <input type="radio" name="player_id" value="{{ pid }}" {% if loop.first %}checked{% endif %}>
+          <strong>{{ plan.name_of(pid) }}</strong>
+          <span>{{ slot }}</span>
+        </label>
+      {% endfor %}
+      {% for player in plan.players.values() if player.id not in on_court %}
+        <label class="player off">
+          <input type="radio" name="player_id" value="{{ player.id }}">
+          <strong>{{ player.name }}</strong>
+          <span>场下</span>
+        </label>
+      {% endfor %}
+    </div>
+    <div class="roster their-roster">
+      {% for opponent in opponents %}
+        <label class="player">
+          <input type="radio" name="opponent_id" value="{{ opponent.id }}">
+          <strong>{{ opponent.jersey }}号</strong>
+          <span>{{ opponent.name }}</span>
+        </label>
+      {% else %}
+        <p>还没有对方号码。</p>
+      {% endfor %}
+      <label class="player">
+        <input type="radio" name="opponent_id" value="">
+        <strong>未知</strong>
+      </label>
+    </div>
+    {% for pair in unlocked %}
+      <p class="pair-note">{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} 这场没有锁定{% if pair.status == 'candidate' %}，它还是候选{% endif %}。</p>
+    {% endfor %}
+  </section>
 
-<details>
-  <summary>书签、模式、下一局</summary>
-  <form class="inline" method="post" action="{{ url_for('post_mode', match_id=match.id) }}">
-    {% if state.mode == "light" %}
-      <button class="secondary" name="mode" value="plan" type="submit">改回预案模式</button>
+  <section class="col">
+    <div class="skill-pick">
+      {% for code, label in skills_vocab.items() %}
+        <label><input type="radio" name="skill" value="{{ code }}" {% if code == 'attack' %}checked{% endif %}>{{ label }}</label>
+      {% endfor %}
+    </div>
+    {% for code, options in skill_results.items() %}
+      <div class="results for-{{ code }}">
+        {% for result, label in options.items() %}
+          <button type="submit" name="result" value="{{ result }}">{{ label }}</button>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <div class="block-pick for-block">
+      <p>参与拦网的人。多人记一次团队事件。</p>
+      {% for slot in court_order %}
+        {% set pid = state.occupants[slot] %}
+        <label><input type="checkbox" name="block_player" value="{{ pid }}">{{ plan.name_of(pid) }}</label>
+      {% endfor %}
+    </div>
+    <details>
+      <summary>对方扣球线路</summary>
+      <label>起攻
+        <select name="start_zone">
+          <option value="">不填</option>
+          {% for code, label in starts.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>线路
+        <select name="attack_line">
+          <option value="">不填</option>
+          {% for code, label in lines.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>落区<input name="end_zone" placeholder="可选，不反推线路"></label>
+      <label>阶段
+        <select name="phase">
+          <option value="">不填</option>
+          {% for code, label in phases.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>传球
+        <select name="set_quality">
+          <option value="">不填</option>
+          {% for code, label in set_qualities.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label><input type="checkbox" name="view_flip">这一局录像换过边</label>
+    </details>
+    <h2>这一回合</h2>
+    {% if open_actions %}
+      <ol class="log">
+        {% for action in open_actions %}
+          <li>
+            {{ skills_vocab[action.skill] }}
+            · {{ action.result }}
+            {% if action.player_id %}· {{ plan.name_of(action.player_id) if action.team_side == 'us' else action.player_id }}{% else %}· 未知{% endif %}
+            <button formaction="{{ url_for('post_action_delete', match_id=match.id, action_id=action.id) }}" formmethod="post" type="submit">删除</button>
+          </li>
+        {% endfor %}
+      </ol>
     {% else %}
-      <button class="secondary" name="mode" value="light" type="submit">改成轻记录</button>
+      <p>还没有动作。保存动作不会改比分。</p>
     {% endif %}
-  </form>
-  <form class="stack" method="post" action="{{ url_for('post_bookmark', match_id=match.id) }}">
-    <label>死球时留一个书签</label>
-    <select name="tag">
-      <option>接发</option>
-      <option>进攻</option>
-      <option>拦防</option>
-    </select>
-    <input name="note" placeholder="一句话">
-    <button class="secondary" type="submit">记下书签</button>
-  </form>
-  {% if bookmarks %}
-    <ul class="list">
-      {% for mark in bookmarks %}
-        <li>{{ mark.created_at }} · {{ mark.payload.tag }} {{ mark.payload.note }}</li>
+    {% if record_depth == 'complete' %}
+      <p>完整记录：这一回合可以继续补动作。缺了也不会挡住得分。</p>
+    {% endif %}
+    <details>
+      <summary>轮转和接发站位</summary>
+      {% include "_diagrams.html" %}
+    </details>
+  </section>
+
+  <section class="col">
+    <article class="tactic {% if suggestion.blocked %}blocked{% endif %}">
+      <p>{{ suggestion.situation }}</p>
+      <h2>{{ suggestion.action }}</h2>
+      {% if card.serve.target_type == 'unset' or not card.serve.target_label %}
+        <p>尚未设置追发目标</p>
+        <p><a class="text-button" href="{{ url_for('board', team_id=plan.team_id) }}">设置目标</a></p>
+      {% endif %}
+      <p>{% if coverage.actions %}本场观察{% else %}赛前预案。本场还没有动作，这不是结论。{% endif %} 语言模型未接通。</p>
+      <details>
+        <summary>依据、切换和备选</summary>
+        <p>依据：{{ suggestion.basis }}。样本 {{ coverage.actions }}。</p>
+        <p>适用：规则和当前场上六人已经核对。固定配对没有锁定的人不能上场。</p>
+        <p>切换：{{ suggestion.switch }}</p>
+        <p>备选：{{ suggestion.alternative }}</p>
+      </details>
+    </article>
+    <h2>场上概况</h2>
+    <ul class="mini">
+      {% for row in player_table if row.id in on_court %}
+        <li>{{ row.name }} 一传 {{ row.passing.attempts }} · 扣球 {{ row.attack.attempts }} · 拦网 {{ row.block.events }}</li>
       {% endfor %}
     </ul>
-  {% endif %}
-  <form class="stack" method="post" action="{{ url_for('next_set', match_id=match.id) }}">
-    <h3>下一局</h3>
-    <label>起始轮次</label>
-    <select name="rotation">
-      {% for number in range(1, 7) %}<option value="{{ number }}">R{{ number }}</option>{% endfor %}
-    </select>
-    <label>谁发球</label>
-    <select name="serving">
-      <option value="us">我方</option>
-      <option value="them">对方</option>
-    </select>
-    {% if plan.rules.pair_lock_scope == "set" %}
-      {% for pair in plan.pairs %}
-        <label><input type="checkbox" name="pair_id" value="{{ pair.id }}"> 本局锁定 {{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }}</label>
-      {% endfor %}
-    {% else %}
-      <p class="muted">这支球队的配对整场锁定，新的一局沿用开场那几对。</p>
-    {% endif %}
-    <button class="secondary" type="submit">开始下一局</button>
+  </section>
+</form>
+
+<form class="opp-add" method="post" action="{{ url_for('post_opponent', match_id=match.id) }}">
+  <label>对方号码<input name="jersey" inputmode="numeric"></label>
+  <button type="submit">建档</button>
+</form>
+
+<div class="dock">
+  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+    <button class="good" name="winner" value="us" type="submit">我方得分</button>
   </form>
-  {% if match.status == "live" %}
-    <form method="post" action="{{ url_for('finish_match', match_id=match.id) }}">
-      <button class="secondary" type="submit">结束本场，去补三个问题</button>
+  <form method="post" action="{{ url_for('post_point', match_id=match.id) }}">
+    <button class="bad" name="winner" value="them" type="submit">对方得分</button>
+  </form>
+  <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
+    <button type="submit">撤销</button>
+  </form>
+  <details>
+    <summary>换人</summary>
+    {% for sub in subs %}
+      <form method="post" action="{{ url_for('post_sub', match_id=match.id) }}">
+        <input type="hidden" name="out" value="{{ sub.out }}">
+        <input type="hidden" name="in" value="{{ sub.in }}">
+        <button type="submit">{{ sub.label }}</button>
+        {% if sub.warning %}<p>{{ sub.warning }}</p>{% endif %}
+      </form>
+    {% else %}
+      <p>现在没有可执行的换人。</p>
+    {% endfor %}
+  </details>
+  <details>
+    <summary>书签</summary>
+    <form method="post" action="{{ url_for('post_bookmark', match_id=match.id) }}">
+      <label>接发<input type="radio" name="tag" value="接发" checked></label>
+      <label>进攻<input type="radio" name="tag" value="进攻"></label>
+      <label>拦防<input type="radio" name="tag" value="拦防"></label>
+      <button type="submit">记下书签</button>
     </form>
-  {% endif %}
+  </details>
+</div>
+
+<details class="legacy">
+  <summary>旧版整分统计</summary>
+  {% include "_skill_cards.html" %}
 </details>
 {% endblock %}

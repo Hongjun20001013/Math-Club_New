@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>录像复盘</h1>
+<p id="video-note">录像留在这台电脑上，不会上传。重新打开页面后要再选一次文件。</p>
+<div class="review-grid">
+  <div class="player-pane">
+    <video id="tape" controls></video>
+    <label>本地录像<input id="video-file" type="file" accept="video/*"></label>
+    <label>倍速
+      <select id="rate">
+        <option>0.5</option>
+        <option selected>1</option>
+        <option>1.5</option>
+        <option>2</option>
+      </select>
+    </label>
+    <p>空格播放或暂停，左右方向键进退 2 秒。识别功能没有接入。</p>
+  </div>
+  <div>
+    <h2>动作</h2>
+    <ol class="log">
+      {% for action in actions %}
+        <li data-lineup-source="{{ action.lineup_source }}" data-lineup-ids="{% for person in action.lineup %}{{ person.player_id }}{% if not loop.last %},{% endif %}{% endfor %}">
+          <button type="button" data-seek="{{ action.video_timestamp }}">{{ action.video_timestamp or "无时间" }}</button>
+          {{ skills_vocab.get(action.skill, action.skill) }} · {{ action.result }}
+          {% if action.lineup_source == 'historical' %}· 历史阵容{% elif action.lineup_source == 'unknown' %}· 阵容未知{% endif %}
+          <form method="post" action="{{ url_for('post_action_edit', match_id=match.id, action_id=action.id) }}">
+            <input type="hidden" name="client_token" value="edit-{{ action.id }}">
+            <input type="hidden" name="team_side" value="{{ action.team_side }}">
+            <input type="hidden" name="skill" value="{{ action.skill }}">
+            <input type="hidden" name="player_id" value="{{ action.player_id }}">
+            <input type="hidden" name="opponent_id" value="{{ action.player_id }}">
+            <label>结果
+              <select name="result">
+                {% for code, label in skill_results[action.skill].items() %}
+                  <option value="{{ code }}" {% if action.result == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>时间<input name="video_timestamp" value="{{ action.video_timestamp }}"></label>
+            <button type="submit">保存修改</button>
+          </form>
+        </li>
+      {% else %}
+        <li>还没有动作。</li>
+      {% endfor %}
+    </ol>
+    <h2>补录到选定回合</h2>
+    <p>使用该回合保存的阵容。不会改成现在场上的人。没有快照时记为阵容未知。</p>
+    <form class="stack" method="post" action="{{ url_for('post_action', match_id=match.id) }}">
+      <input type="hidden" name="client_token" value="{{ action_token }}">
+      <label>回合
+        <select name="rally_id" required>
+          <option value="">选择回合</option>
+          {% for rally in rallies %}
+            <option value="{{ rally.id }}">第 {{ rally.set_number }} 局 R{{ rally.rotation or "—" }} · {{ rally.winner or "未结束" }}{% if rally.legacy %} · 旧版{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>方
+        <select name="team_side"><option value="us">我方</option><option value="them">对方</option></select>
+      </label>
+      <label>我方球员
+        <select name="player_id">
+          <option value="">未知</option>
+          {% for player in plan.players.values() %}<option value="{{ player.id }}">{{ player.name }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>对方
+        <select name="opponent_id">
+          <option value="">未知</option>
+          {% for opponent in opponents %}<option value="{{ opponent.id }}">{{ opponent.jersey }}号</option>{% endfor %}
+        </select>
+      </label>
+      <label>动作
+        <select name="skill">
+          {% for code, label in skills_vocab.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>结果
+        <select name="result">
+          {% for code, label in skill_results['attack'].items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+          {% for code, label in skill_results['pass'].items() %}<option value="{{ code }}">一传{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>线路
+        <select name="attack_line">
+          <option value="">不填</option>
+          {% for code, label in lines.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>起攻
+        <select name="start_zone">
+          <option value="">不填</option>
+          {% for code, label in starts.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>时间<input name="video_timestamp" placeholder="90 或 1:30"></label>
+      <label><input type="checkbox" name="confirm_lineup">用当前场上六人作为阵容，手动确认</label>
+      <button type="submit">保存动作</button>
+    </form>
+  </div>
+</div>
+<h2>回合</h2>
+<ol class="timeline">
+  {% for rally in rallies %}
+    <li>第 {{ rally.set_number }} 局 R{{ rally.rotation or "—" }} · {{ rally.winner or "未结束" }}{% if rally.legacy %} · 旧版数据{% endif %}</li>
+  {% endfor %}
+</ol>
+<h2>书签</h2>
+<ul>
+  {% for mark in bookmarks %}
+    <li>{{ mark.payload.tag }} {% if mark.payload.note %}{{ mark.payload.note }}{% endif %}</li>
+  {% else %}
+    <li>还没有书签。</li>
+  {% endfor %}
+</ul>
+<script>
+  const tape = document.querySelector("#tape");
+  const file = document.querySelector("#video-file");
+  const note = document.querySelector("#video-note");
+  const rate = document.querySelector("#rate");
+  file.addEventListener("change", () => {
+    const chosen = file.files && file.files[0];
+    if (!chosen) return;
+    tape.src = URL.createObjectURL(chosen);
+    note.textContent = "正在播放本机文件：" + chosen.name + "。刷新后需要重新选择。";
+  });
+  rate.addEventListener("change", () => { tape.playbackRate = Number(rate.value); });
+  document.addEventListener("keydown", (event) => {
+    if (event.target.closest("input, textarea, select")) return;
+    if (event.code === "Space") {
+      event.preventDefault();
+      if (tape.paused) tape.play(); else tape.pause();
+    }
+    if (event.code === "ArrowRight") tape.currentTime += 2;
+    if (event.code === "ArrowLeft") tape.currentTime -= 2;
+  });
+  document.querySelectorAll("[data-seek]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!tape.src) {
+        note.textContent = "先选择本地录像，再跳转。";
+        return;
+      }
+      const raw = (button.dataset.seek || "").trim();
+      let seconds = Number(raw);
+      if (raw.includes(":")) {
+        const parts = raw.split(":");
+        seconds = Number(parts[0]) * 60 + Number(parts[1]);
+      }
+      if (!Number.isFinite(seconds)) return;
+      tape.currentTime = seconds;
+      tape.play();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,246 @@
+/* Courtside workbench. Light panels, navy navigation, teal actions. */
+
+body.app {
+  background: #f4f6fa;
+  color: #142238;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+body.app .shell {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+body.app .nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 18px 12px;
+  background: #142238;
+  color: #d5deea;
+}
+
+body.app .nav a {
+  display: block;
+  margin: 2px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #d5deea;
+  text-decoration: none;
+}
+
+body.app .nav a[aria-current="page"],
+body.app .nav a:hover { background: #087f8c; color: white; }
+
+body.app .nav .brand {
+  margin-bottom: 12px;
+  color: white;
+  font-weight: 560;
+  text-decoration: none;
+}
+
+body.app .nav-label {
+  margin: 16px 10px 4px;
+  color: #8ea0b8;
+  font-size: 12px;
+}
+
+body.app .workspace { min-width: 0; }
+
+body.app .matchbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  padding: 10px 16px;
+  background: white;
+  border-bottom: 1px solid #e1e6ef;
+  font-variant-numeric: tabular-nums;
+}
+
+body.app .match-score { font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.app .match-score b { color: #1f7a4d; font-size: 1.35rem; font-weight: 560; }
+
+body.app main {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 16px 16px 96px;
+}
+
+body.app h1,
+body.app h2 { font-family: var(--sans); font-weight: 560; letter-spacing: 0; }
+
+body.app .scope,
+body.app .col,
+body.app .tactic,
+body.app .filters,
+body.app .opp-add,
+body.app .player-pane,
+body.app .card,
+body.app form.stack,
+body.app .table-wrap {
+  background: white;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+body.app .scope,
+body.app .filters,
+body.app .opp-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+}
+body.app .scope fieldset { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+body.app .scope p { margin: 0; color: #52627a; }
+
+body.app fieldset { border: 0; margin: 0; padding: 0; }
+body.app legend { font-size: 13px; color: #52627a; }
+
+body.app .bench {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 260px;
+  gap: 12px;
+  align-items: start;
+}
+
+body.app .col { padding: 12px; }
+body.app .roster { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+body.app .skill-pick, body.app .results, body.app .block-pick, body.app .side-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body.app .player {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px 8px;
+  border: 1px solid #e1e6ef;
+  border-radius: 8px;
+}
+
+body.app .player.on { background: #f4f6fa; }
+body.app .player.off { opacity: 0.72; }
+body.app .player:has(input:checked) { outline: 2px solid #087f8c; }
+
+body.app .results button,
+body.app .dock button,
+body.app .scope button,
+body.app .filters button,
+body.app .opp-add button,
+body.app button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #142238;
+  border-radius: 8px;
+  background: white;
+  color: #142238;
+  font: inherit;
+}
+
+body.app .results button,
+body.app .dock button.good {
+  background: #087f8c;
+  border-color: #087f8c;
+  color: white;
+}
+
+body.app .dock button.bad { background: #d3542a; border-color: #d3542a; color: white; }
+
+body.app .dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+}
+
+body.app .dock form, body.app .dock details { margin: 0; }
+body.app .tactic { padding: 12px; }
+body.app .tactic h2 { margin-top: 0; font-size: 1.15rem; }
+body.app .tactic.blocked { border-color: #d3542a; }
+body.app .log { margin: 8px 0; padding-left: 1.1rem; }
+body.app .mini { margin: 0; padding-left: 1.1rem; }
+body.app table.stats { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.app table.stats th, body.app table.stats td { padding: 8px; border-bottom: 1px solid #e1e6ef; text-align: left; vertical-align: top; }
+body.app table.stats span { display: block; color: #52627a; font-size: 12px; }
+body.app .scout svg { width: 100%; max-width: 520px; height: auto; background: white; }
+body.app .arrow { fill: none; }
+body.app .arrow.kill, body.app .arrow.ace, body.app .arrow.in_system { stroke: #1f7a4d; }
+body.app .arrow.error, body.app .arrow.blocked, body.app .arrow.fault { stroke: #d3542a; }
+body.app .arrow.continue, body.app .arrow.half, body.app .arrow.touch { stroke: #087f8c; }
+body.app .arrow.unknown { stroke: #8ea0b8; }
+body.app .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 4px; }
+body.app .swatch.good { background: #1f7a4d; }
+body.app .swatch.bad { background: #d3542a; }
+body.app .swatch.mid { background: #087f8c; }
+body.app .legend { display: flex; gap: 12px; padding: 0; list-style: none; }
+body.app .review-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); gap: 12px; }
+body.app .player-pane { padding: 12px; background: #142238; color: white; border-radius: 10px; }
+body.app .player-pane video { width: 100%; background: black; }
+body.app .text-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  background: #087f8c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+body.app .bench:not(:has(input[name="team_side"][value="them"]:checked)) .their-roster { display: none; }
+body.app .bench:has(input[name="team_side"][value="them"]:checked) .our-roster { display: none; }
+body.app .bench:not(:has(input[name="skill"][value="pass"]:checked)) .for-pass,
+body.app .bench:not(:has(input[name="skill"][value="attack"]:checked)) .for-attack,
+body.app .bench:not(:has(input[name="skill"][value="block"]:checked)) .for-block,
+body.app .bench:not(:has(input[name="skill"][value="serve"]:checked)) .for-serve,
+body.app .bench:not(:has(input[name="skill"][value="dig"]:checked)) .for-dig,
+body.app .bench:not(:has(input[name="skill"][value="set"]:checked)) .for-set { display: none; }
+
+@media (max-width: 1180px) {
+  body.app .shell { grid-template-columns: 1fr; }
+  body.app .nav {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    height: auto;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 8px;
+  }
+  body.app .nav .brand, body.app .nav-label { display: none; }
+  body.app .nav a { white-space: nowrap; }
+  body.app .matchbar { top: 52px; }
+  body.app .bench { grid-template-columns: 200px minmax(0, 1fr) 220px; }
+  body.app .review-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  body.app .bench { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  body.app main { padding: 12px 12px 108px; }
+  body.app .results button, body.app .dock button { flex: 1 1 42%; }
+}

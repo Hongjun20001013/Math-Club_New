@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>对手分析</h1>
+<form class="opp-add" method="post" action="{{ url_for('post_opponent', match_id=match.id) }}">
+  <label>号码<input name="jersey" inputmode="numeric" required></label>
+  <label>名字<input name="name"></label>
+  <button type="submit">建档</button>
+</form>
+{% if opponents %}
+  <form class="filters" method="get">
+    <label>攻手
+      <select name="player">
+        {% for opponent in opponents %}
+          <option value="{{ opponent.id }}" {% if filters.player == opponent.id %}selected{% endif %}>{{ opponent.jersey }}号 {{ opponent.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>起攻
+      <select name="start">
+        <option value="">全部</option>
+        {% for code, label in starts.items() %}<option value="{{ code }}" {% if filters.start == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>线路
+      <select name="line">
+        <option value="">全部</option>
+        {% for code, label in lines.items() %}<option value="{{ code }}" {% if filters.line == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>阶段
+      <select name="phase">
+        <option value="">全部</option>
+        {% for code, label in phases.items() %}<option value="{{ code }}" {% if filters.phase == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>传球
+      <select name="set_quality">
+        <option value="">全部</option>
+        {% for code, label in set_qualities.items() %}<option value="{{ code }}" {% if filters.set_quality == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <button type="submit">看线路</button>
+  </form>
+  <figure class="scout">
+    <svg viewBox="0 0 100 100" role="img" aria-label="对方进攻线路">
+      <rect x="8" y="4" width="84" height="92" fill="#F4F6FA" stroke="#142238"></rect>
+      <line x1="8" y1="18" x2="92" y2="18" stroke="#142238" stroke-width="1.2"></line>
+      {% for arrow in arrows %}
+        <a href="{{ url_for('opponents_page', match_id=match.id, player=filters.player, start=arrow.start, line=arrow.line) }}">
+          <line class="arrow {{ arrow.result }}" x1="{{ arrow.x1 }}" y1="{{ arrow.y1 }}" x2="{{ arrow.x2 }}" y2="{{ arrow.y2 }}" stroke-width="{{ arrow.width }}"></line>
+        </a>
+      {% endfor %}
+    </svg>
+    <figcaption>
+      箭头粗细是次数。颜色：得分绿，失误橙红，其他蓝。对方左侧画在画面右侧。
+      勾了换边的动作会镜像。落点不拿来反推线路。
+      已判断 {{ attack.attempts }}，未知 {{ attack.unknown }}，成功率 {{ attack.success }}。
+    </figcaption>
+  </figure>
+  <ul class="legend">
+    <li><i class="swatch good"></i>得分</li>
+    <li><i class="swatch bad"></i>失误或被拦</li>
+    <li><i class="swatch mid"></i>继续比赛</li>
+  </ul>
+  <ol class="log">
+    {% for action in actions %}
+      <li>{{ starts.get(action.start_zone, "未知") }} · {{ lines.get(action.attack_line, "未知") }} · {{ attack_labels.get(action.result, action.result) }}{% if action.view_flip %} · 换边{% endif %}{% if action.video_timestamp %} · {{ action.video_timestamp }}{% endif %}</li>
+    {% else %}
+      <li>这个筛选下没有扣球。</li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p>先给对方攻手建一个号码。图上一次只看一名攻手。</p>
+{% endif %}
+{% endblock %}
