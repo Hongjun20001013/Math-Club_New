@@ -508,7 +508,7 @@ def build_suggestion(plan: TeamPlan, state: MatchState, sample_size: int = 0) ->
     if state.serving == "us":
         serve = card.serve
         if serve.target_type == "unset" or not serve.target_label.strip():
-            action = f"{server} 发球。这一轮没有已确认的追发目标，用基础预案，不要临时编一个目标。"
+            action = "发球预案：基础落点"
             basis = serve.evidence or "暂无对手证据"
         else:
             kind = "人" if serve.target_type == "person" else "区域"

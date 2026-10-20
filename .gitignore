@@ -2,6 +2,7 @@
 .venv-unit3
 __pycache__
 *.db
+*.db.bak
 .env
 .vendor_fpdf2
 .DS_Store

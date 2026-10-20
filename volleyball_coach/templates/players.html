@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>球员表现</h1>
+<form class="filters" method="get">
+  <label>局数<input name="set" value="{{ filters.set }}" inputmode="numeric"></label>
+  <label>轮次<input name="rotation" value="{{ filters.rotation }}" inputmode="numeric"></label>
+  <label>阶段
+    <select name="phase">
+      <option value="">全部</option>
+      {% for code, label in phases.items() %}<option value="{{ code }}" {% if filters.phase == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit">筛选</button>
+</form>
+<p>分母只含已判断的次数。未知单独列出，不记成 0。记录范围见每条动作。样本少也显示次数和比例。</p>
+<p data-block-team="{{ team_block_kills }}">团队拦死 {{ team_block_kills }}。同一次拦网只算 1 个团队得分，个人栏是参与次数。</p>
+<details>
+  <summary>一传怎么判</summary>
+  <ul>
+    {% for text in standards.values() %}<li>{{ text }}</li>{% endfor %}
+  </ul>
+</details>
+<div class="table-wrap">
+  <table class="stats">
+    <tr>
+      <th><a href="?sort=name">球员</a></th>
+      <th>一传</th>
+      <th>到位率</th>
+      <th>直接失误率</th>
+      <th><a href="?sort=attack&dir=desc">扣球</a></th>
+      <th>成功率</th>
+      <th>净效率</th>
+      <th>拦网参与</th>
+    </tr>
+    {% for row in rows %}
+      <tr data-player="{{ row.id }}" data-pass="{{ row.passing.attempts }}" data-attack="{{ row.attack.attempts }}" data-block="{{ row.block.events }}">
+        <td>{{ row.name }}</td>
+        <td>
+          <a href="{{ url_for('players_page', match_id=match.id, player=row.id, skill='pass') }}">{{ row.passing.attempts }}</a>
+          <span>未知 {{ row.passing.unknown }} · 分母 {{ row.passing.judged }}</span>
+        </td>
+        <td>{{ row.passing.in_rate }}</td>
+        <td>{{ row.passing.error_rate }}</td>
+        <td>
+          <a href="{{ url_for('players_page', match_id=match.id, player=row.id, skill='attack') }}">{{ row.attack.attempts }}</a>
+          <span>得分 {{ row.attack.kills }} · 失误 {{ row.attack.errors }} · 被拦死 {{ row.attack.blocked }} · 继续 {{ row.attack.continue }} · 未知 {{ row.attack.unknown }}</span>
+        </td>
+        <td>{{ row.attack.success }}</td>
+        <td>{{ row.attack.efficiency }}</td>
+        <td>
+          <a href="{{ url_for('players_page', match_id=match.id, player=row.id, skill='block') }}">{{ row.block.events }}</a>
+          <span>拦死 {{ row.block.kills }} · 未知 {{ row.block.unknown }}</span>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<p>成功率＝得分÷已判断进攻。净效率＝（得分－失误－被拦死）÷已判断进攻。被拦死不重复算进失误。没有单列拦网成功率，因为没有可靠的个人尝试分母。</p>
+{% if show_actions %}
+  <h2>对应动作</h2>
+  <ol class="log">
+    {% for action in actions %}
+      <li data-lineup-source="{{ action.lineup_source }}" data-lineup-ids="{% for person in action.lineup %}{{ person.player_id }}{% if not loop.last %},{% endif %}{% endfor %}">
+        第 {{ action.set_number }} 局 R{{ action.rotation or "—" }}
+        · {{ skills_vocab.get(action.skill, action.skill) }}
+        · {{ action.result }}
+        · {{ scopes.get(action.sample_scope, action.sample_scope) }}
+        {% if action.video_timestamp %}· {{ action.video_timestamp }}{% endif %}
+        {% if action.lineup_source == 'historical' %}· 历史阵容{% elif action.lineup_source == 'unknown' %}· 阵容未知{% elif action.lineup_source == 'manual' %}· 手动确认阵容{% endif %}
+      </li>
+    {% else %}
+      <li>这个筛选下没有动作。</li>
+    {% endfor %}
+  </ol>
+{% endif %}
+<p>覆盖：新回合 {{ coverage.closed }}，旧版回合 {{ coverage.legacy }}。旧版数据没有个人动作。</p>
+{% endblock %}

@@ -6,28 +6,50 @@
   <title>{{ title or "排球临场指挥" }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='workbench.css') }}">
 </head>
-<body>
-  <header class="top">
-    <a class="brand" href="{{ url_for('home') }}">
-      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-        <circle cx="16" cy="16" r="13.2" fill="#B9D9EB" stroke="#0C2340" stroke-width="1.6"/>
-        <path d="M16 3.2C12.2 9 12.2 23 16 28.8M4.6 11.2C11 13.2 14.2 14.6 16 16c1.8 1.6 5.4 4.2 11.4 5.2M4.6 20.8C11 18.8 14.2 17.4 16 16c1.8-1.6 5.4-4.2 11.4-5.2" fill="none" stroke="#0C2340" stroke-width="1.15"/>
-      </svg>
-      排球临场指挥
-    </a>
-    <nav>
-      <a href="{{ url_for('dictionary') }}">标注标准</a>
-      <a href="{{ url_for('drills') }}">验收</a>
-    </nav>
-  </header>
-  <main>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endwith %}
-    {% block body %}{% endblock %}
-  </main>
+<body class="app">
+  <div class="shell">
+    <aside class="nav">
+      <a class="brand" href="{{ url_for('home') }}">排球临场指挥</a>
+      <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>比赛中心</a>
+      {% if nav_match %}
+        <a href="{{ url_for('live', match_id=nav_match['id']) }}" {% if request.endpoint == 'live' %}aria-current="page"{% endif %}>实时记录</a>
+        <a href="{{ url_for('players_page', match_id=nav_match['id']) }}" {% if request.endpoint == 'players_page' %}aria-current="page"{% endif %}>球员表现</a>
+        <a href="{{ url_for('opponents_page', match_id=nav_match['id']) }}" {% if request.endpoint == 'opponents_page' %}aria-current="page"{% endif %}>对手分析</a>
+        <a href="{{ url_for('video_page', match_id=nav_match['id']) }}" {% if request.endpoint == 'video_page' %}aria-current="page"{% endif %}>录像复盘</a>
+        <a href="{{ url_for('team_page', team_id=nav_match['team_id']) }}" {% if request.endpoint == 'team_page' %}aria-current="page"{% endif %}>球队设置</a>
+      {% else %}
+        <a href="{{ url_for('home') }}">实时记录</a>
+        <a href="{{ url_for('home') }}">球员表现</a>
+        <a href="{{ url_for('home') }}">对手分析</a>
+        <a href="{{ url_for('home') }}">录像复盘</a>
+        <a href="{{ url_for('home') }}">球队设置</a>
+      {% endif %}
+      <p class="nav-label">帮助</p>
+      <a href="{{ url_for('dictionary') }}" {% if request.endpoint == 'dictionary' %}aria-current="page"{% endif %}>标注标准</a>
+      <a href="{{ url_for('drills') }}" {% if request.endpoint == 'drills' %}aria-current="page"{% endif %}>验收</a>
+    </aside>
+    <div class="workspace">
+      {% if nav_state %}
+        <header class="matchbar">
+          <span>{{ nav_plan.name }}{% if nav_match['opponent'] %} · {{ nav_match['opponent'] }}{% endif %}</span>
+          <span>第 {{ nav_state.set_index }} 局</span>
+          <span class="match-score">我方 <b>{{ nav_state.score_us }}</b> · 对方 {{ nav_state.score_them }}</span>
+          <span class="pill">{{ "我方发球" if nav_state.serving == "us" else "对方发球" }}</span>
+          <span class="pill">R{{ nav_state.rotation }}</span>
+          <span class="pill">对方轮次：未知</span>
+        </header>
+      {% endif %}
+      <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}" role="status">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+      </main>
+    </div>
+  </div>
 </body>
 </html>

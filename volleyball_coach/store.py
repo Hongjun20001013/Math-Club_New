@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -155,11 +156,50 @@ CREATE TABLE IF NOT EXISTS rallies (
   note TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS actions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  match_id TEXT NOT NULL,
+  rally_id INTEGER NOT NULL,
+  client_token TEXT NOT NULL,
+  sequence INTEGER NOT NULL,
+  team_side TEXT NOT NULL,
+  player_id TEXT NOT NULL DEFAULT '',
+  skill TEXT NOT NULL,
+  result TEXT NOT NULL,
+  quality TEXT NOT NULL DEFAULT '',
+  start_zone TEXT NOT NULL DEFAULT '',
+  attack_line TEXT NOT NULL DEFAULT '',
+  end_zone TEXT NOT NULL DEFAULT '',
+  phase TEXT NOT NULL DEFAULT '',
+  set_quality TEXT NOT NULL DEFAULT '',
+  video_timestamp TEXT NOT NULL DEFAULT '',
+  confirm_status TEXT NOT NULL DEFAULT 'confirmed',
+  lineup_source TEXT NOT NULL DEFAULT 'live',
+  lineup_json TEXT NOT NULL DEFAULT '[]',
+  view_flip INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  UNIQUE(match_id, client_token)
+);
+
+CREATE TABLE IF NOT EXISTS action_players (
+  action_id INTEGER NOT NULL,
+  player_id TEXT NOT NULL,
+  PRIMARY KEY (action_id, player_id)
+);
+
+CREATE TABLE IF NOT EXISTS opponents (
+  id TEXT PRIMARY KEY,
+  match_id TEXT NOT NULL,
+  jersey TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  UNIQUE(match_id, jersey)
+);
 """
 
 
 def now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
 
 
 def new_id(prefix: str) -> str:
@@ -170,6 +210,7 @@ class Store:
     def __init__(self, path: str | Path):
         self.path = str(path)
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        self._backup_once()
         self.conn = sqlite3.connect(self.path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
@@ -179,11 +220,44 @@ class Store:
     def close(self) -> None:
         self.conn.close()
 
+    def _backup_once(self) -> None:
+        """Copy an existing log before the action tables are added. A second start does not overwrite it."""
+        path = Path(self.path)
+        if not path.exists() or path.stat().st_size == 0:
+            return
+        probe = sqlite3.connect(self.path)
+        try:
+            found = probe.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'actions'"
+            ).fetchone()
+        finally:
+            probe.close()
+        if found:
+            return
+        backup = path.with_suffix(path.suffix + ".bak")
+        if not backup.exists():
+            shutil.copy2(path, backup)
+
+    def _ensure_column(self, table: str, column: str, declaration: str) -> None:
+        have = {row["name"] for row in self.conn.execute(f"PRAGMA table_info({table})")}
+        if column not in have:
+            self.conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {declaration}")
+
     def _migrate(self) -> None:
-        have = {row["name"] for row in self.conn.execute("PRAGMA table_info(rallies)")}
         for column in ("block_touch", "defense_quality", "attack_result", "severe_error", "severe_kind"):
-            if column not in have:
-                self.conn.execute(f"ALTER TABLE rallies ADD COLUMN {column} TEXT")
+            self._ensure_column("rallies", column, "TEXT")
+        self._ensure_column("rallies", "status", "TEXT NOT NULL DEFAULT 'closed'")
+        self._ensure_column("rallies", "legacy", "INTEGER NOT NULL DEFAULT 1")
+        self._ensure_column("rallies", "score_us_before", "INTEGER")
+        self._ensure_column("rallies", "score_them_before", "INTEGER")
+        self._ensure_column("rallies", "score_us_after", "INTEGER")
+        self._ensure_column("rallies", "score_them_after", "INTEGER")
+        self._ensure_column("rallies", "their_rotation", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("rallies", "rally_index", "INTEGER")
+        self._ensure_column("rallies", "scored", "INTEGER NOT NULL DEFAULT 0")
+        self._ensure_column("rallies", "lineup_source", "TEXT NOT NULL DEFAULT 'legacy'")
+        self._ensure_column("matches", "record_depth", "TEXT NOT NULL DEFAULT 'light'")
+        self._ensure_column("matches", "sample_scope", "TEXT NOT NULL DEFAULT 'sample'")
         self._backfill_schemes()
         self.conn.commit()
 
@@ -718,6 +792,255 @@ class Store:
             ),
         )
         self.conn.commit()
+
+    def set_recording(self, match_id: str, depth: str, scope: str) -> None:
+        self.conn.execute(
+            "UPDATE matches SET record_depth = ?, sample_scope = ? WHERE id = ?",
+            (depth, scope, match_id),
+        )
+        self.conn.commit()
+
+    def open_rally(self, match_id: str) -> dict | None:
+        row = self.conn.execute(
+            "SELECT * FROM rallies WHERE match_id = ? AND status = 'open' ORDER BY id DESC LIMIT 1",
+            (match_id,),
+        ).fetchone()
+        return self._rally(row) if row else None
+
+    def rally(self, match_id: str, rally_id: int) -> dict | None:
+        row = self.conn.execute(
+            "SELECT * FROM rallies WHERE match_id = ? AND id = ?",
+            (match_id, rally_id),
+        ).fetchone()
+        return self._rally(row) if row else None
+
+    def _rally(self, row: sqlite3.Row) -> dict:
+        item = dict(row)
+        item["bench_ids"] = json.loads(row["bench_json"] or "[]")
+        item["lineup"] = json.loads(row["lineup_json"] or "[]")
+        return item
+
+    def insert_open_rally(self, match_id: str, fields: dict) -> int:
+        index = self.conn.execute(
+            "SELECT COALESCE(MAX(rally_index), 0) + 1 AS n FROM rallies WHERE match_id = ?",
+            (match_id,),
+        ).fetchone()["n"]
+        cursor = self.conn.execute(
+            """
+            INSERT INTO rallies (
+              match_id, set_number, rotation, serving_side, winner, pass_quality,
+              server_label, target_type, target_label, actual_receiver, actual_zone,
+              lineup_json, bench_json, video_timestamp, sample_scope, note, created_at,
+              status, legacy, score_us_before, score_them_before, their_rotation,
+              rally_index, scored, lineup_source
+            ) VALUES (?, ?, ?, ?, '', NULL, '', '', '', '', '', ?, '[]', '', ?, '', ?, 'open', 0, ?, ?, 'unknown', ?, 0, 'live')
+            """,
+            (
+                match_id,
+                fields["set_number"],
+                fields["rotation"],
+                fields["serving_side"],
+                json.dumps(fields["lineup"], ensure_ascii=False),
+                fields["sample_scope"],
+                now(),
+                fields["score_us_before"],
+                fields["score_them_before"],
+                index,
+            ),
+        )
+        self.conn.commit()
+        return int(cursor.lastrowid)
+
+    def close_rally(self, match_id: str, rally_id: int, winner: str, score_us_after: int, score_them_after: int, scored: int) -> None:
+        self.conn.execute(
+            """
+            UPDATE rallies
+            SET status = 'closed', winner = ?, score_us_after = ?, score_them_after = ?, scored = ?
+            WHERE match_id = ? AND id = ?
+            """,
+            (winner, score_us_after, score_them_after, scored, match_id, rally_id),
+        )
+        self.conn.commit()
+
+    def reopen_rally(self, match_id: str, rally_id: int) -> None:
+        self.conn.execute(
+            """
+            UPDATE rallies
+            SET status = 'open', winner = '', score_us_after = NULL, score_them_after = NULL, scored = 0
+            WHERE match_id = ? AND id = ?
+            """,
+            (match_id, rally_id),
+        )
+        self.conn.commit()
+
+    def add_action(self, match_id: str, fields: dict, participants: list[str]) -> tuple[int, bool]:
+        existing = self.conn.execute(
+            "SELECT id FROM actions WHERE match_id = ? AND client_token = ?",
+            (match_id, fields["client_token"]),
+        ).fetchone()
+        if existing:
+            return int(existing["id"]), False
+        sequence = self.conn.execute(
+            "SELECT COALESCE(MAX(sequence), 0) + 1 AS n FROM actions WHERE rally_id = ?",
+            (fields["rally_id"],),
+        ).fetchone()["n"]
+        cursor = self.conn.execute(
+            """
+            INSERT INTO actions (
+              match_id, rally_id, client_token, sequence, team_side, player_id, skill, result,
+              quality, start_zone, attack_line, end_zone, phase, set_quality, video_timestamp,
+              confirm_status, lineup_source, lineup_json, view_flip, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                match_id,
+                fields["rally_id"],
+                fields["client_token"],
+                sequence,
+                fields["team_side"],
+                fields.get("player_id") or "",
+                fields["skill"],
+                fields["result"],
+                fields.get("quality") or "",
+                fields.get("start_zone") or "",
+                fields.get("attack_line") or "",
+                fields.get("end_zone") or "",
+                fields.get("phase") or "",
+                fields.get("set_quality") or "",
+                fields.get("video_timestamp") or "",
+                fields.get("confirm_status") or "confirmed",
+                fields.get("lineup_source") or "live",
+                json.dumps(fields.get("lineup") or [], ensure_ascii=False),
+                1 if fields.get("view_flip") else 0,
+                now(),
+            ),
+        )
+        action_id = int(cursor.lastrowid)
+        for player_id in dict.fromkeys(participants):
+            if player_id:
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO action_players (action_id, player_id) VALUES (?, ?)",
+                    (action_id, player_id),
+                )
+        self.conn.commit()
+        return action_id, True
+
+    def update_action(self, match_id: str, action_id: int, fields: dict, participants: list[str] | None) -> bool:
+        row = self.conn.execute(
+            "SELECT id FROM actions WHERE match_id = ? AND id = ?",
+            (match_id, action_id),
+        ).fetchone()
+        if row is None:
+            return False
+        self.conn.execute(
+            """
+            UPDATE actions
+            SET player_id = ?, result = ?, quality = ?, start_zone = ?, attack_line = ?, end_zone = ?,
+                phase = ?, set_quality = ?, video_timestamp = ?, view_flip = ?, confirm_status = ?
+            WHERE match_id = ? AND id = ?
+            """,
+            (
+                fields.get("player_id") or "",
+                fields["result"],
+                fields.get("quality") or "",
+                fields.get("start_zone") or "",
+                fields.get("attack_line") or "",
+                fields.get("end_zone") or "",
+                fields.get("phase") or "",
+                fields.get("set_quality") or "",
+                fields.get("video_timestamp") or "",
+                1 if fields.get("view_flip") else 0,
+                fields.get("confirm_status") or "confirmed",
+                match_id,
+                action_id,
+            ),
+        )
+        if participants is not None:
+            self.conn.execute("DELETE FROM action_players WHERE action_id = ?", (action_id,))
+            for player_id in dict.fromkeys(participants):
+                if player_id:
+                    self.conn.execute(
+                        "INSERT INTO action_players (action_id, player_id) VALUES (?, ?)",
+                        (action_id, player_id),
+                    )
+        self.conn.commit()
+        return True
+
+    def delete_action(self, match_id: str, action_id: int) -> dict | None:
+        row = self.conn.execute(
+            "SELECT * FROM actions WHERE match_id = ? AND id = ?",
+            (match_id, action_id),
+        ).fetchone()
+        if row is None:
+            return None
+        self.conn.execute("DELETE FROM action_players WHERE action_id = ?", (action_id,))
+        self.conn.execute("DELETE FROM actions WHERE id = ?", (action_id,))
+        rally_id = row["rally_id"]
+        remaining = self.conn.execute(
+            "SELECT COUNT(*) AS n FROM actions WHERE rally_id = ?",
+            (rally_id,),
+        ).fetchone()["n"]
+        rally = self.conn.execute("SELECT status FROM rallies WHERE id = ?", (rally_id,)).fetchone()
+        removed_rally = False
+        if rally and rally["status"] == "open" and remaining == 0:
+            self.conn.execute("DELETE FROM rallies WHERE id = ?", (rally_id,))
+            removed_rally = True
+        self.conn.commit()
+        item = dict(row)
+        item["removed_rally"] = removed_rally
+        return item
+
+    def actions_for(self, match_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            """
+            SELECT actions.*, rallies.set_number, rallies.rotation, rallies.sample_scope,
+                   rallies.status AS rally_status, rallies.legacy, rallies.serving_side, rallies.winner
+            FROM actions
+            JOIN rallies ON rallies.id = actions.rally_id
+            WHERE actions.match_id = ?
+            ORDER BY actions.rally_id, actions.sequence, actions.id
+            """,
+            (match_id,),
+        )
+        parsed = []
+        for row in rows:
+            item = dict(row)
+            item["lineup"] = json.loads(row["lineup_json"] or "[]")
+            item["view_flip"] = bool(row["view_flip"])
+            parsed.append(item)
+        if not parsed:
+            return parsed
+        ids = [item["id"] for item in parsed]
+        marks = {item["id"]: [] for item in parsed}
+        query = f"SELECT action_id, player_id FROM action_players WHERE action_id IN ({','.join('?' for _ in ids)})"
+        for link in self.conn.execute(query, ids):
+            marks[link["action_id"]].append(link["player_id"])
+        for item in parsed:
+            item["participants"] = marks[item["id"]]
+        return parsed
+
+    def opponents_for(self, match_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT id, jersey, name FROM opponents WHERE match_id = ? ORDER BY CAST(jersey AS INTEGER), jersey",
+            (match_id,),
+        )
+        return [dict(row) for row in rows]
+
+    def ensure_opponent(self, match_id: str, jersey: str, name: str = "") -> dict:
+        jersey = jersey.strip()
+        row = self.conn.execute(
+            "SELECT id, jersey, name FROM opponents WHERE match_id = ? AND jersey = ?",
+            (match_id, jersey),
+        ).fetchone()
+        if row:
+            return dict(row)
+        opponent_id = new_id("opp")
+        self.conn.execute(
+            "INSERT INTO opponents (id, match_id, jersey, name) VALUES (?, ?, ?, ?)",
+            (opponent_id, match_id, jersey, name.strip()),
+        )
+        self.conn.commit()
+        return {"id": opponent_id, "jersey": jersey, "name": name.strip()}
 
 
 def plan_for_match(store: Store, match: sqlite3.Row) -> TeamPlan:
