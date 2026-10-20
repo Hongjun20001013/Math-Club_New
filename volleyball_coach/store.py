@@ -120,7 +120,9 @@ CREATE TABLE IF NOT EXISTS matches (
   status TEXT NOT NULL,
   locked_pairs_json TEXT NOT NULL,
   plan_json TEXT NOT NULL,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  backup_scheme_id TEXT NOT NULL DEFAULT '',
+  backup_json TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS events (
@@ -293,6 +295,8 @@ class Store:
         self._ensure_column("matches", "sample_scope", "TEXT NOT NULL DEFAULT 'sample'")
         self._ensure_column("matches", "tactic_id", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("matches", "tactic_json", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("matches", "backup_scheme_id", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("matches", "backup_json", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("rallies", "plan_execution", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("schemes", "system", "TEXT NOT NULL DEFAULT ''")
         self._ensure_column("schemes", "setters_json", "TEXT NOT NULL DEFAULT '[]'")
@@ -954,14 +958,17 @@ class Store:
         serving: str,
         tactic_id: str = "",
         tactic_json: str = "",
+        backup_scheme_id: str = "",
+        backup_json: str = "",
     ) -> str:
         match_id = new_id("m")
         created = now()
         self.conn.execute(
             """
             INSERT INTO matches (
-              id, team_id, opponent, mode, status, locked_pairs_json, plan_json, created_at, tactic_id, tactic_json
-            ) VALUES (?, ?, ?, ?, 'live', ?, ?, ?, ?, ?)
+              id, team_id, opponent, mode, status, locked_pairs_json, plan_json, created_at, tactic_id, tactic_json,
+              backup_scheme_id, backup_json
+            ) VALUES (?, ?, ?, ?, 'live', ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 match_id,
@@ -973,6 +980,8 @@ class Store:
                 created,
                 tactic_id,
                 tactic_json,
+                backup_scheme_id,
+                backup_json,
             ),
         )
         self.append_event(

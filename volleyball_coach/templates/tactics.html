@@ -3,7 +3,7 @@
 <p class="row-links">
   <a href="{{ url_for('team_page', team_id=plan.team_id) }}">{{ plan.name }}</a>
   <a href="{{ url_for('board', team_id=plan.team_id, scheme=scheme.id if scheme else none) }}">六人顺序</a>
-  {% if scheme %}<a href="{{ url_for('new_match', team_id=plan.team_id) }}">准备比赛</a>{% endif %}
+  {% if scheme %}<a href="{{ url_for('new_match', team_id=plan.team_id, scheme=scheme.id, tactic=tactic.id if tactic and published else none) }}">准备比赛</a>{% endif %}
 </p>
 <header class="tactic-head">
   <div>

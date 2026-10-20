@@ -106,6 +106,77 @@ def default_marks(plan: TeamPlan, locked_pairs: set[frozenset[str]]) -> list[dic
     return marks
 
 
+def _front_defender(plan: TeamPlan, card) -> str:
+    for slot, view in card.slots.items():
+        player = plan.players.get(view.occupant_id)
+        if player and player.role == "defender" and slot in FRONT_SLOTS:
+            return f"{player.name} 换到前排。防守替补不占前排。"
+    return ""
+
+
+def prep_rows(plan: TeamPlan, cards: dict, marks: list[dict], locked: set[frozenset[str]]) -> list[dict]:
+    """Six-rotation check for the match that is about to start.
+
+    Status stays computed. A locked sub that leaves nobody setting, or puts a
+    defender in the front row, is a conflict. Unlocked windows are not applied.
+    """
+    rows = []
+    for number in range(1, 7):
+        card = cards[number]
+        receive = [mark for mark in marks if int(mark["rotation"]) == number and mark["phase"] == "receive"]
+        status = rotation_status(card, receive)
+        overrides = {}
+        if card.slots:
+            origins = {view.origin_id for view in card.slots.values()}
+            for window in plan.sub_windows:
+                if number not in window.active_rotations:
+                    continue
+                if frozenset((window.player_out, window.player_in)) not in locked:
+                    continue
+                if window.player_out not in origins:
+                    continue
+                overrides[window.player_out] = window.player_in
+        after_line = ""
+        if overrides:
+            after = build_card(plan, number, overrides, locked)
+            swapped = "，".join(
+                f"{plan.name_of(incoming)} 换 {plan.name_of(outgoing)}"
+                for outgoing, incoming in overrides.items()
+            )
+            server = after.slots[1].occupant_name if after.slots else "未指定"
+            after_line = f"锁定后 {swapped}。二传 {after.setter_name}，补位 {after.backup_name}，发球 {server}。"
+            outgoing = set(overrides)
+            if after.structural:
+                problem = after.structural[0]
+            else:
+                problem = _front_defender(plan, after)
+            if not problem and (
+                not after.setter_id
+                or not after.backup_id
+                or after.setter_id in outgoing
+                or after.backup_id in outgoing
+            ):
+                problem = "换上以后组织或补位接不上。"
+            if problem:
+                status = "存在冲突"
+                after_line = f"{after_line} {problem}"
+        serve = card.serve
+        rows.append(
+            {
+                "rotation": number,
+                "status": status,
+                "setter": card.setter_name,
+                "server": card.slots[1].occupant_name if card.slots else "未指定",
+                "backup": card.backup_name,
+                "after": after_line,
+                "serve_label": serve.target_label if serve.target_type != "unset" and serve.target_label.strip() else "",
+                "block_note": (serve.block_note or "").strip(),
+                "card": card,
+            }
+        )
+    return rows
+
+
 def rotation_status(card, receive_marks: list[dict]) -> str:
     """Computed from the lineup and the receive marks. There is no ready checkbox."""
     if not card.slots:
@@ -204,6 +275,18 @@ def snapshot_payload(tactic: dict, marks: list[dict], notes: list[dict], plan: T
             for note in notes
         ],
     }
+
+
+def load_backup(raw: str) -> dict | None:
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(data, dict) or not data.get("name"):
+        return None
+    return data
 
 
 def load_snapshot(raw: str) -> dict | None:

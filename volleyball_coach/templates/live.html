@@ -136,6 +136,9 @@
   </section>
 
   <section class="col">
+    {% if backup_call %}
+      <p class="fine">备用阵容 {{ backup_call.name }}{% if backup_call.system %} · {{ backup_call.system }}{% endif %}。开场没有换成这一套。</p>
+    {% endif %}
     {% if plan_snapshot %}
       <article class="plan-call">
         <p>本场预案 · {{ plan_snapshot.name }} · {{ plan_phase_label }} · {{ plan_snapshot.position_kind }}</p>

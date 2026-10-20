@@ -68,6 +68,7 @@ from volleyball_coach.model import (
     Rules,
     ServePlan,
     TeamPlan,
+    role_chip,
 )
 from volleyball_coach.report import build_report, execution_of, skill_summary
 from volleyball_coach.seed import MENS_TEAM_ID
@@ -80,8 +81,10 @@ from volleyball_coach.tactics import (
     execution_counts,
     execution_sentence,
     identity_drift,
+    load_backup,
     load_snapshot,
     position_kind,
+    prep_rows,
     present_marks,
     preview_marks,
     rotation_status,
@@ -728,17 +731,99 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.get("/teams/<team_id>/matches/new")
     def new_match(team_id: str):
         plan = team_or_404(team_id)
-        published = [item for item in store().tactics_for_team(team_id) if item["status"] == "published"]
-        return render_template("match_new.html", plan=plan, court_slots=COURT_SLOTS, published_tactics=published)
+        scheme = plan.scheme_by_id(request.args.get("scheme")) or plan.default_scheme()
+        library = store().tactics_for_team(team_id)
+        published = [
+            item
+            for item in library
+            if item["status"] == "published" and scheme and item["scheme_id"] == scheme.id
+        ]
+        asked = (request.args.get("tactic") or "").strip()
+        tactic = next((item for item in published if item["id"] == asked), None)
+        backup = plan.scheme_by_id(request.args.get("backup"))
+        if backup is None or scheme is None or backup.id == scheme.id or len(backup.order) != 6:
+            backup = None
+        try:
+            rotation = int(request.args.get("rotation") or "1")
+        except ValueError:
+            rotation = 1
+        if rotation not in range(1, 7):
+            rotation = 1
+        view = apply_system(plan, scheme) if scheme else plan
+        locked = confirmed_pairs(plan)
+        cards = {number: build_card(view, number, {}, locked) for number in range(1, 7)}
+        marks = store().tactic_marks(tactic["id"]) if tactic else []
+        rows = prep_rows(view, cards, marks, locked)
+        current = rows[rotation - 1]
+        if tactic:
+            phase_marks = [
+                mark for mark in marks if int(mark["rotation"]) == rotation and mark["phase"] == "receive"
+            ]
+        else:
+            phase_marks = preview_marks(cards[rotation], rotation, "receive")
+        order = list(scheme.order) if scheme and len(scheme.order) == 6 else view.base_order()
+        six = []
+        for slot, player_id in enumerate(order, start=1):
+            player = plan.players.get(player_id)
+            six.append(
+                {
+                    "slot": slot,
+                    "name": plan.name_of(player_id),
+                    "role": role_chip(player.role) if player else "",
+                }
+            )
+        on_court = set(order)
+        bench = sorted(
+            (player for player in plan.players.values() if player.id not in on_court),
+            key=lambda player: player.name,
+        )
+        unlocked = [
+            window
+            for window in plan.sub_windows
+            if frozenset((window.player_out, window.player_in)) not in locked
+        ]
+        return render_template(
+            "match_new.html",
+            plan=plan,
+            scheme=scheme,
+            view=view,
+            tactic=tactic,
+            backup=backup,
+            published_tactics=published,
+            rotation=rotation,
+            rows=rows,
+            current=current,
+            marks=present_marks(view, cards[rotation], phase_marks),
+            playable=len(view.base_order()) == 6,
+            six=six,
+            bench=bench,
+            unlocked=unlocked,
+            position_kind=position_kind(plan),
+            system_note=system_note(scheme),
+            court_slots=COURT_SLOTS,
+        )
 
     @app.post("/teams/<team_id>/matches")
     def start_match(team_id: str):
         plan = team_or_404(team_id)
+
+        def back():
+            return redirect(
+                url_for(
+                    "new_match",
+                    team_id=plan.team_id,
+                    scheme=request.form.get("scheme_id") or None,
+                    tactic=request.form.get("tactic_id") or None,
+                    backup=request.form.get("backup_scheme_id") or None,
+                    rotation=request.form.get("rotation") or None,
+                )
+            )
+
         chosen_scheme = plan.scheme_by_id(request.form.get("scheme_id")) or plan.default_scheme()
         working = apply_system(plan, chosen_scheme) if chosen_scheme else plan
         if len(working.base_order()) != 6:
             flash("先把六个首发槽位排满，或选一套完整方案，再开场。", "error")
-            return redirect(url_for("new_match", team_id=plan.team_id))
+            return back()
         try:
             rotation = int(request.form.get("rotation", "1"))
             serving = request.form.get("serving", "")
@@ -752,7 +837,29 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 raise ValueError(error)
         except ValueError as exc:
             flash(str(exc), "error")
-            return redirect(url_for("new_match", team_id=plan.team_id))
+            return back()
+        raw_backup = (request.form.get("backup_scheme_id") or "").strip()
+        backup_scheme = None
+        backup_json = ""
+        if raw_backup:
+            backup_scheme = plan.scheme_by_id(raw_backup)
+            if backup_scheme is None or len(backup_scheme.order) != 6:
+                flash("找不到这套备用阵容。", "error")
+                return back()
+            if chosen_scheme and backup_scheme.id == chosen_scheme.id:
+                flash("备用阵容要换一套，不能和开场是同一套。", "error")
+                return back()
+            backup_view = apply_system(plan, backup_scheme)
+            backup_json = json.dumps(
+                {
+                    "scheme_id": backup_scheme.id,
+                    "name": backup_scheme.name,
+                    "system": backup_scheme.system_label(),
+                    "order": list(backup_scheme.order),
+                    "plan": backup_view.to_json(),
+                },
+                ensure_ascii=False,
+            )
         tactic_id = (request.form.get("tactic_id") or "").strip()
         tactic_json = ""
         tactic = None
@@ -760,13 +867,13 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             tactic = store().tactic(tactic_id)
             if tactic is None or tactic["team_id"] != plan.team_id:
                 flash("找不到这套战术。", "error")
-                return redirect(url_for("new_match", team_id=plan.team_id))
+                return back()
             if tactic["status"] != "published":
                 flash("只有发布后的战术版本能带进比赛。", "error")
-                return redirect(url_for("new_match", team_id=plan.team_id))
+                return back()
             if chosen_scheme is None or tactic["scheme_id"] != chosen_scheme.id:
                 flash("这套战术属于另一套阵容。开场要选对应的阵容。", "error")
-                return redirect(url_for("new_match", team_id=plan.team_id))
+                return back()
             tactic_json = json.dumps(
                 snapshot_payload(
                     tactic,
@@ -786,12 +893,15 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             serving,
             tactic_id=tactic_id,
             tactic_json=tactic_json,
+            backup_scheme_id=backup_scheme.id if backup_scheme else "",
+            backup_json=backup_json,
         )
         scheme_name = chosen_scheme.name if chosen_scheme else "当前首发槽"
+        spare = f"备用「{backup_scheme.name}」。" if backup_scheme else ""
         if tactic:
-            flash(f"开场使用方案「{scheme_name}」，战术「{tactic['name']}」。之后改战术库，不会改这场已经抄下来的版本。", "ok")
+            flash(f"开场使用方案「{scheme_name}」，战术「{tactic['name']}」。{spare}之后改战术库，不会改这场已经抄下来的版本。", "ok")
         else:
-            flash(f"开场使用方案「{scheme_name}」。换人要再确认一次，轮次不会自动把人换上场。", "ok")
+            flash(f"开场使用方案「{scheme_name}」。{spare}换人要再确认一次，轮次不会自动把人换上场。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
     @app.get("/matches/<match_id>")
@@ -826,7 +936,9 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         depth = match["record_depth"] if "record_depth" in match.keys() else "light"
         scope = match["sample_scope"] if "sample_scope" in match.keys() else "sample"
         raw_tactic = match["tactic_json"] if "tactic_json" in match.keys() else ""
+        raw_backup = match["backup_json"] if "backup_json" in match.keys() else ""
         plan_snapshot = load_snapshot(raw_tactic or "")
+        backup_call = load_backup(raw_backup or "")
         plan_phase = "attack" if state.serving == "us" else "receive"
         plan_marks = []
         plan_note = ""
@@ -879,6 +991,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             depths=DEPTHS,
             scopes=SCOPES,
             plan_snapshot=plan_snapshot,
+            backup_call=backup_call,
             plan_marks=plan_marks,
             plan_phase=plan_phase,
             plan_phase_label=TACTIC_PHASES[plan_phase],

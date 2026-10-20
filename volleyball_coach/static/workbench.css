@@ -553,3 +553,76 @@ body.app .checks label {
   line-height: 1.45;
   color: #142238;
 }
+
+body.app .prep-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin: 0 0 12px;
+}
+body.app .prep-bar label {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 180px;
+  min-width: 0;
+  color: #6a7b90;
+  font-size: 12px;
+}
+body.app .prep-bar select { width: 100%; }
+body.app .prep-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 16px;
+  align-items: start;
+  margin: 0 0 12px;
+}
+body.app .prep-stage .half-court { width: min(100%, 440px); }
+body.app .prep-side {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 12px;
+}
+body.app .prep-side p { margin: 0; }
+body.app .prep-serve { display: grid; gap: 6px; }
+body.app .prep-serve input,
+body.app .prep-serve select { width: 100%; }
+body.app .prep-links { display: flex; flex-wrap: wrap; gap: 10px; }
+body.app .prep-checks {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+body.app .prep-checks li {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  font-size: 12px;
+}
+body.app .prep-checks a { color: inherit; font-weight: 560; text-decoration: none; }
+body.app .prep-checks li[aria-current="true"] { outline: 2px solid #087f8c; }
+body.app .roster-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+body.app .roster-line li {
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  font-size: 12px;
+}
+body.app .prep-start { max-width: 520px; }
+
+@media (max-width: 860px) {
+  body.app .prep-stage { grid-template-columns: 1fr; }
+  body.app .prep-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

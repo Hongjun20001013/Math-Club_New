@@ -289,3 +289,245 @@ def test_lineup_system_can_be_five_one_or_custom(tmp_path):
     conn = sqlite3.connect(tmp_path / "coach.db")
     assert conn.execute("SELECT sets_when FROM players WHERE id = 'eric'").fetchone()[0] == "back_row"
     assert conn.execute("SELECT sets_when FROM players WHERE id = 'michael'").fetchone()[0] == "back_row"
+
+
+def _prep(html: str, number: int) -> str:
+    return html.split(f'data-prep="{number}"', 1)[1].split("</li>", 1)[0]
+
+
+def test_prep_page_checks_duties_before_the_match_starts(tmp_path):
+    client = _client(tmp_path)
+    bare = client.get(f"/teams/{MENS_TEAM_ID}/matches/new").get_data(as_text=True)
+    assert "准备比赛" in bare
+    assert "状态分为已配置、待补充、存在冲突。" in bare
+    assert "准备好了" not in bare
+    assert 'name="ready"' not in bare
+    assert "示意站位" in bare
+    assert "没有正式自由人" in bare
+    assert "不会被改名为 libero" in bare
+    assert "没有锁定" in bare
+    assert 'data-player="d"' not in bare
+    assert 'data-player="harvey"' not in bare
+    assert "/sheet" not in bare
+    opening = _prep(bare, 1)
+    assert "待补充" in opening
+    assert "二传 Michael" in opening
+    assert "发球 Michael" in opening
+    assert "补位 Eric" in opening
+    fourth = _prep(bare, 4)
+    assert "二传 Eric" in fourth
+    assert "发球 Eric" in fourth
+    assert "补位 Michael" in fourth
+    assert "发球 Leo" in _prep(bare, 2)
+
+    made = client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": "scheme-mens-62", "name": "开场卡"},
+        follow_redirects=False,
+    )
+    tactic_id = _arg(made.headers["Location"], "tactic")
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": "scheme-mens-62", "name": "草稿不进开场"},
+        follow_redirects=True,
+    )
+    client.post(f"/teams/{MENS_TEAM_ID}/tactics/{tactic_id}/publish", follow_redirects=True)
+    copied = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes/scheme-mens-62/copy",
+        data={"name": "前排试验"},
+        follow_redirects=False,
+    )
+    copy_id = _arg(copied.headers["Location"], "scheme")
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes",
+        data={
+            "scheme_id": copy_id,
+            "name": "前排试验",
+            "slot_1": "michael",
+            "slot_2": "leo",
+            "slot_3": "vitas",
+            "slot_4": "eric",
+            "slot_5": "andy-a",
+            "slot_6": "andy-b",
+        },
+        follow_redirects=True,
+    )
+    other = client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": copy_id, "name": "前排冲突"},
+        follow_redirects=False,
+    )
+    other_id = _arg(other.headers["Location"], "tactic")
+    client.post(f"/teams/{MENS_TEAM_ID}/tactics/{other_id}/publish", follow_redirects=True)
+
+    ready = client.get(
+        f"/teams/{MENS_TEAM_ID}/matches/new?scheme=scheme-mens-62&tactic={tactic_id}&rotation=3"
+    ).get_data(as_text=True)
+    assert 'data-status="已配置"' in _prep(ready, 1)
+    assert 'data-status="已配置"' in _prep(ready, 3)
+    assert "D 换 Andy A" in ready
+    assert "防守替补不占前排" not in ready
+    assert "草稿不进开场" not in ready
+    assert "前排冲突" not in ready
+    assert f"/tactics/{tactic_id}/sheet" in ready
+    assert "准备好了" not in ready
+    assert 'data-player="d"' not in ready
+
+    conflict = client.get(
+        f"/teams/{MENS_TEAM_ID}/matches/new?scheme={copy_id}&tactic={other_id}&rotation=3"
+    ).get_data(as_text=True)
+    assert 'data-status="已配置"' in _prep(conflict, 1)
+    assert 'data-status="存在冲突"' in _prep(conflict, 3)
+    assert "防守替补不占前排" in conflict
+    assert "开场卡" not in conflict
+    assert 'data-player="d"' not in conflict
+    assert 'data-player="harvey"' not in conflict
+
+
+def test_backup_lineup_is_snapshotted_and_old_matches_stay(tmp_path):
+    client = _client(tmp_path)
+    made = client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": "scheme-mens-62", "name": "开场卡"},
+        follow_redirects=False,
+    )
+    tactic_id = _arg(made.headers["Location"], "tactic")
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics/{tactic_id}/marks",
+        data={"rotation": "1", "phase": "receive", "slot": "4", "player_id": "eric", "x": "11", "y": "22"},
+    )
+    client.post(f"/teams/{MENS_TEAM_ID}/tactics/{tactic_id}/publish", follow_redirects=True)
+    copied = client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes/scheme-mens-62/copy",
+        data={"name": "备用阵容"},
+        follow_redirects=False,
+    )
+    copy_id = _arg(copied.headers["Location"], "scheme")
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes",
+        data={
+            "scheme_id": copy_id,
+            "name": "备用阵容",
+            "slot_1": "michael",
+            "slot_2": "leo",
+            "slot_3": "vitas",
+            "slot_4": "eric",
+            "slot_5": "andy-a",
+            "slot_6": "andy-b",
+        },
+        follow_redirects=True,
+    )
+    other = client.post(
+        f"/teams/{MENS_TEAM_ID}/tactics",
+        data={"scheme_id": copy_id, "name": "另一套战术"},
+        follow_redirects=False,
+    )
+    other_id = _arg(other.headers["Location"], "tactic")
+    client.post(f"/teams/{MENS_TEAM_ID}/tactics/{other_id}/publish", follow_redirects=True)
+
+    same = client.post(
+        f"/teams/{MENS_TEAM_ID}/matches",
+        data={
+            "opponent": "红队",
+            "mode": "light",
+            "rotation": "1",
+            "serving": "us",
+            "scheme_id": "scheme-mens-62",
+            "tactic_id": tactic_id,
+            "backup_scheme_id": "scheme-mens-62",
+        },
+    )
+    assert same.status_code == 302
+    assert "/matches/new" in same.headers["Location"]
+
+    first = client.post(
+        f"/teams/{MENS_TEAM_ID}/matches",
+        data={
+            "opponent": "红队",
+            "mode": "light",
+            "rotation": "1",
+            "serving": "them",
+            "pair_id": "pair-d",
+            "scheme_id": "scheme-mens-62",
+            "tactic_id": tactic_id,
+        },
+    )
+    assert first.status_code == 302
+    first_url = first.headers["Location"]
+    mismatched = client.post(
+        f"/teams/{MENS_TEAM_ID}/matches",
+        data={
+            "opponent": "红队",
+            "mode": "light",
+            "rotation": "1",
+            "serving": "them",
+            "scheme_id": "scheme-mens-62",
+            "tactic_id": other_id,
+            "backup_scheme_id": copy_id,
+        },
+    )
+    assert mismatched.status_code == 302
+    assert "/matches/new" in mismatched.headers["Location"]
+
+    second = client.post(
+        f"/teams/{MENS_TEAM_ID}/matches",
+        data={
+            "opponent": "蓝队",
+            "mode": "light",
+            "rotation": "3",
+            "serving": "us",
+            "pair_id": "pair-d",
+            "scheme_id": "scheme-mens-62",
+            "tactic_id": tactic_id,
+            "backup_scheme_id": copy_id,
+        },
+    )
+    assert second.status_code == 302
+    second_url = second.headers["Location"]
+    conn = sqlite3.connect(tmp_path / "coach.db")
+    rows = {
+        row[0]: row
+        for row in conn.execute("SELECT id, tactic_json, backup_json, plan_json FROM matches")
+    }
+    assert len(rows) == 2
+    first_id = first_url.rstrip("/").split("/")[-1]
+    second_id = second_url.rstrip("/").split("/")[-1]
+    assert rows[first_id][2] == ""
+    first_marks = json.loads(rows[first_id][1])["marks"]
+    assert any(abs(float(mark["x"]) - 11) < 0.01 for mark in first_marks)
+    backup = json.loads(rows[second_id][2])
+    assert backup["name"] == "备用阵容"
+    assert backup["order"][4] == "andy-a"
+    opening = {player["id"]: player["base_slot"] for player in json.loads(rows[second_id][3])["players"]}
+    assert opening["andy-a"] == 3
+    live = client.get(second_url).get_data(as_text=True)
+    assert "备用阵容" in live
+    assert _our_score(live) == "0"
+    assert "胜率更高" not in live
+
+    client.post(
+        f"/teams/{MENS_TEAM_ID}/schemes",
+        data={
+            "scheme_id": copy_id,
+            "name": "备用已改",
+            "slot_1": "eric",
+            "slot_2": "leo",
+            "slot_3": "vitas",
+            "slot_4": "michael",
+            "slot_5": "andy-a",
+            "slot_6": "andy-b",
+        },
+        follow_redirects=True,
+    )
+    kept = {
+        row[0]: row
+        for row in conn.execute("SELECT id, tactic_json, backup_json FROM matches")
+    }
+    assert kept[first_id][2] == ""
+    assert any(abs(float(mark["x"]) - 11) < 0.01 for mark in json.loads(kept[first_id][1])["marks"])
+    assert json.loads(kept[second_id][2])["name"] == "备用阵容"
+    assert json.loads(kept[second_id][2])["order"][0] == "michael"
+    again = client.get(second_url).get_data(as_text=True)
+    assert "备用阵容" in again
+    assert "备用已改" not in again
+    assert _our_score(again) == "0"
