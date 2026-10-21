@@ -11,6 +11,7 @@ from ap_calc_slide_helpers import (
     definition,
     exit_ticket,
     fig,
+    fig_gallery_row,
     guided_example,
     intro,
     key_point,
@@ -176,6 +177,65 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
+        "Visual · two seam types",
+        phase_divider("Visual Investigation", "Continuous vs jump at a breakpoint")
+        + role("Visual", "Compare graphs", "Same piecewise idea — different pictures at \\(x=c\\).")
+        + fig_gallery_row([
+            (
+                g["piecewise_model_continuous_15_gallery"],
+                "Branches meet at one height",
+                "\\(L^{-}=L^{+}=f(c)\\) — limit exists and matches the filled dot.",
+            ),
+            (
+                g["piecewise_model_jump_15_gallery"],
+                "Branches disagree at \\(c\\)",
+                "Open circle shows approach height; filled dot may show \\(f(c)\\) on a different branch.",
+            ),
+        ])
+        + key_point(
+            "Always draw both sides",
+            "<p>Before algebra, sketch or trace <strong>each branch</strong> near the breakpoint. "
+            "Piecewise problems are graph problems first.</p>",
+        ),
+        path_phase="Visual Investigation",
+    )
+
+    s.add(
+        "Graph · full piecewise g(x)",
+        phase_divider("Visual Investigation", "Practice #7 in one view")
+        + fig(
+            g["piecewise_g_15"],
+            "\\(g(x)=\\begin{cases}\\sqrt{5-x}, & x&lt;-4\\\\ x^2-5, & -4\\le x&lt;2\\\\ x-3, & x\\ge 2\\end{cases}\\)",
+            cls="ap-fig--teach",
+            notice="Dashed vertical lines mark breakpoints; colored tags name each branch.",
+        )
+        + checkpoint(
+            "At each vertical line, pause and ask: what is \\(L^{-}\\)? what is \\(L^{+}\\)? what is \\(g(c)\\)?"
+        ),
+        path_phase="Visual Investigation",
+    )
+
+    s.add(
+        "Graph · zoom the breakpoints of g",
+        phase_divider("Visual Investigation", "Zoom at \\(x=-4\\) and \\(x=2\\)")
+        + fig_gallery_row([
+            (
+                g["piecewise_g_15_zoom_neg4_gallery"],
+                "At \\(x=-4\\)",
+                "\\(L^{-}=3\\) but \\(g(-4)=11\\) — two-sided limit DNE.",
+            ),
+            (
+                g["piecewise_g_15_zoom_2_gallery"],
+                "At \\(x=2\\)",
+                "\\(L^{-}=L^{+}=-1=g(2)\\) — continuous seam.",
+            ),
+        ])
+        + limit_compare_note("3", "11", "-4")
+        + one_sided_limits_panel("2", "-1", "-1", two_sided="-1"),
+        path_phase="Visual Investigation",
+    )
+
+    s.add(
         "Left-hand and right-hand limits (review)",
         phase_divider("Why It Works", "One direction at a time")
         + definition(
@@ -201,11 +261,32 @@ def build(graphs: dict[str, str]) -> dict:
         + limit_compare_note("4", "0.1", "-5")
         + fig(
             g["piecewise_f_minus5_15"],
-            "Example: \\(f(x)=\\sqrt{11-x}\\) for \\(x&lt;-5\\); rational rule for \\(x\\ge -5\\)",
+            "Notes example: \\(f(x)=\\sqrt{11-x}\\) for \\(x&lt;-5\\); \\(\\dfrac{x+3}{5-x^2}\\) for \\(x\\ge -5\\)",
             cls="ap-fig--teach",
-            notice="Trace the blue branch toward −5 from the left; trace orange from the right.",
+            notice="Zoomed window near \\(x=-5\\); trace blue then orange without crossing the seam.",
         ),
         path_phase="Why It Works",
+    )
+
+    s.add(
+        "Graph · practice #8 style at x = -5",
+        phase_divider("Representation Transfer", "Pick the branch, then trace")
+        + fig(
+            g["piecewise_h_jump_neg5_15"],
+            "\\(h(x)=\\begin{cases}-|x|, & x\\le -5\\\\ 20-x^2, & -5&lt;x\\le 3\\end{cases}\\)",
+            cls="ap-fig--teach",
+            notice="For \\(x\\to -5^{+}\\), use the quadratic branch only.",
+        )
+        + guided_example(
+            "<p><strong>Find</strong> \\(\\displaystyle\\lim_{x\\to -5^{+}} h(x)\\).</p>",
+            [
+                "Approach from the right ⇒ middle rule \\(20-x^2\\).",
+                "Substitute trend: \\(20-25=-5\\).",
+                "\\(\\displaystyle\\lim_{x\\to -5^{+}} h(x)=\\mathbf{-5}\\).",
+            ],
+            limit_card("x\\to -5^+", equals="-5"),
+        ),
+        path_phase="Representation Transfer",
     )
 
     s.add(
@@ -221,9 +302,15 @@ def build(graphs: dict[str, str]) -> dict:
         )
         + fig(
             g["piecewise_limit_2"],
-            "Review from 1.3 — limit can differ from \\(f(c)\\)",
+            "1.3 review — branches agree at height 3; \\(f(2)=1.5\\)",
             cls="ap-fig--standard",
-            notice="Branches agree at height 3; filled dot shows \\(f(2)=1.5\\).",
+            notice="Same four-step protocol on every piecewise graph.",
+        )
+        + fig(
+            g["piecewise_g_15_zoom_neg4"],
+            "1.5 — jump at \\(x=-4\\)",
+            cls="ap-fig--standard",
+            notice="Compare \\(L^{-}\\), \\(L^{+}\\), and \\(g(-4)\\) on separate zoom views.",
         )
         + checkpoint(
             "For piecewise limits, <strong>branch choice</strong> replaces guessing from a single formula."
@@ -250,11 +337,18 @@ def build(graphs: dict[str, str]) -> dict:
             + limit_card("x\\to 2", equals="-1"),
             "\\(\\displaystyle\\lim_{x\\to 2^-} g(x)=\\lim_{x\\to 2^+} g(x)=\\lim_{x\\to 2} g(x)=-1\\); \\(g(2)=-1\\).",
             "Also try \\(x=-4\\): \\(L^{-}=3\\), \\(L^{+}=11\\) → two-sided limit DNE at −4.",
-            stem_math=fig(
-                g["piecewise_g_15"],
-                "Graph of \\(g\\)",
-                cls="ap-fig--practice",
-            ),
+            stem_math=fig_gallery_row([
+                (
+                    g["piecewise_g_15_zoom_2"],
+                    "Zoom at \\(x=2\\)",
+                    "Both sides approach \\(-1\\).",
+                ),
+                (
+                    g["piecewise_g_15_zoom_neg4"],
+                    "Zoom at \\(x=-4\\)",
+                    "Jump between \\(L^{-}\\) and \\(g(-4)\\).",
+                ),
+            ]),
             collapsible_model=True,
         ),
         template="investigation",

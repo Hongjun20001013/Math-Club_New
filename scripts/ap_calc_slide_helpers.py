@@ -35,6 +35,16 @@ def fig_svg_inline(svg_path: str, caption: str = "", notice: str = "") -> str:
     return fig(svg_path, caption, notice=notice)
 
 
+def fig_gallery_row(
+    items: list[tuple[str, str, str]],
+    *,
+    cls: str = "ap-fig--gallery",
+) -> str:
+    """Side-by-side teaching graphs (uses *_gallery SVG assets when available)."""
+    cells = "".join(fig(path, caption, cls=cls, notice=notice) for path, caption, notice in items)
+    return f'<div class="ap-graph-grid ap-graph-grid--gallery">{cells}</div>'
+
+
 def big_idea(html: str) -> str:
     return (
         '<div class="ap-box ap-box--big-idea">'

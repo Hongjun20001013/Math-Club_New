@@ -51,6 +51,16 @@ class PlotLine:
 
 
 @dataclass
+class PlotLabel:
+    x: float
+    y: float
+    text: str
+    color: str = PURPLE_DARK
+    size: int = 11
+    anchor: str = "start"  # start | middle | end
+
+
+@dataclass
 class GraphSpec:
     graph_id: str
     title: str
@@ -61,7 +71,9 @@ class GraphSpec:
     segments: list[PlotSegment] = field(default_factory=list)
     lines: list[PlotLine] = field(default_factory=list)
     points: list[PlotPoint] = field(default_factory=list)
+    labels: list[PlotLabel] = field(default_factory=list)
     v_asymptotes: list[float] = field(default_factory=list)
+    breakpoints: list[float] = field(default_factory=list)
     notice: str = ""
     x_label: str = "x"
     y_label: str = "y"
@@ -220,25 +232,70 @@ def render_graph(
             f'stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>'
         )
 
+    for bx in spec.breakpoints:
+        vx = _x_map(bx, spec, width, pad_l, pad_r)
+        parts.append(
+            f'<line x1="{vx:.1f}" y1="{pad_t}" x2="{vx:.1f}" y2="{height-pad_b}" '
+            f'stroke="rgba(106,76,230,0.22)" stroke-width="1.5" stroke-dasharray="4 5"/>'
+        )
+        if not compact:
+            parts.append(
+                f'<text x="{vx:.1f}" y="{pad_t - 6:.1f}" text-anchor="middle" font-size="10" '
+                f'fill="#7c6fc9" font-weight="600">x={_format_tick(bx)}</text>'
+            )
+
+    y_pad = (spec.y_max - spec.y_min) * 0.04
+    y_lo = spec.y_min - y_pad
+    y_hi = spec.y_max + y_pad
+    max_dy_px = 55 if not compact else 28
+
+    def _emit_polyline(chunk: list[str], seg: PlotSegment) -> None:
+        if len(chunk) < 2:
+            return
+        dash = ' stroke-dasharray="6 4"' if seg.dashed else ""
+        sw = seg.width if not compact else stroke_w
+        parts.append(
+            f'<polyline points="{" ".join(chunk)}" fill="none" stroke="{seg.color}" '
+            f'stroke-width="{sw}"{dash} stroke-linecap="round" stroke-linejoin="round"/>'
+        )
+
     for seg in spec.segments:
-        pts = []
+        pts: list[str] = []
+        prev_py: float | None = None
         step = (seg.x1 - seg.x0) / max(seg.samples, 2)
         x = seg.x0
         while x <= seg.x1 + 1e-9:
             try:
                 y = seg.fn(x)
-                if math.isfinite(y):
-                    pts.append(f"{_x_map(x, spec, width, pad_l, pad_r):.2f},{_y_map(y, spec, height, pad_t, pad_b):.2f}")
+                if not math.isfinite(y) or y < y_lo or y > y_hi:
+                    if pts:
+                        _emit_polyline(pts, seg)
+                        pts = []
+                    prev_py = None
+                else:
+                    px = _x_map(x, spec, width, pad_l, pad_r)
+                    py = _y_map(y, spec, height, pad_t, pad_b)
+                    if py < pad_t or py > height - pad_b:
+                        if pts:
+                            _emit_polyline(pts, seg)
+                            pts = []
+                        prev_py = None
+                        x += step
+                        continue
+                    if prev_py is not None and abs(py - prev_py) > max_dy_px:
+                        if pts:
+                            _emit_polyline(pts, seg)
+                        pts = []
+                    pts.append(f"{px:.2f},{py:.2f}")
+                    prev_py = py
             except (ValueError, ZeroDivisionError):
-                pass
+                if pts:
+                    _emit_polyline(pts, seg)
+                    pts = []
+                prev_py = None
             x += step
-        if len(pts) >= 2:
-            dash = ' stroke-dasharray="6 4"' if seg.dashed else ""
-            sw = seg.width if not compact else stroke_w
-            parts.append(
-                f'<polyline points="{" ".join(pts)}" fill="none" stroke="{seg.color}" '
-                f'stroke-width="{sw}"{dash} stroke-linecap="round"/>'
-            )
+        if pts:
+            _emit_polyline(pts, seg)
 
     for ln in spec.lines:
         x0, y0 = _x_map(ln.x0, spec, width, pad_l, pad_r), _y_map(ln.y0, spec, height, pad_t, pad_b)
@@ -261,10 +318,30 @@ def render_graph(
         else:
             parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{col}"/>')
         if pt.label and not compact:
+            lx, ly = cx + 10, cy - 8
+            if cy < pad_t + 28:
+                ly = cy + 18
             parts.append(
-                f'<text x="{cx+10:.1f}" y="{cy-8:.1f}" font-size="{font_pt}" '
+                f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="{font_pt}" '
                 f'fill="{PURPLE_DARK}">{pt.label}</text>'
             )
+
+    for lab in spec.labels:
+        if compact:
+            continue
+        lx = _x_map(lab.x, spec, width, pad_l, pad_r)
+        ly = _y_map(lab.y, spec, height, pad_t, pad_b)
+        tw = max(36, len(lab.text) * 6.2)
+        parts.append(
+            f'<rect x="{lx - (4 if lab.anchor == "start" else tw/2):.1f}" y="{ly - 14:.1f}" '
+            f'width="{tw:.1f}" height="18" rx="6" fill="rgba(255,255,255,0.92)" '
+            f'stroke="{lab.color}" stroke-width="1"/>'
+        )
+        tx = lx if lab.anchor == "start" else (lx - tw / 2 if lab.anchor == "middle" else lx - tw + 4)
+        parts.append(
+            f'<text x="{tx + 6:.1f}" y="{ly:.1f}" text-anchor="start" font-size="{lab.size}" '
+            f'font-weight="600" fill="{lab.color}">{lab.text}</text>'
+        )
 
     if spec.notice and not compact:
         parts.append(
@@ -487,24 +564,71 @@ def build_all_graphs() -> dict[str, str]:
     def g_lin(x: float) -> float:
         return x - 3
 
+    g15_segments = [
+        PlotSegment(g_sqrt, -6.4, -4.04, color=LEFT_COLOR, width=3.2),
+        PlotSegment(g_quad, -3.96, 1.96, color=PURPLE, width=3.2),
+        PlotSegment(g_lin, 2.04, 4.3, color=RIGHT_COLOR, width=3.2),
+    ]
+    g15_breakpoints = [-4.0, 2.0]
+    g15_branch_labels = [
+        PlotLabel(-5.8, 2.2, "sqrt(5-x)", LEFT_COLOR),
+        PlotLabel(-0.6, -4.2, "x^2 - 5", PURPLE, anchor="middle"),
+        PlotLabel(3.2, 0.2, "x - 3", RIGHT_COLOR),
+    ]
+
     paths["piecewise_g_15"] = write_graph(GraphSpec(
         graph_id="piecewise_g_15",
-        title="Piecewise g(x) — practice #7",
-        x_min=-6.5, x_max=4.5, y_min=-4, y_max=12,
-        segments=[
-            PlotSegment(g_sqrt, -6.2, -4.02, color=LEFT_COLOR, width=3),
-            PlotSegment(g_quad, -4, 1.98, color=PURPLE, width=3),
-            PlotSegment(g_lin, 2, 4.2, color=RIGHT_COLOR, width=3),
-        ],
+        title="g(x) — three branches (practice #7)",
+        x_min=-6.5, x_max=4.5, y_min=-3, y_max=12,
+        segments=g15_segments,
+        breakpoints=g15_breakpoints,
+        labels=g15_branch_labels,
         points=[
-            PlotPoint(-4, 3, "open", "L⁻→3", color=LEFT_COLOR),
-            PlotPoint(-4, 11, "filled", "g(−4)=11"),
-            PlotPoint(2, -1, "filled", "g(2)=−1"),
+            PlotPoint(-4, 3, "open", "L- = 3", color=LEFT_COLOR),
+            PlotPoint(-4, 11, "filled", "g(-4) = 11"),
+            PlotPoint(2, -1, "filled", "g(2) = -1", color=RIGHT_COLOR),
         ],
-        notice="At x=−4 the branches disagree (jump). At x=2 both sides meet at −1.",
+        notice="Jump at x = -4; continuous at x = 2 (both sides approach -1).",
     ))
 
-    # 1.5 notes example: piecewise at x = −5 (left sqrt, right rational)
+    paths["piecewise_g_15_zoom_neg4"] = write_graph(GraphSpec(
+        graph_id="piecewise_g_15_zoom_neg4",
+        title="Zoom at x = -4 (jump)",
+        x_min=-6.2, x_max=-1.8, y_min=-1, y_max=12,
+        segments=[
+            PlotSegment(g_sqrt, -6.1, -4.04, color=LEFT_COLOR, width=3.5),
+            PlotSegment(g_quad, -3.96, -1.9, color=PURPLE, width=3.5),
+        ],
+        breakpoints=[-4.0],
+        points=[
+            PlotPoint(-4, 3, "open", "L- = 3", color=LEFT_COLOR),
+            PlotPoint(-4, 11, "filled", "g(-4) = 11"),
+        ],
+        labels=[
+            PlotLabel(-5.5, 2.5, "sqrt branch", LEFT_COLOR),
+            PlotLabel(-2.2, 8.5, "quadratic branch", PURPLE),
+        ],
+        notice="L- != g(-4): the two-sided limit at -4 does not exist.",
+    ))
+
+    paths["piecewise_g_15_zoom_2"] = write_graph(GraphSpec(
+        graph_id="piecewise_g_15_zoom_2",
+        title="Zoom at x = 2 (branches agree)",
+        x_min=-1.5, x_max=4.2, y_min=-3.5, y_max=2,
+        segments=[
+            PlotSegment(g_quad, -1.45, 1.96, color=PURPLE, width=3.5),
+            PlotSegment(g_lin, 2.04, 4.1, color=RIGHT_COLOR, width=3.5),
+        ],
+        breakpoints=[2.0],
+        points=[PlotPoint(2, -1, "filled", "limit = g(2) = -1", color=GREEN)],
+        labels=[
+            PlotLabel(-0.8, -4.5, "x^2 - 5", PURPLE, anchor="middle"),
+            PlotLabel(3.3, -2.6, "x - 3", RIGHT_COLOR),
+        ],
+        notice="L- = L+ = -1, so the two-sided limit exists and equals g(2).",
+    ))
+
+    # 1.5 notes example: piecewise at x = -5 (left sqrt, right rational)
     def f_left_15(x: float) -> float:
         return math.sqrt(11 - x)
 
@@ -513,18 +637,163 @@ def build_all_graphs() -> dict[str, str]:
 
     paths["piecewise_f_minus5_15"] = write_graph(GraphSpec(
         graph_id="piecewise_f_minus5_15",
-        title="Piecewise f(x) near x = −5",
-        x_min=-8, x_max=-2, y_min=-1, y_max=5,
+        title="f(x) near x = -5 (notes example)",
+        x_min=-7.2, x_max=-3.2, y_min=-0.5, y_max=4.8,
         segments=[
-            PlotSegment(f_left_15, -7.8, -5.02, color=LEFT_COLOR, width=3),
-            PlotSegment(f_right_15, -4.98, -2.2, color=RIGHT_COLOR, width=3),
+            PlotSegment(f_left_15, -7.0, -5.04, color=LEFT_COLOR, width=3.2),
+            PlotSegment(f_right_15, -4.96, -2.55, color=RIGHT_COLOR, width=3.2),
+        ],
+        breakpoints=[-5.0],
+        labels=[
+            PlotLabel(-6.4, 2.2, "sqrt(11-x)", LEFT_COLOR),
+            PlotLabel(-3.6, 0.55, "(x+3)/(5-x^2)", RIGHT_COLOR),
         ],
         points=[
-            PlotPoint(-5, 4, "open", "L⁻→4", color=LEFT_COLOR),
-            PlotPoint(-5, 0.1, "open", "L⁺→0.1", color=RIGHT_COLOR),
+            PlotPoint(-5, 4, "open", "L- = 4", color=LEFT_COLOR),
+            PlotPoint(-5, 0.1, "open", "L+ = 0.1", color=RIGHT_COLOR),
         ],
-        notice="Different formulas on each side of −5 → compare L⁻ and L⁺ before claiming a two-sided limit.",
+        notice="Compare one-sided limits before claiming a two-sided limit at -5.",
     ))
+
+    # Practice #8 style: jump at x = -5
+    def h_left(x: float) -> float:
+        return -abs(x)
+
+    def h_mid(x: float) -> float:
+        return 20 - x * x
+
+    paths["piecewise_h_jump_neg5_15"] = write_graph(GraphSpec(
+        graph_id="piecewise_h_jump_neg5_15",
+        title="h(x) — jump at x = -5 (practice #8)",
+        x_min=-8, x_max=-2, y_min=-8, y_max=6,
+        segments=[
+            PlotSegment(h_left, -7.8, -5.04, color=LEFT_COLOR, width=3.2),
+            PlotSegment(h_mid, -4.96, -2.1, color=RIGHT_COLOR, width=3.2),
+        ],
+        breakpoints=[-5.0],
+        labels=[
+            PlotLabel(-7.0, -6.5, "-|x|", LEFT_COLOR),
+            PlotLabel(-3.5, 3.5, "20 - x^2", RIGHT_COLOR),
+        ],
+        points=[PlotPoint(-5, -5, "filled", "h(-5) = -5", color=PURPLE)],
+        notice="For x -> -5+, follow the quadratic branch; limit is -5.",
+    ))
+
+    paths["piecewise_h_jump_neg5_15_gallery"] = write_graph(
+        GraphSpec(
+            graph_id="piecewise_h_jump_neg5_15",
+            title="Jump at x = -5",
+            x_min=-8, x_max=-2, y_min=-8, y_max=6,
+            segments=[
+                PlotSegment(h_left, -7.8, -5.04, color=LEFT_COLOR, width=3),
+                PlotSegment(h_mid, -4.96, -2.1, color=RIGHT_COLOR, width=3),
+            ],
+            breakpoints=[-5.0],
+            points=[
+                PlotPoint(-5, -5, "filled", "", color=LEFT_COLOR),
+                PlotPoint(-5, -5, "open", "", color=RIGHT_COLOR),
+            ],
+            notice="L- = -5, L+ = -5 at the seam (check inequality at endpoint).",
+        ),
+        variant="gallery",
+    )
+
+    # Teaching strip: continuous vs jump (simple two-line models)
+    paths["piecewise_model_continuous_15"] = write_graph(GraphSpec(
+        graph_id="piecewise_model_continuous_15",
+        title="Continuous at the breakpoint",
+        x_min=-1, x_max=4, y_min=-1, y_max=5,
+        segments=[
+            PlotSegment(lambda x: x + 1, -0.8, 1.96, color=LEFT_COLOR, width=3),
+            PlotSegment(lambda x: -x + 5, 2.04, 3.8, color=RIGHT_COLOR, width=3),
+        ],
+        breakpoints=[2.0],
+        points=[PlotPoint(2, 3, "filled", "L = f(2) = 3", color=GREEN)],
+        notice="Both branches meet at the same height.",
+    ))
+
+    paths["piecewise_model_jump_15"] = write_graph(GraphSpec(
+        graph_id="piecewise_model_jump_15",
+        title="Jump at the breakpoint",
+        x_min=-1, x_max=4, y_min=-1, y_max=5,
+        segments=[
+            PlotSegment(lambda x: x + 1, -0.8, 1.96, color=LEFT_COLOR, width=3),
+            PlotSegment(lambda x: -x + 7, 2.04, 3.8, color=RIGHT_COLOR, width=3),
+        ],
+        breakpoints=[2.0],
+        points=[
+            PlotPoint(2, 3, "open", "L- = 3", color=LEFT_COLOR),
+            PlotPoint(2, 5, "filled", "f(2) = 5", color=PURPLE),
+        ],
+        notice="L- != f(2); two-sided limit may still exist if L+ matches L-.",
+    ))
+
+    paths["piecewise_model_continuous_15_gallery"] = write_graph(
+        GraphSpec(
+            graph_id="piecewise_model_continuous_15",
+            title="Continuous seam",
+            x_min=-1, x_max=4, y_min=-1, y_max=5,
+            segments=[
+                PlotSegment(lambda x: x + 1, -0.8, 1.96, color=LEFT_COLOR, width=2.8),
+                PlotSegment(lambda x: -x + 5, 2.04, 3.8, color=RIGHT_COLOR, width=2.8),
+            ],
+            breakpoints=[2.0],
+            points=[PlotPoint(2, 3, "filled", "", color=GREEN)],
+            notice="L- = L+ = f(c).",
+        ),
+        variant="gallery",
+    )
+    paths["piecewise_model_jump_15_gallery"] = write_graph(
+        GraphSpec(
+            graph_id="piecewise_model_jump_15",
+            title="Jump seam",
+            x_min=-1, x_max=4, y_min=-1, y_max=5,
+            segments=[
+                PlotSegment(lambda x: x + 1, -0.8, 1.96, color=LEFT_COLOR, width=2.8),
+                PlotSegment(lambda x: -x + 7, 2.04, 3.8, color=RIGHT_COLOR, width=2.8),
+            ],
+            breakpoints=[2.0],
+            points=[
+                PlotPoint(2, 3, "open", "", color=LEFT_COLOR),
+                PlotPoint(2, 5, "filled", "", color=PURPLE),
+            ],
+            notice="L- != f(c); compare sides.",
+        ),
+        variant="gallery",
+    )
+    paths["piecewise_g_15_zoom_neg4_gallery"] = write_graph(
+        GraphSpec(
+            graph_id="piecewise_g_15_zoom_neg4",
+            title="Jump at -4",
+            x_min=-6.2, x_max=-1.8, y_min=-1, y_max=12,
+            segments=[
+                PlotSegment(g_sqrt, -6.1, -4.04, color=LEFT_COLOR, width=3),
+                PlotSegment(g_quad, -3.96, -1.9, color=PURPLE, width=3),
+            ],
+            breakpoints=[-4.0],
+            points=[
+                PlotPoint(-4, 3, "open", "", color=LEFT_COLOR),
+                PlotPoint(-4, 11, "filled", ""),
+            ],
+            notice="L- = 3, g(-4) = 11.",
+        ),
+        variant="gallery",
+    )
+    paths["piecewise_g_15_zoom_2_gallery"] = write_graph(
+        GraphSpec(
+            graph_id="piecewise_g_15_zoom_2",
+            title="Agree at 2",
+            x_min=-1.5, x_max=4.2, y_min=-3.5, y_max=2,
+            segments=[
+                PlotSegment(g_quad, -1.45, 1.96, color=PURPLE, width=3),
+                PlotSegment(g_lin, 2.04, 4.1, color=RIGHT_COLOR, width=3),
+            ],
+            breakpoints=[2.0],
+            points=[PlotPoint(2, -1, "filled", "", color=GREEN)],
+            notice="L- = L+ = -1.",
+        ),
+        variant="gallery",
+    )
 
     return paths
 

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 340" role="img" aria-label="Zoom at x = 2 (branches agree)" class="ap-graph-svg">
+<rect width="520" height="340" fill="#faf8ff" rx="12"/>
+<text x="260.0" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#4c3d99">Zoom at x = 2 (branches agree)</text>
+<line x1="58.0" y1="52" x2="58.0" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="144.8" y1="52" x2="144.8" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="231.6" y1="52" x2="231.6" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="318.4" y1="52" x2="318.4" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="405.2" y1="52" x2="405.2" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="492.0" y1="52" x2="492.0" y2="292" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="52.0" x2="492" y2="52.0" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="112.0" x2="492" y2="112.0" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="172.0" x2="492" y2="172.0" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="232.0" x2="492" y2="232.0" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="292.0" x2="492" y2="292.0" stroke="#e8e4ff" stroke-width="1"/>
+<line x1="58" y1="292" x2="492" y2="292" stroke="#4c3d99" stroke-width="1.5"/>
+<line x1="58" y1="52" x2="58" y2="292" stroke="#4c3d99" stroke-width="1.5"/>
+<line x1="172.2" y1="292.0" x2="172.2" y2="298.0" stroke="#4c3d99" stroke-width="1"/>
+<text x="172.2" y="312.0" text-anchor="middle" font-size="12" fill="#4c3d99">0</text>
+<line x1="324.5" y1="292.0" x2="324.5" y2="298.0" stroke="#4c3d99" stroke-width="1"/>
+<text x="324.5" y="312.0" text-anchor="middle" font-size="12" fill="#4c3d99">2</text>
+<line x1="476.8" y1="292.0" x2="476.8" y2="298.0" stroke="#4c3d99" stroke-width="1"/>
+<text x="476.8" y="312.0" text-anchor="middle" font-size="12" fill="#4c3d99">4</text>
+<line x1="52.0" y1="226.5" x2="58.0" y2="226.5" stroke="#4c3d99" stroke-width="1"/>
+<text x="52.0" y="230.5" text-anchor="end" font-size="12" fill="#4c3d99">-2</text>
+<line x1="52.0" y1="139.3" x2="58.0" y2="139.3" stroke="#4c3d99" stroke-width="1"/>
+<text x="52.0" y="143.3" text-anchor="end" font-size="12" fill="#4c3d99">0</text>
+<line x1="52.0" y1="52.0" x2="58.0" y2="52.0" stroke="#4c3d99" stroke-width="1"/>
+<text x="52.0" y="56.0" text-anchor="end" font-size="12" fill="#4c3d99">2</text>
+<text x="494.0" y="310.0" text-anchor="end" font-size="12" fill="#4c3d99">x</text>
+<text x="16" y="172.0" text-anchor="middle" font-size="12" fill="#4c3d99" transform="rotate(-90 16 172.0)">y</text>
+<line x1="324.5" y1="52" x2="324.5" y2="292" stroke="rgba(106,76,230,0.22)" stroke-width="1.5" stroke-dasharray="4 5"/>
+<text x="324.5" y="46.0" text-anchor="middle" font-size="10" fill="#7c6fc9" font-weight="600">x=2</text>
+<polyline points="61.81,265.71 63.97,269.27 66.13,272.76 68.30,276.18 70.46,279.53 72.63,282.81 74.79,286.02 76.95,289.15" fill="none" stroke="#6a4ce6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="267.35,289.32 269.52,286.18 271.68,282.98 273.85,279.70 276.01,276.36 278.17,272.94 280.34,269.46 282.50,265.90 284.66,262.27 286.83,258.57 288.99,254.80 291.15,250.97 293.32,247.06 295.48,243.08 297.65,239.03 299.81,234.91 301.97,230.71 304.14,226.45 306.30,222.12 308.46,217.72 310.63,213.24 312.79,208.70 314.95,204.09 317.12,199.40 319.28,194.65 321.45,189.82" fill="none" stroke="#6a4ce6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="327.54,181.16 328.84,180.41 330.15,179.67 331.46,178.92 332.77,178.17 334.07,177.42 335.38,176.67 336.69,175.92 337.99,175.17 339.30,174.42 340.61,173.67 341.91,172.92 343.22,172.17 344.53,171.43 345.84,170.68 347.14,169.93 348.45,169.18 349.76,168.43 351.06,167.68 352.37,166.93 353.68,166.18 354.99,165.43 356.29,164.68 357.60,163.93 358.91,163.19 360.21,162.44 361.52,161.69 362.83,160.94 364.13,160.19 365.44,159.44 366.75,158.69 368.06,157.94 369.36,157.19 370.67,156.44 371.98,155.69 373.28,154.95 374.59,154.20 375.90,153.45 377.21,152.70 378.51,151.95 379.82,151.20 381.13,150.45 382.43,149.70 383.74,148.95 385.05,148.20 386.36,147.45 387.66,146.71 388.97,145.96 390.28,145.21 391.58,144.46 392.89,143.71 394.20,142.96 395.50,142.21 396.81,141.46 398.12,140.71 399.43,139.96 400.73,139.21 402.04,138.47 403.35,137.72 404.65,136.97 405.96,136.22 407.27,135.47 408.58,134.72 409.88,133.97 411.19,133.22 412.50,132.47 413.80,131.72 415.11,130.97 416.42,130.23 417.73,129.48 419.03,128.73 420.34,127.98 421.65,127.23 422.95,126.48 424.26,125.73 425.57,124.98 426.87,124.23 428.18,123.48 429.49,122.73 430.80,121.99 432.10,121.24 433.41,120.49 434.72,119.74 436.02,118.99 437.33,118.24 438.64,117.49 439.95,116.74 441.25,115.99 442.56,115.24 443.87,114.49 445.17,113.75 446.48,113.00 447.79,112.25 449.09,111.50 450.40,110.75 451.71,110.00 453.02,109.25 454.32,108.50 455.63,107.75 456.94,107.00 458.24,106.25 459.55,105.51 460.86,104.76 462.17,104.01 463.47,103.26 464.78,102.51 466.09,101.76 467.39,101.01 468.70,100.26 470.01,99.51 471.32,98.76 472.62,98.01 473.93,97.27 475.24,96.52 476.54,95.77 477.85,95.02 479.16,94.27 480.46,93.52 481.77,92.77 483.08,92.02 484.39,91.27" fill="none" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="324.5" cy="182.9" r="6" fill="#059669"/>
+<text x="334.5" y="174.9" font-size="12" fill="#4c3d99">limit = g(2) = -1</text>
+<rect x="89.6" y="321.6" width="43.4" height="18" rx="6" fill="rgba(255,255,255,0.92)" stroke="#6a4ce6" stroke-width="1"/>
+<text x="95.6" y="335.6" text-anchor="start" font-size="11" font-weight="600" fill="#6a4ce6">x^2 - 5</text>
+<rect x="419.5" y="238.7" width="36.0" height="18" rx="6" fill="rgba(255,255,255,0.92)" stroke="#ea580c" stroke-width="1"/>
+<text x="429.5" y="252.7" text-anchor="start" font-size="11" font-weight="600" fill="#ea580c">x - 3</text>
+<text x="58" y="332" font-size="11" fill="#5b5380" font-style="italic">Notice: L- = L+ = -1, so the two-sided limit exists and equals g(2).</text>
+</svg>
