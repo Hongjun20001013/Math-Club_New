@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="eyebrow">场边</p>
+<h1>各队分开记，场边只做最少的确认。</h1>
+<p class="lede">第一版解决轮次、固定换人和赛前预案。场上只确认比分和换人；完整触球等赛后对着录像补。没有确认过的内容，不会被写成事实。</p>
+<figure class="hero">
+  <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
+</figure>
+<section class="home-grid">
+  <div>
+    <h2>球队</h2>
+    {% for team in teams %}
+      <a class="team-card" href="{{ url_for('team_page', team_id=team.id) }}">
+        <strong>{{ team.name }}</strong>
+        <span class="muted">{{ team.notes }}</span>
+      </a>
+    {% else %}
+      <p>还没有球队。</p>
+    {% endfor %}
+    <p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。以后别的队也可以用同一套页面做复盘。</p>
+  </div>
+  <form class="stack" method="post" action="{{ url_for('create_team') }}">
+    <h2>新建球队</h2>
+    <label for="name">队名</label>
+    <input id="name" name="name" required placeholder="例如：女排、U16">
+    <label for="notes">备注</label>
+    <textarea id="notes" name="notes" placeholder="这支队自己的赛制，先写在这里。"></textarea>
+    <div class="checks">
+      <label><input type="radio" name="preset" value="blank" checked> 空白规则。不预填禁止后排进攻、无自由人或固定换人。</label>
+      <label><input type="radio" name="preset" value="local_special"> 只套用男排那一组规则开关，不复制名单。</label>
+    </div>
+    <button type="submit">建立球队</button>
+  </form>
+</section>
+{% endblock %}

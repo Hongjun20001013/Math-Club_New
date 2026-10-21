@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('board', team_id=plan.team_id) }}">六轮卡片</a>
+  <a href="{{ url_for('quicksheet', team_id=plan.team_id) }}">场边速查</a>
+  <a href="{{ url_for('new_match', team_id=plan.team_id) }}">开场</a>
+</p>
+<h1>{{ plan.name }}</h1>
+<p class="lede">{{ plan.notes }}</p>
+{% if plan.board_note %}<p>{{ plan.board_note }}</p>{% endif %}
+
+<form class="stack" method="post" action="{{ url_for('save_rules', team_id=plan.team_id) }}">
+  <h2>规则</h2>
+  <div class="checks">
+    <label><input type="checkbox" name="no_back_row_attack" {% if plan.rules.no_back_row_attack %}checked{% endif %}> 禁止后排进攻</label>
+    <label><input type="checkbox" name="no_libero" {% if plan.rules.no_libero %}checked{% endif %}> 无自由人</label>
+    <label><input type="checkbox" name="fixed_pair_subs" {% if plan.rules.fixed_pair_subs %}checked{% endif %}> 固定一对一换人，禁止交叉替换</label>
+    <label><input type="checkbox" name="unlimited_subs" {% if plan.rules.unlimited_subs %}checked{% endif %}> 无限往返。勾上以后，不使用下面的次数上限。</label>
+    <label><input type="checkbox" name="overlap_confirmed" {% if plan.rules.overlap_confirmed %}checked{% endif %}> 重叠规则已经在现场确认。没勾之前，卡片不画站位坐标。</label>
+    <label><input type="checkbox" name="timeouts_known" {% if plan.rules.timeouts_known %}checked{% endif %}> 暂停次数和时长已经录入。没勾之前，软件不显示剩余暂停。</label>
+  </div>
+  <div class="split">
+    <div>
+      <label for="max_subs">换人上限（每次换入或换回都算一次）</label>
+      <input id="max_subs" name="max_subs" value="{{ plan.rules.max_subs if plan.rules.max_subs is not none else '' }}" placeholder="留空表示先不拦截">
+    </div>
+    <div>
+      <label for="pair_lock_scope">配对锁定范围</label>
+      <select id="pair_lock_scope" name="pair_lock_scope">
+        <option value="match" {% if plan.rules.pair_lock_scope == 'match' %}selected{% endif %}>整场锁定</option>
+        <option value="set" {% if plan.rules.pair_lock_scope == 'set' %}selected{% endif %}>每一局可以重设</option>
+      </select>
+    </div>
+  </div>
+  <div class="split">
+    <div>
+      <label for="call_in">到位口令</label>
+      <input id="call_in" name="call_in" value="{{ plan.calls.in_system }}">
+    </div>
+    <div>
+      <label for="call_half">半到位口令</label>
+      <input id="call_half" name="call_half" value="{{ plan.calls.half }}">
+    </div>
+  </div>
+  <label for="call_out">不到位口令</label>
+  <input id="call_out" name="call_out" value="{{ plan.calls.out }}">
+  <label for="notes">队伍备注</label>
+  <textarea id="notes" name="notes">{{ plan.notes }}</textarea>
+  <button type="submit">保存规则</button>
+</form>
+
+<h2>名单</h2>
+<p class="muted">能力只记录你确认过的观察。位置不会被用来推断谁更强。私人备注留在这台机器上。</p>
+{% for player in plan.players.values() %}
+  <details>
+    <summary>{{ player.name }}{% if player.jersey %} · {{ player.jersey }}{% endif %}{% if player.base_slot %} · 首发槽 {{ player.base_slot }}{% else %} · 替补{% endif %}</summary>
+    <form class="stack" method="post" action="{{ url_for('edit_player', team_id=plan.team_id, player_id=player.id) }}">
+      {% include "_player_fields.html" %}
+      <button type="submit">保存 {{ player.name }}</button>
+    </form>
+    <ul class="list">
+      {% for item in abilities.get(player.id, []) %}
+        <li>{{ item.skill }}：{{ item.label | ability }}</li>
+      {% else %}
+        <li>还没有能力记录。</li>
+      {% endfor %}
+    </ul>
+  </details>
+{% endfor %}
+
+<details>
+  <summary>加入球员</summary>
+  <form class="stack" method="post" action="{{ url_for('add_player', team_id=plan.team_id) }}">
+    {% set player = none %}
+    {% include "_player_fields.html" %}
+    <button type="submit">加入名单</button>
+  </form>
+</details>
+
+<form class="stack" method="post" action="{{ url_for('add_ability', team_id=plan.team_id) }}">
+  <h2>补一条能力观察</h2>
+  <label for="ability_player">球员</label>
+  <select id="ability_player" name="player_id">
+    {% for player in plan.players.values() %}
+      <option value="{{ player.id }}">{{ player.name }}</option>
+    {% endfor %}
+  </select>
+  <label for="skill">项目</label>
+  <input id="skill" name="skill" placeholder="例如：接发覆盖">
+  <label for="label">标签</label>
+  <select id="label" name="label">
+    <option value="unknown">尚未验证</option>
+    <option value="protect">需要保护</option>
+    <option value="stable">稳定可用</option>
+  </select>
+  <button type="submit">保存观察</button>
+</form>
+
+<h2>固定配对</h2>
+<p class="muted">同一时间，一个人只能对应一个替换对象。候选配对在开场勾选以后才生效。</p>
+{% for pair in plan.pairs %}
+  <form class="stack" method="post" action="{{ url_for('edit_pair', team_id=plan.team_id, pair_id=pair.id) }}">
+    <div class="split">
+      <div>
+        <label>球员 A</label>
+        <select name="player_a">
+          {% for player in plan.players.values() %}
+            <option value="{{ player.id }}" {% if player.id == pair.a %}selected{% endif %}>{{ player.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>球员 B</label>
+        <select name="player_b">
+          {% for player in plan.players.values() %}
+            <option value="{{ player.id }}" {% if player.id == pair.b %}selected{% endif %}>{{ player.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <label>状态</label>
+    <select name="status">
+      <option value="confirmed" {% if pair.status == 'confirmed' %}selected{% endif %}>已确认</option>
+      <option value="candidate" {% if pair.status == 'candidate' %}selected{% endif %}>候选</option>
+    </select>
+    <label>说明</label>
+    <textarea name="notes">{{ pair.notes }}</textarea>
+    <div class="inline">
+      <button type="submit">更新这对</button>
+    </div>
+  </form>
+  <form method="post" action="{{ url_for('delete_pair', team_id=plan.team_id, pair_id=pair.id) }}">
+    <button class="secondary" type="submit">删除这对</button>
+  </form>
+{% endfor %}
+<form class="stack" method="post" action="{{ url_for('add_pair', team_id=plan.team_id) }}">
+  <h3>新的一对</h3>
+  <div class="split">
+    <select name="player_a">
+      {% for player in plan.players.values() %}<option value="{{ player.id }}">{{ player.name }}</option>{% endfor %}
+    </select>
+    <select name="player_b">
+      {% for player in plan.players.values() %}<option value="{{ player.id }}">{{ player.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <select name="status">
+    <option value="candidate">候选</option>
+    <option value="confirmed">已确认</option>
+  </select>
+  <textarea name="notes" placeholder="为什么是这一对，回换要付什么代价。"></textarea>
+  <button type="submit">保存配对</button>
+</form>
+
+{% if plan.guidance %}
+  <h2>Harvey 这类选择，一次只能留一对</h2>
+  <div class="table-wrap">
+    <table>
+      <tr><th>配对</th><th>什么时候考虑</th><th>后续代价</th></tr>
+      {% for item in plan.guidance %}
+        <tr>
+          <td>{{ item.title }}</td>
+          <td>{{ item.when }}</td>
+          <td>{{ item.cost }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <p class="muted">上表是赛前的阅读材料。真正生效的是上面保存的那一对，而且要在开场时锁定。</p>
+{% endif %}
+
+<h2>比赛</h2>
+{% if matches %}
+  <div class="table-wrap">
+    <table>
+      <tr><th>时间</th><th>对手</th><th>状态</th><th></th></tr>
+      {% for match in matches %}
+        <tr>
+          <td>{{ match.created_at }}</td>
+          <td>{{ match.opponent or "未填对手" }}</td>
+          <td>{{ "进行中" if match.status == "live" else "已结束" }} · {{ "轻记录" if match.mode == "light" else "预案" }}</td>
+          <td><a href="{{ url_for('live', match_id=match.id) }}">进入</a></td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% else %}
+  <p class="muted">还没有比赛。开场之后，比分和换人会写进这台机器上的记录，关掉页面也不会丢。</p>
+{% endif %}
+{% endblock %}

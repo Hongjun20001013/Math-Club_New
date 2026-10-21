@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('review', match_id=match.id) }}">继续补记录</a>
+  <a href="{{ url_for('live', match_id=match.id) }}">场边</a>
+  <a href="{{ url_for('report_json', match_id=match.id) }}">导出 JSON</a>
+</p>
+<h1>赛后报告</h1>
+<p class="lede">{{ report.review_budget }}</p>
+<p>对方轮次：未知。没有输入，就不生成对方阵容。</p>
+
+<h2>哪一轮接发最困难？</h2>
+<p>{{ report.receive.headline }}</p>
+<p class="muted">{{ report.receive.note }}</p>
+<div class="table-wrap">
+  <table>
+    <tr><th>轮次</th><th>已分胜负</th><th>未知胜负</th><th>一传已记录</th><th>一传未知</th><th>发球队员</th></tr>
+    {% for row in report.receive.rows %}
+      <tr>
+        <td>{{ row.label }}</td>
+        <td>{{ row.display }}</td>
+        <td>{{ "—" if row.recorded == 0 else row.unknown_winner }}</td>
+        <td>{{ "—" if row.recorded == 0 else row.pass_quality_recorded }}</td>
+        <td>{{ "—" if row.recorded == 0 else row.pass_unknown }}</td>
+        <td>
+          {% for name, count in row.servers.items() %}{{ name }} {{ count }}{% if not loop.last %}，{% endif %}{% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<h2>发球目标有没有执行到？</h2>
+<p>{{ report.serve.headline }}</p>
+{% if report.serve.rows %}
+  <div class="table-wrap">
+    <table>
+      <tr><th>轮次</th><th>目标</th><th>实际</th><th>执行</th><th>一传</th><th>胜方</th></tr>
+      {% for row in report.serve.rows %}
+        <tr>
+          <td>{{ "未知" if row.rotation is none else "R" ~ row.rotation }}</td>
+          <td>{{ row.target_label }}</td>
+          <td>{{ row.actual_receiver or row.actual_zone or "未核对" }}</td>
+          <td>{{ {"hit": "执行到", "miss": "没执行到", "unchecked": "未核对"}[row.execution] }}</td>
+          <td>{{ row.pass_quality or "未填" }}</td>
+          <td>{{ {"us": "我方", "them": "对方", "unknown": "未知"}.get(row.winner, "未填") }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endif %}
+
+<h2>替补上场之后，具体发生了什么？</h2>
+<p>{{ report.subs.caution }}</p>
+<p>{{ report.subs.headline }}</p>
+{% if report.subs.events %}
+  <ul class="list">
+    {% for event in report.subs.events %}
+      <li>{{ event.at }} · 第 {{ event.set_index }} 局 R{{ event.rotation }} · {{ event.in }} 换 {{ event.out }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% for stint in report.subs.stints %}
+  <article class="card">
+    <h3>在场替补：{{ stint.bench | join("、") }}</h3>
+    <p>轮次 {{ stint.rotations | join("、") or "未知" }}。回合 {{ stint.rallies }}。已分胜负 {{ stint.wins }}/{{ stint.wins + stint.losses }}。</p>
+    <p>{{ stint.reading }}</p>
+  </article>
+{% endfor %}
+
+<h2>场边操作</h2>
+<p>{{ report.burden.note }}</p>
+<p>操作 {{ report.burden.operations }} 次，撤销 {{ report.burden.undos }} 次，校正 {{ report.burden.corrections }} 次，手动改轮次 {{ report.burden.manual_rotations }} 次。</p>
+<p class="muted">从 {{ report.burden.started_at or "—" }} 到 {{ report.burden.ended_at or "—" }}。</p>
+<p>{{ report.sideout.headline }}</p>
+{% endblock %}
