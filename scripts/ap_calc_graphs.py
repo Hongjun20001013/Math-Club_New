@@ -477,6 +477,55 @@ def build_all_graphs() -> dict[str, str]:
         notice="Only a right-hand approach exists at x=0; lim x→0⁻ f(x) is undefined on this domain.",
     ))
 
+    # 1.5 packet #7: three-branch piecewise g(x)
+    def g_sqrt(x: float) -> float:
+        return math.sqrt(5 - x)
+
+    def g_quad(x: float) -> float:
+        return x * x - 5
+
+    def g_lin(x: float) -> float:
+        return x - 3
+
+    paths["piecewise_g_15"] = write_graph(GraphSpec(
+        graph_id="piecewise_g_15",
+        title="Piecewise g(x) — practice #7",
+        x_min=-6.5, x_max=4.5, y_min=-4, y_max=12,
+        segments=[
+            PlotSegment(g_sqrt, -6.2, -4.02, color=LEFT_COLOR, width=3),
+            PlotSegment(g_quad, -4, 1.98, color=PURPLE, width=3),
+            PlotSegment(g_lin, 2, 4.2, color=RIGHT_COLOR, width=3),
+        ],
+        points=[
+            PlotPoint(-4, 3, "open", "L⁻→3", color=LEFT_COLOR),
+            PlotPoint(-4, 11, "filled", "g(−4)=11"),
+            PlotPoint(2, -1, "filled", "g(2)=−1"),
+        ],
+        notice="At x=−4 the branches disagree (jump). At x=2 both sides meet at −1.",
+    ))
+
+    # 1.5 notes example: piecewise at x = −5 (left sqrt, right rational)
+    def f_left_15(x: float) -> float:
+        return math.sqrt(11 - x)
+
+    def f_right_15(x: float) -> float:
+        return (x + 3) / (5 - x * x)
+
+    paths["piecewise_f_minus5_15"] = write_graph(GraphSpec(
+        graph_id="piecewise_f_minus5_15",
+        title="Piecewise f(x) near x = −5",
+        x_min=-8, x_max=-2, y_min=-1, y_max=5,
+        segments=[
+            PlotSegment(f_left_15, -7.8, -5.02, color=LEFT_COLOR, width=3),
+            PlotSegment(f_right_15, -4.98, -2.2, color=RIGHT_COLOR, width=3),
+        ],
+        points=[
+            PlotPoint(-5, 4, "open", "L⁻→4", color=LEFT_COLOR),
+            PlotPoint(-5, 0.1, "open", "L⁺→0.1", color=RIGHT_COLOR),
+        ],
+        notice="Different formulas on each side of −5 → compare L⁻ and L⁺ before claiming a two-sided limit.",
+    ))
+
     return paths
 
 
