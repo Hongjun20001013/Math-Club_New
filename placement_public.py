@@ -50,9 +50,9 @@ SITTING_TTL_SQL = f"-{SITTING_TTL_HOURS} hours"
 ADVISOR_PRESETS = (
     "Mia Hu",
     "Jimmy Zheng",
-    "Rachel",
-    "Dayu",
     "Beck Yang",
+    "Ling Zhang",
+    "Lily",
 )
 ADVISOR_OTHER = "Other"
 ADVISOR_CHOICES = ADVISOR_PRESETS + (ADVISOR_OTHER,)
@@ -219,10 +219,12 @@ def counselor_names_for_staff_username(username: str) -> tuple[str, ...]:
     aliases: dict[str, tuple[str, ...]] = {
         "mia": ("Mia Hu",),
         "jimmy": ("Jimmy Zheng",),
-        "rachel": ("Rachel",),
-        "dayu": ("Dayu",),
         "beck.yang": ("Beck Yang",),
         "beckyang": ("Beck Yang",),
+        "ling.zhang": ("Ling Zhang",),
+        "lingzhang": ("Ling Zhang",),
+        "lily": ("Lily",),
+        "lily.fan": ("Lily",),
     }
     if local in aliases:
         return aliases[local]
