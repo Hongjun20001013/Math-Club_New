@@ -743,6 +743,17 @@ def build_all_graphs() -> dict[str, str]:
         ),
         variant="gallery",
     )
+    # 1.6 removable hole: sin(x)/x → 1
+    paths["sin_over_x_16"] = write_graph(GraphSpec(
+        graph_id="sin_over_x_16",
+        title="y = sin(x)/x (x ≠ 0)",
+        x_min=-6.5, x_max=6.5, y_min=-0.5, y_max=1.35,
+        segments=[PlotSegment(lambda x: math.sin(x) / x, -6.2, -0.12, color=LEFT_COLOR, width=3),
+                  PlotSegment(lambda x: math.sin(x) / x, 0.12, 6.2, color=RIGHT_COLOR, width=3)],
+        points=[PlotPoint(0, 1, "open", "limit = 1", color=GREEN)],
+        notice="Approach height 1 from both sides; f(0) is undefined.",
+    ))
+
     paths["piecewise_model_jump_15_gallery"] = write_graph(
         GraphSpec(
             graph_id="piecewise_model_jump_15",

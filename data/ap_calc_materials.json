@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-21T22:54:01.859428Z",
+  "generated_at": "2026-10-22T06:06:13.776758Z",
   "track": "ap_calc",
-  "total": 5,
-  "available": 5,
+  "total": 6,
+  "available": 6,
   "materials": [
     {
       "slug": "ap-1-1-instantaneous-change",
@@ -1878,7 +1878,7 @@
       "pdf_available": false,
       "phase": 1,
       "prev_lesson_slug": "ap-1-4-limits-from-tables",
-      "next_lesson_slug": null,
+      "next_lesson_slug": "ap-1-6-algebraic-manipulation-limits",
       "knowledge_map": [
         {
           "title": "Launch",
@@ -2081,6 +2081,558 @@
               "index": 21,
               "kind": "lesson",
               "title": "Practice packet · 1.5",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "ap-1-6-algebraic-manipulation-limits",
+      "unit": 1,
+      "unit_name": "Limits and Continuity",
+      "section": "1.6",
+      "title": "Determining Limits Using Algebraic Manipulation",
+      "deck_title": "AP Unit 1.6 · Limit strategies",
+      "slide_count": 26,
+      "slides": [
+        {
+          "index": 1,
+          "title": "1.6 · Algebraic manipulation",
+          "html": "<div class=\"cm-intro-canvas ap-calc-intro ap-slide-template--intro ap-calc-intro--v2\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Novel Prep · AP Calculus AB / BC</span><p class=\"cm-intro-unit\">Unit 1 · Section 1.6</p><h1 class=\"cm-intro-title\">Determining limits using algebraic manipulation</h1><p class=\"cm-intro-lede\">Choose a strategy: substitute, factor and cancel, or use special trig limits</p><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">1</span><span class=\"cm-intro-chip-label\">Strategies</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"6\"><span class=\"cm-intro-chip-num\">2</span><span class=\"cm-intro-chip-label\">Direct sub</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"9\"><span class=\"cm-intro-chip-num\">3</span><span class=\"cm-intro-chip-label\">Factor</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"14\"><span class=\"cm-intro-chip-num\">4</span><span class=\"cm-intro-chip-label\">Trig</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"19\"><span class=\"cm-intro-chip-num\">5</span><span class=\"cm-intro-chip-label\">Mixed</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"23\"><span class=\"cm-intro-chip-num\">6</span><span class=\"cm-intro-chip-label\">AP Practice</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"26\"><span class=\"cm-intro-chip-num\">7</span><span class=\"cm-intro-chip-label\">Exit</span></button></div><p class=\"cm-intro-cta\">Jump to a section or press <strong>Next</strong> to begin.</p></div></div>",
+          "kind": "intro",
+          "template": "intro",
+          "group": "divider",
+          "section": "1.6",
+          "study_tip": ""
+        },
+        {
+          "index": 2,
+          "title": "Bridge · from 1.5",
+          "html": "<div class=\"ap-bridge-page ap-bridge-page--light ap-slide-template--bridge\"><div class=\"ap-bridge-wash\" aria-hidden=\"true\"></div><div class=\"ap-bridge-stage\"><header class=\"ap-bridge-header\"><nav class=\"ap-unit-rail\" aria-label=\"Unit 1 · sections 1.1 through 1.4\"><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.1</span><span class=\"ap-unit-rail-label\">Instant</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.2</span><span class=\"ap-unit-rail-label\">Notation</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.3</span><span class=\"ap-unit-rail-label\">Graphs</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.4</span><span class=\"ap-unit-rail-label\">Tables</span></span></nav><p class=\"ap-bridge-eyebrow\">Unit 1 · Connecting ideas</p><h2 class=\"ap-bridge-hero-title\">Laws → tactics</h2></header><div class=\"ap-bridge-bento\"><section class=\"ap-bridge-pane ap-bridge-pane--recall\"><span class=\"ap-bridge-pane-label\">Recall</span><p><strong>1.5</strong> let you split limits across sums, products, and piecewise branches.</p></section><div class=\"ap-bridge-mid\" aria-hidden=\"true\"><span class=\"ap-bridge-mid-glow\"></span></div><section class=\"ap-bridge-pane ap-bridge-pane--now\"><span class=\"ap-bridge-pane-label\">This lesson</span><p><strong>1.6</strong> is the <em>toolbox</em>: when substitution stalls, rewrite the expression (factor, rationalize, trig identities) so the limit becomes obvious.</p></section></div><ol class=\"ap-bridge-protocol\" aria-label=\"Shared limit protocol\"><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">1</span><span class=\"ap-bridge-step-body\"><strong>Approach</strong><span>\\(x\\to c\\)</span></span></li><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">2</span><span class=\"ap-bridge-step-body\"><strong>Outputs</strong><span>→ \\(L\\)</span></span></li><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">3</span><span class=\"ap-bridge-step-body\"><strong>Separate</strong><span>\\(f(c)\\) may differ</span></span></li></ol><div class=\"ap-bridge-demo\"><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0} \\dfrac{\\sin x}{x} = 1\\]</div></div><p class=\"ap-bridge-footnote\">Tables and graphs suggest the answer; algebra confirms it.</p><div class=\"ap-bridge-rep-bar\"><div class=\"ap-rep-seg\" role=\"list\" aria-label=\"Limit representations in Unit 1\"><span class=\"ap-rep-chip is-active\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.2</span>Limit notation</span><span class=\"ap-rep-chip\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.3</span>Graph trace</span><span class=\"ap-rep-chip\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.4</span>Table columns</span></div></div></div></div>",
+          "kind": "lesson",
+          "template": "bridge",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Launch"
+        },
+        {
+          "index": 3,
+          "title": "Limit strategy flowchart",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Launch\"><span class=\"ap-phase-label\">Launch</span><h3 class=\"ap-phase-title\">Pick a tactic before calculating</h3></div><div class=\"ap-box ap-box--big-idea\"><span class=\"ap-box-label\">Big Idea</span><div class=\"ap-box-body\"><ol class='ap-procedure-list'><li><strong>Try direct substitution</strong> — plug \\(c\\) into a simplified form.</li><li>If you get a <strong>number</strong>, stop (unless the domain blocks \\(x=c\\)).</li><li>If you get <strong>\\(\\tfrac{0}{0}\\)</strong>, factor / cancel common terms or rationalize.</li><li>If you see <strong>\\(\\sin\\)</strong> or <strong>\\(\\cos\\)</strong> near \\(0\\), use special trig limits.</li><li>If simplified denominators still go to \\(0\\) with nonzero numerator → often <strong>DNE</strong> or infinite.</li></ol></div></div><table class=\"ap-data-table\"><thead><tr><th>Strategy</th><th>When to use</th><th>Packet cue</th></tr></thead><tbody><tr><td>Direct substitution</td><td>Polynomials, continuous functions at \\(c\\)</td><td>Notes #1–2</td></tr><tr><td>Factor & cancel</td><td>\\(\\tfrac{0}{0}\\) with algebraic factors</td><td>Notes #3–5, Practice #3–4</td></tr><tr><td>Special trig</td><td>\\(\\sin(kx)/x\\), \\(\\cos\\) near \\(0\\)</td><td>Notes #6–8</td></tr><tr><td>Rewrite / conjugate</td><td>\\(\\cos^2 x-1\\), nested fractions</td><td>Practice #18, #23</td></tr></tbody></table><div class=\"ap-concept-frame\"><div class=\"ap-concept-row\"><span>What it means</span><p>Match the algebra move to the indeterminate form.</p></div><div class=\"ap-concept-row\"><span>Why it matters</span><p>AP exam items cycle the same four moves with different coefficients.</p></div><div class=\"ap-concept-row\"><span>How to recognize</span><p>Factor completely before canceling; cancel only common factors.</p></div><div class=\"ap-concept-row ap-concept-row--warn\"><span>Common mistake</span><p>Canceling terms instead of factors; forgetting \\(x\\neq c\\) in the simplified form.</p></div><div class=\"ap-concept-row\"><span>How to check</span><p>Name your strategy in the margin before simplifying.</p></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Launch"
+        },
+        {
+          "index": 4,
+          "title": "Direct substitution",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Concept & Definition\"><span class=\"ap-phase-label\">Concept & Definition</span><h3 class=\"ap-phase-title\">When plugging in works</h3></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Direct substitution</span><div class=\"ap-box-body\"><p>If \\(f\\) is a polynomial or a rational function with nonzero denominator at \\(c\\), then</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to c} f(x) = f(c).\\]</div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Constants</span><div class=\"ap-box-body\"><p>\\(\\displaystyle\\lim_{x\\to 2} 6 = 6\\). A constant function ignores the approach value.</p></div></div></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Concept & Definition"
+        },
+        {
+          "index": 5,
+          "title": "Example · polynomial at c",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Evaluate \\(\\displaystyle\\lim_{x\\to -1}(x^2+2x-4)\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Polynomial → direct substitution.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Strategy: <strong>direct substitution</strong>.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> \\((-1)^2+2(-1)-4 = 1-2-4\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> \\(\\displaystyle\\lim_{x\\to -1}(x^2+2x-4)=\\mathbf{-5}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-5\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>No factoring needed when the denominator is absent.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 6,
+          "title": "Example · more direct substitution",
+          "html": "<div class=\"ap-slide-template ap-slide-template--practice\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p><strong>Practice sheet</strong> (direct substitution only):</p><table class=\"ap-data-table\"><thead><tr><th>Limit</th><th>Work</th><th>Value</th></tr></thead><tbody><tr><td>\\(\\displaystyle\\lim_{x\\to 2}(x-x^2)\\)</td><td>\\(2-4\\)</td><td>\\(-2\\)</td></tr><tr><td>\\(\\displaystyle\\lim_{x\\to 5}(x+1)^2\\)</td><td>\\(6^2\\)</td><td>\\(36\\)</td></tr><tr><td>\\(\\displaystyle\\lim_{x\\to -2}(3x^2-x+1)\\)</td><td>\\(12+2+1\\)</td><td>\\(15\\)</td></tr><tr><td>\\(\\displaystyle\\lim_{x\\to 3}(2x^2+5x-6)\\)</td><td>\\(18+15-6\\)</td><td>\\(27\\)</td></tr></tbody></table></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Each integrand is a polynomial — substitute \\(x=c\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Watch signs on squared terms.</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\">If substitution gives a single number and no domain issue, you are done.</div></div></div></div>",
+          "kind": "lesson",
+          "template": "practice",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 7,
+          "title": "Factor and cancel",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Why It Works\"><span class=\"ap-phase-label\">Why It Works</span><h3 class=\"ap-phase-title\">Remove the hole algebraically</h3></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Factor & cancel</span><div class=\"ap-box-body\"><p>When direct substitution yields \\(\\tfrac{0}{0}\\), factor numerator and denominator, cancel <strong>common factors</strong>, then substitute into the simplified expression.</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to c}\\frac{p(x)}{q(x)}=\\lim_{x\\to c}\\frac{(x-c)\\,p_1(x)}{(x-c)\\,q_1(x)}=\\lim_{x\\to c}\\frac{p_1(x)}{q_1(x)}\\]</div><div class=\"ap-box ap-box--warning\"><span class=\"ap-box-label\">Common Mistake</span><div class=\"ap-box-body\"><p>Canceling \\((x-c)\\) creates a <em>removable hole</em> at \\(x=c\\); the limit uses the simplified function, not the original value at \\(c\\).</p></div></div></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Why It Works"
+        },
+        {
+          "index": 8,
+          "title": "Example · factor x (notes #3)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Direct sub gives \\(\\tfrac{0}{0}\\). Factor \\(x\\) from the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Cancel \\(x\\) for \\(x\\neq 0\\), then substitute.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\dfrac{4x^2-15x}{x}=\\dfrac{x(4x-15)}{x}=4x-15\\) for \\(x\\neq 0\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> \\(\\displaystyle\\lim_{x\\to 0}(4x-15)=-15\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-15\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Always state what you canceled.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 9,
+          "title": "Example · linear factor in denominator (notes #4)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Substitution at \\(x=-7\\) gives \\(\\tfrac{0}{0}\\). Factor the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Difference of squares.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(x^2-49=(x-7)(x+7)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Cancel \\((x+7)\\): remaining expression \\(x-7\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> \\(\\displaystyle\\lim_{x\\to -7}(x-7)=-7-7=\\mathbf{-14}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-14\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Same template as practice #10 with a different center.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 10,
+          "title": "Example · practice #3",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Numerator \\(1-5=-4\\), denominator \\(0\\) → not merely \\(\\tfrac{0}{0}\\); the factor \\((x-1)\\) is not in the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>After checking factors, use simplified behavior near \\(1\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Near \\(x=1\\), \\(x^2-5x\\to -4\\) while \\(x-1\\to 0^{\\pm}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Magnitude blows up with opposite signs left vs right.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> \\(\\displaystyle\\lim_{x\\to 1}\\dfrac{x^2-5x}{x-1}\\) <strong>does not exist</strong> (infinite behavior).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> DNE (infinite)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Contrast with true \\(\\tfrac{0}{0}\\) cases where a common factor exists.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 11,
+          "title": "Example · practice #4 style",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>True \\(\\tfrac{0}{0}\\) — factor the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Find two numbers that multiply to \\(-6\\) and add to \\(5\\): \\(6\\) and \\(-1\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(x^2+5x-6=(x+6)(x-1)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Cancel \\((x-1)\\): limit \\(\\displaystyle\\lim_{x\\to 1}(x+6)=7\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(7\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Adapted from your practice sheet #4 (same factor-and-cancel move).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 12,
+          "title": "Example · rational at x = 8 (practice #10)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Difference of squares in the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Cancel \\((x-8)\\), then substitute \\(x=8\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(x^2-64=(x-8)(x+8)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Cancel \\((x-8)\\): limit \\(\\displaystyle\\lim_{x\\to 8}(x+8)=16\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(16\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Classic factor-and-cancel template.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 13,
+          "title": "When cancellation fails (notes #5)",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Contrast / Error Analysis\"><span class=\"ap-phase-label\">Contrast / Error Analysis</span><h3 class=\"ap-phase-title\">Limit does not exist</h3></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Contrast</span><strong>Non-removable</strong><p>After factoring, a zero denominator can still remain.</p></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p><strong>Notes #5 pattern:</strong> \\(\\displaystyle\\lim_{x\\to -6}\\dfrac{x^2+11x+30}{x+6}\\).</p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Factor: \\(x^2+11x+30=(x+5)(x+6)\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Cancel \\((x+6)\\): limit \\(\\displaystyle\\lim_{x\\to -6}(x+5)=-1\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> If cancellation leaves denominator \\(0\\) with nonzero numerator → <strong>DNE</strong>.</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to -6}\\dfrac{x^2+11x+30}{x+6}=-1\\]</div><div class=\"ap-box ap-box--warning\"><span class=\"ap-box-label\">Common Mistake</span><div class=\"ap-box-body\"><p><strong>Mistake:</strong> assuming every rational \\(\\tfrac{0}{0}\\) blows up. Some factor to a finite number.</p></div></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Contrast / Error Analysis"
+        },
+        {
+          "index": 14,
+          "title": "Special trigonometric limits",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"AP Connection\"><span class=\"ap-phase-label\">AP Connection</span><h3 class=\"ap-phase-title\">Near \\(x=0\\)</h3></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Two limits to memorize</span><div class=\"ap-box-body\"><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0}\\frac{\\sin x}{x}=1\\qquad\\displaystyle\\lim_{x\\to 0}\\frac{1-\\cos x}{x}=0\\]</div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Equivalents</span><div class=\"ap-box-body\"><p>\\(\\displaystyle\\lim_{x\\to 0}\\frac{x}{\\sin x}=1\\) and \\(\\displaystyle\\lim_{x\\to 0}\\frac{\\cos x-1}{x}=0\\) are the same facts with sign flips.</p></div></div></div></div><figure class=\"ap-fig ap-fig--teach\"><img src=\"/static/ap_calc/figures/sin_over_x_16.svg\" alt=\"Graph of \\(\\dfrac{\\sin x}{x}\\)\" loading=\"lazy\"/><figcaption class=\"ap-fig-cap\">Graph of \\(\\dfrac{\\sin x}{x}\\)</figcaption><p class=\"ap-fig-notice\"><strong>What to notice:</strong> <span class=\"ap-fig-notice-math\">Open circle at the origin; branches approach height \\(1\\).</span></p></figure></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "AP Connection"
+        },
+        {
+          "index": 15,
+          "title": "Example · sin(3x)/x (notes #6)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Create \\(\\dfrac{\\sin(3x)}{3x}\\) to use the standard limit.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Multiply by \\(3/3\\) to match \\(\\sin u/u\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Rewrite: \\(\\dfrac{\\sin(3x)}{x}=3\\cdot\\dfrac{\\sin(3x)}{3x}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> As \\(x\\to 0\\), \\(3x\\to 0\\) so \\(\\dfrac{\\sin(3x)}{3x}\\to 1\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Limit \\(=3\\cdot 1=\\mathbf{3}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(3\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Scale factor stays outside the sine ratio.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 16,
+          "title": "Example · sin(7x)/sin(9x) (notes #7)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Divide numerator and denominator by \\(x\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Rewrite as a ratio of two \\(\\sin(kx)/(kx)\\) limits.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\dfrac{\\sin(7x)}{\\sin(9x)}=\\dfrac{\\sin(7x)/(7x)}{\\sin(9x)/(9x)}\\cdot\\dfrac{7}{9}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Each sine ratio \\(\\to 1\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Limit \\(=\\dfrac{7}{9}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{7}{9}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Works for any nonzero constants \\(a,b\\): \\(\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(ax)}{\\sin(bx)}=\\frac{a}{b}\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 17,
+          "title": "Example · cos identity (notes #8)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Use \\(\\cos^2 x-1=-\\sin^2 x\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Convert to \\(\\sin x/x\\) factors, then let \\(x\\to 0\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Numerator \\(-\\sin^2 x = -x^2\\cdot\\bigl(\\tfrac{\\sin x}{x}\\bigr)^2\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Expression \\(\\approx \\dfrac{-x^2}{x(\\cos x+4)}=\\dfrac{-x}{\\cos x+4}\\cdot\\dfrac{\\sin^2 x}{x^2}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> As \\(x\\to 0\\): \\(\\dfrac{\\sin^2 x}{x^2}\\to 1\\), \\(\\dfrac{-x}{\\cos x+4}\\to 0\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"4\"><p><strong>Step 4.</strong> Limit \\(=\\mathbf{0}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(0\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Pythagorean identity is the standard move when you see \\(\\cos^2 x-1\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 18,
+          "title": "Trig practice pair",
+          "html": "<div class=\"ap-slide-template ap-slide-template--practice\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p><strong>Practice #5–6</strong></p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> \\(\\displaystyle\\lim_{x\\to 0}\\dfrac{3x}{\\sin x}=3\\cdot\\dfrac{x}{\\sin x}\\to 3\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> \\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(2x)}{3x}=\\dfrac{2}{3}\\cdot\\dfrac{\\sin(2x)}{2x}\\to \\dfrac{2}{3}\\).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0}\\frac{3x}{\\sin x}=3,\\qquad\\lim_{x\\to 0}\\frac{\\sin(2x)}{3x}=\\frac{2}{3}\\]</div></div></div>",
+          "kind": "lesson",
+          "template": "practice",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 19,
+          "title": "Mixed · practice #21–22",
+          "html": "<div class=\"ap-phase-divider\" data-ap-phase=\"Worked Example\"><span class=\"ap-phase-label\">Worked Example</span><h3 class=\"ap-phase-title\">Factor after rearranging</h3></div><div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Denominator \\(2-x=-(x-2)\\); factor numerator by \\((x-2)\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Factor, cancel, and watch the sign on \\(2-x\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(x^2+6x-16=(x-2)(x+8)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> \\(\\dfrac{(x-2)(x+8)}{2-x}=\\dfrac{(x-2)(x+8)}{-(x-2)}=-(x+8)\\) for \\(x\\neq 2\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Limit \\(=-(2+8)=\\mathbf{-10}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-10\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Flip the linear denominator factor first.</p></div></div></details></div><div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><p>Factor numerator; note \\(5-x=-(x-5)\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Same sign-flip pattern as practice #21.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(2x^2-17x+35=(2x-7)(x-5)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Cancel \\((x-5)\\) with sign: \\(\\dfrac{(2x-7)(x-5)}{5-x}=-(2x-7)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Limit \\(=-(10-7)=\\mathbf{-3}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-3\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Same template as #21 with different roots.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Worked Example"
+        },
+        {
+          "index": 20,
+          "title": "Mixed · evaluate at π and nested trig",
+          "html": "<div class=\"ap-slide-template ap-slide-template--worked-example\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><p><strong>Practice #19–20, #23</strong></p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> \\(\\displaystyle\\lim_{x\\to \\pi}\\cos x=\\cos\\pi=\\mathbf{-1}\\) (direct).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> \\(\\displaystyle\\lim_{x\\to 0}\\sin(4x)=0\\) (direct continuity).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> \\(\\displaystyle\\lim_{x\\to 0}\\dfrac{(1-\\cos^2 x)\\sin x}{x^2}=\\lim\\dfrac{\\sin^3 x}{x^2}=\\lim \\dfrac{\\sin x}{x}\\cdot\\sin^2 x = 0\\).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\">Use \\(\\sin^2 x+\\cos^2 x=1\\) to rewrite before applying \\(\\sin x/x\\).</div></div></div></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Worked Example"
+        },
+        {
+          "index": 21,
+          "title": "Practice MCQ · ln limit",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">ln 1 = 0</p></details><p>Evaluate \\(\\displaystyle\\lim_{x\\to 1}\\dfrac{\\ln x}{3x}\\).</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\dfrac{3}{e}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(e\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(3\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> — numerator \\(\\to 0\\), denominator \\(\\to 3\\). (Test Prep #24)</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 22,
+          "title": "Practice MCQ · perfect square factor",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">Numerator is (x-a)^2</p></details><p>\\(\\displaystyle\\lim_{x\\to a}\\dfrac{x^2-2ax+a^2}{x-a}=\\) ?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(-\\infty\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(a\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\infty\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>C</strong> — \\(x^2-2ax+a^2=(x-a)^2\\). Cancel one \\((x-a)\\); remaining factor \\((x-a)\\to 0\\). (Test Prep #26)</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 23,
+          "title": "Practice MCQ · trig rational",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">Factor sin x; use sin x ~ x and 1-cos x ~ x^2/2</p></details><p>\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{4\\sin x\\cos x-\\sin x}{x^2}\\) is</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"D\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(2\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\dfrac{40}{3}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(\\infty\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(0\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>D</strong> — \\(\\sin x(4\\cos x-1)/x^2\\to 1\\cdot(-1)/x\\to 0\\) from the standard small-angle behavior. (Test Prep #25)</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 24,
+          "title": "Practice MCQ · bracketed rational",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">cos part → 0, x part → 0</p></details><p>\\(\\displaystyle\\lim_{x\\to 0}\\left(\\dfrac{3x^2+5\\cos x-5}{2x}\\right)=\\) ?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(\\dfrac{5}{2}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(3\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(4\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> — numerator \\(\\to 0\\), denominator \\(\\to 0\\); expand \\(\\cos x\\approx 1-\\tfrac{x^2}{2}\\) or factor numerically → limit \\(0\\). (Test Prep #27)</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 25,
+          "title": "Exit ticket · 1.6",
+          "html": "<div class=\"ap-slide-template ap-slide-template--summary\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Exit Ticket</span><strong>Check your learning</strong><p>Answer each item before revealing.</p></div><ol class=\"ap-exit-list\"><li><span class=\"ap-exit-num\">1</span><div class=\"ap-exit-body\">Name three limit strategies from this section.<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p><strong>Direct substitution</strong>, <strong>factor & cancel</strong>, <strong>special trig limits</strong> (plus rewrite/conjugate when needed).</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">2</span><div class=\"ap-exit-body\">\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(5x)}{x}=\\) ?<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>\\(5\\cdot\\dfrac{\\sin(5x)}{5x}\\to 5\\).</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">3</span><div class=\"ap-exit-body\">\\(\\displaystyle\\lim_{x\\to 4}\\dfrac{x^2-16}{x-4}=\\) ?<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>Factor: \\((x-4)(x+4)/(x-4)\\to 8\\).</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li></ol></div>",
+          "kind": "lesson",
+          "template": "summary",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": "",
+          "path_phase": "Exit Ticket"
+        },
+        {
+          "index": 26,
+          "title": "Practice packet · 1.6",
+          "html": "<div class=\"ap-slide-template ap-slide-template--summary\"><div class=\"ap-calc-packet-card glass-panel np-glass\"><p class=\"np-atelier-kicker\">Practice packet</p><h2>Unit 1.6 · Algebraic manipulation of limits</h2><p>Download the worksheet and solution key for additional practice beyond this deck.</p><div class=\"ap-calc-packet-actions\"><a class=\"np-atelier-btn np-atelier-btn--primary\" href=\"/ap/calc/practice/1.6/packet.pdf\" target=\"_blank\" rel=\"noopener\">Open packet PDF</a><a class=\"np-atelier-btn np-atelier-btn--ghost\" href=\"/ap/calc/practice/1.6/solutions.pdf\" target=\"_blank\" rel=\"noopener\">Open solutions PDF</a></div></div></div>",
+          "kind": "lesson",
+          "template": "summary",
+          "group": "practice",
+          "section": "1.6",
+          "study_tip": ""
+        }
+      ],
+      "practice_section": "1.6",
+      "interactive_count": 4,
+      "checkpoint_count": 4,
+      "tex_available": true,
+      "pdf_available": false,
+      "phase": 1,
+      "prev_lesson_slug": "ap-1-5-algebraic-limits-piecewise",
+      "next_lesson_slug": null,
+      "knowledge_map": [
+        {
+          "title": "Launch",
+          "start_index": 2,
+          "items": [
+            {
+              "index": 2,
+              "kind": "lesson",
+              "title": "Bridge · from 1.5",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 3,
+              "kind": "lesson",
+              "title": "Limit strategy flowchart",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Concept & Definition",
+          "start_index": 4,
+          "items": [
+            {
+              "index": 4,
+              "kind": "lesson",
+              "title": "Direct substitution",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 5,
+          "items": [
+            {
+              "index": 5,
+              "kind": "lesson",
+              "title": "Example · polynomial at c",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 6,
+              "kind": "lesson",
+              "title": "Example · more direct substitution",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Why It Works",
+          "start_index": 7,
+          "items": [
+            {
+              "index": 7,
+              "kind": "lesson",
+              "title": "Factor and cancel",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 8,
+          "items": [
+            {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Example · factor x (notes #3)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 9,
+              "kind": "lesson",
+              "title": "Example · linear factor in denominator (notes #4)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 10,
+              "kind": "lesson",
+              "title": "Example · practice #3",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 11,
+              "kind": "lesson",
+              "title": "Example · practice #4 style",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 12,
+              "kind": "lesson",
+              "title": "Example · rational at x = 8 (practice #10)",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Contrast / Error Analysis",
+          "start_index": 13,
+          "items": [
+            {
+              "index": 13,
+              "kind": "lesson",
+              "title": "When cancellation fails (notes #5)",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "AP Connection",
+          "start_index": 14,
+          "items": [
+            {
+              "index": 14,
+              "kind": "lesson",
+              "title": "Special trigonometric limits",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 15,
+          "items": [
+            {
+              "index": 15,
+              "kind": "lesson",
+              "title": "Example · sin(3x)/x (notes #6)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 16,
+              "kind": "lesson",
+              "title": "Example · sin(7x)/sin(9x) (notes #7)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 17,
+              "kind": "lesson",
+              "title": "Example · cos identity (notes #8)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 18,
+              "kind": "lesson",
+              "title": "Trig practice pair",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Worked Example",
+          "start_index": 19,
+          "items": [
+            {
+              "index": 19,
+              "kind": "lesson",
+              "title": "Mixed · practice #21–22",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 20,
+              "kind": "lesson",
+              "title": "Mixed · evaluate at π and nested trig",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "AP Practice",
+          "start_index": 21,
+          "items": [
+            {
+              "index": 21,
+              "kind": "question",
+              "title": "Practice MCQ · ln limit",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 22,
+              "kind": "question",
+              "title": "Practice MCQ · perfect square factor",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 23,
+              "kind": "question",
+              "title": "Practice MCQ · trig rational",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 24,
+              "kind": "question",
+              "title": "Practice MCQ · bracketed rational",
+              "interactive": true,
+              "has_mcq": true
+            }
+          ]
+        },
+        {
+          "title": "Exit Ticket",
+          "start_index": 25,
+          "items": [
+            {
+              "index": 25,
+              "kind": "lesson",
+              "title": "Exit ticket · 1.6",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Lesson flow",
+          "start_index": 26,
+          "items": [
+            {
+              "index": 26,
+              "kind": "lesson",
+              "title": "Practice packet · 1.6",
               "interactive": false,
               "has_mcq": false
             }
