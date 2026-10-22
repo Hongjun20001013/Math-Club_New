@@ -1504,13 +1504,19 @@ html[data-exam-theme="dark"] .ap-data-table td {
   border: 1px solid rgba(106, 76, 230, 0.16);
 }
 
-.ap-limit-problem-source {
+.ap-limit-problem-source,
+.ap-limit-strategy-chip {
   margin: 0 0 0.45rem;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #6a4ce6;
+  letter-spacing: 0.04em;
+  color: #5b21b6;
+}
+
+.ap-limit-strategy-chip::before {
+  content: "考点 · ";
+  font-weight: 650;
+  color: #7c6fc9;
 }
 
 .ap-worked-strategy {

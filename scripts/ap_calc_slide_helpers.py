@@ -113,7 +113,7 @@ def role(label: str, title: str, lead: str) -> str:
     )
 
 
-def limit_problem(latex: str, source: str = "") -> str:
+def limit_problem(latex: str, strategy: str = "", source: str = "") -> str:
     """Prominent limit statement for worked/guided example stems."""
     raw = (latex or "").strip()
     if raw.startswith("\\(") and raw.endswith("\\)"):
@@ -123,8 +123,14 @@ def limit_problem(latex: str, source: str = "") -> str:
     else:
         inner = raw if raw.startswith("\\displaystyle") else f"\\displaystyle {raw}"
         block = math_block(f"\\[{inner}\\]")
-    badge = f'<p class="ap-limit-problem-source">{source}</p>' if source else ""
+    label = (strategy or source or "").strip()
+    badge = f'<p class="ap-limit-strategy-chip">{label}</p>' if label else ""
     return f'<div class="ap-limit-problem">{badge}{block}</div>'
+
+
+def limit_strategy_row(strategies: list[tuple[str, str]]) -> str:
+    """Stack of (strategy label, limit latex) for guided practice slides."""
+    return "".join(limit_problem(tex, strategy) for strategy, tex in strategies)
 
 
 def math_block(tex: str) -> str:
@@ -560,17 +566,20 @@ def worked_example(
     check: str,
     stem_math: str = "",
     limit_latex: str = "",
+    strategy_focus: str = "",
     source_label: str = "",
     collapsible_model: bool = False,
 ) -> str:
     stem_extra = stem_math if stem_math else ""
-    label = source_label or (title if title and "\\lim" not in title and "lim_" not in title else "")
+    focus = (strategy_focus or source_label or "").strip()
+    if not focus and title and "\\lim" not in title and "lim_" not in title:
+        focus = title.strip()
     limit_tex = (limit_latex or "").strip()
     if not limit_tex and title and ("\\lim" in title or "lim_{" in title):
         limit_tex = title
-    prompt = limit_problem(limit_tex, label) if limit_tex else ""
-    if not limit_tex and title:
-        prompt = f'<p class="ap-limit-problem-source">{title}</p>'
+    prompt = limit_problem(limit_tex, focus) if limit_tex else ""
+    if not limit_tex and focus:
+        prompt = f'<p class="ap-limit-strategy-chip">{focus}</p>'
     strategy = f'<p class="ap-worked-strategy">{understand}</p>' if understand else ""
     model_open = "" if collapsible_model else " open"
     model_tag = "details" if collapsible_model else "div"

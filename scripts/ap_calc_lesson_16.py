@@ -16,6 +16,7 @@ from ap_calc_slide_helpers import (
     key_point,
     limit_card,
     limit_problem,
+    limit_strategy_row,
     math_block,
     mcq_reveal,
     phase_divider,
@@ -26,27 +27,62 @@ from ap_calc_slide_helpers import (
     worked_example,
 )
 
+# Shorthand strategy labels (shown as 考点 · … on each problem card)
+DIRECT = "Direct substitution"
+CONST = "Direct substitution (constant)"
+FACTOR = "Factor & cancel (\\frac{0}{0})"
+DIFF_SQ = "Factor & cancel (difference of squares)"
+DNE_INF = "Limit does not exist (infinite)"
+TRIG_SIN = "Special trig limit (\\sin(kx)/x)"
+TRIG_RATIO = "Special trig limit (ratio of sines)"
+TRIG_ID = "Trig identity + \\sin x/x"
+SIGN_FLIP = "Factor & cancel (watch denominator sign)"
+TRIG_POINT = "Direct substitution (trig at a point)"
+TRIG_MIX = "Trig identity + special limits"
+
+
+def _ex(
+    strategy: str,
+    limit_tex: str,
+    setup: str,
+    method: str,
+    steps: list[str],
+    answer: str,
+    check: str,
+) -> str:
+    return worked_example(
+        strategy,
+        setup,
+        method,
+        solution_steps(steps),
+        answer,
+        check,
+        limit_latex=limit_tex,
+        strategy_focus=strategy,
+        collapsible_model=True,
+    )
+
 
 def build(graphs: dict[str, str]) -> dict:
     s = SlideBuilder("1.6")
     g = graphs
 
     s.add(
-        "1.6 · Algebraic manipulation",
+        "1.6 · Limit strategies",
         intro(
             "1",
             "1.6",
             "Determining limits using algebraic manipulation",
             [
                 (3, "Strategies"),
-                (6, "Direct sub"),
-                (9, "Factor"),
-                (14, "Trig"),
-                (19, "Mixed"),
-                (23, "AP Practice"),
-                (26, "Exit"),
+                (5, "Direct sub"),
+                (11, "Factor"),
+                (20, "Trig"),
+                (28, "Mixed"),
+                (33, "Check"),
+                (37, "Exit"),
             ],
-            lede="Choose a strategy: substitute, factor and cancel, or use special trig limits",
+            lede="Every limit starts with a strategy: substitute, factor, trig limit, or recognize DNE",
         ),
         kind="intro",
         group="divider",
@@ -56,11 +92,11 @@ def build(graphs: dict[str, str]) -> dict:
         "Bridge · from 1.5",
         bridge_slide(
             "1.6",
-            "Laws → tactics",
-            "<p><strong>1.5</strong> let you split limits across sums, products, and piecewise branches.</p>",
-            "<p><strong>1.6</strong> is the <em>toolbox</em>: when substitution stalls, rewrite the expression "
-            "(factor, rationalize, trig identities) so the limit becomes obvious.</p>",
-            "Tables and graphs suggest the answer; algebra confirms it.",
+            "Laws → strategies",
+            "<p><strong>1.5</strong> combined limits with algebra laws.</p>",
+            "<p><strong>1.6</strong> is your <em>limit strategy</em> unit: pick a tactic, show the limit clearly, "
+            "then simplify.</p>",
+            "Each example below labels the 考点 (strategy) before the solution.",
             "notation",
             protocol_mode="notation",
             demo_html=limit_card("x\\to 0", expr="\\dfrac{\\sin x}{x}", equals="1"),
@@ -69,32 +105,31 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Limit strategy flowchart",
-        phase_divider("Launch", "Pick a tactic before calculating")
+        "Limit strategy map",
+        phase_divider("Launch", "Choose before you calculate")
         + big_idea(
             "<ol class='ap-procedure-list'>"
-            "<li><strong>Try direct substitution</strong> — plug \\(c\\) into a simplified form.</li>"
-            "<li>If you get a <strong>number</strong>, stop (unless the domain blocks \\(x=c\\)).</li>"
-            "<li>If you get <strong>\\(\\tfrac{0}{0}\\)</strong>, factor / cancel common terms or rationalize.</li>"
-            "<li>If you see <strong>\\(\\sin\\)</strong> or <strong>\\(\\cos\\)</strong> near \\(0\\), use special trig limits.</li>"
-            "<li>If simplified denominators still go to \\(0\\) with nonzero numerator → often <strong>DNE</strong> or infinite.</li>"
+            "<li><strong>Direct substitution</strong> — polynomials, constants, continuous trig at \\(c\\).</li>"
+            "<li><strong>Factor & cancel</strong> — when substitution gives \\(\\tfrac{0}{0}\\).</li>"
+            "<li><strong>Special trig limits</strong> — \\(\\sin(kx)/x\\), \\(\\cos\\) identities near \\(0\\).</li>"
+            "<li><strong>DNE / infinite</strong> — denominator \\(\\to 0\\) with no cancellable factor.</li>"
             "</ol>"
         )
         + data_table(
-            ["Strategy", "When to use", "Packet cue"],
+            ["考点", "When you use it", "What you do first"],
             [
-                ["Direct substitution", "Polynomials, continuous functions at \\(c\\)", "Notes #1–2"],
-                ["Factor & cancel", "\\(\\tfrac{0}{0}\\) with algebraic factors", "Notes #3–5, Practice #3–4"],
-                ["Special trig", "\\(\\sin(kx)/x\\), \\(\\cos\\) near \\(0\\)", "Notes #6–8"],
-                ["Rewrite / conjugate", "\\(\\cos^2 x-1\\), nested fractions", "Practice #18, #23"],
+                [DIRECT, "Clean number after plugging in \\(c\\)", "Substitute and stop"],
+                [FACTOR, "\\(\\tfrac{0}{0}\\) rational form", "Factor, cancel, substitute"],
+                [TRIG_SIN, "\\(\\sin(kx)\\) with \\(x\\to 0\\)", "Build \\(\\sin(kx)/(kx)\\)"],
+                [DNE_INF, "Nonzero over zero after factoring", "Do not invent a finite value"],
             ],
         )
         + concept_frame(
-            "Match the algebra move to the indeterminate form.",
-            "AP exam items cycle the same four moves with different coefficients.",
-            "Factor completely before canceling; cancel only common factors.",
-            "Canceling terms instead of factors; forgetting \\(x\\neq c\\) in the simplified form.",
-            "Name your strategy in the margin before simplifying.",
+            "Name the strategy before doing algebra.",
+            "AP items reward a clear method, not guessing.",
+            "Indeterminate \\(\\tfrac{0}{0}\\) vs blow-up form.",
+            "Canceling terms instead of factors.",
+            "Write the 考点 in the margin on every limit you attempt.",
         ),
         path_phase="Launch",
     )
@@ -104,291 +139,352 @@ def build(graphs: dict[str, str]) -> dict:
         phase_divider("Concept & Definition", "When plugging in works")
         + definition(
             "Direct substitution",
-            "<p>If \\(f\\) is a polynomial or a rational function with nonzero denominator at \\(c\\), then</p>"
+            "<p>If \\(f\\) is a polynomial, constant, or continuous at \\(c\\), then</p>"
             + math_block("\\[\\displaystyle\\lim_{x\\to c} f(x) = f(c).\\]")
-            + key_point(
-                "Constants",
-                "<p>\\(\\displaystyle\\lim_{x\\to 2} 6 = 6\\). A constant function ignores the approach value.</p>",
-            ),
         ),
         path_phase="Concept & Definition",
     )
 
     s.add(
-        "Example · polynomial at c",
-        worked_example(
-            "Notes #1",
-            "Strategy: direct substitution on a polynomial.",
-            "Polynomial → direct substitution.",
-            solution_steps([
-                "Strategy: <strong>direct substitution</strong>.",
-                "\\((-1)^2+2(-1)-4 = 1-2-4\\).",
-                "\\(\\displaystyle\\lim_{x\\to -1}(x^2+2x-4)=\\mathbf{-5}\\).",
-            ]),
-            "\\(-5\\)",
-            "No factoring needed when the denominator is absent.",
-            limit_latex=r"\lim_{x\to -1}(x^2+2x-4)",
-            source_label="Calculus notes #1",
-            collapsible_model=True,
+        "Example · constant",
+        _ex(
+            CONST,
+            r"\lim_{x\to 2} 6",
+            "A constant does not depend on \\(x\\).",
+            "The value is already simplified.",
+            ["\\(\\displaystyle\\lim_{x\\to 2} 6 = \\mathbf{6}\\)."],
+            "\\(6\\)",
+            "Constants are the fastest direct-substitution case.",
         ),
         path_phase="Guided Example",
     )
 
     s.add(
-        "Example · more direct substitution",
-        guided_example(
-            "<p><strong>Practice sheet</strong> (direct substitution only):</p>"
-            + data_table(
-                ["Limit", "Work", "Value"],
-                [
-                    ["\\(\\displaystyle\\lim_{x\\to 2}(x-x^2)\\)", "\\(2-4\\)", "\\(-2\\)"],
-                    ["\\(\\displaystyle\\lim_{x\\to 5}(x+1)^2\\)", "\\(6^2\\)", "\\(36\\)"],
-                    ["\\(\\displaystyle\\lim_{x\\to -2}(3x^2-x+1)\\)", "\\(12+2+1\\)", "\\(15\\)"],
-                    ["\\(\\displaystyle\\lim_{x\\to 3}(2x^2+5x-6)\\)", "\\(18+15-6\\)", "\\(27\\)"],
-                ],
-            ),
+        "Example · polynomial",
+        _ex(
+            DIRECT,
+            r"\lim_{x\to -1}(x^2+2x-4)",
+            "Polynomial → substitute \\(x=-1\\).",
+            "Evaluate the expression at the approach value.",
             [
-                "Each integrand is a polynomial — substitute \\(x=c\\).",
-                "Watch signs on squared terms.",
+                "\\((-1)^2+2(-1)-4 = 1-2-4\\).",
+                "\\(\\displaystyle\\lim_{x\\to -1}(x^2+2x-4)=\\mathbf{-5}\\).",
             ],
-            checkpoint("If substitution gives a single number and no domain issue, you are done."),
+            "\\(-5\\)",
+            "No factoring when there is no denominator.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · quadratic expression",
+        _ex(
+            DIRECT,
+            r"\lim_{x\to 2}(x-x^2)",
+            "Substitute \\(x=2\\).",
+            "Watch the sign on \\(x^2\\).",
+            ["\\(2-4=\\mathbf{-2}\\)."],
+            "\\(-2\\)",
+            "Order of terms does not change the limit.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · squared binomial",
+        _ex(
+            DIRECT,
+            r"\lim_{x\to 5}(x+1)^2",
+            "Expand or substitute first — here substitution is faster.",
+            "Compute \\((5+1)^2\\).",
+            ["\\(6^2=\\mathbf{36}\\)."],
+            "\\(36\\)",
+            "Powers of continuous expressions use direct substitution.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "More direct substitution",
+        guided_example(
+            limit_strategy_row([
+                (DIRECT, r"\lim_{x\to -2}(3x^2-x+1)"),
+                (DIRECT, r"\lim_{x\to 3}(2x^2+5x-6)"),
+            ])
+            + "<p>Try each limit before opening hints.</p>",
+            [
+                "At \\(x=-2\\): \\(3(4)-(-2)+1=12+2+1=15\\).",
+                "At \\(x=3\\): \\(2(9)+15-6=18+15-6=27\\).",
+            ],
+            math_block(
+                "\\[\\displaystyle\\lim_{x\\to -2}(3x^2-x+1)=15,"
+                "\\qquad"
+                "\\lim_{x\\to 3}(2x^2+5x-6)=27\\]"
+            ),
         ),
         path_phase="Guided Example",
     )
 
     s.add(
         "Factor and cancel",
-        phase_divider("Why It Works", "Remove the hole algebraically")
+        phase_divider("Why It Works", "Remove the hole")
         + definition(
             "Factor & cancel",
-            "<p>When direct substitution yields \\(\\tfrac{0}{0}\\), factor numerator and denominator, "
-            "cancel <strong>common factors</strong>, then substitute into the simplified expression.</p>"
-            + math_block(
-                "\\[\\displaystyle\\lim_{x\\to c}\\frac{p(x)}{q(x)}"
-                "=\\lim_{x\\to c}\\frac{(x-c)\\,p_1(x)}{(x-c)\\,q_1(x)}"
-                "=\\lim_{x\\to c}\\frac{p_1(x)}{q_1(x)}\\]"
-            )
-            + warning(
-                "<p>Canceling \\((x-c)\\) creates a <em>removable hole</em> at \\(x=c\\); the limit uses the "
-                "simplified function, not the original value at \\(c\\).</p>"
-            ),
+            "<p>When direct substitution gives \\(\\tfrac{0}{0}\\), factor, cancel common factors, "
+            "then substitute into the simplified form.</p>"
+            + warning("Cancel factors, not individual terms.")
         ),
         path_phase="Why It Works",
     )
 
     s.add(
-        "Example · factor x (notes #3)",
-        worked_example(
-            "Notes #3",
-            "Direct sub gives \\(\\tfrac{0}{0}\\). Factor \\(x\\) from the numerator.",
-            "Cancel \\(x\\) for \\(x\\neq 0\\), then substitute.",
-            solution_steps([
-                "\\(\\dfrac{4x^2-15x}{x}=\\dfrac{x(4x-15)}{x}=4x-15\\) for \\(x\\neq 0\\).",
-                "\\(\\displaystyle\\lim_{x\\to 0}(4x-15)=-15\\).",
-            ]),
-            "\\(-15\\)",
-            "Always state what you canceled.",
-            limit_latex=r"\lim_{x\to 0}\dfrac{4x^2-15x}{x}",
-            source_label="Calculus notes #3",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · linear factor in denominator (notes #4)",
-        worked_example(
-            "Notes #4",
-            "Substitution at \\(x=-7\\) gives \\(\\tfrac{0}{0}\\). Factor the numerator.",
-            "Difference of squares.",
-            solution_steps([
-                "\\(x^2-49=(x-7)(x+7)\\).",
-                "Cancel \\((x+7)\\): remaining expression \\(x-7\\).",
-                "\\(\\displaystyle\\lim_{x\\to -7}(x-7)=-7-7=\\mathbf{-14}\\).",
-            ]),
-            "\\(-14\\)",
-            "Same template as practice #10 with a different center.",
-            limit_latex=r"\lim_{x\to -7}\dfrac{x^2-49}{x+7}",
-            source_label="Calculus notes #4",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · practice #3",
-        worked_example(
-            "Practice #3",
-            "Numerator \\(1-5=-4\\), denominator \\(0\\) → not merely \\(\\tfrac{0}{0}\\); the factor \\((x-1)\\) is not in the numerator.",
-            "After checking factors, use simplified behavior near \\(1\\).",
-            solution_steps([
-                "Near \\(x=1\\), \\(x^2-5x\\to -4\\) while \\(x-1\\to 0^{\\pm}\\).",
-                "Magnitude blows up with opposite signs left vs right.",
-                "\\(\\displaystyle\\lim_{x\\to 1}\\dfrac{x^2-5x}{x-1}\\) <strong>does not exist</strong> (infinite behavior).",
-            ]),
-            "DNE (infinite)",
-            "Contrast with true \\(\\tfrac{0}{0}\\) cases where a common factor exists.",
-            limit_latex=r"\lim_{x\to 1}\dfrac{x^2-5x}{x-1}",
-            source_label="Practice sheet #3",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · practice #4 style",
-        worked_example(
-            "Practice #4",
-            "True \\(\\tfrac{0}{0}\\) — factor the numerator.",
-            "Find two numbers that multiply to \\(-6\\) and add to \\(5\\): \\(6\\) and \\(-1\\).",
-            solution_steps([
-                "\\(x^2+5x-6=(x+6)(x-1)\\).",
-                "Cancel \\((x-1)\\): limit \\(\\displaystyle\\lim_{x\\to 1}(x+6)=7\\).",
-            ]),
-            "\\(7\\)",
-            "Adapted from your practice sheet #4 (same factor-and-cancel move).",
-            limit_latex=r"\lim_{x\to 1}\dfrac{x^2+5x-6}{x-1}",
-            source_label="Practice sheet #4",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · rational at x = 8 (practice #10)",
-        worked_example(
-            "Practice #10",
-            "Difference of squares in the numerator.",
-            "Cancel \\((x-8)\\), then substitute \\(x=8\\).",
-            solution_steps([
-                "\\(x^2-64=(x-8)(x+8)\\).",
-                "Cancel \\((x-8)\\): limit \\(\\displaystyle\\lim_{x\\to 8}(x+8)=16\\).",
-            ]),
-            "\\(16\\)",
-            "Classic factor-and-cancel template.",
-            limit_latex=r"\lim_{x\to 8}\dfrac{x^2-64}{x-8}",
-            source_label="Practice sheet #10",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "When cancellation fails (notes #5)",
-        phase_divider("Contrast / Error Analysis", "Limit does not exist")
-        + role("Contrast", "Non-removable", "After factoring, a zero denominator can still remain.")
-        + guided_example(
-            limit_problem(r"\lim_{x\to -6}\dfrac{x^2+11x+30}{x+6}", "Calculus notes #5")
-            + "<p><strong>After factoring,</strong> decide whether the limit is finite or DNE.</p>",
+        "Example · factor \\(x\\)",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to 0}\dfrac{4x^2-15x}{x}",
+            "Direct sub gives \\(\\tfrac{0}{0}\\).",
+            "Factor \\(x\\) from the numerator, then cancel.",
             [
-                "Factor: \\(x^2+11x+30=(x+5)(x+6)\\).",
-                "Cancel \\((x+6)\\): limit \\(\\displaystyle\\lim_{x\\to -6}(x+5)=-1\\).",
-                "If cancellation leaves denominator \\(0\\) with nonzero numerator → <strong>DNE</strong>.",
+                "\\(\\dfrac{x(4x-15)}{x}=4x-15\\) for \\(x\\neq 0\\).",
+                "Limit \\(=4(0)-15=\\mathbf{-15}\\).",
             ],
-            math_block("\\[\\displaystyle\\lim_{x\\to -6}\\dfrac{x^2+11x+30}{x+6}=-1\\]")
-            + warning(
-                "<p><strong>Mistake:</strong> assuming every rational \\(\\tfrac{0}{0}\\) blows up. "
-                "Some factor to a finite number.</p>"
+            "\\(-15\\)",
+            "State that \\(x\\neq 0\\) when you cancel.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · difference of squares (1)",
+        _ex(
+            DIFF_SQ,
+            r"\lim_{x\to -7}\dfrac{x^2-49}{x+7}",
+            "Substitution gives \\(\\tfrac{0}{0}\\).",
+            "Factor \\(x^2-49=(x-7)(x+7)\\).",
+            [
+                "Cancel \\((x+7)\\): left with \\(x-7\\).",
+                "\\(\\displaystyle\\lim_{x\\to -7}(x-7)=-7-7=\\mathbf{-14}\\).",
+            ],
+            "\\(-14\\)",
+            "Difference of squares is a common AP pattern.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · factor quadratic",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to 1}\dfrac{x^2+5x-6}{x-1}",
+            "True \\(\\tfrac{0}{0}\\).",
+            "Factor numerator: \\((x+6)(x-1)\\).",
+            [
+                "Cancel \\((x-1)\\).",
+                "\\(\\displaystyle\\lim_{x\\to 1}(x+6)=\\mathbf{7}\\).",
+            ],
+            "\\(7\\)",
+            "Always check for a shared linear factor.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · difference of squares (2)",
+        _ex(
+            DIFF_SQ,
+            r"\lim_{x\to 8}\dfrac{x^2-64}{x-8}",
+            "Numerator is \\(x^2-8^2\\).",
+            "Cancel \\((x-8)\\), then substitute.",
+            [
+                "Simplified form: \\(x+8\\).",
+                "Limit \\(=8+8=\\mathbf{16}\\).",
+            ],
+            "\\(16\\)",
+            "Same 考点 as the \\(x=-7\\) example with a different center.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · factor at \\(x=4\\)",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to 4}\dfrac{5x^2-21x+4}{x-4}",
+            "Substitution gives \\(\\tfrac{0}{0}\\).",
+            "Factor numerator: \\((5x-1)(x-4)\\).",
+            [
+                "Cancel \\((x-4)\\); simplified form \\(5x-1\\).",
+                "\\(\\displaystyle\\lim_{x\\to 4}(5x-1)=5(4)-1=\\mathbf{19}\\).",
+            ],
+            "\\(19\\)",
+            "Synthetic division at \\(x=4\\) is fast when the quadratic is messy.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · rational at \\(x=\\tfrac{1}{3}\\)",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to \frac{1}{3}}\dfrac{6x^2+7x-3}{3x-1}",
+            "Check \\(\\tfrac{0}{0}\\) at \\(x=\\tfrac{1}{3}\\).",
+            "Factor numerator: \\((3x-1)(2x+3)\\).",
+            [
+                "Cancel \\((3x-1)\\); left with \\(2x+3\\).",
+                "\\(\\displaystyle\\lim_{x\\to \\frac{1}{3}}(2x+3)=\\dfrac{2}{3}+3=\\mathbf{\\dfrac{11}{3}}\\).",
+            ],
+            "\\(\\dfrac{11}{3}\\)",
+            "Fractional centers still use the same factor-and-cancel 考点.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · limit DNE",
+        _ex(
+            DNE_INF,
+            r"\lim_{x\to 1}\dfrac{x^2-5x}{x-1}",
+            "Numerator \\(\\to -4\\), denominator \\(\\to 0\\).",
+            "No common factor \\((x-1)\\) in the numerator.",
+            [
+                "Left and right approaches have opposite infinite behavior.",
+                "Two-sided limit <strong>does not exist</strong>.",
+            ],
+            "DNE",
+            "Not every rational with denominator \\(0\\) is a removable hole.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · cancel to a finite value",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to -6}\dfrac{x^2+11x+30}{x+6}",
+            "This is \\(\\tfrac{0}{0}\\) with a shared factor.",
+            "Factor quadratic numerator.",
+            [
+                "\\(x^2+11x+30=(x+5)(x+6)\\).",
+                "Cancel \\((x+6)\\): limit \\(\\displaystyle\\lim_{x\\to -6}(x+5)=\\mathbf{-1}\\).",
+            ],
+            "\\(-1\\)",
+            "Contrast with the previous slide: factoring can give a finite answer.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · factor at \\(x=4\\) (numerator quadratic)",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to 4}\dfrac{x^2-2x-8}{x-4}",
+            "\\(\\tfrac{0}{0}\\) form.",
+            "Factor \\(x^2-2x-8=(x-4)(x+2)\\).",
+            [
+                "Cancel \\((x-4)\\).",
+                "\\(\\displaystyle\\lim_{x\\to 4}(x+2)=4+2=\\mathbf{6}\\).",
+            ],
+            "\\(6\\)",
+            "Always verify that your factorization shares the denominator factor.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Factor & cancel · try two",
+        guided_example(
+            limit_strategy_row([
+                (DIFF_SQ, r"\lim_{x\to 4}\dfrac{x^2-16}{x-4}"),
+                (FACTOR, r"\lim_{x\to -3}\dfrac{x^2+4x+3}{x+3}"),
+            ])
+            + "<p>Name the 考点, then simplify each limit.</p>",
+            [
+                "First: \\(x^2-16=(x-4)(x+4)\\); after cancel, \\(x+4\\to 8\\).",
+                "Second: \\(x^2+4x+3=(x+3)(x+1)\\); after cancel, \\(x+1\\to -2\\).",
+            ],
+            math_block(
+                "\\[\\displaystyle\\lim_{x\\to 4}\\frac{x^2-16}{x-4}=8,"
+                "\\qquad"
+                "\\lim_{x\\to -3}\\frac{x^2+4x+3}{x+3}=-2\\]"
             ),
         ),
-        path_phase="Contrast / Error Analysis",
+        path_phase="Guided Example",
     )
 
     s.add(
         "Special trigonometric limits",
         phase_divider("AP Connection", "Near \\(x=0\\)")
         + definition(
-            "Two limits to memorize",
+            "Memorize these",
             math_block(
                 "\\[\\displaystyle\\lim_{x\\to 0}\\frac{\\sin x}{x}=1"
                 "\\qquad"
                 "\\displaystyle\\lim_{x\\to 0}\\frac{1-\\cos x}{x}=0\\]"
             )
-            + key_point(
-                "Equivalents",
-                "<p>\\(\\displaystyle\\lim_{x\\to 0}\\frac{x}{\\sin x}=1\\) and "
-                "\\(\\displaystyle\\lim_{x\\to 0}\\frac{\\cos x-1}{x}=0\\) are the same facts with sign flips.</p>",
-            ),
         )
-        + fig(
-            g["sin_over_x_16"],
-            "Graph of \\(\\dfrac{\\sin x}{x}\\)",
-            cls="ap-fig--teach",
-            notice="Open circle at the origin; branches approach height \\(1\\).",
-        ),
+        + fig(g["sin_over_x_16"], "Graph of \\(\\dfrac{\\sin x}{x}\\)", cls="ap-fig--teach"),
         path_phase="AP Connection",
     )
 
     s.add(
-        "Example · sin(3x)/x (notes #6)",
-        worked_example(
-            "Notes #6",
-            "Create \\(\\dfrac{\\sin(3x)}{3x}\\) to use the standard limit.",
-            "Multiply by \\(3/3\\) to match \\(\\sin u/u\\).",
-            solution_steps([
-                "Rewrite: \\(\\dfrac{\\sin(3x)}{x}=3\\cdot\\dfrac{\\sin(3x)}{3x}\\).",
-                "As \\(x\\to 0\\), \\(3x\\to 0\\) so \\(\\dfrac{\\sin(3x)}{3x}\\to 1\\).",
-                "Limit \\(=3\\cdot 1=\\mathbf{3}\\).",
-            ]),
-            "\\(3\\)",
-            "Scale factor stays outside the sine ratio.",
-            limit_latex=r"\lim_{x\to 0}\dfrac{\sin(3x)}{x}",
-            source_label="Calculus notes #6",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · sin(7x)/sin(9x) (notes #7)",
-        worked_example(
-            "Notes #7",
-            "Divide numerator and denominator by \\(x\\).",
-            "Rewrite as a ratio of two \\(\\sin(kx)/(kx)\\) limits.",
-            solution_steps([
-                "\\(\\dfrac{\\sin(7x)}{\\sin(9x)}="
-                "\\dfrac{\\sin(7x)/(7x)}{\\sin(9x)/(9x)}\\cdot\\dfrac{7}{9}\\).",
-                "Each sine ratio \\(\\to 1\\).",
-                "Limit \\(=\\dfrac{7}{9}\\).",
-            ]),
-            "\\(\\dfrac{7}{9}\\)",
-            "Works for any nonzero constants \\(a,b\\): \\(\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(ax)}{\\sin(bx)}=\\frac{a}{b}\\).",
-            limit_latex=r"\lim_{x\to 0}\dfrac{\sin(7x)}{\sin(9x)}",
-            source_label="Calculus notes #7",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Example · cos identity (notes #8)",
-        worked_example(
-            "Notes #8",
-            "Use \\(\\cos^2 x-1=-\\sin^2 x\\).",
-            "Convert to \\(\\sin x/x\\) factors, then let \\(x\\to 0\\).",
-            solution_steps([
-                "Numerator \\(-\\sin^2 x = -x^2\\cdot\\bigl(\\tfrac{\\sin x}{x}\\bigr)^2\\).",
-                "Expression \\(\\approx \\dfrac{-x^2}{x(\\cos x+4)}=\\dfrac{-x}{\\cos x+4}\\cdot\\dfrac{\\sin^2 x}{x^2}\\).",
-                "As \\(x\\to 0\\): \\(\\dfrac{\\sin^2 x}{x^2}\\to 1\\), \\(\\dfrac{-x}{\\cos x+4}\\to 0\\).",
-                "Limit \\(=\\mathbf{0}\\).",
-            ]),
-            "\\(0\\)",
-            "Pythagorean identity is the standard move when you see \\(\\cos^2 x-1\\).",
-            limit_latex=r"\lim_{x\to 0}\dfrac{\cos^2 x-1}{x(\cos x+4)}",
-            source_label="Calculus notes #8",
-            collapsible_model=True,
-        ),
-        path_phase="Guided Example",
-    )
-
-    s.add(
-        "Trig practice pair",
-        guided_example(
-            limit_problem(r"\lim_{x\to 0}\dfrac{3x}{\sin x}", "Practice #5")
-            + limit_problem(r"\lim_{x\to 0}\dfrac{\sin(2x)}{3x}", "Practice #6"),
+        "Example · \\(\\sin(3x)/x\\)",
+        _ex(
+            TRIG_SIN,
+            r"\lim_{x\to 0}\dfrac{\sin(3x)}{x}",
+            "Build \\(\\dfrac{\\sin(3x)}{3x}\\).",
+            "Multiply by \\(3/3\\).",
             [
-                "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{3x}{\\sin x}=3\\cdot\\dfrac{x}{\\sin x}\\to 3\\).",
-                "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(2x)}{3x}=\\dfrac{2}{3}\\cdot\\dfrac{\\sin(2x)}{2x}\\to \\dfrac{2}{3}\\).",
+                "\\(\\dfrac{\\sin(3x)}{x}=3\\cdot\\dfrac{\\sin(3x)}{3x}\\to 3\\cdot 1\\).",
+            ],
+            "\\(3\\)",
+            "Any \\(\\sin(kx)/x\\) at \\(0\\) becomes \\(k\\).",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · ratio \\(\\sin(7x)/\\sin(9x)\\)",
+        _ex(
+            TRIG_RATIO,
+            r"\lim_{x\to 0}\dfrac{\sin(7x)}{\sin(9x)}",
+            "Divide top and bottom by \\(x\\).",
+            "Rewrite using \\(\\sin(kx)/(kx)\\to 1\\).",
+            [
+                "Limit \\(=\\dfrac{7}{9}\\cdot\\dfrac{\\sin(7x)/(7x)}{\\sin(9x)/(9x)}\\to \\dfrac{7}{9}\\).",
+            ],
+            "\\(\\dfrac{7}{9}\\)",
+            "General form: \\(\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(ax)}{\\sin(bx)}=\\frac{a}{b}\\).",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · \\(\\cos^2 x-1\\)",
+        _ex(
+            TRIG_ID,
+            r"\lim_{x\to 0}\dfrac{\cos^2 x-1}{x(\cos x+4)}",
+            "Use \\(\\cos^2 x-1=-\\sin^2 x\\).",
+            "Factor \\(\\sin^2 x\\) and use \\(\\sin x/x\\).",
+            [
+                "Numerator \\(\\to 0\\) faster than denominator \\(\\to 0\\).",
+                "Limit \\(=\\mathbf{0}\\).",
+            ],
+            "\\(0\\)",
+            "Pythagorean identity is the key 考点.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Trig strategy pair",
+        guided_example(
+            limit_strategy_row([
+                (TRIG_SIN, r"\lim_{x\to 0}\dfrac{3x}{\sin x}"),
+                (TRIG_SIN, r"\lim_{x\to 0}\dfrac{\sin(2x)}{3x}"),
+            ]),
+            [
+                "First: \\(3\\cdot\\dfrac{x}{\\sin x}\\to 3\\).",
+                "Second: \\(\\dfrac{2}{3}\\cdot\\dfrac{\\sin(2x)}{2x}\\to \\dfrac{2}{3}\\).",
             ],
             math_block(
                 "\\[\\displaystyle\\lim_{x\\to 0}\\frac{3x}{\\sin x}=3,"
@@ -400,66 +496,111 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Mixed · practice #21–22",
-        phase_divider("Worked Example", "Factor after rearranging")
-        + worked_example(
-            "Practice #21",
-            "Denominator \\(2-x=-(x-2)\\); factor numerator by \\((x-2)\\).",
-            "Factor, cancel, and watch the sign on \\(2-x\\).",
-            solution_steps([
-                "\\(x^2+6x-16=(x-2)(x+8)\\).",
-                "\\(\\dfrac{(x-2)(x+8)}{2-x}=\\dfrac{(x-2)(x+8)}{-(x-2)}=-(x+8)\\) for \\(x\\neq 2\\).",
-                "Limit \\(=-(2+8)=\\mathbf{-10}\\).",
-            ]),
-            "\\(-10\\)",
-            "Flip the linear denominator factor first.",
-            limit_latex=r"\lim_{x\to 2}\dfrac{x^2+6x-16}{2-x}",
-            source_label="Practice sheet #21",
-            collapsible_model=True,
-        )
-        + worked_example(
-            "Practice #22",
-            "Factor numerator; note \\(5-x=-(x-5)\\).",
-            "Same sign-flip pattern as practice #21.",
-            solution_steps([
-                "\\(2x^2-17x+35=(2x-7)(x-5)\\).",
-                "Cancel \\((x-5)\\) with sign: \\(\\dfrac{(2x-7)(x-5)}{5-x}=-(2x-7)\\).",
-                "Limit \\(=-(10-7)=\\mathbf{-3}\\).",
-            ]),
-            "\\(-3\\)",
-            "Same template as #21 with different roots.",
-            limit_latex=r"\lim_{x\to 5}\dfrac{2x^2-17x+35}{5-x}",
-            source_label="Practice sheet #22",
-            collapsible_model=True,
-        ),
-        path_phase="Worked Example",
-    )
-
-    s.add(
-        "Mixed · evaluate at π and nested trig",
-        guided_example(
-            limit_problem(r"\lim_{x\to \pi}\cos x", "Practice #19")
-            + limit_problem(r"\lim_{x\to 0}\sin(4x)", "Practice #20")
-            + limit_problem(r"\lim_{x\to 0}\dfrac{(1-\cos^2 x)\sin x}{x^2}", "Practice #23"),
+        "Example · factor \\(x\\) in numerator (2)",
+        _ex(
+            FACTOR,
+            r"\lim_{x\to 0}\dfrac{3x^2+5x}{x}",
+            "\\(\\tfrac{0}{0}\\) — factor \\(x\\).",
+            "Cancel and substitute.",
             [
-                "\\(\\displaystyle\\lim_{x\\to \\pi}\\cos x=\\cos\\pi=\\mathbf{-1}\\) (direct).",
-                "\\(\\displaystyle\\lim_{x\\to 0}\\sin(4x)=0\\) (direct continuity).",
-                "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{(1-\\cos^2 x)\\sin x}{x^2}=\\lim\\dfrac{\\sin^3 x}{x^2}"
-                "=\\lim \\dfrac{\\sin x}{x}\\cdot\\sin^2 x = 0\\).",
+                "\\(\\dfrac{x(3x+5)}{x}=3x+5\\to \\mathbf{5}\\).",
             ],
-            checkpoint("Use \\(\\sin^2 x+\\cos^2 x=1\\) to rewrite before applying \\(\\sin x/x\\)."),
+            "\\(5\\)",
+            "Same 考点 as the \\(4x^2-15x\\) example.",
         ),
-        path_phase="Worked Example",
+        path_phase="Guided Example",
     )
 
     s.add(
-        "Practice MCQ · ln limit",
+        "Example · denominator sign flip (1)",
+        _ex(
+            SIGN_FLIP,
+            r"\lim_{x\to 2}\dfrac{x^2+6x-16}{2-x}",
+            "Rewrite \\(2-x=-(x-2)\\).",
+            "Factor numerator by \\((x-2)\\).",
+            [
+                "\\(x^2+6x-16=(x-2)(x+8)\\).",
+                "Limit \\(=-(2+8)=\\mathbf{-10}\\).",
+            ],
+            "\\(-10\\)",
+            "Track the negative from the denominator.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · denominator sign flip (2)",
+        _ex(
+            SIGN_FLIP,
+            r"\lim_{x\to 5}\dfrac{2x^2-17x+35}{5-x}",
+            "Factor numerator; \\(5-x=-(x-5)\\).",
+            "Cancel \\((x-5)\\) with sign care.",
+            [
+                "\\(2x^2-17x+35=(2x-7)(x-5)\\).",
+                "Limit \\(=-(10-7)=\\mathbf{-3}\\).",
+            ],
+            "\\(-3\\)",
+            "Pair with the \\(2-x\\) example for review.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · trig at a point",
+        _ex(
+            TRIG_POINT,
+            r"\lim_{x\to \pi}\cos x",
+            "\\(\\cos x\\) is continuous at \\(\\pi\\).",
+            "Direct substitution.",
+            ["\\(\\cos\\pi=\\mathbf{-1}\\)."],
+            "\\(-1\\)",
+            "Not every trig limit needs \\(\\sin x/x\\).",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · nested trig",
+        _ex(
+            TRIG_MIX,
+            r"\lim_{x\to 0}\dfrac{(1-\cos^2 x)\sin x}{x^2}",
+            "Use \\(1-\\cos^2 x=\\sin^2 x\\).",
+            "Rewrite as \\(\\dfrac{\\sin^3 x}{x^2}\\).",
+            [
+                "\\(=\\dfrac{\\sin x}{x}\\cdot\\sin^2 x\\to 1\\cdot 0=\\mathbf{0}\\).",
+            ],
+            "\\(0\\)",
+            "Combine identities before applying special limits.",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Example · infinite from rational",
+        _ex(
+            DNE_INF,
+            r"\lim_{x\to 0}\dfrac{7x^2+5}{x}",
+            "Denominator \\(\\to 0\\), numerator \\(\\to 5\\neq 0\\).",
+            "No factor of \\(x\\) to cancel in the numerator at this form.",
+            [
+                "Magnitude grows without bound as \\(x\\to 0\\).",
+                "Limit <strong>does not exist</strong> (infinite behavior).",
+            ],
+            "DNE",
+            "Distinguish \\(\\tfrac{0}{0}\\) from \\(\\tfrac{\\text{nonzero}}{0}\\).",
+        ),
+        path_phase="Guided Example",
+    )
+
+    s.add(
+        "Checkpoint MCQ · logarithm",
         mcq_reveal(
-            "<p>Evaluate \\(\\displaystyle\\lim_{x\\to 1}\\dfrac{\\ln x}{3x}\\).</p>",
+            limit_problem(r"\lim_{x\to 1}\dfrac{\ln x}{3x}", DIRECT)
+            + "<p>Which value is correct?</p>",
             ["\\(0\\)", "\\(\\dfrac{3}{e}\\)", "\\(e\\)", "\\(3\\)", "The limit does not exist"],
             "A",
             "ln 1 = 0",
-            "<p><strong>A</strong> — numerator \\(\\to 0\\), denominator \\(\\to 3\\). (Test Prep #24)</p>",
+            "<p><strong>A</strong> — direct substitution on a continuous expression at \\(x=1\\).</p>",
         ),
         kind="question",
         group="practice",
@@ -467,14 +608,14 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Practice MCQ · perfect square factor",
+        "Checkpoint MCQ · perfect square",
         mcq_reveal(
-            "<p>\\(\\displaystyle\\lim_{x\\to a}\\dfrac{x^2-2ax+a^2}{x-a}=\\) ?</p>",
+            limit_problem(r"\lim_{x\to a}\dfrac{x^2-2ax+a^2}{x-a}", FACTOR)
+            + "<p>Which value is correct?</p>",
             ["\\(-\\infty\\)", "\\(a\\)", "\\(0\\)", "\\(\\infty\\)", "The limit does not exist"],
             "C",
             "Numerator is (x-a)^2",
-            "<p><strong>C</strong> — \\(x^2-2ax+a^2=(x-a)^2\\). Cancel one \\((x-a)\\); remaining factor \\((x-a)\\to 0\\). "
-            "(Test Prep #26)</p>",
+            "<p><strong>C</strong> — cancel one \\((x-a)\\); remaining factor \\((x-a)\\to 0\\).</p>",
         ),
         kind="question",
         group="practice",
@@ -482,14 +623,14 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Practice MCQ · trig rational",
+        "Checkpoint MCQ · trig rational",
         mcq_reveal(
-            "<p>\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{4\\sin x\\cos x-\\sin x}{x^2}\\) is</p>",
+            limit_problem(r"\lim_{x\to 0}\dfrac{4\sin x\cos x-\sin x}{x^2}", TRIG_MIX)
+            + "<p>Which value is correct?</p>",
             ["\\(2\\)", "\\(\\dfrac{40}{3}\\)", "\\(\\infty\\)", "\\(0\\)", "undefined"],
             "D",
-            "Factor sin x; use sin x ~ x and 1-cos x ~ x^2/2",
-            "<p><strong>D</strong> — \\(\\sin x(4\\cos x-1)/x^2\\to 1\\cdot(-1)/x\\to 0\\) from the standard small-angle behavior. "
-            "(Test Prep #25)</p>",
+            "Factor sin x",
+            "<p><strong>D</strong> — \\(\\sin x(4\\cos x-1)/x^2\\to 0\\) from small-angle behavior.</p>",
         ),
         kind="question",
         group="practice",
@@ -497,14 +638,14 @@ def build(graphs: dict[str, str]) -> dict:
     )
 
     s.add(
-        "Practice MCQ · bracketed rational",
+        "Checkpoint MCQ · cosine in numerator",
         mcq_reveal(
-            "<p>\\(\\displaystyle\\lim_{x\\to 0}\\left(\\dfrac{3x^2+5\\cos x-5}{2x}\\right)=\\) ?</p>",
+            limit_problem(r"\lim_{x\to 0}\left(\dfrac{3x^2+5\cos x-5}{2x}\right)", FACTOR)
+            + "<p>Which value is correct?</p>",
             ["\\(0\\)", "\\(\\dfrac{5}{2}\\)", "\\(3\\)", "\\(4\\)", "Does not exist"],
             "A",
-            "cos part → 0, x part → 0",
-            "<p><strong>A</strong> — numerator \\(\\to 0\\), denominator \\(\\to 0\\); expand \\(\\cos x\\approx 1-\\tfrac{x^2}{2}\\) "
-            "or factor numerically → limit \\(0\\). (Test Prep #27)</p>",
+            "0/0 with cos expansion",
+            "<p><strong>A</strong> — numerator \\(\\to 0\\), denominator \\(\\to 0\\); algebra gives limit \\(0\\).</p>",
         ),
         kind="question",
         group="practice",
@@ -515,17 +656,19 @@ def build(graphs: dict[str, str]) -> dict:
         "Exit ticket · 1.6",
         exit_ticket([
             (
-                "Name three limit strategies from this section.",
-                "<p><strong>Direct substitution</strong>, <strong>factor & cancel</strong>, "
-                "<strong>special trig limits</strong> (plus rewrite/conjugate when needed).</p>",
+                "List two 考点 from this lesson.",
+                "<p><strong>Direct substitution</strong> and <strong>factor & cancel</strong> "
+                "(plus special trig when you see \\(\\sin(kx)\\) near \\(0\\)).</p>",
             ),
             (
-                "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(5x)}{x}=\\) ?",
-                "<p>\\(5\\cdot\\dfrac{\\sin(5x)}{5x}\\to 5\\).</p>",
+                limit_problem(r"\lim_{x\to 0}\dfrac{\sin(5x)}{x}", TRIG_SIN)
+                + "<p>Final value?</p>",
+                "<p>\\(\\mathbf{5}\\).</p>",
             ),
             (
-                "\\(\\displaystyle\\lim_{x\\to 4}\\dfrac{x^2-16}{x-4}=\\) ?",
-                "<p>Factor: \\((x-4)(x+4)/(x-4)\\to 8\\).</p>",
+                limit_problem(r"\lim_{x\to 4}\dfrac{x^2-16}{x-4}", DIFF_SQ)
+                + "<p>Final value?</p>",
+                "<p>\\(\\mathbf{8}\\).</p>",
             ),
         ]),
         group="practice",
