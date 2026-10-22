@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build AP Calculus AB/BC course materials JSON — Unit 1 sections 1.1–1.6."""
+"""Build AP Calculus AB/BC course materials JSON — Unit 1 sections 1.1–1.7."""
 from __future__ import annotations
 
 import json
@@ -17,6 +17,7 @@ from ap_calc_lesson_13 import build as build_lesson_13  # noqa: E402
 from ap_calc_lesson_14 import build as build_lesson_14  # noqa: E402
 from ap_calc_lesson_15 import build as build_lesson_15  # noqa: E402
 from ap_calc_lesson_16 import build as build_lesson_16  # noqa: E402
+from ap_calc_lesson_17 import build as build_lesson_17  # noqa: E402
 
 OUTPUT = os.path.join(APP_DIR, "data", "ap_calc_materials.json")
 
@@ -79,6 +80,7 @@ def build() -> dict:
         build_lesson_14(graphs),
         build_lesson_15(graphs),
         build_lesson_16(graphs),
+        build_lesson_17(graphs),
     ])
     return {
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),

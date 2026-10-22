@@ -15,7 +15,7 @@
         {"section": "1.4", "title": "Estimating Limit Values from Tables", "slug": "ap-1-4-limits-from-tables", "live": true},
         {"section": "1.5", "title": "Determining Limits Using Algebraic Properties", "slug": "ap-1-5-algebraic-limits-piecewise", "live": true},
         {"section": "1.6", "title": "Determining Limits Using Algebraic Manipulation", "slug": "ap-1-6-algebraic-manipulation-limits", "live": true},
-        {"section": "1.7", "title": "Selecting Procedures for Determining Limits", "slug": null, "live": false},
+        {"section": "1.7", "title": "Selecting Procedures for Determining Limits", "slug": "ap-1-7-selecting-limit-procedures", "live": true},
         {"section": "1.8", "title": "Determining Limits Using the Squeeze Theorem", "slug": null, "live": false},
         {"section": "1.9", "title": "Connecting Multiple Representations of Limits", "slug": null, "live": false},
         {"section": "1.10", "title": "Exploring Types of Discontinuities", "slug": null, "live": false},

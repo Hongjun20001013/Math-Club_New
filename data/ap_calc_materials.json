@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-22T07:19:01.023522Z",
+  "generated_at": "2026-10-22T07:38:52.433249Z",
   "track": "ap_calc",
-  "total": 6,
-  "available": 6,
+  "total": 7,
+  "available": 7,
   "materials": [
     {
       "slug": "ap-1-1-instantaneous-change",
@@ -2510,7 +2510,7 @@
       "pdf_available": false,
       "phase": 1,
       "prev_lesson_slug": "ap-1-5-algebraic-limits-piecewise",
-      "next_lesson_slug": null,
+      "next_lesson_slug": "ap-1-7-selecting-limit-procedures",
       "knowledge_map": [
         {
           "title": "Launch",
@@ -2819,6 +2819,636 @@
               "index": 37,
               "kind": "lesson",
               "title": "Practice packet · 1.6",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "ap-1-7-selecting-limit-procedures",
+      "unit": 1,
+      "unit_name": "Limits and Continuity",
+      "section": "1.7",
+      "title": "Selecting Procedures for Determining Limits",
+      "deck_title": "AP Unit 1.7 · Rationalize & complex fractions",
+      "slide_count": 31,
+      "slides": [
+        {
+          "index": 1,
+          "title": "1.7 · Choosing a limit procedure",
+          "html": "<div class=\"cm-intro-canvas ap-calc-intro ap-slide-template--intro ap-calc-intro--v2\"><div class=\"cm-intro-bg\" aria-hidden=\"true\"><span class=\"cm-intro-orb cm-intro-orb--1\"></span><span class=\"cm-intro-orb cm-intro-orb--2\"></span><span class=\"cm-intro-grid\"></span></div><div class=\"cm-intro-content\"><span class=\"cm-intro-kicker\">Novel Prep · AP Calculus AB / BC</span><p class=\"cm-intro-unit\">Unit 1 · Section 1.7</p><h1 class=\"cm-intro-title\">Selecting procedures for determining limits</h1><p class=\"cm-intro-lede\">After 1.6 tactics: name the procedure, show the limit, then rationalize or clear denominators</p><div class=\"cm-intro-chips\"><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"3\"><span class=\"cm-intro-chip-num\">1</span><span class=\"cm-intro-chip-label\">Ladder</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"6\"><span class=\"cm-intro-chip-num\">2</span><span class=\"cm-intro-chip-label\">Rationalize</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"14\"><span class=\"cm-intro-chip-num\">3</span><span class=\"cm-intro-chip-label\">Fractions</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"22\"><span class=\"cm-intro-chip-num\">4</span><span class=\"cm-intro-chip-label\">Mixed</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"28\"><span class=\"cm-intro-chip-num\">5</span><span class=\"cm-intro-chip-label\">Check</span></button><button type=\"button\" class=\"cm-intro-chip\" data-cm-jump-section=\"32\"><span class=\"cm-intro-chip-num\">6</span><span class=\"cm-intro-chip-label\">Exit</span></button></div><p class=\"cm-intro-cta\">Jump to a section or press <strong>Next</strong> to begin.</p></div></div>",
+          "kind": "intro",
+          "template": "intro",
+          "group": "divider",
+          "section": "1.7",
+          "study_tip": ""
+        },
+        {
+          "index": 2,
+          "title": "Bridge · from 1.6",
+          "html": "<div class=\"ap-bridge-page ap-bridge-page--light ap-slide-template--bridge\"><div class=\"ap-bridge-wash\" aria-hidden=\"true\"></div><div class=\"ap-bridge-stage\"><header class=\"ap-bridge-header\"><nav class=\"ap-unit-rail\" aria-label=\"Unit 1 · sections 1.1 through 1.4\"><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.1</span><span class=\"ap-unit-rail-label\">Instant</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.2</span><span class=\"ap-unit-rail-label\">Notation</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.3</span><span class=\"ap-unit-rail-label\">Graphs</span></span><span class=\"ap-unit-rail-sep\" aria-hidden=\"true\"></span><span class=\"ap-unit-rail-item\"><span class=\"ap-unit-rail-num\">1.4</span><span class=\"ap-unit-rail-label\">Tables</span></span></nav><p class=\"ap-bridge-eyebrow\">Unit 1 · Connecting ideas</p><h2 class=\"ap-bridge-hero-title\">Strategies → procedures</h2></header><div class=\"ap-bridge-bento\"><section class=\"ap-bridge-pane ap-bridge-pane--recall\"><span class=\"ap-bridge-pane-label\">Recall</span><p><strong>1.6</strong> practiced factoring, direct substitution, and special trig limits.</p></section><div class=\"ap-bridge-mid\" aria-hidden=\"true\"><span class=\"ap-bridge-mid-glow\"></span></div><section class=\"ap-bridge-pane ap-bridge-pane--now\"><span class=\"ap-bridge-pane-label\">This lesson</span><p><strong>1.7</strong> adds <em>which tool when</em>: conjugates for radicals and LCD work for nested fractions — still with a clear limit and strategy label on every example.</p></section></div><ol class=\"ap-bridge-protocol\" aria-label=\"Shared limit protocol\"><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">1</span><span class=\"ap-bridge-step-body\"><strong>Approach</strong><span>\\(x\\to c\\)</span></span></li><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">2</span><span class=\"ap-bridge-step-body\"><strong>Outputs</strong><span>→ \\(L\\)</span></span></li><li class=\"ap-bridge-step\"><span class=\"ap-bridge-step-num\">3</span><span class=\"ap-bridge-step-body\"><strong>Separate</strong><span>\\(f(c)\\) may differ</span></span></li></ol><div class=\"ap-bridge-demo\"><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0} \\dfrac{\\sqrt{x+7}-\\sqrt{7}}{x} = \\dfrac{1}{2\\sqrt{7}}\\]</div></div><p class=\"ap-bridge-footnote\">If substitution is clean, stop. If you see \\(\\tfrac{0}{0}\\) with radicals or stacked fractions, pick rationalize or complex-fraction simplification.</p><div class=\"ap-bridge-rep-bar\"><div class=\"ap-rep-seg\" role=\"list\" aria-label=\"Limit representations in Unit 1\"><span class=\"ap-rep-chip is-active\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.2</span>Limit notation</span><span class=\"ap-rep-chip\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.3</span>Graph trace</span><span class=\"ap-rep-chip\" role=\"listitem\"><span class=\"ap-rep-chip-sec\">1.4</span>Table columns</span></div></div></div></div>",
+          "kind": "lesson",
+          "template": "bridge",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Launch"
+        },
+        {
+          "index": 3,
+          "title": "Procedure ladder",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Launch\"><span class=\"ap-phase-label\">Launch</span><h3 class=\"ap-phase-title\">Decide before you compute</h3></div><div class=\"ap-box ap-box--big-idea\"><span class=\"ap-box-label\">Big Idea</span><div class=\"ap-box-body\"><ol class='ap-procedure-list'><li><strong>Direct substitution</strong> — polynomial, root at an interior point, continuous trig.</li><li><strong>Factor & cancel</strong> — rational \\(\\tfrac{0}{0}\\) with algebraic factors.</li><li><strong>Rationalize</strong> — \\(\\tfrac{0}{0}\\) with square roots (multiply by the conjugate).</li><li><strong>Complex fractions</strong> — combine numerators/denominators with a common denominator, then cancel.</li></ol></div></div><table class=\"ap-data-table\"><thead><tr><th>Strategy</th><th>When you use it</th><th>What you do first</th></tr></thead><tbody><tr><td>Direct substitution</td><td>Finite value after plugging in \\(c\\)</td><td>Substitute</td></tr><tr><td>Factor & cancel \\(\\tfrac{0}{0}\\)</td><td>\\(\\tfrac{0}{0}\\) with polynomials</td><td>Factor shared term</td></tr><tr><td>Rationalize (conjugate)</td><td>\\(\\tfrac{0}{0}\\) with \\(\\sqrt{\\cdot}\\)</td><td>Multiply by conjugate</td></tr><tr><td>Complex fraction (common denominator)</td><td>Fraction inside a fraction</td><td>Single fraction via LCD</td></tr></tbody></table><div class=\"ap-concept-frame\"><div class=\"ap-concept-row\"><span>What it means</span><p>State the procedure in words before algebra.</p></div><div class=\"ap-concept-row\"><span>Why it matters</span><p>AP 1.7 items test method choice, not calculator speed.</p></div><div class=\"ap-concept-row\"><span>How to recognize</span><p>Radical \\(\\tfrac{0}{0}\\) vs polynomial \\(\\tfrac{0}{0}\\).</p></div><div class=\"ap-concept-row ap-concept-row--warn\"><span>Common mistake</span><p>Rationalizing the wrong expression (top only when the denominator has the root).</p></div><div class=\"ap-concept-row\"><span>How to check</span><p>After simplifying, re-check with direct substitution.</p></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Launch"
+        },
+        {
+          "index": 4,
+          "title": "Rationalizing · idea",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Concept & Definition\"><span class=\"ap-phase-label\">Concept & Definition</span><h3 class=\"ap-phase-title\">Conjugate multiplication</h3></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Rationalize with a conjugate</span><div class=\"ap-box-body\"><p>For \\(\\displaystyle\\lim_{x\\to c}\\frac{\\sqrt{\\text{linear}}-\\sqrt{k}}{x-c}\\) or similar \\(\\tfrac{0}{0}\\) forms, multiply top and bottom by the conjugate \\(\\sqrt{\\text{linear}}+\\sqrt{k}\\) to remove the radical from the denominator (or to cancel the \\(x-c\\) factor).</p><div class=\"ap-box ap-box--warning\"><span class=\"ap-box-label\">Common Mistake</span><div class=\"ap-box-body\">Multiply by \\(\\dfrac{\\text{conjugate}}{\\text{conjugate}}=1\\); do not distribute incorrectly.</div></div></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Concept & Definition"
+        },
+        {
+          "index": 5,
+          "title": "Example · \\(\\sqrt{x+7}-\\sqrt{7}\\) over \\(x\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+7}-\\sqrt{7}}{x}\\]</div></div><p class=\"ap-worked-strategy\">Substitution gives \\(\\tfrac{0}{0}\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Multiply by \\(\\dfrac{\\sqrt{x+7}+\\sqrt{7}}{\\sqrt{x+7}+\\sqrt{7}}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Numerator becomes \\((x+7)-7=x\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Cancel \\(x\\): left with \\(\\dfrac{1}{\\sqrt{x+7}+\\sqrt{7}}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Substitute \\(x=0\\): \\(\\dfrac{1}{2\\sqrt{7}}=\\mathbf{\\dfrac{1}{2\\sqrt{7}}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{2\\sqrt{7}}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Same pattern as \\(\\dfrac{\\sqrt{x+11}-\\sqrt{11}}{x}\\) at \\(0\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 6,
+          "title": "Example · \\(\\sqrt{x+11}-\\sqrt{11}\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+11}-\\sqrt{11}}{x}\\]</div></div><p class=\"ap-worked-strategy\">\\(\\tfrac{0}{0}\\) with conjugate \\(\\sqrt{x+11}+\\sqrt{11}\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Simplify to a single rational expression, then substitute.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> After rationalizing: \\(\\dfrac{1}{\\sqrt{x+11}+\\sqrt{11}}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\dfrac{1}{2\\sqrt{11}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{2\\sqrt{11}}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Memorize the template: difference of roots over a linear term.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 7,
+          "title": "Example · \\(\\sqrt{x+9}-3\\) over \\(x\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+9}-3}{x}\\]</div></div><p class=\"ap-worked-strategy\">Classic conjugate setup (\\(3=\\sqrt{9}\\)).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Rationalize; cancel the linear factor.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Simplified form \\(\\dfrac{1}{\\sqrt{x+9}+3}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\dfrac{1}{6}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{6}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Compare to \\(\\dfrac{\\sqrt{x+4}-2}{x}\\) at \\(0\\) (limit \\(\\tfrac{1}{4}\\)).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 8,
+          "title": "Example · \\(\\sqrt{x+9}-4\\) at \\(x=7\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 7}\\dfrac{\\sqrt{x+9}-4}{x-7}\\]</div></div><p class=\"ap-worked-strategy\">\\(\\tfrac{0}{0}\\); conjugate \\(\\sqrt{x+9}+4\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Difference of squares in the numerator after multiply.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Cancel \\((x-7)\\); simplified \\(\\dfrac{1}{\\sqrt{x+9}+4}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> At \\(x=7\\): \\(\\dfrac{1}{4+4}=\\mathbf{\\dfrac{1}{8}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{8}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Breakpoint \\(x=7\\) matches \\(\\sqrt{16}-4=0\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 9,
+          "title": "Example · \\(\\sqrt{x+4}-3\\) at \\(x=5\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 5}\\dfrac{\\sqrt{x+4}-3}{x-5}\\]</div></div><p class=\"ap-worked-strategy\">Radical minus constant; denominator \\(x-5\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Conjugate \\(\\sqrt{x+4}+3\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Numerator \\((x+4)-9=x-5\\); cancel.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\dfrac{1}{\\sqrt{x+4}+3}\\big|_{x=5}=\\mathbf{\\dfrac{1}{6}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{6}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Notes-style radical over a linear denominator.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 10,
+          "title": "Example · denominator has the root",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 10}\\dfrac{x-10}{3-\\sqrt{x-1}}\\]</div></div><p class=\"ap-worked-strategy\">Indeterminate; rationalize the <em>denominator</em>.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Multiply by \\(\\dfrac{3+\\sqrt{x-1}}{3+\\sqrt{x-1}}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Denominator \\(9-(x-1)=10-x=-(x-10)\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Expression \\(\\to -(3+\\sqrt{x-1})\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"3\"><p><strong>Step 3.</strong> Limit \\(=-(3+3)=\\mathbf{-6}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-6\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Track the sign when \\(10-x\\) replaces \\(x-10\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 11,
+          "title": "Rationalize pair",
+          "html": "<div class=\"ap-slide-template ap-slide-template--practice\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+7}-\\sqrt{7}}{x}\\]</div></div><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 7}\\dfrac{\\sqrt{x+9}-4}{x-7}\\]</div></div><p>Name the strategy, then simplify.</p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> First limit: \\(\\dfrac{1}{2\\sqrt{7}}\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Second limit: \\(\\dfrac{1}{8}\\).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0}\\frac{\\sqrt{x+7}-\\sqrt{7}}{x}=\\frac{1}{2\\sqrt{7}},\\qquad\\lim_{x\\to 7}\\frac{\\sqrt{x+9}-4}{x-7}=\\frac{1}{8}\\]</div></div></div>",
+          "kind": "lesson",
+          "template": "practice",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 12,
+          "title": "Complex fractions · idea",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"Why It Works\"><span class=\"ap-phase-label\">Why It Works</span><h3 class=\"ap-phase-title\">One fraction at a time</h3></div><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Simplify a complex fraction</span><div class=\"ap-box-body\"><p>Write nested fractions as a single ratio: combine terms in the numerator (and denominator if needed) using the <strong>least common denominator</strong>, then cancel common factors before taking the limit.</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\frac{\\frac{1}{x+a}-\\frac{1}{a}}{x}\\ \\Longrightarrow\\ \\frac{-1}{a(x+a)}\\ \\Longrightarrow\\ -\\frac{1}{a^2}\\ \\text{ as } x\\to 0\\]</div></div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Why It Works"
+        },
+        {
+          "index": 13,
+          "title": "Example · textbook stack",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+2}-\\dfrac{1}{2}}{x}\\]</div></div><p class=\"ap-worked-strategy\">\\(\\tfrac{0}{0}\\) from stacked fractions.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>LCD on the inner numerator: \\(\\dfrac{2-(x+2)}{2(x+2)}=\\dfrac{-x}{2(x+2)}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Divide by \\(x\\): \\(-\\dfrac{1}{2(x+2)}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Substitute \\(x=0\\): \\(\\mathbf{-\\dfrac{1}{4}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-\\dfrac{1}{4}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Same structure as \\(\\dfrac{\\frac{1}{x+2}-\\frac12}{x}\\) in the course text.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 14,
+          "title": "Example · parameter \\(a\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+a}-\\dfrac{1}{a}}{x}\\]</div></div><p class=\"ap-worked-strategy\">Combine \\(\\dfrac{1}{x+a}-\\dfrac{1}{a}\\) over LCD \\(a(x+a)\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Cancel \\(x\\) after forming one fraction.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Inner numerator \\(=-\\dfrac{x}{a(x+a)}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=-\\dfrac{1}{a(x+a)}\\big|_{x=0}=\\mathbf{-\\dfrac{1}{a^2}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-\\dfrac{1}{a^2}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Keep \\(a\\neq 0\\) fixed as \\(x\\to 0\\).</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 15,
+          "title": "Example · \\(\\dfrac{1}{3}-\\dfrac{1}{3x}\\) over \\(x-1\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 1}\\dfrac{\\dfrac{1}{3}-\\dfrac{1}{3x}}{x-1}\\]</div></div><p class=\"ap-worked-strategy\">Complex fraction with \\((x-1)\\) in the outer denominator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>LCD in numerator: \\(\\dfrac{x-1}{3x}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Cancel \\((x-1)\\): \\(\\dfrac{1}{3x}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\mathbf{\\dfrac{1}{3}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\dfrac{1}{3}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>After canceling, direct substitution works.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 16,
+          "title": "Example · \\(x\\) over nested denominator",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{x}{\\dfrac{1}{x-4}+3}\\]</div></div><p class=\"ap-worked-strategy\">Simplify denominator to a single rational expression.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Combine \\(\\dfrac{1}{x-4}+3=\\dfrac{3x-11}{x-4}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Rewrite as \\(x\\cdot\\dfrac{x-4}{3x-11}\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Substitute \\(x=0\\): \\(0\\cdot\\dfrac{-4}{-11}=\\mathbf{0}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(0\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Not every complex fraction gives \\(\\tfrac{0}{0}\\); check substitution last.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 17,
+          "title": "Example · \\(x\\) over reciprocal form at \\(6\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 6}\\dfrac{x}{\\dfrac{1}{x+8}-\\dfrac{1}{8}}\\]</div></div><p class=\"ap-worked-strategy\">Denominator \\(\\to 0\\) as a stacked difference of fractions.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>LCD: \\(\\dfrac{8-(x+8)}{8(x+8)}=\\dfrac{-x}{8(x+8)}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> Quotient \\(=x\\cdot\\dfrac{8(x+8)}{-x}=-8(x+8)\\) for \\(x\\neq 0\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=-8(14)=\\mathbf{-112}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-112\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Clear the complex denominator before evaluating.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 18,
+          "title": "Example · nested reciprocal at \\(0\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Limit does not exist (infinite)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{(x+3)^2-9}}{x}\\]</div></div><p class=\"ap-worked-strategy\">Simplify \\((x+3)^2-9=x(x+6)\\) first.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Rewrite as \\(\\dfrac{1}{x^2(x+6)}\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> As \\(x\\to 0\\), magnitude blows up.</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Two-sided limit <strong>does not exist</strong> (infinite behavior).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> DNE</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Contrast with limits that simplify to a finite number.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 19,
+          "title": "Complex fraction pair",
+          "html": "<div class=\"ap-slide-template ap-slide-template--practice\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+2}-\\dfrac{1}{2}}{x}\\]</div></div><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 1}\\dfrac{\\dfrac{1}{3}-\\dfrac{1}{3x}}{x-1}\\]</div></div></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> First: \\(-\\dfrac{1}{4}\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Second: \\(\\dfrac{1}{3}\\).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle\\lim_{x\\to 0}\\frac{\\frac{1}{x+2}-\\frac12}{x}=-\\frac14,\\qquad\\lim_{x\\to 1}\\frac{\\frac13-\\frac{1}{3x}}{x-1}=\\frac13\\]</div></div></div>",
+          "kind": "lesson",
+          "template": "practice",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 20,
+          "title": "Mixed procedures",
+          "html": "<div class=\"ap-slide-template ap-slide-template--concept\"><div class=\"ap-phase-divider\" data-ap-phase=\"AP Connection\"><span class=\"ap-phase-label\">AP Connection</span><h3 class=\"ap-phase-title\">Pick one tool per limit</h3></div><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">AP Connection</span><strong>Procedure mix</strong><p>Factor when polynomials dominate; rationalize when roots appear.</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\">Read the limit once and label the strategy before touching algebra.</div></div></div>",
+          "kind": "lesson",
+          "template": "concept",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "AP Connection"
+        },
+        {
+          "index": 21,
+          "title": "Example · direct root",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Direct substitution</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 1}\\sqrt{x+4}\\]</div></div><p class=\"ap-worked-strategy\">\\(\\sqrt{x+4}\\) is continuous at \\(x=1\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Substitute.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\sqrt{5}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(\\sqrt{5}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Do not rationalize when substitution already works.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 22,
+          "title": "Example · factor rational",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Factor & cancel \\(\\tfrac{0}{0}\\)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 5}\\dfrac{x^2-5x}{x-5}\\]</div></div><p class=\"ap-worked-strategy\">\\(\\tfrac{0}{0}\\); factor \\(x\\) from the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Cancel \\((x-5)\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\dfrac{x(x-5)}{x-5}=x\\) for \\(x\\neq 5\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\mathbf{5}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(5\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Procedure ladder: try factor before conjugates when there are no radicals.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 23,
+          "title": "Example · factor at \\(-3\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Factor & cancel \\(\\tfrac{0}{0}\\)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to -3}\\dfrac{x-2}{x^2-3x+2}\\]</div></div><p class=\"ap-worked-strategy\">Denominator nonzero at \\(-3\\); still check substitution.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Direct substitution after quick factor check.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> At \\(x=-3\\): \\(\\dfrac{-5}{9+9+2}=\\dfrac{-5}{20}=\\mathbf{-\\dfrac{1}{4}}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(-\\dfrac{1}{4}\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>If denominator were \\(0\\), you would factor and cancel instead.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 24,
+          "title": "Example · powers in numerator",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Direct substitution</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{2x^4+5x^4}{x^4}\\]</div></div><p class=\"ap-worked-strategy\">Combine like terms in the numerator.</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Simplify to a constant for \\(x\\neq 0\\).</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\dfrac{7x^4}{x^4}=7\\).</p></div><div class=\"cm-step-block cm-step--hidden\" data-step=\"2\"><p><strong>Step 2.</strong> Limit \\(=\\mathbf{7}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(7\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Cancel powers before substituting.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 25,
+          "title": "Example · root over \\(x\\) at \\(3\\)",
+          "html": "<div class=\"ap-slide-template--worked-example\"><div class=\"ap-box ap-box--definition\"><span class=\"ap-box-label\">Definition · Problem</span><div class=\"ap-box-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Direct substitution</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 3}\\dfrac{\\sqrt{2x-6}}{x}\\]</div></div><p class=\"ap-worked-strategy\">Numerator \\(\\to 0\\), denominator \\(3\\).</p></div></div><details class=\"ap-worked-model ap-worked-model--collapsible\"><summary class=\"ap-worked-model__toggle\">Show worked model</summary><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Representation</span><div class=\"ap-box-body\"><p>Substitute into the simplified form.</p></div></div><div class=\"cm-steps-toolbar\" data-cm-steps-toolbar><span class=\"cm-steps-label\">Walk through the solution</span><div class=\"cm-steps-actions\"><button type=\"button\" class=\"cm-steps-btn\" data-cm-next-step>Next step</button><button type=\"button\" class=\"cm-steps-btn cm-steps-btn--ghost\" data-cm-show-all-steps>Show all</button></div></div><div class=\"cm-step-block\" data-step=\"1\"><p><strong>Step 1.</strong> \\(\\dfrac{0}{3}=\\mathbf{0}\\).</p></div><div class=\"ap-box ap-box--checkpoint\"><span class=\"ap-box-label\">AP Checkpoint</span><div class=\"ap-box-body\"><strong>Conclusion:</strong> \\(0\\)</div></div><div class=\"ap-box ap-box--key\"><span class=\"ap-box-label\">Key Point · Check</span><div class=\"ap-box-body\"><p>Interior limit of a continuous root — no conjugate needed.</p></div></div></details></div>",
+          "kind": "lesson",
+          "template": "worked-example",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 26,
+          "title": "Procedure row · three types",
+          "html": "<div class=\"ap-slide-template ap-slide-template--practice\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Guided Example</span><strong>Your turn</strong><p>Use Thinking Space first; reveal hints only when stuck.</p></div><div class=\"ap-thinking-space\"><p class=\"ap-thinking-label\">Thinking Space</p><p class=\"ap-thinking-prompt\">Write your setup and first step before opening any hint.</p></div><div class=\"ap-problem-stem\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Factor & cancel \\(\\tfrac{0}{0}\\)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 4}\\dfrac{x^2-16}{x-4}\\]</div></div><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+9}-3}{x}\\]</div></div><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+2}-\\dfrac{1}{2}}{x}\\]</div></div><p>Match each limit to factor, rationalize, or complex fraction.</p></div><ul class=\"ap-hint-list\" data-ap-hints><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"1\"><strong>Hint 1:</strong> Factor: \\(x+4\\to 8\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"2\"><strong>Hint 2:</strong> Rationalize: \\(\\dfrac{1}{6}\\).</li><li class=\"ap-hint-item ap-hint-item--hidden\" data-ap-hint=\"3\"><strong>Hint 3:</strong> Complex: \\(-\\dfrac{1}{4}\\).</li></ul><button type=\"button\" class=\"cm-reveal-btn ap-hint-btn\" data-ap-reveal-hint>Reveal next hint</button><div class=\"cm-try-banner\" data-cm-try-banner><div class=\"cm-try-banner-icon\" aria-hidden=\"true\">✦</div><div class=\"cm-try-banner-copy\"><strong>Ready to check?</strong><span>Reveal the model solution only after you've written a full attempt.</span></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show solution</button></div><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[8,\\quad \\tfrac{1}{6},\\quad -\\tfrac{1}{4}\\]</div></div></div>",
+          "kind": "lesson",
+          "template": "practice",
+          "group": "learn",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Guided Example"
+        },
+        {
+          "index": 27,
+          "title": "Checkpoint MCQ · conjugate form",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">Multiply by conjugate; watch \\(x-b\\) sign.</p></details><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to b}\\dfrac{b-x}{\\sqrt{x}-\\sqrt{b}}\\]</div></div><p>Which value is correct? (Assume \\(b>0\\).)</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"A\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(-2\\sqrt{b}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(-\\sqrt{b}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(2b\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\sqrt{b}\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>A</strong> — rationalize to \\(-(\\sqrt{x}+\\sqrt{b})\\to -2\\sqrt{b}\\).</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 28,
+          "title": "Checkpoint MCQ · procedure choice",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">Radical difference over linear term.</p></details><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Procedure selection</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+4}-2}{x}\\]</div></div><p>Best first procedure?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"C\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">Direct substitution only</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">Factor polynomials</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">Rationalize with a conjugate</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">Squeeze Theorem</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>C</strong> — \\(\\tfrac{0}{0}\\) with square roots calls for a conjugate; limit \\(=\\tfrac{1}{4}\\).</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 29,
+          "title": "Checkpoint MCQ · complex fraction",
+          "html": "<div class=\"cm-question-workspace ap-slide-template--practice\"><div class=\"cm-question-stem\"><details class=\"cm-strategy-details\" data-cm-strategy-details><summary class=\"cm-strategy-chip-label\">Strategy hint</summary><p class=\"cm-strategy-chip-body\">LCD then cancel x</p></details><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+2}-\\dfrac{1}{2}}{x}\\]</div></div><p>Final value?</p></div><div class=\"cm-question-interact\"><div class=\"cm-mcq-interactive\" data-cm-mcq data-cm-correct=\"B\"><p class=\"cm-mcq-prompt\">Choose your answer</p><div class=\"cm-mcq-grid\"><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"A\"><span class=\"cm-mcq-letter\">A</span><span class=\"cm-mcq-text\">\\(-\\dfrac{1}{2}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"B\"><span class=\"cm-mcq-letter\">B</span><span class=\"cm-mcq-text\">\\(-\\dfrac{1}{4}\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"C\"><span class=\"cm-mcq-letter\">C</span><span class=\"cm-mcq-text\">\\(0\\)</span></button><button type=\"button\" class=\"cm-mcq-choice\" data-choice=\"D\"><span class=\"cm-mcq-letter\">D</span><span class=\"cm-mcq-text\">\\(\\dfrac{1}{4}\\)</span></button></div><div class=\"cm-mcq-actions\"><button type=\"button\" class=\"cm-mcq-check\" data-cm-check-mcq disabled>Check answer</button></div></div><button type=\"button\" class=\"cm-reveal-btn\" data-cm-reveal-solution>Show full solution</button><div class=\"cm-solution-panel cm-is-collapsed\" data-cm-solution-panel><p><strong>B</strong> — simplifies to \\(-\\dfrac{1}{2(x+2)}\\to -\\dfrac{1}{4}\\).</p></div></div></div>",
+          "kind": "question",
+          "template": "practice",
+          "group": "practice",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "AP Practice"
+        },
+        {
+          "index": 30,
+          "title": "Exit ticket · 1.7",
+          "html": "<div class=\"ap-slide-template ap-slide-template--summary\"><div class=\"cm-slide-role cm-slide-role--lesson\"><span class=\"cm-slide-role-label\">Exit Ticket</span><strong>Check your learning</strong><p>Answer each item before revealing.</p></div><ol class=\"ap-exit-list\"><li><span class=\"ap-exit-num\">1</span><div class=\"ap-exit-body\">When do you rationalize instead of factor?<div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>When \\(\\tfrac{0}{0}\\) involves <strong>square roots</strong> (difference of radicals or root minus constant), multiply by the conjugate.</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">2</span><div class=\"ap-exit-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Rationalize (conjugate)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\sqrt{x+7}-\\sqrt{7}}{x}\\]</div></div><p>Final value?</p><div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>\\(\\mathbf{\\dfrac{1}{2\\sqrt{7}}}\\).</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li><li><span class=\"ap-exit-num\">3</span><div class=\"ap-exit-body\"><div class=\"ap-limit-problem\"><p class=\"ap-limit-strategy-chip\">Complex fraction (common denominator)</p><div class=\"stem-math-block cm-math-block ap-math-block ap-math-display\">\\[\\displaystyle \\lim_{x\\to 0}\\dfrac{\\dfrac{1}{x+2}-\\dfrac{1}{2}}{x}\\]</div></div><p>Final value?</p><div class=\"cm-solution-panel cm-is-collapsed ap-exit-solution\" data-cm-solution-panel><p>\\(\\mathbf{-\\dfrac{1}{4}}\\).</p></div><button type=\"button\" class=\"cm-reveal-btn ap-exit-reveal\" data-cm-reveal-solution>Reveal</button></div></li></ol></div>",
+          "kind": "lesson",
+          "template": "summary",
+          "group": "practice",
+          "section": "1.7",
+          "study_tip": "",
+          "path_phase": "Exit Ticket"
+        },
+        {
+          "index": 31,
+          "title": "Practice packet · 1.7",
+          "html": "<div class=\"ap-slide-template ap-slide-template--summary\"><div class=\"ap-calc-packet-card glass-panel np-glass\"><p class=\"np-atelier-kicker\">Practice packet</p><h2>Unit 1.7 · Selecting limit procedures</h2><p>Download the worksheet and solution key for additional practice beyond this deck.</p><div class=\"ap-calc-packet-actions\"><a class=\"np-atelier-btn np-atelier-btn--primary\" href=\"/ap/calc/practice/1.7/packet.pdf\" target=\"_blank\" rel=\"noopener\">Open packet PDF</a><a class=\"np-atelier-btn np-atelier-btn--ghost\" href=\"/ap/calc/practice/1.7/solutions.pdf\" target=\"_blank\" rel=\"noopener\">Open solutions PDF</a></div></div></div>",
+          "kind": "lesson",
+          "template": "summary",
+          "group": "practice",
+          "section": "1.7",
+          "study_tip": ""
+        }
+      ],
+      "practice_section": "1.7",
+      "interactive_count": 3,
+      "checkpoint_count": 3,
+      "tex_available": true,
+      "pdf_available": false,
+      "phase": 1,
+      "prev_lesson_slug": "ap-1-6-algebraic-manipulation-limits",
+      "next_lesson_slug": null,
+      "knowledge_map": [
+        {
+          "title": "Launch",
+          "start_index": 2,
+          "items": [
+            {
+              "index": 2,
+              "kind": "lesson",
+              "title": "Bridge · from 1.6",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 3,
+              "kind": "lesson",
+              "title": "Procedure ladder",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Concept & Definition",
+          "start_index": 4,
+          "items": [
+            {
+              "index": 4,
+              "kind": "lesson",
+              "title": "Rationalizing · idea",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 5,
+          "items": [
+            {
+              "index": 5,
+              "kind": "lesson",
+              "title": "Example · \\(\\sqrt{x+7}-\\sqrt{7}\\) over \\(x\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 6,
+              "kind": "lesson",
+              "title": "Example · \\(\\sqrt{x+11}-\\sqrt{11}\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 7,
+              "kind": "lesson",
+              "title": "Example · \\(\\sqrt{x+9}-3\\) over \\(x\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 8,
+              "kind": "lesson",
+              "title": "Example · \\(\\sqrt{x+9}-4\\) at \\(x=7\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 9,
+              "kind": "lesson",
+              "title": "Example · \\(\\sqrt{x+4}-3\\) at \\(x=5\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 10,
+              "kind": "lesson",
+              "title": "Example · denominator has the root",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 11,
+              "kind": "lesson",
+              "title": "Rationalize pair",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Why It Works",
+          "start_index": 12,
+          "items": [
+            {
+              "index": 12,
+              "kind": "lesson",
+              "title": "Complex fractions · idea",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 13,
+          "items": [
+            {
+              "index": 13,
+              "kind": "lesson",
+              "title": "Example · textbook stack",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 14,
+              "kind": "lesson",
+              "title": "Example · parameter \\(a\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 15,
+              "kind": "lesson",
+              "title": "Example · \\(\\dfrac{1}{3}-\\dfrac{1}{3x}\\) over \\(x-1\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 16,
+              "kind": "lesson",
+              "title": "Example · \\(x\\) over nested denominator",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 17,
+              "kind": "lesson",
+              "title": "Example · \\(x\\) over reciprocal form at \\(6\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 18,
+              "kind": "lesson",
+              "title": "Example · nested reciprocal at \\(0\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 19,
+              "kind": "lesson",
+              "title": "Complex fraction pair",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "AP Connection",
+          "start_index": 20,
+          "items": [
+            {
+              "index": 20,
+              "kind": "lesson",
+              "title": "Mixed procedures",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Guided Example",
+          "start_index": 21,
+          "items": [
+            {
+              "index": 21,
+              "kind": "lesson",
+              "title": "Example · direct root",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 22,
+              "kind": "lesson",
+              "title": "Example · factor rational",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 23,
+              "kind": "lesson",
+              "title": "Example · factor at \\(-3\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 24,
+              "kind": "lesson",
+              "title": "Example · powers in numerator",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 25,
+              "kind": "lesson",
+              "title": "Example · root over \\(x\\) at \\(3\\)",
+              "interactive": false,
+              "has_mcq": false
+            },
+            {
+              "index": 26,
+              "kind": "lesson",
+              "title": "Procedure row · three types",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "AP Practice",
+          "start_index": 27,
+          "items": [
+            {
+              "index": 27,
+              "kind": "question",
+              "title": "Checkpoint MCQ · conjugate form",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 28,
+              "kind": "question",
+              "title": "Checkpoint MCQ · procedure choice",
+              "interactive": true,
+              "has_mcq": true
+            },
+            {
+              "index": 29,
+              "kind": "question",
+              "title": "Checkpoint MCQ · complex fraction",
+              "interactive": true,
+              "has_mcq": true
+            }
+          ]
+        },
+        {
+          "title": "Exit Ticket",
+          "start_index": 30,
+          "items": [
+            {
+              "index": 30,
+              "kind": "lesson",
+              "title": "Exit ticket · 1.7",
+              "interactive": false,
+              "has_mcq": false
+            }
+          ]
+        },
+        {
+          "title": "Lesson flow",
+          "start_index": 31,
+          "items": [
+            {
+              "index": 31,
+              "kind": "lesson",
+              "title": "Practice packet · 1.7",
               "interactive": false,
               "has_mcq": false
             }
