@@ -15,6 +15,7 @@ from ap_calc_slide_helpers import (
     intro,
     key_point,
     limit_card,
+    limit_problem,
     math_block,
     mcq_reveal,
     phase_divider,
@@ -117,7 +118,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Example · polynomial at c",
         worked_example(
             "Notes #1",
-            "Evaluate \\(\\displaystyle\\lim_{x\\to -1}(x^2+2x-4)\\).",
+            "Strategy: direct substitution on a polynomial.",
             "Polynomial → direct substitution.",
             solution_steps([
                 "Strategy: <strong>direct substitution</strong>.",
@@ -126,6 +127,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(-5\\)",
             "No factoring needed when the denominator is absent.",
+            limit_latex=r"\lim_{x\to -1}(x^2+2x-4)",
+            source_label="Calculus notes #1",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -176,7 +179,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · factor x (notes #3)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{4x^2-15x}{x}\\)",
+            "Notes #3",
             "Direct sub gives \\(\\tfrac{0}{0}\\). Factor \\(x\\) from the numerator.",
             "Cancel \\(x\\) for \\(x\\neq 0\\), then substitute.",
             solution_steps([
@@ -185,6 +188,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(-15\\)",
             "Always state what you canceled.",
+            limit_latex=r"\lim_{x\to 0}\dfrac{4x^2-15x}{x}",
+            source_label="Calculus notes #3",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -193,7 +198,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · linear factor in denominator (notes #4)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to -7}\\dfrac{x^2-49}{x+7}\\)",
+            "Notes #4",
             "Substitution at \\(x=-7\\) gives \\(\\tfrac{0}{0}\\). Factor the numerator.",
             "Difference of squares.",
             solution_steps([
@@ -203,6 +208,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(-14\\)",
             "Same template as practice #10 with a different center.",
+            limit_latex=r"\lim_{x\to -7}\dfrac{x^2-49}{x+7}",
+            source_label="Calculus notes #4",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -211,7 +218,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · practice #3",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 1}\\dfrac{x^2-5x}{x-1}\\)",
+            "Practice #3",
             "Numerator \\(1-5=-4\\), denominator \\(0\\) → not merely \\(\\tfrac{0}{0}\\); the factor \\((x-1)\\) is not in the numerator.",
             "After checking factors, use simplified behavior near \\(1\\).",
             solution_steps([
@@ -221,6 +228,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "DNE (infinite)",
             "Contrast with true \\(\\tfrac{0}{0}\\) cases where a common factor exists.",
+            limit_latex=r"\lim_{x\to 1}\dfrac{x^2-5x}{x-1}",
+            source_label="Practice sheet #3",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -229,7 +238,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · practice #4 style",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 1}\\dfrac{x^2+5x-6}{x-1}\\)",
+            "Practice #4",
             "True \\(\\tfrac{0}{0}\\) — factor the numerator.",
             "Find two numbers that multiply to \\(-6\\) and add to \\(5\\): \\(6\\) and \\(-1\\).",
             solution_steps([
@@ -238,6 +247,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(7\\)",
             "Adapted from your practice sheet #4 (same factor-and-cancel move).",
+            limit_latex=r"\lim_{x\to 1}\dfrac{x^2+5x-6}{x-1}",
+            source_label="Practice sheet #4",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -246,7 +257,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · rational at x = 8 (practice #10)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 8}\\dfrac{x^2-64}{x-8}\\)",
+            "Practice #10",
             "Difference of squares in the numerator.",
             "Cancel \\((x-8)\\), then substitute \\(x=8\\).",
             solution_steps([
@@ -255,6 +266,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(16\\)",
             "Classic factor-and-cancel template.",
+            limit_latex=r"\lim_{x\to 8}\dfrac{x^2-64}{x-8}",
+            source_label="Practice sheet #10",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -265,7 +278,8 @@ def build(graphs: dict[str, str]) -> dict:
         phase_divider("Contrast / Error Analysis", "Limit does not exist")
         + role("Contrast", "Non-removable", "After factoring, a zero denominator can still remain.")
         + guided_example(
-            "<p><strong>Notes #5 pattern:</strong> \\(\\displaystyle\\lim_{x\\to -6}\\dfrac{x^2+11x+30}{x+6}\\).</p>",
+            limit_problem(r"\lim_{x\to -6}\dfrac{x^2+11x+30}{x+6}", "Calculus notes #5")
+            + "<p><strong>After factoring,</strong> decide whether the limit is finite or DNE.</p>",
             [
                 "Factor: \\(x^2+11x+30=(x+5)(x+6)\\).",
                 "Cancel \\((x+6)\\): limit \\(\\displaystyle\\lim_{x\\to -6}(x+5)=-1\\).",
@@ -308,7 +322,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · sin(3x)/x (notes #6)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(3x)}{x}\\)",
+            "Notes #6",
             "Create \\(\\dfrac{\\sin(3x)}{3x}\\) to use the standard limit.",
             "Multiply by \\(3/3\\) to match \\(\\sin u/u\\).",
             solution_steps([
@@ -318,6 +332,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(3\\)",
             "Scale factor stays outside the sine ratio.",
+            limit_latex=r"\lim_{x\to 0}\dfrac{\sin(3x)}{x}",
+            source_label="Calculus notes #6",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -326,7 +342,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · sin(7x)/sin(9x) (notes #7)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(7x)}{\\sin(9x)}\\)",
+            "Notes #7",
             "Divide numerator and denominator by \\(x\\).",
             "Rewrite as a ratio of two \\(\\sin(kx)/(kx)\\) limits.",
             solution_steps([
@@ -337,6 +353,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(\\dfrac{7}{9}\\)",
             "Works for any nonzero constants \\(a,b\\): \\(\\displaystyle\\lim_{x\\to 0}\\frac{\\sin(ax)}{\\sin(bx)}=\\frac{a}{b}\\).",
+            limit_latex=r"\lim_{x\to 0}\dfrac{\sin(7x)}{\sin(9x)}",
+            source_label="Calculus notes #7",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -345,7 +363,7 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Example · cos identity (notes #8)",
         worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\cos^2 x-1}{x(\\cos x+4)}\\)",
+            "Notes #8",
             "Use \\(\\cos^2 x-1=-\\sin^2 x\\).",
             "Convert to \\(\\sin x/x\\) factors, then let \\(x\\to 0\\).",
             solution_steps([
@@ -356,6 +374,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(0\\)",
             "Pythagorean identity is the standard move when you see \\(\\cos^2 x-1\\).",
+            limit_latex=r"\lim_{x\to 0}\dfrac{\cos^2 x-1}{x(\cos x+4)}",
+            source_label="Calculus notes #8",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -364,7 +384,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Trig practice pair",
         guided_example(
-            "<p><strong>Practice #5–6</strong></p>",
+            limit_problem(r"\lim_{x\to 0}\dfrac{3x}{\sin x}", "Practice #5")
+            + limit_problem(r"\lim_{x\to 0}\dfrac{\sin(2x)}{3x}", "Practice #6"),
             [
                 "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{3x}{\\sin x}=3\\cdot\\dfrac{x}{\\sin x}\\to 3\\).",
                 "\\(\\displaystyle\\lim_{x\\to 0}\\dfrac{\\sin(2x)}{3x}=\\dfrac{2}{3}\\cdot\\dfrac{\\sin(2x)}{2x}\\to \\dfrac{2}{3}\\).",
@@ -382,7 +403,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Mixed · practice #21–22",
         phase_divider("Worked Example", "Factor after rearranging")
         + worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 2}\\dfrac{x^2+6x-16}{2-x}\\)",
+            "Practice #21",
             "Denominator \\(2-x=-(x-2)\\); factor numerator by \\((x-2)\\).",
             "Factor, cancel, and watch the sign on \\(2-x\\).",
             solution_steps([
@@ -392,10 +413,12 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(-10\\)",
             "Flip the linear denominator factor first.",
+            limit_latex=r"\lim_{x\to 2}\dfrac{x^2+6x-16}{2-x}",
+            source_label="Practice sheet #21",
             collapsible_model=True,
         )
         + worked_example(
-            "\\(\\displaystyle\\lim_{x\\to 5}\\dfrac{2x^2-17x+35}{5-x}\\)",
+            "Practice #22",
             "Factor numerator; note \\(5-x=-(x-5)\\).",
             "Same sign-flip pattern as practice #21.",
             solution_steps([
@@ -405,6 +428,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(-3\\)",
             "Same template as #21 with different roots.",
+            limit_latex=r"\lim_{x\to 5}\dfrac{2x^2-17x+35}{5-x}",
+            source_label="Practice sheet #22",
             collapsible_model=True,
         ),
         path_phase="Worked Example",
@@ -413,7 +438,9 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Mixed · evaluate at π and nested trig",
         guided_example(
-            "<p><strong>Practice #19–20, #23</strong></p>",
+            limit_problem(r"\lim_{x\to \pi}\cos x", "Practice #19")
+            + limit_problem(r"\lim_{x\to 0}\sin(4x)", "Practice #20")
+            + limit_problem(r"\lim_{x\to 0}\dfrac{(1-\cos^2 x)\sin x}{x^2}", "Practice #23"),
             [
                 "\\(\\displaystyle\\lim_{x\\to \\pi}\\cos x=\\cos\\pi=\\mathbf{-1}\\) (direct).",
                 "\\(\\displaystyle\\lim_{x\\to 0}\\sin(4x)=0\\) (direct continuity).",

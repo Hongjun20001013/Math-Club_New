@@ -113,6 +113,20 @@ def role(label: str, title: str, lead: str) -> str:
     )
 
 
+def limit_problem(latex: str, source: str = "") -> str:
+    """Prominent limit statement for worked/guided example stems."""
+    raw = (latex or "").strip()
+    if raw.startswith("\\(") and raw.endswith("\\)"):
+        raw = raw[2:-2].strip()
+    if raw.startswith("\\[") and raw.endswith("\\]"):
+        block = math_block(raw)
+    else:
+        inner = raw if raw.startswith("\\displaystyle") else f"\\displaystyle {raw}"
+        block = math_block(f"\\[{inner}\\]")
+    badge = f'<p class="ap-limit-problem-source">{source}</p>' if source else ""
+    return f'<div class="ap-limit-problem">{badge}{block}</div>'
+
+
 def math_block(tex: str) -> str:
     """Display math card — auto \\displaystyle inside \\[ ... \\] for limits/fractions."""
     inner = tex
@@ -545,9 +559,19 @@ def worked_example(
     conclusion: str,
     check: str,
     stem_math: str = "",
+    limit_latex: str = "",
+    source_label: str = "",
     collapsible_model: bool = False,
 ) -> str:
     stem_extra = stem_math if stem_math else ""
+    label = source_label or (title if title and "\\lim" not in title and "lim_" not in title else "")
+    limit_tex = (limit_latex or "").strip()
+    if not limit_tex and title and ("\\lim" in title or "lim_{" in title):
+        limit_tex = title
+    prompt = limit_problem(limit_tex, label) if limit_tex else ""
+    if not limit_tex and title:
+        prompt = f'<p class="ap-limit-problem-source">{title}</p>'
+    strategy = f'<p class="ap-worked-strategy">{understand}</p>' if understand else ""
     model_open = "" if collapsible_model else " open"
     model_tag = "details" if collapsible_model else "div"
     model_end = f"</{model_tag}>"
@@ -559,7 +583,7 @@ def worked_example(
         model_start += '<summary class="ap-worked-model__toggle">Show worked model</summary>'
     return (
         '<div class="ap-slide-template--worked-example">'
-        + definition("Problem", f"<p>{understand}</p>{stem_extra}")
+        + definition("Problem", f"{prompt}{strategy}{stem_extra}")
         + model_start
         + key_point("Representation", f"<p>{representation}</p>")
         + steps_html

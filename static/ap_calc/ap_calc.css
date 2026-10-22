@@ -1496,6 +1496,29 @@ html[data-exam-theme="dark"] .ap-data-table td {
   margin-right: auto;
 }
 
+.ap-limit-problem {
+  margin: 0.35rem 0 0.85rem;
+  padding: 0.85rem 1rem 0.75rem;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(106, 76, 230, 0.07), rgba(255, 255, 255, 0.92));
+  border: 1px solid rgba(106, 76, 230, 0.16);
+}
+
+.ap-limit-problem-source {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6a4ce6;
+}
+
+.ap-worked-strategy {
+  margin: 0.5rem 0 0;
+  color: #4a4563;
+  line-height: 1.55;
+}
+
 @media (max-width: 640px) {
   .np-ap-chapter__link {
     grid-template-columns: auto 1fr;
