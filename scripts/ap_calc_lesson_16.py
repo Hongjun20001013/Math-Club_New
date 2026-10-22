@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ap_calc_slide_helpers import (
     SlideBuilder,
+    strategy_label_html,
     big_idea,
     bridge_slide,
     checkpoint,
@@ -27,15 +28,15 @@ from ap_calc_slide_helpers import (
     worked_example,
 )
 
-# Shorthand strategy labels (shown as 考点 · … on each problem card)
+# Shorthand strategy labels (shown as "Strategy · …" on each problem card)
 DIRECT = "Direct substitution"
 CONST = "Direct substitution (constant)"
-FACTOR = "Factor & cancel (\\frac{0}{0})"
+FACTOR = "Factor & cancel \\(\\tfrac{0}{0}\\)"
 DIFF_SQ = "Factor & cancel (difference of squares)"
 DNE_INF = "Limit does not exist (infinite)"
-TRIG_SIN = "Special trig limit (\\sin(kx)/x)"
+TRIG_SIN = "Special trig limit \\(\\sin(kx)/x\\)"
 TRIG_RATIO = "Special trig limit (ratio of sines)"
-TRIG_ID = "Trig identity + \\sin x/x"
+TRIG_ID = "Trig identity + \\(\\sin x/x\\)"
 SIGN_FLIP = "Factor & cancel (watch denominator sign)"
 TRIG_POINT = "Direct substitution (trig at a point)"
 TRIG_MIX = "Trig identity + special limits"
@@ -96,7 +97,7 @@ def build(graphs: dict[str, str]) -> dict:
             "<p><strong>1.5</strong> combined limits with algebra laws.</p>",
             "<p><strong>1.6</strong> is your <em>limit strategy</em> unit: pick a tactic, show the limit clearly, "
             "then simplify.</p>",
-            "Each example below labels the 考点 (strategy) before the solution.",
+            "Each example below labels the strategy before the solution.",
             "notation",
             protocol_mode="notation",
             demo_html=limit_card("x\\to 0", expr="\\dfrac{\\sin x}{x}", equals="1"),
@@ -116,12 +117,12 @@ def build(graphs: dict[str, str]) -> dict:
             "</ol>"
         )
         + data_table(
-            ["考点", "When you use it", "What you do first"],
+            ["Strategy", "When you use it", "What you do first"],
             [
-                [DIRECT, "Clean number after plugging in \\(c\\)", "Substitute and stop"],
-                [FACTOR, "\\(\\tfrac{0}{0}\\) rational form", "Factor, cancel, substitute"],
-                [TRIG_SIN, "\\(\\sin(kx)\\) with \\(x\\to 0\\)", "Build \\(\\sin(kx)/(kx)\\)"],
-                [DNE_INF, "Nonzero over zero after factoring", "Do not invent a finite value"],
+                [strategy_label_html(DIRECT), "Clean number after plugging in \\(c\\)", "Substitute and stop"],
+                [strategy_label_html(FACTOR), "\\(\\tfrac{0}{0}\\) rational form", "Factor, cancel, substitute"],
+                [strategy_label_html(TRIG_SIN), "\\(\\sin(kx)\\) with \\(x\\to 0\\)", "Build \\(\\sin(kx)/(kx)\\)"],
+                [strategy_label_html(DNE_INF), "Nonzero over zero after factoring", "Do not invent a finite value"],
             ],
         )
         + concept_frame(
@@ -129,7 +130,7 @@ def build(graphs: dict[str, str]) -> dict:
             "AP items reward a clear method, not guessing.",
             "Indeterminate \\(\\tfrac{0}{0}\\) vs blow-up form.",
             "Canceling terms instead of factors.",
-            "Write the 考点 in the margin on every limit you attempt.",
+            "Write the strategy name in the margin on every limit you attempt.",
         ),
         path_phase="Launch",
     )
@@ -300,7 +301,7 @@ def build(graphs: dict[str, str]) -> dict:
                 "Limit \\(=8+8=\\mathbf{16}\\).",
             ],
             "\\(16\\)",
-            "Same 考点 as the \\(x=-7\\) example with a different center.",
+            "Same strategy as the \\(x=-7\\) example with a different center.",
         ),
         path_phase="Guided Example",
     )
@@ -334,7 +335,7 @@ def build(graphs: dict[str, str]) -> dict:
                 "\\(\\displaystyle\\lim_{x\\to \\frac{1}{3}}(2x+3)=\\dfrac{2}{3}+3=\\mathbf{\\dfrac{11}{3}}\\).",
             ],
             "\\(\\dfrac{11}{3}\\)",
-            "Fractional centers still use the same factor-and-cancel 考点.",
+            "Fractional centers still use the same factor-and-cancel strategy.",
         ),
         path_phase="Guided Example",
     )
@@ -397,7 +398,7 @@ def build(graphs: dict[str, str]) -> dict:
                 (DIFF_SQ, r"\lim_{x\to 4}\dfrac{x^2-16}{x-4}"),
                 (FACTOR, r"\lim_{x\to -3}\dfrac{x^2+4x+3}{x+3}"),
             ])
-            + "<p>Name the 考点, then simplify each limit.</p>",
+            + "<p>Name the strategy, then simplify each limit.</p>",
             [
                 "First: \\(x^2-16=(x-4)(x+4)\\); after cancel, \\(x+4\\to 8\\).",
                 "Second: \\(x^2+4x+3=(x+3)(x+1)\\); after cancel, \\(x+1\\to -2\\).",
@@ -470,7 +471,7 @@ def build(graphs: dict[str, str]) -> dict:
                 "Limit \\(=\\mathbf{0}\\).",
             ],
             "\\(0\\)",
-            "Pythagorean identity is the key 考点.",
+            "Pythagorean identity is the key strategy here.",
         ),
         path_phase="Guided Example",
     )
@@ -506,7 +507,7 @@ def build(graphs: dict[str, str]) -> dict:
                 "\\(\\dfrac{x(3x+5)}{x}=3x+5\\to \\mathbf{5}\\).",
             ],
             "\\(5\\)",
-            "Same 考点 as the \\(4x^2-15x\\) example.",
+            "Same strategy as the \\(4x^2-15x\\) example.",
         ),
         path_phase="Guided Example",
     )
@@ -656,7 +657,7 @@ def build(graphs: dict[str, str]) -> dict:
         "Exit ticket · 1.6",
         exit_ticket([
             (
-                "List two 考点 from this lesson.",
+                "List two strategies from this lesson.",
                 "<p><strong>Direct substitution</strong> and <strong>factor & cancel</strong> "
                 "(plus special trig when you see \\(\\sin(kx)\\) near \\(0\\)).</p>",
             ),

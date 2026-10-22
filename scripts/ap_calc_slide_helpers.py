@@ -7,7 +7,25 @@ AP Calc visual design rules:
 """
 from __future__ import annotations
 
+import re
+
 FIG = "/static/ap_calc/figures"
+
+
+def strategy_label_html(label: str) -> str:
+    """Render strategy names for chips/tables; inline math must use \\(...\\)."""
+    s = (label or "").strip()
+    if not s or "\\(" in s:
+        return s
+    # Parenthetical TeX suffix, e.g. "Factor & cancel (\frac{0}{0})"
+    m = re.fullmatch(r"(.+?)\s*\((\\[^)]+)\)\s*$", s)
+    if m:
+        return f"{m.group(1).strip()} \\({m.group(2)}\\)"
+    # Trailing TeX fragment, e.g. "Trig identity + \sin x/x"
+    m = re.fullmatch(r"(.+?)\s+(\\(?:sin|cos|tan|ln|tfrac|frac)[^\\s].*)$", s)
+    if m:
+        return f"{m.group(1).strip()} \\({m.group(2)}\\)"
+    return s
 
 
 def fig(path: str, caption: str = "", cls: str = "ap-fig--standard", notice: str = "") -> str:
@@ -124,7 +142,9 @@ def limit_problem(latex: str, strategy: str = "", source: str = "") -> str:
         inner = raw if raw.startswith("\\displaystyle") else f"\\displaystyle {raw}"
         block = math_block(f"\\[{inner}\\]")
     label = (strategy or source or "").strip()
-    badge = f'<p class="ap-limit-strategy-chip">{label}</p>' if label else ""
+    badge = (
+        f'<p class="ap-limit-strategy-chip">{strategy_label_html(label)}</p>' if label else ""
+    )
     return f'<div class="ap-limit-problem">{badge}{block}</div>'
 
 
@@ -579,7 +599,7 @@ def worked_example(
         limit_tex = title
     prompt = limit_problem(limit_tex, focus) if limit_tex else ""
     if not limit_tex and focus:
-        prompt = f'<p class="ap-limit-strategy-chip">{focus}</p>'
+        prompt = f'<p class="ap-limit-strategy-chip">{strategy_label_html(focus)}</p>'
     strategy = f'<p class="ap-worked-strategy">{understand}</p>' if understand else ""
     model_open = "" if collapsible_model else " open"
     model_tag = "details" if collapsible_model else "div"

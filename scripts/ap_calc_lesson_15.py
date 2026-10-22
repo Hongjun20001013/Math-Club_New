@@ -17,6 +17,7 @@ from ap_calc_slide_helpers import (
     key_point,
     limit_card,
     limit_cards_row,
+    limit_problem,
     limit_compare_note,
     math_block,
     mcq_reveal,
@@ -116,6 +117,8 @@ def build(graphs: dict[str, str]) -> dict:
             ]),
             "\\(\\displaystyle\\lim_{x\\to 1}\\bigl[f(-x)+\\tfrac{g(x)}{2}\\bigr]=6\\)",
             "Composition \\(f(-x)\\) changes the <em>input</em> trend — track what happens to \\(-x\\) as \\(x\\to c\\).",
+            limit_latex=r"\lim_{x\to 1}\bigl[f(-x)+\tfrac{g(x)}{2}\bigr]",
+            strategy_focus="Limit laws (composition)",
             collapsible_model=True,
         ),
         path_phase="Guided Example",
@@ -124,15 +127,18 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Guided example · three functions at x = 5",
         guided_example(
-            "<p><strong>Given at \\(x=5\\):</strong></p>"
+            limit_problem(
+                r"\lim_{x\to 5}\bigl[h(x)f(x)+2g(x)\bigr]-h(5)",
+                "Limit laws (sum and product)",
+            )
+            + "<p><strong>Given at \\(x=5\\):</strong></p>"
             + data_table(
                 ["", "\\(f\\)", "\\(g\\)", "\\(h\\)"],
                 [
                     ["Value", "\\(f(5)=1\\)", "\\(g(5)=2\\)", "\\(h(5)=3\\)"],
                     ["Limit", "\\(\\displaystyle\\lim_{x\\to 5} f(x)=6\\)", "\\(-1\\)", "\\(5\\)"],
                 ],
-            )
-            + "<p>Find \\(\\displaystyle\\lim_{x\\to 5}\\bigl[h(x)f(x)+2g(x)\\bigr]-h(5)\\).</p>",
+            ),
             [
                 "Product: \\(\\displaystyle\\lim h(x)f(x)=5\\cdot 6=30\\).",
                 "Constant multiple + sum: \\(30+2(-1)=28\\).",
@@ -278,7 +284,8 @@ def build(graphs: dict[str, str]) -> dict:
             notice="For \\(x\\to -5^{+}\\), use the quadratic branch only.",
         )
         + guided_example(
-            "<p><strong>Find</strong> \\(\\displaystyle\\lim_{x\\to -5^{+}} h(x)\\).</p>",
+            limit_problem(r"\lim_{x\to -5^{+}} h(x)", "Piecewise (right-hand limit)")
+            + "<p><strong>Find</strong> \\(\\displaystyle\\lim_{x\\to -5^{+}} h(x)\\).</p>",
             [
                 "Approach from the right ⇒ middle rule \\(20-x^2\\).",
                 "Substitute trend: \\(20-25=-5\\).",
@@ -337,6 +344,12 @@ def build(graphs: dict[str, str]) -> dict:
             + limit_card("x\\to 2", equals="-1"),
             "\\(\\displaystyle\\lim_{x\\to 2^-} g(x)=\\lim_{x\\to 2^+} g(x)=\\lim_{x\\to 2} g(x)=-1\\); \\(g(2)=-1\\).",
             "Also try \\(x=-4\\): \\(L^{-}=3\\), \\(L^{+}=11\\) → two-sided limit DNE at −4.",
+            limit_latex=(
+                r"\lim_{x\to 2^-} g(x),\quad"
+                r"\lim_{x\to 2^+} g(x),\quad"
+                r"\lim_{x\to 2} g(x)"
+            ),
+            strategy_focus="Piecewise (one-sided limits)",
             stem_math=fig_gallery_row([
                 (
                     g["piecewise_g_15_zoom_2"],
@@ -358,7 +371,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Checkpoint · x = −4 on the same g",
         guided_example(
-            "<p>For the same \\(g(x)\\) as the previous slide, analyze <strong>\\(x=-4\\)</strong>.</p>",
+            limit_problem(r"\lim_{x\to -4} g(x)", "Piecewise (two-sided limit)")
+            + "<p>For the same \\(g(x)\\) as the previous slide, analyze <strong>\\(x=-4\\)</strong>.</p>",
             [
                 "<strong>Left:</strong> \\(\\sqrt{5-x}\\) → \\(\\sqrt{9}=3\\).",
                 "<strong>Right:</strong> \\(x^2-5\\) → \\(16-5=11\\).",
@@ -374,7 +388,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Practice · pick the branch",
         mcq_reveal(
-            "<p>Let \\(h(x)=\\begin{cases}-|x|, & x\\le -5\\\\ 20-x^2, & -5&lt;x\\le 3\\\\ 4x-1, & x&gt;3\\end{cases}\\). "
+            limit_problem(r"\lim_{x\to -5^+} h(x)", "Piecewise (right-hand limit)")
+            + "<p>Let \\(h(x)=\\begin{cases}-|x|, & x\\le -5\\\\ 20-x^2, & -5&lt;x\\le 3\\\\ 4x-1, & x&gt;3\\end{cases}\\). "
             "What is \\(\\displaystyle\\lim_{x\\to -5^+} h(x)\\)?</p>",
             ["\\(-5\\)", "\\(0\\)", "\\(-3\\)", "DNE"],
             "A",
@@ -390,7 +405,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Practice · continuous function",
         mcq_reveal(
-            "<p>If \\(f\\) is continuous and \\(f(3)=7\\), which statement <strong>must</strong> be true?</p>",
+            '<p class="ap-limit-strategy-chip">Limit laws (continuity)</p>'
+            + "<p>If \\(f\\) is continuous and \\(f(3)=7\\), which statement <strong>must</strong> be true?</p>",
             [
                 "\\(\\displaystyle\\lim_{x\\to 3} f(3x)=9\\)",
                 "\\(\\displaystyle\\lim_{x\\to 3} f(2x)=14\\)",
@@ -411,7 +427,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Practice · piecewise logarithm at x = 3",
         mcq_reveal(
-            "<p>Let \\(f(x)=\\begin{cases}\\ln(3x), & 0&lt;x\\le 3\\\\ x\\ln 3, & 3&lt;x\\le 4\\end{cases}\\). "
+            limit_problem(r"\lim_{x\to 3} f(x)", "Piecewise (two-sided limit)")
+            + "<p>Let \\(f(x)=\\begin{cases}\\ln(3x), & 0&lt;x\\le 3\\\\ x\\ln 3, & 3&lt;x\\le 4\\end{cases}\\). "
             "Find \\(\\displaystyle\\lim_{x\\to 3} f(x)\\).</p>",
             [
                 "\\(\\ln 9\\)",
@@ -433,7 +450,8 @@ def build(graphs: dict[str, str]) -> dict:
     s.add(
         "Practice · piecewise at x = 2",
         mcq_reveal(
-            "<p>Let \\(f(x)=\\begin{cases}\\ln x, & 0&lt;x\\le 2\\\\ x^2\\ln 2, & 2&lt;x\\le 4\\end{cases}\\). "
+            limit_problem(r"\lim_{x\to 2} f(x)", "Piecewise (two-sided limit)")
+            + "<p>Let \\(f(x)=\\begin{cases}\\ln x, & 0&lt;x\\le 2\\\\ x^2\\ln 2, & 2&lt;x\\le 4\\end{cases}\\). "
             "Find \\(\\displaystyle\\lim_{x\\to 2} f(x)\\).</p>",
             [
                 "\\(\\ln 2\\)",

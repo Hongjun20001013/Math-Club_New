@@ -1514,7 +1514,7 @@ html[data-exam-theme="dark"] .ap-data-table td {
 }
 
 .ap-limit-strategy-chip::before {
-  content: "考点 · ";
+  content: "Strategy · ";
   font-weight: 650;
   color: #7c6fc9;
 }
