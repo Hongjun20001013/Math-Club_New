@@ -1,7 +1,18 @@
 {
-  "generated_at": "2026-10-01T02:40:10.366789Z",
-  "total_topics": 58,
+  "generated_at": "2026-10-25T18:27:28.944909Z",
+  "total_topics": 60,
   "successful_topics": 58,
   "failed_topics": [],
-  "empty_topics": []
+  "empty_topics": [
+    {
+      "domain": "placement",
+      "topic": "english_g7_8",
+      "path": "banks/placement/english_g7_8.tex"
+    },
+    {
+      "domain": "placement",
+      "topic": "english_g9_11",
+      "path": "banks/placement/english_g9_11.tex"
+    }
+  ]
 }
