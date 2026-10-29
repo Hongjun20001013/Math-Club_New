@@ -8,13 +8,15 @@ class TestPlacementAdvisorTeam(unittest.TestCase):
     def test_team_advisors_on_intake(self) -> None:
         self.assertEqual(
             ADVISOR_PRESETS,
-            ("Mia Hu", "Jimmy Zheng", "Beck Yang", "Ling Zhang", "Lily"),
+            ("Mia Hu", "Jimmy Zheng", "Beck Yang", "Lynn", "Lily"),
         )
 
     def test_staff_username_maps_to_counselor_label(self) -> None:
         self.assertEqual(counselor_names_for_staff_username("Mia@novelprep.org"), ("Mia Hu",))
         self.assertEqual(counselor_names_for_staff_username("beck.yang@novelprep.org"), ("Beck Yang",))
-        self.assertEqual(counselor_names_for_staff_username("ling.zhang@novelprep.org"), ("Ling Zhang",))
+        self.assertEqual(counselor_names_for_staff_username("lynn@novelprep.org"), ("Lynn",))
+        self.assertEqual(counselor_names_for_staff_username("lin@novelprep.org"), ("Lynn",))
+        self.assertEqual(counselor_names_for_staff_username("ling.zhang@novelprep.org"), ("Lynn",))
         self.assertEqual(counselor_names_for_staff_username("lily@novelprep.org"), ("Lily",))
 
     def test_placement_track_split(self) -> None:

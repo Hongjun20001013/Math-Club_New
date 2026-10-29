@@ -51,7 +51,7 @@ ADVISOR_PRESETS = (
     "Mia Hu",
     "Jimmy Zheng",
     "Beck Yang",
-    "Ling Zhang",
+    "Lynn",
     "Lily",
 )
 ADVISOR_OTHER = "Other"
@@ -221,8 +221,10 @@ def counselor_names_for_staff_username(username: str) -> tuple[str, ...]:
         "jimmy": ("Jimmy Zheng",),
         "beck.yang": ("Beck Yang",),
         "beckyang": ("Beck Yang",),
-        "ling.zhang": ("Ling Zhang",),
-        "lingzhang": ("Ling Zhang",),
+        "lynn": ("Lynn",),
+        "lin": ("Lynn",),
+        "ling.zhang": ("Lynn",),
+        "lingzhang": ("Lynn",),
         "lily": ("Lily",),
         "lily.fan": ("Lily",),
     }
