@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>验收</h1>
+<p class="lede">{{ passed }}/{{ results|length }} 项通过。这些是规则、换人、撤销、校正和报告口径，不是一场真实比赛的统计。</p>
+<div class="table-wrap">
+  <table>
+    {% for item in results %}
+      <tr>
+        <td>{{ "通过" if item.passed else "失败" }}</td>
+        <td>{{ item.name }}<div class="muted">{{ item.detail }}</div></td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<h2>恢复和负担</h2>
+<ul class="list">
+  <li>比分、换人和校正写在本机数据库里。关掉页面再打开，会重放最后一次确认的状态。</li>
+  <li>断网不影响这些页面。没有网络时，轮转、配对和预案仍然可用。</li>
+  <li>一场训练的操作次数、撤销和校正，记在赛后报告里。漏记看校正，不靠猜。</li>
+  <li>自动识别上线前，不报告识别准确率。</li>
+</ul>
+{% endblock %}

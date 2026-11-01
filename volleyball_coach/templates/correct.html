@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>校正当前状态</h1>
+<p class="lede">漏记以后，直接确认现在的发球方、轮次和场上六人。系统不会从比分反推刚才发生了什么。</p>
+<form class="stack" method="post" action="{{ url_for('post_correct', match_id=match.id) }}">
+  <div class="split">
+    <div>
+      <label for="rotation">轮次</label>
+      <select id="rotation" name="rotation">
+        {% for number in range(1, 7) %}
+          <option value="{{ number }}" {% if number == state.rotation %}selected{% endif %}>R{{ number }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="serving">发球方</label>
+      <select id="serving" name="serving">
+        <option value="us" {% if state.serving == 'us' %}selected{% endif %}>我方。右后这个人就是发球队员。</option>
+        <option value="them" {% if state.serving == 'them' %}selected{% endif %}>对方。对方轮次保持未知。</option>
+      </select>
+    </div>
+  </div>
+  <div class="split">
+    <div>
+      <label for="score_us">我方比分</label>
+      <input id="score_us" name="score_us" value="{{ state.score_us }}">
+    </div>
+    <div>
+      <label for="score_them">对方比分</label>
+      <input id="score_them" name="score_them" value="{{ state.score_them }}">
+    </div>
+  </div>
+  {% for slot, slot_name in [(1, "右后"), (2, "右前"), (3, "中前"), (4, "左前"), (5, "左后"), (6, "中后")] %}
+    <label for="slot_{{ slot }}">{{ slot }} {{ slot_name }}</label>
+    <select id="slot_{{ slot }}" name="slot_{{ slot }}">
+      {% for player in plan.players.values() %}
+        <option value="{{ player.id }}" {% if state.occupants.get(slot) == player.id %}selected{% endif %}>{{ player.name }}</option>
+      {% endfor %}
+    </select>
+  {% endfor %}
+  <button type="submit">确认这个状态</button>
+</form>
+{% endblock %}

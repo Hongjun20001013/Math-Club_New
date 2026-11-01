@@ -1,0 +1,14 @@
+<form class="stack" method="post" action="{{ url_for('save_serve', team_id=plan.team_id) }}">
+  <input type="hidden" name="rotation" value="{{ card.rotation }}">
+  <label>发球目标</label>
+  <select name="target_type">
+    <option value="unset" {% if card.serve.target_type == 'unset' %}selected{% endif %}>先不设</option>
+    <option value="person" {% if card.serve.target_type == 'person' %}selected{% endif %}>追人</option>
+    <option value="zone" {% if card.serve.target_type == 'zone' %}selected{% endif %}>追区域</option>
+  </select>
+  <input name="target_label" value="{{ card.serve.target_label }}" placeholder="目标人或区域。没有证据就留空。">
+  <input name="backup_label" value="{{ card.serve.backup_label }}" placeholder="执行不到时的备用">
+  <input name="block_note" value="{{ card.serve.block_note }}" placeholder="配套拦防">
+  <input name="evidence" value="{{ card.serve.evidence }}" placeholder="证据。没有就写暂无对手证据。">
+  <button class="secondary" type="submit">保存 R{{ card.rotation }} 发球目标</button>
+</form>

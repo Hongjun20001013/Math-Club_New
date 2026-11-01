@@ -1,0 +1,27 @@
+<label>姓名</label>
+<input name="name" value="{{ player.name if player else '' }}" required>
+<label>号码</label>
+<input name="jersey" value="{{ player.jersey if player else '' }}">
+<label>角色</label>
+<select name="role">
+  {% for code, label in roles %}
+    <option value="{{ code }}" {% if player and player.role == code %}selected{% endif %}>{{ label }}</option>
+  {% endfor %}
+</select>
+<label>R1 首发槽位（1 右后到 6 中后，替补留空）</label>
+<input name="base_slot" value="{{ player.base_slot if player and player.base_slot else '' }}">
+<label>组织职责</label>
+<select name="sets_when">
+  <option value="never" {% if not player or player.sets_when == 'never' %}selected{% endif %}>不组织</option>
+  <option value="back_row" {% if player and player.sets_when == 'back_row' %}selected{% endif %}>轮到后排时组织</option>
+  <option value="always" {% if player and player.sets_when == 'always' %}selected{% endif %}>在场就组织</option>
+</select>
+<div class="checks">
+  <label><input type="checkbox" name="receive_primary" {% if player and player.receive_primary %}checked{% endif %}> 主接发</label>
+  <label><input type="checkbox" name="can_backup_set" {% if player and player.can_backup_set %}checked{% endif %}> 可以候选补位传球</label>
+  <label><input type="checkbox" name="setting_verified" {% if player and player.setting_verified %}checked{% endif %}> 二传能力已经验证。没勾就不能顶替组织槽。</label>
+</div>
+<label>补位顺序（数字小的先考虑）</label>
+<input name="backup_rank" value="{{ player.backup_rank if player else '' }}">
+<label>私人备注</label>
+<textarea name="private_note">{{ player.private_note if player else '' }}</textarea>

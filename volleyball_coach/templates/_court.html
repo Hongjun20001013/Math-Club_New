@@ -1,0 +1,21 @@
+<div class="court" data-rotation="{{ card.rotation }}">
+  <div class="net">网</div>
+  {% if card.slots %}
+    <div class="slots">
+      {% for slot in court_order %}
+        {% set cell = card.slots[slot] %}
+        <article class="slot {% if cell.is_sub %}is-sub{% endif %}">
+          <div class="pos">{{ cell.slot }} {{ cell.slot_name }} · {{ cell.row }}</div>
+          <strong>{{ cell.occupant_name }}</strong>
+          {% if cell.wing %}<em>{{ cell.wing }}{% if cell.wing_note %} · {{ cell.wing_note }}{% endif %}</em>{% endif %}
+          {% if cell.is_sub %}<div class="pos">槽位属于 {{ cell.origin_name }}</div>{% endif %}
+          <div class="badges">
+            {% for badge in cell.badges %}<span>{{ badge }}</span>{% endfor %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>六个首发槽还没排完。</p>
+  {% endif %}
+</div>

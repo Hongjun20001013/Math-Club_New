@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('live', match_id=match.id) }}">回到场边</a>
+  <a href="{{ url_for('report_page', match_id=match.id) }}">看三个问题的结果</a>
+  <a href="{{ url_for('dictionary') }}">标注标准</a>
+</p>
+<h1>赛后先回答三个问题</h1>
+<p class="lede">试用目标是每场结束后用 20 分钟。先看哪一轮接发最难、发球目标有没有执行到、替补上场后在可比条件下发生了什么。看不清就标未知，不要为了填满而猜。这个 20 分钟还没有被你的比赛验证过。</p>
+<p class="muted">必填：{{ required_fields | join("、") }}。可以留空：{{ optional_fields | join("、") }}。</p>
+{% if state.history_gap %}
+  <p class="warn-line">这场比分链断过。下面如果附上当前阵容，用的是校正之后的六人，不是漏记之前的过程。</p>
+{% endif %}
+
+<form class="stack" method="post" action="{{ url_for('add_rally', match_id=match.id) }}">
+  <h2>补一个回合</h2>
+  <div class="split">
+    <div>
+      <label for="set_number">局</label>
+      <input id="set_number" name="set_number" value="{{ state.set_index }}">
+    </div>
+    <div>
+      <label for="rotation">轮次</label>
+      <select id="rotation" name="rotation">
+        {% for number in range(1, 7) %}
+          <option value="{{ number }}" {% if number == state.rotation %}selected{% endif %}>R{{ number }}</option>
+        {% endfor %}
+        <option value="unknown">未知</option>
+      </select>
+    </div>
+  </div>
+  <div class="split">
+    <div>
+      <label for="serving_side">发球方</label>
+      <select id="serving_side" name="serving_side">
+        <option value="us" {% if state.serving == 'us' %}selected{% endif %}>我方</option>
+        <option value="them" {% if state.serving == 'them' %}selected{% endif %}>对方</option>
+        <option value="unknown">未知</option>
+      </select>
+    </div>
+    <div>
+      <label for="winner">胜方</label>
+      <select id="winner" name="winner">
+        <option value="us">我方</option>
+        <option value="them">对方</option>
+        <option value="unknown">未知</option>
+      </select>
+    </div>
+  </div>
+  <label for="sample_scope">这段记录是什么</label>
+  <select id="sample_scope" name="sample_scope">
+    <option value="sample">抽样。可以分析，但不能写成整场。</option>
+    <option value="complete">按完整比赛记录</option>
+    <option value="key_clip">关键片段。不能算整场得分率。</option>
+  </select>
+  <label for="pass_quality">一传质量（可以不填）</label>
+  <select id="pass_quality" name="pass_quality">
+    <option value="">先不填</option>
+    {% for code, label in qualities.items() %}
+      <option value="{{ code }}">{{ label }}</option>
+    {% endfor %}
+  </select>
+  <label for="server_label">发球队员</label>
+  <input id="server_label" name="server_label" placeholder="知道再填">
+  <div class="split">
+    <div>
+      <label for="target_type">我方发球目标</label>
+      <select id="target_type" name="target_type">
+        <option value="">没有记目标</option>
+        <option value="person">追人</option>
+        <option value="zone">追区域</option>
+      </select>
+    </div>
+    <div>
+      <label for="target_label">目标</label>
+      <input id="target_label" name="target_label">
+    </div>
+  </div>
+  <div class="split">
+    <div>
+      <label for="actual_receiver">实际接球人</label>
+      <input id="actual_receiver" name="actual_receiver" placeholder="没看清就留空">
+    </div>
+    <div>
+      <label for="actual_zone">实际区域</label>
+      <input id="actual_zone" name="actual_zone">
+    </div>
+  </div>
+  <label for="video_timestamp">录像时间</label>
+  <input id="video_timestamp" name="video_timestamp" placeholder="例如 12:41">
+  <label for="note">备注</label>
+  <input id="note" name="note">
+  <label class="checks"><span><input type="checkbox" name="attach_lineup" checked> 附上现在场上的六人{% if bench_names %}（替补：{{ bench_names | join("、") }}）{% else %}（没有替补在场）{% endif %}</span></label>
+  <button type="submit">保存回合</button>
+</form>
+
+<h2>已记下的回合</h2>
+{% if rallies %}
+  <div class="table-wrap">
+    <table>
+      <tr><th>轮次</th><th>发球</th><th>胜方</th><th>一传</th><th>范围</th><th>阵容</th><th></th></tr>
+      {% for rally in rallies %}
+        <tr>
+          <td>{{ "未知" if rally.rotation is none else "R" ~ rally.rotation }}</td>
+          <td>{{ {"us": "我方", "them": "对方", "unknown": "未知"}[rally.serving_side] }}</td>
+          <td>{{ {"us": "我方", "them": "对方", "unknown": "未知"}[rally.winner] }}</td>
+          <td>{{ qualities.get(rally.pass_quality, "未填") if rally.pass_quality else "未填" }}</td>
+          <td>{{ {"complete": "完整", "sample": "抽样", "key_clip": "片段"}[rally.sample_scope] }}</td>
+          <td>{{ rally.bench_ids | join("、") if rally.bench_ids else "首发" }}</td>
+          <td>
+            <form method="post" action="{{ url_for('remove_rally', match_id=match.id, rally_id=rally.id) }}">
+              <button class="secondary" type="submit">删除</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% else %}
+  <p class="muted">还没有回合。场边的加减分只维护轮次，不代替这里的三个问题。</p>
+{% endif %}
+
+{% if bookmarks %}
+  <h2>场边书签</h2>
+  <ul class="list">
+    {% for mark in bookmarks %}
+      <li>{{ mark.created_at }} · {{ mark.payload.tag }} {{ mark.payload.note }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

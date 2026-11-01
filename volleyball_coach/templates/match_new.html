@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>开场 · {{ plan.name }}</h1>
+<p class="lede">先确认名单、配对、起始轮次和发球方。预案可以离线用。场上六人从这一轮的首发槽开始，替补不会因为轮次到了就自动上场。</p>
+{% if plan.base_order()|length != 6 %}
+  <p class="warn-line">六个首发槽还没排满，现在不能开场。</p>
+{% endif %}
+<form class="stack" method="post" action="{{ url_for('start_match', team_id=plan.team_id) }}">
+  <label for="opponent">对手</label>
+  <input id="opponent" name="opponent" placeholder="可以留空">
+  <label for="mode">场边模式</label>
+  <select id="mode" name="mode">
+    <option value="plan">预案模式。可以不点比分，轮次手动选。</option>
+    <option value="light">轻记录。每分点一下谁得分，用来推轮次。</option>
+  </select>
+  <div class="split">
+    <div>
+      <label for="rotation">起始轮次</label>
+      <select id="rotation" name="rotation">
+        {% for number in range(1, 7) %}<option value="{{ number }}">R{{ number }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="serving">发球方</label>
+      <select id="serving" name="serving">
+        <option value="us">我方</option>
+        <option value="them">对方</option>
+      </select>
+    </div>
+  </div>
+  <h2>本场锁定的配对</h2>
+  {% for pair in plan.pairs %}
+    <label class="checks">
+      <span><input type="checkbox" name="pair_id" value="{{ pair.id }}" {% if pair.status == 'confirmed' %}checked{% endif %}>
+      {{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} · {{ "已确认" if pair.status == "confirmed" else "候选" }}</span>
+    </label>
+    {% if pair.notes %}<p class="muted">{{ pair.notes }}</p>{% endif %}
+  {% else %}
+    <p class="muted">还没有配对。固定换人的球队需要先在名单页建好。</p>
+  {% endfor %}
+  <button type="submit">开始</button>
+</form>
+{% endblock %}
