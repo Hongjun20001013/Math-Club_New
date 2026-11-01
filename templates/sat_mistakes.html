@@ -26,7 +26,17 @@
       <div class="np-sat-mistake-unlock">
         <strong>{{ dashboard.active_count }}</strong>
         <span>active SAT mistakes</span>
+        {% if dashboard.resume and dashboard.resume.kind == 'continue' %}
+        <a href="{{ dashboard.resume.href }}" class="np-sat-mistake-primary">Continue · {{ dashboard.resume.answered }}/{{ dashboard.resume.total }} saved</a>
+        <em>Same questions. Leaving the test does not delete them.</em>
+        {% elif dashboard.resume %}
+        <a href="{{ dashboard.resume.href }}" class="np-sat-mistake-primary">Open saved questions</a>
         {% if dashboard.can_generate %}
+        <form method="post" action="{{ url_for('practice_sat_mistake_test_generate') }}">
+          <button type="submit" class="np-sat-mistake-primary">Start a new {{ test_size }}Q test</button>
+        </form>
+        {% endif %}
+        {% elif dashboard.can_generate %}
         <form method="post" action="{{ url_for('practice_sat_mistake_test_generate') }}">
           <button type="submit" class="np-sat-mistake-primary">Generate {{ test_size }}Q · {{ time_limit_minutes }} min test</button>
         </form>

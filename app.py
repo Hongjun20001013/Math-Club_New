@@ -9170,11 +9170,83 @@ def _sat_mistake_test_items(row: sqlite3.Row) -> list[dict[str, Any]]:
     return [dict(item) for item in raw if isinstance(item, dict)]
 
 
+def _sat_mistake_resume_state(db: sqlite3.Connection, user_id: Any) -> dict[str, Any] | None:
+    """In-progress mistake test for this student. The question list stays on the row."""
+    if user_id is None:
+        return None
+    row = db.execute(
+        """
+        SELECT id, items_json, time_limit_seconds,
+               CAST(strftime('%s', started_at) AS INTEGER) AS started_unix
+        FROM sat_mistake_tests
+        WHERE user_id = ? AND status = 'active'
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (int(user_id),),
+    ).fetchone()
+    if row is None:
+        return None
+    items = _sat_mistake_test_items(row)
+    if not items:
+        return None
+    answered = {
+        int(r["item_order"])
+        for r in db.execute(
+            "SELECT item_order FROM sat_mistake_test_responses WHERE test_id = ?",
+            (int(row["id"]),),
+        ).fetchall()
+    }
+    step = 0
+    for i in range(len(items)):
+        if i not in answered:
+            step = i
+            break
+    else:
+        step = len(items) - 1
+    limit = int(row["time_limit_seconds"] or SAT_MISTAKE_TEST_SECONDS)
+    started = int(row["started_unix"] or 0)
+    if started <= 0:
+        remaining = limit
+    else:
+        remaining = max(0, limit - max(0, int(time.time()) - started))
+    finished = len(answered) >= len(items)
+    expired = remaining <= 0 and not finished
+    test_id = int(row["id"])
+    if finished or expired:
+        href = url_for("practice_sat_mistake_test_done", test_id=test_id)
+        kind = "report"
+    else:
+        href = url_for("practice_sat_mistake_test_question", test_id=test_id, step=step)
+        kind = "continue"
+    return {
+        "test_id": test_id,
+        "step": step,
+        "answered": len(answered),
+        "total": len(items),
+        "remaining_seconds": remaining,
+        "href": href,
+        "kind": kind,
+    }
+
+
+def _close_active_sat_mistake_test(db: sqlite3.Connection, test_id: int) -> None:
+    db.execute(
+        """
+        UPDATE sat_mistake_tests
+        SET status = 'completed', completed_at = COALESCE(completed_at, datetime('now'))
+        WHERE id = ? AND status = 'active'
+        """,
+        (int(test_id),),
+    )
+
+
 @app.route("/practice/mistakes/sat")
 def practice_sat_mistakes():
     db = get_db()
     user_id = session.get("user_id")
     dashboard = _sat_mistake_dashboard(db, user_id)
+    dashboard["resume"] = _sat_mistake_resume_state(db, user_id)
     return render_template(
         "sat_mistakes.html",
         dashboard=dashboard,
@@ -9187,8 +9259,18 @@ def practice_sat_mistakes():
 def practice_sat_mistake_test_generate():
     db = get_db()
     user_id = session.get("user_id")
+    resume = _sat_mistake_resume_state(db, user_id)
+    if resume and resume["kind"] == "continue":
+        return redirect(resume["href"])
+    if resume:
+        saved_id = int(resume["test_id"])
+        _close_active_sat_mistake_test(db, saved_id)
+        db.commit()
     dashboard = _sat_mistake_dashboard(db, user_id)
     if not dashboard["can_generate"]:
+        if resume:
+            flash("Your previous mistake test is saved. These are the questions from that sitting.")
+            return redirect(url_for("practice_sat_mistake_test_done", test_id=int(resume["test_id"])))
         flash(f"You need {dashboard['needed']} more active SAT mistake(s) before a 22-question test unlocks.")
         return redirect(url_for("practice_sat_mistakes"))
     items = _select_sat_mistake_test_items(dashboard["pool"])
@@ -9216,10 +9298,16 @@ def practice_sat_mistake_test_question(test_id: int, step: int):
         return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
     step = max(0, min(step, len(items) - 1))
     item = items[step]
-    questions = get_questions_for_topic(item["domain"], item["topic"], BANKS[item["domain"]][item["topic"]])
+    bank = (BANKS.get(str(item.get("domain") or "")) or {}).get(str(item.get("topic") or ""))
+    questions = (
+        get_questions_for_topic(str(item["domain"]), str(item["topic"]), bank) if bank else []
+    )
     q_index = int(item["q_index"])
     if q_index < 0 or q_index >= len(questions):
-        abort(404)
+        nxt = step + 1
+        if nxt >= len(items):
+            return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+        return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=nxt))
     q = questions[q_index]
     answered_rows = db.execute(
         "SELECT item_order FROM sat_mistake_test_responses WHERE test_id = ?",
@@ -14115,6 +14203,7 @@ def _practice_hub_context() -> dict[str, Any]:
                 int(m.get("checkpoint_count") or 0),
             )
         ctx["resume_session"] = _hub_resume_practice_session(db, int(uid))
+        ctx["mistake_test_resume"] = _sat_mistake_resume_state(db, int(uid))
         rt_row = db.execute(
             """
             SELECT exam_meta_json FROM practice_attempts
