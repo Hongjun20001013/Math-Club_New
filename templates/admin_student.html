@@ -26,7 +26,7 @@
         <div><strong>{{ totals.sessions }}</strong><span>Sessions</span></div>
         <div><strong>{{ totals.responses }}</strong><span>Responses</span></div>
         <div><strong>{% if totals.accuracy_pct is not none %}{{ totals.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
-        <div><strong>{{ totals.mistake_tests_finished }}</strong><span>Mistake tests</span></div>
+        <div><strong>{{ totals.mistake_headline }}</strong><span>{{ totals.mistake_caption }}</span></div>
       </div>
     </section>
 

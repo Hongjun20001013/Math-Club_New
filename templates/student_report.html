@@ -221,24 +221,28 @@
         {% endif %}
       </article>
     </div>
-    <article class="np-report-card np-report-card--flat">
-      <h3>Mistake tests</h3>
-      {% if mistake_tests %}
-      <ul class="np-progress-mq-list">
-        {% for test in mistake_tests %}
-        <li class="{% if test.status == 'completed' %}is-pass{% else %}is-fail{% endif %}">
-          <span>{{ test.status_label }} · {{ test.answered }}/{{ test.total }} answered</span>
-          <strong>{{ test.correct }}/{{ test.total }} · {{ test.pct }}%</strong>
-          <em>{{ test.when_label }}</em>
-          {% if test.href %}<a href="{{ test.href }}">Open</a>{% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p class="np-report-empty">No mistake tests recorded yet.</p>
-      {% endif %}
-    </article>
   </details>
+
+  <section class="np-report-zone glass-panel np-glass mp-animate-up" aria-label="SAT mistake tests">
+    <header class="np-report-zone-head">
+      <h2>Mistake tests</h2>
+      <p>Each saved sitting, including one the student has not finished. Open a report to see every answer.</p>
+    </header>
+    {% if mistake_tests %}
+    <div class="np-report-session-list">
+      {% for test in mistake_tests %}
+      <a href="{{ test.href or '#' }}" class="np-report-session-row"{% if viewer == 'admin' %} target="_blank" rel="noopener"{% endif %}>
+        <strong>{{ test.status_label }} · {{ test.answered }}/{{ test.total }} answered</strong>
+        <span>{{ test.correct }}/{{ test.total }} correct · {{ test.pct }}%</span>
+        <em>{{ test.when_label }}</em>
+        <i>Open →</i>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="np-report-empty">No mistake tests recorded yet.</p>
+    {% endif %}
+  </section>
 
   <section class="np-report-zone glass-panel np-glass mp-animate-up" aria-label="Homework and Random Test history">
     <header class="np-report-zone-head">

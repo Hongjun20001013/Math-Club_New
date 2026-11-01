@@ -31,7 +31,7 @@
       <article>
         <span>{{ unit.label }}</span>
         <strong>{{ unit.correct }}/{{ unit.total }}</strong>
-        <p>{{ unit.title }} · {{ unit.accuracy if unit.accuracy is not none else '—' }}%</p>
+        <p>{{ unit.title }} · {{ unit.answered or 0 }} answered · {{ unit.accuracy if unit.accuracy is not none else '—' }}%</p>
         <b style="width: {{ unit.accuracy if unit.accuracy is not none else 0 }}%;"></b>
       </article>
       {% endfor %}
@@ -44,7 +44,7 @@
       </header>
       <ul>
         {% for row in rows %}
-        <li class="{{ 'is-correct' if row.is_correct else 'is-wrong' }}">
+        <li class="{% if not row.answered %}is-blank{% elif row.is_correct %}is-correct{% else %}is-wrong{% endif %}">
           <span>{{ row.unit_label }} · {{ row.topic_title }}</span>
           <strong>{% if not row.answered %}Not answered{% elif row.is_correct %}Correct{% else %}Missed{% endif %}</strong>
           <em>Your answer: {{ row.selected_answer }} · Key: {{ row.correct_answer }}</em>

@@ -7032,6 +7032,8 @@ def _dashboard_context() -> dict:
                 "when_label": top.get("when_label") or "",
                 "label": top.get("resume_label") or "Continue last session",
             }
+    mistake_test_resume = _sat_mistake_resume_state(db, user_id) if user_id else None
+    mistake_test_saved = _sat_mistake_latest_summary(db, user_id) if user_id else None
 
     return {
         "stats": {
@@ -7051,6 +7053,8 @@ def _dashboard_context() -> dict:
         "sat_unit_progress": sat_unit_progress,
         "next_unit": next_unit,
         "resume_practice": resume_practice,
+        "mistake_test_resume": mistake_test_resume,
+        "mistake_test_saved": mistake_test_saved,
         "recent_sessions": recent_sessions,
         "focus_topics": focus_topics,
     }
@@ -9519,7 +9523,7 @@ def _sat_mistake_test_report(db: sqlite3.Connection, row: sqlite3.Row) -> dict[s
     correct = sum(1 for r in responses if int(r["is_correct"] or 0) == 1)
     total = len(items)
     unit_summary: dict[str, dict[str, Any]] = {
-        k: {"key": k, **SAT_MISTAKE_UNIT_META[k], "total": 0, "correct": 0}
+        k: {"key": k, **SAT_MISTAKE_UNIT_META[k], "total": 0, "correct": 0, "answered": 0}
         for k in SAT_MISTAKE_UNIT_ORDER
     }
     rows = []
@@ -9529,6 +9533,8 @@ def _sat_mistake_test_report(db: sqlite3.Connection, row: sqlite3.Row) -> dict[s
         unit = unit_summary.get(unit_key)
         if unit is not None:
             unit["total"] += 1
+            if resp is not None:
+                unit["answered"] = int(unit.get("answered") or 0) + 1
             if resp and int(resp["is_correct"] or 0) == 1:
                 unit["correct"] += 1
         answered = resp is not None
@@ -16939,6 +16945,11 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
                 "last_activity": row["last_activity"],
                 "mistake_tests": 0,
                 "mistake_tests_finished": 0,
+                "mistake_latest_status": "",
+                "mistake_latest_answered": 0,
+                "mistake_latest_total": 0,
+                "mistake_latest_correct": 0,
+                "mistake_latest_pct": None,
             }
         )
     activity = {
@@ -16955,12 +16966,35 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
             """
         ).fetchall()
     }
+    latest_rows = {
+        int(r["user_id"]): r
+        for r in db.execute(
+            """
+            SELECT t.user_id, t.status, t.answered_count, t.item_count,
+                   t.correct_count, t.score_pct
+            FROM sat_mistake_tests t
+            JOIN (
+                SELECT user_id, MAX(id) AS id
+                FROM sat_mistake_tests
+                WHERE user_id IS NOT NULL
+                GROUP BY user_id
+            ) latest ON latest.id = t.id
+            """
+        ).fetchall()
+    }
     for student in out:
         extra = activity.get(student["id"])
         if extra is None:
             continue
         student["mistake_tests"] = int(extra["tests"] or 0)
         student["mistake_tests_finished"] = int(extra["finished"] or 0)
+        latest = latest_rows.get(student["id"])
+        if latest is not None:
+            student["mistake_latest_status"] = str(latest["status"] or "active")
+            student["mistake_latest_answered"] = int(latest["answered_count"] or 0)
+            student["mistake_latest_total"] = int(latest["item_count"] or 0)
+            student["mistake_latest_correct"] = int(latest["correct_count"] or 0)
+            student["mistake_latest_pct"] = latest["score_pct"]
         last_at = extra["last_at"]
         current = student["last_activity"]
         if last_at and (not current or str(last_at) >= str(current)):
@@ -20081,6 +20115,13 @@ def admin_student_detail(user_id: int):
     totals["mistake_tests"] = len(mistake_tests)
     finished_tests = [row for row in mistake_tests if row["status"] == "completed"]
     totals["mistake_tests_finished"] = len(finished_tests)
+    active_test = next((row for row in mistake_tests if row["status"] != "completed"), None)
+    if active_test:
+        totals["mistake_headline"] = f"{active_test['answered']}/{active_test['total']}"
+        totals["mistake_caption"] = "Mistake test in progress"
+    else:
+        totals["mistake_headline"] = str(len(finished_tests))
+        totals["mistake_caption"] = "Mistake tests"
     return render_template(
         "admin_student.html",
         student=student_dict,

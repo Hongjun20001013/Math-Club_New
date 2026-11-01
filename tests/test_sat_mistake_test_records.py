@@ -136,9 +136,11 @@ class MistakeTestRecordTests(unittest.TestCase):
         home_html = home.get_data(as_text=True)
         self.assertEqual(home.status_code, 200)
         self.assertIn("record-student", home_html)
-        self.assertIn("Mistake tests 0/1", home_html)
-
+        self.assertIn("Mistake test in progress 1/2", home_html)
         self._login(self.user_id, "student", "record-student")
+        home_student = self.client.get("/")
+        self.assertEqual(home_student.status_code, 200)
+        self.assertIn("Continue mistake test · 1/2", home_student.get_data(as_text=True))
         second = self._submit(1, "B")
         self.assertEqual(second.status_code, 302)
         self.assertIn(f"/practice/mistakes/sat/test/{self.test_id}/done", second.headers["Location"])
@@ -171,7 +173,10 @@ class MistakeTestRecordTests(unittest.TestCase):
         self.assertIn(f"{row['correct_count']}/2", progress.get_data(as_text=True))
         finished = self.client.get(f"/admin/students/{self.user_id}")
         self.assertIn("Finished", finished.get_data(as_text=True))
-        self.assertIn("Mistake tests 1/1", self.client.get("/admin").get_data(as_text=True))
+        self.assertIn(
+            f"Mistake test finished · {row['correct_count']}/2",
+            self.client.get("/admin").get_data(as_text=True),
+        )
 
     def test_expired_partial_test_still_saves_a_finished_score(self):
         self._submit(0, "C")

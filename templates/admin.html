@@ -636,7 +636,7 @@
                 <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
                 <div class="np-admin-directory-identity">
                   <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
-                  <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}{% if student.mistake_tests %} · Mistake tests {{ student.mistake_tests_finished }}/{{ student.mistake_tests }}{% endif %}</span>
+                  <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}{% if student.mistake_tests %}{% if student.mistake_latest_status == 'completed' %} · Mistake test finished · {{ student.mistake_latest_correct }}/{{ student.mistake_latest_total }}{% else %} · Mistake test in progress {{ student.mistake_latest_answered }}/{{ student.mistake_latest_total }}{% endif %}{% endif %}</span>
                   <div class="np-admin-directory-badges">
                     <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
                     <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>

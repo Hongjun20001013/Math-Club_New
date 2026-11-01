@@ -41,14 +41,27 @@
     </div>
   </header>
   <div class="np-cmd-center-grid">
+    {% if mistake_test_resume %}
+    <a href="{{ mistake_test_resume.href }}" class="np-cmd-card np-cmd-card--primary">
+      <strong>{% if mistake_test_resume.kind == 'continue' %}Continue mistake test{% else %}Open saved mistake test{% endif %}</strong>
+      <span>{{ mistake_test_resume.answered }}/{{ mistake_test_resume.total }} saved</span>
+      <em>Same questions. Leaving does not delete them.</em>
+    </a>
+    {% elif mistake_test_saved %}
+    <a href="{{ mistake_test_saved.href }}" class="np-cmd-card np-cmd-card--primary">
+      <strong>Open saved mistake test</strong>
+      <span>{{ mistake_test_saved.correct }}/{{ mistake_test_saved.total }} correct</span>
+      <em>The question list from the last sitting.</em>
+    </a>
+    {% endif %}
     {% if resume_practice %}
-    <a href="{{ resume_practice.href }}" class="np-cmd-card np-cmd-card--primary">
+    <a href="{{ resume_practice.href }}" class="np-cmd-card{% if not mistake_test_resume and not mistake_test_saved %} np-cmd-card--primary{% endif %}">
       <strong>Continue</strong>
       <span>{{ resume_practice.line }}</span>
       <em>{{ resume_practice.when_label }}</em>
     </a>
     {% elif next_unit %}
-    <a href="{{ next_unit.href }}" class="np-cmd-card np-cmd-card--primary">
+    <a href="{{ next_unit.href }}" class="np-cmd-card{% if not mistake_test_resume and not mistake_test_saved %} np-cmd-card--primary{% endif %}">
       <strong>Next unit</strong>
       <span>{{ next_unit.label }}</span>
       <em>{{ next_unit.remaining }} questions left</em>
@@ -91,7 +104,11 @@
       </h1>
       <p class="mp-subtitle">{% if dashboard_username %}Continue a unit, clear misses, or open today’s deck — everything stays crisp and easy to find.{% else %}Premium SAT practice: clear decks, sharp drills, and feedback that makes progress feel visible.{% endif %}</p>
       <div class="mp-hero-actions">
-        {% if resume_practice %}
+        {% if mistake_test_resume %}
+        <a href="{{ mistake_test_resume.href }}" class="big-btn mp-btn-pill mp-btn-glow">{% if mistake_test_resume.kind == 'continue' %}Continue mistake test · {{ mistake_test_resume.answered }}/{{ mistake_test_resume.total }}{% else %}Open saved mistake test{% endif %}</a>
+        {% elif mistake_test_saved %}
+        <a href="{{ mistake_test_saved.href }}" class="big-btn mp-btn-pill mp-btn-glow">Open saved mistake test · {{ mistake_test_saved.correct }}/{{ mistake_test_saved.total }}</a>
+        {% elif resume_practice %}
         <a href="{{ resume_practice.href }}" class="big-btn mp-btn-pill mp-btn-glow">{{ resume_practice.label }}</a>
         {% elif next_unit %}
         <a href="{{ next_unit.href }}" class="big-btn mp-btn-pill mp-btn-glow">Start {{ next_unit.label }}</a>

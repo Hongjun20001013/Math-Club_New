@@ -35327,6 +35327,10 @@ body.is-cm-projector .np-cm-slide-body mjx-container {
     color: #b91c1c;
 }
 
+.np-sat-mistake-review li.is-blank strong {
+    color: #5c5670;
+}
+
 .np-sat-mistake-review li a {
     color: #5f3df5;
     font-weight: 850;
