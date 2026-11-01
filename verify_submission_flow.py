@@ -62,9 +62,44 @@ def check_correct_answer_extraction() -> CheckResult:
     )
 
 
+def _authenticate_client(client) -> bool:
+    """Use seeded admin Jack so practice routes are not redirected to /login."""
+    client.get("/login")
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, username, role, is_active, access_grants
+            FROM users
+            WHERE username = 'Jack'
+            LIMIT 1
+            """
+        ).fetchone()
+    finally:
+        conn.close()
+    if row is None or int(row[3] or 0) != 1:
+        return False
+    with client.session_transaction() as sess:
+        sess["user_id"] = int(row[0])
+        sess["username"] = str(row[1])
+        sess["user_role"] = str(row[2] or "student")
+        sess["user_access_grants"] = row[4]
+    return True
+
+
 def run_web_flow_checks() -> list[CheckResult]:
     results: list[CheckResult] = []
     client = app.test_client()
+
+    if not _authenticate_client(client):
+        results.append(
+            CheckResult(
+                "2-4) Submission flow",
+                False,
+                "Could not authenticate verifier session (seed user Jack missing or inactive)",
+            )
+        )
+        return results
 
     # Touch one practice page so before_request initializes DB and creates attempt.
     get_resp = client.get("/practice/algebra/1_1/0")
@@ -79,6 +114,8 @@ def run_web_flow_checks() -> list[CheckResult]:
         return results
 
     html = get_resp.get_data(as_text=True)
+    csrf_m = re.search(r'name="csrf_token"\s+value="([^"]+)"', html)
+    csrf_token = csrf_m.group(1) if csrf_m else ""
     m = re.search(r'name="attempt_id"\s+value="(\d+)"', html)
     if not m:
         results.append(CheckResult("2) attempt_id pass-through", False, "attempt_id hidden input missing"))
@@ -120,6 +157,9 @@ def run_web_flow_checks() -> list[CheckResult]:
             )
             return results
         last_html = last_get.get_data(as_text=True)
+        csrf_m2 = re.search(r'name="csrf_token"\s+value="([^"]+)"', last_html)
+        if csrf_m2:
+            csrf_token = csrf_m2.group(1)
         m2 = re.search(r'name="attempt_id"\s+value="(\d+)"', last_html)
         if not m2:
             results.append(CheckResult("3) SQLite response insert", False, "attempt_id missing on last question"))
@@ -138,6 +178,7 @@ def run_web_flow_checks() -> list[CheckResult]:
                 "topic": "1_1",
                 "qnum": str(last_idx),
                 "selected_answer": final_pick,
+                "csrf_token": csrf_token,
             },
             follow_redirects=True,
         )
