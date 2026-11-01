@@ -4,21 +4,25 @@
 <div class="np-page-shell">
   <section class="np-sat-mistakes">
     <nav class="np-atelier-rail" aria-label="SAT mistake result navigation">
-      <a href="{{ url_for('practice_sat_mistakes') }}">SAT mistake center</a>
+      <a href="{{ back_href or url_for('practice_sat_mistakes') }}">{{ back_label or 'SAT mistake center' }}</a>
       <span class="np-atelier-rail-sep">·</span>
       <span class="np-atelier-rail-current">Mistake test report</span>
     </nav>
 
     <header class="np-sat-mistake-hero glass-panel np-glass">
       <div>
-        <p class="np-sat-mistake-kicker">Mistake Test Report</p>
+        <p class="np-sat-mistake-kicker">Mistake Test Report{% if student_name %} · {{ student_name }}{% endif %}</p>
         <h1>{{ correct }}/{{ total }} correct · {{ pct }}%</h1>
-        <p>This report updates your active SAT mistake pool. Repeated misses stay high priority; corrected items move toward mastery.</p>
+        {% if saved %}
+        <p>Saved on the student record: {{ answered }}/{{ total }} answered, {{ correct }} correct.</p>
+        {% else %}
+        <p>Answers so far are saved. The full score is written to the student record when the test is finished or the timer ends.</p>
+        {% endif %}
       </div>
       <div class="np-sat-mistake-unlock">
         <strong>{{ answered }}</strong>
         <span>answered</span>
-        <a href="{{ url_for('practice_sat_mistakes') }}" class="np-sat-mistake-primary">Back to mistake center</a>
+        <a href="{{ back_href or url_for('practice_sat_mistakes') }}" class="np-sat-mistake-primary">{{ back_label or 'Back to mistake center' }}</a>
       </div>
     </header>
 
@@ -42,7 +46,7 @@
         {% for row in rows %}
         <li class="{{ 'is-correct' if row.is_correct else 'is-wrong' }}">
           <span>{{ row.unit_label }} · {{ row.topic_title }}</span>
-          <strong>{{ 'Correct' if row.is_correct else 'Still missed' }}</strong>
+          <strong>{% if not row.answered %}Not answered{% elif row.is_correct %}Correct{% else %}Missed{% endif %}</strong>
           <em>Your answer: {{ row.selected_answer }} · Key: {{ row.correct_answer }}</em>
           <a href="{{ row.practice_href }}">Open original question</a>
         </li>

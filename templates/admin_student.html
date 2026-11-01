@@ -26,6 +26,7 @@
         <div><strong>{{ totals.sessions }}</strong><span>Sessions</span></div>
         <div><strong>{{ totals.responses }}</strong><span>Responses</span></div>
         <div><strong>{% if totals.accuracy_pct is not none %}{{ totals.accuracy_pct }}%{% else %}—{% endif %}</strong><span>Accuracy</span></div>
+        <div><strong>{{ totals.mistake_tests_finished }}</strong><span>Mistake tests</span></div>
       </div>
     </section>
 
@@ -108,6 +109,40 @@
         </div>
         {% else %}
         <p class="np-admin-empty">No tracked sessions yet — student needs {{ min_tracked_responses }}+ answers in one set before it counts.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="np-admin-card glass-panel np-glass mp-animate-up" aria-labelledby="np-admin-mistake-tests">
+      <header class="np-admin-section-head">
+        <div>
+          <p class="np-admin-kicker">Mistake test</p>
+          <h2 id="np-admin-mistake-tests">SAT mistake tests</h2>
+          <p>Each finished or in-progress 22-question sitting. The score, every answer, and the answer key stay on the student record.</p>
+        </div>
+      </header>
+      <div class="np-admin-record-table np-admin-record-table--mistake" role="table" aria-label="SAT mistake tests">
+        <div class="np-admin-record-row np-admin-record-row--head" role="row">
+          <span>Status</span>
+          <span>Answered</span>
+          <span>Correct</span>
+          <span>Score</span>
+          <span>Started</span>
+          <span>Finished</span>
+          <span>Detail</span>
+        </div>
+        {% for test in mistake_tests %}
+        <div class="np-admin-record-row" role="row">
+          <span class="np-admin-session-badge np-admin-session-badge--tracked">{{ test.status_label }}</span>
+          <span>{{ test.answered }}/{{ test.total }}</span>
+          <span>{{ test.correct }}</span>
+          <span>{{ test.pct }}%</span>
+          <span>{{ test.started_at or "—" }}</span>
+          <span>{{ test.completed_at or "—" }}</span>
+          <span><a href="{{ test.href }}" class="np-admin-detail-link">Report</a></span>
+        </div>
+        {% else %}
+        <p class="np-admin-empty">No mistake tests yet.</p>
         {% endfor %}
       </div>
     </section>

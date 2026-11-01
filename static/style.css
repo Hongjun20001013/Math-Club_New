@@ -21017,7 +21017,7 @@ html[data-exam-theme="dark"] .np-placement-pdf-doc-stack::after {
 
 .np-admin-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
     min-width: min(460px, 100%);
 }
@@ -21329,6 +21329,12 @@ html[data-exam-theme="dark"] .np-placement-pdf-doc-stack::after {
 .np-admin-record-table--with-sat .np-admin-record-row {
     grid-template-columns: 1.35fr 0.7fr 0.65fr 0.7fr 1fr 1fr 0.7fr 0.55fr;
     min-width: 1120px;
+}
+
+.np-admin-record-table--mistake .np-admin-record-row,
+.np-admin-record-table--mistake-log .np-admin-record-row {
+    grid-template-columns: 0.8fr 0.7fr 0.6fr 0.6fr 1.2fr 1.2fr 0.55fr;
+    min-width: 980px;
 }
 
 .np-admin-record-row--head {

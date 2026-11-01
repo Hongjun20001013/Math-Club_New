@@ -36,6 +36,13 @@
           <button type="submit" class="np-sat-mistake-primary">Start a new {{ test_size }}Q test</button>
         </form>
         {% endif %}
+        {% elif dashboard.saved_test %}
+        <a href="{{ dashboard.saved_test.href }}" class="np-sat-mistake-primary">Open saved questions · {{ dashboard.saved_test.correct }}/{{ dashboard.saved_test.total }}</a>
+        {% if dashboard.can_generate %}
+        <form method="post" action="{{ url_for('practice_sat_mistake_test_generate') }}">
+          <button type="submit" class="np-sat-mistake-primary">Start a new {{ test_size }}Q test</button>
+        </form>
+        {% endif %}
         {% elif dashboard.can_generate %}
         <form method="post" action="{{ url_for('practice_sat_mistake_test_generate') }}">
           <button type="submit" class="np-sat-mistake-primary">Generate {{ test_size }}Q · {{ time_limit_minutes }} min test</button>

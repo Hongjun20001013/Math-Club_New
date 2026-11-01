@@ -1100,6 +1100,21 @@ def init_db():
         "CREATE INDEX IF NOT EXISTS idx_mistake_progress_learner "
         "ON mistake_learning_progress(learner_key)"
     )
+    mistake_test_cols = _table_columns(db, "sat_mistake_tests")
+    if "item_count" not in mistake_test_cols:
+        db.execute(
+            "ALTER TABLE sat_mistake_tests ADD COLUMN item_count INTEGER NOT NULL DEFAULT 0"
+        )
+    if "answered_count" not in mistake_test_cols:
+        db.execute(
+            "ALTER TABLE sat_mistake_tests ADD COLUMN answered_count INTEGER NOT NULL DEFAULT 0"
+        )
+    if "correct_count" not in mistake_test_cols:
+        db.execute(
+            "ALTER TABLE sat_mistake_tests ADD COLUMN correct_count INTEGER NOT NULL DEFAULT 0"
+        )
+    if "score_pct" not in mistake_test_cols:
+        db.execute("ALTER TABLE sat_mistake_tests ADD COLUMN score_pct INTEGER")
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS random_test_history (
@@ -8093,12 +8108,18 @@ def _student_report_context(
         else 0,
         "mistake_mastery": _student_mistake_mastery(db, user_id),
         "miss_quiz": _student_miss_quiz_stats(db, user_id),
+        "mistake_tests": [],
         "recent_sessions": recent_sessions,
         "random_test_href": url_for("practice_random_test_intro"),
         "analytics_href": url_for("practice_analytics", part="sat"),
         "practice_href": url_for("practice"),
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
     }
+    mistake_tests = _sat_mistake_admin_rows(db, user_id, limit=20)
+    if viewer != "admin":
+        for item in mistake_tests:
+            item["href"] = url_for("practice_sat_mistake_test_done", test_id=item["id"])
+    ctx["mistake_tests"] = mistake_tests
     if viewer == "admin":
         ctx["admin_href"] = url_for("admin_student_detail", user_id=user_id)
         ctx["print_href"] = url_for("admin_student_report_print", user_id=user_id)
@@ -9230,15 +9251,93 @@ def _sat_mistake_resume_state(db: sqlite3.Connection, user_id: Any) -> dict[str,
     }
 
 
-def _close_active_sat_mistake_test(db: sqlite3.Connection, test_id: int) -> None:
-    db.execute(
+def _sat_mistake_remaining_seconds(db: sqlite3.Connection, row: sqlite3.Row) -> int:
+    limit = int(row["time_limit_seconds"] or SAT_MISTAKE_TEST_SECONDS)
+    started = 0
+    if "started_unix" in row.keys() and row["started_unix"]:
+        started = int(row["started_unix"])
+    else:
+        got = db.execute(
+            """
+            SELECT CAST(strftime('%s', started_at) AS INTEGER) AS started_unix
+            FROM sat_mistake_tests WHERE id = ?
+            """,
+            (int(row["id"]),),
+        ).fetchone()
+        started = int(got["started_unix"] or 0) if got else 0
+    if started <= 0:
+        return limit
+    return max(0, limit - max(0, int(time.time()) - started))
+
+
+def _record_sat_mistake_result(
+    db: sqlite3.Connection, row: sqlite3.Row, *, finalize: bool | None = None
+) -> dict[str, Any]:
+    """Write answered/correct/score onto the sitting. Finish it when the test is over."""
+    test_id = int(row["id"])
+    items = _sat_mistake_test_items(row)
+    total = len(items)
+    counts = db.execute(
         """
-        UPDATE sat_mistake_tests
-        SET status = 'completed', completed_at = COALESCE(completed_at, datetime('now'))
-        WHERE id = ? AND status = 'active'
+        SELECT COUNT(*) AS answered,
+               SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS correct
+        FROM sat_mistake_test_responses
+        WHERE test_id = ?
         """,
+        (test_id,),
+    ).fetchone()
+    answered = int(counts["answered"] or 0) if counts else 0
+    correct = int(counts["correct"] or 0) if counts else 0
+    pct = round(100 * correct / total) if total else 0
+    status = str(row["status"] or "active")
+    if finalize is None:
+        finalize = (total > 0 and answered >= total) or _sat_mistake_remaining_seconds(db, row) <= 0
+    if finalize and status != "completed":
+        db.execute(
+            """
+            UPDATE sat_mistake_tests
+            SET status = 'completed',
+                completed_at = COALESCE(completed_at, datetime('now')),
+                item_count = ?,
+                answered_count = ?,
+                correct_count = ?,
+                score_pct = ?
+            WHERE id = ?
+            """,
+            (total, answered, correct, pct, test_id),
+        )
+        status = "completed"
+    else:
+        db.execute(
+            """
+            UPDATE sat_mistake_tests
+            SET item_count = ?,
+                answered_count = ?,
+                correct_count = ?,
+                score_pct = ?
+            WHERE id = ?
+            """,
+            (total, answered, correct, pct, test_id),
+        )
+    return {
+        "test_id": test_id,
+        "status": status,
+        "total": total,
+        "answered": answered,
+        "correct": correct,
+        "pct": pct,
+        "finalized": status == "completed",
+    }
+
+
+def _close_active_sat_mistake_test(db: sqlite3.Connection, test_id: int) -> None:
+    row = db.execute(
+        "SELECT * FROM sat_mistake_tests WHERE id = ? AND status = 'active'",
         (int(test_id),),
-    )
+    ).fetchone()
+    if row is None:
+        return
+    _record_sat_mistake_result(db, row, finalize=True)
 
 
 @app.route("/practice/mistakes/sat")
@@ -9247,6 +9346,7 @@ def practice_sat_mistakes():
     user_id = session.get("user_id")
     dashboard = _sat_mistake_dashboard(db, user_id)
     dashboard["resume"] = _sat_mistake_resume_state(db, user_id)
+    dashboard["saved_test"] = _sat_mistake_latest_summary(db, user_id)
     return render_template(
         "sat_mistakes.html",
         dashboard=dashboard,
@@ -9262,24 +9362,30 @@ def practice_sat_mistake_test_generate():
     resume = _sat_mistake_resume_state(db, user_id)
     if resume and resume["kind"] == "continue":
         return redirect(resume["href"])
+    saved_id = int(resume["test_id"]) if resume else None
     if resume:
-        saved_id = int(resume["test_id"])
-        _close_active_sat_mistake_test(db, saved_id)
+        _close_active_sat_mistake_test(db, int(resume["test_id"]))
         db.commit()
     dashboard = _sat_mistake_dashboard(db, user_id)
     if not dashboard["can_generate"]:
-        if resume:
+        if saved_id is None:
+            latest = _sat_mistake_latest_summary(db, user_id)
+            if latest:
+                saved_id = int(latest["test_id"])
+        if saved_id is not None:
             flash("Your previous mistake test is saved. These are the questions from that sitting.")
-            return redirect(url_for("practice_sat_mistake_test_done", test_id=int(resume["test_id"])))
+            return redirect(url_for("practice_sat_mistake_test_done", test_id=saved_id))
         flash(f"You need {dashboard['needed']} more active SAT mistake(s) before a 22-question test unlocks.")
         return redirect(url_for("practice_sat_mistakes"))
     items = _select_sat_mistake_test_items(dashboard["pool"])
     cur = db.execute(
         """
-        INSERT INTO sat_mistake_tests (user_id, learner_key, items_json, status, started_at, time_limit_seconds)
-        VALUES (?, ?, ?, 'active', datetime('now'), ?)
+        INSERT INTO sat_mistake_tests (
+            user_id, learner_key, items_json, status, started_at, time_limit_seconds, item_count
+        )
+        VALUES (?, ?, ?, 'active', datetime('now'), ?, ?)
         """,
-        (user_id, _learner_key(), json.dumps(items), SAT_MISTAKE_TEST_SECONDS),
+        (user_id, _learner_key(), json.dumps(items), SAT_MISTAKE_TEST_SECONDS, len(items)),
     )
     db.commit()
     return redirect(url_for("practice_sat_mistake_test_question", test_id=int(cur.lastrowid), step=0))
@@ -9294,7 +9400,9 @@ def practice_sat_mistake_test_question(test_id: int, step: int):
     if not items:
         flash("That mistake test has no questions.")
         return redirect(url_for("practice_sat_mistakes"))
-    if str(row["status"]) == "completed":
+    if str(row["status"]) == "completed" or _sat_mistake_remaining_seconds(db, row) <= 0:
+        _record_sat_mistake_result(db, row, finalize=True)
+        db.commit()
         return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
     step = max(0, min(step, len(items) - 1))
     item = items[step]
@@ -9353,8 +9461,18 @@ def practice_sat_mistake_test_submit(test_id: int):
         flash("Please enter or select an answer before submitting.")
         return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=step))
     item = items[step]
-    questions = get_questions_for_topic(item["domain"], item["topic"], BANKS[item["domain"]][item["topic"]])
+    bank = (BANKS.get(str(item.get("domain") or "")) or {}).get(str(item.get("topic") or ""))
+    questions = (
+        get_questions_for_topic(str(item["domain"]), str(item["topic"]), bank) if bank else []
+    )
     q_index = int(item["q_index"])
+    if q_index < 0 or q_index >= len(questions):
+        nxt = step + 1
+        if nxt >= len(items):
+            _record_sat_mistake_result(db, row)
+            db.commit()
+            return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
+        return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=nxt))
     q = questions[q_index]
     q_kind = q.get("question_kind", "mcq")
     selected = raw_answer.upper()[:1] if q_kind in ("mcq", "mcq5") else raw_answer
@@ -9378,18 +9496,16 @@ def practice_sat_mistake_test_submit(test_id: int):
         _mistake_progress_on_correct(db, _learner_key(), item["domain"], item["topic"], q_index)
     elif is_correct == 0:
         _mistake_progress_on_wrong(db, _learner_key(), item["domain"], item["topic"], q_index)
+    summary = _record_sat_mistake_result(db, row)
     db.commit()
-    if step >= len(items) - 1:
+    if summary["finalized"] or step >= len(items) - 1:
         return redirect(url_for("practice_sat_mistake_test_done", test_id=test_id))
     return redirect(url_for("practice_sat_mistake_test_question", test_id=test_id, step=step + 1))
 
 
-@app.route("/practice/mistakes/sat/test/<int:test_id>/done")
-def practice_sat_mistake_test_done(test_id: int):
-    db = get_db()
-    user_id = session.get("user_id")
-    row = _sat_mistake_test_row_or_404(db, test_id, user_id)
+def _sat_mistake_test_report(db: sqlite3.Connection, row: sqlite3.Row) -> dict[str, Any]:
     items = _sat_mistake_test_items(row)
+    test_id = int(row["id"])
     responses = db.execute(
         """
         SELECT item_order, selected_answer, correct_answer, is_correct
@@ -9402,12 +9518,6 @@ def practice_sat_mistake_test_done(test_id: int):
     by_order = {int(r["item_order"]): r for r in responses}
     correct = sum(1 for r in responses if int(r["is_correct"] or 0) == 1)
     total = len(items)
-    if len(responses) >= total and str(row["status"]) != "completed":
-        db.execute(
-            "UPDATE sat_mistake_tests SET status = 'completed', completed_at = datetime('now') WHERE id = ?",
-            (test_id,),
-        )
-        db.commit()
     unit_summary: dict[str, dict[str, Any]] = {
         k: {"key": k, **SAT_MISTAKE_UNIT_META[k], "total": 0, "correct": 0}
         for k in SAT_MISTAKE_UNIT_ORDER
@@ -9415,31 +9525,99 @@ def practice_sat_mistake_test_done(test_id: int):
     rows = []
     for i, item in enumerate(items):
         resp = by_order.get(i)
-        unit = unit_summary[item["unit_key"]]
-        unit["total"] += 1
-        if resp and int(resp["is_correct"] or 0) == 1:
-            unit["correct"] += 1
+        unit_key = str(item.get("unit_key") or "")
+        unit = unit_summary.get(unit_key)
+        if unit is not None:
+            unit["total"] += 1
+            if resp and int(resp["is_correct"] or 0) == 1:
+                unit["correct"] += 1
+        answered = resp is not None
         rows.append(
             {
                 **item,
+                "answered": answered,
                 "selected_answer": resp["selected_answer"] if resp else "—",
                 "correct_answer": resp["correct_answer"] if resp else "—",
                 "is_correct": bool(resp and int(resp["is_correct"] or 0) == 1),
-                "practice_href": url_for("practice_question", domain=item["domain"], topic=item["topic"], qnum=int(item["q_index"])),
+                "practice_href": url_for(
+                    "practice_question",
+                    domain=item["domain"],
+                    topic=item["topic"],
+                    qnum=int(item["q_index"]),
+                ),
             }
         )
     for unit in unit_summary.values():
         unit["accuracy"] = round(100 * unit["correct"] / unit["total"]) if unit["total"] else None
-    return render_template(
-        "sat_mistake_test_done.html",
-        test_id=test_id,
-        total=total,
-        answered=len(responses),
-        correct=correct,
-        pct=round(100 * correct / total) if total else 0,
-        units=list(unit_summary.values()),
-        rows=rows,
-    )
+    return {
+        "test_id": test_id,
+        "total": total,
+        "answered": len(responses),
+        "correct": correct,
+        "pct": round(100 * correct / total) if total else 0,
+        "units": list(unit_summary.values()),
+        "rows": rows,
+        "saved": str(row["status"] or "") == "completed",
+        "back_href": url_for("practice_sat_mistakes"),
+        "back_label": "SAT mistake center",
+        "student_name": None,
+    }
+
+
+def _sat_mistake_latest_summary(db: sqlite3.Connection, user_id: Any) -> dict[str, Any] | None:
+    """Newest mistake test for this student, including one that is already finished."""
+    if user_id is None:
+        return None
+    row = db.execute(
+        """
+        SELECT id, status, items_json, item_count
+        FROM sat_mistake_tests
+        WHERE user_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (int(user_id),),
+    ).fetchone()
+    if row is None:
+        return None
+    total = int(row["item_count"] or 0)
+    if total <= 0:
+        total = len(_sat_mistake_test_items(row))
+    if total <= 0:
+        return None
+    counts = db.execute(
+        """
+        SELECT COUNT(*) AS answered,
+               SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS correct
+        FROM sat_mistake_test_responses
+        WHERE test_id = ?
+        """,
+        (int(row["id"]),),
+    ).fetchone()
+    answered = int(counts["answered"] or 0) if counts else 0
+    correct = int(counts["correct"] or 0) if counts else 0
+    test_id = int(row["id"])
+    return {
+        "test_id": test_id,
+        "status": str(row["status"] or "active"),
+        "answered": answered,
+        "correct": correct,
+        "total": total,
+        "pct": round(100 * correct / total) if total else 0,
+        "href": url_for("practice_sat_mistake_test_done", test_id=test_id),
+    }
+
+
+@app.route("/practice/mistakes/sat/test/<int:test_id>/done")
+def practice_sat_mistake_test_done(test_id: int):
+    db = get_db()
+    user_id = session.get("user_id")
+    row = _sat_mistake_test_row_or_404(db, test_id, user_id)
+    summary = _record_sat_mistake_result(db, row)
+    db.commit()
+    report = _sat_mistake_test_report(db, row)
+    report["saved"] = bool(summary["finalized"])
+    return render_template("sat_mistake_test_done.html", **report)
 
 
 def _placement_analytics_unit(q_index: int, topic: str | None = None) -> dict:
@@ -14204,6 +14382,7 @@ def _practice_hub_context() -> dict[str, Any]:
             )
         ctx["resume_session"] = _hub_resume_practice_session(db, int(uid))
         ctx["mistake_test_resume"] = _sat_mistake_resume_state(db, int(uid))
+        ctx["mistake_test_saved"] = _sat_mistake_latest_summary(db, int(uid))
         rt_row = db.execute(
             """
             SELECT exam_meta_json FROM practice_attempts
@@ -16758,8 +16937,34 @@ def _student_rows(db: sqlite3.Connection, q: str) -> List[dict]:
                 if responses_total
                 else None,
                 "last_activity": row["last_activity"],
+                "mistake_tests": 0,
+                "mistake_tests_finished": 0,
             }
         )
+    activity = {
+        int(r["user_id"]): r
+        for r in db.execute(
+            """
+            SELECT user_id,
+                   COUNT(*) AS tests,
+                   SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS finished,
+                   MAX(COALESCE(completed_at, started_at)) AS last_at
+            FROM sat_mistake_tests
+            WHERE user_id IS NOT NULL
+            GROUP BY user_id
+            """
+        ).fetchall()
+    }
+    for student in out:
+        extra = activity.get(student["id"])
+        if extra is None:
+            continue
+        student["mistake_tests"] = int(extra["tests"] or 0)
+        student["mistake_tests_finished"] = int(extra["finished"] or 0)
+        last_at = extra["last_at"]
+        current = student["last_activity"]
+        if last_at and (not current or str(last_at) >= str(current)):
+            student["last_activity"] = last_at
     return out
 
 
@@ -16782,6 +16987,77 @@ def _staff_rows(db: sqlite3.Connection) -> List[dict]:
             "All students" if item["student_view_scope"] == STAFF_VIEW_ALL else "Own students only"
         )
         out.append(item)
+    return out
+
+
+def _sat_mistake_admin_rows(
+    db: sqlite3.Connection, user_id: int | None = None, *, limit: int = 40
+) -> list[dict[str, Any]]:
+    """Mistake-test sittings for the admin record, with the score stored on each row."""
+    scope_clause, scope_params = _staff_student_scope_clause(db, "u")
+    filters = ["u.role = 'student'"]
+    params: list[Any] = []
+    if user_id is not None:
+        filters.append("t.user_id = ?")
+        params.append(int(user_id))
+    rows = db.execute(
+        f"""
+        SELECT
+            t.id,
+            t.user_id,
+            u.username,
+            t.status,
+            t.started_at,
+            t.completed_at,
+            t.items_json,
+            t.item_count,
+            COUNT(r.id) AS live_answered,
+            SUM(CASE WHEN r.is_correct = 1 THEN 1 ELSE 0 END) AS live_correct
+        FROM sat_mistake_tests t
+        JOIN users u ON u.id = t.user_id
+        LEFT JOIN sat_mistake_test_responses r ON r.test_id = t.id
+        WHERE {" AND ".join(filters)}{scope_clause}
+        GROUP BY t.id
+        ORDER BY COALESCE(t.completed_at, t.started_at) DESC, t.id DESC
+        LIMIT ?
+        """,
+        tuple(params) + tuple(scope_params) + (int(limit),),
+    ).fetchall()
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        total = int(row["item_count"] or 0)
+        if total <= 0:
+            try:
+                raw = json.loads(row["items_json"] or "[]")
+            except (TypeError, json.JSONDecodeError):
+                raw = []
+            total = len(raw) if isinstance(raw, list) else 0
+        answered = int(row["live_answered"] or 0)
+        correct = int(row["live_correct"] or 0)
+        status = str(row["status"] or "active")
+        out.append(
+            {
+                "id": int(row["id"]),
+                "user_id": int(row["user_id"]) if row["user_id"] is not None else None,
+                "username": str(row["username"] or ""),
+                "status": status,
+                "status_label": "Finished" if status == "completed" else "In progress",
+                "started_at": row["started_at"],
+                "completed_at": row["completed_at"],
+                "when_label": _session_when_label(row["completed_at"] or row["started_at"]),
+                "total": total,
+                "answered": answered,
+                "correct": correct,
+                "pct": round(100 * correct / total) if total else 0,
+                "href": url_for(
+                    "admin_student_mistake_test",
+                    user_id=int(row["user_id"]),
+                    test_id=int(row["id"]),
+                )
+                if row["user_id"] is not None
+                else None,
+            }
+        )
     return out
 
 
@@ -18467,6 +18743,7 @@ def _admin_data_snapshot(db: sqlite3.Connection) -> dict:
         "all_attempts": scalar("SELECT COUNT(*) FROM practice_attempts"),
         "all_responses": scalar("SELECT COUNT(*) FROM practice_responses"),
         "progress_rows": scalar("SELECT COUNT(*) FROM mistake_learning_progress"),
+        "mistake_tests": scalar("SELECT COUNT(*) FROM sat_mistake_tests"),
     }
 
 
@@ -18487,10 +18764,33 @@ def _delete_attempt_scope(db: sqlite3.Connection, where_sql: str, params: tuple[
     return len(attempt_ids)
 
 
+def _delete_sat_mistake_tests(
+    db: sqlite3.Connection, where_sql: str, params: tuple[Any, ...]
+) -> int:
+    rows = db.execute(
+        f"SELECT id FROM sat_mistake_tests WHERE {where_sql}", params
+    ).fetchall()
+    test_ids = [int(r["id"]) for r in rows]
+    if not test_ids:
+        return 0
+    placeholders = ",".join("?" for _ in test_ids)
+    db.execute(
+        f"DELETE FROM sat_mistake_test_responses WHERE test_id IN ({placeholders})",
+        tuple(test_ids),
+    )
+    db.execute(
+        f"DELETE FROM sat_mistake_tests WHERE id IN ({placeholders})",
+        tuple(test_ids),
+    )
+    return len(test_ids)
+
+
 def _clear_all_practice_history(db: sqlite3.Connection) -> None:
     db.execute("DELETE FROM practice_responses")
     db.execute("DELETE FROM practice_attempts")
     db.execute("DELETE FROM mistake_learning_progress")
+    db.execute("DELETE FROM sat_mistake_test_responses")
+    db.execute("DELETE FROM sat_mistake_tests")
 
 
 def _admin_confirm_value(raw: str) -> str:
@@ -18626,6 +18926,7 @@ def admin():
     )
     students = _student_rows(db, q)
     recent_records = _recent_record_rows(db)
+    mistake_test_records = _sat_mistake_admin_rows(db, limit=40)
     data_snapshot = _admin_data_snapshot(db)
     student_cohorts = pulse_ctx["student_cohorts"]
     totals = {
@@ -18656,6 +18957,7 @@ def admin():
         students=students,
         staff_members=_staff_rows(db) if current_user_is_supervisor() else [],
         recent_records=recent_records,
+        mistake_test_records=mistake_test_records,
         data_snapshot=data_snapshot,
         totals=totals,
         weekly_digest=pulse_ctx["weekly_digest"],
@@ -19775,6 +20077,10 @@ def admin_student_detail(user_id: int):
     totals["accuracy_pct"] = (
         round(100 * totals["correct"] / totals["responses"]) if totals["responses"] else None
     )
+    mistake_tests = _sat_mistake_admin_rows(db, user_id, limit=50)
+    totals["mistake_tests"] = len(mistake_tests)
+    finished_tests = [row for row in mistake_tests if row["status"] == "completed"]
+    totals["mistake_tests_finished"] = len(finished_tests)
     return render_template(
         "admin_student.html",
         student=student_dict,
@@ -19784,9 +20090,40 @@ def admin_student_detail(user_id: int):
         preview_session_count=preview_count,
         min_tracked_responses=MIN_TRACKED_SAT_RESPONSES,
         totals=totals,
+        mistake_tests=mistake_tests,
         report_href=url_for("admin_student_report", user_id=user_id),
         student_resource_grant_options=STUDENT_RESOURCE_GRANTS,
     )
+
+
+@app.route("/admin/students/<int:user_id>/mistake-tests/<int:test_id>")
+def admin_student_mistake_test(user_id: int, test_id: int):
+    gate = _require_admin_response()
+    if gate is not None:
+        return gate
+    db = get_db()
+    if not _staff_can_view_student(db, user_id):
+        abort(403)
+    student = db.execute(
+        "SELECT id, username FROM users WHERE id = ? AND role = 'student'",
+        (user_id,),
+    ).fetchone()
+    if student is None:
+        abort(404)
+    row = db.execute(
+        "SELECT * FROM sat_mistake_tests WHERE id = ? AND user_id = ?",
+        (test_id, user_id),
+    ).fetchone()
+    if row is None:
+        abort(404)
+    summary = _record_sat_mistake_result(db, row)
+    db.commit()
+    report = _sat_mistake_test_report(db, row)
+    report["saved"] = bool(summary["finalized"])
+    report["student_name"] = str(student["username"])
+    report["back_href"] = url_for("admin_student_detail", user_id=user_id)
+    report["back_label"] = "Student record"
+    return render_template("sat_mistake_test_done.html", **report)
 
 
 @app.route("/admin/students/<int:user_id>/report")
@@ -20122,10 +20459,14 @@ def admin_delete_student(user_id: int):
         return redirect(url_for("admin"))
 
     deleted_attempts = _delete_attempt_scope(db, "user_id = ?", (user_id,))
+    deleted_tests = _delete_sat_mistake_tests(db, "user_id = ?", (user_id,))
     db.execute("DELETE FROM mistake_learning_progress WHERE learner_key = ?", (f"u:{user_id}",))
     db.execute("DELETE FROM users WHERE id = ? AND role = 'student'", (user_id,))
     db.commit()
-    flash(f"Deleted {row['username']} and {deleted_attempts} linked practice sessions.")
+    flash(
+        f"Deleted {row['username']}, {deleted_attempts} linked practice sessions, "
+        f"and {deleted_tests} mistake tests."
+    )
     _backup_after_account_change(db)
     return redirect(url_for("admin"))
 
@@ -20183,8 +20524,9 @@ def admin_clear_all_records():
     _clear_all_practice_history(db)
     db.commit()
     flash(
-        f"Cleared {snapshot['all_attempts']} practice sessions and "
-        f"{snapshot['all_responses']} responses. Accounts were kept."
+        f"Cleared {snapshot['all_attempts']} practice sessions, "
+        f"{snapshot['all_responses']} responses, and "
+        f"{snapshot['mistake_tests']} mistake tests. Accounts were kept."
     )
     return redirect(url_for("admin"))
 

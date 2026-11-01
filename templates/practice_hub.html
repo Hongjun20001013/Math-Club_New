@@ -223,6 +223,8 @@
         <a href="{{ url_for('practice_analytics', part='sat') }}" class="np-atelier-btn np-atelier-btn--primary">Review mistakes →</a>
         {% if mistake_test_resume %}
         <a href="{{ mistake_test_resume.href }}" class="np-atelier-btn np-atelier-btn--ghost">{% if mistake_test_resume.kind == 'continue' %}Continue test · {{ mistake_test_resume.answered }}/{{ mistake_test_resume.total }}{% else %}Open saved test{% endif %}</a>
+        {% elif mistake_test_saved %}
+        <a href="{{ mistake_test_saved.href }}" class="np-atelier-btn np-atelier-btn--ghost">Open saved test · {{ mistake_test_saved.correct }}/{{ mistake_test_saved.total }}</a>
         {% else %}
         <a href="{{ url_for('practice_sat_mistakes') }}" class="np-atelier-btn np-atelier-btn--ghost">Mistake test</a>
         {% endif %}

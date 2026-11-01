@@ -78,6 +78,9 @@
     <section class="np-report-print-section">
       <h2>Mistake digestion</h2>
       <p>Mastered {{ mistake_mastery.mastered }} · In review {{ mistake_mastery.in_progress }} · Open {{ mistake_mastery.open_misses }}{% if miss_quiz.total_runs %} · Miss quiz pass {{ miss_quiz.pass_rate }}% ({{ miss_quiz.passed_runs }}/{{ miss_quiz.total_runs }}){% endif %}</p>
+      {% if mistake_tests %}
+      <p>{% for test in mistake_tests %}Mistake test {{ test.correct }}/{{ test.total }} ({{ test.pct }}%, {{ test.status_label }}){% if not loop.last %} · {% endif %}{% endfor %}</p>
+      {% endif %}
     </section>
 
     <p style="color:#5b6478;font-size:0.8rem;margin-top:24px;">Confidential instructor report.</p>

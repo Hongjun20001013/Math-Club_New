@@ -636,7 +636,7 @@
                 <div class="np-admin-student-avatar" aria-hidden="true">{{ student.username[:1]|upper }}</div>
                 <div class="np-admin-directory-identity">
                   <strong><a href="{{ url_for('admin_student_detail', user_id=student.id) }}">{{ student.username }}</a></strong>
-                  <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}</span>
+                  <span class="np-admin-directory-meta">Joined {{ student.created_at or "—" }}{% if student.mistake_tests %} · Mistake tests {{ student.mistake_tests_finished }}/{{ student.mistake_tests }}{% endif %}</span>
                   <div class="np-admin-directory-badges">
                     <span class="np-admin-grants-pill">{{ student.access_grants_label }}</span>
                     <span class="np-admin-status{% if not student.is_active %} is-inactive{% endif %}">{{ "Active" if student.is_active else "Inactive" }}</span>
@@ -733,12 +733,39 @@
           {% endfor %}
         </div>
       </div>
+      <div class="np-admin-record-shell">
+        <h3 class="np-admin-drawer-title">Mistake tests</h3>
+        <div class="np-admin-record-table np-admin-record-table--mistake-log" role="table" aria-label="Recent mistake tests">
+          <div class="np-admin-record-row np-admin-record-row--head" role="row">
+            <span>Student</span>
+            <span>Status</span>
+            <span>Answered</span>
+            <span>Correct</span>
+            <span>Score</span>
+            <span>Finished</span>
+            <span>Report</span>
+          </div>
+          {% for test in mistake_test_records %}
+          <div class="np-admin-record-row" role="row">
+            <span>{% if test.user_id %}<a href="{{ url_for('admin_student_detail', user_id=test.user_id) }}">{{ test.username }}</a>{% else %}—{% endif %}</span>
+            <span>{{ test.status_label }}</span>
+            <span>{{ test.answered }}/{{ test.total }}</span>
+            <span>{{ test.correct }}</span>
+            <span>{{ test.pct }}%</span>
+            <span>{{ test.completed_at or test.started_at or "—" }}</span>
+            <span>{% if test.href %}<a href="{{ test.href }}" class="np-admin-detail-link">Open →</a>{% endif %}</span>
+          </div>
+          {% else %}
+          <p class="np-admin-empty">No mistake tests yet.</p>
+          {% endfor %}
+        </div>
+      </div>
       {% if user_is_supervisor %}
       <aside class="np-admin-record-danger" aria-label="Clear all practice records">
         <div>
           <p class="np-admin-danger-kicker">Danger zone</p>
           <strong>Clear all practice records</strong>
-          <span>Removes every session, response, and mistake-progress row. Student accounts remain.</span>
+          <span>Removes every session, response, mistake-progress row, and mistake test. Student accounts remain.</span>
         </div>
         <form method="post" action="{{ url_for('admin_clear_all_records') }}" class="np-admin-clear-records-form">
           <label>
