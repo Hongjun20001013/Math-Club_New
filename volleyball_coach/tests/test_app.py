@@ -168,6 +168,33 @@ def test_starting_slots_are_on_the_match_page(tmp_path):
     assert started.status_code == 302
 
 
+def test_roster_position_is_set_before_recording(tmp_path):
+    client = _client(tmp_path)
+    home = client.get("/").get_data(as_text=True)
+    assert "先定名字和位置" in home
+    andy = home.split('aria-label="Andy A 的位置"', 1)[1].split("</select>", 1)[0]
+    assert 'value="middle" selected' in andy
+    assert "副攻" in andy
+    started = client.post(
+        f"/teams/{MENS_TEAM_ID}/roster",
+        data={
+            "player_id": "andy-a",
+            "player_name": "Andy A",
+            "player_role": "middle",
+            "new_name": "Sky",
+            "new_role": "setter",
+            "start": "1",
+        },
+    )
+    assert started.status_code == 302
+    page = client.get(started.headers["Location"]).get_data(as_text=True)
+    assert "Sky" in page and "二传" in page
+    assert "Andy A" in page and "副攻" in page
+    roster = client.get(f"/teams/{MENS_TEAM_ID}").get_data(as_text=True)
+    assert "Andy A · 首发槽 3" in roster
+    assert "几号位" in roster
+
+
 def test_dictionary_and_drills_pages(tmp_path):
     client = _client(tmp_path)
     dictionary = client.get("/dictionary").get_data(as_text=True)

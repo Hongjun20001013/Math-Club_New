@@ -45,13 +45,16 @@ from volleyball_coach.store import Store, ability_label, locked_pairs_of, new_id
 FONT_PATH = Path(__file__).resolve().parents[1] / "fonts" / "NotoSansSC-Regular.otf"
 COURT_ORDER = (4, 3, 2, 5, 6, 1)
 ROLES = (
-    ("opposite", "接应 / 对角二传"),
     ("outside", "主攻"),
     ("middle", "副攻"),
-    ("defender", "防守替补"),
+    ("setter", "二传"),
+    ("opposite", "接应"),
+    ("libero", "自由人"),
+    ("other", "待定"),
+    ("defender", "防守"),
     ("flex", "主攻或接应"),
-    ("other", "其他"),
 )
+ROLE_LABEL = dict(ROLES)
 
 
 def create_app(db_path: str | Path | None = None) -> Flask:
@@ -122,7 +125,19 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                     "score_them": state.score_them if state else 0,
                 }
             )
-        return render_template("home.html", teams=remembered.list_teams(), mens_id=MENS_TEAM_ID, live_matches=cards)
+        plans = []
+        for team in remembered.list_teams():
+            loaded = remembered.load_plan(team["id"])
+            if loaded:
+                plans.append(loaded)
+        return render_template(
+            "home.html",
+            teams=remembered.list_teams(),
+            plans=plans,
+            mens_id=MENS_TEAM_ID,
+            live_matches=cards,
+            roles=ROLES,
+        )
 
     @app.post("/teams")
     def create_team():
@@ -151,6 +166,39 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 match_id = store().create_match(ready, "", "light", set(), 1, "them", require_lineup=False)
                 return redirect(url_for("live", match_id=match_id))
         return redirect(url_for("team_page", team_id=plan.team_id))
+
+    @app.post("/teams/<team_id>/roster")
+    def save_roster(team_id: str):
+        plan = team_or_404(team_id)
+        allowed = {code for code, _label in ROLES}
+        ids = request.form.getlist("player_id")
+        names = request.form.getlist("player_name")
+        roles = request.form.getlist("player_role")
+        for player_id, raw_name, role in zip(ids, names, roles):
+            player = plan.players.get(player_id)
+            name = raw_name.strip()
+            if player is None or not name:
+                continue
+            player.name = name
+            player.role = role if role in allowed else "other"
+            store().save_player(plan.team_id, player)
+        for raw_name, role in zip(request.form.getlist("new_name"), request.form.getlist("new_role")):
+            name = raw_name.strip()
+            if not name:
+                continue
+            store().save_player(
+                plan.team_id,
+                Player(id=new_id("p"), name=name, role=role if role in allowed else "other"),
+            )
+        if request.form.get("start") == "1":
+            ready = store().load_plan(plan.team_id)
+            if ready is None or not ready.players:
+                flash("先写至少一个名字，再开始记。", "error")
+                return redirect(url_for("home"))
+            match_id = store().create_match(ready, "", "light", set(), 1, "them", require_lineup=False)
+            return redirect(url_for("live", match_id=match_id))
+        flash("名字和位置已记下。开始记球时沿用这份名单。", "ok")
+        return redirect(url_for("home"))
 
     @app.get("/teams/<team_id>")
     def team_page(team_id: str):
@@ -422,6 +470,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             sheet = "serve" if state.serving == "us" and serving_confirmed else "pass"
         view = request.args.get("view") or ""
         players = sorted(plan.players.values(), key=lambda player: (not player.receive_primary, player.name))
+        desk = _desk_rows(players)
         server_id = ""
         if tracking and state.serving == "us":
             server_id = state.occupants.get(1) or ""
@@ -476,6 +525,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             sheet=sheet,
             view=view,
             players=players,
+            desk=desk,
+            role_labels=ROLE_LABEL,
             server_id=server_id,
             server_name=names.get(server_id, ""),
             lines=pause_lines(board_for(quick_rallies, quick_actions, names, scope=scope, set_index=state.set_index)),
@@ -1023,6 +1074,32 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         return render_template("drills.html", results=results, passed=sum(item["passed"] for item in results))
 
     return app
+
+
+def _desk_rows(players: list[Player]) -> dict[str, list[Player]]:
+    """Position suggests who to show first. It does not assign a court slot."""
+
+    def pass_key(player: Player) -> tuple:
+        band = 0 if player.receive_primary else 1
+        role = {"outside": 0, "libero": 1, "opposite": 2, "middle": 3, "setter": 4}.get(player.role, 5)
+        return (band, role, player.name)
+
+    def attack_key(player: Player) -> tuple:
+        role = {"outside": 0, "flex": 0, "opposite": 1, "middle": 2, "setter": 3, "defender": 5, "libero": 6}.get(player.role, 4)
+        return (role, player.name)
+
+    passing = sorted(players, key=pass_key)
+    hitting = sorted(players, key=attack_key)
+    servers = sorted((player for player in players if player.role != "libero"), key=lambda player: player.name)
+    liberos = [player for player in players if player.role == "libero"]
+    return {
+        "pass_main": passing[:3],
+        "pass_rest": passing[3:],
+        "attack_main": hitting[:4],
+        "attack_rest": hitting[4:],
+        "serve_main": servers,
+        "serve_rest": liberos,
+    }
 
 
 def _starters_redirect(team_id: str):

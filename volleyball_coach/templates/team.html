@@ -15,8 +15,9 @@
   {% include "_starters.html" %}
 </details>
 
-<h2>名单</h2>
-<p class="muted">能力只记录你确认过的观察。位置不会被用来推断谁更强。私人备注留在这台机器上。</p>
+{% include "_roster.html" %}
+<h2>名单细节</h2>
+<p class="muted">号码、首发槽和接发习惯在这里。位置本身不决定站几号位。</p>
 {% for player in plan.players.values() %}
   <details>
     <summary>{{ player.name }}{% if player.jersey %} · {{ player.jersey }}{% endif %}{% if player.base_slot %} · 首发槽 {{ player.base_slot }}{% else %} · 替补{% endif %}</summary>

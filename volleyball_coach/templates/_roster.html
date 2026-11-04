@@ -1,0 +1,25 @@
+<form class="roster" method="post" action="{{ url_for('save_roster', team_id=plan.team_id) }}">
+  <h2>{{ plan.name }}</h2>
+  <p class="formula">一行一个名字，旁边选位置：主攻、副攻、二传、接应、自由人。两个人都可以是副攻。位置不是几号位，也不会自动排首发。</p>
+  {% for player in plan.players.values()|sort(attribute='name') %}
+    <div class="roster-row">
+      <input type="hidden" name="player_id" value="{{ player.id }}">
+      <input name="player_name" value="{{ player.name }}" aria-label="{{ player.name }} 的名字" required>
+      <select name="player_role" aria-label="{{ player.name }} 的位置">
+        {% for code, label in roles %}
+          <option value="{{ code }}" {% if player.role == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endfor %}
+  <div class="roster-row">
+    <input name="new_name" placeholder="再加一个人" aria-label="新球员名字">
+    <select name="new_role" aria-label="新球员位置">
+      {% for code, label in roles %}
+        <option value="{{ code }}" {% if code == 'other' %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="go" type="submit" name="start" value="1">沿用名单，开始</button>
+  <button class="cell ghost" type="submit">只保存位置</button>
+</form>

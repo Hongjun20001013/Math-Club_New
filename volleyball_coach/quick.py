@@ -70,6 +70,8 @@ SCOPES = ("set", "last10", "match")
 
 
 def _winner(kind: str, result: str) -> str | None:
+    if kind == "opp_serve" and result == "error":
+        return "us"
     table = {
         ("pass", "error"): "them",
         ("serve", "ace"): "us",
@@ -328,6 +330,8 @@ def describe_action(action: dict, names: dict[str, str]) -> str:
     player = names.get(action.get("player_id") or "", "")
     kind = action["kind"]
     result = action["result"]
+    if kind == "opp_serve":
+        return "对方发球失误"
     if kind == "pass":
         who = player or "没看清"
         return f"{who} 一传{PASS_RESULTS.get(result, result)}"
@@ -402,13 +406,16 @@ def record_cell(
     if kind == "score":
         if result not in ("us", "them"):
             raise QuickError("结分要选我方或对方。")
+    elif kind == "opp_serve":
+        if result != "error":
+            raise QuickError("对方发丢只有一种记法。")
     elif kind not in catalogs or result not in catalogs[kind]:
         raise QuickError("这一格不在记录表里。")
     if kind == "opp" and start not in OPP_STARTS:
         raise QuickError("先有起攻位置。")
     action = _action(
         updated,
-        side="them" if kind == "opp" else "us",
+        side="them" if kind in ("opp", "opp_serve") else "us",
         player_id="" if player_id in ("", "unknown", "shared") else player_id,
         kind=kind,
         result=result,

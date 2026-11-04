@@ -52,9 +52,9 @@
         <tr><th>接发</th><th>到位</th><th>半到位</th><th>不到位</th><th>直接失分</th><th>未知</th></tr>
       </thead>
       <tbody>
-        {% for player in players %}
+        {% for player in desk.pass_main %}
           <tr>
-            <th>{{ player.name }}</th>
+            <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
             {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
               <td>{{ cell("pass", value, word, player.name, player.id) }}</td>
             {% endfor %}
@@ -74,6 +74,30 @@
         </tr>
       </tbody>
     </table>
+    <form class="cell-form" method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+      <input type="hidden" name="tap" value="cell">
+      <input type="hidden" name="kind" value="opp_serve">
+      <input type="hidden" name="value" value="error">
+      <input type="hidden" name="token" value="{{ new_token('t') }}">
+      <button class="cell ghost" type="submit" aria-label="对方发丢">对方发丢</button>
+    </form>
+    {% if desk.pass_rest %}
+      <details>
+        <summary>其他人</summary>
+        <table class="grid">
+          <tbody>
+            {% for player in desk.pass_rest %}
+              <tr>
+                <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
+                {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+                  <td>{{ cell("pass", value, word, player.name, player.id) }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </details>
+    {% endif %}
   </section>
 
   <section class="sheet" data-sheet="attack" {% if sheet != 'attack' %}hidden{% endif %}>
@@ -82,9 +106,9 @@
         <tr><th>进攻</th><th>扣死</th><th>没扣死</th><th>失误</th><th>被拦死</th></tr>
       </thead>
       <tbody>
-        {% for player in players %}
+        {% for player in desk.attack_main %}
           <tr>
-            <th>{{ player.name }}</th>
+            <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
             {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
               <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
             {% endfor %}
@@ -92,40 +116,79 @@
         {% endfor %}
       </tbody>
     </table>
+    {% if desk.attack_rest %}
+      <details>
+        <summary>其他人</summary>
+        <table class="grid">
+          <tbody>
+            {% for player in desk.attack_rest %}
+              <tr>
+                <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
+                {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+                  <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </details>
+    {% endif %}
   </section>
 
   <section class="sheet" data-sheet="serve" {% if sheet != 'serve' %}hidden{% endif %}>
     <table class="grid">
       <thead>
-        <tr><th>发球</th><th>ACE</th><th>发丢</th><th>对方到位</th><th>半到位</th><th>不到位</th><th>未知</th></tr>
+        <tr><th>发球</th><th>ACE</th><th>发丢</th><th>对方到位</th><th>不到位</th></tr>
       </thead>
       <tbody>
         {% if server_name %}
           <tr>
             <th>{{ server_name }}</th>
-            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("out","不到位")] %}
               <td>{{ cell("serve", value, word, server_name, server_id) }}</td>
             {% endfor %}
           </tr>
         {% else %}
-          {% for player in players %}
+          {% for player in desk.serve_main %}
             <tr>
-              <th>{{ player.name }}</th>
-              {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+              <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
+              {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("out","不到位")] %}
                 <td>{{ cell("serve", value, word, player.name, player.id) }}</td>
               {% endfor %}
             </tr>
           {% endfor %}
           <tr>
             <th>团队</th>
-            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("out","不到位")] %}
               <td>{{ cell("serve", value, word, "团队", "") }}</td>
             {% endfor %}
           </tr>
         {% endif %}
       </tbody>
     </table>
-    <p class="formula">发丢就是发球失误。ACE 和发丢会直接结分。</p>
+    <details>
+      <summary>半到位、未知{% if not server_name and desk.serve_rest %}、自由人{% endif %}</summary>
+      <table class="grid">
+        <tbody>
+          {% if server_name %}
+            <tr>
+              <th>{{ server_name }}</th>
+              <td>{{ cell("serve", "half", "半到位", server_name, server_id) }}</td>
+              <td>{{ cell("serve", "unknown", "未知", server_name, server_id) }}</td>
+            </tr>
+          {% else %}
+            {% for player in desk.serve_main + desk.serve_rest %}
+              <tr>
+                <th>{{ player.name }}</th>
+                <td>{{ cell("serve", "half", "半到位", player.name, player.id) }}</td>
+                <td>{{ cell("serve", "unknown", "未知", player.name, player.id) }}</td>
+              </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </details>
+    <p class="formula">发丢就是发球失误。ACE 和发丢会直接结分。自由人不发球。</p>
   </section>
 
   <section class="sheet" data-sheet="opp" {% if sheet != 'opp' %}hidden{% endif %}>
@@ -134,7 +197,7 @@
         <tr><th>对方</th><th>打死</th><th>没打死</th><th>自失</th><th>我方拦死</th></tr>
       </thead>
       <tbody>
-        {% for start, who in [("4","四号位"),("3","中路"),("2","二号位"),("back","后排"),("second","二次"),("unknown","没看清")] %}
+        {% for start, who in [("4","四号位"),("3","中路"),("2","二号位")] %}
           <tr>
             <th>{{ who }}</th>
             {% for value, word in [("kill","打死"),("in_play","没打死"),("error","自失"),("blocked","我方拦死")] %}
@@ -144,6 +207,21 @@
         {% endfor %}
       </tbody>
     </table>
+    <details>
+      <summary>后排、二次、没看清</summary>
+      <table class="grid">
+        <tbody>
+          {% for start, who in [("back","后排"),("second","二次"),("unknown","没看清")] %}
+            <tr>
+              <th>{{ who }}</th>
+              {% for value, word in [("kill","打死"),("in_play","没打死"),("error","自失"),("blocked","我方拦死")] %}
+                <td>{{ cell("opp", value, word, who, "", start) }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
     <p class="formula">不填号码也能记位置。线路可以之后再补。</p>
     <div class="line-row">
       {% for value, word in [("line","直线"),("sharp","小斜线"),("cross","大斜线"),("tip","吊球")] %}

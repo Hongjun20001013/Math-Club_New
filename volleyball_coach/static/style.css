@@ -905,6 +905,22 @@ button.go {
 
 form.paste { margin-top: 22px; }
 
+.roster { margin: 18px 0 28px; }
+.roster-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.roster-row input, .roster-row select { min-height: 44px; }
+.roster .go { margin-top: 8px; }
+.grid th small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
 body.desk { background: var(--paper); }
 body.desk main { max-width: 980px; padding-top: 8px; }
 body.desk .top { padding-top: 8px; padding-bottom: 4px; }
@@ -932,9 +948,10 @@ body.desk.view-stats .pad { display: none; }
 .nums b { font-size: 3.2rem; line-height: 0.9; font-weight: 650; }
 .nums span { margin: 0 6px; color: var(--muted); }
 
-.sheets { display: flex; gap: 6px; margin: 4px 0 10px; overflow-x: auto; }
+.sheets { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
 .sheets a {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  text-align: center;
   text-decoration: none;
   color: var(--navy);
   border: 1px solid var(--line-strong);
@@ -1002,6 +1019,21 @@ body.desk.view-stats .pad { display: none; }
 @media (max-width: 720px) {
   body.desk main { padding-left: 10px; padding-right: 10px; }
   .nums b { font-size: 2.6rem; }
-  .cell { min-width: 68px; font-size: 0.88rem; }
-  .grid tbody th { min-width: 64px; }
+  .sheet { overflow-x: visible; }
+  .grid, .grid tbody, .grid tr, .grid th, .grid td { display: block; }
+  .grid thead { display: none; }
+  .grid tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 10px;
+  }
+  .grid tbody th {
+    position: static;
+    flex: 1 0 100%;
+    min-width: 0;
+    background: transparent;
+  }
+  .grid td { flex: 1 1 calc(50% - 6px); }
+  .cell { min-width: 0; min-height: 44px; }
 }
