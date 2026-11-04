@@ -130,6 +130,39 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
     assert "<strong>D</strong>" in reopened_html
 
 
+def test_starting_slots_are_on_the_match_page(tmp_path):
+    client = _client(tmp_path)
+    created = client.post("/teams", data={"name": "小队", "preset": "blank"})
+    team_url = created.headers["Location"]
+    names = ["Leo", "Vitas", "Andy", "Junhao", "Michael", "Eric"]
+    for name in names:
+        added = client.post(f"{team_url}/players", data={"name": name, "role": "outside"}, follow_redirects=True)
+        assert name in added.get_data(as_text=True)
+    page = client.get(f"{team_url}/matches/new").get_data(as_text=True)
+    assert "首发六个槽" in page
+    assert "1 右后" in page
+    assert "六个槽还没选满" in page
+    roster = client.get(team_url).get_data(as_text=True)
+    ids = []
+    for name in names:
+        marker = f"保存 {name}"
+        chunk = roster.split(marker, 1)[0]
+        ids.append(chunk.split('action="/teams/')[-1].split("/players/", 1)[1].split('"', 1)[0])
+    saved = client.post(
+        f"{team_url}/starters",
+        data={f"slot_{slot}": player_id for slot, player_id in enumerate(ids, start=1)},
+        follow_redirects=True,
+    )
+    saved_html = saved.get_data(as_text=True)
+    assert "六个首发槽已记下" in saved_html
+    assert "六个槽还没选满" not in saved_html
+    started = client.post(
+        f"{team_url}/matches",
+        data={"opponent": "红队", "mode": "light", "rotation": "1", "serving": "them"},
+    )
+    assert started.status_code == 302
+
+
 def test_dictionary_and_drills_pages(tmp_path):
     client = _client(tmp_path)
     dictionary = client.get("/dictionary").get_data(as_text=True)

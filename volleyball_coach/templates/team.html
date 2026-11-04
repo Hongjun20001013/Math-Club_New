@@ -7,6 +7,8 @@
 </p>
 <h1>{{ plan.name }}</h1>
 <p class="lede">{{ plan.notes }}</p>
+{% set next_page = "team" %}
+{% include "_starters.html" %}
 {% if plan.board_note %}<p>{{ plan.board_note }}</p>{% endif %}
 
 <form class="stack" method="post" action="{{ url_for('save_rules', team_id=plan.team_id) }}">

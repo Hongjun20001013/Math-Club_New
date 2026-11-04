@@ -278,6 +278,30 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         cards = [build_card(plan, rotation, {}, locked) for rotation in range(1, 7)]
         return render_template("quicksheet.html", plan=plan, cards=cards)
 
+    @app.post("/teams/<team_id>/starters")
+    def save_starters(team_id: str):
+        plan = team_or_404(team_id)
+        assigned: dict[str, int] = {}
+        for slot in range(1, 7):
+            player_id = (request.form.get(f"slot_{slot}") or "").strip()
+            if not player_id:
+                continue
+            if player_id not in plan.players:
+                flash("首发要从这支队的名单里选。", "error")
+                return _starters_redirect(plan.team_id)
+            if player_id in assigned:
+                flash("同一个人不能占两个槽。", "error")
+                return _starters_redirect(plan.team_id)
+            assigned[player_id] = slot
+        for player in plan.players.values():
+            player.base_slot = assigned.get(player.id)
+            store().save_player(plan.team_id, player)
+        if len(assigned) == 6:
+            flash("六个首发槽已记下。", "ok")
+        else:
+            flash("已保存。六个槽都选上人才能开场。", "ok")
+        return _starters_redirect(plan.team_id)
+
     @app.get("/teams/<team_id>/matches/new")
     def new_match(team_id: str):
         plan = team_or_404(team_id)
@@ -775,6 +799,12 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         return render_template("drills.html", results=results, passed=sum(item["passed"] for item in results))
 
     return app
+
+
+def _starters_redirect(team_id: str):
+    if request.form.get("next") == "team":
+        return redirect(url_for("team_page", team_id=team_id))
+    return redirect(url_for("new_match", team_id=team_id))
 
 
 def rules_from_form(form) -> Rules:

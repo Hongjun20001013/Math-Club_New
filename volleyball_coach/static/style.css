@@ -873,3 +873,24 @@ button.texty {
   }
   .score-dock { position: sticky; bottom: 0; background: var(--white); }
 }
+
+.starter-court {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+
+.starter-court label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.starter-court select {
+  font-size: 1rem;
+  color: var(--navy);
+}
