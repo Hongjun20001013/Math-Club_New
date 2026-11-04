@@ -32,6 +32,7 @@
       <button class="texty" type="submit">撤销</button>
     </form>
     <a href="{{ url_for('live', match_id=match.id, view='stats', scope=scope) }}">暂停看数</a>
+    <a href="{{ url_for('summary_page', match_id=match.id) }}">汇总 PDF</a>
     {% if view == 'stats' %}
       <a href="{{ url_for('live', match_id=match.id, sheet=sheet) }}">返回记球</a>
     {% endif %}
@@ -200,6 +201,9 @@
       <input type="hidden" name="rotation" value="{{ state.rotation }}">
       <input type="hidden" name="serving" value="them">
       <button class="cell ghost" type="submit">结束本局</button>
+    </form>
+    <form method="post" action="{{ url_for('finish_match', match_id=match.id) }}">
+      <button class="cell" type="submit">结束本场，看汇总</button>
     </form>
   </section>
 

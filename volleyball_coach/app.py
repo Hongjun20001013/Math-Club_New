@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
 
 from flask import Flask, abort, flash, g, jsonify, redirect, render_template, request, send_file, url_for
@@ -32,10 +33,12 @@ from volleyball_coach.quick import (
     pad_for,
     pause_lines,
     reception_editable,
+    build_digest,
     record_cell,
     sheet_after,
 )
 from volleyball_coach.report import build_report, execution_of
+from volleyball_coach.summary_pdf import render_summary_pdf
 from volleyball_coach.seed import MENS_TEAM_ID
 from volleyball_coach.store import Store, ability_label, locked_pairs_of, new_id, now, plan_for_match
 
@@ -867,8 +870,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     def finish_match(match_id: str):
         match_bundle(match_id)
         store().set_match_status(match_id, "done")
-        flash("本场已结束。赛后用三个问题补记录，不要只看比分。", "ok")
-        return redirect(url_for("review", match_id=match_id))
+        flash("本场已结束。下面是汇总，可以下载 PDF。", "ok")
+        return redirect(url_for("summary_page", match_id=match_id))
 
     @app.get("/matches/<match_id>/review")
     def review(match_id: str):
@@ -923,6 +926,30 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         store().delete_rally(match_id, rally_id)
         flash("这条回合记录已删除。", "ok")
         return redirect(url_for("review", match_id=match_id))
+
+    def _match_digest(match_id: str):
+        match, plan, _state, _points, _events = match_bundle(match_id)
+        names = {player_id: player.name for player_id, player in plan.players.items()}
+        rallies = store().quick_rallies(match_id)
+        actions = store().quick_actions(match_id)
+        return match, plan, build_digest(rallies, actions, names)
+
+    @app.get("/matches/<match_id>/summary")
+    def summary_page(match_id: str):
+        match, plan, digest = _match_digest(match_id)
+        return render_template("summary.html", match=match, plan=plan, digest=digest)
+
+    @app.get("/matches/<match_id>/summary.pdf")
+    def summary_pdf(match_id: str):
+        match, plan, digest = _match_digest(match_id)
+        payload = render_summary_pdf(digest, team=plan.name, opponent=match["opponent"])
+        filename = f"{plan.name}-数据汇总.pdf"
+        return send_file(
+            BytesIO(payload),
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=filename,
+        )
 
     @app.get("/matches/<match_id>/report")
     def report_page(match_id: str):

@@ -387,6 +387,73 @@ def test_eric_sets_add_up_and_set_two_edits_leave_set_one(tmp_path):
     assert "5扣4中1失误" not in current
 
 
+def test_summary_pdf_uses_the_same_attack_rates(tmp_path):
+    from volleyball_coach.quick import build_digest
+    from volleyball_coach.summary_pdf import render_summary_pdf
+
+    rally_ids = [f"r{index}" for index in range(13)]
+    rallies = [
+        {
+            "id": rally_id,
+            "status": "scored",
+            "set_index": 1 if index < 5 else 2,
+            "completeness": "complete",
+            "winner": "us" if index != 10 else "them",
+            "score_us_before": index,
+            "score_them_before": 0,
+            "point_seq": index + 1,
+        }
+        for index, rally_id in enumerate(rally_ids)
+    ]
+    actions = []
+    for index, rally_id in enumerate(rally_ids):
+        result = "kill" if index < 10 else ("error" if index == 10 else "in_play")
+        actions.append(
+            {
+                "rally_id": rally_id,
+                "ord": 1,
+                "kind": "attack",
+                "result": result,
+                "player_id": "eric",
+                "side": "us",
+                "start": "",
+                "line": "",
+                "count_only": 0,
+                "tag": "",
+            }
+        )
+    digest = build_digest(rallies, actions, {"eric": "Eric"})
+    assert digest["team"]["phrase"].startswith("13扣10中")
+    assert digest["team"]["errors"] == 1
+    assert digest["team"]["rate"] == "76.9%"
+    assert digest["team"]["eff"] == "69.2%"
+    assert digest["sets"][0]["team"]["phrase"].startswith("5扣")
+    assert "上场后胜率更高" not in repr(digest)
+    payload = render_summary_pdf(digest, team="男排", opponent="红队")
+    assert payload.startswith(b"%PDF")
+    import pymupdf
+
+    text = "\n".join(page.get_text() for page in pymupdf.open(stream=payload, filetype="pdf"))
+    assert "13扣10中" in text
+    assert "76.9%" in text
+    assert "69.2%" in text
+    assert "上场后胜率更高" not in text
+
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "pass", "in_system", "pdf-pass", player="leo")
+    _cell(client, url, "attack", "kill", "pdf-kill", player="andy-a")
+    page = client.get(f"{url}/summary").get_data(as_text=True)
+    assert "下载数据汇总 PDF" in page
+    assert "1扣1中" in page
+    assert "1到位" in page
+    downloaded = client.get(f"{url}/summary.pdf")
+    assert downloaded.mimetype == "application/pdf"
+    assert downloaded.data.startswith(b"%PDF")
+    finished = client.post(f"{url}/finish", follow_redirects=True)
+    assert "下载数据汇总 PDF" in finished.get_data(as_text=True)
+
+
 def _player_id(client, url, name: str) -> str:
     page = client.get(url).get_data(as_text=True)
     marker = f'aria-label="{name} 到位"'

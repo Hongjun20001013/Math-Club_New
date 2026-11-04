@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="row-links">
+  <a href="{{ url_for('live', match_id=match.id) }}">返回记球</a>
+  <a href="{{ url_for('review', match_id=match.id) }}">补录像记录</a>
+</p>
+<p class="eyebrow">{{ plan.name }}{% if match.opponent %} 对 {{ match.opponent }}{% endif %}</p>
+<h1>本场汇总</h1>
+{% if digest.sets %}
+  <p class="nums summary-score">
+    {% for item in digest.sets %}
+      <span>第{{ item.set_index }}局 <b>{{ item.score_us }}</b>–<b>{{ item.score_them }}</b></span>
+    {% endfor %}
+  </p>
+{% else %}
+  <p>这场还没有记分。</p>
+{% endif %}
+<p class="formula">已记 {{ digest.recorded }} 分{% if digest.pending %}，其中 {{ digest.pending }} 分待补，不进进攻成功率{% endif %}。未知不记成 0。</p>
+<a class="go" href="{{ url_for('summary_pdf', match_id=match.id) }}">下载数据汇总 PDF</a>
+<ul class="pause-lines">
+  <li><span>进攻</span>{{ digest.lines.attack }}</li>
+  <li><span>一传</span>{{ digest.lines.receive }}</li>
+  <li><span>发球</span>{{ digest.lines.serve }}</li>
+  <li><span>对方</span>{{ digest.lines.opp }}</li>
+</ul>
+<h2>全队 {{ digest.team.phrase }}</h2>
+<p>成功率 {{ digest.team.rate }}　效率 {{ digest.team.eff }}{% if digest.team.count_only %}　只计次数 {{ digest.team.count_only }}{% endif %}</p>
+{% if digest.people %}
+  <div class="table-wrap">
+    <table>
+      <tr><th>姓名</th><th>进攻</th><th>失误</th><th>被拦</th><th>成功率</th><th>拦网得分</th><th>ACE</th><th>直接得分</th></tr>
+      {% for row in digest.people %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.phrase }}</td>
+          <td>{{ row.errors }}</td>
+          <td>{{ row.blocked }}</td>
+          <td>{{ row.rate }}</td>
+          <td>{{ row.block_points }}</td>
+          <td>{{ row.ace }}</td>
+          <td>{{ row.points }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endif %}
+<p class="formula">直接得分＝扣死＋ACE＋拦死＋打手出界。这是这个人终结的分。</p>
+{% endblock %}

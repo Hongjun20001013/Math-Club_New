@@ -697,6 +697,105 @@ def board_for(
     }
 
 
+def _team_attack(rows: list[dict]) -> dict:
+    attempts = sum(row["attempts"] for row in rows)
+    kills = sum(row["kills"] for row in rows)
+    errors = sum(row["errors"] for row in rows)
+    blocked = sum(row["blocked"] for row in rows)
+    return {
+        "name": "全队",
+        "attempts": attempts,
+        "kills": kills,
+        "errors": errors,
+        "blocked": blocked,
+        "phrase": _attack_phrase(attempts, kills, errors, blocked),
+        "rate": _pct(kills, attempts),
+        "eff": _pct(kills - errors - blocked, attempts),
+        "count_only": sum(row["count_only"] for row in rows),
+    }
+
+
+def person_sheet(board: dict) -> list[dict]:
+    """One row per person. Direct points are kills, aces, stuff blocks, and tools."""
+    attacks = {row["player_id"]: row for row in board["attacks"]}
+    serves = {row["key"]: row for row in board["serves"]}
+    blocks = {row["key"]: row for row in board["blocks"]}
+    keys = list(dict.fromkeys([*attacks, *serves, *blocks]))
+    rows = []
+    for key in keys:
+        attack = attacks.get(key)
+        serve = serves.get(key)
+        block = blocks.get(key)
+        source = attack or serve or block
+        kills = attack["kills"] if attack else 0
+        aces = int(serve.get("ace", 0)) if serve else 0
+        block_points = int(block.get("kill", 0) + block.get("tool", 0)) if block else 0
+        rows.append(
+            {
+                "player_id": key,
+                "name": source["name"],
+                "phrase": attack["phrase"] if attack else "—",
+                "errors": attack["errors"] if attack else 0,
+                "blocked": attack["blocked"] if attack else 0,
+                "rate": attack["rate"] if attack else "—",
+                "eff": attack["eff"] if attack else "—",
+                "count_only": attack["count_only"] if attack else 0,
+                "ace": aces,
+                "block_points": block_points,
+                "points": kills + aces + block_points,
+            }
+        )
+    rows.sort(key=lambda item: (-item["points"], item["name"]))
+    return rows
+
+
+def build_digest(rallies: list[dict], actions: list[dict], names: dict[str, str]) -> dict:
+    """The pause card, the summary page, and the PDF all read this."""
+    scored = [rally for rally in rallies if rally.get("status") == "scored"]
+    set_indexes = sorted({int(rally["set_index"]) for rally in scored})
+    sets = []
+    for index in set_indexes:
+        board = board_for(rallies, actions, names, scope="set", set_index=index)
+        sets.append(
+            {
+                "set_index": index,
+                "score_us": sum(1 for rally in board["rallies"] if rally.get("winner") == "us"),
+                "score_them": sum(1 for rally in board["rallies"] if rally.get("winner") == "them"),
+                "board": board,
+                "lines": pause_lines(board),
+                "team": _team_attack(board["attacks"]),
+                "people": person_sheet(board),
+            }
+        )
+    match_board = board_for(rallies, actions, names, scope="match", set_index=set_indexes[-1] if set_indexes else 1)
+    by_rally: dict[str, list[dict]] = {}
+    for action in actions:
+        by_rally.setdefault(action["rally_id"], []).append(action)
+    for group in by_rally.values():
+        group.sort(key=lambda item: item.get("ord") or 0)
+    detail = []
+    for rally in sorted(scored, key=lambda item: (int(item.get("set_index") or 0), int(item.get("point_seq") or 0), str(item.get("id")))):
+        detail.append(
+            {
+                "set_index": int(rally["set_index"]),
+                "score": f"{rally.get('score_us_before', 0)}–{rally.get('score_them_before', 0)}",
+                "winner": "我方" if rally.get("winner") == "us" else "对方" if rally.get("winner") == "them" else "未知",
+                "story": describe(by_rally.get(rally["id"], []), names),
+                "pending": rally.get("completeness") in ("pending", "score_only"),
+            }
+        )
+    return {
+        "sets": sets,
+        "match": match_board,
+        "lines": pause_lines(match_board),
+        "team": _team_attack(match_board["attacks"]),
+        "people": person_sheet(match_board),
+        "detail": detail,
+        "recorded": len(match_board["rallies"]),
+        "pending": match_board["pending"],
+    }
+
+
 def _people(plan: TeamPlan, state: MatchState) -> list:
     if state.occupants:
         ordered = []

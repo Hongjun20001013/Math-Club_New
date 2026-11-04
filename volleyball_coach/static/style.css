@@ -992,6 +992,8 @@ body.desk.view-stats .pad { display: none; }
 .add-name { display: flex; gap: 8px; margin: 8px 0; }
 .add-name input { flex: 1; min-height: 44px; }
 .pad h2 { font-size: 1rem; margin: 16px 0 6px; }
+.summary-score { display: flex; flex-wrap: wrap; gap: 18px; margin: 8px 0 12px; }
+.summary-score b { font-size: 2.4rem; font-variant-numeric: tabular-nums; }
 .pause-lead { font-size: 1.05rem; margin: 0 0 8px; }
 .pause-lines { list-style: none; padding: 0; margin: 0 0 12px; }
 .pause-lines li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
