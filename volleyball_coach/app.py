@@ -323,6 +323,52 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         flash("配对已删除。", "ok")
         return redirect(url_for("team_page", team_id=team_id))
 
+    @app.post("/teams/<team_id>/delete")
+    def delete_team(team_id: str):
+        plan = team_or_404(team_id)
+        if request.form.get("confirm") != "1":
+            flash("没有确认，这队还在。", "error")
+            return redirect(url_for("home"))
+        store().delete_team(plan.team_id)
+        flash(f"「{plan.name}」和这队的比赛已经删除。", "ok")
+        return redirect(url_for("home"))
+
+    @app.post("/teams/<team_id>/roster/remove")
+    def remove_roster_player(team_id: str):
+        return _remove_player(team_id, (request.form.get("player_id") or "").strip())
+
+    @app.post("/teams/<team_id>/players/<player_id>/delete")
+    def delete_player(team_id: str, player_id: str):
+        return _remove_player(team_id, player_id)
+
+    def _remove_player(team_id: str, player_id: str):
+        plan = team_or_404(team_id)
+        player = plan.players.get(player_id)
+        if player is None:
+            abort(404)
+        back = request.form.get("next") or "home"
+        match_id = (request.form.get("match_id") or "").strip()
+        if request.form.get("confirm") != "1":
+            flash("没有确认，球员还在名单里。", "error")
+        elif store().delete_player(plan.team_id, player_id):
+            flash(f"{player.name} 已从名单去掉。已经记过的比赛仍留着当时的名字。", "ok")
+        if back == "team":
+            return redirect(url_for("team_page", team_id=plan.team_id))
+        if back == "live" and match_id:
+            return redirect(url_for("live", match_id=match_id, sheet="more"))
+        return redirect(url_for("home"))
+
+    @app.post("/teams/<team_id>/abilities/<int:ability_id>/delete")
+    def delete_ability(team_id: str, ability_id: int):
+        team_or_404(team_id)
+        if request.form.get("confirm") != "1":
+            flash("没有确认，这条观察还在。", "error")
+        elif not store().delete_ability(team_id, ability_id):
+            abort(404)
+        else:
+            flash("这条观察已删除。", "ok")
+        return redirect(url_for("team_page", team_id=team_id))
+
     @app.get("/teams/<team_id>/board")
     def board(team_id: str):
         plan = team_or_404(team_id)
@@ -959,6 +1005,21 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         store().set_match_status(match_id, "done")
         flash("本场已结束。下面是汇总，可以下载 PDF。", "ok")
         return redirect(url_for("summary_page", match_id=match_id))
+
+    @app.post("/matches/<match_id>/delete")
+    def delete_match(match_id: str):
+        match = store().get_match(match_id)
+        if match is None:
+            abort(404)
+        team_id = match["team_id"]
+        if request.form.get("confirm") != "1":
+            flash("没有确认，这场还在。", "error")
+            return redirect(url_for("live", match_id=match_id))
+        store().delete_match(match_id)
+        flash("这场记录已删除。", "ok")
+        if request.form.get("next") == "home":
+            return redirect(url_for("home"))
+        return redirect(url_for("team_page", team_id=team_id))
 
     @app.get("/matches/<match_id>/review")
     def review(match_id: str):

@@ -227,6 +227,53 @@ def test_each_set_keeps_its_own_court(tmp_path):
     assert "checked" not in harvey
 
 
+def test_team_player_match_and_note_can_be_deleted(tmp_path):
+    client = _client(tmp_path)
+    created = client.post("/teams", data={"name": "临时队", "names": "Isa"})
+    team_url = created.headers["Location"]
+    client.post(f"{team_url}/delete")
+    assert "临时队" in client.get("/").get_data(as_text=True)
+    started = client.post(f"{team_url}/roster", data={"team_name": "临时队", "start": "1"})
+    match_url = started.headers["Location"]
+    removed = client.post(f"{team_url}/delete", data={"confirm": "1"}, follow_redirects=True)
+    page = removed.get_data(as_text=True)
+    assert 'name="team_name" value="临时队"' not in page
+    assert "男排" in page
+    assert client.get(team_url).status_code == 404
+    assert client.get(match_url).status_code == 404
+
+    client.post(f"/teams/{MENS_TEAM_ID}/roster", data={"new_name": "Sky", "new_role": "libero"})
+    home = client.get("/").get_data(as_text=True)
+    player_id = home.split('value="Sky"', 1)[0].split('name="player_id" value="')[-1].split('"', 1)[0]
+    client.post(f"/teams/{MENS_TEAM_ID}/players/{player_id}/delete")
+    assert "Sky" in client.get("/").get_data(as_text=True)
+    client.post(f"/teams/{MENS_TEAM_ID}/players/{player_id}/delete", data={"confirm": "1"})
+    after = client.get("/").get_data(as_text=True)
+    assert 'value="Sky"' not in after
+    assert "Leo" in after
+
+    started = client.post(
+        f"/teams/{MENS_TEAM_ID}/roster",
+        data={"player_id": "leo", "player_name": "Leo", "player_role": "outside", "start": "1"},
+    )
+    match_url = started.headers["Location"]
+    client.post(f"{match_url}/delete", data={"confirm": "1"})
+    assert client.get(match_url).status_code == 404
+    assert client.get(f"/teams/{MENS_TEAM_ID}").status_code == 200
+
+    noted = client.post(
+        f"/teams/{MENS_TEAM_ID}/abilities",
+        data={"player_id": "leo", "skill": "今晚单独的观察", "label": "stable"},
+        follow_redirects=True,
+    ).get_data(as_text=True)
+    assert "今晚单独的观察" in noted
+    action = noted.split("今晚单独的观察", 1)[1].split('action="', 1)[1].split('"', 1)[0]
+    client.post(action)
+    assert "今晚单独的观察" in client.get(f"/teams/{MENS_TEAM_ID}").get_data(as_text=True)
+    client.post(action, data={"confirm": "1"}, follow_redirects=True)
+    assert "今晚单独的观察" not in client.get(f"/teams/{MENS_TEAM_ID}").get_data(as_text=True)
+
+
 def test_dictionary_and_drills_pages(tmp_path):
     client = _client(tmp_path)
     dictionary = client.get("/dictionary").get_data(as_text=True)

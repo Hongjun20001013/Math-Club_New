@@ -15,6 +15,7 @@
   {% include "_starters.html" %}
 </details>
 
+{% set delete_next = "team" %}
 {% include "_roster.html" %}
 <h2>名单细节</h2>
 <p class="muted">号码、首发槽和接发习惯在这里。位置本身不决定站几号位。</p>
@@ -27,7 +28,13 @@
     </form>
     <ul class="list">
       {% for item in abilities.get(player.id, []) %}
-        <li>{{ item.skill }}：{{ item.label | ability }}</li>
+        <li class="with-delete">
+          <span>{{ item.skill }}：{{ item.label | ability }}</span>
+          <form method="post" action="{{ url_for('delete_ability', team_id=plan.team_id, ability_id=item.id) }}" onsubmit="return confirm('删掉这条观察？');">
+            <input type="hidden" name="confirm" value="1">
+            <button class="warn" type="submit">删除</button>
+          </form>
+        </li>
       {% else %}
         <li>还没有能力记录。</li>
       {% endfor %}
@@ -145,7 +152,13 @@
           <td>{{ match.created_at }}</td>
           <td>{{ match.opponent or "未填对手" }}</td>
           <td>{{ "进行中" if match.status == "live" else "已结束" }} · {{ "轻记录" if match.mode == "light" else "预案" }}</td>
-          <td><a href="{{ url_for('live', match_id=match.id) }}">进入</a></td>
+          <td class="with-delete">
+            <a href="{{ url_for('live', match_id=match.id) }}">进入</a>
+            <form method="post" action="{{ url_for('delete_match', match_id=match.id) }}" onsubmit="return confirm('删掉这场记录？不能恢复。');">
+              <input type="hidden" name="confirm" value="1">
+              <button class="warn" type="submit">删除这场</button>
+            </form>
+          </td>
         </tr>
       {% endfor %}
     </table>

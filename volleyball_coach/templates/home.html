@@ -5,7 +5,14 @@
 <p class="lede">一场常见是两名主攻、两名副攻、一名接应、一名二传，再加自由人。人可以多，同一个位置也可以有好几个人。</p>
 <section class="starts">
   {% for match in live_matches %}
-    <a class="go" href="{{ url_for('live', match_id=match.id) }}">继续 · {{ match.team_name }} · 第{{ match.set_index }}局 {{ match.score_us }}–{{ match.score_them }}</a>
+    <div class="continue-row">
+      <a class="go" href="{{ url_for('live', match_id=match.id) }}">继续 · {{ match.team_name }} · 第{{ match.set_index }}局 {{ match.score_us }}–{{ match.score_them }}</a>
+      <form method="post" action="{{ url_for('delete_match', match_id=match.id) }}" onsubmit="return confirm('删掉这场还没结束的记录？不能恢复。');">
+        <input type="hidden" name="confirm" value="1">
+        <input type="hidden" name="next" value="home">
+        <button class="warn" type="submit">删除这场</button>
+      </form>
+    </div>
   {% endfor %}
 </section>
 {% for plan in plans if plan.team_id == mens_id %}

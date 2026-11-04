@@ -186,6 +186,11 @@ CREATE TABLE IF NOT EXISTS op_tokens (
   match_id TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS app_meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
 """
 
 
@@ -215,10 +220,14 @@ class Store:
         if columns and "voided" not in columns:
             self.conn.execute("ALTER TABLE quick_actions ADD COLUMN voided INTEGER NOT NULL DEFAULT 0")
             self.conn.commit()
+        has_teams = self.conn.execute("SELECT COUNT(*) AS n FROM teams").fetchone()["n"]
+        flagged = self.conn.execute("SELECT 1 FROM app_meta WHERE key = 'seeded'").fetchone()
+        if has_teams and not flagged:
+            self.conn.execute("INSERT INTO app_meta (key, value) VALUES ('seeded', '1')")
+            self.conn.commit()
 
     def _seed_mens_if_empty(self) -> None:
-        row = self.conn.execute("SELECT COUNT(*) AS n FROM teams").fetchone()
-        if row["n"]:
+        if self.conn.execute("SELECT 1 FROM app_meta WHERE key = 'seeded'").fetchone():
             return
         self.insert_plan(build_mens_plan())
         for player_id, skills in MENS_ABILITIES.items():
@@ -230,6 +239,7 @@ class Store:
                     """,
                     (player_id, skill, now()),
                 )
+        self.conn.execute("INSERT INTO app_meta (key, value) VALUES ('seeded', '1')")
         self.conn.commit()
 
     def insert_plan(self, plan: TeamPlan) -> None:
@@ -455,6 +465,80 @@ class Store:
             (json.dumps([sorted(pair) for pair in locked_pairs], ensure_ascii=False), match_id),
         )
         self.conn.commit()
+
+    def delete_ability(self, team_id: str, ability_id: int) -> bool:
+        row = self.conn.execute(
+            """
+            SELECT abilities.id FROM abilities
+            JOIN players ON players.id = abilities.player_id
+            WHERE abilities.id = ? AND players.team_id = ?
+            """,
+            (ability_id, team_id),
+        ).fetchone()
+        if row is None:
+            return False
+        self.conn.execute("DELETE FROM abilities WHERE id = ?", (ability_id,))
+        self.conn.commit()
+        return True
+
+    def delete_player(self, team_id: str, player_id: str) -> bool:
+        row = self.conn.execute(
+            "SELECT id FROM players WHERE id = ? AND team_id = ?",
+            (player_id, team_id),
+        ).fetchone()
+        if row is None:
+            return False
+        self.conn.execute("DELETE FROM abilities WHERE player_id = ?", (player_id,))
+        self.conn.execute(
+            "DELETE FROM pairs WHERE team_id = ? AND (player_a = ? OR player_b = ?)",
+            (team_id, player_id, player_id),
+        )
+        self.conn.execute(
+            "DELETE FROM sub_windows WHERE team_id = ? AND (player_out = ? OR player_in = ?)",
+            (team_id, player_id, player_id),
+        )
+        self.conn.execute("DELETE FROM players WHERE id = ?", (player_id,))
+        self.conn.commit()
+        return True
+
+    def _delete_match_rows(self, match_id: str) -> None:
+        self.conn.execute("DELETE FROM quick_actions WHERE match_id = ?", (match_id,))
+        self.conn.execute("DELETE FROM quick_rallies WHERE match_id = ?", (match_id,))
+        self.conn.execute("DELETE FROM op_tokens WHERE match_id = ?", (match_id,))
+        self.conn.execute("DELETE FROM events WHERE match_id = ?", (match_id,))
+        self.conn.execute("DELETE FROM rallies WHERE match_id = ?", (match_id,))
+        self.conn.execute("DELETE FROM matches WHERE id = ?", (match_id,))
+
+    def delete_match(self, match_id: str) -> bool:
+        row = self.conn.execute("SELECT id FROM matches WHERE id = ?", (match_id,)).fetchone()
+        if row is None:
+            return False
+        self._delete_match_rows(match_id)
+        self.conn.commit()
+        return True
+
+    def delete_team(self, team_id: str) -> bool:
+        row = self.conn.execute("SELECT id FROM teams WHERE id = ?", (team_id,)).fetchone()
+        if row is None:
+            return False
+        match_ids = [
+            item["id"]
+            for item in self.conn.execute("SELECT id FROM matches WHERE team_id = ?", (team_id,))
+        ]
+        for match_id in match_ids:
+            self._delete_match_rows(match_id)
+        self.conn.execute(
+            "DELETE FROM abilities WHERE player_id IN (SELECT id FROM players WHERE team_id = ?)",
+            (team_id,),
+        )
+        self.conn.execute("DELETE FROM pairs WHERE team_id = ?", (team_id,))
+        self.conn.execute("DELETE FROM serve_plans WHERE team_id = ?", (team_id,))
+        self.conn.execute("DELETE FROM sub_windows WHERE team_id = ?", (team_id,))
+        self.conn.execute("DELETE FROM players WHERE team_id = ?", (team_id,))
+        self.conn.execute("DELETE FROM rules WHERE team_id = ?", (team_id,))
+        self.conn.execute("DELETE FROM teams WHERE id = ?", (team_id,))
+        self.conn.commit()
+        return True
 
     def delete_rally(self, match_id: str, rally_id: int) -> None:
         self.conn.execute("DELETE FROM rallies WHERE match_id = ? AND id = ?", (match_id, rally_id))

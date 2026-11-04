@@ -323,6 +323,22 @@
     <form method="post" action="{{ url_for('finish_match', match_id=match.id) }}">
       <button class="cell" type="submit">结束本场，看汇总</button>
     </form>
+    <form method="post" action="{{ url_for('delete_match', match_id=match.id) }}" onsubmit="return confirm('删掉这场记录？不能恢复。');">
+      <input type="hidden" name="confirm" value="1">
+      <button class="warn" type="submit">删除这场</button>
+    </form>
+    <form class="add-name" method="post" action="{{ url_for('remove_roster_player', team_id=plan.team_id) }}" onsubmit="return confirm('从名单去掉这名球员？');">
+      <input type="hidden" name="confirm" value="1">
+      <input type="hidden" name="next" value="live">
+      <input type="hidden" name="match_id" value="{{ match.id }}">
+      <label for="drop-player">从名单去掉</label>
+      <select id="drop-player" name="player_id">
+        {% for player in players|sort(attribute='name') %}
+          <option value="{{ player.id }}">{{ player.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="warn" type="submit">去掉</button>
+    </form>
   </section>
 
   <div class="score-dock">

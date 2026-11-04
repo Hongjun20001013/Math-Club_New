@@ -715,6 +715,10 @@ body.desk main {
   gap: 10px;
   margin: 0 0 28px;
 }
+.continue-row { display: flex; gap: 8px; align-items: stretch; }
+.continue-row .go { flex: 1; }
+.continue-row form { margin: 0; display: flex; }
+.continue-row .warn { min-width: 96px; }
 
 .go {
   display: flex;
@@ -908,12 +912,15 @@ form.paste { margin-top: 22px; }
 .roster { margin: 18px 0 28px; }
 .roster-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 128px;
+  grid-template-columns: minmax(0, 1fr) 112px auto;
   gap: 8px;
   margin-bottom: 8px;
 }
 .roster-row input, .roster-row select { min-height: 44px; }
 .roster .go { margin-top: 8px; }
+.danger-row { margin: 8px 0 22px; }
+.with-delete { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.with-delete form { margin: 0; }
 .roster > input[name="team_name"] { margin-bottom: 8px; font-size: 1.2rem; font-weight: 650; }
 
 .court-pick { margin: 0 0 12px; }

@@ -11,6 +11,7 @@
           <option value="{{ code }}" {% if player.role == code %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
+      <button class="warn" type="submit" form="drop-{{ plan.team_id }}-{{ player.id }}">删除</button>
     </div>
   {% endfor %}
   <div class="roster-row">
@@ -23,4 +24,14 @@
   </div>
   <button class="go" type="submit" name="start" value="1">沿用名单，开始</button>
   <button class="cell ghost" type="submit">只保存位置</button>
+</form>
+{% for player in plan.players.values() %}
+  <form id="drop-{{ plan.team_id }}-{{ player.id }}" method="post" action="{{ url_for('delete_player', team_id=plan.team_id, player_id=player.id) }}" onsubmit="return confirm('从名单去掉这名球员？已经记过的比赛还留着他当时的名字。');">
+    <input type="hidden" name="confirm" value="1">
+    <input type="hidden" name="next" value="{{ delete_next|default('home') }}">
+  </form>
+{% endfor %}
+<form class="danger-row" method="post" action="{{ url_for('delete_team', team_id=plan.team_id) }}" onsubmit="return confirm('删掉这队和它的全部比赛？不能恢复。');">
+  <input type="hidden" name="confirm" value="1">
+  <button class="warn" type="submit">删除这队</button>
 </form>
