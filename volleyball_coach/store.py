@@ -752,6 +752,30 @@ class Store:
             (json.dumps(payload, ensure_ascii=False), match_id, row["seq"]),
         )
 
+    def rename_team(self, team_id: str, name: str) -> None:
+        self.conn.execute("UPDATE teams SET name = ? WHERE id = ?", (name, team_id))
+        self.conn.commit()
+
+    def set_set_court(self, match_id: str, player_ids: list[str]) -> None:
+        """Who is on the floor for the current set. The next set can be a different list."""
+        row = self.conn.execute(
+            """
+            SELECT seq, payload FROM events
+            WHERE match_id = ? AND type = 'set_start'
+            ORDER BY seq DESC LIMIT 1
+            """,
+            (match_id,),
+        ).fetchone()
+        if row is None:
+            return
+        payload = json.loads(row["payload"])
+        payload["court"] = player_ids
+        self.conn.execute(
+            "UPDATE events SET payload = ? WHERE match_id = ? AND seq = ?",
+            (json.dumps(payload, ensure_ascii=False), match_id, row["seq"]),
+        )
+        self.conn.commit()
+
     def mark_line(self, match_id: str, line: str) -> bool:
         row = self.conn.execute(
             """
@@ -962,9 +986,12 @@ def plan_for_match(store: Store, match: sqlite3.Row) -> TeamPlan:
         if current:
             player.name = current.name
             player.jersey = current.jersey
+            player.role = current.role
+            player.receive_primary = current.receive_primary
     for player_id, player in live.players.items():
         if player_id not in plan.players:
             plan.players[player_id] = player
+    plan.name = live.name
     plan.serve_plans = live.serve_plans or plan.serve_plans
     return plan
 

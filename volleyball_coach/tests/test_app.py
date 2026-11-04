@@ -195,6 +195,38 @@ def test_roster_position_is_set_before_recording(tmp_path):
     assert "几号位" in roster
 
 
+def test_team_name_can_be_changed(tmp_path):
+    client = _client(tmp_path)
+    created = client.post("/teams", data={"name": "1"})
+    assert created.status_code == 302
+    team_url = created.headers["Location"]
+    saved = client.post(f"{team_url}/roster", data={"team_name": "一队"}, follow_redirects=True)
+    page = saved.get_data(as_text=True)
+    assert 'name="team_name" value="一队"' in page
+
+
+def test_each_set_keeps_its_own_court(tmp_path):
+    client = _client(tmp_path)
+    started = client.post(
+        f"/teams/{MENS_TEAM_ID}/roster",
+        data={"player_id": "leo", "player_name": "Leo", "player_role": "outside", "start": "1"},
+    )
+    url = started.headers["Location"]
+    client.post(f"{url}/court", data={"player_id": ["leo", "andy-a"], "sheet": "attack"})
+    page = client.get(f"{url}?sheet=attack").get_data(as_text=True)
+    assert "这一局上场：Leo、Andy A" in page
+    main, bench = page.split("没上场", 1)
+    assert "Leo" in main and "Andy A" in main
+    assert "Harvey" in bench
+    nxt = client.post(f"{url}/next-set", data={"rotation": "1", "serving": "them"}, follow_redirects=True)
+    body = nxt.get_data(as_text=True)
+    assert "第 2 局" in body
+    assert 'value="leo" checked' in body
+    assert 'value="andy-a" checked' in body
+    harvey = body.split('value="harvey"', 1)[1].split(">", 1)[0]
+    assert "checked" not in harvey
+
+
 def test_dictionary_and_drills_pages(tmp_path):
     client = _client(tmp_path)
     dictionary = client.get("/dictionary").get_data(as_text=True)

@@ -315,6 +315,36 @@ def test_count_only_and_two_digs_do_not_invent_errors(tmp_path):
     assert "防起 2" in page or "防起 1" in page
 
 
+def test_three_swings_in_one_rally_all_count(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "attack", "in_play", "swing-1", player="leo")
+    second = client.post(
+        f"{url}/quick",
+        data={"tap": "cell", "kind": "attack", "value": "in_play", "player": "leo", "token": "swing-2"},
+        headers={"X-Requested-With": "fetch"},
+    )
+    payload = second.get_json()
+    assert payload["open"] is True
+    assert payload["counts"]["attack:leo"] == 2
+    assert payload["last"].count("没") == 2
+    page = _cell(client, url, "attack", "kill", "swing-3", player="leo").get_data(as_text=True)
+    assert _score(page) == ("1", "0")
+    leo = page.split('id="atk-leo"', 1)[1].split("</details>", 1)[0]
+    assert "3扣1中" in leo
+
+
+def test_same_token_does_not_record_the_swing_twice(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "attack", "in_play", "dup", player="leo")
+    _cell(client, url, "attack", "in_play", "dup", player="leo")
+    page = _cell(client, url, "attack", "kill", "swing-end", player="leo").get_data(as_text=True)
+    leo = page.split('id="atk-leo"', 1)[1].split("</details>", 1)[0]
+    assert "2扣1中" in leo
+    assert _score(page) == ("1", "0")
+
+
 def test_two_identical_attacks_are_both_kept(tmp_path):
     client = _client(tmp_path)
     url = _start(client, serving="them")

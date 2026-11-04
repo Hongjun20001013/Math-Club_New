@@ -914,6 +914,21 @@ form.paste { margin-top: 22px; }
 }
 .roster-row input, .roster-row select { min-height: 44px; }
 .roster .go { margin-top: 8px; }
+.roster > input[name="team_name"] { margin-bottom: 8px; font-size: 1.2rem; font-weight: 650; }
+
+.court-pick { margin: 0 0 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  background: white;
+}
+.chip input { width: 22px; height: 22px; }
+.rally-count { display: inline; margin-left: 6px; color: var(--navy); font-size: 0.78rem; }
 .grid th small {
   display: block;
   color: var(--muted);

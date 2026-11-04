@@ -170,6 +170,10 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     @app.post("/teams/<team_id>/roster")
     def save_roster(team_id: str):
         plan = team_or_404(team_id)
+        title = (request.form.get("team_name") or "").strip()
+        if title and title != plan.name:
+            store().rename_team(plan.team_id, title)
+            plan.name = title
         allowed = {code for code, _label in ROLES}
         ids = request.form.getlist("player_id")
         names = request.form.getlist("player_name")
@@ -470,7 +474,11 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             sheet = "serve" if state.serving == "us" and serving_confirmed else "pass"
         view = request.args.get("view") or ""
         players = sorted(plan.players.values(), key=lambda player: (not player.receive_primary, player.name))
-        desk = _desk_rows(players)
+        court_ids: list[str] = []
+        for event in events:
+            if event["type"] == "set_start":
+                court_ids = [player_id for player_id in (event["payload"].get("court") or []) if player_id in plan.players]
+        desk = _desk_rows(players, set(court_ids))
         server_id = ""
         if tracking and state.serving == "us":
             server_id = state.occupants.get(1) or ""
@@ -527,6 +535,9 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             players=players,
             desk=desk,
             role_labels=ROLE_LABEL,
+            court_ids=court_ids,
+            court_names="、".join(plan.name_of(player_id) for player_id in court_ids),
+            touch_counts=_touch_counts(open_actions),
             server_id=server_id,
             server_name=names.get(server_id, ""),
             lines=pause_lines(board_for(quick_rallies, quick_actions, names, scope=scope, set_index=state.set_index)),
@@ -578,6 +589,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 story = ""
                 if last_touch:
                     story = describe(remembered.actions_for_rally(last_touch["rally_id"]), fresh_names)
+                open_rally = remembered.open_quick_rally(match_id)
+                open_actions = remembered.actions_for_rally(open_rally["id"]) if open_rally else []
                 return jsonify(
                     {
                         "ok": category != "error",
@@ -588,6 +601,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                         "last": story,
                         "message": message,
                         "synced": True,
+                        "open": bool(open_rally),
+                        "counts": _touch_counts(open_actions),
                     }
                 )
             if message:
@@ -876,6 +891,24 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         flash(f"已记下{tag}书签。", "ok")
         return redirect(url_for("live", match_id=match_id))
 
+    @app.post("/matches/<match_id>/court")
+    def save_court(match_id: str):
+        _match, plan, _state, _points, _events = match_bundle(match_id)
+        if request.form.get("clear") == "1":
+            store().set_set_court(match_id, [])
+            flash("这一局改回全队名单。", "ok")
+        else:
+            chosen = [player_id for player_id in request.form.getlist("player_id") if player_id in plan.players]
+            store().set_set_court(match_id, chosen)
+            if chosen:
+                flash("这一局上场的人已记下。下一局可以再换。", "ok")
+            else:
+                flash("这一局没有勾人，格子里仍是全队。", "ok")
+        sheet = request.form.get("sheet") or "attack"
+        if sheet not in ("pass", "attack", "serve", "opp", "more"):
+            sheet = "attack"
+        return redirect(url_for("live", match_id=match_id, sheet=sheet))
+
     @app.post("/matches/<match_id>/next-set")
     def next_set(match_id: str):
         match, plan, state, _points, _events = match_bundle(match_id)
@@ -898,9 +931,11 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             locked = {frozenset(pair) for pair in selected}
             store().replace_locked_pairs(match_id, locked)
         require_lineup = True
+        previous_court: list[str] = []
         for event in _events:
             if event["type"] == "set_start":
                 require_lineup = bool(event["payload"].get("require_lineup", True))
+                previous_court = [player_id for player_id in (event["payload"].get("court") or []) if player_id in plan.players]
         store().append_event(
             match_id,
             "set_start",
@@ -912,10 +947,11 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 "overrides": {},
                 "require_lineup": require_lineup,
                 "serving_confirmed": True,
+                "court": list(previous_court),
             },
         )
-        flash(f"第 {state.set_index + 1} 局从 R{rotation} 开始。上一局的记录还在。", "ok")
-        return redirect(url_for("live", match_id=match_id))
+        flash(f"第 {state.set_index + 1} 局。上一局上场的人先留着，换了谁再改勾选。", "ok")
+        return redirect(url_for("live", match_id=match_id, court=1))
 
     @app.post("/matches/<match_id>/finish")
     def finish_match(match_id: str):
@@ -1076,8 +1112,21 @@ def create_app(db_path: str | Path | None = None) -> Flask:
     return app
 
 
-def _desk_rows(players: list[Player]) -> dict[str, list[Player]]:
-    """Position suggests who to show first. It does not assign a court slot."""
+def _touch_counts(actions: list[dict]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for action in actions:
+        if action.get("voided"):
+            continue
+        kind = action.get("kind") or ""
+        if kind not in ("attack", "pass", "serve", "block", "defense"):
+            continue
+        key = f"{kind}:{action.get('player_id') or ''}"
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def _desk_rows(players: list[Player], court_ids: set[str] | None = None) -> dict[str, list[Player]]:
+    """On-court names come first. Position only suggests an order, not a slot number."""
 
     def pass_key(player: Player) -> tuple:
         band = 0 if player.receive_primary else 1
@@ -1088,17 +1137,32 @@ def _desk_rows(players: list[Player]) -> dict[str, list[Player]]:
         role = {"outside": 0, "flex": 0, "opposite": 1, "middle": 2, "setter": 3, "defender": 5, "libero": 6}.get(player.role, 4)
         return (role, player.name)
 
-    passing = sorted(players, key=pass_key)
-    hitting = sorted(players, key=attack_key)
-    servers = sorted((player for player in players if player.role != "libero"), key=lambda player: player.name)
-    liberos = [player for player in players if player.role == "libero"]
+    on_court = [player for player in players if player.id in court_ids] if court_ids else list(players)
+    bench = [player for player in players if court_ids and player.id not in court_ids]
+    passing = sorted(on_court, key=pass_key)
+    hitting = sorted(on_court, key=attack_key)
+    if court_ids:
+        attack_main = [player for player in hitting if player.role != "libero"] or hitting
+        attack_rest = [player for player in hitting if player.role == "libero"]
+        pass_main = passing
+        pass_rest: list[Player] = []
+        serve_main = [player for player in on_court if player.role != "libero"] or list(on_court)
+        serve_rest = [player for player in on_court if player.role == "libero"]
+    else:
+        attack_main = hitting[:4]
+        attack_rest = hitting[4:]
+        pass_main = passing[:3]
+        pass_rest = passing[3:]
+        serve_main = sorted((player for player in players if player.role != "libero"), key=lambda player: player.name)
+        serve_rest = [player for player in players if player.role == "libero"]
     return {
-        "pass_main": passing[:3],
-        "pass_rest": passing[3:],
-        "attack_main": hitting[:4],
-        "attack_rest": hitting[4:],
-        "serve_main": servers,
-        "serve_rest": liberos,
+        "pass_main": pass_main,
+        "pass_rest": pass_rest,
+        "attack_main": attack_main,
+        "attack_rest": attack_rest,
+        "serve_main": serve_main,
+        "serve_rest": serve_rest,
+        "bench": bench,
     }
 
 

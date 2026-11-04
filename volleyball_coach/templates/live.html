@@ -40,6 +40,28 @@
 </header>
 
 <div class="pad">
+  <details class="court-pick" {% if request.args.get('court') %}open{% endif %}>
+    <summary>这一局上场{% if court_names %}：{{ court_names }}{% else %}：还没圈，格子里是全队{% endif %}</summary>
+    <p class="formula">勾这一局真的在场上的人。通常是六个人，自由人可以一起勾。第二局换阵容，先点结束本局，再改勾选。没勾的人收在「没上场」里，临时上了仍能记。</p>
+    <form method="post" action="{{ url_for('save_court', match_id=match.id) }}">
+      <input type="hidden" name="sheet" value="{{ sheet }}">
+      <div class="chips">
+        {% for player in players|sort(attribute='name') %}
+          <label class="chip">
+            <input type="checkbox" name="player_id" value="{{ player.id }}" {% if player.id in court_ids %}checked{% endif %}>
+            {{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small>
+          </label>
+        {% endfor %}
+      </div>
+      <button class="go" type="submit">这一局就他们</button>
+      <button class="cell ghost" type="submit" name="clear" value="1">改回全队</button>
+    </form>
+    <form method="post" action="{{ url_for('next_set', match_id=match.id) }}">
+      <input type="hidden" name="rotation" value="{{ state.rotation }}">
+      <input type="hidden" name="serving" value="them">
+      <button class="cell ghost" type="submit">结束本局，换下一局阵容</button>
+    </form>
+  </details>
   <nav class="sheets">
     {% for key, label in [("pass","接发"),("attack","我方进攻"),("serve","我方发球"),("opp","对方进攻"),("more","更多")] %}
       <a href="{{ url_for('live', match_id=match.id, sheet=key) }}" class="{{ 'on' if sheet == key else '' }}" data-sheet-link="{{ key }}">{{ label }}</a>
@@ -101,6 +123,7 @@
   </section>
 
   <section class="sheet" data-sheet="attack" {% if sheet != 'attack' %}hidden{% endif %}>
+    <p class="formula">没扣死可以连点。同一个人这一球扣了三次，就点三次，名字旁边会变成「本球 3」。扣死、失误、被拦死才结束这一球。</p>
     <table class="grid">
       <thead>
         <tr><th>进攻</th><th>扣死</th><th>没扣死</th><th>失误</th><th>被拦死</th></tr>
@@ -108,7 +131,7 @@
       <tbody>
         {% for player in desk.attack_main %}
           <tr>
-            <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
+            <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
             {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
               <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
             {% endfor %}
@@ -123,7 +146,24 @@
           <tbody>
             {% for player in desk.attack_rest %}
               <tr>
-                <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
+                <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
+                {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+                  <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </details>
+    {% endif %}
+    {% if desk.bench %}
+      <details>
+        <summary>没上场</summary>
+        <table class="grid">
+          <tbody>
+            {% for player in desk.bench %}
+              <tr>
+                <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
                 {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
                   <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
                 {% endfor %}
@@ -427,6 +467,20 @@
       link.classList.toggle("on", link.getAttribute("data-sheet-link") === name);
     });
   }
+  function freshToken() {
+    return "t-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
+  }
+  function isTerminal(form) {
+    var kind = (form.querySelector("[name=kind]") || {}).value || "";
+    var value = (form.querySelector("[name=value]") || {}).value || "";
+    if (kind === "score" || kind === "opp_serve") return true;
+    if (kind === "pass" && value === "error") return true;
+    if (kind === "attack" && (value === "kill" || value === "error" || value === "blocked")) return true;
+    if (kind === "serve" && (value === "ace" || value === "error")) return true;
+    if (kind === "opp" && (value === "kill" || value === "error" || value === "blocked")) return true;
+    if (kind === "block" && (value === "kill" || value === "tool")) return true;
+    return false;
+  }
   function paint(data) {
     var ours = document.querySelector(".score-us");
     var theirs = document.querySelector(".score-them");
@@ -435,7 +489,12 @@
     var label = document.querySelector(".serve-label");
     if (label) label.textContent = data.serving === "us" ? "我方发球" : data.serving === "them" ? "对方发球" : label.textContent;
     var last = document.querySelector(".last-ball");
-    if (last && data.last) last.textContent = "上一笔　" + data.last;
+    if (last && data.last) last.textContent = (data.open ? "这一球　" : "上一笔　") + data.last;
+    document.querySelectorAll(".rally-count").forEach(function (node) {
+      var key = node.getAttribute("data-kind") + ":" + (node.getAttribute("data-player") || "");
+      var count = data.counts && data.counts[key];
+      node.textContent = count ? "本球 " + count : "";
+    });
     if (data.sheet) showSheet(data.sheet);
     if (sync) sync.textContent = data.synced ? "已同步" : "未同步";
   }
@@ -473,15 +532,26 @@
     var form = event.target;
     if (!form.classList.contains("cell-form")) return;
     event.preventDefault();
+    if (form.dataset.busy === "1") return;
     var button = form.querySelector("button");
     if (button) button.classList.add("lit");
+    var tokenInput = form.querySelector("[name=token]");
     var body = new FormData(form);
+    var terminal = isTerminal(form);
+    if (terminal) {
+      form.dataset.busy = "1";
+    } else if (tokenInput) {
+      tokenInput.value = freshToken();
+    }
     send(body).then(function (data) {
       paint(data);
       if (button) button.classList.remove("lit");
+      if (terminal && tokenInput) tokenInput.value = freshToken();
+      if (terminal) form.dataset.busy = "";
     }).catch(function () {
       remember(body);
       if (button) button.classList.remove("lit");
+      if (terminal) form.dataset.busy = "";
     });
   });
   flush();

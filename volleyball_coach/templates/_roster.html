@@ -1,6 +1,7 @@
 <form class="roster" method="post" action="{{ url_for('save_roster', team_id=plan.team_id) }}">
-  <h2>{{ plan.name }}</h2>
-  <p class="formula">一行一个名字，旁边选位置：主攻、副攻、二传、接应、自由人。两个人都可以是副攻。位置不是几号位，也不会自动排首发。</p>
+  <h2>队名</h2>
+  <input name="team_name" value="{{ plan.name }}" aria-label="队名" required>
+  <p class="formula">一行一个名字，旁边选位置：主攻、副攻、二传、接应、自由人。两个人都可以是副攻。位置不是几号位，也不会自动排首发。每一局上场的人在记球页再勾，两局可以不一样。</p>
   {% for player in plan.players.values()|sort(attribute='name') %}
     <div class="roster-row">
       <input type="hidden" name="player_id" value="{{ player.id }}">
