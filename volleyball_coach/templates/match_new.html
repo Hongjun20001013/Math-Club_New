@@ -1,12 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <h1>开场 · {{ plan.name }}</h1>
-<p class="lede">先把下面六个槽选满，再选谁发球。场上六人从这一轮的首发槽开始，替补不会因为轮次到了就自动上场。</p>
-{% set next_page = "match" %}
-{% include "_starters.html" %}
-{% if plan.base_order()|length != 6 %}
-  <p class="warn-line">六个槽还没选满，现在不能开场。</p>
-{% endif %}
+<p class="lede">不排首发也能开始记。六个槽只在勾了「跟踪轮次」时才要选满。</p>
 <form class="stack" method="post" action="{{ url_for('start_match', team_id=plan.team_id) }}">
   <label for="opponent">对手</label>
   <input id="opponent" name="opponent" placeholder="可以留空">
@@ -30,6 +25,7 @@
       </select>
     </div>
   </div>
+  <label class="checks"><input type="checkbox" name="track_rotation"> 跟踪轮次。勾上以后，没排满六个首发槽就不能开场。</label>
   <h2>本场锁定的配对</h2>
   {% for pair in plan.pairs %}
     <label class="checks">
@@ -40,6 +36,11 @@
   {% else %}
     <p class="muted">还没有配对。固定换人的球队需要先在名单页建好。</p>
   {% endfor %}
-  <button type="submit">开始</button>
+  <button type="submit">开始记球</button>
 </form>
+<details class="fold">
+  <summary>可选：只有跟踪轮次才要排首发</summary>
+  {% set next_page = "match" %}
+  {% include "_starters.html" %}
+</details>
 {% endblock %}

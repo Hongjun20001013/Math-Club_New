@@ -177,6 +177,7 @@ CREATE TABLE IF NOT EXISTS quick_actions (
   line TEXT NOT NULL DEFAULT '',
   count_only INTEGER NOT NULL DEFAULT 0,
   tag TEXT NOT NULL DEFAULT '',
+  voided INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
 );
 
@@ -203,10 +204,17 @@ class Store:
         self.conn = sqlite3.connect(self.path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        self._migrate()
         self._seed_mens_if_empty()
 
     def close(self) -> None:
         self.conn.close()
+
+    def _migrate(self) -> None:
+        columns = {row[1] for row in self.conn.execute("PRAGMA table_info(quick_actions)")}
+        if columns and "voided" not in columns:
+            self.conn.execute("ALTER TABLE quick_actions ADD COLUMN voided INTEGER NOT NULL DEFAULT 0")
+            self.conn.commit()
 
     def _seed_mens_if_empty(self) -> None:
         row = self.conn.execute("SELECT COUNT(*) AS n FROM teams").fetchone()
@@ -500,7 +508,17 @@ class Store:
             )
         )
 
-    def create_match(self, plan: TeamPlan, opponent: str, mode: str, locked_pairs: set[frozenset[str]], rotation: int, serving: str) -> str:
+    def create_match(
+        self,
+        plan: TeamPlan,
+        opponent: str,
+        mode: str,
+        locked_pairs: set[frozenset[str]],
+        rotation: int,
+        serving: str,
+        *,
+        require_lineup: bool = True,
+    ) -> str:
         match_id = new_id("m")
         created = now()
         self.conn.execute(
@@ -521,7 +539,15 @@ class Store:
         self.append_event(
             match_id,
             "set_start",
-            {"rotation": rotation, "serving": serving, "set_index": 1, "mode": mode, "overrides": {}},
+            {
+                "rotation": rotation,
+                "serving": serving,
+                "set_index": 1,
+                "mode": mode,
+                "overrides": {},
+                "require_lineup": require_lineup,
+                "serving_confirmed": require_lineup,
+            },
             created=created,
         )
         return match_id
@@ -646,6 +672,7 @@ class Store:
             "line": row["line"],
             "count_only": row["count_only"],
             "tag": row["tag"],
+            "voided": row["voided"] if "voided" in row.keys() else 0,
         }
 
     def quick_rallies(self, match_id: str) -> list[dict]:
@@ -660,11 +687,11 @@ class Store:
             "SELECT * FROM quick_actions WHERE match_id = ? ORDER BY ord, id",
             (match_id,),
         )
-        return [self._action_from_row(row) for row in rows]
+        return [self._action_from_row(row) for row in rows if not row["voided"]]
 
     def open_quick_rally(self, match_id: str) -> dict | None:
         row = self.conn.execute(
-            "SELECT * FROM quick_rallies WHERE match_id = ? AND status = 'open' ORDER BY created_at DESC LIMIT 1",
+            "SELECT * FROM quick_rallies WHERE match_id = ? AND status = 'open' ORDER BY rowid DESC LIMIT 1",
             (match_id,),
         ).fetchone()
         return self._rally_from_row(row) if row else None
@@ -672,15 +699,80 @@ class Store:
     def actions_for_rally(self, rally_id: str) -> list[dict]:
         if not rally_id:
             return []
-        rows = self.conn.execute("SELECT * FROM quick_actions WHERE rally_id = ? ORDER BY ord", (rally_id,))
+        rows = self.conn.execute(
+            "SELECT * FROM quick_actions WHERE rally_id = ? AND voided = 0 ORDER BY ord",
+            (rally_id,),
+        )
         return [self._action_from_row(row) for row in rows]
+
+    def rally_by_id(self, rally_id: str) -> dict | None:
+        row = self.conn.execute("SELECT * FROM quick_rallies WHERE id = ?", (rally_id,)).fetchone()
+        return self._rally_from_row(row) if row else None
+
+    def latest_action(self, match_id: str) -> dict | None:
+        row = self.conn.execute(
+            """
+            SELECT * FROM quick_actions
+            WHERE match_id = ? AND voided = 0
+            ORDER BY rowid DESC LIMIT 1
+            """,
+            (match_id,),
+        ).fetchone()
+        return self._action_from_row(row) if row else None
+
+    def void_action(self, action_id: str) -> None:
+        self.conn.execute("UPDATE quick_actions SET voided = 1 WHERE id = ?", (action_id,))
+
+    def reopen_rally(self, rally_id: str) -> None:
+        self.conn.execute(
+            """
+            UPDATE quick_rallies
+            SET status = 'open', winner = '', point_seq = NULL, completeness = 'open', phase = 'choose'
+            WHERE id = ?
+            """,
+            (rally_id,),
+        )
+
+    def update_latest_set_start(self, match_id: str, *, serving: str, serving_confirmed: bool) -> None:
+        row = self.conn.execute(
+            """
+            SELECT seq, payload FROM events
+            WHERE match_id = ? AND type = 'set_start'
+            ORDER BY seq DESC LIMIT 1
+            """,
+            (match_id,),
+        ).fetchone()
+        if row is None:
+            return
+        payload = json.loads(row["payload"])
+        payload["serving"] = serving
+        payload["serving_confirmed"] = serving_confirmed
+        self.conn.execute(
+            "UPDATE events SET payload = ? WHERE match_id = ? AND seq = ?",
+            (json.dumps(payload, ensure_ascii=False), match_id, row["seq"]),
+        )
+
+    def mark_line(self, match_id: str, line: str) -> bool:
+        row = self.conn.execute(
+            """
+            SELECT id FROM quick_actions
+            WHERE match_id = ? AND voided = 0 AND kind = 'opp'
+            ORDER BY rowid DESC LIMIT 1
+            """,
+            (match_id,),
+        ).fetchone()
+        if row is None:
+            return False
+        self.conn.execute("UPDATE quick_actions SET line = ? WHERE id = ?", (line, row["id"]))
+        self.conn.commit()
+        return True
 
     def last_scored_rally(self, match_id: str) -> dict | None:
         row = self.conn.execute(
             """
             SELECT * FROM quick_rallies
             WHERE match_id = ? AND status = 'scored'
-            ORDER BY created_at DESC, id DESC LIMIT 1
+            ORDER BY point_seq DESC LIMIT 1
             """,
             (match_id,),
         ).fetchone()
@@ -870,6 +962,9 @@ def plan_for_match(store: Store, match: sqlite3.Row) -> TeamPlan:
         if current:
             player.name = current.name
             player.jersey = current.jersey
+    for player_id, player in live.players.items():
+        if player_id not in plan.players:
+            plan.players[player_id] = player
     plan.serve_plans = live.serve_plans or plan.serve_plans
     return plan
 

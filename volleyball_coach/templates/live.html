@@ -1,576 +1,408 @@
 {% extends "base.html" %}
-{% block body_class %}desk{% endblock %}
+{% block body_class %}desk{% if view == 'stats' %} view-stats{% endif %}{% endblock %}
 {% block body %}
-<p class="row-links">
-  <a href="{{ url_for('home') }}">首页</a>
-  <a href="{{ url_for('team_page', team_id=plan.team_id) }}">球队设置</a>
-  <a href="{{ url_for('quicksheet', team_id=plan.team_id) }}">六轮卡</a>
-  <a href="{{ url_for('review', match_id=match.id) }}">赛后</a>
-</p>
-<div class="scoreline">
-  <div class="side">
-    <span>我方{% if match.opponent %} · 对 {{ match.opponent }}{% endif %}</span>
-    <b>{{ state.score_us }}</b>
+{% macro cell(kind, value, word, who, player='', start='') %}
+<form method="post" action="{{ url_for('post_quick', match_id=match.id) }}" class="cell-form">
+  <input type="hidden" name="tap" value="cell">
+  <input type="hidden" name="kind" value="{{ kind }}">
+  <input type="hidden" name="value" value="{{ value }}">
+  <input type="hidden" name="player" value="{{ player }}">
+  <input type="hidden" name="start" value="{{ start }}">
+  <input type="hidden" name="token" value="{{ new_token('t') }}">
+  <button class="cell" type="submit" aria-label="{{ who }} {{ word }}">{{ word }}</button>
+</form>
+{% endmacro %}
+
+<header class="bar">
+  <div class="bar-score">
+    <span>第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}</span>
+    <p class="nums"><b class="score-us">{{ state.score_us }}</b><span>–</span><b class="score-them">{{ state.score_them }}</b></p>
   </div>
-  <div class="mid">
-    <span>第 {{ state.set_index }} 局</span>
-    <span class="pill">R{{ state.rotation }}</span>
-    <span class="pill">{{ "我方发球" if state.serving == "us" else "对方发球" }}</span>
-    {% if open_rally %}
-      <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-        <input type="hidden" name="token" value="{{ new_token('t') }}">
-        <input type="hidden" name="tap" value="discard">
-        <input type="hidden" name="scope" value="{{ scope }}">
-        <button class="texty" type="submit">撤销</button>
-      </form>
-    {% elif match.status == "live" %}
-      <form method="post" action="{{ url_for('post_undo', match_id=match.id) }}">
-        <button class="texty" type="submit">撤销</button>
-      </form>
+  <p class="bar-meta">
+    <span class="serve-label">{{ serve_label }}</span>
+    {% if tracking %}
+      <span class="pill">R{{ state.rotation }}</span>
+      <span class="pill">对方轮次：未知</span>
+    {% endif %}
+  </p>
+  <div class="bar-actions">
+    <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+      <input type="hidden" name="tap" value="undo_touch">
+      <input type="hidden" name="token" value="{{ new_token('t') }}">
+      <button class="texty" type="submit">撤销</button>
+    </form>
+    <a href="{{ url_for('live', match_id=match.id, view='stats', scope=scope) }}">暂停看数</a>
+    {% if view == 'stats' %}
+      <a href="{{ url_for('live', match_id=match.id, sheet=sheet) }}">返回记球</a>
     {% endif %}
   </div>
-  <div class="side">
-    <span>对方</span>
-    <b>{{ state.score_them }}</b>
-  </div>
-</div>
-<p class="pills slim">
-  <span class="pill">对方轮次：未知</span>
-  {% if not state.trusted %}
-    <span class="pill warn">轮次待确认</span>
-  {% endif %}
-  {% if state.score_tracked and not state.history_gap %}
-    <span class="pill ok">比分链连续</span>
-  {% else %}
-    <span class="pill warn">手动轮次，统计未实时更新</span>
-  {% endif %}
-</p>
+</header>
 
-<div class="desk-grid">
-  <section class="pad" aria-label="场边快记">
-    {% if pad.story %}
-      <p class="story">本回合　{{ pad.story }}</p>
-    {% elif pad.phase == "serve" %}
-      <p class="story">发球　{{ pad.server_name }}{% if pad.server_pending %}，待确认{% endif %}</p>
-    {% elif pad.phase == "pass_player" %}
-      <p class="story">接发球　先点谁接的</p>
-    {% else %}
-      <p class="story">本回合　还没记动作</p>
-    {% endif %}
+<div class="pad">
+  <nav class="sheets">
+    {% for key, label in [("pass","接发"),("attack","我方进攻"),("serve","我方发球"),("opp","对方进攻"),("more","更多")] %}
+      <a href="{{ url_for('live', match_id=match.id, sheet=key) }}" class="{{ 'on' if sheet == key else '' }}" data-sheet-link="{{ key }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
 
-    {% if pad.phase == "pass_player" or pad.phase == "pass_all" %}
-      <p class="step">接发球</p>
-      <div class="tap-row">
-        {% for player in pad.primary %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="pass_player">
-            <input type="hidden" name="value" value="{{ player.id }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit" data-key="{{ loop.index }}">{{ player.name }} <kbd>{{ loop.index }}</kbd></button>
-          </form>
-        {% endfor %}
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="pass_player">
-          <input type="hidden" name="value" value="unknown">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap" type="submit" data-key="0">没看清 <kbd>0</kbd></button>
-        </form>
-      </div>
-      {% if pad.others %}
-        <details class="more-people">
-          <summary>其他人</summary>
-          <div class="tap-row">
-            {% for player in pad.others %}
-              <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-                <input type="hidden" name="token" value="{{ new_token('t') }}">
-                <input type="hidden" name="tap" value="pass_player">
-                <input type="hidden" name="value" value="{{ player.id }}">
-                <input type="hidden" name="scope" value="{{ scope }}">
-                <button class="tap" type="submit">{{ player.name }}</button>
-              </form>
+  <section class="sheet" data-sheet="pass" {% if sheet != 'pass' %}hidden{% endif %}>
+    <table class="grid">
+      <thead>
+        <tr><th>接发</th><th>到位</th><th>半到位</th><th>不到位</th><th>直接失分</th><th>未知</th></tr>
+      </thead>
+      <tbody>
+        {% for player in players %}
+          <tr>
+            <th>{{ player.name }}</th>
+            {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+              <td>{{ cell("pass", value, word, player.name, player.id) }}</td>
             {% endfor %}
-          </div>
-        </details>
-      {% endif %}
-    {% elif pad.phase == "pass_quality" %}
-      <p class="step">质量　{{ pad.focus_name or "没看清" }}</p>
-      <div class="tap-row">
-        {% for value, label, key in [("in_system","到位","q"),("half","半到位","w"),("out","不到位","e"),("error","直接失分","r"),("unknown","没看清","t")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="pass_quality">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap {% if value == 'error' %}them{% endif %}" type="submit" data-key="{{ key }}">{{ label }} <kbd>{{ key }}</kbd></button>
-          </form>
+          </tr>
         {% endfor %}
-      </div>
-    {% elif pad.phase == "serve" %}
-      <p class="step">发球　{{ pad.server_name }}</p>
-      {% if pad.server_pending %}
-        <div class="tap-row">
-          {% for player in pad.roster %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="serve_player">
-              <input type="hidden" name="value" value="{{ player.id }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap" type="submit">{{ player.name }}</button>
-            </form>
+        <tr>
+          <th>共同</th>
+          {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+            <td>{{ cell("pass", value, word, "共同", "shared") }}</td>
           {% endfor %}
-        </div>
-      {% else %}
-        <div class="tap-row">
-          {% for value, label, key in [("ace","ACE","a"),("error","发球失误","s"),("in_system","对方到位","d"),("half","半到位","f"),("out","不到位","g"),("unknown","没看清","h")] %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="serve">
-              <input type="hidden" name="value" value="{{ value }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap {% if value == 'error' %}them{% elif value == 'ace' %}us{% endif %}" type="submit" data-key="{{ key }}">{{ label }} <kbd>{{ key }}</kbd></button>
-            </form>
+        </tr>
+        <tr>
+          <th>没看清</th>
+          {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+            <td>{{ cell("pass", value, word, "没看清", "unknown") }}</td>
           {% endfor %}
-        </div>
-        <details class="more-people">
-          <summary>换发球人</summary>
-          <div class="tap-row">
-            {% for player in pad.roster %}
-              <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-                <input type="hidden" name="token" value="{{ new_token('t') }}">
-                <input type="hidden" name="tap" value="serve_player">
-                <input type="hidden" name="value" value="{{ player.id }}">
-                <input type="hidden" name="scope" value="{{ scope }}">
-                <button class="tap" type="submit">{{ player.name }}</button>
-              </form>
-            {% endfor %}
-          </div>
-        </details>
-      {% endif %}
-    {% elif pad.phase == "attack_player" %}
-      <p class="step">我方进攻　选攻手</p>
-      <div class="tap-row">
-        {% for player in pad.front %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="attack_player">
-            <input type="hidden" name="value" value="{{ player.id }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit" data-key="{{ loop.index }}">{{ player.name }} <kbd>{{ loop.index }}</kbd></button>
-          </form>
-        {% endfor %}
-      </div>
-      <details class="more-people">
-        <summary>其他在场球员</summary>
-        <div class="tap-row">
-          {% for player in pad.court if player not in pad.front %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="attack_player">
-              <input type="hidden" name="value" value="{{ player.id }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap" type="submit">{{ player.name }}</button>
-            </form>
-          {% endfor %}
-          {% for player in pad.roster if player not in pad.court %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="attack_player">
-              <input type="hidden" name="value" value="{{ player.id }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap ghost" type="submit">{{ player.name }}</button>
-            </form>
-          {% endfor %}
-        </div>
-      </details>
-    {% elif pad.phase == "attack_result" %}
-      <p class="step">{{ pad.focus_name }}{% if pad.focus_tag %} · {{ pad.focus_tag }}{% endif %}</p>
-      <div class="tap-row">
-        {% for value, label, key in [("kill","扣球得分","j"),("in_play","没打死","k"),("error","失误","l"),("blocked","被拦死","u"),("count","只计次数","i")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="attack_result">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap {% if value == 'kill' %}us{% elif value in ('error','blocked') %}them{% endif %}" type="submit" data-key="{{ key }}">{{ label }} <kbd>{{ key }}</kbd></button>
-          </form>
-        {% endfor %}
-      </div>
-      <div class="tap-row slim-row">
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="attack_tag">
-          <input type="hidden" name="value" value="quick">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap ghost" type="submit">快攻</button>
-        </form>
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="attack_tag">
-          <input type="hidden" name="value" value="dump">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap ghost" type="submit">探头</button>
-        </form>
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="choose">
-          <input type="hidden" name="value" value="attack">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap ghost" type="submit">换人</button>
-        </form>
-      </div>
-    {% elif pad.phase == "opp_start" %}
-      <p class="step">对方起攻　不猜人</p>
-      <div class="tap-row">
-        {% for value, label, key in [("4","四号位","1"),("3","中路","2"),("2","二号位","3"),("back","后排","4"),("second","二次球","5"),("unknown","未知","6")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="opp_start">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit" data-key="{{ key }}">{{ label }} <kbd>{{ key }}</kbd></button>
-          </form>
-        {% endfor %}
-      </div>
-    {% elif pad.phase == "opp_result" %}
-      <p class="step">对方{{ pad.focus_start }}{% if pad.focus_line %} · {{ pad.focus_line }}{% endif %}　未记号码</p>
-      <div class="tap-row">
-        {% for value, label in [("line","直线"),("cross","大斜线"),("sharp","小斜线"),("tip","吊球"),("unknown","线路未知")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="opp_line">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap ghost {% if pad.focus_line == label %}on{% endif %}" type="submit">{{ label }}</button>
-          </form>
-        {% endfor %}
-      </div>
-      <div class="tap-row">
-        {% for value, label, key in [("kill","得分","j"),("in_play","没打死","k"),("error","失误","l"),("blocked","被拦死","u")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="opp_result">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap {% if value == 'kill' %}them{% elif value in ('error','blocked') %}us{% endif %}" type="submit" data-key="{{ key }}">{{ label }} <kbd>{{ key }}</kbd></button>
-          </form>
-        {% endfor %}
-      </div>
-    {% elif pad.phase == "block_player" %}
-      <p class="step">拦网　谁碰的</p>
-      <div class="tap-row">
-        {% for player in pad.front %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="block_player">
-            <input type="hidden" name="value" value="{{ player.id }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit">{{ player.name }}</button>
-          </form>
-        {% endfor %}
-      </div>
-      <details class="more-people" open>
-        <summary>其他人</summary>
-        <div class="tap-row">
-          {% for player in pad.roster if player not in pad.front %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="block_player">
-              <input type="hidden" name="value" value="{{ player.id }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap ghost" type="submit">{{ player.name }}</button>
-            </form>
-          {% endfor %}
-        </div>
-      </details>
-    {% elif pad.phase == "block_result" %}
-      <p class="step">{{ pad.focus_name }} 拦网</p>
-      <div class="tap-row">
-        {% for value, label in [("kill","拦网得分"),("rebound","拦回"),("touch","无效触球"),("tool","打手出界")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="block_result">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap {% if value == 'kill' %}us{% elif value == 'tool' %}us{% endif %}" type="submit">{{ label }}</button>
-          </form>
-        {% endfor %}
-      </div>
-    {% elif pad.phase == "defense_player" %}
-      <p class="step">防守　谁防起</p>
-      <div class="tap-row">
-        {% for player in pad.court %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="defense_player">
-            <input type="hidden" name="value" value="{{ player.id }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit">{{ player.name }}</button>
-          </form>
-        {% endfor %}
-      </div>
-      <details class="more-people">
-        <summary>名单里的其他人</summary>
-        <div class="tap-row">
-          {% for player in pad.roster if player not in pad.court %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="defense_player">
-              <input type="hidden" name="value" value="{{ player.id }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap ghost" type="submit">{{ player.name }}</button>
-            </form>
-          {% endfor %}
-        </div>
-      </details>
-    {% elif pad.phase == "defense_result" %}
-      <p class="step">{{ pad.focus_name }}</p>
-      <div class="tap-row">
-        {% for value, label in [("dig","起球"),("system","起球到位")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="defense_result">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap" type="submit">{{ label }}</button>
-          </form>
-        {% endfor %}
-      </div>
-    {% elif pad.phase == "choose" %}
-      <p class="step">下一拍</p>
-    {% endif %}
-
-    {% if pad.can_switch %}
-      <div class="tap-row slim-row">
-        {% for value, label in [("attack","我方进攻"),("opp","对方进攻"),("block","拦网"),("defense","防守")] %}
-          <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-            <input type="hidden" name="token" value="{{ new_token('t') }}">
-            <input type="hidden" name="tap" value="choose">
-            <input type="hidden" name="value" value="{{ value }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <button class="tap ghost" type="submit">{{ label }}</button>
-          </form>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if match.status == "live" and pad.phase != "done" %}
-      <div class="score-dock">
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="score">
-          <input type="hidden" name="value" value="us">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap us" type="submit">我方得分</button>
-        </form>
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="score">
-          <input type="hidden" name="value" value="them">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap them" type="submit">对方得分</button>
-        </form>
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="flag_score">
-          <input type="hidden" name="value" value="us">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap ghost" type="submit">只记分，待补 · 我方</button>
-        </form>
-        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-          <input type="hidden" name="token" value="{{ new_token('t') }}">
-          <input type="hidden" name="tap" value="flag_score">
-          <input type="hidden" name="value" value="them">
-          <input type="hidden" name="scope" value="{{ scope }}">
-          <button class="tap ghost" type="submit">只记分，待补 · 对方</button>
-        </form>
-      </div>
-    {% endif %}
-
-    {% if last_rally %}
-      <p class="last-ball" id="rally-{{ last_rally.id }}">
-        最近一球　{{ last_rally.score_us_before }}–{{ last_rally.score_them_before }}
-        → {% if last_rally.winner == "us" %}我方{% else %}对方{% endif %}
-        · {{ last_story }}
-      </p>
-      {% if last_edit %}
-        <div class="tap-row slim-row">
-          {% for value, label in [("in_system","到位"),("half","半到位"),("out","不到位"),("unknown","没看清")] %}
-            <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-              <input type="hidden" name="token" value="{{ new_token('t') }}">
-              <input type="hidden" name="tap" value="edit_quality">
-              <input type="hidden" name="action_id" value="{{ last_edit.id }}">
-              <input type="hidden" name="value" value="{{ value }}">
-              <input type="hidden" name="scope" value="{{ scope }}">
-              <button class="tap ghost" type="submit">改成{{ label }}</button>
-            </form>
-          {% endfor %}
-        </div>
-      {% endif %}
-      {% if last_rally.completeness in ("score_only", "pending") %}
-        <p class="step">补上一球的进攻，比分不再加</p>
-        <div class="tap-row">
-          {% for player in pad.front %}
-            {% for value, label in [("kill","扣球得分"),("error","失误"),("blocked","被拦死")] %}
-              <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-                <input type="hidden" name="token" value="{{ new_token('t') }}">
-                <input type="hidden" name="tap" value="repair">
-                <input type="hidden" name="player" value="{{ player.id }}">
-                <input type="hidden" name="value" value="{{ value }}">
-                <input type="hidden" name="scope" value="{{ scope }}">
-                <button class="tap ghost" type="submit">{{ player.name }} {{ label }}</button>
-              </form>
-            {% endfor %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endif %}
+        </tr>
+      </tbody>
+    </table>
   </section>
 
-  <aside class="stats" id="stats">
-    <nav class="scope">
-      <a href="{{ url_for('live', match_id=match.id, scope='set') }}" class="{{ 'on' if scope == 'set' else '' }}">本局</a>
-      <a href="{{ url_for('live', match_id=match.id, scope='last10') }}" class="{{ 'on' if scope == 'last10' else '' }}">最近 10 球</a>
-      <a href="{{ url_for('live', match_id=match.id, scope='match') }}" class="{{ 'on' if scope == 'match' else '' }}">整场</a>
-    </nav>
-    {% if board.pending %}
-      <p class="formula">待补或只记了比分 {{ board.pending }} 球。这些球不进进攻成功率。</p>
-    {% endif %}
+  <section class="sheet" data-sheet="attack" {% if sheet != 'attack' %}hidden{% endif %}>
+    <table class="grid">
+      <thead>
+        <tr><th>进攻</th><th>扣死</th><th>没扣死</th><th>失误</th><th>被拦死</th></tr>
+      </thead>
+      <tbody>
+        {% for player in players %}
+          <tr>
+            <th>{{ player.name }}</th>
+            {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+              <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
 
-    <h2>我方进攻</h2>
-    <p class="formula">成功率＝得分/进攻次数　效率＝（得分－失误－被拦死）/进攻次数。分母为 0 显示 —。</p>
-    {% for row in board.attacks %}
-      <details class="stat" id="atk-{{ row.player_id or 'none' }}">
-        <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b><span>{{ row.rate_ratio }} {{ row.rate }}</span></summary>
-        <p>效率 {{ row.eff }}{% if row.split %}　{{ row.split }}{% endif %}{% if row.count_only %}　只计次数 {{ row.count_only }}{% endif %}</p>
-        <ul>
-          {% for rally_id in row.rallies %}
-            <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
+  <section class="sheet" data-sheet="serve" {% if sheet != 'serve' %}hidden{% endif %}>
+    <table class="grid">
+      <thead>
+        <tr><th>发球</th><th>ACE</th><th>发丢</th><th>对方到位</th><th>半到位</th><th>不到位</th><th>未知</th></tr>
+      </thead>
+      <tbody>
+        {% if server_name %}
+          <tr>
+            <th>{{ server_name }}</th>
+            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+              <td>{{ cell("serve", value, word, server_name, server_id) }}</td>
+            {% endfor %}
+          </tr>
+        {% else %}
+          {% for player in players %}
+            <tr>
+              <th>{{ player.name }}</th>
+              {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+                <td>{{ cell("serve", value, word, player.name, player.id) }}</td>
+              {% endfor %}
+            </tr>
           {% endfor %}
-        </ul>
-      </details>
-    {% else %}
-      <p class="muted">本范围还没有进攻。</p>
-    {% endfor %}
+          <tr>
+            <th>团队</th>
+            {% for value, word in [("ace","ACE"),("error","发丢"),("in_system","对方到位"),("half","半到位"),("out","不到位"),("unknown","未知")] %}
+              <td>{{ cell("serve", value, word, "团队", "") }}</td>
+            {% endfor %}
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <p class="formula">发丢就是发球失误。ACE 和发丢会直接结分。</p>
+  </section>
 
-    <h2>接发</h2>
-    <p class="formula">到位率＝到位/（到位＋半到位＋不到位＋直接失误）。未知单独数，不进这个分母。</p>
-    {% for row in board.passes %}
-      <details class="stat">
-        <summary><span>{{ row.name }}</span><b>{{ row.in_system }} 到位</b><span>{{ row.rate_ratio }}</span></summary>
-        <p>半到位 {{ row.half }}　不到位 {{ row.out }}　直接失误 {{ row.error }}　未知 {{ row.unknown }}</p>
-      </details>
-    {% else %}
-      <p class="muted">本范围还没有接发。</p>
-    {% endfor %}
-
-    <h2>发球威胁</h2>
-    <p class="formula">威胁率＝（ACE＋逼不到位）/已判明结果。未知不进这个分母。进界率＝（总发球－失误）/总发球。</p>
-    {% for row in board.serves %}
-      <details class="stat">
-        <summary><span>{{ row.name }}</span><b>失误 {{ row.error }}</b><span>威胁 {{ row.threat_ratio }}　进界 {{ row.in_ratio }}</span></summary>
-        <p>ACE {{ row.ace }}　逼不到位 {{ row.out }}　失误 {{ row.error }}　对方到位 {{ row.in_system }}　半到位 {{ row.half }}　未知 {{ row.unknown }}</p>
-      </details>
-    {% else %}
-      <p class="muted">本范围还没有我方发球。</p>
-    {% endfor %}
-
-    <h2>对方起攻</h2>
-    <p class="formula">只记了位置就只写位置，不猜人。号码空着。</p>
-    {% for row in board.opponents %}
-      <details class="stat" id="opp-{{ row.key }}">
-        <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b></summary>
-        <p>{% if row.line_text %}{{ row.line_text }}{% else %}线路还没记{% endif %}{% if row.line_note %}　{{ row.line_note }}{% endif %}</p>
-        <ul>
-          {% for rally_id in row.rallies %}
-            <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
-          {% endfor %}
-        </ul>
-      </details>
-    {% else %}
-      <p class="muted">本范围还没有对方起攻。</p>
-    {% endfor %}
-
-    {% if board.blocks %}
-      <h2>拦网触球</h2>
-      {% for row in board.blocks %}
-        <p class="stat-line">{{ row.name }}　拦回 {{ row.get("rebound", 0) }}　得分 {{ row.get("kill", 0) }}　无效 {{ row.get("touch", 0) }}　打手出界 {{ row.get("tool", 0) }}</p>
+  <section class="sheet" data-sheet="opp" {% if sheet != 'opp' %}hidden{% endif %}>
+    <table class="grid">
+      <thead>
+        <tr><th>对方</th><th>打死</th><th>没打死</th><th>自失</th><th>我方拦死</th></tr>
+      </thead>
+      <tbody>
+        {% for start, who in [("4","四号位"),("3","中路"),("2","二号位"),("back","后排"),("second","二次"),("unknown","没看清")] %}
+          <tr>
+            <th>{{ who }}</th>
+            {% for value, word in [("kill","打死"),("in_play","没打死"),("error","自失"),("blocked","我方拦死")] %}
+              <td>{{ cell("opp", value, word, who, "", start) }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="formula">不填号码也能记位置。线路可以之后再补。</p>
+    <div class="line-row">
+      {% for value, word in [("line","直线"),("sharp","小斜线"),("cross","大斜线"),("tip","吊球")] %}
+        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+          <input type="hidden" name="tap" value="mark_line">
+          <input type="hidden" name="value" value="{{ value }}">
+          <input type="hidden" name="token" value="{{ new_token('t') }}">
+          <button class="cell ghost" type="submit">补{{ word }}</button>
+        </form>
       {% endfor %}
-      <p class="formula">没有逐次拦网尝试，这里不报拦网成功率。</p>
-    {% endif %}
-    {% if board.defenses %}
-      <h2>防守起球</h2>
-      {% for row in board.defenses %}
-        <p class="stat-line">{{ row.name }}　起球 {{ row.get("dig", 0) }}　到位 {{ row.get("system", 0) }}</p>
+    </div>
+  </section>
+
+  <section class="sheet" data-sheet="more" {% if sheet != 'more' %}hidden{% endif %}>
+    <h2>防守</h2>
+    <table class="grid">
+      <thead><tr><th></th><th>防起扣球</th><th>接二次</th><th>接无攻</th></tr></thead>
+      <tbody>
+        {% for player in players %}
+          <tr>
+            <th>{{ player.name }}</th>
+            {% for value, word in [("dig_spike","防起"),("dig_second","接二次"),("dig_free","接无攻")] %}
+              <td>{{ cell("defense", value, word, player.name, player.id) }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h2>拦网</h2>
+    <table class="grid">
+      <thead><tr><th></th><th>拦回</th><th>拦死</th><th>打手出界</th></tr></thead>
+      <tbody>
+        {% for player in players %}
+          <tr>
+            <th>{{ player.name }}</th>
+            {% for value, word in [("rebound","拦回"),("kill","拦死"),("tool","打手出界")] %}
+              <td>{{ cell("block", value, word, player.name, player.id) }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h2>只计一次进攻</h2>
+    <p class="formula">进进攻次数，不加个人失误。要给对方这一分，再点下面的对方得分。</p>
+    <div class="line-row">
+      {% for player in players %}
+        {{ cell("attack", "count", player.name, player.name ~ " 只计一次", player.id) }}
       {% endfor %}
+    </div>
+    <form class="add-name" method="post" action="{{ url_for('add_match_player', match_id=match.id) }}">
+      <input name="name" placeholder="赛中加人，写名字">
+      <button class="cell" type="submit">加入</button>
+    </form>
+    <form method="post" action="{{ url_for('next_set', match_id=match.id) }}">
+      <input type="hidden" name="rotation" value="{{ state.rotation }}">
+      <input type="hidden" name="serving" value="them">
+      <button class="cell ghost" type="submit">结束本局</button>
+    </form>
+  </section>
+
+  <div class="score-dock">
+    {{ cell("score", "us", "我方得分", "我方得分") }}
+    {{ cell("score", "them", "对方得分", "对方得分") }}
+  </div>
+  <p class="last-ball" {% if last_rally %}id="rally-{{ last_rally.id }}"{% endif %}>
+    {% if open_rally %}
+      这一球　{{ pad.story or "还没记动作" }}
+    {% elif last_rally %}
+      最近一球　{{ last_rally.score_us_before }}–{{ last_rally.score_them_before }}
+      → {% if last_rally.winner == 'us' %}我方{% else %}对方{% endif %}
+      · {{ last_story }}
+    {% else %}
+      上一笔会显示在这里。
     {% endif %}
-  </aside>
+  </p>
+  <p class="sync" data-sync>已同步</p>
+  {% if last_edit %}
+    <div class="line-row">
+      {% for value, label in [("in_system","到位"),("half","半到位"),("out","不到位"),("unknown","没看清")] %}
+        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+          <input type="hidden" name="token" value="{{ new_token('t') }}">
+          <input type="hidden" name="tap" value="edit_quality">
+          <input type="hidden" name="action_id" value="{{ last_edit.id }}">
+          <input type="hidden" name="value" value="{{ value }}">
+          <button class="cell ghost" type="submit">改成{{ label }}</button>
+        </form>
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
+
+<aside class="stats" id="stats">
+  <p class="pause-lead">本局已记 {{ lines.recorded }} 分{% if lines.pending %}，其中 {{ lines.pending }} 分待补{% endif %}。</p>
+  <ul class="pause-lines">
+    <li><span>进攻</span>{{ lines.attack }}</li>
+    <li><span>一传</span>{{ lines.receive }}</li>
+    <li><span>发球</span>{{ lines.serve }}</li>
+    <li><span>对方</span>{{ lines.opp }}</li>
+  </ul>
+  <nav class="scope">
+    <a href="{{ url_for('live', match_id=match.id, view='stats', scope='set') }}" class="{{ 'on' if scope == 'set' else '' }}">本局</a>
+    <a href="{{ url_for('live', match_id=match.id, view='stats', scope='last10') }}" class="{{ 'on' if scope == 'last10' else '' }}">最近 10 球</a>
+    <a href="{{ url_for('live', match_id=match.id, view='stats', scope='match') }}" class="{{ 'on' if scope == 'match' else '' }}">整场</a>
+  </nav>
+  {% if board.pending %}
+    <p class="formula">待补或只记了比分 {{ board.pending }} 球。这些球不进进攻成功率。</p>
+  {% endif %}
+  <h2>我方进攻</h2>
+  <p class="formula">成功率＝得分/进攻次数。效率＝（得分－失误－被拦死）/进攻次数。分母为 0 显示 —。</p>
+  {% for row in board.attacks %}
+    <details class="stat" id="atk-{{ row.player_id or 'none' }}">
+      <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b><span>{{ row.rate_ratio }} {{ row.rate }}</span></summary>
+      <p>效率 {{ row.eff }}{% if row.split %}　{{ row.split }}{% endif %}{% if row.count_only %}　只计次数 {{ row.count_only }}，不加失误{% endif %}</p>
+      <ul>
+        {% for rally_id in row.rallies %}
+          <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% else %}
+    <p class="muted">本范围还没有进攻。</p>
+  {% endfor %}
+  <h2>接发</h2>
+  {% for row in board.passes %}
+    <details class="stat">
+      <summary><span>{{ row.name }}</span><b>{{ row.in_system }} 到位</b><span>{{ row.rate_ratio }}</span></summary>
+      <p>半到位 {{ row.half }}　不到位 {{ row.out }}　直接失误 {{ row.error }}　未知 {{ row.unknown }}</p>
+    </details>
+  {% else %}
+    <p class="muted">本范围还没有接发。</p>
+  {% endfor %}
+  <h2>发球威胁</h2>
+  {% for row in board.serves %}
+    <details class="stat">
+      <summary><span>{{ row.name }}</span><b>失误 {{ row.error }}</b><span>威胁 {{ row.threat_ratio }}　进界 {{ row.in_ratio }}</span></summary>
+      <p>ACE {{ row.ace }}　逼不到位 {{ row.out }}　失误 {{ row.error }}　对方到位 {{ row.in_system }}　半到位 {{ row.half }}　未知 {{ row.unknown }}</p>
+    </details>
+  {% else %}
+    <p class="muted">本范围还没有我方发球。</p>
+  {% endfor %}
+  <h2>对方起攻</h2>
+  <p class="formula">不猜人。未记号码。</p>
+  {% for row in board.opponents %}
+    <details class="stat" id="opp-{{ row.key }}">
+      <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b></summary>
+      <p>{% if row.line_text %}{{ row.line_text }}{% else %}线路还没记{% endif %}{% if row.line_note %}　{{ row.line_note }}{% endif %}</p>
+      <ul>
+        {% for rally_id in row.rallies %}
+          <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% else %}
+    <p class="muted">本范围还没有对方起攻。</p>
+  {% endfor %}
+  {% if board.blocks %}
+    <h2>拦网触球</h2>
+    {% for row in board.blocks %}
+      <p class="stat-line">{{ row.name }}　拦回 {{ row.get("rebound", 0) }}　得分 {{ row.get("kill", 0) }}　打手出界 {{ row.get("tool", 0) }}</p>
+    {% endfor %}
+  {% endif %}
+  {% if board.defenses %}
+    <h2>防守起球</h2>
+    {% for row in board.defenses %}
+      <p class="stat-line">{{ row.name }}　起球 {{ row.get("dig", 0) }}　防起 {{ row.get("dig_spike", 0) }}　接二次 {{ row.get("dig_second", 0) }}　接无攻 {{ row.get("dig_free", 0) }}</p>
+    {% endfor %}
+  {% endif %}
+</aside>
 
 <details class="fold">
-  <summary>换人 / 轮次</summary>
-  {% include "_court.html" %}
-  <section>
-    <h2>换人</h2>
-    {% if subs %}
-      {% for sub in subs %}
-        <form class="sub-row" method="post" action="{{ url_for('post_sub', match_id=match.id) }}">
-          <input type="hidden" name="out" value="{{ sub.out }}">
-          <input type="hidden" name="in" value="{{ sub.in }}">
-          <button class="{{ 'warn' if sub.warning else '' }}" type="submit">确认：{{ sub.label }}</button>
-          {% if sub.warning %}<p class="warn-line">{{ sub.warning }}</p>{% endif %}
-        </form>
-      {% endfor %}
-    {% else %}
-      <p>现在没有可执行的换人。</p>
-    {% endif %}
-    {% for pair in unlocked %}
-      <p class="muted">{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} 这场没有锁定{% if pair.status == 'candidate' %}，它还是候选{% endif %}。</p>
-    {% endfor %}
-  </section>
-  <form class="rot-row" method="post" action="{{ url_for('post_rotation', match_id=match.id) }}">
-    {% for number in range(1, 7) %}
-      <button class="secondary {% if number == state.rotation %}current{% endif %}" name="rotation" value="{{ number }}" type="submit">R{{ number }}</button>
-    {% endfor %}
-  </form>
-  <p>组织 {{ card.setter_name }}。补位 {{ card.backup_name }}。</p>
-  <form class="stack" method="post" action="{{ url_for('next_set', match_id=match.id) }}">
-    <h3>下一局</h3>
-    <label>起始轮次</label>
-    <select name="rotation">
-      {% for number in range(1, 7) %}<option value="{{ number }}">R{{ number }}</option>{% endfor %}
-    </select>
-    <label>谁发球</label>
-    <select name="serving">
-      <option value="us">我方</option>
-      <option value="them">对方</option>
-    </select>
-    {% if plan.rules.pair_lock_scope == "set" %}
-      {% for pair in plan.pairs %}
-        <label><input type="checkbox" name="pair_id" value="{{ pair.id }}"> 本局锁定 {{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }}</label>
-      {% endfor %}
-    {% else %}
-      <p class="muted">这支球队的配对整场锁定，新的一局沿用开场那几对。</p>
-    {% endif %}
-    <button class="secondary" type="submit">开始下一局</button>
-  </form>
-  {% if match.status == "live" %}
-    <form method="post" action="{{ url_for('finish_match', match_id=match.id) }}">
-      <button class="secondary" type="submit">结束本场</button>
-    </form>
+  <summary>轮次和换人</summary>
+  {% if tracking %}
+    {% include "_court.html" %}
   {% endif %}
+  {% if subs %}
+    {% for sub in subs %}
+      <form class="sub-row" method="post" action="{{ url_for('post_sub', match_id=match.id) }}">
+        <input type="hidden" name="out" value="{{ sub.out }}">
+        <input type="hidden" name="in" value="{{ sub.in }}">
+        <button type="submit">确认：{{ sub.label }}</button>
+        {% if sub.warning %}<p class="warn-line">{{ sub.warning }}</p>{% endif %}
+      </form>
+    {% endfor %}
+  {% endif %}
+  {% for pair in unlocked %}
+    <p class="muted">{{ plan.name_of(pair.a) }} / {{ plan.name_of(pair.b) }} 这场没有锁定{% if pair.status == 'candidate' %}，它还是候选{% endif %}。</p>
+  {% endfor %}
 </details>
 <script>
-document.addEventListener("keydown", function (event) {
-  if (event.metaKey || event.ctrlKey || event.altKey) return;
-  var tag = event.target && event.target.tagName;
-  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-  var key = String(event.key || "").toLowerCase();
-  var button = document.querySelector('.pad button[data-key="' + key + '"]');
-  if (!button) return;
-  event.preventDefault();
-  button.click();
-});
+(function () {
+  var root = document.querySelector(".pad");
+  if (!root) return;
+  var sync = document.querySelector("[data-sync]");
+  var key = "coach-queue-{{ match.id }}";
+  function showSheet(name) {
+    document.querySelectorAll(".sheet").forEach(function (sheet) {
+      sheet.hidden = sheet.getAttribute("data-sheet") !== name;
+    });
+    document.querySelectorAll("[data-sheet-link]").forEach(function (link) {
+      link.classList.toggle("on", link.getAttribute("data-sheet-link") === name);
+    });
+  }
+  function paint(data) {
+    var ours = document.querySelector(".score-us");
+    var theirs = document.querySelector(".score-them");
+    if (ours) ours.textContent = data.score_us;
+    if (theirs) theirs.textContent = data.score_them;
+    var label = document.querySelector(".serve-label");
+    if (label) label.textContent = data.serving === "us" ? "我方发球" : data.serving === "them" ? "对方发球" : label.textContent;
+    var last = document.querySelector(".last-ball");
+    if (last && data.last) last.textContent = "上一笔　" + data.last;
+    if (data.sheet) showSheet(data.sheet);
+    if (sync) sync.textContent = data.synced ? "已同步" : "未同步";
+  }
+  function send(body) {
+    return fetch("{{ url_for('post_quick', match_id=match.id) }}", {
+      method: "POST",
+      body: body,
+      headers: {"X-Requested-With": "fetch"}
+    }).then(function (response) { return response.json(); });
+  }
+  function remember(body) {
+    var queued = JSON.parse(localStorage.getItem(key) || "[]");
+    var entry = {};
+    body.forEach(function (value, name) { entry[name] = value; });
+    queued.push(entry);
+    localStorage.setItem(key, JSON.stringify(queued));
+    if (sync) sync.textContent = "未同步 · 已留在这台机器";
+  }
+  function flush() {
+    var queued = JSON.parse(localStorage.getItem(key) || "[]");
+    if (!queued.length) return;
+    var next = queued[0];
+    var body = new FormData();
+    Object.keys(next).forEach(function (name) { body.append(name, next[name]); });
+    send(body).then(function (data) {
+      queued.shift();
+      localStorage.setItem(key, JSON.stringify(queued));
+      paint(data);
+      flush();
+    }).catch(function () {
+      if (sync) sync.textContent = "未同步 · 已留在这台机器";
+    });
+  }
+  root.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form.classList.contains("cell-form")) return;
+    event.preventDefault();
+    var button = form.querySelector("button");
+    if (button) button.classList.add("lit");
+    var body = new FormData(form);
+    send(body).then(function (data) {
+      paint(data);
+      if (button) button.classList.remove("lit");
+    }).catch(function () {
+      remember(body);
+      if (button) button.classList.remove("lit");
+    });
+  });
+  flush();
+})();
 </script>
 {% endblock %}

@@ -61,6 +61,9 @@ BLOCK_RESULTS = {
 DEFENSE_RESULTS = {
     "dig": "起球",
     "system": "起球到位",
+    "dig_spike": "防起扣球",
+    "dig_second": "接二次",
+    "dig_free": "接无攻",
 }
 RECEPTION_EDITABLE = ("in_system", "half", "out", "unknown")
 SCOPES = ("set", "last10", "match")
@@ -364,9 +367,113 @@ def describe_action(action: dict, names: dict[str, str]) -> str:
 
 
 def describe(actions: list[dict], names: dict[str, str]) -> str:
-    if not actions:
+    skills = [action for action in actions if action.get("kind") != "score" and not action.get("voided")]
+    if not skills:
         return "未记录技术动作"
-    return " → ".join(describe_action(action, names) for action in actions)
+    return " → ".join(describe_action(action, names) for action in skills)
+
+
+def action_winner(action: dict) -> str | None:
+    if action.get("kind") == "score" and action.get("result") in ("us", "them"):
+        return action["result"]
+    return _winner(action.get("kind") or "", action.get("result") or "")
+
+
+def record_cell(
+    rally: dict,
+    *,
+    kind: str,
+    result: str,
+    player_id: str = "",
+    start: str = "",
+    line: str = "",
+    tag: str = "",
+) -> tuple[dict, list[dict], str | None]:
+    """One cell. Does not require the previous step. A closed rally only gains a touch."""
+    catalogs = {
+        "pass": PASS_RESULTS,
+        "serve": SERVE_RESULTS,
+        "attack": ATTACK_RESULTS,
+        "opp": OPP_RESULTS,
+        "block": BLOCK_RESULTS,
+        "defense": DEFENSE_RESULTS,
+    }
+    updated = dict(rally)
+    if kind == "score":
+        if result not in ("us", "them"):
+            raise QuickError("结分要选我方或对方。")
+    elif kind not in catalogs or result not in catalogs[kind]:
+        raise QuickError("这一格不在记录表里。")
+    if kind == "opp" and start not in OPP_STARTS:
+        raise QuickError("先有起攻位置。")
+    action = _action(
+        updated,
+        side="them" if kind == "opp" else "us",
+        player_id="" if player_id in ("", "unknown", "shared") else player_id,
+        kind=kind,
+        result=result,
+        start=start,
+        line=line,
+        count_only=1 if kind == "attack" and result == "count" else 0,
+        tag=tag or ("shared" if player_id == "shared" else ""),
+    )
+    if player_id == "shared":
+        action["player_id"] = ""
+        action["tag"] = "shared"
+    if updated.get("status") == "scored":
+        return updated, [action], None
+    if kind == "serve" and action["player_id"]:
+        updated["server_id"] = action["player_id"]
+    winner = action_winner(action)
+    if winner:
+        updated["status"] = "scored"
+        updated["winner"] = winner
+        updated["phase"] = "done"
+        updated["completeness"] = "pending" if kind == "score" else "complete"
+        updated["flag"] = 1 if kind == "score" else int(updated.get("flag") or 0)
+    return updated, [action], winner
+
+
+def sheet_after(kind: str, result: str, serving: str) -> str:
+    if action_winner({"kind": kind, "result": result}):
+        return "serve" if serving == "us" else "pass"
+    if kind == "pass":
+        return "attack"
+    if kind == "serve":
+        return "opp"
+    if kind in ("attack", "opp"):
+        return kind
+    return "more"
+
+
+def pause_lines(board: dict) -> dict:
+    if board["attacks"]:
+        top = board["attacks"][0]
+        attack = f"{top['name']} {top['phrase']}　成功率 {top['rate']}"
+    else:
+        attack = "还没有进攻"
+    if board["passes"]:
+        bits = [f"{row['name']} {row['in_system']}到位/{row['rated'] + row['unknown']}接" for row in board["passes"][:3]]
+        receive = "　".join(bits)
+    else:
+        receive = "还没有接发"
+    if board["serves"]:
+        row = board["serves"][0]
+        serve = f"{row['name']} 威胁 {row['threat_ratio']}　ACE {row['ace']}　失误 {row['error']}　逼不到位 {row['out']}"
+    else:
+        serve = "还没有发球"
+    if board["opponents"]:
+        opp = "，".join(f"{row['name']} {row['phrase']}" for row in board["opponents"])
+    else:
+        opp = "还没有对方起攻"
+    return {
+        "attack": attack,
+        "receive": receive,
+        "serve": serve,
+        "opp": opp,
+        "recorded": len(board["rallies"]),
+        "pending": board["pending"],
+    }
 
 
 def _pct(numerator: int, denominator: int) -> str:
@@ -461,7 +568,10 @@ def board_for(
                 started = True
             if kind == "pass":
                 player_id = action.get("player_id") or ""
-                row = bucket(passes, player_id, names.get(player_id, "没看清") if player_id else "没看清")
+                if action.get("tag") == "shared":
+                    player_id = "__shared__"
+                label = "共同" if player_id == "__shared__" else (names.get(player_id, "没看清") if player_id else "没看清")
+                row = bucket(passes, player_id, label)
                 result = action["result"] if action["result"] in PASS_RESULTS else "unknown"
                 row[result] = row.get(result, 0) + 1
                 row["rallies"].append(rally["id"])

@@ -12,7 +12,14 @@ def _client(tmp_path):
 def _start(client, *, rotation="1", serving="them"):
     started = client.post(
         f"/teams/{MENS_TEAM_ID}/matches",
-        data={"opponent": "测试", "mode": "light", "rotation": rotation, "serving": serving, "pair_id": "pair-d"},
+        data={
+            "opponent": "测试",
+            "mode": "light",
+            "rotation": rotation,
+            "serving": serving,
+            "pair_id": "pair-d",
+            "track_rotation": "on",
+        },
     )
     return started.headers["Location"]
 
@@ -24,8 +31,8 @@ def _tap(client, url, tap, value, token, **extra):
 
 
 def _score(html: str) -> tuple[str, str]:
-    ours = html.split("<b>", 1)[1].split("</b>", 1)[0]
-    theirs = html.split("<b>", 2)[2].split("</b>", 1)[0]
+    ours = html.split('class="score-us">', 1)[1].split("<", 1)[0]
+    theirs = html.split('class="score-them">', 1)[1].split("<", 1)[0]
     return ours.strip(), theirs.strip()
 
 
@@ -89,34 +96,48 @@ def test_rates_match_the_written_formulas():
     assert serve["in_ratio"] == "9/10"
 
 
-def test_receive_kill_is_four_taps_and_undo_restores(tmp_path):
+def _cell(client, url, kind, value, token, player="", start=""):
+    return client.post(
+        f"{url}/quick",
+        data={
+            "tap": "cell",
+            "kind": kind,
+            "value": value,
+            "player": player,
+            "start": start,
+            "token": token,
+            "scope": "set",
+        },
+        follow_redirects=True,
+    )
+
+
+def test_receive_kill_is_two_cells_and_undo_keeps_the_pass(tmp_path):
     client = _client(tmp_path)
     url = _start(client, serving="them")
     page = client.get(url).get_data(as_text=True)
-    assert "Leo" in page
-    assert "到位" not in page.split('class="pad"', 1)[1].split('class="stats"', 1)[0]
+    assert "Leo" in page and "到位" in page and "扣死" in page
 
-    page = _tap(client, url, "pass_player", "leo", "c1-pass").get_data(as_text=True)
-    assert "到位" in page
-    page = _tap(client, url, "pass_quality", "in_system", "c1-quality").get_data(as_text=True)
-    assert "Andy A" in page
-    assert "扣球得分" not in page.split('class="pad"', 1)[1].split("最近一球", 1)[0]
-    page = _tap(client, url, "attack_player", "andy-a", "c1-hitter").get_data(as_text=True)
-    assert "扣球得分" in page
-    page = _tap(client, url, "attack_result", "kill", "c1-kill").get_data(as_text=True)
+    _cell(client, url, "pass", "in_system", "c1-pass", player="leo")
+    page = _cell(client, url, "attack", "kill", "c1-kill", player="andy-a").get_data(as_text=True)
     assert _score(page) == ("1", "0")
     assert _rotation(page) == "2"
     assert "1扣1中" in page
-    assert "Leo" in page and "1 到位" in page
+    assert "1 到位" in page
     assert "已得分" in page
 
-    again = _tap(client, url, "attack_result", "kill", "c1-kill")
+    again = _cell(client, url, "attack", "kill", "c1-kill", player="andy-a")
     assert _score(again.get_data(as_text=True)) == ("1", "0")
 
-    undone = client.post(f"{url}/undo", follow_redirects=True).get_data(as_text=True)
+    undone = client.post(
+        f"{url}/quick",
+        data={"tap": "undo_touch", "token": "c1-undo"},
+        follow_redirects=True,
+    ).get_data(as_text=True)
     assert _score(undone) == ("0", "0")
     assert _rotation(undone) == "1"
     assert "1扣1中" not in undone
+    assert "Leo 一传到位" in undone
 
 
 def test_serve_error_is_one_tap(tmp_path):
@@ -257,3 +278,117 @@ def test_score_only_is_not_an_attack_rate(tmp_path):
     assert "未记录技术动作" in page
     assert "待补或只记了比分 1 球" in page
     assert "1扣" not in page
+
+
+def test_quick_start_without_slots_records_cells(tmp_path):
+    client = _client(tmp_path)
+    created = client.post("/teams", data={"name": "小队", "names": "Eric Leo Vitas", "start": "1"})
+    assert created.status_code == 302
+    url = created.headers["Location"]
+    page = client.get(url).get_data(as_text=True)
+    assert "发球未记" in page
+    assert "Eric" in page and "到位" in page
+    assert '<span class="pill">R' not in page
+    _cell(client, url, "pass", "in_system", "q-pass", player=_player_id(client, url, "Leo"))
+    page = _cell(client, url, "attack", "kill", "q-kill", player=_player_id(client, url, "Eric")).get_data(as_text=True)
+    assert _score(page) == ("1", "0")
+    assert "1扣1中" in page
+    assert "1 到位" in page
+
+
+def test_count_only_and_two_digs_do_not_invent_errors(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "attack", "count", "n-count", player="vitas")
+    page = _cell(client, url, "score", "them", "n-score").get_data(as_text=True)
+    assert _score(page) == ("0", "1")
+    vitas = page.split('id="atk-vitas"', 1)[1].split("</details>", 1)[0]
+    assert "1扣0中" in vitas
+    assert "只计次数 1" in vitas
+    assert "1失误" not in vitas
+
+    _cell(client, url, "defense", "dig_spike", "d1", player="leo")
+    _cell(client, url, "defense", "dig_spike", "d2", player="leo")
+    page = _cell(client, url, "score", "us", "d-score").get_data(as_text=True)
+    stats = page.split('class="stats"', 1)[1]
+    assert "本范围还没有接发" in stats
+    assert "防起 2" in page or "防起 1" in page
+
+
+def test_two_identical_attacks_are_both_kept(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "attack", "in_play", "same-1", player="andy-a")
+    _cell(client, url, "score", "them", "same-1-end")
+    _cell(client, url, "attack", "in_play", "same-2", player="andy-a")
+    page = _cell(client, url, "score", "them", "same-2-end").get_data(as_text=True)
+    assert "2扣0中" in page
+
+
+def test_opponent_line_shows_on_the_pause_card(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "opp", "kill", "opp-1", start="4")
+    page = client.post(
+        f"{url}/quick",
+        data={"tap": "mark_line", "value": "sharp", "token": "opp-line"},
+        follow_redirects=True,
+    ).get_data(as_text=True)
+    block = page.split('id="opp-4"', 1)[1].split("</details>", 1)[0]
+    assert "四号位" in block
+    assert "小斜线 1" in block
+    assert "仅失分片段" in block
+    assert 'href="#rally-' in block
+
+
+def test_score_only_cell_stays_out_of_the_attack_rate(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    page = _cell(client, url, "score", "us", "only-1").get_data(as_text=True)
+    assert _score(page) == ("1", "0")
+    assert "未记录技术动作" in page
+    assert "待补或只记了比分 1 球" in page
+    assert "1扣" not in page
+
+
+def test_eric_sets_add_up_and_set_two_edits_leave_set_one(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    for index in range(4):
+        _cell(client, url, "attack", "kill", f"s1-k{index}", player="eric")
+    page = _cell(client, url, "attack", "error", "s1-e", player="eric").get_data(as_text=True)
+    assert "5扣4中1失误" in page
+    client.post(f"{url}/next-set", data={"rotation": "1", "serving": "them"})
+    for index in range(6):
+        _cell(client, url, "attack", "kill", f"s2-k{index}", player="eric")
+    for index in range(2):
+        _cell(client, url, "pass", "in_system", f"s2-p{index}", player="leo")
+        _cell(client, url, "attack", "in_play", f"s2-i{index}", player="eric")
+        _cell(client, url, "score", "them", f"s2-end{index}")
+    page = client.get(f"{url}?scope=set").get_data(as_text=True)
+    assert "8扣6中" in page
+    assert "5扣4中1失误" not in page
+    whole = client.get(f"{url}?scope=match").get_data(as_text=True)
+    assert "13扣10中1失误" in whole
+    assert "76.9%" in whole
+    assert "69.2%" in whole
+    action_id = page.split('name="action_id" value="', 1)[1].split('"', 1)[0]
+    client.post(
+        f"{url}/quick",
+        data={"tap": "edit_quality", "value": "half", "action_id": action_id, "token": "s2-edit"},
+        follow_redirects=True,
+    )
+    after = client.get(f"{url}?scope=match").get_data(as_text=True)
+    assert "13扣10中1失误" in after
+    assert "76.9%" in after
+    assert "69.2%" in after
+    current = client.get(f"{url}?scope=set").get_data(as_text=True)
+    assert "8扣6中" in current
+    assert "5扣4中1失误" not in current
+
+
+def _player_id(client, url, name: str) -> str:
+    page = client.get(url).get_data(as_text=True)
+    marker = f'aria-label="{name} 到位"'
+    chunk = page.split(marker, 1)[0]
+    return chunk.rsplit('name="player" value="', 1)[1].split('"', 1)[0]

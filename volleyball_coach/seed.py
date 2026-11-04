@@ -58,25 +58,10 @@ def build_mens_plan() -> TeamPlan:
             private_note="可以打主攻或接应。二传和接发都还没验证，所以不进主接发，也不能默认留在后排组织。",
         ),
     }
-    rules = Rules(
-        no_back_row_attack=True,
-        no_libero=True,
-        fixed_pair_subs=True,
-        unlimited_subs=True,
-        max_subs=None,
-        pair_lock_scope="match",
-        overlap_confirmed=False,
-        timeouts_known=False,
-    )
+    rules = Rules()
     pairs = [
-        Pair("pair-d", "andy-a", "d", "confirmed", "已确认。整场锁定，禁止和别人交叉替换。"),
-        Pair(
-            "pair-harvey",
-            "michael",
-            "harvey",
-            "candidate",
-            "优先测试的候选，不是已经确定的最终配对。开赛前要明确锁定，不锁定就不能上场。",
-        ),
+        Pair("pair-d", "andy-a", "d", "confirmed", "D 可以换 Andy A。"),
+        Pair("pair-harvey", "michael", "harvey", "candidate", "Harvey 可以换 Michael。"),
     ]
     serve_plans = {
         rotation: ServePlan(
@@ -135,12 +120,11 @@ def build_mens_plan() -> TeamPlan:
         guidance=guidance,
         board_note=(
             "R2 和 R5 的前排按槽位重算过。原稿把 R1–R2、R4–R5 写成同一组前排，"
-            "但 R2 的 Leo、R5 的 Vitas 已经转到后排。这支球队禁止后排进攻，卡片不沿用那个合并写法。"
+            "但 R2 的 Leo、R5 的 Vitas 已经转到后排。"
         ),
         notes=(
-            "8 人。本地赛制：禁止后排进攻、无自由人、固定一对一、无限往返。"
-            "Andy A 和 Andy B 是临时标签。D 的姓名还没补。配对默认整场锁定。"
-            "女排和其他小队不要套用这份名单，也不要套用这套规则。"
+            "8 人。Andy A 和 Andy B 是两个人。D 的姓名还没补。"
+            "记球按普通排球。女排和其他小队各自建队，不套用这份名单。"
         ),
     )
 

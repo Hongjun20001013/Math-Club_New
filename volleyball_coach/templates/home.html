@@ -1,48 +1,49 @@
 {% extends "base.html" %}
 {% block body %}
 <p class="eyebrow">场边快记</p>
-<h1>先把这一分记下来。</h1>
-<p class="lede">接发轮点接球人、质量、攻手、结果。我方发球时，失误或 ACE 点一下就结分。暂停时右边就是本局的一传、进攻、发球和对方起攻位置。</p>
+<h1>记这一分。</h1>
 <section class="starts">
   {% for match in live_matches %}
-    <a class="go" href="{{ url_for('live', match_id=match.id) }}">继续上场比赛 · {{ match.team_name }}{% if match.opponent %} 对 {{ match.opponent }}{% endif %}</a>
+    <a class="go" href="{{ url_for('live', match_id=match.id) }}">继续 · {{ match.team_name }} · 第{{ match.set_index }}局 {{ match.score_us }}–{{ match.score_them }}</a>
   {% endfor %}
-  <a class="go" href="{{ url_for('new_match', team_id=mens_id) }}">开始比赛 · 男排</a>
-  {% if live_matches %}
-    <a class="go quiet" href="{{ url_for('review', match_id=live_matches[0].id) }}">看录像补球</a>
-  {% else %}
-    <a class="go quiet" href="{{ url_for('new_match', team_id=mens_id) }}">看录像补球 · 先开一场</a>
-  {% endif %}
+  <form method="post" action="{{ url_for('quick_start', team_id=mens_id) }}">
+    <button class="go" type="submit">男排 · 开始记球</button>
+  </form>
+  {% for team in teams if team.id != mens_id %}
+    <form method="post" action="{{ url_for('quick_start', team_id=team.id) }}">
+      <button class="go quiet" type="submit">{{ team.name }} · 开始记球</button>
+    </form>
+  {% endfor %}
 </section>
-{% for team in teams if team.id != mens_id %}
-  <p class="row-links"><a href="{{ url_for('new_match', team_id=team.id) }}">开始比赛 · {{ team.name }}</a></p>
-{% endfor %}
 
-<details class="fold" open>
+<form class="stack paste" method="post" action="{{ url_for('create_team') }}">
+  <h2>新的一队</h2>
+  <label for="name">队名</label>
+  <input id="name" name="name" required placeholder="例如：女排">
+  <label for="names">名字，空格分开</label>
+  <input id="names" name="names" placeholder="例如：Isa Eric Sky">
+  <input type="hidden" name="start" value="1">
+  <button type="submit">写好名单，开始记</button>
+</form>
+
+<details class="fold">
   <summary>球队设置</summary>
   <section class="home-grid">
     <div>
-      <h2>球队</h2>
       {% for team in teams %}
         <a class="team-card" href="{{ url_for('team_page', team_id=team.id) }}">
           <strong>{{ team.name }}</strong>
           <span class="muted">{{ team.notes }}</span>
         </a>
-      {% else %}
-        <p>还没有球队。</p>
       {% endfor %}
       <p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。女排和其他队的名单另存，不套用这份。</p>
     </div>
     <form class="stack" method="post" action="{{ url_for('create_team') }}">
-      <h2>新建球队</h2>
-      <label for="name">队名</label>
-      <input id="name" name="name" required placeholder="例如：女排、U16">
+      <h2>只建队，先不记</h2>
+      <label for="name-only">队名</label>
+      <input id="name-only" name="name" required>
       <label for="notes">备注</label>
-      <textarea id="notes" name="notes" placeholder="这支队自己的赛制，先写在这里。"></textarea>
-      <div class="checks">
-        <label><input type="radio" name="preset" value="blank" checked> 空白规则。不预填禁止后排进攻、无自由人或固定换人。</label>
-        <label><input type="radio" name="preset" value="local_special"> 只套用男排那一组规则开关，不复制名单。</label>
-      </div>
+      <textarea id="notes" name="notes"></textarea>
       <button type="submit">建立球队</button>
     </form>
   </section>

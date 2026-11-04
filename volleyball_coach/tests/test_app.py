@@ -13,7 +13,7 @@ def _rotation(html: str) -> str:
 
 
 def _our_score(html: str) -> str:
-    return html.split("<b>", 1)[1].split("</b>", 1)[0]
+    return html.split('class="score-us">', 1)[1].split("<", 1)[0]
 
 
 def test_other_team_does_not_inherit_mens_roster_or_rules(tmp_path):
@@ -30,8 +30,8 @@ def test_other_team_does_not_inherit_mens_roster_or_rules(tmp_path):
     page = created.get_data(as_text=True)
     assert "女排" in page
     assert "Michael" not in page
-    assert 'name="no_back_row_attack"' in page
-    assert 'name="no_back_row_attack" checked' not in page
+    assert "禁止后排进攻" not in page
+    assert "后排可以进攻" in page
 
     special = client.post(
         "/teams",
@@ -41,7 +41,7 @@ def test_other_team_does_not_inherit_mens_roster_or_rules(tmp_path):
     special_page = special.get_data(as_text=True)
     assert "U16" in special_page
     assert "Michael" not in special_page
-    assert 'name="no_back_row_attack" checked' in special_page
+    assert "禁止后排进攻" not in special_page
     assert "没有复制男排球员" in special_page
 
 
@@ -57,7 +57,7 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
 
     started = client.post(
         f"/teams/{MENS_TEAM_ID}/matches",
-        data={"opponent": "红队", "mode": "light", "rotation": "1", "serving": "them", "pair_id": "pair-d"},
+        data={"opponent": "红队", "mode": "light", "rotation": "1", "serving": "them", "pair_id": "pair-d", "track_rotation": "on"},
     )
     assert started.status_code == 302
     match_url = started.headers["Location"]
@@ -67,10 +67,11 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
     assert "对方轮次：未知" in live_html
     assert "Harvey" in live_html and "没有锁定" in live_html
 
-    blocked = client.post(f"{match_url}/sub", data={"out": "leo", "in": "harvey"}, follow_redirects=True)
-    blocked_html = blocked.get_data(as_text=True)
-    assert "跨配对" in blocked_html
-    assert _rotation(blocked_html) == "1"
+    swapped = client.post(f"{match_url}/sub", data={"out": "leo", "in": "harvey"}, follow_redirects=True)
+    swapped_html = swapped.get_data(as_text=True)
+    assert "已确认 Harvey 上场" in swapped_html
+    assert "跨配对" not in swapped_html
+    assert _rotation(swapped_html) == "1"
 
     moved = client.post(f"{match_url}/point", data={"winner": "us"}, follow_redirects=True)
     moved_html = moved.get_data(as_text=True)
@@ -84,7 +85,7 @@ def test_live_rotation_illegal_sub_undo_and_report(tmp_path):
 
     third = client.post(
         f"/teams/{MENS_TEAM_ID}/matches",
-        data={"opponent": "蓝队", "mode": "light", "rotation": "3", "serving": "us", "pair_id": "pair-d"},
+        data={"opponent": "蓝队", "mode": "light", "rotation": "3", "serving": "us", "pair_id": "pair-d", "track_rotation": "on"},
     )
     third_url = third.headers["Location"]
     subbed = client.post(f"{third_url}/sub", data={"out": "andy-a", "in": "d"}, follow_redirects=True)
@@ -141,7 +142,12 @@ def test_starting_slots_are_on_the_match_page(tmp_path):
     page = client.get(f"{team_url}/matches/new").get_data(as_text=True)
     assert "首发六个槽" in page
     assert "1 右后" in page
-    assert "六个槽还没选满" in page
+    assert "六个槽还没选满" not in page
+    started_empty = client.post(
+        f"{team_url}/matches",
+        data={"opponent": "白队", "mode": "light", "rotation": "1", "serving": "them"},
+    )
+    assert started_empty.status_code == 302
     roster = client.get(team_url).get_data(as_text=True)
     ids = []
     for name in names:
@@ -155,7 +161,6 @@ def test_starting_slots_are_on_the_match_page(tmp_path):
     )
     saved_html = saved.get_data(as_text=True)
     assert "六个首发槽已记下" in saved_html
-    assert "六个槽还没选满" not in saved_html
     started = client.post(
         f"{team_url}/matches",
         data={"opponent": "红队", "mode": "light", "rotation": "1", "serving": "them"},

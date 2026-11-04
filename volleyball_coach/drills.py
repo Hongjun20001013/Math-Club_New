@@ -48,7 +48,7 @@ def acceptance_drills() -> list[dict]:
         ("我方连续发球得分不轮转", lambda: _serve_streak(plan, locked)),
         ("对方连续发球得分，我方不轮转", lambda: _their_streak(plan, locked)),
         ("换人不改轮次，D 和 Andy A 可以反复换", lambda: _d_swaps(plan, locked)),
-        ("Harvey 锁定 Michael 时不能换 Leo", lambda: _no_cross_pair(plan, locked)),
+        ("Harvey 可以换 Leo，轮次不动", lambda: _normal_sub(plan, locked)),
         ("Harvey 换下 Michael 之后，补位人不再是 Michael", lambda: _backup_leaves_with_michael(plan, locked)),
         ("Harvey 占着后排组织槽时，停止位置建议", lambda: _setter_conflict(plan, locked)),
         ("R6 的 Harvey 要在回到 R1 前换回 Michael", lambda: _harvey_return(plan, locked)),
@@ -123,26 +123,15 @@ def _d_swaps(plan, locked) -> str:
     return "D 与 Andy A 往返 4 次，轮次始终是 R3。"
 
 
-def _no_cross_pair(plan, locked) -> str:
+def _normal_sub(plan, locked) -> str:
     state = start_set(plan, rotation=1, serving="us", locked_pairs=locked, mode="light")
-    try:
-        apply_sub(plan, state, "leo", "harvey")
-    except MatchError as exc:
-        if "跨配对" not in str(exc):
-            raise
-    else:
-        raise AssertionError("跨配对换人没有被拦住")
-    if _line(state) != TABLE[1]:
-        raise AssertionError("被拒绝的换人改动了场上名单")
-    unlocked = mens_locked_pairs(include_harvey=False)
-    quiet = start_set(plan, rotation=4, serving="us", locked_pairs=unlocked, mode="light")
-    try:
-        apply_sub(plan, quiet, "michael", "harvey")
-    except MatchError:
-        pass
-    else:
-        raise AssertionError("没有锁定的 Harvey 仍然上了场")
-    return "Harvey 只能替换本场锁定的那一个人。"
+    state = apply_sub(plan, state, "leo", "harvey")
+    if state.rotation != 1:
+        raise AssertionError("换人带动了轮次")
+    on_court = set(state.occupants.values())
+    if "harvey" not in on_court or "leo" in on_court:
+        raise AssertionError("Harvey 没有换到 Leo 的位置")
+    return "Harvey 换下 Leo。轮次仍是 R1。"
 
 
 def _backup_leaves_with_michael(plan, locked) -> str:
