@@ -140,6 +140,51 @@ CREATE TABLE IF NOT EXISTS rallies (
   note TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS quick_rallies (
+  id TEXT PRIMARY KEY,
+  match_id TEXT NOT NULL,
+  set_index INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  serving TEXT NOT NULL,
+  rotation INTEGER NOT NULL,
+  score_us_before INTEGER NOT NULL,
+  score_them_before INTEGER NOT NULL,
+  winner TEXT NOT NULL DEFAULT '',
+  point_seq INTEGER,
+  completeness TEXT NOT NULL,
+  server_id TEXT NOT NULL DEFAULT '',
+  phase TEXT NOT NULL,
+  focus_player TEXT NOT NULL DEFAULT '',
+  focus_start TEXT NOT NULL DEFAULT '',
+  focus_line TEXT NOT NULL DEFAULT '',
+  focus_tag TEXT NOT NULL DEFAULT '',
+  flag INTEGER NOT NULL DEFAULT 0,
+  lineup_confirmed INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS quick_actions (
+  id TEXT PRIMARY KEY,
+  rally_id TEXT NOT NULL,
+  match_id TEXT NOT NULL,
+  ord INTEGER NOT NULL,
+  side TEXT NOT NULL,
+  player_id TEXT NOT NULL DEFAULT '',
+  kind TEXT NOT NULL,
+  result TEXT NOT NULL,
+  start TEXT NOT NULL DEFAULT '',
+  line TEXT NOT NULL DEFAULT '',
+  count_only INTEGER NOT NULL DEFAULT 0,
+  tag TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS op_tokens (
+  token TEXT PRIMARY KEY,
+  match_id TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 """
 
 
@@ -491,14 +536,15 @@ class Store:
             for row in rows
         ]
 
-    def append_event(self, match_id: str, event_type: str, payload: dict, created: str | None = None) -> int:
+    def append_event(self, match_id: str, event_type: str, payload: dict, created: str | None = None, commit: bool = True) -> int:
         current = self.conn.execute("SELECT COALESCE(MAX(seq), 0) AS n FROM events WHERE match_id = ?", (match_id,)).fetchone()
         seq = int(current["n"]) + 1
         self.conn.execute(
             "INSERT INTO events (match_id, seq, type, payload, created_at) VALUES (?, ?, ?, ?, ?)",
             (match_id, seq, event_type, json.dumps(payload, ensure_ascii=False), created or now()),
         )
-        self.conn.commit()
+        if commit:
+            self.conn.commit()
         return seq
 
     def set_match_status(self, match_id: str, status: str) -> None:
@@ -549,6 +595,268 @@ class Store:
             ),
         )
         self.conn.commit()
+
+    def list_live_matches(self) -> list[sqlite3.Row]:
+        return list(
+            self.conn.execute(
+                """
+                SELECT matches.id, matches.opponent, matches.team_id, matches.created_at, teams.name AS team_name
+                FROM matches JOIN teams ON teams.id = matches.team_id
+                WHERE matches.status = 'live'
+                ORDER BY matches.created_at DESC
+                """
+            )
+        )
+
+    def _rally_from_row(self, row: sqlite3.Row) -> dict:
+        return {
+            "id": row["id"],
+            "match_id": row["match_id"],
+            "set_index": row["set_index"],
+            "status": row["status"],
+            "serving": row["serving"],
+            "rotation": row["rotation"],
+            "score_us_before": row["score_us_before"],
+            "score_them_before": row["score_them_before"],
+            "winner": row["winner"],
+            "point_seq": row["point_seq"],
+            "completeness": row["completeness"],
+            "server_id": row["server_id"],
+            "phase": row["phase"],
+            "focus_player": row["focus_player"],
+            "focus_start": row["focus_start"],
+            "focus_line": row["focus_line"],
+            "focus_tag": row["focus_tag"],
+            "flag": row["flag"],
+            "lineup_confirmed": row["lineup_confirmed"],
+            "created_at": row["created_at"],
+        }
+
+    def _action_from_row(self, row: sqlite3.Row) -> dict:
+        return {
+            "id": row["id"],
+            "rally_id": row["rally_id"],
+            "match_id": row["match_id"],
+            "ord": row["ord"],
+            "side": row["side"],
+            "player_id": row["player_id"],
+            "kind": row["kind"],
+            "result": row["result"],
+            "start": row["start"],
+            "line": row["line"],
+            "count_only": row["count_only"],
+            "tag": row["tag"],
+        }
+
+    def quick_rallies(self, match_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT * FROM quick_rallies WHERE match_id = ? ORDER BY created_at, id",
+            (match_id,),
+        )
+        return [self._rally_from_row(row) for row in rows]
+
+    def quick_actions(self, match_id: str) -> list[dict]:
+        rows = self.conn.execute(
+            "SELECT * FROM quick_actions WHERE match_id = ? ORDER BY ord, id",
+            (match_id,),
+        )
+        return [self._action_from_row(row) for row in rows]
+
+    def open_quick_rally(self, match_id: str) -> dict | None:
+        row = self.conn.execute(
+            "SELECT * FROM quick_rallies WHERE match_id = ? AND status = 'open' ORDER BY created_at DESC LIMIT 1",
+            (match_id,),
+        ).fetchone()
+        return self._rally_from_row(row) if row else None
+
+    def actions_for_rally(self, rally_id: str) -> list[dict]:
+        if not rally_id:
+            return []
+        rows = self.conn.execute("SELECT * FROM quick_actions WHERE rally_id = ? ORDER BY ord", (rally_id,))
+        return [self._action_from_row(row) for row in rows]
+
+    def last_scored_rally(self, match_id: str) -> dict | None:
+        row = self.conn.execute(
+            """
+            SELECT * FROM quick_rallies
+            WHERE match_id = ? AND status = 'scored'
+            ORDER BY created_at DESC, id DESC LIMIT 1
+            """,
+            (match_id,),
+        ).fetchone()
+        return self._rally_from_row(row) if row else None
+
+    def void_rally_for_point(self, match_id: str, point_seq: int) -> None:
+        self.conn.execute(
+            "UPDATE quick_rallies SET status = 'void' WHERE match_id = ? AND point_seq = ?",
+            (match_id, point_seq),
+        )
+        self.conn.commit()
+
+    def persist_tap(
+        self,
+        match_id: str,
+        token: str,
+        rally: dict,
+        new_actions: list[dict],
+        *,
+        winner: str | None,
+    ) -> bool:
+        """One transaction. A repeated token does not add another point or action."""
+        try:
+            self.conn.execute(
+                "INSERT INTO op_tokens (token, match_id, created_at) VALUES (?, ?, ?)",
+                (token, match_id, now()),
+            )
+        except sqlite3.IntegrityError:
+            self.conn.rollback()
+            return False
+        rally_id = rally.get("id") or new_id("q")
+        created = now()
+        if rally.get("id"):
+            self.conn.execute(
+                """
+                UPDATE quick_rallies SET
+                  status = ?, winner = ?, completeness = ?, server_id = ?, phase = ?,
+                  focus_player = ?, focus_start = ?, focus_line = ?, focus_tag = ?, flag = ?
+                WHERE id = ?
+                """,
+                (
+                    rally["status"],
+                    rally.get("winner") or "",
+                    rally.get("completeness") or "open",
+                    rally.get("server_id") or "",
+                    rally.get("phase") or "done",
+                    rally.get("focus_player") or "",
+                    rally.get("focus_start") or "",
+                    rally.get("focus_line") or "",
+                    rally.get("focus_tag") or "",
+                    int(rally.get("flag") or 0),
+                    rally_id,
+                ),
+            )
+        else:
+            self.conn.execute(
+                """
+                INSERT INTO quick_rallies (
+                  id, match_id, set_index, status, serving, rotation, score_us_before, score_them_before,
+                  winner, point_seq, completeness, server_id, phase, focus_player, focus_start, focus_line,
+                  focus_tag, flag, lineup_confirmed, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    rally_id,
+                    match_id,
+                    int(rally["set_index"]),
+                    rally["status"],
+                    rally["serving"],
+                    int(rally["rotation"]),
+                    int(rally["score_us_before"]),
+                    int(rally["score_them_before"]),
+                    rally.get("winner") or "",
+                    rally.get("completeness") or "open",
+                    rally.get("server_id") or "",
+                    rally.get("phase") or "pass_player",
+                    rally.get("focus_player") or "",
+                    rally.get("focus_start") or "",
+                    rally.get("focus_line") or "",
+                    rally.get("focus_tag") or "",
+                    int(rally.get("flag") or 0),
+                    int(rally.get("lineup_confirmed") or 0),
+                    created,
+                ),
+            )
+        current = self.conn.execute("SELECT COALESCE(MAX(ord), 0) AS n FROM quick_actions WHERE rally_id = ?", (rally_id,)).fetchone()
+        order = int(current["n"])
+        for action in new_actions:
+            order += 1
+            self.conn.execute(
+                """
+                INSERT INTO quick_actions (
+                  id, rally_id, match_id, ord, side, player_id, kind, result, start, line, count_only, tag, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    new_id("a"),
+                    rally_id,
+                    match_id,
+                    order,
+                    action["side"],
+                    action.get("player_id") or "",
+                    action["kind"],
+                    action["result"],
+                    action.get("start") or "",
+                    action.get("line") or "",
+                    int(action.get("count_only") or 0),
+                    action.get("tag") or "",
+                    created,
+                ),
+            )
+        if winner:
+            seq = self.append_event(match_id, "point", {"winner": winner, "rally_id": rally_id}, commit=False)
+            self.conn.execute(
+                "UPDATE quick_rallies SET point_seq = ?, winner = ?, status = 'scored' WHERE id = ?",
+                (seq, winner, rally_id),
+            )
+        elif rally.get("status") == "discarded":
+            self.conn.execute("DELETE FROM quick_actions WHERE rally_id = ?", (rally_id,))
+            self.conn.execute("DELETE FROM quick_rallies WHERE id = ?", (rally_id,))
+        self.conn.commit()
+        return True
+
+    def attach_action(self, match_id: str, token: str, rally_id: str, action: dict) -> bool:
+        try:
+            self.conn.execute(
+                "INSERT INTO op_tokens (token, match_id, created_at) VALUES (?, ?, ?)",
+                (token, match_id, now()),
+            )
+        except sqlite3.IntegrityError:
+            self.conn.rollback()
+            return False
+        current = self.conn.execute("SELECT COALESCE(MAX(ord), 0) AS n FROM quick_actions WHERE rally_id = ?", (rally_id,)).fetchone()
+        self.conn.execute(
+            """
+            INSERT INTO quick_actions (
+              id, rally_id, match_id, ord, side, player_id, kind, result, start, line, count_only, tag, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '', ?, ?, ?)
+            """,
+            (
+                new_id("a"),
+                rally_id,
+                match_id,
+                int(current["n"]) + 1,
+                action["side"],
+                action.get("player_id") or "",
+                action["kind"],
+                action["result"],
+                int(action.get("count_only") or 0),
+                action.get("tag") or "",
+                now(),
+            ),
+        )
+        self.conn.execute(
+            """
+            UPDATE quick_rallies
+            SET completeness = 'complete'
+            WHERE id = ? AND completeness IN ('score_only', 'pending', 'open')
+            """,
+            (rally_id,),
+        )
+        self.conn.commit()
+        return True
+
+    def edit_reception(self, match_id: str, token: str, action_id: str, result: str) -> bool:
+        try:
+            self.conn.execute(
+                "INSERT INTO op_tokens (token, match_id, created_at) VALUES (?, ?, ?)",
+                (token, match_id, now()),
+            )
+        except sqlite3.IntegrityError:
+            self.conn.rollback()
+            return False
+        self.conn.execute("UPDATE quick_actions SET result = ? WHERE id = ? AND match_id = ?", (result, action_id, match_id))
+        self.conn.commit()
+        return True
 
 
 def plan_for_match(store: Store, match: sqlite3.Row) -> TeamPlan:

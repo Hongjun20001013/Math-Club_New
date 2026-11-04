@@ -704,3 +704,172 @@ form.stack + form { margin-top: 8px; }
   .court, .scoreline { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   main { width: auto; }
 }
+
+body.desk main {
+  width: min(1180px, calc(100% - 28px));
+  padding-top: 18px;
+}
+
+.starts {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 28px;
+}
+
+.go {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 14px 18px;
+  background: var(--navy);
+  color: white;
+  text-decoration: none;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+.go.quiet {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--line-strong);
+}
+
+.desk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.pad, .stats {
+  background: var(--white);
+  border: 1px solid var(--line);
+  padding: 14px;
+}
+
+.story, .last-ball, .step, .formula, .stat-line {
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+
+.story, .last-ball {
+  font-size: 1.02rem;
+}
+
+.step {
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+
+.formula {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.tap-row, .score-dock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.tap-row form, .score-dock form { margin: 0; }
+
+.tap {
+  min-height: 52px;
+  min-width: 88px;
+  padding: 10px 14px;
+  border: 1px solid var(--navy);
+  background: var(--white);
+  color: var(--navy);
+  font: 600 1.02rem/1.2 var(--sans);
+  cursor: pointer;
+}
+
+.tap.us { background: var(--navy); color: white; }
+.tap.them { background: var(--rose); color: white; border-color: var(--rose); }
+.tap.ghost { background: var(--paper); border-color: var(--line-strong); font-weight: 500; }
+.tap kbd {
+  margin-left: 6px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.tap.us kbd, .tap.them kbd { color: inherit; opacity: 0.75; }
+
+.slim-row .tap { min-height: 40px; }
+
+button.texty {
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font: 600 0.95rem/1 var(--sans);
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.scoreline form { margin: 8px 0 0; }
+
+.pills.slim { margin-top: 8px; }
+
+.scope {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.scope a {
+  text-decoration: none;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.scope a.on {
+  border-color: var(--navy);
+  color: var(--navy);
+  background: var(--columbia);
+}
+
+.stats h2 {
+  margin: 16px 0 4px;
+  font-size: 1.05rem;
+}
+
+.stat {
+  border-top: 1px solid var(--line);
+  padding: 8px 0;
+}
+
+.stat summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat summary b { font-size: 1rem; }
+
+.stat p, .stat li { font-size: 0.88rem; color: var(--muted); }
+
+.fold { margin-top: 18px; }
+.fold summary { cursor: pointer; font-size: 1rem; }
+
+.scoreline b, .stat summary b { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 800px) {
+  .desk-grid { display: flex; flex-direction: column-reverse; }
+  .pad {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    box-shadow: 0 -8px 24px rgba(12, 35, 64, 0.08);
+  }
+  .score-dock { position: sticky; bottom: 0; background: var(--white); }
+}

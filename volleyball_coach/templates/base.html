@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
   <header class="top">
     <a class="brand" href="{{ url_for('home') }}">
       <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
