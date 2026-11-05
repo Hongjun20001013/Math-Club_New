@@ -5,7 +5,20 @@
   <a href="{{ url_for('report_page', match_id=match.id) }}">看三个问题的结果</a>
   <a href="{{ url_for('dictionary') }}">标注标准</a>
 </p>
-<h1>赛后先回答三个问题</h1>
+<h1>补刚才记下的球</h1>
+{% if quick_rows %}
+  <p class="lede">这些是场边已经结分的回合。点进去补动作，写回原来那一球，比分不动。轮次没开跟踪时不显示轮次。</p>
+  <ul class="list">
+    {% for row in quick_rows %}
+      <li id="rally-{{ row.id }}">第{{ row.set_index }}局 {{ row.score }} → {{ row.winner }} · {{ row.text }}　<a href="{{ url_for('live', match_id=match.id, repair=row.id) }}">补这一球</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">场边还没有结分的回合。</p>
+{% endif %}
+<details class="fold">
+  <summary>另外记一条录像回合</summary>
+<h2>三个问题的旧表</h2>
 <p class="lede">试用目标是每场结束后用 20 分钟。先看哪一轮接发最难、发球目标有没有执行到、替补上场后在可比条件下发生了什么。看不清就标未知，不要为了填满而猜。这个 20 分钟还没有被你的比赛验证过。</p>
 <p class="muted">必填：{{ required_fields | join("、") }}。可以留空：{{ optional_fields | join("、") }}。</p>
 {% if state.history_gap %}
@@ -23,9 +36,9 @@
       <label for="rotation">轮次</label>
       <select id="rotation" name="rotation">
         {% for number in range(1, 7) %}
-          <option value="{{ number }}" {% if number == state.rotation %}selected{% endif %}>R{{ number }}</option>
+          <option value="{{ number }}" {% if tracking and number == state.rotation %}selected{% endif %}>R{{ number }}</option>
         {% endfor %}
-        <option value="unknown">未知</option>
+        <option value="unknown" {% if not tracking %}selected{% endif %}>未知</option>
       </select>
     </div>
   </div>
@@ -117,8 +130,9 @@
     </table>
   </div>
 {% else %}
-  <p class="muted">还没有回合。场边的加减分只维护轮次，不代替这里的三个问题。</p>
+  <p class="muted">这条旧表还是空的。场边的球在上面的列表里补。</p>
 {% endif %}
+</details>
 
 {% if bookmarks %}
   <h2>场边书签</h2>

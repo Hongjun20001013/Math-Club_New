@@ -36,6 +36,8 @@ from volleyball_coach.quick import (
     build_digest,
     record_cell,
     sheet_after,
+    sheet_after_undo,
+    sheet_for_context,
 )
 from volleyball_coach.report import build_report, execution_of
 from volleyball_coach.summary_pdf import render_summary_pdf
@@ -517,7 +519,21 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 serving_confirmed = bool(event["payload"].get("serving_confirmed", True))
         sheet = request.args.get("sheet") or ""
         if sheet not in ("pass", "attack", "serve", "opp", "more"):
-            sheet = "serve" if state.serving == "us" and serving_confirmed else "pass"
+            if open_rally and open_actions:
+                sheet = sheet_for_context(open_actions, state.serving)
+            else:
+                sheet = "serve" if state.serving == "us" and serving_confirmed else "pass"
+        repair_id = (request.args.get("repair") or "").strip()
+        repair_text = ""
+        if repair_id:
+            repair_rally = store().rally_by_id(repair_id)
+            if repair_rally is None or repair_rally.get("match_id") != match_id:
+                repair_id = ""
+            else:
+                repair_actions = store().actions_for_rally(repair_id)
+                repair_text = describe(repair_actions, names)
+                if request.args.get("sheet") not in ("pass", "attack", "serve", "opp", "more") and repair_actions:
+                    sheet = sheet_for_context(repair_actions, state.serving)
         view = request.args.get("view") or ""
         players = sorted(plan.players.values(), key=lambda player: (not player.receive_primary, player.name))
         court_ids: list[str] = []
@@ -584,6 +600,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             court_ids=court_ids,
             court_names="、".join(plan.name_of(player_id) for player_id in court_ids),
             touch_counts=_touch_counts(open_actions),
+            repair_id=repair_id,
+            repair_text=repair_text,
             server_id=server_id,
             server_name=names.get(server_id, ""),
             lines=pause_lines(board_for(quick_rallies, quick_actions, names, scope=scope, set_index=state.set_index)),
@@ -597,7 +615,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             return redirect(url_for("live", match_id=match_id))
         winner = request.form.get("winner", "")
         try:
-            apply_point(plan, state, winner)
+            state = apply_point(plan, state, winner)
         except MatchError as exc:
             flash(str(exc), "error")
             return redirect(url_for("live", match_id=match_id))
@@ -626,6 +644,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
         value = (request.form.get("value") or "").strip()
         token = (request.form.get("token") or "").strip() or new_id("t")
         remembered = store()
+        fixed_id = (request.form.get("rally_id") or "").strip()
 
         def respond(sheet: str, message: str, category: str = "ok"):
             if request.headers.get("X-Requested-With") == "fetch":
@@ -653,7 +672,8 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 )
             if message:
                 flash(message, category)
-            return redirect(url_for("live", match_id=match_id, scope=scope, sheet=sheet))
+            extra = {"repair": fixed_id} if fixed_id else {}
+            return redirect(url_for("live", match_id=match_id, scope=scope, sheet=sheet, **extra))
 
         if tap == "undo_touch":
             try:
@@ -681,7 +701,9 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 remembered.append_event(match_id, "undo", {"target_seq": rally["point_seq"]}, commit=False)
                 remembered.reopen_rally(rally["id"])
             remembered.conn.commit()
-            return respond("pass", "已撤销这一笔。上一笔还在。")
+            _match, _plan, fresh, _points, _events = match_bundle(match_id)
+            serving = fresh.serving if fresh else state.serving
+            return respond(sheet_after_undo(action, earlier, serving), "已撤销这一笔。上一笔还在。")
         if tap == "mark_line":
             from volleyball_coach.quick import OPP_LINES
 
@@ -704,7 +726,12 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 state.serving = implied
                 remembered.update_latest_set_start(match_id, serving=implied, serving_confirmed=True)
                 remembered.conn.commit()
-            rally = remembered.open_quick_rally(match_id) or draft_rally(match_id, state)
+            if fixed_id:
+                rally = remembered.rally_by_id(fixed_id)
+                if rally is None or rally.get("match_id") != match_id:
+                    return respond("attack", "找不到这一球。", "error")
+            else:
+                rally = remembered.open_quick_rally(match_id) or draft_rally(match_id, state)
             try:
                 updated, new_actions, winner = record_cell(
                     rally,
@@ -717,15 +744,22 @@ def create_app(db_path: str | Path | None = None) -> Flask:
                 )
             except QuickError as exc:
                 return respond(request.form.get("sheet") or "pass", str(exc), "error")
+            if rally.get("status") == "scored":
+                winner = None
             if winner:
                 try:
-                    apply_point(plan, state, winner)
+                    state = apply_point(plan, state, winner)
                 except MatchError as exc:
                     return respond("pass", str(exc), "error")
             saved = remembered.persist_tap(match_id, token, updated, new_actions, winner=winner)
             sheet = sheet_after(kind, value, state.serving)
             if not saved:
                 return respond(sheet, "")
+            if fixed_id:
+                stay = {"block": "more", "defense": "more", "opp_serve": "pass"}.get(kind, kind)
+                if stay not in ("pass", "attack", "serve", "opp", "more"):
+                    stay = sheet
+                return respond(stay, "已补在这一球，比分没有改。")
             return respond(sheet, "已得分 · 撤销" if winner else "已记")
         if tap == "edit_quality":
             if value not in PASS_RESULTS:
@@ -790,7 +824,7 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             updated["completeness"] = "pending"
         if winner:
             try:
-                apply_point(plan, state, winner)
+                state = apply_point(plan, state, winner)
             except MatchError as exc:
                 flash(str(exc), "error")
                 return redirect(target)
@@ -1030,12 +1064,34 @@ def create_app(db_path: str | Path | None = None) -> Flask:
             for slot in range(1, 7)
         ]
         bench = sorted(player_id for player_id in state.occupants.values() if player_id not in set(plan.base_order()))
+        names = {player_id: player.name for player_id, player in plan.players.items()}
+        quick_actions = store().quick_actions(match_id)
+        quick_rows = []
+        for rally in store().quick_rallies(match_id):
+            if rally.get("status") != "scored":
+                continue
+            acts = [action for action in quick_actions if action["rally_id"] == rally["id"]]
+            quick_rows.append(
+                {
+                    "id": rally["id"],
+                    "set_index": rally["set_index"],
+                    "score": f"{rally['score_us_before']}–{rally['score_them_before']}",
+                    "winner": "我方" if rally.get("winner") == "us" else "对方",
+                    "text": describe(acts, names),
+                }
+            )
+        tracking = True
+        for event in events:
+            if event["type"] == "set_start":
+                tracking = bool(event["payload"].get("require_lineup", True))
         return render_template(
             "review.html",
             match=match,
             plan=plan,
             state=state,
             card=card,
+            tracking=tracking,
+            quick_rows=quick_rows,
             rallies=store().rallies_for(match_id),
             bookmarks=[event for event in events if event["type"] == "bookmark"],
             lineup=lineup,

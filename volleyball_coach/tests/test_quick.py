@@ -219,7 +219,7 @@ def test_serve_disrupts_then_block_touch_then_attack_point(tmp_path):
     assert "Harvey" in page and "威胁 1/1" in page
     assert "ACE 0" in page
     assert "拦回 1" in page
-    assert "得分 0" in page
+    assert "拦死 0" in page
     assert "1扣1中" in page
 
 
@@ -237,8 +237,8 @@ def test_opponent_angle_is_listed_without_a_jersey(tmp_path):
     assert "四号位" in block
     assert "1扣1中" in block
     assert "小斜线 1" in block
-    assert "未记号码" in page or "不猜人" in page
-    assert f'href="#rally-' in block
+    assert "号码未知" in page
+    assert "repair=" in block
 
 
 def test_pass_error_does_not_ask_for_an_attack(tmp_path):
@@ -312,7 +312,7 @@ def test_count_only_and_two_digs_do_not_invent_errors(tmp_path):
     page = _cell(client, url, "score", "us", "d-score").get_data(as_text=True)
     stats = page.split('class="stats"', 1)[1]
     assert "本范围还没有接发" in stats
-    assert "防起 2" in page or "防起 1" in page
+    assert "防起扣球 2" in page
 
 
 def test_three_swings_in_one_rally_all_count(tmp_path):
@@ -368,7 +368,7 @@ def test_opponent_line_shows_on_the_pause_card(tmp_path):
     assert "四号位" in block
     assert "小斜线 1" in block
     assert "仅失分片段" in block
-    assert 'href="#rally-' in block
+    assert "repair=" in block
 
 
 def test_score_only_cell_stays_out_of_the_attack_rate(tmp_path):
@@ -482,6 +482,129 @@ def test_summary_pdf_uses_the_same_attack_rates(tmp_path):
     assert downloaded.data.startswith(b"%PDF")
     finished = client.post(f"{url}/finish", follow_redirects=True)
     assert "下载数据汇总 PDF" in finished.get_data(as_text=True)
+
+
+def _sheet_open(html: str, name: str) -> bool:
+    return f'data-sheet="{name}" hidden' not in html
+
+
+def test_block_tool_scores_them_and_attack_tool_scores_us(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    page = _cell(client, url, "block", "tool", "tool-block", player="andy-a").get_data(as_text=True)
+    assert _score(page) == ("0", "1")
+    assert "被打手出界 1" in page
+    assert "拦死 0" in page
+    us = _cell(client, url, "attack", "tool", "tool-attack", player="andy-a").get_data(as_text=True)
+    assert _score(us) == ("1", "1")
+    andy = us.split('id="atk-andy-a"', 1)[1].split("</details>", 1)[0]
+    assert "1扣1中" in andy
+    assert _sheet_open(us, "serve")
+
+
+def test_point_switches_the_sheet_to_the_next_serve(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "pass", "in_system", "sheet-pass", player="leo")
+    killed = _cell(client, url, "attack", "kill", "sheet-kill", player="andy-a").get_data(as_text=True)
+    assert _score(killed) == ("1", "0")
+    assert _sheet_open(killed, "serve")
+    missed = _cell(client, url, "serve", "error", "sheet-miss", player="vitas").get_data(as_text=True)
+    assert _score(missed) == ("1", "1")
+    assert _sheet_open(missed, "pass")
+
+
+def test_undo_returns_to_the_touch_before_the_point(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "pass", "in_system", "undo-pass", player="leo")
+    _cell(client, url, "attack", "kill", "undo-kill", player="andy-a")
+    undone = client.post(
+        f"{url}/quick",
+        data={"tap": "undo_touch", "token": "undo-back"},
+        follow_redirects=True,
+    ).get_data(as_text=True)
+    assert _score(undone) == ("0", "0")
+    assert _sheet_open(undone, "attack")
+    assert "Leo 一传到位" in undone
+
+
+def test_repair_adds_a_touch_without_a_second_point(tmp_path):
+    client = _client(tmp_path)
+    url = _start(client, serving="them")
+    _cell(client, url, "pass", "in_system", "fix-pass", player="leo")
+    _cell(client, url, "attack", "kill", "fix-kill", player="andy-a")
+    review = client.get(f"{url}/review").get_data(as_text=True)
+    assert "补这一球" in review
+    rally_id = review.split("repair=", 1)[1].split('"', 1)[0]
+    page = client.post(
+        f"{url}/quick",
+        data={
+            "tap": "cell",
+            "kind": "attack",
+            "value": "in_play",
+            "player": "eric",
+            "token": "fix-extra",
+            "rally_id": rally_id,
+            "scope": "set",
+        },
+        follow_redirects=True,
+    ).get_data(as_text=True)
+    assert _score(page) == ("1", "0")
+    assert "比分没有改" in page
+    assert "Eric 没扣死" in page
+    again = client.get(f"{url}/review").get_data(as_text=True)
+    assert again.count("补这一球") == 1
+
+
+def test_phase_stays_unknown_until_a_dig_splits_the_rally():
+    def action(rally_id, order, kind, result, player):
+        return {
+            "rally_id": rally_id,
+            "ord": order,
+            "kind": kind,
+            "result": result,
+            "player_id": player,
+            "side": "us",
+            "start": "",
+            "line": "",
+            "count_only": 0,
+            "tag": "",
+        }
+
+    names = {"eric": "Eric", "leo": "Leo", "vitas": "Vitas"}
+    early = board_for(
+        [{"id": "r4", "status": "scored", "set_index": 1, "completeness": "complete"}],
+        [
+            action("r4", 1, "pass", "out", "eric"),
+            action("r4", 2, "attack", "in_play", "eric"),
+            action("r4", 3, "attack", "error", "eric"),
+        ],
+        names,
+        scope="set",
+        set_index=1,
+    )
+    eric = early["attacks"][0]
+    assert "阶段未确认 2" in eric["split"]
+    assert "第一攻" not in eric["split"]
+    assert eric["rally_links"] == [{"id": "r4", "n": 2}]
+
+    split = board_for(
+        [{"id": "r8", "status": "scored", "set_index": 1, "completeness": "complete"}],
+        [
+            action("r8", 1, "pass", "in_system", "vitas"),
+            action("r8", 2, "attack", "in_play", "leo"),
+            action("r8", 3, "defense", "dig_spike", "vitas"),
+            action("r8", 4, "attack", "kill", "leo"),
+        ],
+        names,
+        scope="set",
+        set_index=1,
+    )
+    leo = split["attacks"][0]
+    assert "第一攻 1" in leo["split"]
+    assert "防反 1" in leo["split"]
+    assert leo["rally_links"] == [{"id": "r8", "n": 2}]
 
 
 def _player_id(client, url, name: str) -> str:

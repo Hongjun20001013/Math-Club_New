@@ -26,6 +26,7 @@ SERVE_RESULTS = {
 }
 ATTACK_RESULTS = {
     "kill": "扣球得分",
+    "tool": "打手出界",
     "in_play": "没打死",
     "error": "失误",
     "blocked": "被拦死",
@@ -56,7 +57,7 @@ BLOCK_RESULTS = {
     "kill": "拦网得分",
     "rebound": "拦回",
     "touch": "无效触球",
-    "tool": "打手出界",
+    "tool": "被打手出界",
 }
 DEFENSE_RESULTS = {
     "dig": "起球",
@@ -83,7 +84,8 @@ def _winner(kind: str, result: str) -> str | None:
         ("opp", "error"): "us",
         ("opp", "blocked"): "us",
         ("block", "kill"): "us",
-        ("block", "tool"): "us",
+        ("block", "tool"): "them",
+        ("attack", "tool"): "us",
     }
     return table.get((kind, result))
 
@@ -442,6 +444,7 @@ def record_cell(
 
 
 def sheet_after(kind: str, result: str, serving: str) -> str:
+    """The next sheet follows the point. A manual tab change does not outlive the rally."""
     if action_winner({"kind": kind, "result": result}):
         return "serve" if serving == "us" else "pass"
     if kind == "pass":
@@ -450,13 +453,40 @@ def sheet_after(kind: str, result: str, serving: str) -> str:
         return "opp"
     if kind in ("attack", "opp"):
         return kind
-    return "more"
+    if kind in ("block", "defense"):
+        return "more"
+    return "pass" if serving != "us" else "serve"
+
+
+def sheet_for_context(actions: list[dict], serving: str) -> str:
+    live = [action for action in actions if not action.get("voided")]
+    if not live:
+        return "serve" if serving == "us" else "pass"
+    last = live[-1]
+    return sheet_after(last.get("kind") or "", last.get("result") or "", serving)
+
+
+def sheet_after_undo(voided: dict, earlier: list[dict], serving: str) -> str:
+    kept = [action for action in earlier if not action.get("voided")]
+    if kept:
+        return sheet_for_context(kept, serving)
+    kind = voided.get("kind") or ""
+    if kind in ("pass", "attack", "serve", "opp"):
+        return kind
+    if kind in ("block", "defense"):
+        return "more"
+    return "serve" if serving == "us" else "pass"
 
 
 def pause_lines(board: dict) -> dict:
     if board["attacks"]:
         top = board["attacks"][0]
-        attack = f"{top['name']} {top['phrase']}　成功率 {top['rate']}"
+        attack = f"{top['name']} {top['phrase']}　成功率 {top['rate_ratio']} {top['rate']}"
+        rated = [row for row in board["attacks"] if row["attempts"]]
+        if rated:
+            best = max(rated, key=lambda row: (row["kills"] / row["attempts"], row["attempts"]))
+            if best["player_id"] != top["player_id"]:
+                attack += f"。打得最顺是 {best['name']} {best['rate_ratio']} {best['rate']}"
     else:
         attack = "还没有进攻"
     if board["passes"]:
@@ -551,6 +581,7 @@ def board_for(
                 "count_only": 0,
                 "first_ball": 0,
                 "transition": 0,
+                "unsure": 0,
                 "rallies": [],
             }
             attacks[player_id] = row
@@ -568,11 +599,12 @@ def board_for(
         if rally.get("completeness") in ("pending", "score_only") or not rally_actions:
             pending += 1
         seen_defense = False
-        started = False
+        had_pass = False
+        rally_attacks: list[tuple[dict, bool]] = []
         for action in rally_actions:
             kind = action["kind"]
-            if kind in ("pass", "serve"):
-                started = True
+            if kind == "pass":
+                had_pass = True
             if kind == "pass":
                 player_id = action.get("player_id") or ""
                 if action.get("tag") == "shared":
@@ -593,7 +625,7 @@ def board_for(
                 row = attack_row(action.get("player_id") or "")
                 row["attempts"] += 1
                 result = action["result"]
-                if result == "kill":
+                if result in ("kill", "tool"):
                     row["kills"] += 1
                 elif result == "error":
                     row["errors"] += 1
@@ -603,11 +635,7 @@ def board_for(
                     row["count_only"] += 1
                 else:
                     row["in_play"] += 1
-                if rally.get("completeness") == "complete" and started:
-                    if seen_defense:
-                        row["transition"] += 1
-                    else:
-                        row["first_ball"] += 1
+                rally_attacks.append((row, seen_defense))
                 row["rallies"].append(rally["id"])
             elif kind == "opp":
                 start = action.get("start") or "unknown"
@@ -635,6 +663,17 @@ def board_for(
                 row[action["result"]] = row.get(action["result"], 0) + 1
                 row["rallies"].append(rally["id"])
                 seen_defense = True
+        if seen_defense:
+            for row, after_defense in rally_attacks:
+                if after_defense:
+                    row["transition"] += 1
+                else:
+                    row["first_ball"] += 1
+        elif had_pass and len(rally_attacks) == 1:
+            rally_attacks[0][0]["first_ball"] += 1
+        else:
+            for row, _before in rally_attacks:
+                row["unsure"] += 1
 
     attack_rows = []
     for row in attacks.values():
@@ -643,9 +682,13 @@ def board_for(
         row["rate"] = _pct(row["kills"], attempts)
         row["rate_ratio"] = _ratio(row["kills"], attempts)
         row["eff"] = _pct(row["kills"] - row["errors"] - row["blocked"], attempts)
-        row["split"] = ""
+        bits = []
         if row["first_ball"] or row["transition"]:
-            row["split"] = f"第一攻 {row['first_ball']} · 防反 {row['transition']}"
+            bits.append(f"第一攻 {row['first_ball']} · 防反 {row['transition']}")
+        if row["unsure"]:
+            bits.append(f"阶段未确认 {row['unsure']}")
+        row["split"] = "　".join(bits)
+        row["rally_links"] = _mentions(row["rallies"])
         attack_rows.append(row)
     attack_rows.sort(key=lambda item: (-item["attempts"], item["name"]))
 
@@ -687,6 +730,9 @@ def board_for(
             line_bits.append(f"{OPP_LINES.get(key, key)} {count}")
         row["line_text"] = "、".join(line_bits)
         row["line_note"] = "" if row.get("line_on_live") or not line_bits else "仅失分片段"
+        row["rate"] = _pct(row["kill"], row["attempts"])
+        row["eff"] = _pct(row["kill"] - row["error"] - row["blocked"], row["attempts"])
+        row["rally_links"] = _mentions(row["rallies"])
         opp_rows.append(row)
     order = {key: index for index, key in enumerate(OPP_STARTS)}
     opp_rows.sort(key=lambda item: order.get(item["key"], 99))
@@ -702,6 +748,17 @@ def board_for(
         "pending": pending,
         "rallies": scoped,
     }
+
+
+def _mentions(rally_ids: list[str]) -> list[dict]:
+    order: list[str] = []
+    counts: dict[str, int] = {}
+    for rally_id in rally_ids:
+        if rally_id not in counts:
+            order.append(rally_id)
+            counts[rally_id] = 0
+        counts[rally_id] += 1
+    return [{"id": rally_id, "n": counts[rally_id]} for rally_id in order]
 
 
 def _team_attack(rows: list[dict]) -> dict:
@@ -723,7 +780,7 @@ def _team_attack(rows: list[dict]) -> dict:
 
 
 def person_sheet(board: dict) -> list[dict]:
-    """One row per person. Direct points are kills, aces, stuff blocks, and tools."""
+    """One row per person. Direct points are kills, aces, and stuff blocks. A tool off our block is their point."""
     attacks = {row["player_id"]: row for row in board["attacks"]}
     serves = {row["key"]: row for row in board["serves"]}
     blocks = {row["key"]: row for row in board["blocks"]}
@@ -736,7 +793,7 @@ def person_sheet(board: dict) -> list[dict]:
         source = attack or serve or block
         kills = attack["kills"] if attack else 0
         aces = int(serve.get("ace", 0)) if serve else 0
-        block_points = int(block.get("kill", 0) + block.get("tool", 0)) if block else 0
+        block_points = int(block.get("kill", 0)) if block else 0
         rows.append(
             {
                 "player_id": key,
@@ -745,6 +802,7 @@ def person_sheet(board: dict) -> list[dict]:
                 "errors": attack["errors"] if attack else 0,
                 "blocked": attack["blocked"] if attack else 0,
                 "rate": attack["rate"] if attack else "—",
+                "rate_ratio": attack["rate_ratio"] if attack else "",
                 "eff": attack["eff"] if attack else "—",
                 "count_only": attack["count_only"] if attack else 0,
                 "ace": aces,

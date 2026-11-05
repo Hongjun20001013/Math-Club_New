@@ -2,7 +2,7 @@
 {% block body %}
 <p class="row-links">
   <a href="{{ url_for('live', match_id=match.id) }}">返回记球</a>
-  <a href="{{ url_for('review', match_id=match.id) }}">补录像记录</a>
+  <a href="{{ url_for('review', match_id=match.id) }}">补刚才的球</a>
 </p>
 <p class="eyebrow">{{ plan.name }}{% if match.opponent %} 对 {{ match.opponent }}{% endif %}</p>
 <h1>本场汇总</h1>
@@ -35,7 +35,7 @@
           <td>{{ row.phrase }}</td>
           <td>{{ row.errors }}</td>
           <td>{{ row.blocked }}</td>
-          <td>{{ row.rate }}</td>
+          <td>{% if row.rate_ratio %}{{ row.rate_ratio }} {% endif %}{{ row.rate }}</td>
           <td>{{ row.block_points }}</td>
           <td>{{ row.ace }}</td>
           <td>{{ row.points }}</td>
@@ -44,5 +44,5 @@
     </table>
   </div>
 {% endif %}
-<p class="formula">直接得分＝扣死＋ACE＋拦死＋打手出界。这是这个人终结的分。</p>
+<p class="formula">直接得分＝扣死＋ACE＋拦死。我方扣球打手出界算扣死。对方打我方手出界算对方得分，不加拦网得分。号码没记的对方球只按位置算。</p>
 {% endblock %}

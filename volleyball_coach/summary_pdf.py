@@ -135,7 +135,7 @@ def render_summary_pdf(digest: dict, *, team: str, opponent: str) -> bytes:
                 row["phrase"],
                 row["errors"],
                 row["blocked"],
-                row["rate"],
+                f"{row['rate_ratio']} {row['rate']}".strip() if row.get("rate_ratio") else row["rate"],
                 row["eff"],
                 row["block_points"],
                 row["ace"],
@@ -145,7 +145,7 @@ def render_summary_pdf(digest: dict, *, team: str, opponent: str) -> bytes:
         ],
         [22, 28, 12, 12, 16, 16, 18, 12, 18],
     )
-    _text(pdf, "直接得分＝扣死＋ACE＋拦死＋打手出界。这是这个人终结的分，不是换人之后的胜负。", size=8, color=MUTED, height=4.5)
+    _text(pdf, "直接得分＝扣死＋ACE＋拦死。扣球打手出界算扣死。被打手出界是对方的分，不加拦网得分。", size=8, color=MUTED, height=4.5)
 
     _heading(pdf, "一传")
     _table(

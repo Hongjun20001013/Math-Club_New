@@ -8,6 +8,7 @@
   <input type="hidden" name="value" value="{{ value }}">
   <input type="hidden" name="player" value="{{ player }}">
   <input type="hidden" name="start" value="{{ start }}">
+  {% if repair_id %}<input type="hidden" name="rally_id" value="{{ repair_id }}">{% endif %}
   <input type="hidden" name="token" value="{{ new_token('t') }}">
   <button class="cell" type="submit" aria-label="{{ who }} {{ word }}">{{ word }}</button>
 </form>
@@ -15,33 +16,33 @@
 
 <header class="bar">
   <div class="bar-score">
-    <span>第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}</span>
     <p class="nums"><b class="score-us">{{ state.score_us }}</b><span>–</span><b class="score-them">{{ state.score_them }}</b></p>
-  </div>
-  <p class="bar-meta">
     <span class="serve-label">{{ serve_label }}</span>
-    {% if tracking %}
-      <span class="pill">R{{ state.rotation }}</span>
-      <span class="pill">对方轮次：未知</span>
-    {% endif %}
-  </p>
+  </div>
   <div class="bar-actions">
-    <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-      <input type="hidden" name="tap" value="undo_touch">
-      <input type="hidden" name="token" value="{{ new_token('t') }}">
-      <button class="texty" type="submit">撤销</button>
-    </form>
-    <a href="{{ url_for('live', match_id=match.id, view='stats', scope=scope) }}">暂停看数</a>
-    <a href="{{ url_for('summary_page', match_id=match.id) }}">汇总 PDF</a>
     {% if view == 'stats' %}
-      <a href="{{ url_for('live', match_id=match.id, sheet=sheet) }}">返回记球</a>
+      <a class="bar-main" href="{{ url_for('live', match_id=match.id) }}">返回记球</a>
+    {% else %}
+      <a class="bar-main" href="{{ url_for('live', match_id=match.id, view='stats', scope=scope) }}">暂停</a>
     {% endif %}
+    <details class="bar-menu">
+      <summary>菜单</summary>
+      <a href="{{ url_for('home') }}">首页</a>
+      <a href="{{ url_for('summary_page', match_id=match.id) }}">汇总 PDF</a>
+      <a href="{{ url_for('review', match_id=match.id) }}">补记</a>
+      <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+        <input type="hidden" name="tap" value="undo_touch">
+        <input type="hidden" name="token" value="{{ new_token('t') }}">
+        <button class="texty" type="submit">撤销上一笔</button>
+      </form>
+    </details>
   </div>
 </header>
+<p class="set-line">第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}{% if tracking %} · <span class="pill">R{{ state.rotation }}</span> · 对方轮次：未知{% endif %}</p>
 
 <div class="pad">
   <details class="court-pick" {% if request.args.get('court') %}open{% endif %}>
-    <summary>这一局上场{% if court_names %}：{{ court_names }}{% else %}：还没圈，格子里是全队{% endif %}</summary>
+    <summary>这一局上场{% if court_names %}：{{ court_names }}{% else %}{% endif %}</summary>
     <p class="formula">勾这一局真的在场上的人。通常是六个人，自由人可以一起勾。第二局换阵容，先点结束本局，再改勾选。没勾的人收在「没上场」里，临时上了仍能记。</p>
     <form method="post" action="{{ url_for('save_court', match_id=match.id) }}">
       <input type="hidden" name="sheet" value="{{ sheet }}">
@@ -62,6 +63,9 @@
       <button class="cell ghost" type="submit">结束本局，换下一局阵容</button>
     </form>
   </details>
+  {% if repair_id %}
+    <p class="repair-banner" id="rally-{{ repair_id }}">正在补这一球：{{ repair_text or "还没有动作" }}。补在原来的回合上，比分不动。</p>
+  {% endif %}
   <nav class="sheets">
     {% for key, label in [("pass","接发"),("attack","我方进攻"),("serve","我方发球"),("opp","对方进攻"),("more","更多")] %}
       <a href="{{ url_for('live', match_id=match.id, sheet=key) }}" class="{{ 'on' if sheet == key else '' }}" data-sheet-link="{{ key }}">{{ label }}</a>
@@ -71,29 +75,17 @@
   <section class="sheet" data-sheet="pass" {% if sheet != 'pass' %}hidden{% endif %}>
     <table class="grid">
       <thead>
-        <tr><th>接发</th><th>到位</th><th>半到位</th><th>不到位</th><th>直接失分</th><th>未知</th></tr>
+        <tr><th>接发</th><th>到位</th><th>半到位</th><th>不到位</th><th>直接失分</th></tr>
       </thead>
       <tbody>
         {% for player in desk.pass_main %}
           <tr>
             <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
-            {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+            {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分")] %}
               <td>{{ cell("pass", value, word, player.name, player.id) }}</td>
             {% endfor %}
           </tr>
         {% endfor %}
-        <tr>
-          <th>共同</th>
-          {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
-            <td>{{ cell("pass", value, word, "共同", "shared") }}</td>
-          {% endfor %}
-        </tr>
-        <tr>
-          <th>没看清</th>
-          {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
-            <td>{{ cell("pass", value, word, "没看清", "unknown") }}</td>
-          {% endfor %}
-        </tr>
       </tbody>
     </table>
     <form class="cell-form" method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
@@ -103,11 +95,22 @@
       <input type="hidden" name="token" value="{{ new_token('t') }}">
       <button class="cell ghost" type="submit" aria-label="对方发丢">对方发丢</button>
     </form>
-    {% if desk.pass_rest %}
-      <details>
-        <summary>其他人</summary>
+    <details>
+      <summary>其他人、共同、没看清</summary>
         <table class="grid">
           <tbody>
+            <tr>
+              <th>共同</th>
+              {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+                <td>{{ cell("pass", value, word, "共同", "shared") }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>没看清</th>
+              {% for value, word in [("in_system","到位"),("half","半到位"),("out","不到位"),("error","直接失分"),("unknown","未知")] %}
+                <td>{{ cell("pass", value, word, "没看清", "unknown") }}</td>
+              {% endfor %}
+            </tr>
             {% for player in desk.pass_rest %}
               <tr>
                 <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small></th>
@@ -119,20 +122,19 @@
           </tbody>
         </table>
       </details>
-    {% endif %}
   </section>
 
   <section class="sheet" data-sheet="attack" {% if sheet != 'attack' %}hidden{% endif %}>
     <p class="formula">没扣死可以连点。同一个人这一球扣了三次，就点三次，名字旁边会变成「本球 3」。扣死、失误、被拦死才结束这一球。</p>
     <table class="grid">
       <thead>
-        <tr><th>进攻</th><th>扣死</th><th>没扣死</th><th>失误</th><th>被拦死</th></tr>
+        <tr><th>进攻</th><th>扣死</th><th>打手出界</th><th>没扣死</th><th>失误</th><th>被拦死</th></tr>
       </thead>
       <tbody>
         {% for player in desk.attack_main %}
           <tr>
             <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
-            {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+            {% for value, word in [("kill","扣死"),("tool","打手出界"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
               <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
             {% endfor %}
           </tr>
@@ -147,7 +149,7 @@
             {% for player in desk.attack_rest %}
               <tr>
                 <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
-                {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+                {% for value, word in [("kill","扣死"),("tool","打手出界"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
                   <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
                 {% endfor %}
               </tr>
@@ -164,7 +166,7 @@
             {% for player in desk.bench %}
               <tr>
                 <th>{{ player.name }} <small>{{ role_labels.get(player.role, "待定") }}</small> <b class="rally-count" data-kind="attack" data-player="{{ player.id }}">{% set n = touch_counts.get('attack:' ~ player.id, 0) %}{% if n %}本球 {{ n }}{% endif %}</b></th>
-                {% for value, word in [("kill","扣死"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
+                {% for value, word in [("kill","扣死"),("tool","打手出界"),("in_play","没扣死"),("error","失误"),("blocked","被拦死")] %}
                   <td>{{ cell("attack", value, word, player.name, player.id) }}</td>
                 {% endfor %}
               </tr>
@@ -292,12 +294,12 @@
     </table>
     <h2>拦网</h2>
     <table class="grid">
-      <thead><tr><th></th><th>拦回</th><th>拦死</th><th>打手出界</th></tr></thead>
+      <thead><tr><th></th><th>拦回</th><th>拦死</th><th>被打手出界</th></tr></thead>
       <tbody>
         {% for player in players %}
           <tr>
             <th>{{ player.name }}</th>
-            {% for value, word in [("rebound","拦回"),("kill","拦死"),("tool","打手出界")] %}
+            {% for value, word in [("rebound","拦回"),("kill","拦死"),("tool","被打手出界")] %}
               <td>{{ cell("block", value, word, player.name, player.id) }}</td>
             {% endfor %}
           </tr>
@@ -395,8 +397,8 @@
       <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b><span>{{ row.rate_ratio }} {{ row.rate }}</span></summary>
       <p>效率 {{ row.eff }}{% if row.split %}　{{ row.split }}{% endif %}{% if row.count_only %}　只计次数 {{ row.count_only }}，不加失误{% endif %}</p>
       <ul>
-        {% for rally_id in row.rallies %}
-          <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
+        {% for item in row.rally_links %}
+          <li><a href="{{ url_for('live', match_id=match.id, repair=item.id) }}">{{ rally_text[item.id] }}{% if item.n > 1 %} · 本回合 {{ item.n }} 次出手{% endif %}</a></li>
         {% endfor %}
       </ul>
     </details>
@@ -422,14 +424,14 @@
     <p class="muted">本范围还没有我方发球。</p>
   {% endfor %}
   <h2>对方起攻</h2>
-  <p class="formula">不猜人。未记号码。</p>
+  <p class="formula">只记位置和球量。号码未知就空着，不能据此说对方哪位球员最强。</p>
   {% for row in board.opponents %}
     <details class="stat" id="opp-{{ row.key }}">
-      <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b></summary>
-      <p>{% if row.line_text %}{{ row.line_text }}{% else %}线路还没记{% endif %}{% if row.line_note %}　{{ row.line_note }}{% endif %}</p>
+      <summary><span>{{ row.name }}</span><b>{{ row.phrase }}</b><span>成功率 {{ row.rate }}　效率 {{ row.eff }}</span></summary>
+      <p>{% if row.line_text %}{{ row.line_text }}{% else %}线路还没记{% endif %}{% if row.line_note %}　{{ row.line_note }}{% endif %}　号码未知</p>
       <ul>
-        {% for rally_id in row.rallies %}
-          <li><a href="#rally-{{ rally_id }}">{{ rally_text[rally_id] }}</a></li>
+        {% for item in row.rally_links %}
+          <li><a href="{{ url_for('live', match_id=match.id, repair=item.id) }}">{{ rally_text[item.id] }}</a></li>
         {% endfor %}
       </ul>
     </details>
@@ -439,13 +441,13 @@
   {% if board.blocks %}
     <h2>拦网触球</h2>
     {% for row in board.blocks %}
-      <p class="stat-line">{{ row.name }}　拦回 {{ row.get("rebound", 0) }}　得分 {{ row.get("kill", 0) }}　打手出界 {{ row.get("tool", 0) }}</p>
+      <p class="stat-line">{{ row.name }}　拦回 {{ row.get("rebound", 0) }}　拦死 {{ row.get("kill", 0) }}　被打手出界 {{ row.get("tool", 0) }}。被打手出界是对方得分，不加拦网得分。</p>
     {% endfor %}
   {% endif %}
   {% if board.defenses %}
     <h2>防守起球</h2>
     {% for row in board.defenses %}
-      <p class="stat-line">{{ row.name }}　起球 {{ row.get("dig", 0) }}　防起 {{ row.get("dig_spike", 0) }}　接二次 {{ row.get("dig_second", 0) }}　接无攻 {{ row.get("dig_free", 0) }}</p>
+      <p class="stat-line">{{ row.name }}　起球 {{ row.get("dig", 0) }}　防起扣球 {{ row.get("dig_spike", 0) }}　接二次 {{ row.get("dig_second", 0) }}　接无攻 {{ row.get("dig_free", 0) }}{% if not row.get("system") %}　到位程度未记录{% endif %}</p>
     {% endfor %}
   {% endif %}
 </aside>
@@ -491,7 +493,7 @@
     var value = (form.querySelector("[name=value]") || {}).value || "";
     if (kind === "score" || kind === "opp_serve") return true;
     if (kind === "pass" && value === "error") return true;
-    if (kind === "attack" && (value === "kill" || value === "error" || value === "blocked")) return true;
+    if (kind === "attack" && (value === "kill" || value === "tool" || value === "error" || value === "blocked")) return true;
     if (kind === "serve" && (value === "ace" || value === "error")) return true;
     if (kind === "opp" && (value === "kill" || value === "error" || value === "blocked")) return true;
     if (kind === "block" && (value === "kill" || value === "tool")) return true;
@@ -511,7 +513,14 @@
       var count = data.counts && data.counts[key];
       node.textContent = count ? "本球 " + count : "";
     });
-    if (data.sheet) showSheet(data.sheet);
+    if (data.sheet) {
+      showSheet(data.sheet);
+      if (window.history && window.history.replaceState) {
+        var next = new URL(window.location.href);
+        next.searchParams.set("sheet", data.sheet);
+        window.history.replaceState(null, "", next.pathname + next.search);
+      }
+    }
     if (sync) sync.textContent = data.synced ? "已同步" : "未同步";
   }
   function send(body) {
