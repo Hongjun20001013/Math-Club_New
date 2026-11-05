@@ -342,6 +342,7 @@ class MatchState:
     structural: list[str] = field(default_factory=list)
     origins: dict[int, str] = field(default_factory=dict)
     occupants: dict[int, str] = field(default_factory=dict)
+    lineup_required: bool = True
 
     @property
     def advice_blocked(self) -> bool:

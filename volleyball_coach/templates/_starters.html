@@ -1,0 +1,24 @@
+<form class="stack starters" method="post" action="{{ url_for('save_starters', team_id=plan.team_id) }}">
+  <h2>首发六个槽</h2>
+  <p class="muted">对着网排。上面一排是前排，下面一排是后排。1 号位在右后，轮到我方发球时从这里发球。替补留在名单里，不占槽。</p>
+  {% if not plan.players %}
+    <p>名单还是空的。先去球队设置加人，再回来排这六个槽。</p>
+    <p><a href="{{ url_for('team_page', team_id=plan.team_id) }}">去球队设置</a></p>
+  {% else %}
+    <div class="starter-court">
+      {% for slot, label in [(4, "4 左前"), (3, "3 中前"), (2, "2 右前"), (5, "5 左后"), (6, "6 中后"), (1, "1 右后")] %}
+        <label>
+          {{ label }}
+          <select name="slot_{{ slot }}">
+            <option value="">空</option>
+            {% for player in plan.players.values() %}
+              <option value="{{ player.id }}" {% if player.base_slot == slot %}selected{% endif %}>{{ player.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="next" value="{{ next_page }}">
+    <button type="submit">保存首发</button>
+  {% endif %}
+</form>

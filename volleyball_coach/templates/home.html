@@ -1,35 +1,59 @@
 {% extends "base.html" %}
 {% block body %}
-<p class="eyebrow">场边</p>
-<h1>各队分开记，场边只做最少的确认。</h1>
-<p class="lede">第一版解决轮次、固定换人和赛前预案。场上只确认比分和换人；完整触球等赛后对着录像补。没有确认过的内容，不会被写成事实。</p>
-<figure class="hero">
-  <img src="{{ url_for('static', filename='court-scene.jpg') }}" alt="两名队员在网前，排球在空中">
-</figure>
-<section class="home-grid">
-  <div>
-    <h2>球队</h2>
-    {% for team in teams %}
-      <a class="team-card" href="{{ url_for('team_page', team_id=team.id) }}">
-        <strong>{{ team.name }}</strong>
-        <span class="muted">{{ team.notes }}</span>
-      </a>
-    {% else %}
-      <p>还没有球队。</p>
-    {% endfor %}
-    <p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。以后别的队也可以用同一套页面做复盘。</p>
+<p class="eyebrow">场边快记</p>
+<h1>先定名字和位置。</h1>
+<p class="lede">一场常见是两名主攻、两名副攻、一名接应、一名二传，再加自由人。人可以多，同一个位置也可以有好几个人。</p>
+<figure class="gym">
+  <div class="gym-stage">
+    {% include "_court_art.html" %}
   </div>
-  <form class="stack" method="post" action="{{ url_for('create_team') }}">
-    <h2>新建球队</h2>
-    <label for="name">队名</label>
-    <input id="name" name="name" required placeholder="例如：女排、U16">
-    <label for="notes">备注</label>
-    <textarea id="notes" name="notes" placeholder="这支队自己的赛制，先写在这里。"></textarea>
-    <div class="checks">
-      <label><input type="radio" name="preset" value="blank" checked> 空白规则。不预填禁止后排进攻、无自由人或固定换人。</label>
-      <label><input type="radio" name="preset" value="local_special"> 只套用男排那一组规则开关，不复制名单。</label>
+  <figcaption>两名主攻站两边，副攻在中间，接应错位，二传组织，自由人留在后排。这些是角色，不是轮次。</figcaption>
+</figure>
+<section class="starts">
+  {% for match in live_matches %}
+    <div class="continue-row">
+      <a class="go" href="{{ url_for('live', match_id=match.id) }}">继续 · {{ match.team_name }} · 第{{ match.set_index }}局 {{ match.score_us }}–{{ match.score_them }}</a>
+      <form method="post" action="{{ url_for('delete_match', match_id=match.id) }}" onsubmit="return confirm('删掉这场还没结束的记录？不能恢复。');">
+        <input type="hidden" name="confirm" value="1">
+        <input type="hidden" name="next" value="home">
+        <button class="warn" type="submit">删除这场</button>
+      </form>
     </div>
+  {% endfor %}
+</section>
+{% for plan in plans if plan.team_id == mens_id %}
+  {% include "_roster.html" %}
+{% endfor %}
+{% for plan in plans if plan.team_id != mens_id %}
+  <details class="fold" open>
+    <summary>{{ plan.name }} · {{ plan.players|length }} 人</summary>
+    {% include "_roster.html" %}
+  </details>
+{% endfor %}
+
+<details class="fold">
+  <summary>新的一队</summary>
+  <form class="stack paste" method="post" action="{{ url_for('create_team') }}">
+    <label for="name">队名</label>
+    <input id="name" name="name" required placeholder="例如：女排">
+    <label for="names">名字，空格分开。位置先记成待定，保存前可以改。</label>
+    <input id="names" name="names" placeholder="例如：Isa Eric Sky">
     <button type="submit">建立球队</button>
   </form>
-</section>
+</details>
+
+<details class="fold">
+  <summary>球队设置</summary>
+  <section class="home-grid">
+    <div>
+      {% for team in teams %}
+        <a class="team-card" href="{{ url_for('team_page', team_id=team.id) }}">
+          <strong>{{ team.name }}</strong>
+          <span class="muted">{{ team.notes }}</span>
+        </a>
+      {% endfor %}
+      <p class="colophon">现在方案里写清名单的是男排。另外的小队各自新建。规则、配对和比赛都分开，不会把男排的六二或特殊换人复制过去。女排和其他队的名单另存，不套用这份。</p>
+    </div>
+  </section>
+</details>
 {% endblock %}

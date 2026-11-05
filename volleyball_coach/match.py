@@ -35,7 +35,12 @@ def refresh(plan: TeamPlan, state: MatchState) -> MatchState:
     state.occupants = occupants
     state.structural = structural
     state.conflicts = structural + tactical
-    state.trusted = not structural
+    if state.lineup_required:
+        state.trusted = not structural
+    else:
+        state.structural = []
+        state.conflicts = []
+        state.trusted = True
     return state
 
 
@@ -48,6 +53,7 @@ def start_set(
     mode: str,
     set_index: int = 1,
     overrides: dict[str, str] | None = None,
+    require_lineup: bool = True,
 ) -> MatchState:
     if serving not in ("us", "them"):
         raise MatchError("发球方只能是我方或对方。")
@@ -66,9 +72,10 @@ def start_set(
         mode=mode,
         locked_pairs=set(locked_pairs),
         sub_count=0,
+        lineup_required=require_lineup,
     )
     refresh(plan, state)
-    if state.structural:
+    if require_lineup and state.structural:
         raise MatchError(state.structural[0])
     return state
 
@@ -236,6 +243,7 @@ def replay(plan: TeamPlan, events: list[dict], locked_pairs: set[frozenset[str]]
                 mode=payload.get("mode") or mode,
                 set_index=int(payload.get("set_index") or 1),
                 overrides=payload.get("overrides") or {},
+                require_lineup=payload.get("require_lineup", True),
             )
             continue
         if state is None:

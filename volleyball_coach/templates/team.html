@@ -7,50 +7,18 @@
 </p>
 <h1>{{ plan.name }}</h1>
 <p class="lede">{{ plan.notes }}</p>
+<p class="lede">记球按普通排球。后排可以进攻，不锁固定配对，也不拦自由人。名单和场上六人分开，不排首发也能开始记。</p>
 {% if plan.board_note %}<p>{{ plan.board_note }}</p>{% endif %}
+<details class="fold">
+  <summary>可选：只有跟踪轮次才要排首发</summary>
+  {% set next_page = "team" %}
+  {% include "_starters.html" %}
+</details>
 
-<form class="stack" method="post" action="{{ url_for('save_rules', team_id=plan.team_id) }}">
-  <h2>规则</h2>
-  <div class="checks">
-    <label><input type="checkbox" name="no_back_row_attack" {% if plan.rules.no_back_row_attack %}checked{% endif %}> 禁止后排进攻</label>
-    <label><input type="checkbox" name="no_libero" {% if plan.rules.no_libero %}checked{% endif %}> 无自由人</label>
-    <label><input type="checkbox" name="fixed_pair_subs" {% if plan.rules.fixed_pair_subs %}checked{% endif %}> 固定一对一换人，禁止交叉替换</label>
-    <label><input type="checkbox" name="unlimited_subs" {% if plan.rules.unlimited_subs %}checked{% endif %}> 无限往返。勾上以后，不使用下面的次数上限。</label>
-    <label><input type="checkbox" name="overlap_confirmed" {% if plan.rules.overlap_confirmed %}checked{% endif %}> 重叠规则已经在现场确认。没勾之前，卡片不画站位坐标。</label>
-    <label><input type="checkbox" name="timeouts_known" {% if plan.rules.timeouts_known %}checked{% endif %}> 暂停次数和时长已经录入。没勾之前，软件不显示剩余暂停。</label>
-  </div>
-  <div class="split">
-    <div>
-      <label for="max_subs">换人上限（每次换入或换回都算一次）</label>
-      <input id="max_subs" name="max_subs" value="{{ plan.rules.max_subs if plan.rules.max_subs is not none else '' }}" placeholder="留空表示先不拦截">
-    </div>
-    <div>
-      <label for="pair_lock_scope">配对锁定范围</label>
-      <select id="pair_lock_scope" name="pair_lock_scope">
-        <option value="match" {% if plan.rules.pair_lock_scope == 'match' %}selected{% endif %}>整场锁定</option>
-        <option value="set" {% if plan.rules.pair_lock_scope == 'set' %}selected{% endif %}>每一局可以重设</option>
-      </select>
-    </div>
-  </div>
-  <div class="split">
-    <div>
-      <label for="call_in">到位口令</label>
-      <input id="call_in" name="call_in" value="{{ plan.calls.in_system }}">
-    </div>
-    <div>
-      <label for="call_half">半到位口令</label>
-      <input id="call_half" name="call_half" value="{{ plan.calls.half }}">
-    </div>
-  </div>
-  <label for="call_out">不到位口令</label>
-  <input id="call_out" name="call_out" value="{{ plan.calls.out }}">
-  <label for="notes">队伍备注</label>
-  <textarea id="notes" name="notes">{{ plan.notes }}</textarea>
-  <button type="submit">保存规则</button>
-</form>
-
-<h2>名单</h2>
-<p class="muted">能力只记录你确认过的观察。位置不会被用来推断谁更强。私人备注留在这台机器上。</p>
+{% set delete_next = "team" %}
+{% include "_roster.html" %}
+<h2>名单细节</h2>
+<p class="muted">号码、首发槽和接发习惯在这里。位置本身不决定站几号位。</p>
 {% for player in plan.players.values() %}
   <details>
     <summary>{{ player.name }}{% if player.jersey %} · {{ player.jersey }}{% endif %}{% if player.base_slot %} · 首发槽 {{ player.base_slot }}{% else %} · 替补{% endif %}</summary>
@@ -60,7 +28,13 @@
     </form>
     <ul class="list">
       {% for item in abilities.get(player.id, []) %}
-        <li>{{ item.skill }}：{{ item.label | ability }}</li>
+        <li class="with-delete">
+          <span>{{ item.skill }}：{{ item.label | ability }}</span>
+          <form method="post" action="{{ url_for('delete_ability', team_id=plan.team_id, ability_id=item.id) }}" onsubmit="return confirm('删掉这条观察？');">
+            <input type="hidden" name="confirm" value="1">
+            <button class="warn" type="submit">删除</button>
+          </form>
+        </li>
       {% else %}
         <li>还没有能力记录。</li>
       {% endfor %}
@@ -178,7 +152,13 @@
           <td>{{ match.created_at }}</td>
           <td>{{ match.opponent or "未填对手" }}</td>
           <td>{{ "进行中" if match.status == "live" else "已结束" }} · {{ "轻记录" if match.mode == "light" else "预案" }}</td>
-          <td><a href="{{ url_for('live', match_id=match.id) }}">进入</a></td>
+          <td class="with-delete">
+            <a href="{{ url_for('live', match_id=match.id) }}">进入</a>
+            <form method="post" action="{{ url_for('delete_match', match_id=match.id) }}" onsubmit="return confirm('删掉这场记录？不能恢复。');">
+              <input type="hidden" name="confirm" value="1">
+              <button class="warn" type="submit">删除这场</button>
+            </form>
+          </td>
         </tr>
       {% endfor %}
     </table>
