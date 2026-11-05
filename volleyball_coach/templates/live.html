@@ -10,14 +10,13 @@
   <input type="hidden" name="start" value="{{ start }}">
   {% if repair_id %}<input type="hidden" name="rally_id" value="{{ repair_id }}">{% endif %}
   <input type="hidden" name="token" value="{{ new_token('t') }}">
-  <button class="cell" type="submit" aria-label="{{ who }} {{ word }}">{{ word }}</button>
+  <button class="cell cell-{{ kind }}-{{ value }}" type="submit" aria-label="{{ who }} {{ word }}">{{ word }}</button>
 </form>
 {% endmacro %}
 
 <header class="bar">
   <div class="bar-score">
     <p class="nums"><b class="score-us">{{ state.score_us }}</b><span>–</span><b class="score-them">{{ state.score_them }}</b></p>
-    <span class="serve-label">{{ serve_label }}</span>
   </div>
   <div class="bar-actions">
     {% if view == 'stats' %}
@@ -27,18 +26,20 @@
     {% endif %}
     <details class="bar-menu">
       <summary>菜单</summary>
-      <a href="{{ url_for('home') }}">首页</a>
-      <a href="{{ url_for('summary_page', match_id=match.id) }}">汇总 PDF</a>
-      <a href="{{ url_for('review', match_id=match.id) }}">补记</a>
-      <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
-        <input type="hidden" name="tap" value="undo_touch">
-        <input type="hidden" name="token" value="{{ new_token('t') }}">
-        <button class="texty" type="submit">撤销上一笔</button>
-      </form>
+      <div class="menu-panel">
+        <a href="{{ url_for('home') }}">首页</a>
+        <a href="{{ url_for('summary_page', match_id=match.id) }}">汇总 PDF</a>
+        <a href="{{ url_for('review', match_id=match.id) }}">补记</a>
+        <form method="post" action="{{ url_for('post_quick', match_id=match.id) }}">
+          <input type="hidden" name="tap" value="undo_touch">
+          <input type="hidden" name="token" value="{{ new_token('t') }}">
+          <button class="texty" type="submit">撤销上一笔</button>
+        </form>
+      </div>
     </details>
   </div>
+  <p class="set-line"><span class="serve-label">{{ serve_label }}</span> · 第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}{% if tracking %} · <span class="pill">R{{ state.rotation }}</span> · 对方轮次：未知{% endif %}</p>
 </header>
-<p class="set-line">第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}{% if tracking %} · <span class="pill">R{{ state.rotation }}</span> · 对方轮次：未知{% endif %}</p>
 
 <div class="pad">
   <details class="court-pick" {% if request.args.get('court') %}open{% endif %}>
