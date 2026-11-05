@@ -1,0 +1,152 @@
+{% if art == "net" %}
+<svg class="net-svg" viewBox="0 0 720 168" aria-hidden="true">
+  <defs>
+    <clipPath id="net-clip">
+      <rect x="36" y="36" width="648" height="78"/>
+    </clipPath>
+  </defs>
+  <rect x="0" y="118" width="720" height="50" fill="#1e4d86"/>
+  <rect x="0" y="118" width="720" height="3" fill="#f7f4ee"/>
+  <line x1="360" y1="118" x2="360" y2="168" stroke="#f7f4ee" stroke-width="2.4"/>
+  <line x1="150" y1="118" x2="150" y2="168" stroke="#f7f4ee" stroke-width="1.8"/>
+  <line x1="570" y1="118" x2="570" y2="168" stroke="#f7f4ee" stroke-width="1.8"/>
+  <line x1="36" y1="14" x2="36" y2="156" stroke="#2a241c" stroke-width="8" stroke-linecap="round"/>
+  <line x1="684" y1="14" x2="684" y2="156" stroke="#2a241c" stroke-width="8" stroke-linecap="round"/>
+  <rect x="36" y="36" width="648" height="78" fill="#e6dfd0"/>
+  <g clip-path="url(#net-clip)" stroke="#2a261f" stroke-width="2.6" fill="none">
+    {% for i in range(-4, 42) %}
+    <line x1="{{ 20 + i * 18 }}" y1="36" x2="{{ 98 + i * 18 }}" y2="114"/>
+    <line x1="{{ 20 + i * 18 }}" y1="114" x2="{{ 98 + i * 18 }}" y2="36"/>
+    {% endfor %}
+  </g>
+  <rect x="36" y="36" width="648" height="7" fill="#f7f4ee"/>
+  <rect x="36" y="107" width="648" height="7" fill="#1a1f2b"/>
+  <rect x="36" y="36" width="648" height="78" fill="none" stroke="#1a1f2b" stroke-width="1.4"/>
+  <g>
+    <rect x="92" y="16" width="5" height="10" fill="#e24b3b"/>
+    <rect x="92" y="26" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="92" y="36" width="5" height="10" fill="#e24b3b"/>
+    <rect x="92" y="46" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="92" y="56" width="5" height="10" fill="#e24b3b"/>
+    <rect x="92" y="66" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="92" y="76" width="5" height="10" fill="#e24b3b"/>
+    <rect x="92" y="86" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="92" y="96" width="5" height="10" fill="#e24b3b"/>
+    <rect x="92" y="106" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="92" y="116" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="16" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="26" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="623" y="36" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="46" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="623" y="56" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="66" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="623" y="76" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="86" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="623" y="96" width="5" height="10" fill="#e24b3b"/>
+    <rect x="623" y="106" width="5" height="10" fill="#f7f4ee"/>
+    <rect x="623" y="116" width="5" height="10" fill="#e24b3b"/>
+  </g>
+  <g transform="translate(470 104)">
+    <ellipse cx="2" cy="20" rx="22" ry="4" fill="#14325c"/>
+    <circle r="22" fill="#f3e6c4" stroke="#1a1f2b" stroke-width="1.3"/>
+    <path d="M0 -22 C-7 -6 -7 6 0 22 M-19 -11 C-5 -5 6 7 19 14 M-19 11 C-4 4 7 -7 19 -14" fill="none" stroke="#1a1f2b" stroke-width="1.25"/>
+  </g>
+</svg>
+{% else %}
+<svg class="court-svg" viewBox="0 0 360 640" role="img" aria-label="排球场，近端是我方">
+  <defs>
+    <clipPath id="court-net-clip">
+      <rect x="18" y="300" width="324" height="22"/>
+    </clipPath>
+    <radialGradient id="ball-shade" cx="36%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="0.55" stop-color="#f3e2b0"/>
+      <stop offset="1" stop-color="#d7c08a"/>
+    </radialGradient>
+  </defs>
+  <rect width="360" height="640" rx="22" fill="#efe8dc"/>
+  <rect x="40" y="36" width="280" height="548" fill="#1e4d86"/>
+  <g fill="none" stroke="#f7f4ee" stroke-width="2.6">
+    <rect x="40" y="36" width="280" height="548"/>
+    <line x1="40" y1="310" x2="320" y2="310"/>
+    <line x1="40" y1="214" x2="320" y2="214"/>
+    <line x1="40" y1="406" x2="320" y2="406"/>
+  </g>
+  <g stroke="#f7f4ee" stroke-width="2.2">
+    <line x1="78" y1="584" x2="78" y2="608"/>
+    <line x1="282" y1="584" x2="282" y2="608"/>
+    <line x1="78" y1="12" x2="78" y2="36"/>
+    <line x1="282" y1="12" x2="282" y2="36"/>
+  </g>
+  <line x1="18" y1="292" x2="18" y2="340" stroke="#2a241c" stroke-width="7" stroke-linecap="round"/>
+  <line x1="342" y1="292" x2="342" y2="340" stroke="#2a241c" stroke-width="7" stroke-linecap="round"/>
+  <rect x="18" y="300" width="324" height="22" fill="#e6dfd0"/>
+  <g clip-path="url(#court-net-clip)" stroke="#2a261f" stroke-width="1.15" fill="none">
+    {% for i in range(-2, 28) %}
+    <line x1="{{ 10 + i * 12 }}" y1="300" x2="{{ 32 + i * 12 }}" y2="322"/>
+    <line x1="{{ 10 + i * 12 }}" y1="322" x2="{{ 32 + i * 12 }}" y2="300"/>
+    {% endfor %}
+  </g>
+  <rect x="18" y="300" width="324" height="3.2" fill="#f7f4ee"/>
+  <rect x="18" y="318.5" width="324" height="3.4" fill="#1a1f2b"/>
+  <g>
+    <rect x="40" y="286" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="40" y="292" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="40" y="298" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="40" y="304" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="40" y="310" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="40" y="316" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="40" y="322" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="40" y="328" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="317.6" y="286" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="317.6" y="292" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="317.6" y="298" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="317.6" y="304" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="317.6" y="310" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="317.6" y="316" width="2.4" height="6" fill="#f7f4ee"/>
+    <rect x="317.6" y="322" width="2.4" height="6" fill="#e24b3b"/>
+    <rect x="317.6" y="328" width="2.4" height="6" fill="#f7f4ee"/>
+  </g>
+  <g fill="#f7f4ee">
+    <circle cx="100" cy="168" r="4.5"/>
+    <circle cx="180" cy="150" r="4.5"/>
+    <circle cx="260" cy="168" r="4.5"/>
+    <circle cx="110" cy="250" r="4.5"/>
+    <circle cx="180" cy="258" r="4.5"/>
+    <circle cx="250" cy="250" r="4.5"/>
+  </g>
+  <g font-family="Noto Sans SC, sans-serif" font-size="12" text-anchor="middle">
+    <g transform="translate(92 352)">
+      <rect x="-20" y="-12" width="40" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">主攻</text>
+    </g>
+    <g transform="translate(180 346)">
+      <rect x="-20" y="-12" width="40" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">副攻</text>
+    </g>
+    <g transform="translate(268 352)">
+      <rect x="-20" y="-12" width="40" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">接应</text>
+    </g>
+    <g transform="translate(96 470)">
+      <rect x="-20" y="-12" width="40" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">主攻</text>
+    </g>
+    <g transform="translate(168 528)">
+      <rect x="-26" y="-12" width="52" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">自由人</text>
+    </g>
+    <g transform="translate(250 458)">
+      <rect x="-20" y="-12" width="40" height="22" rx="11" fill="#f7f4ee"/>
+      <text y="4" fill="#1a1f2b">二传</text>
+    </g>
+  </g>
+  <g transform="translate(268 500)">
+    <ellipse cx="2" cy="24" rx="20" ry="5" fill="#14325c" opacity="0.55"/>
+    <circle r="24" fill="url(#ball-shade)" stroke="#1a1f2b" stroke-width="1.25"/>
+    <path d="M0 -24 C-8 -8 -8 8 0 24 M-21 -12 C-6 -6 6 8 21 15 M-21 12 C-4 5 8 -8 21 -15" fill="none" stroke="#1a1f2b" stroke-width="1.2"/>
+  </g>
+  <text x="180" y="92" text-anchor="middle" fill="#f7f4ee" font-family="Noto Sans SC, sans-serif" font-size="13" letter-spacing="8">对方</text>
+  <text x="180" y="582" text-anchor="middle" fill="#f7f4ee" font-family="Noto Sans SC, sans-serif" font-size="13" letter-spacing="8">我方</text>
+</svg>
+{% endif %}
