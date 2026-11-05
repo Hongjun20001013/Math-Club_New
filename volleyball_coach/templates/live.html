@@ -20,7 +20,7 @@
   </div>
   <div class="bar-actions">
     {% if view == 'stats' %}
-      <a class="bar-main" href="{{ url_for('live', match_id=match.id) }}">返回记球</a>
+      <a class="bar-main" href="{{ url_for('live', match_id=match.id) }}">记球</a>
     {% else %}
       <a class="bar-main" href="{{ url_for('live', match_id=match.id, view='stats', scope=scope) }}">暂停</a>
     {% endif %}
@@ -40,6 +40,7 @@
   </div>
   <p class="set-line"><span class="serve-label">{{ serve_label }}</span> · 第 {{ state.set_index }} 局{% if match.opponent %} · {{ match.opponent }}{% endif %}{% if tracking %} · <span class="pill">R{{ state.rotation }}</span> · 对方轮次：未知{% endif %}</p>
 </header>
+<div class="net-line" aria-hidden="true"><i></i><span>球网</span><i></i></div>
 
 <div class="pad">
   <details class="court-pick" {% if request.args.get('court') %}open{% endif %}>
